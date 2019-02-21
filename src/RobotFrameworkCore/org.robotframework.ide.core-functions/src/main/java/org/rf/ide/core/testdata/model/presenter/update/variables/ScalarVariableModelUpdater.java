@@ -28,9 +28,11 @@ public class ScalarVariableModelUpdater implements IVariableTableElementOperatio
     public void addOrSet(final AVariable dst, final int startIndexForModification, final List<RobotToken> toAdd) {
         final ScalarVariable var = (ScalarVariable) dst;
 
-        int size = toAdd.size();
+        final int size = toAdd.size();
         for (int i = 0; i < size; i++) {
-            var.addValue(toAdd.get(i), startIndexForModification + i);
+            if (!toAdd.get(i).getText().isEmpty()) {
+                var.addValue(toAdd.get(i), startIndexForModification + i);
+            }
         }
     }
 }

@@ -39,7 +39,6 @@ public class CleanVariableValueCommand extends EditorCommand {
         boolean modified = false;
         switch (variable.getType()) {
             case SCALAR:
-            case SCALAR_AS_LIST:
                 final ScalarVariable scalar = (ScalarVariable) variable.getLinkedElement();
                 if (!scalar.getValues().isEmpty()) {
                     modified = true;

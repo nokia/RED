@@ -65,12 +65,7 @@ public class ScalarVariable extends AVariable {
 
     @Override
     public VariableType getType() {
-        if (values.size() >= 2) {
-            this.type = VariableType.SCALAR_AS_LIST;
-        } else {
-            this.type = VariableType.SCALAR;
-        }
-
+        this.type = VariableType.SCALAR;
         return type;
     }
 

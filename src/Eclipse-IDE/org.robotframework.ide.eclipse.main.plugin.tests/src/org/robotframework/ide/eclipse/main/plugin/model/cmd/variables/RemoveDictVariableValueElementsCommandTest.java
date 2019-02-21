@@ -31,7 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 public class RemoveDictVariableValueElementsCommandTest {
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToRemoveElementsFromScalar() {
+    public void exceptionIsThrown_whenTryingToRemoveElementsFromScalar_1() {
         final RobotVariable variable = createVariables().get(0);
 
         final RemoveDictVariableValueElementsCommand command = new RemoveDictVariableValueElementsCommand(variable,
@@ -40,7 +40,7 @@ public class RemoveDictVariableValueElementsCommandTest {
     }
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToRemoveElementsFromScalarAsList() {
+    public void exceptionIsThrown_whenTryingToRemoveElementsFromScalar_2() {
         final RobotVariable variable = createVariables().get(1);
 
         final RemoveDictVariableValueElementsCommand command = new RemoveDictVariableValueElementsCommand(variable,
@@ -128,8 +128,8 @@ public class RemoveDictVariableValueElementsCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

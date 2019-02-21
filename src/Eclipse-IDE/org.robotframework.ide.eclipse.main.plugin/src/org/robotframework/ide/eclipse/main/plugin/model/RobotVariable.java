@@ -89,13 +89,13 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         if (getType() == VariableType.SCALAR) {
             final ScalarVariable variable = (ScalarVariable) holder;
             final List<RobotToken> values = variable.getValues();
-            return values.isEmpty() ? "" : values.get(0).getText();
-
-        } else if (getType() == VariableType.SCALAR_AS_LIST) {
-            final ScalarVariable variable = (ScalarVariable) holder;
-            final List<RobotToken> values = variable.getValues();
-
-            return values.stream().map(RobotToken::getText).collect(joining(", ", "[", "]"));
+            if (values.isEmpty()) {
+                return "";
+            } else if (values.size() == 1) {
+                return values.get(0).getText();
+            } else {
+                return values.stream().map(RobotToken::getText).collect(joining(", ", "[", "]"));
+            }
 
         } else if (getType() == VariableType.LIST) {
             final ListVariable variable = (ListVariable) holder;
@@ -125,8 +125,6 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     public ImageDescriptor getImage() {
         switch (getType()) {
             case SCALAR:
-                return RedImages.getRobotScalarVariableImage();
-            case SCALAR_AS_LIST:
                 return RedImages.getRobotScalarVariableImage();
             case LIST:
                 return RedImages.getRobotListVariableImage();

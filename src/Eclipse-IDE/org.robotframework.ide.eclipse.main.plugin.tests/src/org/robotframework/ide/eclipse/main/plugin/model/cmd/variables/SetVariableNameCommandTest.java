@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 public class SetVariableNameCommandTest {
 
     @Test
-    public void nameIsProperlyChangedFromScalarToScalar() {
+    public void nameIsProperlyChangedFromScalarToScalar_1() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(0);
@@ -46,7 +46,27 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromScalarToList() {
+    public void nameIsProperlyChangedFromScalarToScalar_2() {
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+
+        final RobotVariable variable = createVariables().get(1);
+
+        final SetVariableNameCommand command = ContextInjector.prepareContext().inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
+        command.execute();
+
+        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
+        verifyNoMoreInteractions(eventBroker);
+
+        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variable.getName()).isEqualTo("other_scalar");
+        assertThat(variable.getValue()).isEqualTo("[0, 1, 2]");
+        assertThat(variable.getComment()).isEqualTo("# comment 2");
+    }
+
+
+    @Test
+    public void nameIsProperlyChangedFromScalarToList_1() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(0);
@@ -67,7 +87,27 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromScalarToDictionary() {
+    public void nameIsProperlyChangedFromScalarToList_2() {
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+
+        final RobotVariable variable = createVariables().get(1);
+
+        final SetVariableNameCommand command = ContextInjector.prepareContext().inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
+        command.execute();
+
+        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
+        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
+        verifyNoMoreInteractions(eventBroker);
+
+        assertThat(variable.getType()).isEqualTo(VariableType.LIST);
+        assertThat(variable.getName()).isEqualTo("other_list");
+        assertThat(variable.getValue()).isEqualTo("[0, 1, 2]");
+        assertThat(variable.getComment()).isEqualTo("# comment 2");
+    }
+
+    @Test
+    public void nameIsProperlyChangedFromScalarToDictionary_1() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(0);
@@ -88,69 +128,7 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromScalarToInvalid() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
-        final RobotVariable variable = createVariables().get(0);
-
-        final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
-        command.execute();
-
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
-        verifyNoMoreInteractions(eventBroker);
-
-        assertThat(variable.getType()).isEqualTo(VariableType.INVALID);
-        assertThat(variable.getName()).isEqualTo("{other_invalid}");
-        assertThat(variable.getValue()).isEqualTo("[0]");
-        assertThat(variable.getComment()).isEqualTo("# comment 1");
-    }
-
-    @Test
-    public void nameIsProperlyChangedFromScalarAsListToScalarAsList() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
-        final RobotVariable variable = createVariables().get(1);
-
-        final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
-        command.execute();
-
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
-        verifyNoMoreInteractions(eventBroker);
-
-        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR_AS_LIST);
-        assertThat(variable.getName()).isEqualTo("other_scalar_as_list");
-        assertThat(variable.getValue()).isEqualTo("[0, 1, 2]");
-        assertThat(variable.getComment()).isEqualTo("# comment 2");
-    }
-
-    @Test
-    public void nameIsProperlyChangedFromScalarAsListToList() {
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
-        final RobotVariable variable = createVariables().get(1);
-
-        final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
-        command.execute();
-
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
-        verifyNoMoreInteractions(eventBroker);
-
-        assertThat(variable.getType()).isEqualTo(VariableType.LIST);
-        assertThat(variable.getName()).isEqualTo("other_list");
-        assertThat(variable.getValue()).isEqualTo("[0, 1, 2]");
-        assertThat(variable.getComment()).isEqualTo("# comment 2");
-    }
-
-    @Test
-    public void nameIsProperlyChangedFromScalarAsListToDictionary() {
+    public void nameIsProperlyChangedFromScalarToDictionary_2() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(1);
@@ -172,7 +150,28 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromScalarAsListToInvalid() {
+    public void nameIsProperlyChangedFromScalarToInvalid_1() {
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+
+        final RobotVariable variable = createVariables().get(0);
+
+        final SetVariableNameCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
+        command.execute();
+
+        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
+        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
+        verifyNoMoreInteractions(eventBroker);
+
+        assertThat(variable.getType()).isEqualTo(VariableType.INVALID);
+        assertThat(variable.getName()).isEqualTo("{other_invalid}");
+        assertThat(variable.getValue()).isEqualTo("[0]");
+        assertThat(variable.getComment()).isEqualTo("# comment 1");
+    }
+
+    @Test
+    public void nameIsProperlyChangedFromScalarToInvalid_2() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(1);
@@ -194,22 +193,21 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromListToScalarAsList() {
+    public void nameIsProperlyChangedFromListToScalar() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(2);
 
-        final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+        final SetVariableNameCommand command = ContextInjector.prepareContext().inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
         verifyNoMoreInteractions(eventBroker);
 
-        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR_AS_LIST);
-        assertThat(variable.getName()).isEqualTo("other_scalar_as_list");
+        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variable.getName()).isEqualTo("other_scalar");
         assertThat(variable.getValue()).isEqualTo("[1, 2, 3]");
         assertThat(variable.getComment()).isEqualTo("# comment 3");
     }
@@ -279,22 +277,22 @@ public class SetVariableNameCommandTest {
     }
 
     @Test
-    public void nameIsProperlyChangedFromDictionaryToScalarAsList() {
+    public void nameIsProperlyChangedFromDictionaryToScalar() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotVariable variable = createVariables().get(3);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
         verifyNoMoreInteractions(eventBroker);
 
-        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR_AS_LIST);
-        assertThat(variable.getName()).isEqualTo("other_scalar_as_list");
+        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variable.getName()).isEqualTo("other_scalar");
         assertThat(variable.getValue()).isEqualTo("[a=1, b=2, c=3]");
         assertThat(variable.getComment()).isEqualTo("# comment 4");
     }
@@ -371,7 +369,7 @@ public class SetVariableNameCommandTest {
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -379,7 +377,7 @@ public class SetVariableNameCommandTest {
         verifyNoMoreInteractions(eventBroker);
 
         assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
-        assertThat(variable.getName()).isEqualTo("other_scalar_as_list");
+        assertThat(variable.getName()).isEqualTo("other_scalar");
         assertThat(variable.getValue()).isEqualTo("0");
         assertThat(variable.getComment()).isEqualTo("# comment 5");
     }
@@ -464,8 +462,8 @@ public class SetVariableNameCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0  # comment 1")
-                .appendLine("${scalar_as_list}  0  1  2  # comment 2")
+                .appendLine("${scalar1}  0  # comment 1")
+                .appendLine("${scalar2}  0  1  2  # comment 2")
                 .appendLine("@{list}  1  2  3  # comment 3")
                 .appendLine("&{dictionary}  a=1  b=2  c=3  # comment 4")
                 .appendLine("invalid}  0  # comment 5")

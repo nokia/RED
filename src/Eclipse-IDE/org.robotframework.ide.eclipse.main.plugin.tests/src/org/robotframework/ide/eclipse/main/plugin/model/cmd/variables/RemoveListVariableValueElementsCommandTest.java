@@ -33,15 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 public class RemoveListVariableValueElementsCommandTest {
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToRemoveElementsFromScalar() {
-        final RobotVariable variable = createVariables().get(0);
-
-        final RemoveListVariableValueElementsCommand command = new RemoveListVariableValueElementsCommand(variable,
-                newArrayList(new RobotToken()));
-        command.execute();
-    }
-
-    @Test(expected = CommandExecutionException.class)
     public void exceptionIsThrown_whenTryingToRemoveElementsFromDictionary() {
         final RobotVariable variable = createVariables().get(3);
 
@@ -51,25 +42,24 @@ public class RemoveListVariableValueElementsCommandTest {
     }
 
     @Test
-    public void elementIsRemovedFromScalarAsListAndEventBrokerSendsEvent_1() {
+    public void elementIsRemovedFromScalarAndEventBrokerSendsEvent_1() {
         final RobotVariable variable = createVariables().get(1);
 
         final Collection<RobotToken> elementsToRemove = newArrayList(
                 ((ScalarVariable) variable.getLinkedElement()).getValues().subList(0, 1));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
+        final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker)
                 .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
         command.execute();
 
-        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR_AS_LIST);
+        assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
         assertThat(variable.getValue()).isEqualTo("[1, 2]");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 
     @Test
-    public void elementIsRemovedFromScalarAsListAndEventBrokerSendsEvent_2() {
+    public void elementIsRemovedFromScalarAndEventBrokerSendsEvent_2() {
         final RobotVariable variable = createVariables().get(1);
 
         final Collection<RobotToken> elementsToRemove = newArrayList(
@@ -165,8 +155,8 @@ public class RemoveListVariableValueElementsCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2")
                 .appendLine("invalid}  1  2  3")

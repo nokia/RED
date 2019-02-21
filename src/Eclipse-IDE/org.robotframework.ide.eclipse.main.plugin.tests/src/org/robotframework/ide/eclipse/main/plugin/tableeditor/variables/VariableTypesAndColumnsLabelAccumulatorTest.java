@@ -27,7 +27,7 @@ public class VariableTypesAndColumnsLabelAccumulatorTest {
         assertThat(labelStackAt(accumulator, 0, 0))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 0, 1))
-                .contains(VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR_AS_LIST));
+                .contains(VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 0, 2))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
         assertThat(labelStackAt(accumulator, 0, 3))
@@ -39,7 +39,7 @@ public class VariableTypesAndColumnsLabelAccumulatorTest {
         assertThat(labelStackAt(accumulator, 1, 0))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 1, 1))
-                .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR_AS_LIST));
+                .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 1, 2))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         assertThat(labelStackAt(accumulator, 1, 3))
@@ -51,7 +51,7 @@ public class VariableTypesAndColumnsLabelAccumulatorTest {
         assertThat(labelStackAt(accumulator, 2, 0))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 2, 1))
-                .contains(VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.SCALAR_AS_LIST));
+                .contains(VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 2, 2))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.LIST));
         assertThat(labelStackAt(accumulator, 2, 3))
@@ -73,7 +73,7 @@ public class VariableTypesAndColumnsLabelAccumulatorTest {
         return new RobotSuiteFileCreator()
                 .appendLine("*** Variables ***")
                 .appendLine("${scalar}  1")
-                .appendLine("${scalar_as_list}  1  2  3")
+                .appendLine("${scalar_with_few_values}  1  2  3")
                 .appendLine("@{list}  a  b  c")
                 .appendLine("&{dict}  k1=a  k2=b")
                 .appendLine("{invalid}  1  2")

@@ -29,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 public class MoveDictVariableValueElementsCommandTest {
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToMoveElementsInsideScalar() {
+    public void exceptionIsThrown_whenTryingToMoveElementsInsideScalar_1() {
         final RobotVariable variable = createVariables().get(0);
 
         final List<DictionaryKeyValuePair> elements = newArrayList(
@@ -40,7 +40,7 @@ public class MoveDictVariableValueElementsCommandTest {
     }
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToMoveElementsInsideScalarAsList() {
+    public void exceptionIsThrown_whenTryingToMoveElementsInsideScalar_2() {
         final RobotVariable variable = createVariables().get(1);
 
         final List<DictionaryKeyValuePair> elements = newArrayList(
@@ -108,8 +108,8 @@ public class MoveDictVariableValueElementsCommandTest {
 
     private static List<RobotVariable> createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("@{list}  1  2  3")
                 .appendLine("&{dict}  a=1  b=2  c=3  d=4")
                 .appendLine("invalid}  1  2  3")

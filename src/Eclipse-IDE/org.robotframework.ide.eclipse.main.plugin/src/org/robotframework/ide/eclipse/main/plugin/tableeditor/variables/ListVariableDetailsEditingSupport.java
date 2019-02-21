@@ -61,7 +61,7 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
         if (model == null) {
             throw new IllegalStateException("The input for editing support should be taken first");
         }
-        if (model.getType() == VariableType.SCALAR_AS_LIST) {
+        if (model.getType() == VariableType.SCALAR) {
             final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
             return new ArrayList<>(variable.getValues());
 

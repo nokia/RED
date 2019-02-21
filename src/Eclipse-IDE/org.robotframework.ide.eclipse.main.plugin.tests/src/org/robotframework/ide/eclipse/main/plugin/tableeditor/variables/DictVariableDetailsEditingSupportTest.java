@@ -29,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 public class DictVariableDetailsEditingSupportTest {
 
     @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrownWhenTryingToGetInputOfScalar() {
+    public void exceptionIsThrownWhenTryingToGetInputOfScalar_1() {
         final RobotVariablesSection section = createVariables();
 
         final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
@@ -41,7 +41,7 @@ public class DictVariableDetailsEditingSupportTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrownWhenTryingToGetInputOfScalarAsList() {
+    public void exceptionIsThrownWhenTryingToGetInputOfScalar_2() {
         final RobotVariablesSection section = createVariables();
 
         final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
@@ -84,7 +84,7 @@ public class DictVariableDetailsEditingSupportTest {
         final VariablesDataProvider dataProvider = new VariablesDataProvider(commandsStack, section);
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
-        
+
         final List<DictionaryKeyValuePair> input = support.getInput(0, 3);
         assertThat(input).hasSize(3);
         assertThat(input.get(0).getRaw().getText()).isEqualTo("a=1");
@@ -113,7 +113,7 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
         support.getInput(0, 3);
-        
+
         final List<DictionaryKeyValuePair> input = support.getDetailElements();
         assertThat(input).hasSize(3);
         assertThat(input.get(0).getRaw().getText()).isEqualTo("a=1");
@@ -203,8 +203,7 @@ public class DictVariableDetailsEditingSupportTest {
 
     private static RobotVariablesSection createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0  # comment 1")
-                .appendLine("${scalar_as_list}  0  1  2  # comment 2")
+                .appendLine("${scalar1}  0  # comment 1").appendLine("${scalar2}  0  1  2  # comment 2")
                 .appendLine("@{list}  1  2  3  # comment 3")
                 .appendLine("&{dictionary}  a=1  b=2  c=3  # comment 4")
                 .appendLine("invalid}  0  # comment 5")

@@ -38,11 +38,6 @@ public class VariableValuesEditConfigurationTest {
     }
 
     @Test
-    public void thereIsATextCellEditorRegisteredForScalarAsListName() {
-        assertNameColumnValidator(VariableType.SCALAR_AS_LIST);
-    }
-
-    @Test
     public void thereIsATextCellEditorRegisteredForScalarName() {
         assertNameColumnValidator(VariableType.SCALAR);
     }
@@ -68,7 +63,7 @@ public class VariableValuesEditConfigurationTest {
     }
 
     @Test
-    public void thereIsATextCellEditorRegisteredForScalarVariableValues() {
+    public void thereIsADetailCellEditorRegisteredForScalarVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
                 suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
@@ -78,21 +73,6 @@ public class VariableValuesEditConfigurationTest {
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
-        assertThat(editor).isInstanceOf(RedTextCellEditor.class);
-    }
-
-    @Test
-    public void thereIsADetailCellEditorRegisteredForScalarAsListVariableValues() {
-        final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
-        final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
-
-        final IConfigRegistry configRegistry = new ConfigRegistry();
-        config.configureRegistry(configRegistry);
-
-        final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL,
-                VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR_AS_LIST));
         assertThat(editor).isInstanceOf(DetailCellEditor.class);
     }
 

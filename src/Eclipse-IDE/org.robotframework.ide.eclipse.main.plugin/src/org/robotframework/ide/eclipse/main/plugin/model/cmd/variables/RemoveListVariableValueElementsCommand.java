@@ -39,7 +39,7 @@ public class RemoveListVariableValueElementsCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
 
-        if (variable.getType() == VariableType.SCALAR_AS_LIST) {
+        if (variable.getType() == VariableType.SCALAR) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
             for (final RobotToken token : elements) {
                 removedElementsIndexes.add(var.getValues().indexOf(token));

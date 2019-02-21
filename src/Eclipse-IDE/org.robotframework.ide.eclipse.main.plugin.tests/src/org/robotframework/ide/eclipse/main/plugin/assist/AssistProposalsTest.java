@@ -401,11 +401,6 @@ public class AssistProposalsTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void cannotCreateNewScalarAsListProposalProperties() {
-        AssistProposals.createNewVariableProposal(VariableType.SCALAR_AS_LIST);
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void cannotCreateNewInvalidVariableProposalProperties() {
         AssistProposals.createNewVariableProposal(VariableType.INVALID);
     }

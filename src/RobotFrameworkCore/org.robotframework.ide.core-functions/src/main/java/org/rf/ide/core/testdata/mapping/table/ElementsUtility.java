@@ -255,7 +255,6 @@ public class ElementsUtility {
         for (final RobotToken rt : robotTokens) {
             for (final IRobotTokenType type : rt.getTypes()) {
                 if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
-                        || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
                         || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
                         || type == RobotTokenType.VARIABLES_LIST_DECLARATION
                         || type == RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION) {

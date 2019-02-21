@@ -210,7 +210,7 @@ public class VariableDeclaration extends AContainerOperation {
         } else {
             final String variableNameText = getVariableName().getText();
             final VariableType varType = getRobotType();
-            if (varType == VariableType.SCALAR || varType == VariableType.SCALAR_AS_LIST) {
+            if (varType == VariableType.SCALAR) {
                 if (EXPONENT_NUMBER_PATTERN.matcher(variableNameText).find()) {
                     return VariableDeclarationType.EXPONENT_NUMBER;
                 } else if (COMPUTATION_PATTERN.matcher(variableNameText).find()) {

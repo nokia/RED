@@ -30,9 +30,6 @@ public class CommonVariableHelperTest {
         assertIncorrectVariable(null, RobotTokenType.VARIABLES_SCALAR_DECLARATION);
         assertIncorrectVariable("", RobotTokenType.VARIABLES_SCALAR_DECLARATION);
         assertIncorrectVariable("@{var}", RobotTokenType.VARIABLES_SCALAR_DECLARATION);
-        assertIncorrectVariable(null, RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION);
-        assertIncorrectVariable("", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION);
-        assertIncorrectVariable("@{var}", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION);
         assertIncorrectVariable(null, RobotTokenType.VARIABLES_LIST_DECLARATION);
         assertIncorrectVariable("", RobotTokenType.VARIABLES_LIST_DECLARATION);
         assertIncorrectVariable("${var}", RobotTokenType.VARIABLES_LIST_DECLARATION);
@@ -50,7 +47,6 @@ public class CommonVariableHelperTest {
     @Test
     public void testCorrectVariables() throws Exception {
         assertCorrectVariable("${var}", RobotTokenType.VARIABLES_SCALAR_DECLARATION);
-        assertCorrectVariable("${var}", RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION);
         assertCorrectVariable("@{var}", RobotTokenType.VARIABLES_LIST_DECLARATION);
         assertCorrectVariable("&{var}", RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
         assertCorrectVariable("${var}", RobotTokenType.VARIABLE_USAGE);

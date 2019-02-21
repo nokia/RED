@@ -29,18 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 public class ListVariableDetailsEditingSupportTest {
 
     @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrownWhenTryingToGetInputOfScalar() {
-        final RobotVariablesSection section = createVariables();
-
-        final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
-        final VariablesDataProvider dataProvider = new VariablesDataProvider(commandsStack, section);
-        final ListVariableDetailsEditingSupport support = new ListVariableDetailsEditingSupport(mock(TableTheme.class),
-                dataProvider, commandsStack);
-
-        support.getInput(0, 0);
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void exceptionIsThrownWhenTryingToGetInputOfDictionary() {
         final RobotVariablesSection section = createVariables();
 
@@ -53,7 +41,7 @@ public class ListVariableDetailsEditingSupportTest {
     }
 
     @Test
-    public void theInputIsListOfTokens_whenScalarAsListIsGiven() {
+    public void theInputIsListOfTokens_whenScalarIsGiven() {
         final RobotVariablesSection section = createVariables();
 
         final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
@@ -209,8 +197,8 @@ public class ListVariableDetailsEditingSupportTest {
 
     private static RobotVariablesSection createVariables() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0  # comment 1")
-                .appendLine("${scalar_as_list}  0  1  2  # comment 2")
+                .appendLine("${scalar1}  0  # comment 1")
+                .appendLine("${scalar2}  0  1  2  # comment 2")
                 .appendLine("@{list}  1  2  3  # comment 3")
                 .appendLine("&{dictionary}  a=1  b=2  c=3  # comment 4")
                 .appendLine("invalid}  0  # comment 5")

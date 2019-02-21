@@ -76,8 +76,8 @@ public class DeleteSectionCommandTest {
 
     private static RobotSuiteFile createModel() {
         return new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar1}  0")
+                .appendLine("${scalar2}  0  1  2")
                 .appendLine("*** Settings ***")
                 .appendLine("Library  foo")
                 .appendLine("Library  bar")

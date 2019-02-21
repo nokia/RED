@@ -25,27 +25,20 @@ public class SetScalarValueCommandTest {
 
     @Test(expected = CommandExecutionException.class)
     public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_1() {
-        final RobotVariable variable = createVariablesForTest().get(2);
-
-        new SetScalarValueCommand(variable, "42").execute();
-    }
-
-    @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_2() {
         final RobotVariable variable = createVariablesForTest().get(3);
 
         new SetScalarValueCommand(variable, "42").execute();
     }
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_3() {
+    public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_2() {
         final RobotVariable variable = createVariablesForTest().get(4);
 
         new SetScalarValueCommand(variable, "42").execute();
     }
 
     @Test(expected = CommandExecutionException.class)
-    public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_4() {
+    public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_3() {
         final RobotVariable variable = createVariablesForTest().get(5);
 
         new SetScalarValueCommand(variable, "42").execute();
@@ -80,7 +73,7 @@ public class SetScalarValueCommandTest {
     }
 
     @Test
-    public void valueIsChangedToEmptyAndEventIsPosted_whenNullIsGiven() {
+    public void valueIsNotChangedAndEventIsPosted_whenNullIsGiven() {
         final RobotVariable variable = createVariablesForTest().get(1);
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
@@ -89,7 +82,7 @@ public class SetScalarValueCommandTest {
                 .isInjectedInto(new SetScalarValueCommand(variable, null));
         command.execute();
 
-        assertThat(variable.getValue()).isEqualTo("");
+        assertThat(variable.getValue()).isEqualTo("0");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 
@@ -97,7 +90,7 @@ public class SetScalarValueCommandTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
                 .appendLine("${scalar1}")
                 .appendLine("${scalar2}  0")
-                .appendLine("${scalar_as_list}  0  1  2")
+                .appendLine("${scalar3}  0  1  2")
                 .appendLine("@{list}  1  2  3 ")
                 .appendLine("&{dictionary}  a=1  b=2  c=3")
                 .appendLine("invalid}  0")
