@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
@@ -161,7 +162,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             @Override
             public void whenFileMarkerChanged() {
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED,
-                        editorInput.getProjectConfiguration()));
+                        new RedProjectConfigEventData<>(editorInput.getFile(), editorInput.getProjectConfiguration())));
             }
         });
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
@@ -202,7 +203,6 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private void setupEnvironmentLoadingJob() {
-        final RobotProject project = editorInput.getRobotProject();
         final String activeEnv = "activeEnv";
         final String allEnvs = "allEnvs";
 
@@ -211,8 +211,9 @@ public class RedProjectEditor extends MultiPageEditorPart {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED,
-                        editorInput.getProjectConfiguration()));
+                        new RedProjectConfigEventData<>(editorInput.getFile(), editorInput.getProjectConfiguration())));
 
+                final RobotProject project = editorInput.getRobotProject();
                 final IRuntimeEnvironment activeEnvironment = project == null ? new NullRuntimeEnvironment()
                         : project.getRuntimeEnvironment();
                 if (monitor.isCanceled()) {
@@ -239,7 +240,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
                         .getProperty(createKey(allEnvs));
 
                 SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED,
-                        new Environments(allEnvironments, env)));
+                        new RedProjectConfigEventData<>(editorInput.getFile(),
+                                new Environments(allEnvironments, env))));
             }
         });
         envLoadingJob.schedule();

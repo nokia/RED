@@ -343,8 +343,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenMarkerChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
         }
     }
@@ -352,27 +352,30 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        viewer.getTree().setEnabled(false);
-        excludeFilesBtn.setEnabled(false);
-        excludeFilesTxt.setEnabled(false);
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTree().setEnabled(false);
+            excludeFilesBtn.setEnabled(false);
+            excludeFilesTxt.setEnabled(false);
+        }
     }
 
     @Inject
     @Optional
     private void whenEnvironmentsWereLoaded(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        viewer.getTree().setEnabled(editorInput.isEditable());
-        excludeFilesBtn.setEnabled(editorInput.isEditable());
-        excludeFilesTxt.setEnabled(excludeFilesBtn.getSelection() && editorInput.isEditable());
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTree().setEnabled(editorInput.isEditable());
+            excludeFilesBtn.setEnabled(editorInput.isEditable());
+            excludeFilesTxt.setEnabled(excludeFilesBtn.getSelection() && editorInput.isEditable());
+        }
     }
 
     @Inject
     @Optional
     private void whenExclusionListChanged(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED) final RedProjectConfigEventData<Collection<IPath>> eventData) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             setInput();
             refreshDecorators();

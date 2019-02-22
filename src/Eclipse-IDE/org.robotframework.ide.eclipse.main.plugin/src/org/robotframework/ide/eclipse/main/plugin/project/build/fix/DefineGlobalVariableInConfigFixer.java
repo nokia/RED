@@ -19,6 +19,7 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingDialog;
@@ -93,7 +94,9 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
 
         @Override
         protected void fireEvents() {
-            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED, changedMappings);
+            final RedProjectConfigEventData<List<VariableMapping>> eventData = new RedProjectConfigEventData<>(
+                    externalFile, changedMappings);
+            eventBroker.post(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED, eventData);
         }
 
         @Override

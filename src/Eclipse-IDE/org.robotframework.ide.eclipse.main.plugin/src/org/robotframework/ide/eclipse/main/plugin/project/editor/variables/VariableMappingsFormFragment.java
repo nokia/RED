@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -34,6 +37,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -120,20 +124,29 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final Supplier<VariableMapping> elementsCreator = newElementsCreator();
+
+        final Consumer<VariableMapping> nameEditingSuccessHandler = mapping -> eventBroker.send(
+                RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_NAME_CHANGED,
+                new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(150)
                 .withMinWidth(150)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator, eventBroker))
+                .editingSupportedBy(
+                        new VariableMappingNameEditingSupport(viewer, elementsCreator, nameEditingSuccessHandler))
                 .labelsProvidedBy(new VariableMappingsNameLabelProvider())
                 .createFor(viewer);
 
+        final Consumer<VariableMapping> valueEditingSuccessHandler = mapping -> eventBroker.send(
+                RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED,
+                new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
         ViewerColumnsFactory.newColumn("Value")
                 .withWidth(150)
                 .withMinWidth(150)
                 .shouldGrabAllTheSpaceLeft(true)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator, eventBroker))
+                .editingSupportedBy(
+                        new VariableMappingValueEditingSupport(viewer, elementsCreator, valueEditingSuccessHandler))
                 .labelsProvidedBy(new VariableMappingsValueLabelProvider())
                 .createFor(viewer);
     }
@@ -146,7 +159,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
                 final boolean wasAdded = editorInput.getProjectConfiguration().addVariableMapping(mapping);
                 if (wasAdded) {
                     eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
-                            editorInput.getProjectConfiguration().getVariableMappings());
+                            new RedProjectConfigEventData<>(editorInput.getFile(), newArrayList(mapping)));
                 }
                 return mapping;
             }
@@ -186,8 +199,8 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenMarkerChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RobotProjectConfig config) {
-        if (editorInput.getRobotProject() != null && editorInput.getProjectConfiguration() == config) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_MARKER_CHANGED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
         }
     }
@@ -195,23 +208,26 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        viewer.getTable().setEnabled(false);
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RedProjectConfigEventData<RobotProjectConfig> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTable().setEnabled(false);
+        }
     }
 
     @Inject
     @Optional
     private void whenEnvironmentsWereLoaded(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
-        viewer.getTable().setEnabled(editorInput.isEditable());
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            viewer.getTable().setEnabled(editorInput.isEditable());
+        }
     }
 
     @Inject
     @Optional
     private void whenMappingDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_DETAIL_CHANGED) final VariableMapping mapping) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getProjectConfiguration().getVariableMappings().contains(mapping)) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_DETAIL_CHANGED) final RedProjectConfigEventData<VariableMapping> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             viewer.refresh();
         }
@@ -220,9 +236,8 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenMappingsChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final List<VariableMapping> mappings) {
-        if (editorInput.getRobotProject() != null
-                && editorInput.getProjectConfiguration().getVariableMappings() == mappings) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<VariableMapping>> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
             setDirty(true);
             viewer.refresh();

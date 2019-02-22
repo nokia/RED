@@ -61,6 +61,10 @@ public class RedProjectEditorInput {
         return config.getConfigurationModel();
     }
 
+    public IFile getFile() {
+        return file;
+    }
+
     public boolean isEditable() {
         return isEditable;
     }

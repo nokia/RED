@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
+import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteVariableMappingHandler.E4DeleteVariableMappingHandler;
@@ -36,10 +37,11 @@ public class DeleteVariableMappingHandler extends DIParameterizedHandler<E4Delet
         public void deleteMappings(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<VariableMapping> mappings = Selections.getElements(selection, VariableMapping.class);
-            input.getProjectConfiguration().removeVariableMappings(mappings);
-
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
-                    input.getProjectConfiguration().getVariableMappings());
+            final boolean removed = input.getProjectConfiguration().removeVariableMappings(mappings);
+            if (removed) {
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
+                        new RedProjectConfigEventData<>(input.getFile(), mappings));
+            }
         }
     }
 }
