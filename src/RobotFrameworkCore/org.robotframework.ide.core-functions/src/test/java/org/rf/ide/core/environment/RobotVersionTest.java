@@ -8,7 +8,6 @@ package org.rf.ide.core.environment;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotVersion;
 
 public class RobotVersionTest {
 
@@ -198,6 +197,30 @@ public class RobotVersionTest {
         assertThat(RobotVersion.from("1.2.3").isNewerOrEqualTo(RobotVersion.from("1.3.7"))).isFalse();
         assertThat(RobotVersion.from("1.2.3").isNewerOrEqualTo(RobotVersion.from("1.3"))).isFalse();
         assertThat(RobotVersion.from("1.2.3").isNewerOrEqualTo(RobotVersion.from("2.0.1"))).isFalse();
+    }
+
+    @Test
+    public void isDeprecatedTest_whenVersionHasNoPatch() {
+        assertThat(RobotVersion.from("1.2").isDeprecated()).isTrue();
+        assertThat(RobotVersion.from("2.7").isDeprecated()).isTrue();
+        assertThat(RobotVersion.from("2.8").isDeprecated()).isTrue();
+
+        assertThat(RobotVersion.from("2.9").isDeprecated()).isFalse();
+        assertThat(RobotVersion.from("3.0").isDeprecated()).isFalse();
+        assertThat(RobotVersion.from("5.9").isDeprecated()).isFalse();
+
+    }
+
+    @Test
+    public void isDeprecatedTest_whenVersionHasPatch() {
+        assertThat(RobotVersion.from("1.2.3").isDeprecated()).isTrue();
+        assertThat(RobotVersion.from("2.7.2").isDeprecated()).isTrue();
+        assertThat(RobotVersion.from("2.8.9").isDeprecated()).isTrue();
+
+        assertThat(RobotVersion.from("2.9.0").isDeprecated()).isFalse();
+        assertThat(RobotVersion.from("3.0.2").isDeprecated()).isFalse();
+        assertThat(RobotVersion.from("5.9.3").isDeprecated()).isFalse();
+
     }
 
     @Test

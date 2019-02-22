@@ -63,6 +63,15 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     }
 
     @Test
+    public void testGettingForeground_forDeprecatedRobotInstallationWithPythonInstalled() throws Exception {
+        final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
+                "Robot Framework 2.7.2 (Python 3.6.5 on win32)");
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(createViewer());
+        assertThat(labelProvider.getForeground(environment))
+                .isEqualTo(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW));
+    }
+
+    @Test
     public void testGettingForeground_forValidPythonInstallationWithRobotInstalled() throws Exception {
         final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 3.6.5 on win32)");
@@ -124,6 +133,18 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     }
 
     @Test
+    public void testGettingToolTipText_forDeprecatedRobotInstallationWithPythonInstalled() throws Exception {
+        final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
+        when(pythonInstallation.getInterpreter()).thenReturn(SuiteExecutor.Python);
+        when(pythonInstallation.getAbsolutePath()).thenReturn("path");
+        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(pythonInstallation,
+                "Robot Framework 2.7.2 (Python 3.6.5 on win32)");
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
+        assertThat(labelProvider.getToolTipText(environment)).isEqualTo(
+                "Robot Framework installation has deprecated version (2.7.2). RED may be not compatible with it.");
+    }
+
+    @Test
     public void testGettingToolTipText_forValidPythonInstallationWithRobotInstalled() throws Exception {
         final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
         when(pythonInstallation.getInterpreter()).thenReturn(SuiteExecutor.Python);
@@ -156,6 +177,18 @@ public class InstalledRobotsEnvironmentsLabelProviderTest {
     public void testGettingToolTipImage_forDeprecatedPythonInstallationWithRobotInstalled() throws Exception {
         final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.2 (Python 2.6.1 on win32)");
+        final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
+        assertThat(labelProvider.getToolTipImage(environment))
+                .isSameAs(ImagesManager.getImage(RedImages.getTooltipWarnImage()));
+    }
+
+    @Test
+    public void testGettingToolTipImage_forDeprecatedRobotInstallationWithPythonInstallated() throws Exception {
+        final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
+        when(pythonInstallation.getInterpreter()).thenReturn(SuiteExecutor.Python);
+        when(pythonInstallation.getAbsolutePath()).thenReturn("path");
+        final RobotRuntimeEnvironment environment = new RobotRuntimeEnvironment(pythonInstallation,
+                "Robot Framework 2.7.2 (Python 3.6.5 on win32)");
         final InstalledRobotsEnvironmentsLabelProvider labelProvider = createLabelProvider(null);
         assertThat(labelProvider.getToolTipImage(environment))
                 .isSameAs(ImagesManager.getImage(RedImages.getTooltipWarnImage()));

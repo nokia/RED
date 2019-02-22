@@ -97,6 +97,18 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.DEPRECATED_PYTHON_ENVIRONMENT;
         }
+    },
+    ENVIRONMENT_DEPRECATED_ROBOT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Robot Framework installation has deprecated version (%s). RED may not compatible with it.";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_ROBOT_ENVIRONMENT;
+        }
     };
 
     @Override

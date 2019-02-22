@@ -23,8 +23,6 @@ public interface IRuntimeEnvironment {
 
     boolean hasRobotInstalled();
 
-    boolean isCompatibleRobotInstallation();
-
     String getVersion();
 
     RobotVersion getRobotVersion();

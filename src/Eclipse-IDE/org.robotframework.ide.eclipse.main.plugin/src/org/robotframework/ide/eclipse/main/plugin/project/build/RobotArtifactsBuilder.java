@@ -148,7 +148,13 @@ class RobotArtifactsBuilder {
                     .formatMessageWith(runtimeEnvironment.getFile());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
 
-        } else if (!runtimeEnvironment.isCompatibleRobotInstallation()) {
+        } else if (runtimeEnvironment.getRobotVersion().isDeprecated()) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT)
+                    .formatMessageWith(runtimeEnvironment.getRobotVersion().asString());
+            reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+
+        } else if (PythonVersion.from(runtimeEnvironment.getVersion()).isDeprecated()) {
             final RobotProblem problem = RobotProblem
                     .causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_PYTHON)
                     .formatMessageWith(runtimeEnvironment.getFile(),

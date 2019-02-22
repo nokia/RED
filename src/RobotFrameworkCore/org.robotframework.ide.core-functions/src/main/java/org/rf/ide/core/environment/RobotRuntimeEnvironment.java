@@ -66,11 +66,6 @@ public class RobotRuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public boolean isCompatibleRobotInstallation() {
-        return !PythonVersion.from(version).isDeprecated();
-    }
-
-    @Override
     public String getVersion() {
         return version;
     }

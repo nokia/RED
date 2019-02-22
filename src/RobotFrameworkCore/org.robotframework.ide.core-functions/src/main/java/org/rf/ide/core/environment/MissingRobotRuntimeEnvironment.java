@@ -30,11 +30,6 @@ public class MissingRobotRuntimeEnvironment extends RobotRuntimeEnvironment {
     }
 
     @Override
-    public boolean isCompatibleRobotInstallation() {
-        return false;
-    }
-
-    @Override
     public String getVersion() {
         return "<unknown>";
     }
