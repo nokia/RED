@@ -30,6 +30,8 @@ import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrate
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class VariableProposalsProvider implements RedContentProposalProvider {
 
     private final RobotSuiteFile suiteFile;
@@ -86,7 +88,8 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         throw new IllegalStateException("Unrecognized element in table");
     }
 
-    private static class VariableTextModificationStrategy implements ModificationStrategy {
+    @VisibleForTesting
+    static class VariableTextModificationStrategy implements ModificationStrategy {
 
         @Override
         public void insert(final Text text, final IContentProposal proposal) {
@@ -107,11 +110,9 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         }
 
         private String findPrefix(final String content, final String textBeforeSelection) {
-            final String varStart = content.substring(0, 2);
-            for (int i = 2; i <= textBeforeSelection.length(); i++) {
-                final String currentSuffix = textBeforeSelection.substring(textBeforeSelection.length() - i,
-                        textBeforeSelection.length());
-                if (currentSuffix.startsWith(varStart)) {
+            final char varIdentificator = content.charAt(0);
+            for (int i = 1; i <= textBeforeSelection.length(); i++) {
+                if (textBeforeSelection.charAt(textBeforeSelection.length() - i) == varIdentificator) {
                     return textBeforeSelection.substring(0, textBeforeSelection.length() - i);
                 }
             }
