@@ -35,14 +35,6 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
-    public void testRobotInstallationCompatibility() throws Exception {
-        assertThat(new RobotRuntimeEnvironment(null, null, "RF 3.0.2 (Python 2.6.9 on win32)")
-                .isCompatibleRobotInstallation()).isFalse();
-        assertThat(new RobotRuntimeEnvironment(null, null, "RF 3.0.2 (Python 2.7.1 on win32)")
-                .isCompatibleRobotInstallation()).isTrue();
-    }
-
-    @Test
     public void moduleCanonicalPathIsReturned_evenWhenExecutorReturnsLowerCasePath() {
         // this test only makes sense on case-insensitive platforms like windows
         assumeTrue(RedSystemProperties.isWindowsPlatform());

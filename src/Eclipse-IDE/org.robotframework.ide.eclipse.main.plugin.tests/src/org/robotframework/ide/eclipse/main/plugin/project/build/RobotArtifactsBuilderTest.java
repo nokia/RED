@@ -108,6 +108,44 @@ public class RobotArtifactsBuilderTest {
     }
 
     @Test
+    public void deprecatedRobotProblemIsReported_whenPythonInstallationIsNotDeprecated() throws Exception {
+        final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
+        final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
+                "Robot Framework 2.8.2 (Python 2.7.1 on win32)");
+        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
+        final RobotProjectConfig configuration = new RobotProjectConfig();
+
+        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT, new ProblemPosition(1)));
+    }
+
+    @Test
+    public void deprecatedRobotProblemIsReported_whenPythonInstallationIsDeprecated() throws Exception {
+        final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
+        final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
+                "Robot Framework 2.8.2 (Python 2.6.1 on win32)");
+        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
+        final RobotProjectConfig configuration = new RobotProjectConfig();
+
+        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT, new ProblemPosition(1)));
+    }
+
+    @Test
+    public void noProblemsAreReported_whenRobotInstallationIsNotDeprecated() throws Exception {
+        final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
+        final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
+                "Robot Framework 2.9 (Python 2.7.1 on win32)");
+        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
+        final RobotProjectConfig configuration = new RobotProjectConfig();
+
+        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
     public void deprecatedPythonProblemIsReported() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,

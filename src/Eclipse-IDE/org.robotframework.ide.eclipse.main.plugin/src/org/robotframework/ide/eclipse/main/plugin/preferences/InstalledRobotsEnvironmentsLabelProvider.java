@@ -36,7 +36,8 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
         final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_RED);
-        } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
+        } else if (!env.hasRobotInstalled() || PythonVersion.from(env.getVersion()).isDeprecated()
+                || env.getRobotVersion().isDeprecated()) {
             return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW);
         }
         return null;
@@ -61,10 +62,15 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
         if (!env.hasRobotInstalled()) {
             return String.format("Python installation '%s' does not seem to have Robot Framework installed", execPath);
         }
-        if (!env.isCompatibleRobotInstallation()) {
+        if (PythonVersion.from(env.getVersion()).isDeprecated()) {
             return String.format(
                     "Python installation '%s' has deprecated version (%s). RED or Robot Framework may be not compatible with it.",
                     execPath, PythonVersion.from(env.getVersion()).asString());
+        }
+        if (env.getRobotVersion().isDeprecated()) {
+            return String.format(
+                    "Robot Framework installation has deprecated version (%s). RED may be not compatible with it.",
+                    env.getRobotVersion().asString());
         }
         return String.format("Python installation '%s' has %s", execPath, env.getVersion());
     }
@@ -74,7 +80,8 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
         final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
             return ImagesManager.getImage(RedImages.getTooltipProhibitedImage());
-        } else if (!env.hasRobotInstalled() || !env.isCompatibleRobotInstallation()) {
+        } else if (!env.hasRobotInstalled() || PythonVersion.from(env.getVersion()).isDeprecated()
+                || env.getRobotVersion().isDeprecated()) {
             return ImagesManager.getImage(RedImages.getTooltipWarnImage());
         }
         return ImagesManager.getImage(RedImages.getTooltipImage());

@@ -64,6 +64,17 @@ public enum ProblemCategory {
             return Severity.WARNING;
         }
     },
+    DEPRECATED_ROBOT_ENVIRONMENT(
+            ProblemCategoryType.PROJECT_CONFIGURATION,
+            "Deprecated Robot Framework environment",
+            "Occurs when deprecated Robot Framework version is defined.\n"
+                    + "RED may not be compatible with it.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.WARNING;
+        }
+    },
     LIBRARY_SPECIFICATION_FILE(
             ProblemCategoryType.PROJECT_CONFIGURATION,
             "Library documentation file cannot be generated",

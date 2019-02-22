@@ -42,11 +42,6 @@ public class InvalidPythonRuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public boolean isCompatibleRobotInstallation() {
-        return false;
-    }
-
-    @Override
     public String getVersion() {
         return "<unknown>";
     }

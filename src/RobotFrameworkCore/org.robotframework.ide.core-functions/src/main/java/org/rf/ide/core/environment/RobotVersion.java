@@ -86,6 +86,10 @@ public final class RobotVersion implements Comparable<RobotVersion> {
         return isNewerThan(otherVersion) || isEqualTo(otherVersion);
     }
 
+    public boolean isDeprecated() {
+        return isOlderThan(RobotVersion.from("2.9"));
+    }
+
     private boolean isLessPatch(final Optional<Integer> patch1, final Optional<Integer> patch2) {
         if (!patch1.isPresent() && !patch2.isPresent()) {
             return false;
