@@ -114,8 +114,12 @@ class ClassesRetrievingTests(unittest.TestCase):
         module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'relative_import', '__init__.py')
 
         result = get_classes_from_module(module_location)
-
-        self.assertEqual(result, ['relative_import', 'relative_import.non_relative'])
+        
+        import platform
+        if 'Jython' in platform.python_implementation():
+            self.assertEqual(result, ['relative_import', 'relative_import.non_relative'])
+        else:
+            self.assertEqual(result, ['relative_import', 'relative_import.non_relative', 'relative_import.relative', 'relative_import.relative.Relative'])
 
     def test_retrieving_classes_from_python_module_with_init_only(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -163,8 +167,8 @@ class ClassesRetrievingTests(unittest.TestCase):
             self.assertEqual(result, ['mod_outer', 'mod_outer.mod_inner', 'mod_outer.mod_inner.mod_a',
                                       'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
                                       'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
-                                      'mod_outer.mod_inner.mod_a.mod_a', 'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
-                                      'mod_outer.mod_inner.mod_b.ClassB.ClassB', 'mod_outer.mod_inner.mod_b.mod_b'])
+                                      'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
+                                      'mod_outer.mod_inner.mod_b.ClassB.ClassB'])
 
     def test_retrieving_classes_from_nested_python_module_2(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -187,12 +191,12 @@ class ClassesRetrievingTests(unittest.TestCase):
             self.assertEqual(result, ['mod_inner', 'mod_inner.mod_a',
                                       'mod_inner.mod_a.ClassA', 'mod_inner.mod_a.ClassA.ClassA',
                                       'mod_inner.mod_a.OtherClassA', 'mod_inner.mod_a.OtherClassA.OtherClassA',
-                                      'mod_inner.mod_a.mod_a', 'mod_inner.mod_b', 'mod_inner.mod_b.ClassB',
-                                      'mod_inner.mod_b.ClassB.ClassB', 'mod_inner.mod_b.mod_b', 'mod_outer.mod_inner', 'mod_outer.mod_inner.mod_a',
+                                      'mod_inner.mod_b', 'mod_inner.mod_b.ClassB',
+                                      'mod_inner.mod_b.ClassB.ClassB', 'mod_outer.mod_inner', 'mod_outer.mod_inner.mod_a',
                                       'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
                                       'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
-                                      'mod_outer.mod_inner.mod_a.mod_a', 'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
-                                      'mod_outer.mod_inner.mod_b.ClassB.ClassB', 'mod_outer.mod_inner.mod_b.mod_b'])
+                                      'mod_outer.mod_inner.mod_b', 'mod_outer.mod_inner.mod_b.ClassB',
+                                      'mod_outer.mod_inner.mod_b.ClassB.ClassB'])
 
     def test_retrieving_classes_from_nested_python_module_3(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -206,7 +210,16 @@ class ClassesRetrievingTests(unittest.TestCase):
                                   'mod_outer.mod_inner.mod_a', 'mod_outer.mod_inner.mod_a.ClassA', 'mod_outer.mod_inner.mod_a.ClassA.ClassA',
                                   'mod_outer.mod_inner.mod_a.OtherClassA', 'mod_outer.mod_inner.mod_a.OtherClassA.OtherClassA',
                                   'mod_outer.mod_inner.mod_a.mod_a'])
-                
+        
+
+    def test_retrieving_classes_from_module_with_non_module_files(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_red_module_classes', 'module_with_non_module_files', '__init__.py')
+
+        result = get_classes_from_module(module_location)
+
+        self.assertEqual(result, ['module_with_non_module_files', 'module_with_non_module_files.InitClass'])
+
     import sys
     @unittest.skipUnless(sys.version_info >= (3, 0, 0), "requires Python 3")
     def test_retrieving_classes_from_unicode_named_module(self):
