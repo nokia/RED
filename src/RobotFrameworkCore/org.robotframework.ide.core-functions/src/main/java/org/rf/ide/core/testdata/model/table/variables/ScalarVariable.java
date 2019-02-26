@@ -64,12 +64,6 @@ public class ScalarVariable extends AVariable {
     }
 
     @Override
-    public VariableType getType() {
-        this.type = VariableType.SCALAR;
-        return type;
-    }
-
-    @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
