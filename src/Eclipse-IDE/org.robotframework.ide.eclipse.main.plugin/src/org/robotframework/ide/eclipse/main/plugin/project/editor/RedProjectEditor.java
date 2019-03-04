@@ -52,7 +52,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibrariesProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectValidationConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart;
 import org.robotframework.red.swt.SwtThread;
@@ -109,7 +109,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             final IEclipseContext context = prepareContext();
 
             addEditorPart(new GeneralProjectConfigurationEditorPart(), "General", context);
-            addEditorPart(new ReferencedLibrariesProjectConfigurationEditorPart(), "Referenced libraries", context);
+            addEditorPart(new LibrariesProjectConfigurationEditorPart(), "Libraries", context);
             addEditorPart(new VariablesProjectConfigurationEditorPart(), "Variables", context);
             addEditorPart(new ProjectValidationConfigurationEditorPart(), "Validation", context);
 

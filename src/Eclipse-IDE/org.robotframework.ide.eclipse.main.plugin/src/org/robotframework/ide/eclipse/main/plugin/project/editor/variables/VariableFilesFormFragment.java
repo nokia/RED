@@ -53,6 +53,8 @@ class VariableFilesFormFragment implements ISectionFormFragment {
 
     private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.varfiles.context";
 
+    private static final String CONTEXT_MENU_ID = "org.robotframework.ide.eclipse.redxmleditor.varfiles.contextMenu";
+
     @Inject
     private IEditorSite site;
 
@@ -131,13 +133,11 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.redxmleditor.variablefiles.contextMenu";
-
-        final MenuManager manager = new MenuManager("Red.xml file editor variable files context menu", menuId);
+        final MenuManager manager = new MenuManager("Red.xml file editor variable files context menu", CONTEXT_MENU_ID);
         final Table control = viewer.getTable();
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, viewer, false);
+        site.registerContextMenu(CONTEXT_MENU_ID, manager, viewer, false);
     }
 
     private void setInput() {

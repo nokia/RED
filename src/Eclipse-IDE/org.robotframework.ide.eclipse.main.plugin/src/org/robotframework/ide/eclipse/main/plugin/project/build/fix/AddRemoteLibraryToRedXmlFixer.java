@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibrariesProjectConfigurationEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
 
 
@@ -62,7 +62,7 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         @Override
         protected void openDesiredPageInEditor(final RedProjectEditor editor) {
-            editor.openPage(ReferencedLibrariesProjectConfigurationEditorPart.class);
+            editor.openPage(LibrariesProjectConfigurationEditorPart.class);
         }
 
         @Override

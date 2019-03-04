@@ -14,11 +14,11 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
@@ -45,21 +45,16 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
             final StyledString label = new StyledString(lib.getName(), styler);
             label.append(" - " + lib.getPath(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
             return label;
-        } else if (element instanceof RemoteLocation) {
-            final RemoteLocation location = (RemoteLocation) element;
-
-            final Styler styler = editorInput.getProblemsFor(location).isEmpty() ? Stylers.Common.EMPTY_STYLER
-                    : Stylers.Common.ERROR_STYLER;
-            final StyledString label = new StyledString(location.getUri(), styler);
-            label.append(" - Remote", Stylers.Common.ECLIPSE_DECORATION_STYLER);
-            return label;
+        } else {
+            return ((ElementAddingToken) element).getStyledText();
         }
-        return new StyledString();
     }
 
     @Override
     public Image getImage(final Object element) {
-        if (element instanceof ReferencedLibrary) {
+        if (element instanceof ElementAddingToken) {
+            return ((ElementAddingToken) element).getImage();
+        } else if (element instanceof ReferencedLibrary) {
             final ReferencedLibrary library = (ReferencedLibrary) element;
 
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(library);
@@ -78,15 +73,6 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
                     default:
                         return ImagesManager.getImage(RedImages.getLibraryImage());
                 }
-            }
-        } else if (element instanceof RemoteLocation) {
-            final RemoteLocation location = (RemoteLocation) element;
-
-            final List<RedXmlProblem> problems = editorInput.getProblemsFor(location);
-            if (problems.isEmpty()) {
-                return ImagesManager.getImage(RedImages.getRemoteConnectedImage());
-            } else {
-                return ImagesManager.getImage(RedImages.getRemoteDisconnectedImage());
             }
         }
         return null;
@@ -109,11 +95,6 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
                 return ImagesManager.getImage(RedImages.getErrorImage());
             } else if (!problems.isEmpty()) {
                 return ImagesManager.getImage(RedImages.getWarningImage());
-            }
-        } else if (element instanceof RemoteLocation) {
-            final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
-            if (!problems.isEmpty()) {
-                return ImagesManager.getImage(RedImages.getErrorImage());
             }
         }
         return null;

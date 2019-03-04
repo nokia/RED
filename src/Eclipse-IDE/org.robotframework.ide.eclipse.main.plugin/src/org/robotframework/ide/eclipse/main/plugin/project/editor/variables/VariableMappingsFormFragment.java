@@ -5,12 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -26,7 +22,6 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -41,6 +36,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingCreator;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingNameEditingSupport;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariableMappingsDetailsEditingSupport.VariableMappingValueEditingSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
@@ -56,6 +52,8 @@ import org.robotframework.red.viewers.Viewers;
 public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.varmapping.context";
+
+    private static final String CONTEXT_MENU_ID = "org.robotframework.ide.eclipse.redxmleditor.varmapping.contextMenu";
 
     @Inject
     private IEditorSite site;
@@ -123,58 +121,36 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final Supplier<VariableMapping> elementsCreator = newElementsCreator();
+        final VariableMappingCreator elementsCreator = new VariableMappingCreator(viewer.getTable().getShell(),
+                editorInput, eventBroker);
 
-        final Consumer<VariableMapping> nameEditingSuccessHandler = mapping -> eventBroker.send(
-                RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_NAME_CHANGED,
-                new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(150)
                 .withMinWidth(150)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(
-                        new VariableMappingNameEditingSupport(viewer, elementsCreator, nameEditingSuccessHandler))
+                        new VariableMappingNameEditingSupport(viewer, elementsCreator, editorInput, eventBroker))
                 .labelsProvidedBy(new VariableMappingsNameLabelProvider())
                 .createFor(viewer);
 
-        final Consumer<VariableMapping> valueEditingSuccessHandler = mapping -> eventBroker.send(
-                RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED,
-                new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
         ViewerColumnsFactory.newColumn("Value")
                 .withWidth(150)
                 .withMinWidth(150)
                 .shouldGrabAllTheSpaceLeft(true)
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(
-                        new VariableMappingValueEditingSupport(viewer, elementsCreator, valueEditingSuccessHandler))
+                        new VariableMappingValueEditingSupport(viewer, elementsCreator, editorInput, eventBroker))
                 .labelsProvidedBy(new VariableMappingsValueLabelProvider())
                 .createFor(viewer);
     }
 
-    private Supplier<VariableMapping> newElementsCreator() {
-        return () -> {
-            final VariableMappingDialog dialog = new VariableMappingDialog(viewer.getTable().getShell());
-            if (dialog.open() == Window.OK) {
-                final VariableMapping mapping = dialog.getMapping();
-                final boolean wasAdded = editorInput.getProjectConfiguration().addVariableMapping(mapping);
-                if (wasAdded) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
-                            new RedProjectConfigEventData<>(editorInput.getFile(), newArrayList(mapping)));
-                }
-                return mapping;
-            }
-            return null;
-        };
-    }
-
     private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.redxmleditor.variablesmapping.contextMenu";
-
-        final MenuManager manager = new MenuManager("Red.xml file editor variables mapping context menu", menuId);
+        final MenuManager manager = new MenuManager("Red.xml file editor variable mappings context menu",
+                CONTEXT_MENU_ID);
         final Table control = viewer.getTable();
         final Menu menu = manager.createContextMenu(control);
         control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, viewer, false);
+        site.registerContextMenu(CONTEXT_MENU_ID, manager, viewer, false);
     }
 
     private void setInput() {

@@ -13,7 +13,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -35,23 +34,14 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
     public static class E4DeleteReferencedLibraryHandler {
 
         @Execute
-        public void deleteLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void deleteReferencedLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedLibrary> libraries = Selections.getElements(selection, ReferencedLibrary.class);
-            input.getProjectConfiguration().removeReferencedLibraries(libraries);
-            input.getRobotProject().unregisterWatchingOnReferencedLibraries(libraries);
-
-            if (!libraries.isEmpty()) {
+            final boolean removed = input.getProjectConfiguration().removeReferencedLibraries(libraries);
+            if (removed) {
                 eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
                         new RedProjectConfigEventData<>(input.getFile(), libraries));
-            }
-
-            final List<RemoteLocation> locations = Selections.getElements(selection, RemoteLocation.class);
-            input.getProjectConfiguration().removeRemoteLocations(locations);
-
-            if (!locations.isEmpty()) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED,
-                        new RedProjectConfigEventData<>(input.getFile(), locations));
+                input.getRobotProject().unregisterWatchingOnReferencedLibraries(libraries);
             }
         }
     }
