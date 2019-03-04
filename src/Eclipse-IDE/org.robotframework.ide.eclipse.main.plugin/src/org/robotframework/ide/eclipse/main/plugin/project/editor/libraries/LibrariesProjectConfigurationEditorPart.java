@@ -12,28 +12,28 @@ import java.util.List;
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorPage;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart.LibrariesProjectConfigurationEditor;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibrariesProjectConfigurationEditorPart.LibrariesProjectConfigurationEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
 
-public class ReferencedLibrariesProjectConfigurationEditorPart
+public class LibrariesProjectConfigurationEditorPart
         extends DIEditorPart<LibrariesProjectConfigurationEditor> {
 
-    public ReferencedLibrariesProjectConfigurationEditorPart() {
+    public LibrariesProjectConfigurationEditorPart() {
         super(LibrariesProjectConfigurationEditor.class);
     }
 
     static class LibrariesProjectConfigurationEditor extends RedProjectEditorPage {
 
-        private ReferencedLibrariesFormFragment referencedFragment;
+        private LibrariesFormFragment librariesFragment;
 
         private PathsFormFragment pathsFragment;
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            referencedFragment = new ReferencedLibrariesFormFragment();
+            librariesFragment = new LibrariesFormFragment();
             pathsFragment = new PathsFormFragment();
-            return newArrayList(referencedFragment, pathsFragment);
+            return newArrayList(librariesFragment, pathsFragment);
         }
 
         @Override
@@ -43,8 +43,9 @@ public class ReferencedLibrariesProjectConfigurationEditorPart
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer(),
-                    pathsFragment.getPythonPathViewer(), pathsFragment.getClassPathViewer());
+            return new ViewersCombiningSelectionProvider(librariesFragment.getReferencedLibrariesViewer(),
+                    librariesFragment.getRemoteLocationsViewer(), pathsFragment.getPythonPathViewer(),
+                    pathsFragment.getClassPathViewer());
         }
     }
 }

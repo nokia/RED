@@ -15,9 +15,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,10 +54,12 @@ public class PathsEditingSupportTest {
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
+        when(viewer.getColumnViewerEditor()).thenReturn(mock(ColumnViewerEditor.class));
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
-        assertThat(support.getCellEditor(SearchPath.create("path"))).isInstanceOf(TextCellEditor.class);
+        assertThat(support.getCellEditor(SearchPath.create("path")))
+                .isInstanceOf(ActivationCharPreservingTextCellEditor.class);
     }
 
     @Test

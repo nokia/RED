@@ -1210,8 +1210,13 @@
           parentId="org.eclipse.ui.contexts.window">
     </context>
     <context
-          id="org.robotframework.ide.eclipse.redxmleditor.libraries.context"
+          id="org.robotframework.ide.eclipse.redxmleditor.referencedLibraries.context"
           name="Context for Referenced Libraries section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.remoteLocations.context"
+          name="Context for Remote Locations section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
     <context
@@ -1230,11 +1235,6 @@
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
     <context
-          id="org.robotframework.ide.eclipse.tableeditor.outline.context"
-          name="Context for Robot files selection outline"
-          parentId="org.eclipse.ui.contexts.window">
-    </context>
-    <context
           id="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context"
           name="Context for pythonpaths section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
@@ -1243,6 +1243,11 @@
           id="org.robotframework.ide.eclipse.redxmleditor.classpath.context"
           name="Context for classpaths section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.tableeditor.outline.context"
+          name="Context for Robot files selection outline"
+          parentId="org.eclipse.ui.contexts.window">
     </context>
  </extension>
  <extension
@@ -3327,14 +3332,30 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <or>
-                   <instanceof
-                         value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
-                   </instanceof>
-                   <instanceof
-                         value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
-                   </instanceof>
-                </or>
+               <instanceof
+                     value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+               </instanceof>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteRemoteLocationHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.remoteLocationsPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+               <instanceof
+                     value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
+               </instanceof>
              </iterate>
           </with>
        </enabledWhen>
@@ -3961,7 +3982,7 @@
        point="org.eclipse.ui.menus">
     <menuContribution
           allPopups="false"
-          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.variablesmapping.contextMenu?before=additions">
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.varmapping.contextMenu?before=additions">
        <command
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
@@ -3979,7 +4000,7 @@
     </menuContribution>
     <menuContribution
           allPopups="false"
-          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.variablefiles.contextMenu?before=additions">
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.varfiles.contextMenu?before=additions">
        <command
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
@@ -3988,7 +4009,16 @@
     </menuContribution>
     <menuContribution
           allPopups="false"
-          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.reflibraries.contextMenu?before=additions">
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.referencedLibraries.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.remoteLocations.contextMenu?before=additions">
        <command
              commandId="org.eclipse.ui.edit.delete"
              label="Delete"
@@ -6172,7 +6202,38 @@
 	                   ifEmpty="false"
 	                   operator="or">
 	                <equals
-	                      value="org.robotframework.ide.eclipse.redxmleditor.libraries.context">
+	                      value="org.robotframework.ide.eclipse.redxmleditor.referencedLibraries.context">
+	                </equals>
+	             </iterate>
+	             <not>
+	                <iterate>
+	                   <equals
+	                         value="org.robotframework.ide.eclipse.details.context">
+	                   </equals>
+	                </iterate>
+	             </not>
+             </and>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.redXmlIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.redxml.remoteLocationsPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <and>
+	             <iterate
+	                   ifEmpty="false"
+	                   operator="or">
+	                <equals
+	                      value="org.robotframework.ide.eclipse.redxmleditor.remoteLocations.context">
 	                </equals>
 	             </iterate>
 	             <not>

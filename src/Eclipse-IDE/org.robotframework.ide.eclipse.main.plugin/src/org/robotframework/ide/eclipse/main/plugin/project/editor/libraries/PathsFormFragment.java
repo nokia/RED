@@ -8,9 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -24,12 +21,12 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Combo;
@@ -52,6 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PathsEditingSupport.SearchPathCreator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -59,16 +57,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.Viewers;
 
-
 /**
  * @author Michal Anglart
- *
  */
 class PathsFormFragment implements ISectionFormFragment {
-
-    private static final String PYTHONPATH_CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.pythonpath.context";
-
-    private static final String CLASSPATH_CONTEXT_ID = "org.robotframework.ide.eclipse.redxmleditor.classpath.context";
 
     @Inject
     private IEditorSite site;
@@ -160,8 +152,6 @@ class PathsFormFragment implements ISectionFormFragment {
     }
 
     private RowExposingTableViewer createPathViewer(final Composite parent, final ViewerConfiguration config) {
-        toolkit.createFormText(parent, false)
-                .setText("<form><li>" + config.getVariableName() + "</li></form>", true, false);
         final RowExposingTableViewer viewer = createViewer(parent, config);
         createColumns(viewer, config);
         createContextMenu(viewer, config);
@@ -174,11 +164,11 @@ class PathsFormFragment implements ISectionFormFragment {
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        GridDataFactory.fillDefaults().grab(true, true).minSize(100, 50).applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults().grab(true, true).minSize(100, 100).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(true);
-        viewer.getTable().setHeaderVisible(false);
+        viewer.getTable().setHeaderVisible(true);
 
         viewer.setContentProvider(new PathsContentProvider(config.getVariableName(), editorInput.isEditable()));
 
@@ -188,38 +178,16 @@ class PathsFormFragment implements ISectionFormFragment {
         return viewer;
     }
 
-    private void createColumns(final TableViewer viewer, final ViewerConfiguration config) {
-        ViewerColumnsFactory.newColumn("")
+    private void createColumns(final RowExposingTableViewer viewer, final ViewerConfiguration config) {
+        ViewerColumnsFactory.newColumn(config.getVariableName())
                 .withWidth(300)
                 .labelsProvidedBy(new PathsLabelProvider(config.getVariableName(), editorInput))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config),
-                        config.getPathModificationSuccessHandler()))
+                .editingSupportedBy(config.getEditingSupport(viewer))
                 .createFor(viewer);
     }
 
-    private Supplier<SearchPath> elementsCreator(final ViewerConfiguration config) {
-        return () -> {
-            final PathEntryDialog dialog = new PathEntryDialog(site.getShell());
-            if (dialog.open() == Window.OK) {
-                final List<SearchPath> paths = dialog.getSearchPath();
-                if (paths.isEmpty()) {
-                    return null;
-                }
-                boolean added = false;
-                for (final SearchPath path : paths) {
-                    added |= config.getPathAddingStrategy().apply(path);
-                }
-                if (added) {
-                    config.getPathAddingSuccessHandler().accept(paths);
-                }
-                return paths.get(paths.size() - 1);
-            }
-            return null;
-        };
-    }
-
-    private void createContextMenu(final TableViewer viewer, final ViewerConfiguration config) {
+    private void createContextMenu(final RowExposingTableViewer viewer, final ViewerConfiguration config) {
         final String menuId = config.getMenuId();
 
         final MenuManager manager = new MenuManager(config.getMenuText(), menuId);
@@ -379,44 +347,23 @@ class PathsFormFragment implements ISectionFormFragment {
 
         String getVariableName();
 
-        Consumer<SearchPath> getPathModificationSuccessHandler();
-
-        Function<SearchPath, Boolean> getPathAddingStrategy();
-
-        Consumer<List<SearchPath>> getPathAddingSuccessHandler();
-
         String getMenuText();
 
         String getMenuId();
+
+        EditingSupport getEditingSupport(RowExposingTableViewer viewer);
     }
 
     private class PythonPathViewerConfiguration implements ViewerConfiguration {
 
         @Override
         public String getContextId() {
-            return PYTHONPATH_CONTEXT_ID;
+            return "org.robotframework.ide.eclipse.redxmleditor.pythonpath.context";
         }
 
         @Override
         public String getVariableName() {
             return "PYTHONPATH";
-        }
-
-        @Override
-        public Consumer<SearchPath> getPathModificationSuccessHandler() {
-            return path -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_CHANGED,
-                    new RedProjectConfigEventData<>(editorInput.getFile(), path));
-        }
-
-        @Override
-        public Function<SearchPath, Boolean> getPathAddingStrategy() {
-            return path -> editorInput.getProjectConfiguration().addPythonPath(path);
-        }
-
-        @Override
-        public Consumer<List<SearchPath>> getPathAddingSuccessHandler() {
-            return paths -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED,
-                    new RedProjectConfigEventData<>(editorInput.getFile(), paths));
         }
 
         @Override
@@ -428,35 +375,29 @@ class PathsFormFragment implements ISectionFormFragment {
         public String getMenuId() {
             return "org.robotframework.ide.eclipse.redxmleditor.pythonpath.contextMenu";
         }
+
+        @Override
+        public EditingSupport getEditingSupport(final RowExposingTableViewer viewer) {
+            final SearchPathCreator elementsCreator = new SearchPathCreator(viewer.getTable().getShell(),
+                    path -> editorInput.getProjectConfiguration().addPythonPath(path),
+                    paths -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), paths)));
+            return new PathsEditingSupport(viewer, elementsCreator,
+                    path -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), path)));
+        }
     }
 
     private class ClassPathViewerConfiguration implements ViewerConfiguration {
 
         @Override
         public String getContextId() {
-            return CLASSPATH_CONTEXT_ID;
+            return "org.robotframework.ide.eclipse.redxmleditor.classpath.context";
         }
 
         @Override
         public String getVariableName() {
             return "CLASSPATH";
-        }
-
-        @Override
-        public Consumer<SearchPath> getPathModificationSuccessHandler() {
-            return path -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_CHANGED,
-                    new RedProjectConfigEventData<>(editorInput.getFile(), path));
-        }
-
-        @Override
-        public Function<SearchPath, Boolean> getPathAddingStrategy() {
-            return path -> editorInput.getProjectConfiguration().addClassPath(path);
-        }
-
-        @Override
-        public Consumer<List<SearchPath>> getPathAddingSuccessHandler() {
-            return paths -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED,
-                    new RedProjectConfigEventData<>(editorInput.getFile(), paths));
         }
 
         @Override
@@ -466,7 +407,18 @@ class PathsFormFragment implements ISectionFormFragment {
 
         @Override
         public String getMenuId() {
-            return "org.robotframework.ide.eclipse.redxmleditor.pythonpath.contextMenu";
+            return "org.robotframework.ide.eclipse.redxmleditor.classpath.contextMenu";
+        }
+
+        @Override
+        public EditingSupport getEditingSupport(final RowExposingTableViewer viewer) {
+            final SearchPathCreator elementsCreator = new SearchPathCreator(viewer.getTable().getShell(),
+                    path -> editorInput.getProjectConfiguration().addClassPath(path),
+                    paths -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), paths)));
+            return new PathsEditingSupport(viewer, elementsCreator,
+                    path -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), path)));
         }
     }
 }
