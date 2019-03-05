@@ -7,8 +7,10 @@
 <body>
 <h2>General usage hints</h2>
 <h3>Tab key behavior </h3>
-Tab key press behavior is set by default to be aware of the file type. For .tsv files each Tab will produce item separator, for text files 4 spaces will generated. <br>
-In Robot Framework preferences (Window -> Preferences under Source section), Tab behavior can be changed if needed.
+Tab key press behavior can be changed at <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor)')">
+Window-&gt;Preferences-&gt;Robot Framework-&gt;Editor</a></i> in <b>Source</b> section. <br>
+It is set by default to be aware of the file type. For .tsv files each Tab will produce item separator, for text files 4 spaces will generated. <br>
+Moreover, <b>jump out of active region</b> behavior can be enabled there. If enabled, instead of inserting defined separator in source editor, RED will move cursor to the end of active region. It may be useful for example for variables edition. 
 <br><br><img src="general/tab_behaviour.png"> <br><br>
 <h3>Validating & revalidating whole project/workspace</h3>
 Validation of test case is triggered by any user actions, it is also done during files&project imports.<br>
