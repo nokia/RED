@@ -21,10 +21,16 @@ When given input is camel case string (for example: REA, CrBiFi, WaUCr) keywords
 <br><br><img src="content_assist/content-assist-camel-case.png"> <br><br><br>
 
 <h3>Content assistance preferences </h3>
-Behavior of content assist can be changed in Robot Framework preferences (Window -> Preferences).<br>  
-Auto activation triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br>
+Behavior of content assist can be changed at <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
+Window-&gt;Preferences-&gt;Robot Framework-&gt;Editor-&gt;Content Assist</a></i>.<br>  
+
+<br><b>Auto activation</b><br>
+When auto activation is enabled, triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br>
+
+<br><b>Keywords</b><br>
 It can also be configured if library/resource prefix should be always used when accepting content proposal.<br>
-Keyword propositions from libraries available in red.xml but not imported in robot file can be enabled too. Library import will be added automatically when such proposal is accepted.
+Moreover, keyword propositions from libraries available in red.xml, but not imported in robot file, can be enabled. Library import will be added automatically when such proposal is accepted.<br>
+Another option is Tab behavior for automatically added arguments in source view. Cycle between arguments or exit on last argument can be chosen.
 <br><br><img src="content_assist/content_pref.png"> <br><br>
 
 </body>
