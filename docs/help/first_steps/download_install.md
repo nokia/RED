@@ -53,6 +53,6 @@ Note
 
   * Restart Eclipse as prompted  
 
-  * Verify RED installation by opening _Help -> Installation Details_ to check if RED is visible on installed features list  
+  * Verify RED installation by opening _Help -> About RED -> Installation Details_ to check if RED is visible on installed features list  
 
 [Return to Help index](http://nokia.github.io/RED/help/)

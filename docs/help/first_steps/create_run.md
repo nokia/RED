@@ -14,7 +14,7 @@ first.
   * Check if you have already set Robot perspective:   
 ![](create_run/perspective_1.png)
 
-  * Set perspective to Robot by issuing action: _Window -> Perspective -> Open Perspective -> Other ... -> Robot_
+  * Set perspective to Robot by issuing action: _[Window -> Perspective -> Open Perspective -> Other ... -> Robot](javascript:executeCommand\('org.eclipse.ui.perspectives.showPerspective\(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective\)'\))_
 
 ### Workspace & project
 
@@ -83,7 +83,8 @@ logs. Those information are available in Console and Message Log, by default
 visible in the Robot perspective or by _Window -> Show View -> Other.... ->
 Robot_ ![](create_run/console_1.png) ![](create_run/msg_log_1.png) If any of
 those 2 views are missing, best way is to reset perspective settings by using
-action _Window -> Perspective -> Reset Perspective ..._
+action _[Window -> Perspective -> Reset Perspective
+...](javascript:executeCommand\('org.eclipse.ui.window.resetPerspective\(\)'\))_
 
 #### Execution status
 

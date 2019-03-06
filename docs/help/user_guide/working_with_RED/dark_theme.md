@@ -8,7 +8,7 @@ From version 0.8.1 RED is compatible with Eclipse default dark theme.
 
 RED provides 2 default syntax coloring profiles used in RED source & tables
 editors. Settings can be found at _[Window->Preferences->Robot
-Framework->Editor>Syntax
+Framework->Editor->Syntax
 Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))_.
 
 **Default** profile is used for light/default theme in Eclipse and it is the

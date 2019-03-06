@@ -10,8 +10,8 @@ This page is intended to help users in following cases:
 Editor preferences are stored together with other Eclipse settings, all of
 them are shared across **active workspace**.
 
-Preferences can be found in toolbar menu _Window -> Preferences -> Robot
-Framework_.
+Preferences can be found in toolbar menu _[Window->Preferences->Robot
+Framework](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.main\)'\))_.
 
 One of the most important item in multiple python environment is setting
 active Python and RobotFramework instances to be used for running and

@@ -16,6 +16,7 @@
     * [General usage hints](/user_guide/general.md)
     * [Working with RED](/user_guide/working_with_RED.md)
       * [Table Editors - general usage hints](/user_guide/working_with_RED/table_general.md)
+      * [Variable typing in editors](/user_guide/working_with_RED/variable_typing.md)
       * [Recognizing external libraries in RED](/user_guide/working_with_RED/libs.md)
       * [Variable mapping - dealing with parametrized paths to libraries and resources](/user_guide/working_with_RED/variable_mapping.md)
       * [Variable Files - using files with variable accessible anywhere inside Project](/user_guide/working_with_RED/variable_files.md)
