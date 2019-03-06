@@ -28,7 +28,7 @@ When there is a need to run autodiscovery on list of files, folders or whole pro
 
 <h3>Add library from Project Explorer</h3>
 External libraries as python files can be directly included to red.xml file by right clicking on file and using option:<br>
-<i>Robot Framework -> Add Library to red.xml.</i>
+<b><code>Robot Framework -&gt; Add Library to red.xml.</code></b>
 <h3>Quick Fix - shortcut CTRL+1</h3>
 Lets focus on following example:
 <br><br><img src="libs/unknown_libs.png"> <br><br>
@@ -60,7 +60,8 @@ To verify you can try to execute libdoc in console:<br>
 
 <h3>Preference for generating libdoc</h3>
 In some cases there are the problems occurring during the libdoc generation via session server. It leads to a situation when a server hang due to <a target="_blank" class="external"  href="https://wiki.python.org/moin/GlobalInterpreterLock">Global Interpreter Lock</a> between the server code and the library code. 
-To avoid this problem the preference located in <i>Window -> Preferences -> Robot Framework -> Libraries</i> is enabled by default.
+To avoid this problem the preference located in <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Libraries</a></code> is enabled by default.
 <br><br><img src="libs/libdoc_generation_preference.png"> <br><br>
 This preference controls if the libdoc is generated in a separate process or not. Note that this solution may affect the time of libdoc generation, i.e. slowing down the libraries import, especially with jython interpreter.
 If you are not using problematic libraries you can disable the preference to make libdoc generation faster.
