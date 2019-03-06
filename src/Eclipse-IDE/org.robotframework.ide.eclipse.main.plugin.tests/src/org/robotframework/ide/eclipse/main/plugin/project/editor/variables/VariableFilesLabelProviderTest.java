@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
@@ -58,9 +57,8 @@ public class VariableFilesLabelProviderTest {
         when(editorInput.getProblemsFor(varFile)).thenReturn(new ArrayList<>());
 
         final StyledString styledLabel = provider.getStyledText(varFile);
-        assertThat(styledLabel.getString()).isEqualTo("file.py - path/to/file.py");
-        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 7, null, null, SWT.NORMAL),
-                new StyleRange(8, 17, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(styledLabel.getString()).isEqualTo("path/to/file.py");
+        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 15, null, null, SWT.NORMAL));
     }
 
     @Test
@@ -70,10 +68,9 @@ public class VariableFilesLabelProviderTest {
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
         final StyledString styledLabel = provider.getStyledText(varFile);
-        assertThat(styledLabel.getString()).isEqualTo("file.py - path/to/file.py");
-        assertThat(styledLabel.getStyleRanges()).containsExactly(
-                new StyleRange(0, 7, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL),
-                new StyleRange(8, 17, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(styledLabel.getString()).isEqualTo("path/to/file.py");
+        assertThat(styledLabel.getStyleRanges())
+                .containsExactly(new StyleRange(0, 15, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL));
     }
 
     @Test
@@ -83,10 +80,9 @@ public class VariableFilesLabelProviderTest {
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
 
         final StyledString styledLabel = provider.getStyledText(varFile);
-        assertThat(styledLabel.getString()).isEqualTo("file.py - path/to/file.py");
-        assertThat(styledLabel.getStyleRanges()).containsExactly(
-                new StyleRange(0, 7, ColorsManager.getColor(255, 165, 0), null, SWT.NORMAL),
-                new StyleRange(8, 17, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(styledLabel.getString()).isEqualTo("path/to/file.py");
+        assertThat(styledLabel.getStyleRanges())
+                .containsExactly(new StyleRange(0, 15, ColorsManager.getColor(255, 165, 0), null, SWT.NORMAL));
     }
 
     @Test
