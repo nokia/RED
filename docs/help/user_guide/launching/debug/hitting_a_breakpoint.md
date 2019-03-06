@@ -77,8 +77,8 @@ written in **Value** column. On the picture above **DotDict[3]** for
 the same way. Additionally you may display **Actual Type** column which would
 also show types of objects for scalar variables and for objects inside
 list/dictionaries. To do it click on arrow icon in the top right corner of the
-Variables view, choose **Layout** - > **Select Columns...** and select
-**Actual Type** column.
+Variables view, choose **`Layout -> Select Columns...`** and select **Actual
+Type** column.
 
 Variables are send from Robot to RED every time when RED is ordered to suspend
 the execution. Sometimes you may observe that variables are highlighted with
@@ -150,8 +150,8 @@ The editor opened for any frame displays **instruction pointer** \- by default
 it's a green background displayed in line which relates to chosen stack frame.
 You may also notice that instruction pointer for top frame is a bit darker
 than pointers for other frames. The way the instruction pointers are displayed
-can be configured in preferences: [ General -> Editors > Text Editors >
-Annotations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations\)'\))
+can be configured in preferences: `[ General -> Editors > Text Editors >
+Annotations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations\)'\))`
 (change annotations **Debug Call Stack** for ordinary frame or **Debug Current
 Instruction Pointer** for top frame)
 

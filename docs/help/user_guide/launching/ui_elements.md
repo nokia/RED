@@ -9,7 +9,7 @@ Launch configuration has to be created to launch Robot tests. This can be done
 either manually or automatically e.g. when launching tests from **Project
 Explorer** or from **Suite Editor**.
 
-  * **Launch Configuration dialog** \- open launch configurations dialog (via [ Run -> Run Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\)) or [ Run -> Debug Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\)) menu) and create new configuration under _Robot_ or _Robot Remote_ element. For detailed description of both configurations and their possible attributes read [Local launches](local_launch.md) or [Remote launches](remote_launch.md) topic. After creating the configuration it can be launched manually by clicking **Run** / **Debug** button. 
+  * **Launch Configuration dialog** \- open launch configurations dialog (via `[ Run -> Run Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\))` or `[ Run -> Debug Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\))` menu) and create new configuration under _Robot_ or _Robot Remote_ element. For detailed description of both configurations and their possible attributes read [Local launches](local_launch.md) or [Remote launches](remote_launch.md) topic. After creating the configuration it can be launched manually by clicking **Run** / **Debug** button. 
 
 ![](images/ui_run_configs.png)
 

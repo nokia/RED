@@ -27,7 +27,7 @@ can be specified in preferences.
 
 Detected tasks are visible in RED in couple of places:
 
-  * **Tasks** view - this view is similar to Problems view and displays all the tasks reported for files in whole workspace (this view can be open from menu by choosing **Window - > Show View -> Other -> General -> Tasks**), 
+  * **Tasks** view - this view is similar to Problems view and displays all the tasks reported for files in whole workspace (this view can be open from menu by choosing **`Window -> Show View -> Other... -> General -> Tasks`** ), 
   * **Source** tab of editor - icon is visible in line where task is defined on left vertical ruler as well as small square on right overview vertical ruler, 
   * **Tables** tab of editor - icon is visible on element to which the task is attached on left ruler, 
   * **syntax coloring** of comment - the detected tag is colored differently than the rest of the comment both in source tab as well as tables 

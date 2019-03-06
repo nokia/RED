@@ -30,9 +30,9 @@ keywords proposals that match that string are displayed before other matches.
 
 ### Content assistance preferences
 
-Behavior of content assist can be changed at _[Window->Preferences->Robot
-Framework->Editor->Content
-Assist](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist\)'\))_.  
+Behavior of content assist can be changed at `[ Window -> Preferences -> Robot
+Framework -> Editor -> Content
+Assist](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist\)'\))`.  
   
 **Auto activation**  
 When auto activation is enabled, triggers and delay can be specified to

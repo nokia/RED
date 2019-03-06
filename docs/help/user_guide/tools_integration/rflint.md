@@ -8,7 +8,7 @@ one have to have it installed in the python installation used by the project.
 
 RfLint can be run on selected file or folder (or whole project) in **Project
 Explorer** view. In order to start analysis open context menu for selected
-resource and choose **Robot Framework -> Run RfLint analysis**.
+resource and choose **`Robot Framework -> Run RfLint analysis`**.
 
 ![](images/rflint_run.png)
 
@@ -25,8 +25,8 @@ findings are visible in **Problems** view and are also visible in editors.
 
 ![](images/rflint_problems.png)
 
-In order to remove problems simply choose **Robot Framework -> Clean RfLint
-problems** from context menu of selected resource.
+In order to remove problems simply choose **`Robot Framework -> Clean RfLint
+problems`** from context menu of selected resource.
 
 Note
 
@@ -34,10 +34,9 @@ Note
 
 ### Configuration
 
-It is possible to configure RfLint behavior in Preferences (
-_[Window->Preferences->Robot Framework->Errors/Warnings->RfLint
-validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint\)'\))_
-)
+It is possible to configure RfLint behavior in Preferences ( `[ Window ->
+Preferences -> Robot Framework -> Errors/Warnings -> RfLint
+validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint\)'\))`)
 
 ![](images/rflint_prefs.png)
 

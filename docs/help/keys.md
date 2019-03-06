@@ -2,7 +2,7 @@
 
 Note
 
-    Key bindings can be configured in Preferences ( _[Window->Preferences->General->Keys](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Keys\)'\))_ ).
+    Key bindings can be configured in Preferences (`[ Window -> Preferences -> General -> Keys](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Keys\)'\))`).
 
 ### Key shortcuts in editors
 

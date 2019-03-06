@@ -6,8 +6,8 @@ TestRunnerAgent which runs Robot tests on remote host.
 
 ## Remote launch configuration
 
-Open [ Run -> Run
-Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\))
+Open `[ Run -> Run
+Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\))`
 dialog and under **Robot Remote** create new configuration. The configuration
 itself is rather simple and consists mainly of network-related settings:
 

@@ -28,9 +28,9 @@ variables in command line with actual string values.
 
 ### Creating custom variables
 
-Custom string substitution variables can be created and configured at [
-Window->Preferences->Run/Debug->String
-Substitution](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage\)"\))
+Custom string substitution variables can be created and configured at `[
+Window -> Preferences -> Run/Debug -> String
+Substitution](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage\)"\))`
 preference page.
 
 ### Overriding custom variables in variables sets
@@ -48,9 +48,9 @@ string substitution sets feature can be used.
 
 ### Defining different variables sets
 
-The variables sets can be configured at [ Window->Preferences->Robot
-Framework->Launching->Active String Substitution
-sets](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets\)"\))
+The variables sets can be configured at `[ Window -> Preferences -> Robot
+Framework -> Launching -> Active String Substitution
+sets](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets\)"\))`
 preference page:
 
 ![](images/ui_active_variables.png)

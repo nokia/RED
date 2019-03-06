@@ -51,7 +51,7 @@ To integrate jython.exe with RED:
   1. put _jython.exe_ file to bin directory. It can be anywhere, but parent folder must be named as bin - i.e. _C:\bin\_
   2. It is easier to copy robotframework*.jar to this bin directory instead of set RF_JAR environment variable
   3. run _eclipse.exe_ or _RED.exe_ depends on which RED version you are using 
-  4. go to _Window - > Preferences -> Robot Framework -> Installed frameworks _preference 
+  4. go to `[ Window -> Preferences -> Robot Framework -> Installed frameworks](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed\)'\))`
   5. click _Add..._ button and select bin directory from 1. 
   6. if everything is ok, information about Robot Framework version should be visible
   7. when you will create RED project or execute Clean\Build, you should see in Robot Standard libraries standard libraries like i.e. BultIn with information about keywords, which they contains.

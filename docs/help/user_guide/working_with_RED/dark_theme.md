@@ -7,9 +7,9 @@ From version 0.8.1 RED is compatible with Eclipse default dark theme.
 ### RED Syntax Coloring profiles
 
 RED provides 2 default syntax coloring profiles used in RED source & tables
-editors. Settings can be found at _[Window->Preferences->Robot
-Framework->Editor->Syntax
-Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))_.
+editors. Settings can be found at `[ Window -> Preferences -> Robot Framework
+-> Editor -> Syntax
+Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))`.
 
 **Default** profile is used for light/default theme in Eclipse and it is the
 same color palette as in older versions of RED. New **heliophobia** profile is
@@ -25,9 +25,8 @@ Note
 
 ### Changing to Dark theme
 
-Dark theme can be changed in
-_[Window->Preferences->Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))_
-,
+Dark theme can be changed in `[ Window -> Preferences ->
+Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))`,
 
 ![](dark_theme/apperence-dark.png)
 
@@ -41,9 +40,9 @@ Darkest Dark plugin is the external theme which greatly improves Eclipse dark
 theme making it consistent with modified icons and other UI elements for dark
 profile.
 
-Darkest Dark Theme can be installed from **Help -> Eclipse Marketplace** and
-then be activated from
-_[Window->Preferences->Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))_
+Darkest Dark Theme can be installed from **`Help -> Eclipse Marketplace`** and
+then be activated from `[ Window -> Preferences ->
+Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))`
 
 ![](dark_theme/apperence-darkest-dark.png)
 

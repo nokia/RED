@@ -25,8 +25,9 @@ offset of error and underline will be observed.
 
 ![](images/unicode.png)
 
-This can be fixed by selecting proper file encoding in Preferences (at
-_[Window->Preferences->General->Workspace](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Workspace\)'\))_
+This can be fixed by selecting proper file encoding in Preferences (at `[
+Window -> Preferences -> General ->
+Workspace](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Workspace\)'\))`
 change **Text file encoding** to UTF-8).
 
   * ### GTK3 issues under Linux
@@ -44,9 +45,8 @@ check and change - if necessary - to GTK2.
 
 #### Verifying current GTK version used
 
-GTK version can be checked in Eclipse under **Help- >Installation
-Details->Configuration**, search for `org.eclipse.swt.internal.gtk.version`
-entry.
+GTK version can be checked in Eclipse under **`Help -> Installation Details ->
+Configuration`** , search for `org.eclipse.swt.internal.gtk.version` entry.
 
 #### Setting GTK2 system wide
 
