@@ -1,8 +1,6 @@
 <html>
 <head>
-<link
-	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
-	rel="stylesheet" type="text/css" />
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/doc/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <h2>Recognizing external libraries in RED</h2>
@@ -16,7 +14,7 @@ There are few ways to include library into red.xml
 Main mechanism to include libraries' keywords in RED is done by autodiscovery mechanism. Mechanism works on two levels - during test edition and executed in Project Explorer on group of files and folders. </br>
 Every time when user edits test suite which has error markers on library declaration, autodiscovery is executed together with save action.<br>
 When there is a need to run autodiscovery on list of files, folders or whole project, this can be achieved by using right click menu in Project Explorer from Robot Framework option.  
-<br><br><img src="libs/autodiscovery_menu.png"> <br><br>
+<br><br><img src="images/autodiscovery_menu.png"> <br><br>
 
 <p>Autodiscovery mechanism is configured per project. Its preferences are stored in red.xml file under Referenced Libraries tab.</p>
 
@@ -31,15 +29,15 @@ External libraries as python files can be directly included to red.xml file by r
 <b><code>Robot Framework -&gt; Add Library to red.xml.</code></b>
 <h3>Quick Fix - shortcut CTRL+1</h3>
 Lets focus on following example:
-<br><br><img src="libs/unknown_libs.png"> <br><br>
+<br><br><img src="images/unknown_libs.png"> <br><br>
 
 In sample testcase, there are two libraries included. CalculatorLibrary.py is custom user local library placed in the same folder as testcase, Selenium2Library was installed by pip.<br>
 Both libraries are not recognized by RED as libraries names are underlined and error markers are placed next to line numbers. <br>
 Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
 <br>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1.
-<br><br><img src="libs/quick_fix.png"> <br><br>
+<br><br><img src="images/autodiscovery_quick_fix.png"> <br><br>
 Double click on Discover option, RED will search either PythonPath or library file path, if successful library will be added to Referenced libraries in red.xml 
-<br><br><img src="libs/reference_libs.png"> <br><br>
+<br><br><img src="images/reference_libs.png"> <br><br>
 <br>
 All changes are stored in red.xml, if you need to modify them, open red.xml using Eclipse Default Editor.
 
@@ -53,7 +51,7 @@ During library import, RED is generating LibDoc from given python file using loc
 Under the hood RED is executing following command to RobotFramework to get list of Keywords from give library:<br>
 <i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt &ltOPTIONS&gt</i><br>
 Whenever RED encounters problem, it will be shown as popup window from Python execution:
-<br><br><img src="libs/error.png"> <br><br>
+<br><br><img src="images/libdoc_error.png"> <br><br>
 This indicates that some of the dependencies are missing on your local machine which may affect testcase execution.    
 To verify you can try to execute libdoc in console:<br>
 <i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt list </i>
@@ -62,7 +60,7 @@ To verify you can try to execute libdoc in console:<br>
 In some cases there are the problems occurring during the libdoc generation via session server. It leads to a situation when a server hang due to <a target="_blank" class="external"  href="https://wiki.python.org/moin/GlobalInterpreterLock">Global Interpreter Lock</a> between the server code and the library code. 
 To avoid this problem the preference located in <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries)')">
 Window -&gt; Preferences -&gt; Robot Framework -&gt; Libraries</a></code> is enabled by default.
-<br><br><img src="libs/libdoc_generation_preference.png"> <br><br>
+<br><br><img src="images/libdoc_generation_preference.png"> <br><br>
 This preference controls if the libdoc is generated in a separate process or not. Note that this solution may affect the time of libdoc generation, i.e. slowing down the libraries import, especially with jython interpreter.
 If you are not using problematic libraries you can disable the preference to make libdoc generation faster.
 
