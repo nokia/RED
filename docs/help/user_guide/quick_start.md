@@ -21,7 +21,7 @@ Empty Robot Project should looks similar as below:
 ![](images/simple_project_1.png)  
 If project doesn't have brown icon or no red.xml file it means that the
 Project is different type than Robot. Fix this by right-click on Project
-name,from Robot Framework select **Configure as Robot project**
+name,from Robot Framework select **Add Robot nature**
 
 ### Import Robot files into project
 
