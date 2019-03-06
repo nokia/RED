@@ -1,8 +1,8 @@
 ## Debugger preferences
 
-Following settings found at [ Window->Preferences->Robot
-Framework->Launching->Debugger
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.debugger\)'\))
+Following settings found at `[ Window -> Preferences -> Robot Framework ->
+Launching ->
+Debugger](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.debugger\)'\))`
 preference page which can be adjusted in order to influence debugger behavior:
 
   * **Omit library keywords when stepping into/return** \- disables possibility to enter into the library keyword - see [Assistance editor](hitting_a_breakpoint.html#assist_editor) paragraph for more information, 

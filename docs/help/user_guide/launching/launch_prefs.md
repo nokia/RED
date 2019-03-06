@@ -2,9 +2,9 @@
 
 ### General launching preferences
 
-General preferences used when launching Robot tests can be found at [
-Window->Preferences->Robot Framework->Launching
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch\)'\))
+General preferences used when launching Robot tests can be found at `[ Window
+-> Preferences -> Robot Framework ->
+Launching](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch\)'\))`
 preference page. Following settings can be changed:
 
   * **Pass Robot arguments using arguments file** \- when enabled RED will put all the Robot arguments inside arguments file (temporary file) and call Robot using `--argumentfile` argument; when disabled all the Robot arguments are passed directly in command line call. 
@@ -14,9 +14,9 @@ preference page. Following settings can be changed:
 
 ### Default launch configurations
 
-All arguments which are set at [ Window->Preferences->Robot
-Framework->Launching->Default Launch Configurations
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))
+All arguments which are set at `[ Window -> Preferences -> Robot Framework ->
+Launching -> Default Launch
+Configurations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))`
 preference page will be used by RED when new launch configuration is
 automatically created. This may happen for example when launching suites from
 **Project Explorer** and there is no launch configuration matching selected
@@ -31,8 +31,8 @@ Note
 
 Run and Debug actions, depending on preferences, can use previously used or
 created launch configuration or create a new one. Standard behavior can be
-changed at
-[Window->Preferences->Run/Debug>Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))
+changed at `[ Window -> Preferences -> Run/Debug ->
+Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))`
 under Launch Operation.
 
 [Return to Help index](http://nokia.github.io/RED/help/)

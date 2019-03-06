@@ -36,10 +36,10 @@ environment variable in your system.
 
 ### Manual environment configuration
 
-It is possible to add environments manually in _[Window->Preferences->Robot
-Framework->Installed
-frameworks](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed\)'\))_.
-Simply use  Add... button to open dialog in which the directory can be chosen.
+It is possible to add environments manually in `[ Window -> Preferences ->
+Robot Framework -> Installed
+frameworks](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed\)'\))`.
+Simply use Add... button to open dialog in which the directory can be chosen.
 It should be the directory which contains one of the executable files listed
 above.
 

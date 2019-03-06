@@ -13,8 +13,8 @@ using RED together with PyDev in one RED/Eclipse instance.
 
   * Install PyDev to RED or Eclipse with RED instance (if not already installed), 
   * set Python nature to Robot project to be debugged - right click on Project, from PyDev menu select `Set as PyDev project`, 
-  * set port for remote PyDev debugger: `Preferences -> PyDev -> Debug -> Port for remote debugger`, 
-  * for convenience Remote debugger server activation can be changed from `Manual` to `Keep always on` (from `Preferences -> PyDev -> Debug -> Remote debugger server activation`), 
+  * set port for remote PyDev debugger: **`Preferences -> PyDev -> Debug -> Port for remote debugger`** , 
+  * for convenience Remote debugger server activation can be changed from `Manual` to `Keep always on` (from **`Preferences -> PyDev -> Debug -> Remote debugger server activation`** ), 
   * to use `runPyDevDebug.py` script logic RED needs to pass parameters separated by space to external script, check [Launching preferences](../launch_prefs.md). 
 
 ### Script runPyDevDebug.py update
@@ -36,13 +36,10 @@ Note
 
 ### Debug
 
+  * As mentioned in [PyDev Remote Debugger User Guide](http://www.pydev.org/manual_adv_remote_debugger.md) there is no actual 'signal' of reaching a breakpoint when doing remote debugging, so debug perspective must be opened first ( **`Window -> Perspective -> Open Perspective -> Other... -> Debug`** ). 
   * Remember to place at least one breakpoint on executable line either in Robot test or Python library. 
   * Before running custom Debug Configuration, PyDev Debug server needs to be started if the startup was not changed to Automatic in Environment Setup part. Switch to Debug perspective and from PyDev menu select `Start Debug Server`. 
   * Run created Debug Configuration, RED should start the `runPyDevDebug.py` script which will take command line from RED and start Robot Framework debug run simultaneously being connected with Pydev Debugger. 
   * If breakpoint is reached, appropriated Debugger is used depending on the source from where the breakpoint was reached (either Robot testcase or Python library). 
-
-Note
-
-     As mentioned in [PyDev Remote Debugger User Guide](http://www.pydev.org/manual_adv_remote_debugger.md) there is no actual 'signal' of reaching a breakpoint when doing remote debugging, so debug perspective must be opened first ( **Window- >Perspective->Open Perspective->Other->Debug**). 
 
 [Return to Help index](http://nokia.github.io/RED/help/)

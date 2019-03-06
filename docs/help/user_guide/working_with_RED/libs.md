@@ -32,7 +32,7 @@ Note
 
 External libraries as python files can be directly included to red.xml file by
 right clicking on file and using option:  
-_Robot Framework -> Add Library to red.xml._
+**`Robot Framework -> Add Library to red.xml.`**
 
 ### Quick Fix - shortcut CTRL+1
 
@@ -97,8 +97,9 @@ In some cases there are the problems occurring during the libdoc generation
 via session server. It leads to a situation when a server hang due to [Global
 Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between
 the server code and the library code. To avoid this problem the preference
-located in _Window -> Preferences -> Robot Framework -> Libraries_ is enabled
-by default.  
+located in `[ Window -> Preferences -> Robot Framework ->
+Libraries](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries\)'\))`
+is enabled by default.  
   
 ![](libs/libdoc_generation_preference.png)  
   

@@ -2,10 +2,9 @@
 
 ### General information
 
-Validation findings levels can be customized in Preferences (
-_[Window->Preferences->Robot
-Framework->Errors/Warnings](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation\)'\))_
-).  
+Validation findings levels can be customized in Preferences (`[ Window ->
+Preferences -> Robot Framework ->
+Errors/Warnings](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation\)'\))`).  
 Each issue can be reported as error/warning/info/ignore. In case of setting
 ignore level, such validation issue type will not be visible in Problems view.
 

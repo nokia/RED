@@ -14,8 +14,9 @@ wrapped with variable brackets.
 ### Variable typing preferences
 
 All variable typing related preferences (bracket insertion, text wrapping,
-text wrapping pattern) can be configured at _[Window->Preferences->Robot
-Framework->Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))_
+text wrapping pattern) can be configured at `[ Window -> Preferences -> Robot
+Framework ->
+Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))`
 in **Variables** section.  
   
 ![](variable_typing/variable_preferneces.png)  

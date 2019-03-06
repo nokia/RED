@@ -2,8 +2,9 @@
 
 ### Tab key behavior
 
-Tab key press behavior can be changed at _[Window->Preferences->Robot
-Framework->Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))_
+Tab key press behavior can be changed at `[ Window -> Preferences -> Robot
+Framework ->
+Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))`
 in **Source** section.  
 It is set by default to be aware of the file type. For .tsv files each Tab
 will produce item separator, for text files 4 spaces will generated.  
@@ -18,10 +19,10 @@ variables edition.
 ### Validating & revalidating whole project/workspace
 
 Validation of test case is triggered by any user actions, it is also done
-during files&project; imports.  
-Whenever there is a change in multiple files (for instance find &replace;) or
+during files & project imports.  
+Whenever there is a change in multiple files (for instance find/replace) or
 big file import/deletion, it is good to force revalidation of project.  
-It is done accessing option Project -> Clean ...  
+It is done accessing option **`Project -> Clean...`**  
   
 ![](general/gen_1.png)  
   

@@ -16,10 +16,10 @@ injected into tests execution.
 
 ### Obtaining agent script
 
-You can always obtain agent script from RED within Preferences dialog (at
-_[Window->Preferences->Robot Framework->Default Launch Configurations
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))_
-, use **Export Client Script** button). Additionally the file may be saved
+You can always obtain agent script from RED within Preferences dialog (at `[
+Window -> Preferences -> Robot Framework -> Default Launch Configurations
+](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))`,
+use **Export Client Script** button). Additionally the file may be saved
 straight from launch configuration dialog.
 
 Warning

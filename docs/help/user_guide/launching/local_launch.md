@@ -8,8 +8,8 @@ interpreter or using [user-defined script](local_launch_scripting.md).
 
 ### Robot launch configuration
 
-Open [ Run -> Run
-Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\))
+Open `[ Run -> Run
+Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\))`
 dialog and under **Robot** element create new configuration. The configuration
 itself is using couple of tabs:
 

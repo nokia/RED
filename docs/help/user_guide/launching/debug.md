@@ -57,10 +57,12 @@ debug mode. For example by clicking on "green bug" icon at the top toolbar:
 #### Limiting test cases to be debugged
 
 You may edit the launch configuration in order to limit test cases which
-should be executed in your debug session. Open [ Run -> Debug
-Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\))
+should be executed in your debug session. Open `[ Run -> Debug
+Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\))`
 dialog and choose which cases should be executed:
 
 ![](images/debug_4.png)  
+
+### Contents
 
 [Return to Help index](http://nokia.github.io/RED/help/)

@@ -34,7 +34,7 @@ Note
 
 #### Install from Eclipse Marketplace
 
-  * Start Eclipse, open _Help -> Eclipse Marketplace_
+  * Start Eclipse, open **`Help -> Eclipse Marketplace`**
   * Search for "RED Robot Editor"
   * Install preferred version accepting license
   * Restart Eclipse to apply changes
@@ -43,9 +43,9 @@ Note
 
   * Start Eclipse, accept default Workspace folder placement  
 
-  * Open _Help -> Install New Software_  
+  * Open **`Help -> Install New Software`**  
 
-  * Click _Add -> Archive_ and select RED zip feature (eg. org.robotframework.ide.eclipse.feature_1.0.0.201507130728.zip)  
+  * Click **`Add -> Archive`** and select RED zip feature (eg. org.robotframework.ide.eclipse.feature_1.0.0.201507130728.zip)  
 
   * Tick all boxes in Robot Framework IDE Category and apply Next  
 
@@ -53,6 +53,6 @@ Note
 
   * Restart Eclipse as prompted  
 
-  * Verify RED installation by opening _Help -> About RED -> Installation Details_ to check if RED is visible on installed features list  
+  * Verify RED installation by opening **`Help -> About RED -> Installation Details`** to check if RED is visible on installed features list  
 
 [Return to Help index](http://nokia.github.io/RED/help/)

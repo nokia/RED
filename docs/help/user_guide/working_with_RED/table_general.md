@@ -29,8 +29,8 @@ list and dictionary.
 ### Table preferences
 
 All table related preferences (cell text folding, number of columns, default
-behaviors) can be configured at _[Window->Preferences->Robot
-Framework->Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))_
+behaviors) can be configured at `[ Window -> Preferences -> Robot Framework ->
+Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))`
 in **Tables** section.  
   
 ![](table_general/table_preferences.png)  

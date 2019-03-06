@@ -47,8 +47,8 @@ UserDict ={'key1':'value1', 'key2':'value2'}
 
 Since version 0.6.6, RED can automatically invoke refresh of variable files
 being changed.  
-This can be done manually by clicking on Project by RMB and selecting **Robot
-Framework -> Reset Robot Environment**  
+This can be done manually by clicking on Project by RMB and selecting **`Robot
+Framework -> Reset Robot Environment`**  
   
   
 ![](variable_files/reset_robot_env.gif)  

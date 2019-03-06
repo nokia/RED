@@ -12,16 +12,17 @@ resources etc.
 
 Validation mechanism is executed any time when edited file is changed with
 slight delay while **Build Automatic** option is selected from Project. Whole
-project validation can be manually started using option **Project -> Clean**.  
-Resources can be also validated by selecting **Robot Framework -> Revalidate**
-option in Project explorer.  
+project validation can be manually started using option **`Project ->
+Clean`**.  
+Resources can be also validated by selecting **`Robot Framework ->
+Revalidate`** option in Project explorer.  
 
 The file which currently edited within Suite Editor is constantly validated in
 background giving quick feedback about potential problems.
 
 Note
 
-    Although not recommended, validation can be turned off in Preferences ( _[Window->Preferences->Robot Framework->Errors/Warnings](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation\)'\))_ ). 
+    Although not recommended, validation can be turned off in Preferences (`[ Window -> Preferences -> Robot Framework -> Errors/Warnings](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation\)'\))`). 
 
 ### Validation preferences
 
@@ -33,5 +34,7 @@ scope](validation/scope.md)
 
 Validation as command line tool (without GUI, headless) is covered under topic
 [Running validation in command line](validation/headless.md)
+
+### Contents
 
 [Return to Help index](http://nokia.github.io/RED/help/)
