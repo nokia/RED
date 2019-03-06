@@ -29,10 +29,10 @@
 		<li>set Python nature to Robot project to be debugged - right click on Project, from PyDev menu 
 		select <code>Set as PyDev project</code>,
 		</li>
-		<li>set port for remote PyDev debugger: <code>Preferences -> PyDev -> Debug -> Port for remote debugger</code>,
+		<li>set port for remote PyDev debugger: <b><code>Preferences -&gt; PyDev -&gt; Debug -&gt; Port for remote debugger</code></b>,
 		</li>
 		<li>for convenience Remote debugger server activation can be changed from <code>Manual</code> to 
-		<code>Keep always on</code> (from <code>Preferences -> PyDev -> Debug -> Remote debugger server activation</code>),
+		<code>Keep always on</code> (from <b><code>Preferences -&gt; PyDev -&gt; Debug -&gt; Remote debugger server activation</code></b>),
 		</li>
 		<li>to use <code>runPyDevDebug.py</code> script logic RED needs to pass parameters separated by 
 		space to external script, check <a href="../launch_prefs.html">Launching preferences</a>.
@@ -78,6 +78,10 @@
 
 	<h3>Debug</h3>
 	<ul>
+		<li>As mentioned in <a target="_blank" href="http://www.pydev.org/manual_adv_remote_debugger.html" class="external">PyDev Remote Debugger User Guide</a> 
+		there is no actual 'signal' of reaching a breakpoint when doing remote debugging, so debug perspective must be opened first
+		(<b><code>Window -&gt; Perspective -&gt; Open Perspective -&gt; Other... -&gt; Debug</code></b>). 
+		</li>
 		<li>Remember to place at least one breakpoint on executable line either in Robot test or Python library.
 		</li>
 		<li>Before running custom Debug Configuration, PyDev Debug server needs to be started if the startup was
@@ -91,14 +95,5 @@
 		was reached (either Robot testcase or Python library).
 		</li>
 	</ul>
-
-	<dl class="note">
-	   <dt>Note</dt>
-	   <dd>
-	   As mentioned in <a target="_blank" href="http://www.pydev.org/manual_adv_remote_debugger.html" class="external">PyDev Remote Debugger User Guide</a>
-	   there is no actual 'signal' of reaching a breakpoint when doing remote debugging, so debug perspective must be opened first
-	   (<b>Window-&gt;Perspective-&gt;Open Perspective-&gt;Other-&gt;Debug</b>).   
-	   </dd>
-	</dl>
 </body>
 </html>
