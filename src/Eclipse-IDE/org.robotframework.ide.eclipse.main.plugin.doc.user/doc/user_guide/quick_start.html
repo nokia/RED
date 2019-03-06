@@ -11,21 +11,21 @@
 	<p>
 		In order to work with RED, Robot perspective needs to be activated.
 		This can be done in several ways, the easiest is to use top menu:<br />
-		<a class="command"
-			href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective()')">Window
-			-> Perspective -> Open perspective -> Other</a> and select <a
+		<code><a class="command"
+			href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective()')">
+			Window -&gt; Perspective -&gt; Open perspective -&gt; Other</a></i> and select <i><a
 			class="command"
-			href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective)')">Robot</a>
+			href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective)')">Robot</a></code>
 	</p>
 
 	<h3>Create Robot Project</h3>
 	<p>
 		All projects with Robot Framework files should be kept in project-type
 		(<i>nature</i>) Robot, as this allows RED to activate RED specific
-		features on Robot files. Select from top menu bar:<br /> <a
+		features on Robot files. Select from top menu bar:<br /> <code><a
 			class="command"
-			href="javascript:executeCommand('org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotProject)')">File
-			-> New -> Other -> Robot Framework -> Robot Project</a>
+			href="javascript:executeCommand('org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotProject)')">
+			File -&gt; New -&gt; Other -&gt; Robot Framework -&gt; Robot Project</a></code>
 	</p>
     Empty Robot Project should looks similar as  below: </br>
     <img src="images/simple_project_1.png"><br>
@@ -36,19 +36,18 @@
 	<h3>Import Robot files into project</h3>
 	<p>
 		Import Robot files by drag&amp;drop to created project, alternatively
-		you can import folders by right click on project and selecting<br /> <a
+		you can import folders by right click on project and selecting<br /> <code><a
 			class="command"
-			href="javascript:executeCommand('org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.FileSystem)')">Import
-			-> General -> File System</a>
+			href="javascript:executeCommand('org.eclipse.ui.file.import(importWizardId=org.eclipse.ui.wizards.import.FileSystem)')">
+			Import -&gt; General -&gt; File System</a></code>
 	</p>
 
 	<h3>Validate project and imported files</h3>
 	<p>
 		When Robot files has been imported, it is time to validate all the
 		files to get indication about possible issues - either errors in test
-		cases or missing libraries links in red.xml. Use <a class="command"
-			href="javascript:executeCommand('org.eclipse.ui.project.buildAll()')">Project
-			-> Clean</a> from top menu.
+		cases or missing libraries links in red.xml. Use <code><a class="command"
+			href="javascript:executeCommand('org.eclipse.ui.project.buildAll()')">Project -&gt; Clean</a></code> from top menu.
 	</p>
 
 </body>

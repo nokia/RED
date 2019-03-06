@@ -7,15 +7,15 @@
 <body>
 <h2>General usage hints</h2>
 <h3>Tab key behavior </h3>
-Tab key press behavior can be changed at <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor)')">
-Window-&gt;Preferences-&gt;Robot Framework-&gt;Editor</a></i> in <b>Source</b> section. <br>
+Tab key press behavior can be changed at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor</a></code> in <b>Source</b> section. <br>
 It is set by default to be aware of the file type. For .tsv files each Tab will produce item separator, for text files 4 spaces will generated. <br>
 Moreover, <b>jump out of active region</b> behavior can be enabled there. If enabled, instead of inserting defined separator in source editor, RED will move cursor to the end of active region. It may be useful for example for variables edition. 
 <br><br><img src="general/tab_behaviour.png"> <br><br>
-<h3>Validating & revalidating whole project/workspace</h3>
-Validation of test case is triggered by any user actions, it is also done during files&project imports.<br>
-Whenever there is a change in multiple files (for instance find&replace) or  big file import/deletion, it is good to force revalidation of project.<br>
-It is done accessing option Project -> Clean ...  
+<h3>Validating &amp; revalidating whole project/workspace</h3>
+Validation of test case is triggered by any user actions, it is also done during files &amp; project imports.<br>
+Whenever there is a change in multiple files (for instance find/replace) or  big file import/deletion, it is good to force revalidation of project.<br>
+It is done accessing option <b><code>Project -&gt; Clean...</code></b>  
 <br><br><img src="general/gen_1.png"> <br><br>
 At the bottom right of RED, progress bar will appear with the status of validation.<br>
 <h3>Automatic source formatting CTRL+SHIFT+F</h3>
