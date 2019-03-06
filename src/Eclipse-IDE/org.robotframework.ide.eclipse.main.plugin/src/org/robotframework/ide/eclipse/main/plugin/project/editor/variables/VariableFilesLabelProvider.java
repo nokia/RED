@@ -9,7 +9,6 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
@@ -43,19 +42,13 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
     }
 
     private StyledString getStyledText(final ReferencedVariableFile element, final List<RedXmlProblem> problems) {
-        final ReferencedVariableFile varFile = element;
-        final StyledString label = new StyledString();
-
         final boolean hasProblems = !problems.isEmpty();
         final boolean hasErrors = RedXmlProblem.hasErrors(problems);
 
         final Styler styler = hasProblems ? (hasErrors ? Stylers.Common.ERROR_STYLER : Stylers.Common.WARNING_STYLER)
                 : Stylers.Common.EMPTY_STYLER;
 
-        label.append(Path.fromPortableString(varFile.getPath()).lastSegment(), styler);
-        label.append(' ');
-        label.append("- " + new Path(varFile.getPath()), Stylers.Common.ECLIPSE_DECORATION_STYLER);
-        return label;
+        return new StyledString(element.getPath().toString(), styler);
     }
 
     @Override
