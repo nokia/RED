@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Launching preferences
 
 ### General launching preferences
@@ -35,4 +39,3 @@ changed at `[ Window -> Preferences -> Run/Debug ->
 Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))`
 under Launch Operation.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

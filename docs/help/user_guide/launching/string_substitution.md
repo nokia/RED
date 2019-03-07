@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Parameterizing launches
 
 Eclipse string substitution feature allows using built-in or custom variables
@@ -72,4 +76,3 @@ between different sets of values as depicted below:
 ![](images/ui_active_variables_toolbar.png)  
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

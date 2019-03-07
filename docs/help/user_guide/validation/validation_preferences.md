@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Validation](http://nokia.github.io/RED/help/user_guide/validation.md) >
+
 ## Validation - setting issues severity levels
 
 ### General information
@@ -66,4 +70,3 @@ Note
   * **Python Robot Framework environment missing** \- occurs when there is no Robot Environment defined. Python main directory with Robot modules installed should be defined in preferences. Project may override this setting in its configuration file.
   * **Library documentation file cannot be generated** \- occurs when for some reason Robot framework is unable to generate library specification file, probably due to missing library dependencies or errors in library source code.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

@@ -1,3 +1,6 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+
 ## Launching Tests
 
 With RED it is possible to launch Robot Framework tests in 2 modes ( **run**
@@ -45,4 +48,13 @@ if user run tests with agent | Only if user run tests with agent
   
 ### Contents
 
-[Return to Help index](http://nokia.github.io/RED/help/)
+  * [User interface](http://nokia.github.io/RED/help/user_guide/launching/ui_elements.md)
+  * [Local launches](http://nokia.github.io/RED/help/user_guide/launching/local_launch.md)
+  * [Local launches scripting](http://nokia.github.io/RED/help/user_guide/launching/local_launch_scripting.md)
+  * [Remote launches](http://nokia.github.io/RED/help/user_guide/launching/remote_launch.md)
+  * [Parameterizing launches](http://nokia.github.io/RED/help/user_guide/launching/string_substitution.md)
+  * [Controlling execution](http://nokia.github.io/RED/help/user_guide/launching/exec_control.md)
+  * [Debugging Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md)
+  * [Launching preferences](http://nokia.github.io/RED/help/user_guide/launching/launch_prefs.md)
+  * [RED Tests Runner Agent](http://nokia.github.io/RED/help/user_guide/launching/red_agent.md)
+

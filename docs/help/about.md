@@ -1,3 +1,5 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+
 ## About this Guide
 
 This topic gathers useful tips and informations about RED User Guide
@@ -10,4 +12,3 @@ This topic gathers useful tips and informations about RED User Guide
 
   * every other link will redirect to some topic inside this User Guide. 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

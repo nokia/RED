@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## General info about Python variable files used in Robot Test Suites
 
 RobotFramework allows to use Python variable files in Robot Test Suites in two
@@ -31,7 +36,7 @@ Note
 Below is a sample body of such Python variable file (examples can be also
 found in RobotFramework official manual and Python examples).  
   
-![](variable_files/var-files-red-xml.gif)  
+![](images/var-files-red-xml.gif)  
   
   
 `  
@@ -51,7 +56,6 @@ This can be done manually by clicking on Project by RMB and selecting **`Robot
 Framework -> Reset Robot Environment`**  
   
   
-![](variable_files/reset_robot_env.gif)  
+![](images/reset_robot_env.gif)  
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

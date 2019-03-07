@@ -1,3 +1,5 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+
 ## Useful RED key shortcuts
 
 Note
@@ -91,4 +93,3 @@ editor.
 
 **Zoom Out in source editor. **
 
-[Return to Help index](http://nokia.github.io/RED/help/)

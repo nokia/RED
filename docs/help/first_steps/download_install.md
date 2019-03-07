@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[First steps with
+RED](http://nokia.github.io/RED/help/first_steps/first_steps.md) >
+
 ## Download & install
 
 ### Get Java
@@ -55,4 +59,3 @@ Note
 
   * Verify RED installation by opening **`Help -> About RED -> Installation Details`** to check if RED is visible on installed features list  
 
-[Return to Help index](http://nokia.github.io/RED/help/)

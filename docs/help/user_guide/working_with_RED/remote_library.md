@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Working with Remote Library
 
 ### Introduction
@@ -34,7 +39,7 @@ red.xml under Referenced Libraries tab.
 
   
   
-![](remote_library/remote_library_settings.png)  
+![](images/remote_library_settings.png)  
   
 
 Note that IP, Port and name library served by remote library server may
@@ -49,10 +54,9 @@ Standard syntax is as follows: _Library Remote http://${ADDRESS}:${PORT}_
 
   
   
-![](remote_library/remote_library_testcase.png)  
+![](images/remote_library_testcase.png)  
   
 
 For more examples please check RobotFramewoke RemoteInterface webpage
 <https://github.com/robotframework/RemoteInterface#available-remote-servers>
 
-[Return to Help index](http://nokia.github.io/RED/help/)

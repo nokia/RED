@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Launching related UI elements
 
 RED provides couple of elements which are used in order to launch test and
@@ -79,4 +83,3 @@ RED uses standard eclipse **Debug** perspective when configuration is launched
 in debug mode. For more information about working with this perspective please
 take a look at [Debugging Robot](debug.md) topic.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Integration with other
+tools](http://nokia.github.io/RED/help/user_guide/tools_integration.md) >
+
 ## PyDev and PyLint
 
 [PyDev](https://marketplace.eclipse.org/content/pydev-python-ide-eclipse) and
@@ -36,4 +41,3 @@ _pip install pylint_
   * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **`Project -> PyDev -> Set as Source Folder (add to PYTHONPATH)`** , 
   * restart Eclipse/RED Product.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

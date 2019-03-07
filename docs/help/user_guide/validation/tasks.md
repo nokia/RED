@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Validation](http://nokia.github.io/RED/help/user_guide/validation.md) >
+
 ## Detecting tasks/TODO defined in comments
 
 It is a common practice to put notes in comments describing some kind of tasks
@@ -41,4 +45,3 @@ Following preferences can be changed regarding tasks detection:
   * **tags syntax coloring** \- the color of syntax highlighting for task tags can be specified at _[Syntax Coloring](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax\)'\))_ page, 
   * **marker annotations** color and appearance used by editor can be changed at _[Annotations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations\)'\))_ page. 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

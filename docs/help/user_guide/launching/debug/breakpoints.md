@@ -1,3 +1,9 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+[Debugging
+Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md) >
+
 ## Breakpoints
 
 List of all breakpoints is displayed in **Breakpoints** view of Debug
@@ -27,4 +33,3 @@ Note
 
     When breakpoint is edited the changes has to be saved. Unsaved changes in breakpoint are marked with ***** mark placed in Breakpoints view title similarly as in editors. Breakpoints are stored in workspace metadata so they are not removed when RED/eclipse is restarted. 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

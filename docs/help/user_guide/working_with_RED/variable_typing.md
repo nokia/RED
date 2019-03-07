@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Variable typing in editors
 
 RED supports several variable typing enhancements. When this feature is
@@ -8,7 +13,7 @@ first bracket is deleted by typing Delete or Backspace. When selected text
 matches given pattern and one of variable identifiers is typed, selection is
 wrapped with variable brackets.  
   
-![](variable_typing/variable_typing.gif)  
+![](images/variable_typing.gif)  
   
 
 ### Variable typing preferences
@@ -19,7 +24,6 @@ Framework ->
 Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))`
 in **Variables** section.  
   
-![](variable_typing/variable_preferneces.png)  
+![](images/variable_preferneces.png)  
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

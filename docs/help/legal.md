@@ -1,3 +1,5 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+
 ## License
 
 Copyright 2015, 2016, 2017, 2018, 2019 Nokia Solutions and Networks
@@ -14,4 +16,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and  
 limitations under the License.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

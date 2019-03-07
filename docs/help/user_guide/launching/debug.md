@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Debugging Robot
 
 Debug functionality is unique way of checking what is happening during tests
@@ -65,4 +69,9 @@ dialog and choose which cases should be executed:
 
 ### Contents
 
-[Return to Help index](http://nokia.github.io/RED/help/)
+  * [User interface](http://nokia.github.io/RED/help/user_guide/launching/debug/ui_elements.md)
+  * [Breakpoints](http://nokia.github.io/RED/help/user_guide/launching/debug/breakpoints.md)
+  * [Hitting a breakpoint](http://nokia.github.io/RED/help/user_guide/launching/debug/hitting_a_breakpoint.md)
+  * [Debugger preferences](http://nokia.github.io/RED/help/user_guide/launching/debug/preferences.md)
+  * [Debugging Robot & Python with RED & PyDev](http://nokia.github.io/RED/help/user_guide/launching/debug/robot_python_debug.md)
+

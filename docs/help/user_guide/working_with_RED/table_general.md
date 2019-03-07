@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Table Editors - general usage hints
 
 ### Jump to Source, View in Table Editor
@@ -21,7 +26,7 @@ discarded when switching to Source editor.
 Type of new variable in Variable Editor can be controlled by small green arrow
 next to "...add new xxx":  
   
-![](table_general/add_new_var.png)  
+![](images/add_new_var.png)  
   
 Scalar type is displayed as default on add action element. Other types are:
 list and dictionary.  
@@ -33,7 +38,7 @@ behaviors) can be configured at `[ Window -> Preferences -> Robot Framework ->
 Editor](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor\)'\))`
 in **Tables** section.  
   
-![](table_general/table_preferences.png)  
+![](images/table_preferences.png)  
   
 
 ### Default number of columns in Test Cases/Keywords editors
@@ -51,4 +56,3 @@ Additionally it can be configured that Enter will finish cell edit and cursor
 will stay on current cell.  
 **Hint:** by pressing Shift+Enter, cursor will move backwards.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

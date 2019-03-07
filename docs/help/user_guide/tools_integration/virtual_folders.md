@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Integration with other
+tools](http://nokia.github.io/RED/help/user_guide/tools_integration.md) >
+
 ## Working with virtual folders mounted via SSH
 
 If there is a need to work with remote folders mounted as SSH, this can be
@@ -33,4 +38,3 @@ Warning
 
     It was seen that RSE might cause Eclipse to be unresponsive while waiting for establish connection.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

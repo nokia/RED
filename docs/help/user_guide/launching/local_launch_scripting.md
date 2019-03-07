@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Locally launched tests using own scripts
 
 The **Robot** launch configurations may be called through some user-defined
@@ -90,4 +94,3 @@ see the message from script as well as the output from tests.
   
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

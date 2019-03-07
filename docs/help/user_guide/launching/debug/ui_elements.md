@@ -1,3 +1,9 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+[Debugging
+Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md) >
+
 ## User interface
 
 Debug perspective looks as follows:
@@ -15,4 +21,3 @@ Major parts of this perspective are:
 
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

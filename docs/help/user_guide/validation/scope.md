@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Validation](http://nokia.github.io/RED/help/user_guide/validation.md) >
+
 ## Limiting validation scope
 
 When working with bigger projects, it is good to limit validation scope to
@@ -35,4 +39,3 @@ Note
 Note that exclude folders are grayed out, exclude state is inherited from
 parent folders.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

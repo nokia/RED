@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Custom python/class paths and path relativeness
 
 Settings available in **`red.xml -> Referenced Libraries`**
@@ -12,7 +17,7 @@ Path entries can be absolute or relative, they will be taken into use anytime
 when interpreter executes (testcase and debug run or libdoc generation).  
   
   
-![](custom_paths_relatve/custom_path.png)  
+![](images/custom_path.png)  
   
 
 ### Path relativeness
@@ -24,4 +29,3 @@ This can be changed in **`red.xml -> Referenced Libraries -> Paths`** part.
 **Note that relativeness setting is used together with class/python path and
 libraries only.**
 
-[Return to Help index](http://nokia.github.io/RED/help/)
