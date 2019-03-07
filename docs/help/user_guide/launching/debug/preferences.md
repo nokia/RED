@@ -1,3 +1,9 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+[Debugging
+Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md) >
+
 ## Debugger preferences
 
 Following settings found at `[ Window -> Preferences -> Robot Framework ->
@@ -9,4 +15,3 @@ preference page which can be adjusted in order to influence debugger behavior:
 
   * **Suspend execution whenever debugger goes into erroneous state** \- as described in [ Debugger Basics](../debug.md) topic the debugger can suspend when going into erroneous state. With this preference the behavior can be enabled or disabled (by default user is asked each time what to do). 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

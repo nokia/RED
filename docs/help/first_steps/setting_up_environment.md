@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[First steps with
+RED](http://nokia.github.io/RED/help/first_steps/first_steps.md) >
+
 ## Establishing environment
 
 As mentioned [earlier](download_install.md) RED requires Python interpreter
@@ -59,4 +63,3 @@ variable to see if any of listed executables are there.
 
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[First steps with
+RED](http://nokia.github.io/RED/help/first_steps/first_steps.md) >
+
 ## RED Preferences & red.xml and other
 
 This page is intended to help users in following cases:  
@@ -50,4 +54,3 @@ Red.xml file opened with RED Project Editor should look like follows:
   
 ![](preferences_misc/red_xml.gif)  
 
-[Return to Help index](http://nokia.github.io/RED/help/)

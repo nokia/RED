@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Recognizing external libraries in RED
 
 ### External libraries installed by pip or included in testcase by file path
@@ -18,7 +23,7 @@ When there is a need to run autodiscovery on list of files, folders or whole
 project, this can be achieved by using right click menu in Project Explorer
 from Robot Framework option.  
   
-![](libs/autodiscovery_menu.png)  
+![](images/autodiscovery_menu.png)  
   
 
 Autodiscovery mechanism is configured per project. Its preferences are stored
@@ -38,7 +43,7 @@ right clicking on file and using option:
 
 Lets focus on following example:  
   
-![](libs/unknown_libs.png)  
+![](images/unknown_libs.png)  
   
 In sample testcase, there are two libraries included. CalculatorLibrary.py is
 custom user local library placed in the same folder as testcase,
@@ -50,13 +55,13 @@ action available.
 Click on the library name in test editor, open right click menu and choose
 Quick Fix or use CTRL+1.  
   
-![](libs/quick_fix.png)  
+![](images/autodiscovery_quick_fix.png)  
   
 Double click on Discover option, RED will search either PythonPath or library
 file path, if successful library will be added to Referenced libraries in
 red.xml  
   
-![](libs/reference_libs.png)  
+![](images/reference_libs.png)  
   
   
 All changes are stored in red.xml, if you need to modify them, open red.xml
@@ -84,7 +89,7 @@ _python -m robot.libdoc &ltPATH;_TO_LIBNAME> &ltOPTIONS;>_
 Whenever RED encounters problem, it will be shown as popup window from Python
 execution:  
   
-![](libs/error.png)  
+![](images/libdoc_error.png)  
   
 This indicates that some of the dependencies are missing on your local machine
 which may affect testcase execution. To verify you can try to execute libdoc
@@ -101,7 +106,7 @@ located in `[ Window -> Preferences -> Robot Framework ->
 Libraries](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries\)'\))`
 is enabled by default.  
   
-![](libs/libdoc_generation_preference.png)  
+![](images/libdoc_generation_preference.png)  
   
 This preference controls if the libdoc is generated in a separate process or
 not. Note that this solution may affect the time of libdoc generation, i.e.
@@ -118,4 +123,3 @@ change and regenerate libdoc (it can be switch off/on in red.xml).
 This can be also done manually by right clicking on library in Project
 Explorer and selecting _Reload action_
 
-[Return to Help index](http://nokia.github.io/RED/help/)

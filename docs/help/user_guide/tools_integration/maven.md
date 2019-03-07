@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Integration with other
+tools](http://nokia.github.io/RED/help/user_guide/tools_integration.md) >
+
 ## How to integrate RED with Robotframework Maven Plugin
 
   * Download from [launch4j](http://sourceforge.net/projects/launch4j/files/launch4j-3/3.8/) applicable for your OS package - we will use launch4j-3.8-win32.zip (it is standalone version, which requires only unzip) 
@@ -56,4 +61,3 @@ To integrate jython.exe with RED:
   6. if everything is ok, information about Robot Framework version should be visible
   7. when you will create RED project or execute Clean\Build, you should see in Robot Standard libraries standard libraries like i.e. BultIn with information about keywords, which they contains.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

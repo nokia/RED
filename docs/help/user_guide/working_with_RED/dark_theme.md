@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Dark theme in RED
 
 Dark theme is a popular way to reduce eyes strain especially in low-light
@@ -21,20 +26,20 @@ Note
 
     The syntax coloring will automatically change to **heliophobia** profile once the theme is changed to dark. Some other colors stored in preferences are also adjusted - for example keyword occurrences annotation displayed in source editor.
   
-![](dark_theme/robot-color-profiles.png)
+![](images/robot-color-profiles.png)
 
 ### Changing to Dark theme
 
 Dark theme can be changed in `[ Window -> Preferences ->
 Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))`,
 
-![](dark_theme/apperence-dark.png)
+![](images/apperence-dark.png)
 
-![](dark_theme/red-dark.png)
+![](images/red-dark.png)
 
 ### Darkest Dark theme - expanded Dark theme for Eclipse
 
-![](dark_theme/darkest-dark.png)
+![](images/darkest-dark.png)
 
 Darkest Dark plugin is the external theme which greatly improves Eclipse dark
 theme making it consistent with modified icons and other UI elements for dark
@@ -44,6 +49,5 @@ Darkest Dark Theme can be installed from **`Help -> Eclipse Marketplace`** and
 then be activated from `[ Window -> Preferences ->
 Appearance](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Views\)'\))`
 
-![](dark_theme/apperence-darkest-dark.png)
+![](images/apperence-darkest-dark.png)
 
-[Return to Help index](http://nokia.github.io/RED/help/)

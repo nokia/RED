@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Controlling execution
 
 In both **RUN** and **DEBUG** modes no matter if locally or remotely launched
@@ -36,4 +40,3 @@ information proceed to [Debug](debug.md) topic.
 
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

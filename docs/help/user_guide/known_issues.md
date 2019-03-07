@@ -1,3 +1,6 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+
 ## Known issues and problems
 
 For all currently opened issues please visit our repository at
@@ -72,4 +75,3 @@ section:
 ...  
 -vmargs  
 
-[Return to Help index](http://nokia.github.io/RED/help/)

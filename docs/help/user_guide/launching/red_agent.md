@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## RED Agent
 
 RED Tests Runner Agent is something of which you should be aware if you're
@@ -68,4 +72,3 @@ in this case `HOST=192.168.0.7`, `PORT=12321` and `TIMEOUT=60`
   
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

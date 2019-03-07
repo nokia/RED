@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Integration with other
+tools](http://nokia.github.io/RED/help/user_guide/tools_integration.md) >
+
 ## Robot Framework Lint analysis
 
 Starting with RED 0.8.1 it is possible to run [Robot Framework
@@ -52,4 +57,3 @@ Note
 
     Additional arguments field accepts Eclipse [string variables](../launching/string_substitution.md).
 
-[Return to Help index](http://nokia.github.io/RED/help/)

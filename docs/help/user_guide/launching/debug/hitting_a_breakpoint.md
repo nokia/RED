@@ -1,3 +1,9 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+[Debugging
+Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md) >
+
 ## Hitting a breakpoint during debug execution
 
 Whenever debugger suspends the execution there are many useful informations
@@ -215,4 +221,3 @@ code which should be stepped over.
   
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

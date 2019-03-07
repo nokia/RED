@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Validation](http://nokia.github.io/RED/help/user_guide/validation.md) >
+
 ## Running validation in command line
 
 RED can be run in headless mode (without GUI) to provide validation info of
@@ -17,4 +21,3 @@ $PROJECT_PATHS -projects $PROJECT_NAMES -report $RAPORT_FILE
   * **$PROJECT_PATHS** \- list of paths to projects to be imported into workspace, separated by space
   * **$PROJECT_NAMES** \- list of projects to be validated from workspace, separated by space
 
-[Return to Help index](http://nokia.github.io/RED/help/)

@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[First steps with
+RED](http://nokia.github.io/RED/help/first_steps/first_steps.md) >
+
 ## Create project, add test and run
 
 In order to start working with RED & Eclipse, you should set RED perspective.
@@ -93,4 +97,3 @@ execution time. This view is in Robot perspective by default.
 ![](create_run/exec_1.png)  
 To open Execution go to: **`Window -> Show View -> Robot -> Execution View`**
 
-[Return to Help index](http://nokia.github.io/RED/help/)

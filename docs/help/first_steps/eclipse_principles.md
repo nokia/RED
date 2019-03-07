@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[First steps with
+RED](http://nokia.github.io/RED/help/first_steps/first_steps.md) >
+
 ## Eclipse principles
 
 ### Eclipse platform overview
@@ -79,4 +83,3 @@ not case-sensitive, or that does have restrictions on resource names, then
 those restrictions will show through when you actually try to create and
 modify resources.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

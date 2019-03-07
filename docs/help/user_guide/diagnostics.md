@@ -1,3 +1,6 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+
 ## Diagnostics
 
 ### Session server
@@ -49,4 +52,3 @@ in command line
 
 After starting again RED should connect to manually started session server.
 
-[Return to Help index](http://nokia.github.io/RED/help/)

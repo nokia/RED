@@ -1,3 +1,9 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+[Debugging
+Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md) >
+
 ## Debugging Robot & Python with RED & PyDev
 
 From RED 0.7.6 it is possible to debug Robot test cases and Python libraries
@@ -42,4 +48,3 @@ Note
   * Run created Debug Configuration, RED should start the `runPyDevDebug.py` script which will take command line from RED and start Robot Framework debug run simultaneously being connected with Pydev Debugger. 
   * If breakpoint is reached, appropriated Debugger is used depending on the source from where the breakpoint was reached (either Robot testcase or Python library). 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

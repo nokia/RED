@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Integration with other
+tools](http://nokia.github.io/RED/help/user_guide/tools_integration.md) >
+
 ## Running tests using Gradle
 
 It is possible to run Robot tests from RED by launching them through script.
@@ -102,4 +107,3 @@ Warning
 
     As for now RED cannot use Standalone JAR distribution of RF as environment, so while it would possible to run the tests using (2) method it is currently not possible to have other features of RED like validation, code assistance etc. working without having python interpreter installed. 
 
-[Return to Help index](http://nokia.github.io/RED/help/)

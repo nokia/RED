@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Remotely launched tests
 
 When **Robot Remote** launch configuration is launched, it setups a simple
@@ -72,4 +76,3 @@ double check following:
   
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

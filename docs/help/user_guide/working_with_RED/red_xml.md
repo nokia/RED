@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 # General information about red.xml
 
 Red.xml is file which stores Project related settings, some of those controls
@@ -15,7 +20,7 @@ In case of importing robot files to generic Eclipse project, right click on
 Project in Project Explorer and select **`Robot Framework -> Add Robot
 nature`** to create red.xml
 
-![](red_xml/add_robot_nature.png)  
+![](images/add_robot_nature.png)  
   
 
 In any case, red.xml shall be visible in Project Explorer in root folder.
@@ -33,7 +38,7 @@ window: General, Referenced Libraries, Variable files, Validation.
 
 This place holds settings which controls overall behavior of RED Robot Editor.
 
-![](red_xml/general_tab.png)  
+![](images/red_xml_general_tab.png)  
   
 
 **Robot Framework** \- this section allows to set python interpreter
@@ -48,7 +53,7 @@ mapping](variable_mapping.md)
 
 ### Referenced Libraries tab
 
-![](red_xml/ref_libs.png)  
+![](images/red-xml-libraries-tab.png)  
   
 
 This section holds anything related to libraries and RED mechanisms for
@@ -68,7 +73,7 @@ relativeness](custom_paths_relatve.md)
 
 ### Variable files tab
 
-![](red_xml/var_files.png)  
+![](images/red_xml_variables_tab.png)  
   
 
 **Variable files** \- this tab specify variable files which should be visible
@@ -81,7 +86,7 @@ anywhere inside Project](variable_files.md).
 
 ### Validation tab
 
-![](red_xml/validation_tab.png)  
+![](images/red_xml_validation_tab.png)  
   
 
 **Excluded project parts** \- this section allows user to limit validation to
@@ -91,4 +96,3 @@ and choose _Exclude_ from menu.
 
 More info under topic [Limiting validation scope](../validation/scope.md).
 
-[Return to Help index](http://nokia.github.io/RED/help/)

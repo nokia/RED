@@ -1,3 +1,8 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Working with
+RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
+
 ## Content assistance
 
 Content assistance is a functionality provided by Eclipse platform extended to
@@ -12,19 +17,19 @@ preferences.
 Assist window has multiple modes which are cycled by CTRL+SPACE. Next mode
 type is displayed at the bottom of the window.  
   
-![](content_assist/content-assist-modes.gif)  
+![](images/content-assist-modes.gif)  
   
   
 All proposal containing given input are displayed. Proposals starting with
 given input are displayed first.  
   
-![](content_assist/content-assist-search.png)  
+![](images/content-assist-search.png)  
   
   
 When given input is camel case string (for example: REA, CrBiFi, WaUCr)
 keywords proposals that match that string are displayed before other matches.  
   
-![](content_assist/content-assist-camel-case.png)  
+![](images/content-assist-camel-case.png)  
   
   
 
@@ -47,7 +52,6 @@ automatically when such proposal is accepted.
 Another option is Tab behavior for automatically added arguments in source
 view. Cycle between arguments or exit on last argument can be chosen.  
   
-![](content_assist/content_pref.png)  
+![](images/content-assist-pref.png)  
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

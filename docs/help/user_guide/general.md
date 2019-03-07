@@ -1,3 +1,6 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+
 ## General usage hints
 
 ### Tab key behavior
@@ -13,7 +16,7 @@ enabled, instead of inserting defined separator in source editor, RED will
 move cursor to the end of active region. It may be useful for example for
 variables edition.  
   
-![](general/tab_behaviour.png)  
+![](images/tab_behaviour.png)  
   
 
 ### Validating & revalidating whole project/workspace
@@ -24,7 +27,7 @@ Whenever there is a change in multiple files (for instance find/replace) or
 big file import/deletion, it is good to force revalidation of project.  
 It is done accessing option **`Project -> Clean...`**  
   
-![](general/gen_1.png)  
+![](images/gen_1.png)  
   
 At the bottom right of RED, progress bar will appear with the status of
 validation.  
@@ -40,7 +43,7 @@ formatting and check style.
 It is invoked by right click menu in Source editor.  
   
   
-![](general/gen_5.png)  
+![](images/gen_5.png)  
   
 
 ### Quick Fix - Ctrl+1
@@ -49,7 +52,7 @@ Quick Fix is an Eclipse mechanism to provide user with predefined action for
 solving issues. If the Quick Fix action is available, light bulb icon is shown
 next to line number.  
   
-![](general/gen_6.png)  
+![](images/gen_6.png)  
   
 Quick Fix can be accessed by clicking on underlined item and choosing from
 right click menu Quick Fix or directly by Ctrl+1.
@@ -59,11 +62,10 @@ right click menu Quick Fix or directly by Ctrl+1.
 RED can run or debug one, selected testcase. This can be achieved by altering
 Run Configuration :  
   
-![](general/run-selected.gif)  
+![](images/run-selected.gif)  
   
 and also by placing cursor on testcase body and using right click menu:  
   
-![](general/run-selected-editors.gif)  
+![](images/run-selected-editors.gif)  
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)

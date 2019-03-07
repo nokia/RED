@@ -1,3 +1,7 @@
+[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
+[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
+
 ## Locally launched tests
 
 When **Robot** launch configuration is launched, it setups a simple server
@@ -96,4 +100,3 @@ topic.
   
   
 
-[Return to Help index](http://nokia.github.io/RED/help/)
