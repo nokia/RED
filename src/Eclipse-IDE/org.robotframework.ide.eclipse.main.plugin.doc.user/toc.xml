@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<toc label="RED - Robot Editor User Guide" topic="user_guide.html">
+<toc label="RED - Robot Editor User Guide" topic="doc/index.html">
    <topic href="doc/about.html" label="About this Guide"></topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
     <topic href="doc/keys.html" label="RED key shortcuts cheatsheet">    </topic>
@@ -27,7 +27,7 @@
         </topic>
         <topic href="doc/user_guide/working_with_RED/libs.html" label="Recognizing external libraries in RED">
         </topic>
-        <topic href="doc/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
+        <topic href="doc/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parameterized paths to libraries and resources">
         </topic>
         <topic href="doc/user_guide/working_with_RED/variable_files.html" label="Variable Files - using files with variable accessible anywhere inside Project">
         </topic>

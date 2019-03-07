@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
@@ -60,7 +59,7 @@ public class RemoteLocationsLabelProviderTest {
 
     @Test
     public void whenAddingTokenIsGiven_itsImageIsReturned() {
-        final ElementAddingToken addingToken = new ElementAddingToken("new path", true);
+        final ElementAddingToken addingToken = new ElementAddingToken("new remote location", true);
         assertThat(provider.getImage(addingToken)).isSameAs(addingToken.getImage());
     }
 
@@ -70,9 +69,8 @@ public class RemoteLocationsLabelProviderTest {
         when(editorInput.getProblemsFor(location)).thenReturn(new ArrayList<>());
 
         final StyledString styledLabel = provider.getStyledText(location);
-        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/ - Remote");
-        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 22, null, null, SWT.NORMAL),
-                new StyleRange(22, 9, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/");
+        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 22, null, null, SWT.NORMAL));
     }
 
     @Test
@@ -82,15 +80,14 @@ public class RemoteLocationsLabelProviderTest {
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
         final StyledString styledLabel = provider.getStyledText(location);
-        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/ - Remote");
-        assertThat(styledLabel.getStyleRanges()).containsExactly(
-                new StyleRange(0, 22, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL),
-                new StyleRange(22, 9, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/");
+        assertThat(styledLabel.getStyleRanges())
+                .containsExactly(new StyleRange(0, 22, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL));
     }
 
     @Test
     public void whenAddingTokenIsGiven_itsStyledLabelIsReturned() {
-        final ElementAddingToken addingToken = new ElementAddingToken("new path", true);
+        final ElementAddingToken addingToken = new ElementAddingToken("new remote location", true);
         final StyledString expected = addingToken.getStyledText();
         final StyledString actual = provider.getStyledText(addingToken);
 
@@ -100,7 +97,7 @@ public class RemoteLocationsLabelProviderTest {
 
     @Test
     public void whenAddingTokenIsGiven_nonTooltipTextIsReturned() {
-        final ElementAddingToken addingToken = new ElementAddingToken("new path", true);
+        final ElementAddingToken addingToken = new ElementAddingToken("new remote location", true);
 
         assertThat(provider.getToolTipText(addingToken)).isNull();
     }

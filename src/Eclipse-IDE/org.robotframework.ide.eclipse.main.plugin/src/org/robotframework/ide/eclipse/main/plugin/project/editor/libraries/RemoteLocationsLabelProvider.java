@@ -36,9 +36,7 @@ class RemoteLocationsLabelProvider extends RedCommonLabelProvider {
 
             final Styler styler = editorInput.getProblemsFor(location).isEmpty() ? Stylers.Common.EMPTY_STYLER
                     : Stylers.Common.ERROR_STYLER;
-            final StyledString label = new StyledString(location.getUri(), styler);
-            label.append(" - Remote", Stylers.Common.ECLIPSE_DECORATION_STYLER);
-            return label;
+            return new StyledString(location.getUri(), styler);
         } else {
             return ((ElementAddingToken) element).getStyledText();
         }
