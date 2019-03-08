@@ -49,6 +49,10 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        projectProvider.createDir(".hidden_dir");
+        projectProvider.createFile(".hidden_dir/from_hidden.robot",
+                "*** Settings ***",
+                "Library  unknown");
         projectProvider.createDir("resources");
         projectProvider.createFile("suite_with_known_libraries.robot",
                 "*** Settings ***",
@@ -89,6 +93,9 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 "*** Settings ***",
                 "Library  ../knownInResource.py");
         projectProvider.createFile("knownInResource.py");
+        projectProvider.createFile("suite_with_windows_paths.robot",
+                "*** Settings ***",
+                "Library  C:\\Users\\Lib.py.py");
 
         final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1",
                 projectProvider.getProject().getName());
@@ -182,6 +189,22 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
     }
 
     @Test
+    public void autodiscovererIsNotStarted_whenSuiteIsInEclipseHiddenDirectory() throws Exception {
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile(".hidden_dir/from_hidden.robot"));
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verifyZeroInteractions(discoverer);
+    }
+
+    @Test
     public void autodiscovererIsNotStarted_whenSuiteIsExcludedFromProject() throws Exception {
         preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
         excludePathInProjectConfig("suite_with_unknown_library_1.robot");
@@ -267,6 +290,25 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resources_with_cycle.robot"));
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verify(factory).create(suite.getRobotProject(), newArrayList(suite));
+
+        verify(discoverer).start();
+        verifyNoMoreInteractions(discoverer);
+    }
+
+    @Test
+    public void autodiscovererStarts_whenLibraryImportedWithWindowsPathSeparatorIsDetected() {
+        preferenceUpdater.setValue(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
+
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite_with_windows_paths.robot"));
         final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);

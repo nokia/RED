@@ -10,7 +10,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -40,8 +39,6 @@ import com.google.common.collect.ImmutableMap;
  * @author Michal Anglart
  */
 abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
-
-    private static final Pattern UNESCAPED_WINDOWS_PATH_SEPARATOR = Pattern.compile("^.*[^\\\\][\\\\]{1}[^\\\\ ].*$");
 
     protected final FileValidationContext validationContext;
 
@@ -120,7 +117,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParameterized,
             final List<RobotToken> arguments) {
 
-        if (hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
+        if (ImportPath.hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
             reportWindowsPathImport(pathToken);
             return;
         }
@@ -164,11 +161,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 validateFile(importAsFile, path, pathToken, arguments);
             }
         }
-    }
-
-    private boolean hasNotEscapedWindowsPathSeparator(final String path) {
-        // e.g. c:\lib.py, but space escape is allowed e.g. c:/folder \ with2spaces/file.robot
-        return UNESCAPED_WINDOWS_PATH_SEPARATOR.matcher(path).find();
     }
 
     private void reportFileOutsideOfWorkspace(final String path, final RobotToken pathToken) {
