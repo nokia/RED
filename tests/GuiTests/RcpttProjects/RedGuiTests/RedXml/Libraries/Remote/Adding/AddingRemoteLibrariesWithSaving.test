@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _a7l9oLkNEeWzJthH3JoEWQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 3:09 PM
+Save-Time: 3/8/19 12:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,7 +65,7 @@ get-button "Save \((Ctrl|M1)\+S\)" | click
 try -times 10 -delay 1000 -command{
 	get-editor "RobotProject/red.xml" | get-section Libraries | get-table 
     -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1 | get-item -path "http:\\/\\/127.0.0.1:8270\\/ - Remote" | get-property "image.path" 
+    -index 1 | get-item -path "http:\\/\\/127.0.0.1:8270\\/" | get-property "image.path" 
     	| equals ".*remote_disconnected.png" | verify-true
 }
 
@@ -75,16 +75,16 @@ with [get-editor "RobotProject/red.xml" | get-section Libraries | get-table
     -index 1] {
 
     get-property "getItems().length" | equals 4 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/ - Remote" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "http://158.5.0.1:994/ - Remote" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "noting - Remote" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://158.5.0.1:994/" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "noting" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "...add new remote location" | verify-true
 
-    get-item -path "http:\\/\\/127.0.0.1:8270\\/ - Remote" | get-property "styles[0].foregroundColor" 
+    get-item -path "http:\\/\\/127.0.0.1:8270\\/" | get-property "styles[0].foregroundColor" 
         | equals "#FF0000" | verify-true
-    get-item -path "http:\\/\\/158.5.0.1:994\\/ - Remote" | get-property "styles[0].foregroundColor" | equals "#FF0000" 
+    get-item -path "http:\\/\\/158.5.0.1:994\\/" | get-property "styles[0].foregroundColor" | equals "#FF0000" 
         | verify-true
-    get-item -path "noting - Remote" | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path "noting" | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
 }
 //check Problems
 get-tab-folder -index 4 | get-tab-item Problems | click
