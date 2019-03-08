@@ -80,6 +80,11 @@ public class ReferencedLibraryLocator {
         Optional<File> libraryFile = Optional.empty();
         try {
             if (new Path(path).isAbsolute() || path.endsWith("/") || path.endsWith(".py")) {
+                if (ImportPath.hasNotEscapedWindowsPathSeparator(path)) {
+                    detector.libraryDetectingByPathFailed(path, libraryFile,
+                            "The path '" + path + "' contains not supported Windows separator.");
+                    return;
+                }
                 libraryFile = new RobotProjectPathsProvider(suiteFile.getRobotProject())
                         .findAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
                         .map(File::new)

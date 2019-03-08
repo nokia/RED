@@ -466,6 +466,18 @@ public class ReferencedLibraryLocatorTest {
         verifyNoMoreInteractions(detector);
     }
 
+    @Test
+    public void detectingFails_whenLibraryPathContainsWindowsPathSeparator() throws Exception {
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, "C:\\folder\\path_lib.py");
+
+        verifyZeroInteractions(importer);
+
+        verify(detector).libraryDetectingByPathFailed("C:\\folder\\path_lib.py", Optional.empty(),
+                "The path 'C:\\folder\\path_lib.py' contains not supported Windows separator.");
+        verifyNoMoreInteractions(detector);
+    }
+
     private void setupJavaImport(final IResource libResource) {
         final String name = libResource.getLocation().removeFileExtension().lastSegment();
         final String path = libResource.getLocation().toPortableString();
