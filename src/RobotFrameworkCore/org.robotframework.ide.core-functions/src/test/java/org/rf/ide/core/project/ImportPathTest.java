@@ -70,4 +70,12 @@ public class ImportPathTest {
         assertThat(ImportPath.from("c:\\absolute\\..\\.\\..\\to\\file.ext").isAbsolute()).isTrue();
     }
 
+    @Test
+    public void testUnescapedWindowsPathSeparators() throws Exception {
+        assertThat(ImportPath.hasNotEscapedWindowsPathSeparator("c:\\path\\to\\file")).isTrue();
+        assertThat(ImportPath.hasNotEscapedWindowsPathSeparator("c:/path/to\\file")).isTrue();
+        assertThat(ImportPath.hasNotEscapedWindowsPathSeparator("c:/path/to/file")).isFalse();
+        assertThat(ImportPath.hasNotEscapedWindowsPathSeparator("c:/path/to/file\\ with\\ spaces")).isFalse();
+    }
+
 }

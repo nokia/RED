@@ -144,7 +144,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         final Label libsLabel = new Label(parent, SWT.NONE);
         libsLabel.setText("Discovered libraries (" + importedLibraries.size() + "):");
 
-        final SashForm mainComposite = new SashForm(parent, SWT.VERTICAL);
+        final SashForm mainComposite = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
         GridLayoutFactory.fillDefaults().applyTo(mainComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(mainComposite);
 

@@ -6,12 +6,20 @@
 package org.rf.ide.core.project;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class ImportPath {
+
+    private static final Pattern UNESCAPED_WINDOWS_PATH_SEPARATOR = Pattern.compile("^.*[^\\\\][\\\\]{1}[^\\\\ ].*$");
 
     private final String path;
 
     private final boolean isAbsolute;
+
+    public static boolean hasNotEscapedWindowsPathSeparator(final String path) {
+        // e.g. c:\lib.py, but space escape is allowed e.g. c:/folder \ with2spaces/file.robot
+        return UNESCAPED_WINDOWS_PATH_SEPARATOR.matcher(path).find();
+    }
 
     public static ImportPath from(final String path) {
         return new ImportPath(path, new File(path).isAbsolute());
