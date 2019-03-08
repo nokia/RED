@@ -4,7 +4,7 @@
   	         name="RED Overview" path="overview/@">
 		<group style-id="content-group" id="red-overviewGroup">
        		<link label="RED - Robot Framework editor"  style-id="content-link" id="red-overviewHelpLink"
-       		       url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.robotframework.ide.eclipse.main.plugin.doc.user/doc/index.html">
+       		       url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.robotframework.ide.eclipse.main.plugin.doc.user/help/index.html">
           		<text>Learn how Robot Framework tests can be developed with RED environment</text>
        		</link>
        	</group>

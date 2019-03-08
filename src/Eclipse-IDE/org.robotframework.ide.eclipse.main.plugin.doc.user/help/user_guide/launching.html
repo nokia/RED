@@ -1,0 +1,93 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<h2>Launching Tests</h2>
+
+	<p>With RED it is possible to launch Robot Framework tests in 2 modes (<b>run</b> or <b>debug</b>)
+	in conjunction with 2 types of configurations: (<b>local</b> or <b>remote</b>). Furthermore local 
+	configuration can be launched directly using python interpreter or with script (e.g batch or bash)
+	provided by user.
+	</p>
+	
+	<p>The debug mode is different from run mode in only aspect: it allows to stop test execution on defined
+	breakpoints and perform step-by-step execution.
+	</p>
+
+	<p><a href="launching/remote_launch.html">Remote configuration</a> is rather simple: it starts a server 
+	in RED which is listening for a connection from running tests and outputs messages coming to server
+	into <b>Log Message</b> view as well as updates tests suites tree inside <b>Execution</b> view. When launched
+	in debug the debugging capabilities are enabled. In <b>Console</b> view there are only server status messages
+	printed, as output of remotely running tests are not send to RED. User has to start the tests manually
+	with <a href="launching/red_agent.html">RED agent</a> attached.
+	</p>
+	
+	<p><a href="launching/local_launch.html">Local configuration</a> is a bit more complicated: apart from
+	starting above-mentioned server it automatically starts Robot test execution. Moreover it can be either started 
+	using some Robot environment (python interpreter + Robot Framework) or using some script. In latter case
+	it depends upon script if particular RED feature will work (Console will have tests output only if 
+	script is redirecting it; other features work if script is executing script with 
+	<a href="launching/red_agent.html">RED agent</a> or not).
+	</p>
+	
+	<p>Table below summarizes which RED features are working when running different configuration 
+	in different modes
+	</p>
+	
+	<table>
+	<tr>
+		<th>Configuration &amp; mode</th>
+		<th>Console view</th>
+		<th>Message log view</th>
+		<th>Execution view</th>
+		<th>Debugging</th>
+	</tr>
+	<tr>
+		<td>Local run</td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#ff7b7b"></td>
+	</tr>
+	<tr>
+		<td>Local debug</td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#7bff7b"></td>
+		<td style="background-color:#7bff7b"></td>
+	</tr>
+	<tr>
+		<td>Local run through script</td>
+		<td style="background-color:#bbffbb">Output of script</td>
+		<td style="background-color:#bbffbb">Only if script run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if script run tests with agent</td>
+		<td style="background-color:#ff7b7b"></td>
+	</tr>
+	<tr>
+		<td>Local debug through script</td>
+		<td style="background-color:#bbffbb">Output of script</td>
+		<td style="background-color:#bbffbb">Only if script run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if script run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if script run tests with agent</td>
+	</tr>
+	<tr>
+		<td>Remote run</td>
+		<td style="background-color:#ffbbbb">Only server messages</td>
+		<td style="background-color:#bbffbb">Only if user run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if user run tests with agent</td>
+		<td style="background-color:#ff7b7b"></td>
+	</tr>
+	<tr>
+		<td>Remote debug</td>
+		<td style="background-color:#ffbbbb">Only server messages</td>
+		<td style="background-color:#bbffbb">Only if user run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if user run tests with agent</td>
+		<td style="background-color:#bbffbb">Only if user run tests with agent</td>
+	</tr>
+	</table>
+
+	<h3>Contents</h3>
+	<!--INSERT_CHILD_LINKS-->
+</body>
+</html>
