@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 3:20 PM
+Save-Time: 3/8/19 4:31 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -30,20 +30,27 @@ get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item
 
 //add libspec
 set-dialog-result File "platform:/resource/RobotProject/generated_libspec/liby.xml"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add libspec file" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //add multiply.py lib
 set-dialog-result File "platform:/resource/RobotProject/multiply.py"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //add empty libspec
-set-dialog-result File "platform:/resource/RobotProject/empty  libspeck/empty.xml"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add libspec file" | click
-wait 500
+exec-with-options {
+	set-dialog-result File "platform:/resource/RobotProject/empty  libspeck/empty.xml"
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+    get-window "Problem Occurred" 
+        | get-label "RED was unable to find classes/modules inside '.*empty.xml' module" 
+        | get-property caption 
+        | equals "RED was unable to find classes/modules inside '.*empty  libspeck\\\\empty.xml' module" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
 
 //add file with few classes
 set-dialog-result File "platform:/resource/RobotProject/additional libs/lib1.py"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 wait 500
 get-window "Select library class" | get-table | select "lib1.Selenium"
 with [get-window "Select library class" | get-table] {
@@ -61,22 +68,22 @@ with [get-window "Select library class"] {
 }
 
 //add xml file which is not libspec
-set-dialog-result File "platform:/resource/RobotProject/report_xml/output.xml"
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add libspec file"] {
-    click
-    key-type "M1+s"
-}
+exec-with-options {
+	set-dialog-result File "platform:/resource/RobotProject/report_xml/output.xml"
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+    get-window "Problem Occurred" 
+        | get-label "RED was unable to find classes/modules inside '.*output.xml' module" 
+        | get-property caption 
+        | equals "RED was unable to find classes/modules inside '.*output.xml' module" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click    
+} -allowStatusDialog
+
+
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+
 //check how looks tree
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/empty.xml RobotProject\\/empty  libspeck\\/empty.xml \\(non-accessible\\)" | get-property "styles[0].text" 
-        | equals "empty.xml" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/empty.xml RobotProject\\/empty  libspeck\\/empty.xml \\(non-accessible\\)" 
-        | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/empty.xml RobotProject\\/empty  libspeck\\/empty.xml \\(non-accessible\\)" 
-        | get-property "styles[1].fontStyle" | equals normal | verify-true
-    get-item "RobotProject/Robot Referenced libraries/empty.xml RobotProject\\/empty  libspeck\\/empty.xml \\(non-accessible\\)" 
-        | get-property "styles[1].foregroundColor" | equals "#FF0000" | verify-true
-}
+
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries/lib1.Selenium RobotProject\\/additional libs \\(2\\)" 
         | get-property caption | equals "lib1.Selenium RobotProject/additional libs (2)" | verify-true
@@ -108,13 +115,7 @@ with [get-view "Project Explorer" | get-tree] {
 
     get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals Mulitply | verify-true
-        
-        
-    get-item  "RobotProject/Robot Referenced libraries/output.xml RobotProject\\/report_xml\\/output.xml \\(non-accessible\\)"  | get-property caption 
-        | equals "output.xml RobotProject/report_xml/output.xml (non-accessible)" | verify-true
-
-    get-item  "RobotProject/Robot Referenced libraries/output.xml RobotProject\\/report_xml\\/output.xml \\(non-accessible\\)"  
-        | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+       
 
     get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" | get-property childCount 
         | equals 1 | verify-true
@@ -124,15 +125,14 @@ with [get-view "Project Explorer" | get-tree] {
 
 //remove few files
 with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
-    select "lib1.Selenium - RobotProject\\/additional libs" | key-type "M2+ARROW_UP"
-    select "empty.xml - RobotProject\\/empty  libspeck\\/empty.xml" "lib1.Selenium - RobotProject\\/additional libs"
+    select  "lib1.Selenium - RobotProject\\/additional libs"
     key-type Del
     key-type "M1+s"
 }
 
 //add duplicate lib
 set-dialog-result File "platform:/resource/RobotProject/libs/sum.py"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //chec if it is not dirty
 with [get-tab-folder -index 1] {
@@ -143,11 +143,11 @@ with [get-tab-folder -index 1] {
 //add file with class name as file
 get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
 set-dialog-result File "platform:/resource/RobotProject/classes/DefaultLib.py"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //add file with different class name
 set-dialog-result File "platform:/resource/RobotProject/classes/FileNOTAsClassName.py"
-get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-window "Select library class" | get-table | select FileNOTAsClassName
 with [get-window "Select library class" | get-table] {
     get-property itemCount | equals 2 | verify-true
@@ -161,14 +161,12 @@ with [get-window "Select library class"] {
 
 //add empty file
 set-dialog-result File "platform:/resource/RobotProject/empty.py"
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-button "Add Python library"] {
-    click
-    key-type "M1+s"
-}
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
 //check project expolorer
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 8 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 7 | verify-true
     get-item "RobotProject/Robot Referenced libraries/DefaultLib RobotProject\\/classes \\(1\\)/Nirvana" 
         | get-property index | equals 0 | verify-true
     get-item "RobotProject/Robot Referenced libraries/empty RobotProject \\(0\\)" | get-property childCount | equals 0 
@@ -192,14 +190,9 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property childCount 
         | equals 3 | verify-true
 }
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" | get-property childCount 
-        | equals 1 | verify-true
-    get-item  "RobotProject/Robot Referenced libraries/output.xml RobotProject\\/report_xml\\/output.xml \\(non-accessible\\)"  | get-property childCount 
-        | equals 0 | verify-true
-}
 
 get-view "Project Explorer" | get-tree 
     | get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" | get-property childCount 
     | equals 1 | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
