@@ -5,8 +5,8 @@ Element-Name: RemoveLibsFromREDxml
 Element-Type: context
 Element-Version: 2.0
 Id: _2JCD4B3CEeehL98jfxP8Sw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/10/17 9:54 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 3/6/19 6:00 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -14,12 +14,9 @@ Entry-Name: .ecl.context
 
 proc "remove-all-libraries-from-xml"{
 	get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-	get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-	    with [get-table] {
-	        select ".*" -all
-	        key-type Del
-	    }
-	}
+	get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | select "^\w.*" -all 
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type Del
 }
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

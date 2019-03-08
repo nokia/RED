@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ueh6UCC5EemEjfjIU9tmyw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/25/19 6:23 PM
+Save-Time: 3/7/19 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,8 +58,8 @@ check-referenced-libs
 //remove all libs from red.xml
 get-view "Project Explorer" | get-tree | select "SpecialLibs/red.xml" | double-click
 with [get-editor "SpecialLibs/red.xml"] {
-    get-tab-folder | get-tab-item "Referenced libraries" | click
-    with [get-section "Referenced libraries" | get-table] {
+    get-tab-folder | get-tab-item "Libraries" | click
+    with [get-section "Libraries" | get-table] {
         select "PandasLib - SpecialLibs" "LibWithPywintypes - SpecialLibs" "LibWithPymouse - SpecialLibs" "JSONLibrary - .*/site-packages"
         key-type Del
     }

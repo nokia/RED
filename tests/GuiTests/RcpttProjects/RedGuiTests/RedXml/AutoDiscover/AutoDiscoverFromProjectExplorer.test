@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Contexts: _eXb6MPp7EeW7_PzjO98BIw,_2JCD4B3CEeehL98jfxP8Sw
 Element-Name: AutoDiscoverFromProjectExplorer
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/15/19 11:51 AM
+Save-Time: 3/7/19 4:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,9 +44,9 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 //check that lib was added to red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 1 | verify-true
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
 
@@ -72,18 +72,14 @@ with [get-editor "resource.robot" | get-text-viewer] {
 get-editor "resource.robot" | close
 //remove lib from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-	key-type "M1+a"
-    key-type Del
-    key-type "M1+s"
-}
+remove-all-libraries-from-xml
+
 //use autodiscover on folder
 get-view "Project Explorer" | get-tree | select "RobotProject/tests" 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
 
-try -times 4 -delay 1000 -command{
-		get-window "Discovering libraries summary"
-}    
+wait-for-discover-window
+   
 //check window    
 with [get-window "Discovering libraries summary" | get-tree] {
     get-property itemCount | equals 6 | verify-true
@@ -98,8 +94,8 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 //check red.xml if all libs were added
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 5 | verify-true
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+    get-property itemCount | equals 6 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "add - RobotProject/libs" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "divide - RobotProject/libs/t" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
@@ -153,7 +149,7 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
     key-type "M1+a"
     key-type Del
     key-type "M1+s"
@@ -174,7 +170,7 @@ get-view "Project Explorer" | get-tree
     
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
     select "res1 - RobotProject\\/libs\\/for_resource" | key-type Del
     key-type "M1+s"
 }
@@ -195,7 +191,7 @@ get-view "Project Explorer" | get-tree
     
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
     select "multiply - RobotProject" "many_classes - RobotProject\\/libs\\/subfolder" "divide - RobotProject\\/libs\\/t" "res1 - RobotProject\\/libs\\/for_resource" "add - RobotProject\\/libs" "lib_with_args - RobotProject\\/libs" "discover_lib - RobotProject\\/Tests_wit_lib"
     key-type Del
     key-type "M1+s"

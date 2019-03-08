@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/3/18 5:45 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 3/7/19 1:57 PM
 Testcase-Type: ecl
 Verifications: _JUqVgK-LEeiBA8H4m2oMKw
 
@@ -45,7 +45,7 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Add 'Remote http:\\/\\/127.0.0.1:8270\\/RPC2' to configuration" | click -default
     
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
 
 // go back to Source
 get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
@@ -115,14 +115,17 @@ try -command{
 	    
 	//check what was added to red.xml    
 	get-editor "RobotProject/red.xml" | click
-	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-	    get-property "getItems().length" | equals 6 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/RPC2 - Remote" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/ - Remote" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:8272/ - Remote" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "http://127.0.0.1:8273/ - Remote" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "http://127.0.0.1:8274/ - Remote" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "http://timeoutttt=30/ - Remote" | verify-true
+	with [get-editor "RobotProject/red.xml" | get-section Libraries | get-table 
+	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
+	    -index 1] {
+	    get-property itemCount | equals 7 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/RPC2" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:8272/" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "http://127.0.0.1:8273/" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "http://127.0.0.1:8274/" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "http://timeoutttt=30/" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "...add new remote location" | verify-true
 	}
 
 	

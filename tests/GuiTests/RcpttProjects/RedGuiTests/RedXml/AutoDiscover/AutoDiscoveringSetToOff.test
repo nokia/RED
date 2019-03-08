@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-gXO8P_gEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/15/19 4:19 PM
+Save-Time: 3/7/19 4:58 PM
 Testcase-Type: ecl
 Verifications: _gGHWMP_kEeWRL4nRKA71zA
 
@@ -79,23 +79,24 @@ wait 3000
 //check that no window is shown
 verify-error {get-window "Discovering libraries summary"}
 
-//check that libs were added to red.xml
+// check if red.xml was not open
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "lib_with_variable.robot" | verify-true
     get-property activePage | equals "lib_with_variable.robot" | verify-true
     get-property tabCount | equals 1 | verify-true
 }
 
+//check that libs were added to red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" | double-click
-get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 1 | verify-true
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
 
 //remove lib from red.xml and close red.xml
 with [get-editor "RobotProject/red.xml"] {
-    with [get-section "Referenced libraries" | get-table] {
+    with [get-section "Libraries" | get-table] {
         select "multiply - RobotProject" | key-type Del
         key-type "M1+s"
     }
@@ -110,11 +111,11 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
-
-//check if libs were add to red.xml
+//check if lib was add to red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 1 | verify-true
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/24/18 12:14 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 3/6/19 2:21 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -71,7 +71,7 @@ get-view "Project Explorer" | get-tree | select "ResourceProject/red.xml" | sele
     | double-click
 wait-for-loading-red-xml -editor_name  "ResourceProject/red.xml"
 
-get-editor "ResourceProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "ResourceProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 get-editor "ResourceProject/red.xml" | get-section Paths | get-table 
     | get-item ".*LibsFromPythonPath.*" 
     | get-property caption 
