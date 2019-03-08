@@ -53,7 +53,7 @@ mapping](variable_mapping.md)
 
 ### Referenced Libraries tab
 
-![](images/red-xml-libraries-tab.png)  
+![](images/red_xml_libraries_tab.png)  
   
 
 This section holds anything related to libraries and RED mechanisms for

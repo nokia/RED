@@ -55,6 +55,11 @@ if user run tests with agent | Only if user run tests with agent
   * [Parameterizing launches](http://nokia.github.io/RED/help/user_guide/launching/string_substitution.md)
   * [Controlling execution](http://nokia.github.io/RED/help/user_guide/launching/exec_control.md)
   * [Debugging Robot](http://nokia.github.io/RED/help/user_guide/launching/debug.md)
+    * [User interface](http://nokia.github.io/RED/help/user_guide/launching/debug/ui_elements.md)
+    * [Breakpoints](http://nokia.github.io/RED/help/user_guide/launching/debug/breakpoints.md)
+    * [Hitting a breakpoint](http://nokia.github.io/RED/help/user_guide/launching/debug/hitting_a_breakpoint.md)
+    * [Debugger preferences](http://nokia.github.io/RED/help/user_guide/launching/debug/preferences.md)
+    * [Debugging Robot & Python with RED & PyDev](http://nokia.github.io/RED/help/user_guide/launching/debug/robot_python_debug.md)
   * [Launching preferences](http://nokia.github.io/RED/help/user_guide/launching/launch_prefs.md)
   * [RED Tests Runner Agent](http://nokia.github.io/RED/help/user_guide/launching/red_agent.md)
 
