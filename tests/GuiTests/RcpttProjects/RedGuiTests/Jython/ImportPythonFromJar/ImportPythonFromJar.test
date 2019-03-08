@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Ocx3EOniEeWqgY2-QUmvuQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 2:19 PM
+Save-Time: 3/8/19 3:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,7 +47,6 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		    get-button $Apply_and_OK_in_preference | click
 		    get-window "Rebuild required" | get-button OK | click
 		}
-
 }
 
 // for windows:
@@ -94,11 +93,11 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	
 	// add single python lib from jar
 	set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
-	get-editor "PythonInJar/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
+	get-editor "PythonInJar/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+	
 	get-window "Select library class" | get-table | select ClassInClass | click -default
-	get-editor "PythonInJar/red.xml" | get-section "Libraries" | get-button "Add Python library" 
-	    | key-type "M1+s"
-	    
+	get-editor "PythonInJar/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	
 	with [get-view "Project Explorer" | get-tree] {
     	select "PythonInJar/Robot Referenced libraries" | double-click
 	}
@@ -117,22 +116,17 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		
 	// open red.xml and add jar and python from jar file
 	set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
-	get-editor "PythonInJar/red.xml" | get-section "Libraries" | get-button "Add Java library" | click
+	get-editor "PythonInJar/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 	with [get-window "Select library class"] {
 	    get-table 
 	        | select ClassInClass "ClassInClass.Class1" "ClassInClass.Class2" "com.nokia.java.lib.Libatron" MyPython StaticClass "StaticClass.X"
 	    get-button OK | click
 	}
-	set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
-	get-editor "PythonInJar/red.xml" | get-section "Libraries" | get-button "Add Python library" | click
-	with [get-window "Select library class"] {
-	    get-table | select ClassInClass "ClassInClass.Class1" "ClassInClass.Class2" MyPython StaticClass "StaticClass.X"
-	    get-button OK | click
-	}
-	with [get-editor "PythonInJar/red.xml"] {
-	    get-section "Libraries" | get-button "Add Python library" | key-type "M1+s"
-	    close
-	}
+
+	get-editor "PythonInJar/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	get-editor "test.robot" | click
+	get-editor "PythonInJar/red.xml" | close
+
 	// revalidate whole project
 	get-view "Project Explorer" | get-tree | select "PythonInJar/test.robot" | double-click
 	get-menu "Project/Clean..." | click
@@ -161,4 +155,5 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    + "    Go\n"
 	    + "    Call Libatron    name" | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
