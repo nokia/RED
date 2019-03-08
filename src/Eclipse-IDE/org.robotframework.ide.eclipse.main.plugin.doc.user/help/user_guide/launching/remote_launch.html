@@ -1,0 +1,89 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+	<h2>Remotely launched tests</h2>
+	
+	<p>When <b>Robot Remote</b> launch configuration is launched, it setups a simple server inside 
+	RED instance and listens execution events from remote TestRunnerAgent which runs Robot tests on remote host.
+	</p>
+	
+	<h2>Remote launch configuration</h2>
+	
+	<p>Open 
+	<code><a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenRunConfigurations')">
+	Run -&gt; Run Configurations...</a></code> dialog and under <b>Robot Remote</b> create new configuration. The
+	configuration itself is rather simple and consists mainly of network-related settings: 
+	</p>
+	
+	<img src="images/remote_config.png"/>
+	
+	<ul>
+		<li><b>Project</b> - here the project needs to be specified. The project is used when running in 
+		<b>debug</b> mode in order to locate sources for which breakpoints are checked,
+		</li>
+		<li><b>Local IP</b> - IP address which will be used by server,</li>
+		<li><b>Local port</b> - port number which will be used by server,</li>
+		<li><b>Connection timeout</b> - how long the server will wait for connection (in seconds).</li>
+	</ul>
+	
+	<h2>Launching tests</h2>
+	
+	<p>Once remote configuration is launched the server will report it in <b>Console</b> view:
+	</p>
+	
+	<img class="bordered" src="images/remote_console.png"/>
+	
+	<p>after that the tests can be launched. Refer to 
+	<a class="external" target="_blank" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#starting-test-execution">
+	Starting test execution</a>
+	chapter in RobotFramework user guide for detailed description about launching Robot tests.
+	For RED it is only important that the <a href="red_agent.html">agent script</a> is injected into
+	execution using <code>--listener</code> argument. Without it RED will not be able to obtain any
+	data from running tests, thus <b>Execution</b> view, <b>Message Log</b> view and <b>debugging</b>
+	will not work - simply the server will shut down after specified timeout has passed as no
+	client have connected.
+	</p>
+	
+	<p>The agent script can be exported from <b>Remote Launch Configuration</b> dialog using <b>Export Client Script</b>
+	button visible on image above. From the same dialog you can copy command line argument which has to be used
+	when launching tests. It may be required to provide whole absolute path to agent script depending on 
+	the location it was exported and location from which the tests are executed. Refer to 
+	<a href="red_agent.html#command_line_usage">detailed agent usage</a> description for all options used by agent.
+	</p>
+	
+	<p>In simplest case following command line call would start Robot with injected agent, which will try to 
+	connect to RED server running on <code>localhost</code> at port <code>12345</code> and will send data needed by RED:
+	</p>
+	
+	<div class="code"><code>
+	python -m robot.run --listener /LOCATION_TO_AGENT_FILE/TestRunnerAgent.py:127.0.0.1:12345 TEST_LOCATION
+	</code></div>
+	
+	
+	<h2>Debugging remote launches</h2>
+	
+	<p>Remote debug allows to perform debug activities with RED using remote host to execute tests and get 
+	debug information back to RED. It is especially useful when Robot tests are executed on dedicated
+	test line with hardware/software under test or in cloud environment where test editing and test 
+	execution is separated. <b>Robot Remote</b> configuration needs to be launched in <b>debug</b> mode.
+	Apart from that debugging is no different from <a href="debug.html">local debug</a> - remember to set 
+	at least one breakpoint prior the debug run.
+	</p>
+	
+	<h2>Possible issues</h2>  
+	
+	<p>When having problem with running/debugging Remote configurations, please double check following:</p>
+	
+	<ul>
+		<li>check if remote host can connect to local host (routing, firewalls),
+		<li>check network settings in configurations (Port/IP) and in agent command line parameters, 
+		<li>check if you have the same test material locally and remotely (exact same test cases, test names).
+	</ul>
+	
+	<br/>
+	<br/>
+	
+</body>
+</html>

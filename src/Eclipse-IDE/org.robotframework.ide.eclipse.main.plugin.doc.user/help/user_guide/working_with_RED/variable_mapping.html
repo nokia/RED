@@ -1,0 +1,30 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<h2>Variable mapping - dealing with parameterized paths to libraries and resources</h2>
+
+<p>
+Whenever parameterized file path is used in resources or libraries paths (paths are resolved during Robot runtime when parameter in path is known), RED will not be able to evaluate parameter value by itself.</br>
+</br><img src="images/variable_mapping_5.png"></br>
+</p>
+
+<p>
+Variables mappings can be used to statically assign value to parameters in paths to resolve such paths to resources and libraries.</br>
+<dl class="note">
+    <dt>Note</dt>
+    <dd>Variables provided in red.xml are used only by RED for validation purpose and are not added to Robot run command line.</br>
+    During test execution variables have to be provided by Robot.</dd>
+</dl>
+</p>
+
+<p>
+Open <b><code>red.xml -&gt; Variables</code></b> and assign static value for path parameter in Variable mappings section:</br>
+</br></br><img src="images/variable_mapping_6.gif"> </br></br> 
+When successful, path will be recognized and validation will take place.
+</br></br><img src="images/variable_mapping_7.png"> </br></br>
+</br></br>
+
+</body>
+</html>
