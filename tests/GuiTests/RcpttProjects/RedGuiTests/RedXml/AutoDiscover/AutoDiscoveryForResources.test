@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _AessoB3CEeehL98jfxP8Sw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 4:36 PM
+Save-Time: 3/6/19 6:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -64,7 +64,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
 get-window "Discovering libraries summary" | get-button OK | click
 // clean red.xml
 remove-all-libraries-from-xml
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
 get-editor "RobotProject/red.xml" | close
 // set correct path to library in project
 //get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" | double-click
@@ -89,7 +89,7 @@ with [get-editor "test_with_resource.robot" | get-text-viewer] {
 get-window "Discovering libraries summary" | get-button OK | click
 // clean red.xml
 remove-all-libraries-from-xml
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
 get-editor "RobotProject/red.xml" | close
 //----------------------------------------------------------------------------------------------------------------------
 //open resource file and add new line
@@ -143,15 +143,15 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 //check red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
-    get-property itemCount | equals 1 | verify-true
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
     get-item "res1 - RobotProject\\/libs\\/for_resource" | get-property index | equals 0 | verify-true
 }
 //--------------------------change location of project------------------------------------------------------------------------------
 // clean red.xml
 remove-all-libraries-from-xml
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
 get-editor "RobotProject/red.xml" | close
 // change location of resource library
 get-editor "test_with_resource.robot" | click
@@ -237,7 +237,7 @@ with [get-window "Discovering libraries summary"] {
 }
 // clean red.xml
 remove-all-libraries-from-xml
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
 get-editor "RobotProject/red.xml" | close
 // validate
 with [get-editor "test_with_resource.robot" | get-text-viewer] {

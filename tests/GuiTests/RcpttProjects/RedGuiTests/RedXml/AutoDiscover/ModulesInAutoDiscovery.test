@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Brg00CufEeikWYhBbRs9Qw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 5:14 PM
+Save-Time: 3/6/19 2:20 PM
 Testcase-Type: ecl
 Verifications: _mlPDsCuhEeikWYhBbRs9Qw
 
@@ -18,7 +18,7 @@ Entry-Name: .content
 //add folder in user folder
 get-view "Project Explorer" | get-tree | select "ManyModules/red.xml" | double-click
 wait-for-loading-red-xml -editor_name "ManyModules/red.xml"
-get-editor "ManyModules/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "ManyModules/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 get-editor "ManyModules/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
 with [get-window "Add new search path"] {
     get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 

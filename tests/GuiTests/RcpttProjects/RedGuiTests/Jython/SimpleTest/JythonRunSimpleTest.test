@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/11/18 10:20 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 3/7/19 5:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,30 +21,22 @@ Entry-Name: .content
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
 
-
 // for windows:
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-
 		set-dialog-result Folder "C:\\jython2.7.0\\bin"
-		with [get-window Preferences] {
-			wait 5000
-		    get-button "Add..." | click
-		    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
-		    get-button $Apply_and_OK_in_preference | click
-		    get-window "Rebuild required" | get-button OK | click
-		}
+	
 }-else{
-
 		set-dialog-result Folder "/usr/local/lib/jython/bin"
-		with [get-window Preferences] {
-			wait 5000
-		    get-button "Add..." | click
-		    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
-		    get-button $Apply_and_OK_in_preference | click
-		    get-window "Rebuild required" | get-button OK | click
-		}
-
 }
+
+with [get-window Preferences] {
+		wait 5000
+	    get-button "Add..." | click
+	    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
+	    get-button $Apply_and_OK_in_preference | click
+	    get-window "Rebuild required" | get-button OK | click
+}
+
 // open test and check if errors due to unknown libs are present
 get-view "Project Explorer" | get-tree | select "jython_simple_project/test.robot" | double-click
 get-tab-folder -index 4 | get-tab-item Problems | click
@@ -64,16 +56,16 @@ get-view "Execution View" | get-label "Failed: 1" | get-property caption | equal
 
 // add to red.xml jython libs
 get-view "Project Explorer" | get-tree | select "jython_simple_project/red.xml" | double-click
-get-editor "jython_simple_project/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "jython_simple_project/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 
 
 set-dialog-result File "platform:/resource/jython_simple_project/RED_TEST_JavaLib.jar"
-get-editor "jython_simple_project/red.xml" | get-section "Referenced libraries" | get-button "Add Java library" | click
+get-editor "jython_simple_project/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+
 get-window "Select library class" | get-table | select MathOperator | click -default
-with [get-editor "jython_simple_project/red.xml"] {
-    get-section "Referenced libraries" | get-button "Add Java library" | key-type "M1+s"
-    close
-}
+get-editor "jython_simple_project/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "jython_simple_project/red.xml" | close
+
 // check problems - now libspecs should be generated, no erros visible
 get-editor "test.robot" | get-text-viewer | type-text " "
 get-tab-folder -index 4 | get-tab-item Problems | click
@@ -107,4 +99,5 @@ get-view "Project Explorer" | get-tree
     | get-property caption | equals "MathOperator jython_simple_project/RED_TEST_JavaLib.jar (2)" | verify-true
     
 release-files-handle
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
