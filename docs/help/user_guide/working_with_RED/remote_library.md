@@ -31,11 +31,9 @@ simple remote protocol on top of an XML-RPC channel.
 
 ### Using Remote libraries in RED
 
-#### Settings in Referenced Libraries in red.xml
-
 In order to use Keywords from Remote Library together with validation and code
 assistance, information about Remote Library address needs to be included in
-red.xml under Referenced Libraries tab.
+**`red.xml -> Libraries -> Libraries`** part.
 
   
   
