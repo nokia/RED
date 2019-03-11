@@ -16,7 +16,7 @@ test-cases. To start working with RED, you should activate Robot perspective
 first.
 
   * Check if you have already set Robot perspective:   
-![](create_run/perspective_1.png)
+![](images/robot_perspective_toolbar.png)
 
   * Set perspective to Robot by issuing action: `[ Window -> Perspective -> Open Perspective -> Other... -> Robot](javascript:executeCommand\('org.eclipse.ui.perspectives.showPerspective\(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective\)'\))`
 
@@ -40,7 +40,7 @@ If you wish to import anything into Workspace (i.e. already existing Project)
 or into Project (existing test cases), menu _Import..._ will open up wizard.
 Upon creating Project, you should have see similar structure in Project
 Explorer tree, which will also indicate that RobotFramework is visible to
-Eclipse. ![](create_run/simple_project_1.png)  
+Eclipse. ![](images/view_project_explorer.png)  
 If the project doesn't look like above (there is no brown icon or no red.xml
 file) it means that the Project is different type than Robot. Fix this by
 right-click on Project name,from Robot Framework select **Configure as Robot
@@ -56,8 +56,8 @@ RED consists of 2 different modes of editing: a Table (Ride-like style) and
 Text style.  At the bottom of opened editor, there are list of tabs.Rightmost
 opens text editor(Source),others are for Table syles.  
 By default Source editor is used when Test Suite file is opened.
-![](create_run/editors_1.png) Source view displays text representation of all
-table views: ![](create_run/editors_2.png)
+![](images/red_editor_table.png) Source view displays text representation of
+all table views: ![](images/red_editor_source.png)
 
 #### Content assistant
 
@@ -69,23 +69,23 @@ CTRL+SPACE keys to activate hints for robot keywords an variables.
 
 To run TestSuite, _Run_ button needs to be selected or right-click menu on
 file in Source view. The same action is in right-click menu on file in Project
-Explorer. ![](create_run/toolbar-1.png)
+Explorer. ![](images/run_configurations_toolbar.png)
 
 #### Limiting test cases to be run
 
 To limit list of test cases to be run, open _Run Configurations..._ ,  
-![](create_run/run_1.png) In Robot part you can specify which test cases
-should be run by using either tags or include/exclude list of test cases in
-active project.  ![](create_run/run_configurations.png) To run single test
-case in test suite, you can select desire test case in Project Explorer and in
-right-click menu select "Run".
+![](images/run_configurations_robot.png) In Robot part you can specify which
+test cases should be run by using either tags or include/exclude list of test
+cases in active project.  ![](images/run_configurations_all.png) To run single
+test case in test suite, you can select desire test case in Project Explorer
+and in right-click menu select "Run".
 
 #### Console and message log
 
 During TestSuite execution, RED displays RobotFramework console and message
 logs. Those information are available in Console and Message Log, by default
 visible in the Robot perspective or by **`Window -> Show View -> Other... ->
-Robot`** ![](create_run/console_1.png) ![](create_run/msg_log_1.png) If any of
+Robot`** ![](images/view_console.png) ![](images/view_msg_log.png) If any of
 those 2 views are missing, best way is to reset perspective settings by using
 action `[ Window -> Perspective -> Reset
 Perspective...](javascript:executeCommand\('org.eclipse.ui.window.resetPerspective\(\)'\))`
@@ -94,6 +94,6 @@ Perspective...](javascript:executeCommand\('org.eclipse.ui.window.resetPerspecti
 
 RED can show execution status of TestCases along with outcome result and
 execution time. This view is in Robot perspective by default.
-![](create_run/exec_1.png)  
+![](images/view_exec.png)  
 To open Execution go to: **`Window -> Show View -> Robot -> Execution View`**
 
