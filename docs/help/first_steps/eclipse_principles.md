@@ -10,7 +10,7 @@ The Eclipse platform itself is structured as subsystems which are implemented
 in one or more plug-ins. The subsystems are built on top of a small runtime
 engine. The figure below depicts a simplified view.
 
-![](eclipse_principles/arch-npi.jpg)
+![](images/arch_npi.png)
 
 #### Workbench
 
@@ -51,7 +51,7 @@ with other views in a tabbed notebook. You can change the layout of a
 perspective by opening and closing views and by docking them in different
 positions in the Workbench window.
 
-![](eclipse_principles/main_view.png)
+![](images/robot_perspective.png)
 
 ### Workspace & Project
 

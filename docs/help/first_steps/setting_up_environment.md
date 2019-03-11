@@ -14,9 +14,9 @@ If there is no environment established RED will signal this: error will be
 reported by workspace validation for each red.xml file in your projects or the
 dialog will be presented when opening editor:
 
-![](images/error_missing_env.png)
+![](images/error_missing_env_problem.png)
 
-![](images/error_missing_env2.png)
+![](images/error_missing_env_dialog.png)
 
 There are two ways in which Python & RF environment can be established:
 automatically or manually via Preferences
