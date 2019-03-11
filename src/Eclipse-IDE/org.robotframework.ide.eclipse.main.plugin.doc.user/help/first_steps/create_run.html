@@ -17,7 +17,7 @@ To start working with RED, you should activate Robot perspective first.
 	<ul>
 	<li>Check if you have already set Robot perspective: 
 	<br/></br>
-    <img src="create_run/perspective_1.png" > </li>
+    <img src="images/robot_perspective_toolbar.png" > </li>
 
     <li>Set perspective to Robot by issuing action: <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective)')">
 Window -&gt; Perspective -&gt; Open Perspective -&gt; Other... -&gt; Robot</a></code></li>
@@ -40,7 +40,7 @@ Creating new Project can be done by:
 </ul>
 If you wish to import anything into Workspace (i.e. already existing Project) or into Project (existing test cases), menu <i>Import... </i>will open up wizard.</br>
 Upon creating Project, you should have see similar structure in Project Explorer tree, which will also indicate that RobotFramework is visible to Eclipse.</br></br>
-<img src="create_run/simple_project_1.png">
+<img src="images/view_project_explorer.png">
 <br>
 If the project doesn't look like above (there is no brown icon or no red.xml file) it means that the Project is different type than Robot.</br>
 Fix this by right-click on Project name,from Robot Framework select <b>Configure as Robot project</b>
@@ -53,10 +53,10 @@ Double click on file in Project Explorer will open file's editor.<br>
 RED consists of 2 different modes of editing: a Table (Ride-like style) and Text style. </br>
 At the bottom of opened editor, there are list of tabs.Rightmost opens text editor(Source),others are for Table syles. 
 <br>By default Source editor is used when Test Suite file is opened. </br></br>
-<img src="create_run/editors_1.png"> </br></br>
+<img src="images/red_editor_table.png"> </br></br>
 
 Source view displays text representation of all table views:</br></br>
-<img src="create_run/editors_2.png"></p>
+<img src="images/red_editor_source.png"></p>
 
 <h4>Content assistant</h4>
 <p>
@@ -66,13 +66,13 @@ When editing tab or item in text editor, press CTRL+SPACE keys to activate hints
 <p>
 To run TestSuite, <i>Run</i> button needs to be selected or right-click menu on file in Source view. 
 The same action is in right-click menu on file in Project Explorer.</br></br>
-<img src="create_run/toolbar-1.png">
+<img src="images/run_configurations_toolbar.png">
 
 <h4>Limiting test cases to be run </h4>
 To limit list of test cases to be run, open <i>Run Configurations...</i>, <br></br>
-<img src="create_run/run_1.png"></br>
+<img src="images/run_configurations_robot.png"></br>
 In Robot part you can specify which test cases should be run by using either tags or include/exclude list of test cases in active project. </br></br>
-<img src="create_run/run_configurations.png"></br></br>
+<img src="images/run_configurations_all.png"></br></br>
 
 To run single test case in test suite, you can select desire test case in Project Explorer and in right-click menu select "Run".
 </p>
@@ -80,15 +80,15 @@ To run single test case in test suite, you can select desire test case in Projec
 <p>
 During TestSuite execution, RED displays RobotFramework console and message logs.</br>
 Those information are available in Console and Message Log, by default visible in the Robot perspective or by <b><code>Window -&gt; Show View -&gt; Other... -&gt; Robot</code></b></br></br>
-<img src="create_run/console_1.png"> </br>
-<img src="create_run/msg_log_1.png"> </br>
+<img src="images/view_console.png"> </br>
+<img src="images/view_msg_log.png"> </br>
 If any of those 2 views are missing, best way is to reset perspective settings by using action <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.resetPerspective()')">
 Window -&gt; Perspective -&gt; Reset Perspective...</a></code>
 </p>
 <h4>Execution status</h4>
 
 RED can show execution status of TestCases along with outcome result and execution time. This view is in Robot perspective by default.</br></br>
-<img src="create_run/exec_1.png"> </br>
+<img src="images/view_exec.png"> </br>
  <br/>
 To open Execution go to: <b><code>Window -&gt; Show View -&gt; Robot -&gt; Execution View</code></b>
 </body>
