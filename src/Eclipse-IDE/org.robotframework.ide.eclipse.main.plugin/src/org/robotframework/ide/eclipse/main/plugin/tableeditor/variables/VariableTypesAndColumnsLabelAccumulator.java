@@ -44,7 +44,11 @@ public class VariableTypesAndColumnsLabelAccumulator implements IConfigLabelAccu
             if (columnPosition == 0) {
                 configLabels.addLabel(getNameColumnLabel(type));
             } else if (columnPosition == 1) {
-                configLabels.addLabel(getValueColumnLabel(type));
+                if (type.equals(VariableType.SCALAR) && var.getLinkedElement().getValueTokens().size() >= 2) {
+                    configLabels.addLabel(getValueColumnLabel(VariableType.LIST));
+                } else {
+                    configLabels.addLabel(getValueColumnLabel(type));
+                }
             } else if (columnPosition == 2) {
                 configLabels.addLabel(getCommentColumnLabel(type));
                 configLabels.addLabel(CommentsLabelAccumulator.COMMENT_CONFIG_LABEL);

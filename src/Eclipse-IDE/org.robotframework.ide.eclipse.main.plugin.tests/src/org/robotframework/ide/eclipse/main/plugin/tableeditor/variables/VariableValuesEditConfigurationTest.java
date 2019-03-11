@@ -73,7 +73,7 @@ public class VariableValuesEditConfigurationTest {
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
-        assertThat(editor).isInstanceOf(DetailCellEditor.class);
+        assertThat(editor).isInstanceOf(RedTextCellEditor.class);
     }
 
     @Test
