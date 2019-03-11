@@ -75,10 +75,9 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
             final RedContentProposalProvider proposalsProvider) {
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsProvider),
-                DisplayMode.NORMAL,
+                new RedTextCellEditor(proposalsProvider, wrapCellContent), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
+
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
                         proposalsProvider),
