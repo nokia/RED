@@ -39,7 +39,7 @@ public class VariableTypesAndColumnsLabelAccumulatorTest {
         assertThat(labelStackAt(accumulator, 1, 0))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
         assertThat(labelStackAt(accumulator, 1, 1))
-                .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
+                .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         assertThat(labelStackAt(accumulator, 1, 2))
                 .contains(VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         assertThat(labelStackAt(accumulator, 1, 3))
