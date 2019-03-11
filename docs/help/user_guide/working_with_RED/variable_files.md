@@ -36,7 +36,7 @@ Note
 Below is a sample body of such Python variable file (examples can be also
 found in RobotFramework official manual and Python examples).  
   
-![](images/var-files-red-xml.gif)  
+![](images/var_files_red_xml.gif)  
   
   
 `  

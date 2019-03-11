@@ -5,39 +5,30 @@ RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
 
 ## Recognizing external libraries in RED
 
-### External libraries installed by pip or included in testcase by file path
-
 In order to provide validation and keyword assistance of external libraries
-(any library not bundled with RobotFramework), external library **needs** to
-be included in **red.xml** file in the Referenced libraries part.  
-There are few ways to include library into red.xml
+(any library not bundled with RobotFramework, but installed by pip or included
+in testcase by file path), external library **needs** to be included in
+**red.xml** file in the Referenced libraries part.
+
+There are few ways to include library into red.xml.
 
 ### Library autodiscovery
 
 Main mechanism to include libraries' keywords in RED is done by autodiscovery
 mechanism. Mechanism works on two levels - during test edition and executed in
-Project Explorer on group of files and folders.  Every time when user edits
-test suite which has error markers on library declaration, autodiscovery is
-executed together with save action.  
+Project Explorer on group of files and folders.  
+Every time when user edits test suite which has error markers on library
+declaration, autodiscovery is executed together with save action.  
 When there is a need to run autodiscovery on list of files, folders or whole
 project, this can be achieved by using right click menu in Project Explorer
-from Robot Framework option.  
-  
+from Robot Framework option.
+
 ![](images/autodiscovery_menu.png)  
   
-
-Autodiscovery mechanism is configured per project. Its preferences are stored
-in red.xml file under Referenced Libraries tab.
 
 Note
 
     Library autodiscovering is not run on excluded project parts (see more under topic [Limiting validation scope](../validation/scope.md). 
-
-### Add library from Project Explorer
-
-External libraries as python files can be directly included to red.xml file by
-right clicking on file and using option:  
-**`Robot Framework -> Add Library to red.xml.`**
 
 ### Quick Fix - shortcut CTRL+1
 
@@ -57,15 +48,24 @@ Quick Fix or use CTRL+1.
   
 ![](images/autodiscovery_quick_fix.png)  
   
-Double click on Discover option, RED will search either PythonPath or library
+After selecting Discover option, RED will search either PythonPath or library
 file path, if successful library will be added to Referenced libraries in
 red.xml  
   
 ![](images/reference_libs.png)  
+
+### Add library from Project Explorer
+
+External Python libraries can be directly included to red.xml file by right
+clicking on file and using option:  
+**`Robot Framework -> Add Library to red.xml.`**
+
+### Add library from red.xml editor
+
+External can be also added directly from red.xml editor:  
   
+![](images/library_add.gif)  
   
-All changes are stored in red.xml, if you need to modify them, open red.xml
-using Eclipse Default Editor.
 
 ### Using libdoc file when external library is not present locally
 
@@ -74,52 +74,50 @@ thus it is undesirable/unnecessary to install/import all libraries as on
 remote host. RobotFramework provides possibility to generate an xml file with
 list of keywords, this also provides agile test development where libraries
 are developed in parallel to test cases.  
-Libdoc file can be included instead of link to external library by using
+Libdoc xml file can be included instead of external library file by using
 red.xml editor.  
   
 For more information about LibDoc please refer to <http://robot-
 framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc>  
 
-### Errors while importing Referenced Libraries
+### Library autodiscovering and libdoc generation preferences
 
-During library import, RED is generating LibDoc from given python file using
-local python interpreter. Under the hood RED is executing following command to
-RobotFramework to get list of Keywords from give library:  
-_python -m robot.libdoc &ltPATH;_TO_LIBNAME> &ltOPTIONS;>_  
-Whenever RED encounters problem, it will be shown as popup window from Python
-execution:  
-  
-![](images/libdoc_error.png)  
-  
-This indicates that some of the dependencies are missing on your local machine
-which may affect testcase execution. To verify you can try to execute libdoc
-in console:  
-_python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
-
-### Preference for generating libdoc
-
-In some cases there are the problems occurring during the libdoc generation
-via session server. It leads to a situation when a server hang due to [Global
-Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between
-the server code and the library code. To avoid this problem the preference
-located in `[ Window -> Preferences -> Robot Framework ->
+Autodiscovering and libdoc generation preferences can be configured at `[
+Window -> Preferences -> Robot Framework ->
 Libraries](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries\)'\))`
-is enabled by default.  
+
+![](images/libraries_preferences.png)  
   
-![](images/libdoc_generation_preference.png)  
-  
-This preference controls if the libdoc is generated in a separate process or
-not. Note that this solution may affect the time of libdoc generation, i.e.
-slowing down the libraries import, especially with jython interpreter. If you
-are not using problematic libraries you can disable the preference to make
+
+Note
+
+    In some cases problems occur during libdoc generation via session server. It leads to a situation when the server hangs due to [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between the server code and the library code.  
+To avoid this problem since version 0.8.11 libdocs are generated in a separate
+by default. Note that this solution may affect the time of libdoc generation,
+i.e. slowing down the libraries import, especially with jython interpreter. If
+you are not using problematic libraries you can disable the preference to make
 libdoc generation faster.
 
 ### Reloading libraries after change
 
 Whenever external library is changed (for instance new keyword is added),
 libdoc needs to be regenerated to provide changes on content assist and
-validation in RED. Since version 0.6.3, RED can automatically detect library
-change and regenerate libdoc (it can be switch off/on in red.xml).  
+validation in RED.  
+Since version 0.6.3, RED can automatically detect library change and
+regenerate libdoc (it can be switch off/on in
+[preferences](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries\)'\))).  
 This can be also done manually by right clicking on library in Project
 Explorer and selecting _Reload action_
+
+Manual library reloading can be also useful for finding libdoc generation
+errors.  
+Whenever RED encounters libdoc generation problem, it will be shown as popup
+window from Python execution:
+
+![](images/libdoc_error.png)  
+  
+This indicates that some of the dependencies are missing on your local machine
+which may affect testcase execution. To verify you can try to execute libdoc
+in console:  
+_python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
 

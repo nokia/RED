@@ -32,37 +32,24 @@ load red.xml with graphical representation of file content. Alternatively, as
 this is xml file, it can be viewed and edited by any text editor.
 
 Red.xml is divided in 4 groups,with respectful tabs at the bottom of the
-window: General, Referenced Libraries, Variable files, Validation.
+window: General, Libraries, Variables, Validation.
 
 ### General tab
 
-This place holds settings which controls overall behavior of RED Robot Editor.
+This section allows to set python interpreter regardless of interpreter
+setting in [Preferences](../launching/launch_prefs.md).
 
 ![](images/red_xml_general_tab.png)  
   
 
-**Robot Framework** \- this section allows to set python interpreter
-regardless of interpreter setting in
-[Preferences](../launching/launch_prefs.md).
+### Libraries tab
 
-**Variables mappings** \- values can be assigned to variables, this is used to
-resolved parameterized paths.
+This section holds everything related to Robot external libraries.
 
-More details can be found under topic [Variable
-mapping](variable_mapping.md)
+**Libraries** \- holds a list of discovered or manually added libraries. It is
+divided to **Referenced libraries** and **Remote locations**.
 
-### Referenced Libraries tab
-
-![](images/red_xml_libraries_tab.png)  
-  
-
-This section holds anything related to libraries and RED mechanisms for
-dealing with libraries.
-
-**Referenced libraries** \- holds a list of discovered or manually added
-libraries in current Project. At the bottom of pane, library auto discovery
-and reloading settings can be changed. More details can be found under topic
-[Recognizing external libraries in RED
+More info under topic [Recognizing external libraries in RED
 
 **Paths** \- holds settings for user defined Python/ClassPath which are used
 for Libraries discovery and testcase execution, additionally relative paths
@@ -71,28 +58,38 @@ relativity can be changed from Workspace to Project.
 More info under topic [Custom python/class paths and path
 relativeness](custom_paths_relatve.md)
 
-### Variable files tab
-
-![](images/red_xml_variables_tab.png)  
+![](images/red_xml_libraries_tab.png)  
   
 
+### Variables tab
+
+This section holds everything related to Robot variables.
+
+**Variable mappings** \- values can be assigned to variables, this is used to
+resolved parameterized paths.
+
+More info under topic [Variable mapping - dealing with parameterized paths to
+libraries and resources](variable_mapping.md)
+
 **Variable files** \- this tab specify variable files which should be visible
-on global scope (Project wise). Those global variable files are used during
-testcase edit and running testcases by using Robot command line parameter
-_-V_.
+on global scope. Those global variable files are used during testcase edit and
+validation.
 
 More info under topic [Variable Files - using files with variable accessible
 anywhere inside Project](variable_files.md).
 
+![](images/red_xml_variables_tab.png)  
+  
+
 ### Validation tab
+
+This section allows user to limit validation to selected folder or exclude
+selected folder from validation. To exclude folder in Project, right click on
+folder and choose _Exclude_ from menu. Files can be also excluded by fixed
+size [KB].
+
+More info under topic [Limiting validation scope](../validation/scope.md).
 
 ![](images/red_xml_validation_tab.png)  
   
-
-**Excluded project parts** \- this section allows user to limit validation to
-selected folder or exclude selected folder from validation.Files can be
-excluded by fixed size. To exclude folder in Project, right click on folder
-and choose _Exclude_ from menu.
-
-More info under topic [Limiting validation scope](../validation/scope.md).
 

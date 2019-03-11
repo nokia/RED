@@ -5,7 +5,7 @@ RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
 
 ## Custom python/class paths and path relativeness
 
-Settings available in **`red.xml -> Referenced Libraries`**
+Settings available in **`red.xml -> Libraries`**
 
 ### Custom python/class paths
 
@@ -25,7 +25,7 @@ when interpreter executes (testcase and debug run or libdoc generation).
 By default, relative paths are resolved around Project scope although in some
 scenarios like storing Robot testsuites in one project and libraries in other,
 there is a need to change relativeness regards to Workspace.  
-This can be changed in **`red.xml -> Referenced Libraries -> Paths`** part.  
+This can be changed in **`red.xml -> Libraries -> Paths`** part.  
 **Note that relativeness setting is used together with class/python path and
 libraries only.**
 
