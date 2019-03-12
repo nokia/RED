@@ -90,6 +90,15 @@ class LibdocGenerationTests(unittest.TestCase):
         response = create_libdoc_in_separate_process("c.HangingInit", 'XML', python_paths, [], timeout_duration)
 
         self.assertTrue('Libdoc not generated due to timeout' in response['exception'])
+        
+    def test_if_libdoc_is_generated_in_separate_process_for_library_with_logger(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
+        timeout_duration = 5 if 'Jython' not in platform.python_implementation() else 20
+
+        response = create_libdoc_in_separate_process("lib_logger", 'XML', python_paths, [], timeout_duration)
+
+        self.assertNotEqual(response["result"], None)
 
 
 @unittest.skipUnless(platform.python_version_tuple()[0] == '2', "requires Python 2")
