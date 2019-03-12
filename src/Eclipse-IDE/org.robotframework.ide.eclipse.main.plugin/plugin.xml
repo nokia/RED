@@ -3287,13 +3287,18 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <instanceof
-                      value="org.rf.ide.core.project.RobotProjectConfig$VariableMapping">
-                </instanceof>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <instanceof
+                         value="org.rf.ide.core.project.RobotProjectConfig$VariableMapping">
+                   </instanceof>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
@@ -3308,13 +3313,18 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <instanceof
-                      value="org.rf.ide.core.project.RobotProjectConfig$ReferencedVariableFile">
-                </instanceof>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <instanceof
+                         value="org.rf.ide.core.project.RobotProjectConfig$ReferencedVariableFile">
+                   </instanceof>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
@@ -3329,13 +3339,18 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-               <instanceof
-                     value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
-               </instanceof>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <instanceof
+                         value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                   </instanceof>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
@@ -3350,13 +3365,18 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-               <instanceof
-                     value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
-               </instanceof>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <instanceof
+                         value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
+                   </instanceof>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
@@ -3371,19 +3391,24 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <and>
-                   <instanceof
-                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
-                   </instanceof>
-                   <test
-                         property="org.robotframework.redxml.libraries.isSystemPath"
-                         value="false">
-                   </test>
-                </and>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+	                <and>
+	                   <instanceof
+	                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
+	                   </instanceof>
+	                   <test
+	                         property="org.robotframework.redxml.libraries.isSystemPath"
+	                         value="false">
+	                   </test>
+	                </and>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
@@ -3398,19 +3423,24 @@
        <enabledWhen>
           <with
                 variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <and>
-                   <instanceof
-                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
-                   </instanceof>
-                   <test
-                         property="org.robotframework.redxml.libraries.isSystemPath"
-                         value="false">
-                   </test>
-                </and>
-             </iterate>
+             <and>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+	                <and>
+	                   <instanceof
+	                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
+	                   </instanceof>
+	                   <test
+	                         property="org.robotframework.redxml.libraries.isSystemPath"
+	                         value="false">
+	                   </test>
+	                </and>
+                </iterate>
+                <count
+                      value="+">
+                </count>
+             </and>
           </with>
        </enabledWhen>
     </handler>
