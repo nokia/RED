@@ -354,7 +354,7 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
         err = q_stderr.get()
 
         if out:
-            return out.rstrip().decode('UTF-8')
+            return out.rstrip().splitlines()[-1].decode('UTF-8')
         else:
             raise Exception(err.decode('UTF-8', 'replace'))
     except queue.Empty:
