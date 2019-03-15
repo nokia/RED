@@ -1,0 +1,263 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: AutomaticlyAddingBracketsToVariables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _GntocEcoEemdcP6EMagK2Q
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 3/15/19 4:28 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//check default preferences
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor"
+with [get-window Preferences | get-group Variables] {
+    get-property caption | equals Variables | verify-true
+    get-property "getChildren().length" | equals 5 | verify-true
+    get-property "getChildren().Control[0].getText()" 
+        | equals "When one of robot variable identificators ($, @, &&, %) is typed" | verify-true
+    get-property "getChildren().Control[1].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[1].getText()" | equals "Automatically add variable brackets" | verify-true
+    get-property "getChildren().Control[2].getText()" 
+        | equals "Automatically wrap selected text with variable brackets" | verify-true
+    get-property "getChildren().Control[2].isEnabled()" | equals false | verify-true
+    get-property "getChildren().Control[3].getText()" | equals "Wrap selected text pattern" | verify-true
+    get-property "getChildren().Control[4].getText()" | equals "\\w+" | verify-true
+    get-property "getChildren().Control[4].getEditable()" | equals true | verify-true
+    get-property "getChildren().Control[4].isEnabled()" | equals false | verify-true
+}
+
+//check preference
+with [get-window Preferences] {
+    get-group Variables | get-button "Automatically add variable brackets" | check
+    get-button "Apply and Close" | click
+}
+
+
+// add test and new var
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type End
+    set-caret-pos 1 19
+    key-type Enter
+    type-text test
+    key-type Enter
+    type-text "$"
+}
+
+//check source
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}" | verify-true
+    
+// add list    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 8
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "@"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}" | verify-true
+    
+// add env var    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 8
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "%"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}" | verify-true
+    
+// add dict    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 8
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "&"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}" | verify-true
+    
+// add variable when $ added ${}     
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 8
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "$"
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${DEBUG_FILE}" | click 
+    -default
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "$"
+}
+
+//check that double brackets were not added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    ${}" | verify-true
+    
+//check removing brackets for new var    
+get-editor "TestFile.robot" | get-text-viewer | key-type BackSpace
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    $" | verify-true
+    
+//use Del to remove    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 6
+    key-type BackSpace
+    type-text "&"
+    key-type Left
+    key-type Del
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    &" | verify-true
+    
+ // add few vars in one line
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 6
+    key-type BackSpace
+    type-text "@"
+    key-type "M1+SPACE"
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "  $text"
+    key-type Right
+    type-text "  %enc.var"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    @{EMPTY}  ${text}  %{enc.var}" | verify-true
+    
+
+
+
+
+// select text and wrap it into brackets
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Variables | get-button "Automatically wrap selected text with variable brackets" | check
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 34
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text text
+    key-type "M2+ARROW_LEFT" -times 4
+    type-text "$"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    @{EMPTY}  ${text}  %{enc.var}\n"
+    + "    ${text}" | verify-true
+
+//use letters, digit and _
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 12
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "my_var1"
+    key-type "M2+ARROW_LEFT" -times 7
+    type-text "@"
+}
+
+//changed to user regex
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Variables | get-editbox -after [get-label "Wrap selected text pattern"] | set-text "\\w+(\\s?\\w*)*"
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 10 15
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "text with space"
+    key-type "M2+ARROW_LEFT" -times 15
+    type-text "&"
+}   
+
+//text is now dict
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    @{EMPTY}  ${text}  %{enc.var}\n"
+    + "    ${text}\n"
+    + "    @{my_var1}\n"
+    + "    &{text with space}" | verify-true
+    
+//press ctrl+z    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 11 20
+}
+
+//check if brackets were removed
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    @{EMPTY}  ${text}  %{enc.var}\n"
+    + "    ${text}\n"
+    + "    @{my_var1}\n"
+    + "    text with space" | verify-true
+    
+//add now $ - scalar should be created    
+get-editor "TestFile.robot" | get-text-viewer | type-text "$"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    ${}\n"
+    + "    @{}\n"
+    + "    %{}\n"
+    + "    &{}\n"
+    + "    ${DEBUG_FILE}\n"
+    + "    @{EMPTY}  ${text}  %{enc.var}\n"
+    + "    ${text}\n"
+    + "    @{my_var1}\n"
+    + "    ${text with space}" | verify-true 
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
