@@ -84,7 +84,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryPathIsNotDirectory() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -101,7 +103,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryPathIsDirectory() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -118,7 +122,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenMultipleClassesFromLibraryAreUsed() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -151,7 +157,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryIsModule() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -169,7 +177,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterJavaLibrary() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(JAVA_LIBRARY_NAME,
                 javaLibraryFile.getParentFile().getPath(), LibraryType.JAVA);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -186,7 +196,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterVirtualLibrary() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("virtualLibTest", "",
                 LibraryType.VIRTUAL);
 
@@ -199,7 +211,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterNonExistenceLibrary() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("libTest",
                 pythonModuleLibraryFolder.getPath() + "/libTest.py", LibraryType.PYTHON);
 
@@ -212,7 +226,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenTheSameLibSpecWithDifferentKeywordsIsRegistered() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -240,7 +256,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testUnregisterLibraries() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -260,7 +278,9 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testUnregisterModuleLibrary() {
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProject(project);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -520,8 +540,7 @@ public class LibrariesWatchHandlerTest {
     }
 
     private KeywordSpecification createNewKeywordSpec(final String name, final List<String> args) {
-        final KeywordSpecification keywordSpec = new KeywordSpecification();
-        keywordSpec.setName(name);
+        final KeywordSpecification keywordSpec = KeywordSpecification.create(name);
         keywordSpec.setArguments(args);
         return keywordSpec;
     }

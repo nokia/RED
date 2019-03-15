@@ -19,15 +19,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.EnvironmentVariableReplacer;
+import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
@@ -105,17 +103,12 @@ public class RobotProjectPathsProvider {
             @Override
             public List<File> provideUserSearchPaths() {
                 final RobotProjectConfig configuration = robotProject.getRobotProjectConfig();
-                final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
                 final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
                         configuration);
                 return configuration.getPythonPaths()
                         .stream()
-                        .map(SearchPath::getLocation)
-                        .map(variableReplacer::replaceKnownEnvironmentVariables)
-                        .map(Path::new)
-                        .map(redConfig::toAbsolutePath)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .map(redConfig::resolveToAbsolutePath)
+                        .map(IPath::toFile)
                         .collect(toList());
             }
         };

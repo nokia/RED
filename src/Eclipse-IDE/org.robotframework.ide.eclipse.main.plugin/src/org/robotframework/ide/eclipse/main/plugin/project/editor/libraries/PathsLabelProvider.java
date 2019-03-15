@@ -7,16 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static java.util.stream.Collectors.joining;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
-import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
@@ -82,17 +79,11 @@ class PathsLabelProvider extends RedCommonLabelProvider {
             final SearchPath path = (SearchPath) element;
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
             if (problems.isEmpty()) {
-                final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer();
-                final String pathWithReplacedVariables = variableReplacer
-                        .replaceKnownEnvironmentVariables(path.getLocation());
                 final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(
                         editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration());
-                return redConfig.toAbsolutePath(new Path(pathWithReplacedVariables))
-                        .map(File::getPath)
-                        .map(tooltipPath -> path.isSystem()
-                                ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
-                                : tooltipPath)
-                        .orElse(null);
+                final String absolutePath = redConfig.resolveToAbsolutePath(path).toOSString();
+                return path.isSystem() ? absolutePath + " [already defined in " + pathVariableName + " variable]"
+                        : absolutePath;
             } else {
                 return problems.stream().map(RedXmlProblem::getDescription).collect(joining("\n"));
             }

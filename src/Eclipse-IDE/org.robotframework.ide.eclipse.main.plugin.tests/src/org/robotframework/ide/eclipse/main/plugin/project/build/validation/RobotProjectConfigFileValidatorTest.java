@@ -574,8 +574,9 @@ public class RobotProjectConfigFileValidatorTest {
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
-        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage))
-                .containsExactly("The path '" + PROJECT_NAME + "/folder/${INCORRECT}' is invalid");
+        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage)).containsExactly(
+                "The path '" + projectProvider.getProject().getLocation().append("/folder/${INCORRECT}").toOSString()
+                        + "' is invalid");
     }
 
     @Test
@@ -599,10 +600,10 @@ public class RobotProjectConfigFileValidatorTest {
         validator = createValidator(SuiteExecutor.Python, variableAccessor);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        assertThat(reporter.getReportedProblems()).contains(
                 new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)),
                 new Problem(ConfigFileProblem.UNKNOWN_ENV_VARIABLE, new ProblemPosition(42)));
-        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage)).containsExactly(
+        assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage)).contains(
                 "Environment variable '%{UNKNOWN_ENV_VARIABLE_1}' is not defined",
                 "Environment variable '%{UNKNOWN_ENV_VARIABLE_2}' is not defined");
     }
