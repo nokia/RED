@@ -17,10 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
@@ -345,7 +342,7 @@ public class LocalProcessCommandLineBuilderTest {
 
         final File nonWorkspaceDir = tempFolder.newFolder("Project_outside");
 
-        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+        movedProjectProvider.move(nonWorkspaceDir);
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
         final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject());
@@ -370,7 +367,7 @@ public class LocalProcessCommandLineBuilderTest {
 
         final File nonWorkspaceDir = tempFolder.newFolder("Project_outside_with_tests");
 
-        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+        movedProjectProvider.move(nonWorkspaceDir);
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
         final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject());
@@ -400,7 +397,7 @@ public class LocalProcessCommandLineBuilderTest {
         movedProjectProvider.createDir("suites");
         movedProjectProvider.createFile("suites/s1.robot", "*** Test Cases ***", "c1", "  Log  1");
         resourceCreator.createLink(nonWorkspaceTest.toURI(), movedProjectProvider.getFile("suites/LinkedTest.robot"));
-        moveProject(movedProjectProvider.getProject(), nonWorkspaceDir);
+        movedProjectProvider.move(nonWorkspaceDir);
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
         final RobotProject robotProject = createRobotProject(movedProjectProvider.getProject());
@@ -1104,11 +1101,5 @@ public class LocalProcessCommandLineBuilderTest {
         robotConfig.fillDefaults();
         robotConfig.setProjectName(project.getName());
         return robotConfig;
-    }
-
-    private void moveProject(final IProject project, final File destination) throws CoreException {
-        final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(project.getName());
-        description.setLocation(new Path(destination.getAbsolutePath()));
-        project.move(description, true, null);
     }
 }

@@ -6,6 +6,7 @@
 package org.robotframework.red.junit;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -146,6 +148,12 @@ public class ProjectProvider implements TestRule {
         } catch (IOException | CoreException e) {
             return new ArrayList<>();
         }
+    }
+
+    public void move(final File destination) throws CoreException {
+        final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(project.getName());
+        description.setLocation(new Path(destination.getAbsolutePath()));
+        project.move(description, true, null);
     }
 
 }
