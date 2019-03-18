@@ -20,6 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rf.ide.core.RedURI;
 
 public class RedWorkspace {
 
@@ -111,25 +112,46 @@ public class RedWorkspace {
 
     public static class Paths {
 
-        public static IPath toWorkspaceRelativeIfPossible(final IPath fullPath) {
-            return toRelativeIfPossible(ResourcesPlugin.getWorkspace().getRoot().getLocation(), fullPath);
+        public static IPath toWorkspaceRelativeIfPossible(final IPath path) {
+            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+            if (root.getLocation().isPrefixOf(path)) {
+                return path.makeRelativeTo(root.getLocation());
+            } else {
+                try {
+                    for (final IResource project : root.members()) {
+                        if (project.getLocation().isPrefixOf(path)) {
+                            final IPath projectRelativePath = path.makeRelativeTo(project.getLocation());
+                            final IPath workspaceRelativePath = project.getFullPath().append(projectRelativePath);
+                            return workspaceRelativePath.makeRelativeTo(root.getFullPath());
+                        }
+                    }
+                } catch (final CoreException e) {
+                    // should not happen
+                }
+            }
+            return path;
         }
 
-        private static IPath toRelativeIfPossible(final IPath relativityPoint, final IPath fullPath) {
-            if (relativityPoint.isPrefixOf(fullPath)) {
-                return fullPath.makeRelativeTo(relativityPoint);
+        public static IPath toAbsoluteFromWorkspaceRelativeIfPossible(final IPath path) {
+            return toAbsoluteFromRelativeIfPossible(ResourcesPlugin.getWorkspace().getRoot(), path);
+        }
+
+        public static IPath toAbsoluteFromRelativeIfPossible(final IContainer base, final IPath path) {
+            if (path.isAbsolute()) {
+                return path;
             } else {
-                return fullPath;
+                final IResource member = base.findMember(path);
+                return member == null ? base.getLocation().append(path) : member.getLocation();
             }
         }
 
-        public static IPath toAbsoluteFromWorkspaceRelativeIfPossible(final IPath workspaceRelativePath) {
-            if (workspaceRelativePath.isAbsolute()) {
-                return workspaceRelativePath;
-            } else {
-                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                final IResource member = root.findMember(workspaceRelativePath);
-                return member == null ? root.getLocation().append(workspaceRelativePath) : member.getLocation();
+        public static boolean isCorrect(final IPath path) {
+            try {
+                // checking if the given string violates RFC 2396
+                URI.create(RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(path.toPortableString()));
+                return true;
+            } catch (final IllegalArgumentException e) {
+                return false;
             }
         }
     }

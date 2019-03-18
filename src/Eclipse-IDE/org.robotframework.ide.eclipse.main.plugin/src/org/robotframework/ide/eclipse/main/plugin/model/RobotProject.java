@@ -244,12 +244,8 @@ public class RobotProject extends RobotContainer {
      * @return configuration opened in editor or empty
      */
     public Optional<RobotProjectConfig> getOpenedProjectConfig() {
-        final RedProjectEditorInput redProjectInput = findEditorInputIfAlreadyOpened();
-        if (redProjectInput != null) {
-            return Optional.ofNullable(redProjectInput.getProjectConfiguration());
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(findEditorInputIfAlreadyOpened())
+                .map(RedProjectEditorInput::getProjectConfiguration);
     }
 
     private RedProjectEditorInput findEditorInputIfAlreadyOpened() {

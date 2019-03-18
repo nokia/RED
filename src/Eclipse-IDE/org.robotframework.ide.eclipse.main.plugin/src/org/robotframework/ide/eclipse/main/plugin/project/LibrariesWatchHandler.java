@@ -38,7 +38,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.watcher.IWatchEventHandler;
 import org.rf.ide.core.watcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
@@ -313,10 +312,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             return null;
         }
 
-        IPath libraryPath = new org.eclipse.core.runtime.Path(library.getPath());
-        if (!libraryPath.isAbsolute()) {
-            libraryPath = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
-        }
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
+                robotProject.getRobotProjectConfig());
+        final IPath libraryPath = redConfig.resolveToAbsolutePath(library);
         final File libraryFile = libraryPath.toFile();
         if (libraryFile.exists()) {
             if (!libraryFile.isDirectory()) {

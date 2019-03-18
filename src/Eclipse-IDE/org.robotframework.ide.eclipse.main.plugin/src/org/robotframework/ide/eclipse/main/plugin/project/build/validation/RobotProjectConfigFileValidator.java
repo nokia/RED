@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -14,7 +13,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -223,29 +221,23 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final ProblemPosition position = new ProblemPosition(config.getLineFor(searchPath));
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configFile.getProject(),
-                config.getConfigurationModel());
         final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor,
                 varName -> {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.UNKNOWN_ENV_VARIABLE)
                             .formatMessageWith("%{" + varName + "}");
                     reporter.handleProblem(problem, configFile, position);
                 });
-        final String pathWithReplacedVariables = variableReplacer
-                .replaceKnownEnvironmentVariables(searchPath.getLocation());
-        if (!variableReplacer.hasUnknownEnvironmentVariables(pathWithReplacedVariables)) {
-            final Optional<File> absoluteLocation = redConfig.toAbsolutePath(new Path(pathWithReplacedVariables));
-            if (absoluteLocation.isPresent()) {
-                if (!absoluteLocation.get().exists()) {
-                    final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
-                            .formatMessageWith(absoluteLocation.get().getPath());
-                    reporter.handleProblem(problem, configFile, position);
-                }
-            } else {
-                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
-                        .formatMessageWith(pathWithReplacedVariables);
-                reporter.handleProblem(problem, configFile, position);
-            }
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configFile.getProject(),
+                config.getConfigurationModel(), variableReplacer);
+        final IPath absolutePath = redConfig.resolveToAbsolutePath(searchPath);
+        if (!RedWorkspace.Paths.isCorrect(absolutePath)) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
+                    .formatMessageWith(absolutePath.toOSString());
+            reporter.handleProblem(problem, configFile, position);
+        } else if (!absolutePath.toFile().exists()) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
+                    .formatMessageWith(absolutePath.toOSString());
+            reporter.handleProblem(problem, configFile, position);
         }
     }
 

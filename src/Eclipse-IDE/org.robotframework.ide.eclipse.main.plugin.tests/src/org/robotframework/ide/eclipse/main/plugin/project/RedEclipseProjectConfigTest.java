@@ -14,11 +14,10 @@ import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -50,8 +49,8 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(project.getLocation().append("file.txt")))
-                .hasValue(project.getLocation().append("file.txt").toFile());
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create(PROJECT_NAME + "/file.txt")))
+                .isEqualTo(project.getLocation().append("file.txt"));
     }
 
     @Test
@@ -61,8 +60,8 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(path("resource.txt")))
-                .hasValue(project.getWorkspace().getRoot().getLocation().append("resource.txt").toFile());
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create("resource.txt")))
+                .isEqualTo(project.getWorkspace().getRoot().getLocation().append("resource.txt"));
     }
 
     @Test
@@ -72,8 +71,8 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(path("resource.txt")))
-                .hasValue(project.getLocation().append("resource.txt").toFile());
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create("resource.txt")))
+                .isEqualTo(project.getLocation().append("resource.txt"));
     }
 
     @Test
@@ -83,8 +82,8 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(path("file.txt")))
-                .hasValue(project.getWorkspace().getRoot().getLocation().append("file.txt").toFile());
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create("file.txt")))
+                .isEqualTo(project.getWorkspace().getRoot().getLocation().append("file.txt"));
     }
 
     @Test
@@ -94,8 +93,8 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.toAbsolutePath(path("file.txt")))
-                .hasValue(project.getLocation().append("file.txt").toFile());
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create("file.txt")))
+                .isEqualTo(project.getLocation().append("file.txt"));
     }
 
     @Test
@@ -118,7 +117,8 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addPythonPath(SearchPath.create("${INCORRECT_2}/incorrect"));
         projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/%{FOLDER}"));
 
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig,
+                new EnvironmentVariableReplacer(variableAccessor));
 
         assertThat(redConfig.createAdditionalEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
                 newArrayList(absolutePath("java", "lib.jar")), newArrayList(absolutePath("python", "folder"))));
@@ -154,55 +154,12 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addReferencedLibrary(
                 ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
 
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig,
+                new EnvironmentVariableReplacer(variableAccessor));
 
         assertThat(redConfig.createExecutionEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
                 newArrayList(".", absolutePath("lib1.jar"), absolutePath("lib2.jar"), absolutePath("java", "lib.jar")),
                 newArrayList(absolutePath("folder1"), absolutePath("folder2"), absolutePath("python", "folder"))));
-    }
-
-    @Test
-    public void cannotResolveAbsolutePath_whenBasePathIsNull() {
-        assertThat(RedEclipseProjectConfig.resolveToAbsolutePath(null, path("path/pointing/somewhere"))).isNotPresent();
-    }
-
-    @Test
-    public void cannotResolveAbsolutePath_whenRelativeIsParameterized() {
-        assertThat(absoluteOf("/base", "dir/${PARAM}/file")).isNotPresent();
-    }
-
-    @Test
-    public void childPathIsReturned_whenItIsAlreadyAbsolutePath() {
-        assertThat(absoluteOf("/base", "/absolute")).hasValue(path("/absolute"));
-        assertThat(absoluteOf("/base", "c:/dir")).hasValue(path("c:/dir"));
-    }
-
-    @Test
-    public void resolvedPathIsReturned_whenBaseIsGivenWithRelativeChild() {
-        assertThat(absoluteOf("/base", "relative")).hasValue(path("/relative"));
-        assertThat(absoluteOf("/base.file", "relative")).hasValue(path("/relative"));
-
-        assertThat(absoluteOf("/base/", "relative")).hasValue(path("/base/relative"));
-        assertThat(absoluteOf("/base/c.file", "relative")).hasValue(path("/base/relative"));
-
-        assertThat(absoluteOf("/base/", "relative/something")).hasValue(path("/base/relative/something"));
-        assertThat(absoluteOf("/base/c.file", "relative/something")).hasValue(path("/base/relative/something"));
-
-        assertThat(absoluteOf("/base/1/2/3/", ".././../relative/something"))
-                .hasValue(path("/base/1/relative/something"));
-        assertThat(absoluteOf("/base/1/2/3/c.file", ".././../relative/something"))
-                .hasValue(path("/base/1/relative/something"));
-
-        assertThat(absoluteOf("/base/", "relative path/containing!@#$%^&*();,.\"/differentchars"))
-                .hasValue(path("/base/relative path/containing!@#$%^&*();,.\"/differentchars"));
-    }
-
-    private static Optional<IPath> absoluteOf(final String path1, final String path2) {
-        return RedEclipseProjectConfig.resolveToAbsolutePath(new Path(path1), new Path(path2));
-    }
-
-    private static IPath path(final String path) {
-        return new Path(path);
     }
 
     private static String absolutePath(final String... projectRelativeParts) {
