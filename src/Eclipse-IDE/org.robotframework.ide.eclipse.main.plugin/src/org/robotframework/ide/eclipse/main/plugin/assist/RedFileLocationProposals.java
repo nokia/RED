@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
@@ -69,13 +68,7 @@ public abstract class RedFileLocationProposals {
         for (final IFile toFile : files) {
 
             final IFile fromFile = suiteFile.getFile();
-            final String content;
-            if (RedSystemProperties.isWindowsPlatform()
-                    && !fromFile.getLocation().getDevice().equals(toFile.getLocation().getDevice())) {
-                content = toFile.getLocation().toString();
-            } else {
-                content = createCurrentFileRelativePath(fromFile, toFile);
-            }
+            final String content = AssistProposals.createRelativePathIfPossible(fromFile, toFile);
             final Optional<ProposalMatch> match = matcher.matches(userContent, content);
 
             if (match.isPresent()) {
@@ -83,10 +76,6 @@ public abstract class RedFileLocationProposals {
             }
         }
         return proposals;
-    }
-
-    private static String createCurrentFileRelativePath(final IFile from, final IFile to) {
-        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1).toString();
     }
 
     private static class RedPythonFileLocationsProposals extends RedFileLocationProposals {

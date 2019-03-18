@@ -48,18 +48,16 @@ public class AssistProposals {
 
     static RedFileLocationProposal createFileLocationProposal(final IFile fromFile, final IFile toFile,
             final ProposalMatch match) {
-        final String content;
-        if (RedSystemProperties.isWindowsPlatform()
-                && !fromFile.getLocation().getDevice().equals(toFile.getLocation().getDevice())) {
-            content = toFile.getLocation().toString();
-        } else {
-            content = createCurrentFileRelativePath(fromFile, toFile);
-        }
+        final String content = createRelativePathIfPossible(fromFile, toFile);
         return new RedFileLocationProposal(content, content, toFile, match);
     }
 
-    private static String createCurrentFileRelativePath(final IFile from, final IFile to) {
-        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1).toString();
+    static String createRelativePathIfPossible(final IFile fromFile, final IFile toFile) {
+        final IPath toLocation = toFile.getLocation();
+        final IPath fromLocation = fromFile.getLocation();
+        return !RedSystemProperties.isWindowsPlatform() || fromLocation.getDevice().equals(toLocation.getDevice())
+                ? toLocation.makeRelativeTo(fromLocation).removeFirstSegments(1).toString()
+                : toLocation.toString();
     }
 
     static RedLibraryProposal createLibraryProposal(final RobotSuiteFile suiteFile, final LibrarySpecification libSpec,
@@ -72,8 +70,10 @@ public class AssistProposals {
     static RedSitePackagesLibraryProposal createSitePackagesLibraryProposal(final String name,
             final RobotSuiteFile suiteFile, final ProposalMatch match) {
 
-        final boolean isImported = suiteFile.getImportedLibraries().keys().stream().anyMatch(
-                libSpec -> libSpec.getName().equals(name));
+        final boolean isImported = suiteFile.getImportedLibraries()
+                .keys()
+                .stream()
+                .anyMatch(libSpec -> libSpec.getName().equals(name));
         return new RedSitePackagesLibraryProposal(name, isImported, match);
     }
 
