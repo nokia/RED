@@ -80,18 +80,17 @@ public class ReferencedLibraryLocator {
         Optional<File> libraryFile = Optional.empty();
         try {
             if (new Path(path).isAbsolute() || path.endsWith("/") || path.endsWith(".py")) {
-                if (ImportPath.hasNotEscapedWindowsPathSeparator(path)) {
-                    detector.libraryDetectingByPathFailed(path, libraryFile,
-                            "The path '" + path + "' contains not supported Windows separator.");
-                    return;
-                }
                 libraryFile = new RobotProjectPathsProvider(suiteFile.getRobotProject())
                         .findAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
                         .map(File::new)
-                        .map(this::tryToCanonical);
+                        .map(this::tryToCanonical)
+                        .filter(File::exists);
                 if (libraryFile.isPresent()) {
                     final Entry<File, Collection<ReferencedLibrary>> imported = importByPath(libraryFile.get());
                     detector.libraryDetectedByPath(path, imported.getKey(), imported.getValue());
+                } else if (ImportPath.hasNotEscapedWindowsPathSeparator(path)) {
+                    detector.libraryDetectingByPathFailed(path, libraryFile,
+                            "The path '" + path + "' contains not supported Windows separator.");
                 } else {
                     detector.libraryDetectingByPathFailed(path, libraryFile,
                             "Unable to find library under '" + path + "' location.");

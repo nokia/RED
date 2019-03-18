@@ -478,6 +478,26 @@ public class ReferencedLibraryLocatorTest {
         verifyNoMoreInteractions(detector);
     }
 
+    @Test
+    public void pythonLibraryIsFoundByPath_whenLibraryPathContainsWindowsPathSeparator() throws Exception {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final IResource libResource = projectProvider.getFile("dir_lib.py");
+        setupPythonImport(libResource);
+
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, libResource.getLocation().toOSString());
+
+        verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile());
+        verifyNoMoreInteractions(importer);
+
+        verify(detector).libraryDetectedByPath(eq(libResource.getLocation().toOSString()),
+                eq(projectProvider.getFile("dir_lib.py").getLocation().toFile()),
+                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", libResource)));
+        verifyNoMoreInteractions(detector);
+    }
+
     private void setupJavaImport(final IResource libResource) {
         final String name = libResource.getLocation().removeFileExtension().lastSegment();
         final String path = libResource.getLocation().toPortableString();
