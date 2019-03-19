@@ -322,6 +322,10 @@ public class RedPreferences {
         return store.getBoolean(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
     }
 
+    public void setShouldUseSingleCommandLineArgument(final boolean shouldUseSingleArg) {
+        store.setValue(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, shouldUseSingleArg);
+    }
+
     public boolean shouldUseSingleFileDataSource() {
         return store.getBoolean(LAUNCH_USE_SINGLE_FILE_DATA_SOURCE);
     }

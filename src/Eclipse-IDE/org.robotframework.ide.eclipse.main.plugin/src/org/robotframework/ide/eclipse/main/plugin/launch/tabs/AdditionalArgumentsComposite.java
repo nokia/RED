@@ -19,7 +19,7 @@ class AdditionalArgumentsComposite extends Composite {
     AdditionalArgumentsComposite(final Composite parent, final ModifyListener listener) {
         super(parent, SWT.NONE);
 
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 5).applyTo(this);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 
         createAdditionalArgumentsText(listener);
         BrowseButtons.selectVariableButton(this, argumentsText::insert);

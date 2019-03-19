@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,9 +29,8 @@ public class ExecutableFileCompositeTest {
 
     @Test
     public void executableFileCompositeComposite_inputSettingTest() {
-        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(),
-                mock(ModifyListener.class));
-        composite.setInput(" path ");
+        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), "title");
+        composite.setFilePath(" path ");
 
         assertThat(executableFilePathText(composite)).is(enabled());
         final List<Button> browseButtons = getBrowseButtons(composite);
@@ -40,7 +38,7 @@ public class ExecutableFileCompositeTest {
                 "Variables...");
         assertThat(browseButtons).allSatisfy(button -> assertThat(button).is(enabled()));
 
-        assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("path");
+        assertThat(composite.getFilePath()).isEqualTo("path");
     }
 
     @Test
@@ -48,7 +46,8 @@ public class ExecutableFileCompositeTest {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
         final ModifyListener listener = e -> listenerWasCalled.set(true);
 
-        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), listener);
+        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), "title");
+        composite.addModifyListener(listener);
 
         executableFilePathText(composite).setText("selected");
 
@@ -58,7 +57,7 @@ public class ExecutableFileCompositeTest {
                 "Variables...");
         assertThat(browseButtons).allSatisfy(button -> assertThat(button).is(enabled()));
 
-        assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("selected");
+        assertThat(composite.getFilePath()).isEqualTo("selected");
 
         assertThat(listenerWasCalled.get()).isTrue();
     }

@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.stream.Stream;
 
 public final class RedTemporaryDirectory {
 
@@ -21,14 +24,61 @@ public final class RedTemporaryDirectory {
 
     private static Path temporaryDirectory;
 
+    public static File copyRedpydevdPackage() throws IOException {
+        copyScriptFile("red_pydevd_package", "redpydevd", "__init__.py");
+        copyScriptFile("red_pydevd_package", "redpydevd", "__main__.py");
+        copyScriptFile("red_pydevd_package", "redpydevd", "redpydevd.py");
+        copyScriptFile("red_pydevd_package", "__init__.py");
+        copyScriptFile("red_pydevd_package", "setup.py");
+        copyScriptFile("red_pydevd_package", "README.md");
+        copyScriptFile("red_pydevd_package", "LICENSE");
+        copyScriptFile("red_pydevd_package", "MANIFEST.in");
+
+        return new File(temporaryDirectory.toString() + File.separator + "red_pydevd_package");
+    }
+
+    public static File getRedpydevdSetup() throws IOException {
+        final Path tempDir = createTemporaryDirectoryIfNotExists();
+        return new File(tempDir.toString() + File.separator + "red_pydevd_package" + File.separator + "setup.py");
+    }
+
+    public static InputStream getRedpydevdInitAsStream() throws IOException {
+        return getScriptFileAsStream("red_pydevd_package", "redpydevd", "__init__.py");
+    }
+
+    public static InputStream getRedpydevdFileAsStream() throws IOException {
+        return getScriptFileAsStream("red_pydevd_package", "redpydevd", "redpydevd.py");
+    }
+
     public static File copyScriptFile(final String filename) throws IOException {
         try (InputStream source = getScriptFileAsStream(filename)) {
-            return replaceTemporaryFile(filename, source);
+            final File tempFile = getTemporaryFile(filename);
+            Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return tempFile;
+        }
+    }
+
+    public static File copyScriptFile(final String dir, final String... filepath) throws IOException {
+        try (InputStream source = getScriptFileAsStream(dir, filepath)) {
+            final Path tempDir = createTemporaryDirectoryIfNotExists();
+            final File dirFile = new File(tempDir.toString() + File.separator + dir + File.separator
+                    + Stream.of(filepath).limit(filepath.length - 1).collect(joining(File.separator)));
+
+            if (!dirFile.exists()) {
+                dirFile.mkdirs();
+            }
+            final File tempFile = new File(dirFile, filepath[filepath.length - 1]);
+            Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return tempFile;
         }
     }
 
     public static InputStream getScriptFileAsStream(final String filename) throws IOException {
         return RedTemporaryDirectory.class.getResourceAsStream("/scripts/" + filename);
+    }
+
+    public static InputStream getScriptFileAsStream(final String dir, final String... filepath) throws IOException {
+        return RedTemporaryDirectory.class.getResourceAsStream("/scripts/" + dir + "/" + String.join("/", filepath));
     }
 
     public static File getTemporaryFile(final String filename) throws IOException {
@@ -40,12 +90,6 @@ public final class RedTemporaryDirectory {
         final File tempFile = getTemporaryFile(filename);
         tempFile.delete();
         tempFile.createNewFile();
-        return tempFile;
-    }
-
-    public static File replaceTemporaryFile(final String filename, final InputStream source) throws IOException {
-        final File tempFile = getTemporaryFile(filename);
-        Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         return tempFile;
     }
 
