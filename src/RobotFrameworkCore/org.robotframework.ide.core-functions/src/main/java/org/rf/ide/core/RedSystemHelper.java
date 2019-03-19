@@ -6,6 +6,7 @@
 package org.rf.ide.core;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,8 +33,33 @@ public final class RedSystemHelper {
      */
     public static int runExternalProcess(final List<String> command, final Consumer<String> lineHandler)
             throws IOException {
+        return runExternalProcess(null, command, lineHandler);
+    }
+
+    /**
+     * Run external process in specified working directory with error stream redirection and wait
+     * until
+     * it is terminated.
+     *
+     * @param workingDirectory
+     *            Working directory for external process
+     * @param command
+     *            System command to run
+     * @param lineHandler
+     *            Output lines handler
+     * @return The exit value of the subprocess which was run
+     * @throws IOException
+     *             thrown if the current thread is interrupted by another thread while it is
+     *             waiting.
+     */
+    public static int runExternalProcess(final File workingDirectory, final List<String> command,
+            final Consumer<String> lineHandler) throws IOException {
         try {
-            final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
+            final ProcessBuilder builder = new ProcessBuilder(command);
+            if (workingDirectory != null) {
+                builder.directory(workingDirectory);
+            }
+            final Process process = builder.redirectErrorStream(true).start();
 
             final InputStream inputStream = process.getInputStream();
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));

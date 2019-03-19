@@ -82,6 +82,16 @@
             id="org.robotframework.ide.eclipse.wizards.newRobotPython"
             name="Robot python file">
       </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRedPyDevConfigWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            icon="resources/robot_script.png"
+            id="org.robotframework.red.wizard.new.redPydevdLaunchConfig"
+            name="RED with PyDev debugging session"
+            project="false">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">

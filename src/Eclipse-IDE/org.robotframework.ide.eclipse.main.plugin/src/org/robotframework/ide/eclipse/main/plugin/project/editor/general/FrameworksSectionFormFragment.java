@@ -10,7 +10,9 @@ import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
@@ -183,16 +185,17 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         ColumnViewerToolTipSupport.enableFor(viewer);
 
+        final Predicate<Object> shouldBeBold = elem -> Arrays.asList(viewer.getCheckedElements()).contains(elem);
         viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(320)
-                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
+                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(shouldBeBold))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
                 .withWidth(200)
                 .shouldShowLastVerticalSeparator(false)
                 .shouldGrabAllTheSpaceLeft(true)
-                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
+                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(shouldBeBold))
                 .createFor(viewer);
     }
 

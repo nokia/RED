@@ -71,7 +71,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public static final String CURRENT_CONFIGURATION_VERSION = "1";
 
-    static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
+    public static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final Map<IResource, List<String>> suitesMapping = resources.stream()
                 .collect(toMap(r -> r, r -> new ArrayList<>()));
         return prepareCopy(suitesMapping, RobotLaunchConfigurationType.GENERAL_PURPOSE);
@@ -99,11 +99,15 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.fillDefaults();
-        final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
+        final IProject project = suitesMapping.isEmpty() ? null : getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        robotConfig.setInterpreter(robotProject.getRuntimeEnvironment().getInterpreter());
+        if (robotProject != null) {
+            robotConfig.setInterpreter(robotProject.getRuntimeEnvironment().getInterpreter());
+        }
 
-        robotConfig.setProjectName(project.getName());
+        if (project != null) {
+            robotConfig.setProjectName(project.getName());
+        }
         robotConfig.updateTestCases(suitesMapping);
         robotConfig.setIsGeneralPurposeEnabled(type == RobotLaunchConfigurationType.GENERAL_PURPOSE);
 

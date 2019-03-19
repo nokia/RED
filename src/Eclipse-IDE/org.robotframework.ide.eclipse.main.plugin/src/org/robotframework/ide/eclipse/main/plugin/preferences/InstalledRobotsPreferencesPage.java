@@ -10,9 +10,11 @@ import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -206,16 +208,17 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         });
         ColumnViewerToolTipSupport.enableFor(viewer);
 
+        final Predicate<Object> shouldBeBold = elem -> Arrays.asList(viewer.getCheckedElements()).contains(elem);
         viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(320)
-                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
+                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(shouldBeBold))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
                 .withWidth(200)
                 .shouldShowLastVerticalSeparator(false)
                 .shouldGrabAllTheSpaceLeft(true)
-                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
+                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(shouldBeBold))
                 .createFor(viewer);
     }
 

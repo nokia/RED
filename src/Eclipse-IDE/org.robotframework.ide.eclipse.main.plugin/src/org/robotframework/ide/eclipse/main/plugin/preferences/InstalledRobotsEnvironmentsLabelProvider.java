@@ -6,9 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.function.Predicate;
 
-import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -17,6 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -24,31 +24,31 @@ import com.google.common.annotations.VisibleForTesting;
 
 public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
 
-    private final CheckboxTableViewer viewer;
+    private final Predicate<Object> elementShouldBeMarkedBold;
 
     @VisibleForTesting
-    InstalledRobotsEnvironmentsLabelProvider(final CheckboxTableViewer viewer) {
-        this.viewer = viewer;
+    public InstalledRobotsEnvironmentsLabelProvider(final Predicate<Object> elementShouldBeMarkedBold) {
+        this.elementShouldBeMarkedBold = elementShouldBeMarkedBold;
     }
 
     @Override
     public Color getForeground(final Object element) {
         final IRuntimeEnvironment env = (IRuntimeEnvironment) element;
         if (!env.isValidPythonInstallation()) {
-            return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_RED);
+            return ColorsManager.getColor(SWT.COLOR_RED);
+
         } else if (!env.hasRobotInstalled() || PythonVersion.from(env.getVersion()).isDeprecated()
                 || env.getRobotVersion().isDeprecated()) {
-            return viewer.getTable().getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW);
+            return ColorsManager.getColor(SWT.COLOR_DARK_YELLOW);
         }
         return null;
     }
 
     @Override
     public Font getFont(final Object element) {
-        if (Arrays.asList(viewer.getCheckedElements()).contains(element)) {
-            return FontsManager.transformFontWithStyle(viewer.getTable().getFont(), SWT.BOLD);
-        }
-        return super.getFont(element);
+        final Font fontToUse = super.getFont(element);
+        return elementShouldBeMarkedBold.test(element) ? FontsManager.transformFontWithStyle(fontToUse, SWT.BOLD)
+                : fontToUse;
     }
 
     @Override
@@ -89,8 +89,12 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     public static class InstalledRobotsNamesLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
 
-        public InstalledRobotsNamesLabelProvider(final CheckboxTableViewer viewer) {
-            super(viewer);
+        public InstalledRobotsNamesLabelProvider() {
+            this(elem -> false);
+        }
+
+        public InstalledRobotsNamesLabelProvider(final Predicate<Object> elementShouldBeMarkedBold) {
+            super(elementShouldBeMarkedBold);
         }
 
         @Override
@@ -101,8 +105,12 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
 
     public static class InstalledRobotsPathsLabelProvider extends InstalledRobotsEnvironmentsLabelProvider {
 
-        public InstalledRobotsPathsLabelProvider(final CheckboxTableViewer viewer) {
-            super(viewer);
+        public InstalledRobotsPathsLabelProvider() {
+            super(elem -> false);
+        }
+
+        public InstalledRobotsPathsLabelProvider(final Predicate<Object> elementShouldBeMarkedBold) {
+            super(elementShouldBeMarkedBold);
         }
 
         @Override

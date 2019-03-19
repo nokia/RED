@@ -164,7 +164,7 @@ class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab impleme
         GridDataFactory.fillDefaults().grab(true, false).applyTo(robotArgumentsDescription);
 
         robotArgumentsComposite = new AdditionalArgumentsComposite(group, e -> updateLaunchConfigurationDialog());
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(robotArgumentsComposite);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(robotArgumentsComposite);
     }
 
     private void createTagsGroup(final Composite parent) {
