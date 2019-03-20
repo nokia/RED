@@ -112,10 +112,8 @@ public class RobotArtifactsBuilderTest {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
                 "Robot Framework 2.8.2 (Python 2.7.1 on win32)");
-        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
-        final RobotProjectConfig configuration = new RobotProjectConfig();
+        builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT, new ProblemPosition(1)));
     }
@@ -125,10 +123,8 @@ public class RobotArtifactsBuilderTest {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
                 "Robot Framework 2.8.2 (Python 2.6.1 on win32)");
-        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
-        final RobotProjectConfig configuration = new RobotProjectConfig();
+        builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT, new ProblemPosition(1)));
     }
@@ -138,10 +134,8 @@ public class RobotArtifactsBuilderTest {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
                 "Robot Framework 2.9 (Python 2.7.1 on win32)");
-        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
-        final RobotProjectConfig configuration = new RobotProjectConfig();
+        builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
@@ -150,10 +144,8 @@ public class RobotArtifactsBuilderTest {
         final RobotProject robotProject = spy(model.createRobotProject(projectProvider.getProject()));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
                 "Robot Framework 3.0.4 (Python 2.6.6 on win32)");
-        when(robotProject.getRuntimeEnvironment()).thenReturn(env);
-        final RobotProjectConfig configuration = new RobotProjectConfig();
+        builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_PYTHON, new ProblemPosition(1)));
     }
@@ -165,8 +157,9 @@ public class RobotArtifactsBuilderTest {
                 "Robot Framework 3.0.4 (Python 3.7.1 on win32)");
         when(robotProject.getRuntimeEnvironment()).thenReturn(env);
         final RobotProjectConfig configuration = new RobotProjectConfig();
+        builder.provideRuntimeEnvironment(robotProject, configuration, reporter);
+        builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
-        assertThat(builder.provideRuntimeEnvironment(robotProject, configuration, reporter)).isSameAs(env);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
