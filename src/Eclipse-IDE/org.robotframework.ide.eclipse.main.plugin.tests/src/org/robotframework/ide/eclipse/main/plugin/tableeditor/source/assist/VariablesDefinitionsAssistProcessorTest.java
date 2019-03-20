@@ -30,7 +30,6 @@ public class VariablesDefinitionsAssistProcessorTest {
     @Test
     public void varDefsProcessorIsValidOnlyForVariablesSection() {
         final RobotSuiteFile file = mock(RobotSuiteFile.class);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -40,7 +39,6 @@ public class VariablesDefinitionsAssistProcessorTest {
     @Test
     public void varDefsProcessorHasTitleDefined() {
         final RobotSuiteFile file = mock(RobotSuiteFile.class);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -55,7 +53,6 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(6)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -72,7 +69,6 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(7)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -80,7 +76,7 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         assertThat(proposals).isNull();
     }
-    
+
     @Test
     public void proposalsAreProvided_whenAtTheEndOfFirstCellOfVariablesSection() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -89,7 +85,6 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(11)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -108,7 +103,7 @@ public class VariablesDefinitionsAssistProcessorTest {
                 new Document("line1", "@{newList}  item  "),
                 new Document("line1", "&{newDict}  key=value  "));
     }
-    
+
     @Test
     public void proposalsAreProvided_whenInsideTheFirstCellOfVariablesSection() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -117,7 +112,6 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(8)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));
@@ -145,7 +139,6 @@ public class VariablesDefinitionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(6)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
-        when(file.getFileExtension()).thenReturn("robot");
 
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(
                 createAssistant(file));

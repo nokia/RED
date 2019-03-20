@@ -34,6 +34,11 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     }
 
     @Override
+    public boolean isEditable() {
+        return !readOnly;
+    }
+
+    @Override
     public String getFileExtension() {
         return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : null;
     }
@@ -79,11 +84,6 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean isEditable() {
-        return !readOnly;
     }
 
     public void setRobotVersion(final RobotVersion version) {

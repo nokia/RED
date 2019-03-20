@@ -75,7 +75,7 @@ public class FindUsagesHandler {
 
     public static boolean isTSV(final RobotFormEditor editor) {
         final IFile file = getUnderlyingFile(editor);
-        return file.getFileExtension().equals("tsv");
+        return "tsv".equalsIgnoreCase(file.getFileExtension());
     }
 
     private static IFile getUnderlyingFile(final RobotFormEditor editor) {

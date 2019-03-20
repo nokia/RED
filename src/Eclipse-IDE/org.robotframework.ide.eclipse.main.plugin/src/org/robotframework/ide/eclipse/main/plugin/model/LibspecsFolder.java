@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.project.RobotProjectConfig;
 
 public class LibspecsFolder {
-    
+
     private static final String FOLDER_NAME = "libspecs";
 
     private static final String LIBSPEC_FILE_EXTENSION = ".libspec";
@@ -70,7 +70,7 @@ public class LibspecsFolder {
                 return Stream.of(folder.members())
                         .filter(r -> r.getType() == IResource.FILE)
                         .map(IFile.class::cast)
-                        .filter(r -> r.getFileExtension().equals("html"))
+                        .filter(r -> "html".equalsIgnoreCase(r.getFileExtension()))
                         .sorted((r1, r2) -> Long.compare(r2.getLocalTimeStamp(), r1.getLocalTimeStamp()))
                         .limit(20)
                         .collect(toSet());
