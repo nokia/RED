@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -51,7 +52,6 @@ import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferencesLinker;
 import org.rf.ide.core.testdata.model.FileFormat;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -96,14 +96,19 @@ public class RobotFormEditor extends FormEditor {
 
     private RobotSuiteFile suiteModel;
 
-    private boolean isEditable;
-
     private SuiteFileMarkersListener validationListener;
 
     private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
     public RedClipboard getClipboard() {
         return clipboard;
+    }
+
+    public RobotSuiteFile provideSuiteModel() {
+        if (suiteModel == null) {
+            suiteModel = createSuiteFile(getEditorInput());
+        }
+        return suiteModel;
     }
 
     @Override
@@ -151,15 +156,13 @@ public class RobotFormEditor extends FormEditor {
     @Override
     protected void setInput(final IEditorInput input) {
         if (input instanceof FileEditorInput) {
-            final IFile file = ((FileEditorInput) input).getFile();
-            isEditable = !file.isReadOnly();
-            setPartName(RedPlugin.getDefault().getPreferences().isParentDirectoryNameInTabEnabled()
-                    ? file.getParent().getName() + "/" + input.getName()
-                    : input.getName());
+            final String parentPrefix = RedPlugin.getDefault().getPreferences().isParentDirectoryNameInTabEnabled()
+                    ? ((FileEditorInput) input).getFile().getParent().getName() + "/"
+                    : "";
+            setPartName(parentPrefix + input.getName());
         } else {
             final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
-                isEditable = !storage.isReadOnly();
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
             } else {
                 throw new IllegalRobotEditorInputException(
@@ -169,18 +172,14 @@ public class RobotFormEditor extends FormEditor {
         super.setInput(input);
     }
 
-    public boolean isEditable() {
-        return isEditable;
-    }
-
     @Override
     protected void addPages() {
         try {
             prepareCommandsContext();
 
-            if (provideSuiteModel().isSuiteFile()) {
+            if (suiteModel.isSuiteFile()) {
                 addEditorPart(new CasesEditorPart(), "Test Cases");
-            } else if (provideSuiteModel().isRpaSuiteFile()) {
+            } else if (suiteModel.isRpaSuiteFile()) {
                 addEditorPart(new TasksEditorPart(), "Tasks");
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
@@ -249,92 +248,75 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
-        waitForPendingEditorJobs();
-
-        final RobotSuiteFile currentModel = provideSuiteModel();
+        final IDocument document = getSourceEditor().getDocument();
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
-            updateSourceFromModel();
+            updateSourceIfNeeded(() -> document);
         }
 
-        final String contentTypeId = ASuiteFileDescriber.getContentType(suiteModel.getFile().getName(),
-                getSourceEditor().getDocument().get());
-        final boolean contentTypeMismatchDetected =
-                currentModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
-                || currentModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
-                || currentModel.isResourceFile() && !suiteModel.getFileExtension().equals("resource")
-                        && !ASuiteFileDescriber.isResourceFile(contentTypeId);
-
-        boolean shouldSave = true;
-        if (contentTypeMismatchDetected) {
-            shouldSave = shouldMismatchedContentBeSavedPriorToClosing(currentModel, contentTypeId);
+        final String contentTypeId = ASuiteFileDescriber.getContentType(suiteModel.getFile().getName(), document.get());
+        if (!isContentTypeMismatched(contentTypeId)) {
+            saveDirtyEditors(monitor);
+        } else {
+            if (shouldMismatchedContentBeSavedPriorToClosing(contentTypeId)) {
+                saveDirtyEditors(monitor);
+                reopenEditor();
+            } else {
+                monitor.setCanceled(true);
+            }
         }
-        if (!shouldSave) {
-            monitor.setCanceled(true);
-            return;
-        }
+    }
 
+    private void saveDirtyEditors(final IProgressMonitor monitor) {
         for (final IEditorPart dirtyEditor : getDirtyEditors()) {
             dirtyEditor.doSave(monitor);
         }
         updateActivePage();
 
-        saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(currentModel);
-
-        if (contentTypeMismatchDetected) {
-            reopenEditor();
-        }
+        saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(suiteModel);
     }
 
-    private boolean shouldMismatchedContentBeSavedPriorToClosing(final RobotSuiteFile currentModel,
-            final String contentTypeId) {
+    private boolean isContentTypeMismatched(final String contentTypeId) {
+        return suiteModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
+                || suiteModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
+                || suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
+                        && !ASuiteFileDescriber.isResourceFile(contentTypeId);
+    }
+
+    private boolean shouldMismatchedContentBeSavedPriorToClosing(final String contentTypeId) {
 
         final String title = "File content mismatch";
-        final String description = "The file " + currentModel.getFile().getName() + " is a %s file but after "
+        final String description = "The file " + suiteModel.getFile().getName() + " is a %s file but after "
                 + "changes there is %s section defined. From now on this file will be recognized as a %s file."
                 + "\n\nClick OK to save and reopen editor or cancel saving";
 
-        if (currentModel.isSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
+        if (suiteModel.isSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tests suite", "no Test Cases nor Tasks", "resource"));
 
-        } else if (currentModel.isSuiteFile() && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
+        } else if (suiteModel.isSuiteFile() && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tests suite", "a Tasks", "tasks suite"));
 
-        } else if (currentModel.isResourceFile() && !getFileExtension().equals("resource")
+        } else if (suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
                 && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Test Cases", "tests suite"));
 
-        } else if (currentModel.isResourceFile() && !getFileExtension().equals("resource")
+        } else if (suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
                 && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Tasks", "tasks suite"));
 
-        } else if (currentModel.isRpaSuiteFile() && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
+        } else if (suiteModel.isRpaSuiteFile() && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tasks suite", "a Test Cases", "tests suite"));
 
-        } else if (currentModel.isRpaSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
+        } else if (suiteModel.isRpaSuiteFile() && ASuiteFileDescriber.isResourceFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tasks suite", "no Test Cases nor Tasks", "resource"));
         }
         return false;
-    }
-
-    private String getFileExtension() {
-        return suiteModel.getFileExtension();
-    }
-
-    private void waitForPendingEditorJobs() {
-        // jobs are sending model modification events, so it has to be done before dumping model to
-        // source
-        for (final IEditorPart part : parts) {
-            if (part instanceof ISectionEditorPart) {
-                ((ISectionEditorPart) part).waitForPendingJobs();
-            }
-        }
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {
@@ -415,25 +397,21 @@ public class RobotFormEditor extends FormEditor {
         return java.util.Optional.empty();
     }
 
-    public RobotSuiteFile provideSuiteModel() {
-        if (suiteModel != null) {
-            return suiteModel;
-        }
-        if (getEditorInput() instanceof FileEditorInput) {
-            suiteModel = RedPlugin.getModelManager().createSuiteFile(((FileEditorInput) getEditorInput()).getFile());
-            checkRuntimeEnvironment(suiteModel);
+    private RobotSuiteFile createSuiteFile(final IEditorInput input) {
+        if (input instanceof FileEditorInput) {
+            final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
+                    .createSuiteFile(((FileEditorInput) input).getFile());
+            checkRuntimeEnvironment(suiteFile);
+            return suiteFile;
         } else {
-            final IStorage storage = getEditorInput().getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             try (InputStream stream = storage.getContents()) {
                 final String content = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
-                suiteModel = new RobotSuiteStreamFile(storage.getName(), content, storage.isReadOnly());
-
+                return new RobotSuiteStreamFile(storage.getName(), content, storage.isReadOnly());
             } catch (final CoreException | IOException e) {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }
         }
-
-        return suiteModel;
     }
 
     public SuiteSourceEditor getSourceEditor() {
@@ -462,6 +440,8 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void updateActivePage() {
+        final SuiteSourceEditor sourceEditor = getSourceEditor();
+
         if (getActiveEditor() instanceof ISectionEditorPart) {
 
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
@@ -471,38 +451,48 @@ public class RobotFormEditor extends FormEditor {
                 // there are some locking threads involved which results in blocking
                 // main thread for hundreds of milliseconds thus giving stops when switching
                 // from source part to some section editor part
-                SwtThread.asyncExec(() -> getSourceEditor().disableReconcilation());
+                SwtThread.asyncExec(() -> sourceEditor.disableReconcilation());
             } else {
-                getSourceEditor().disableReconcilation();
+                sourceEditor.disableReconcilation();
             }
 
         } else if (getActiveEditor() instanceof SuiteSourceEditor) {
-            getSourceEditor().enableReconcilation();
+            sourceEditor.enableReconcilation();
 
-            updateSourceFromModel();
+            updateSourceIfNeeded(sourceEditor::getDocument);
         }
     }
 
-    private void updateSourceFromModel() {
-        waitForPendingEditorJobs();
-        final SuiteSourceEditor editor = getSourceEditor();
-
+    private void updateSourceIfNeeded(final Supplier<IDocument> documentSupplier) {
         if (!getDirtyEditors().isEmpty()) {
-            final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            final RobotFile model = provideSuiteModel().getLinkedElement();
-            final RobotFileOutput currentRobotOutputFile = model.getParent();
-
-            final String separatorFromPreference = RedPlugin.getDefault()
-                    .getPreferences()
-                    .getSeparatorToUse(currentRobotOutputFile.getFileFormat() == FileFormat.TSV);
-            final DumpContext ctx = new DumpContext(separatorFromPreference, true);
-
-            final DumpedResult dumpResult = new RobotFileDumper().dump(ctx, currentRobotOutputFile);
-            final String content = dumpResult.newContent();
-            new QuickTokenListenerBaseTwoModelReferencesLinker().update(currentRobotOutputFile, dumpResult);
-
-            document.set(content);
+            waitForPendingEditorJobs();
+            updateSourceFromModel(documentSupplier.get());
         }
+    }
+
+    private void waitForPendingEditorJobs() {
+        // jobs are sending model modification events, so it has to be done before dumping model to
+        // source
+        for (final IEditorPart part : parts) {
+            if (part instanceof ISectionEditorPart) {
+                ((ISectionEditorPart) part).waitForPendingJobs();
+            }
+        }
+    }
+
+    private void updateSourceFromModel(final IDocument document) {
+        final RobotFileOutput fileOutput = suiteModel.getLinkedElement().getParent();
+
+        final String separatorFromPreference = RedPlugin.getDefault()
+                .getPreferences()
+                .getSeparatorToUse(fileOutput.getFileFormat() == FileFormat.TSV);
+        final DumpContext ctx = new DumpContext(separatorFromPreference, true);
+
+        final DumpedResult dumpResult = new RobotFileDumper().dump(ctx, fileOutput);
+        final String content = dumpResult.newContent();
+        new QuickTokenListenerBaseTwoModelReferencesLinker().update(fileOutput, dumpResult);
+
+        document.set(content);
     }
 
     public SuiteSourceEditor activateSourcePage() {

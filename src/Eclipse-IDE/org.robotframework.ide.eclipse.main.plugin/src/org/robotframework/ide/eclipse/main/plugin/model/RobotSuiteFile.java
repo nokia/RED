@@ -202,9 +202,12 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
         return new ArrayList<>();
     }
 
+    public boolean isEditable() {
+        return !file.isReadOnly();
+    }
+
     public boolean isTsvFile() {
-        final String fileExt = getFileExtension();
-        return fileExt != null && fileExt.toLowerCase().equals("tsv");
+        return "tsv".equalsIgnoreCase(getFileExtension());
     }
 
     public boolean isSuiteFile() {
@@ -307,10 +310,6 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
     @Override
     public List<RobotSuiteFileSection> getChildren() {
         return sections == null ? new ArrayList<>() : sections;
-    }
-
-    public boolean isEditable() {
-        return !file.isReadOnly();
     }
 
     @Override
