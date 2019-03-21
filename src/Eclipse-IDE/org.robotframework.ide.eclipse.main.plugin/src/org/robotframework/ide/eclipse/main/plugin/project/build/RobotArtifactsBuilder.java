@@ -99,6 +99,7 @@ class RobotArtifactsBuilder {
         final SubMonitor runtimeEnvCreationMonitor = subMonitor.newChild(15);
         final IRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(robotProject, configuration,
                 fatalReporter);
+        checkRuntimeEnvironment(runtimeEnvironment, robotProject, reporter);
         runtimeEnvCreationMonitor.done();
         if (subMonitor.isCanceled()) {
             return;
@@ -147,10 +148,15 @@ class RobotArtifactsBuilder {
             final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_HAS_NO_ROBOT)
                     .formatMessageWith(runtimeEnvironment.getFile());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
+        }
+        return runtimeEnvironment;
+    }
 
-        } else if (runtimeEnvironment.getRobotVersion().isDeprecated()) {
-            final RobotProblem problem = RobotProblem
-                    .causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT)
+    void checkRuntimeEnvironment(final IRuntimeEnvironment runtimeEnvironment, final RobotProject robotProject,
+            final ValidationReportingStrategy reporter) {
+
+        if (runtimeEnvironment.getRobotVersion().isDeprecated()) {
+            final RobotProblem problem = RobotProblem.causedBy(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT)
                     .formatMessageWith(runtimeEnvironment.getRobotVersion().asString());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
 
@@ -161,6 +167,5 @@ class RobotArtifactsBuilder {
                             PythonVersion.from(runtimeEnvironment.getVersion()).asString());
             reporter.handleProblem(problem, robotProject.getConfigurationFile(), 1);
         }
-        return runtimeEnvironment;
     }
 }
