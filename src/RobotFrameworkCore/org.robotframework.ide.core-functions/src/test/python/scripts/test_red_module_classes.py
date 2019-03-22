@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from red_module_classes import get_classes_from_module
+from red_module_classes import get_classes_from_module, isJarOrZip
 
 
 class ClassesRetrievingTests(unittest.TestCase):
@@ -255,3 +255,31 @@ class ClassesRetrievingTests(unittest.TestCase):
             self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other', 'PythonWithJava'])
         else:
             self.assertEqual(result, ['PythonOnly', 'PythonOnly.Other'])
+            
+            
+class ModuleLocationTest(unittest.TestCase):
+    
+    def test_if_module_location_is_jar_file(self):
+        module_location = os.path.join('path', 'to', 'JarFile.jar')
+
+        self.assertTrue(isJarOrZip(module_location))
+        
+    def test_if_module_location_is_zip_file(self):
+        module_location = os.path.join('path', 'to', 'ZipFile.zip')
+
+        self.assertTrue(isJarOrZip(module_location))
+            
+    def test_if_module_location_is_capital_jar_file(self):
+        module_location = os.path.join('path', 'to', 'CapitalJarFile.JAR')
+
+        self.assertTrue(isJarOrZip(module_location))
+        
+    def test_if_module_location_is_capital_zip_file(self):
+        module_location = os.path.join('path', 'to', 'CapitalZipFile.ZIP')
+
+        self.assertTrue(isJarOrZip(module_location))
+        
+    def test_if_module_location_is_not_jar_or_zip_file(self):
+        module_location = os.path.join('path', 'to', 'PythonFile.py')
+
+        self.assertFalse(isJarOrZip(module_location))

@@ -126,7 +126,9 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
             }
 
             final IRuntimeEnvironment environment = environmentSupplier.get();
-            return environment.getInterpreter() == SuiteExecutor.Jython && "jar".equals(path.getFileExtension())
+            return environment.getInterpreter() == SuiteExecutor.Jython
+                    && ("jar".equals(path.getFileExtension().toLowerCase())
+                            || "zip".equals(path.getFileExtension().toLowerCase()))
                     ? importer.importJavaLib(environment, editorInput.getRobotProject().getProject(),
                             editorInput.getProjectConfiguration(), path.toFile())
                     : importer.importPythonLib(environment, editorInput.getRobotProject().getProject(),

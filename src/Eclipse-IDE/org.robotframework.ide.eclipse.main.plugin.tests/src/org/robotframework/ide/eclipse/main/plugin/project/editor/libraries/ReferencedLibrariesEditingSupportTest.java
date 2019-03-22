@@ -46,6 +46,7 @@ public class ReferencedLibrariesEditingSupportTest {
     public static void beforeSuite() throws Exception {
         projectProvider.createFile("PyLib.py");
         projectProvider.createFile("JavaLib.jar");
+        projectProvider.createFile("JavaLib.zip");
         projectProvider.createFile("libspec.xml", "<keywordspec name=\"TestLib\" format=\"ROBOT\">",
                 "<version>1.0</version><scope>global</scope>", "<doc>Documentation for test library ``TestLib``.</doc>",
                 "<kw name=\"Some Keyword\"><arguments><arg>a</arg><arg>b</arg></arguments><doc></doc></kw>",
@@ -189,6 +190,28 @@ public class ReferencedLibrariesEditingSupportTest {
     }
 
     @Test
+    public void pythonLibraryIsImported_whenNonJythonInterpreterIsUsedAndPathPointsToZipFile() {
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProjectConfig config = new RobotProjectConfig();
+        final RedProjectEditorInput input = mock(RedProjectEditorInput.class);
+        when(input.getRobotProject()).thenReturn(robotProject);
+        when(input.getProjectConfiguration()).thenReturn(config);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getInterpreter()).thenReturn(SuiteExecutor.Python);
+
+        final ReferencedLibraryImporter importer = mock(ReferencedLibraryImporter.class);
+        final IPath path = projectProvider.getFile("JavaLib.zip").getLocation();
+
+        final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(shellProvider.getShell(), input,
+                null, () -> env);
+
+        elementsCreator.importLibrary(importer, path);
+
+        verify(importer).importPythonLib(env, projectProvider.getProject(), config, path.toFile());
+        verifyNoMoreInteractions(importer);
+    }
+
+    @Test
     public void pythonLibraryIsImported_whenJythonInterpreterIsUsedAndPathDoesNotPointToJarFile() {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final RobotProjectConfig config = new RobotProjectConfig();
@@ -211,6 +234,50 @@ public class ReferencedLibrariesEditingSupportTest {
     }
 
     @Test
+    public void pythonLibraryIsImported_whenJythonInterpreterIsUsedAndPathDoesPointToJarFile() {
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProjectConfig config = new RobotProjectConfig();
+        final RedProjectEditorInput input = mock(RedProjectEditorInput.class);
+        when(input.getRobotProject()).thenReturn(robotProject);
+        when(input.getProjectConfiguration()).thenReturn(config);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getInterpreter()).thenReturn(SuiteExecutor.Jython);
+
+        final ReferencedLibraryImporter importer = mock(ReferencedLibraryImporter.class);
+        final IPath path = projectProvider.getFile("JavaLib.jar").getLocation();
+
+        final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(shellProvider.getShell(), input,
+                null, () -> env);
+
+        elementsCreator.importLibrary(importer, path);
+
+        verify(importer).importJavaLib(env, projectProvider.getProject(), config, path.toFile());
+        verifyNoMoreInteractions(importer);
+    }
+
+    @Test
+    public void pythonLibraryIsImported_whenJythonInterpreterIsUsedAndPathDoesPointToZipFile() {
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProjectConfig config = new RobotProjectConfig();
+        final RedProjectEditorInput input = mock(RedProjectEditorInput.class);
+        when(input.getRobotProject()).thenReturn(robotProject);
+        when(input.getProjectConfiguration()).thenReturn(config);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getInterpreter()).thenReturn(SuiteExecutor.Jython);
+
+        final ReferencedLibraryImporter importer = mock(ReferencedLibraryImporter.class);
+        final IPath path = projectProvider.getFile("JavaLib.zip").getLocation();
+
+        final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(shellProvider.getShell(), input,
+                null, () -> env);
+
+        elementsCreator.importLibrary(importer, path);
+
+        verify(importer).importJavaLib(env, projectProvider.getProject(), config, path.toFile());
+        verifyNoMoreInteractions(importer);
+    }
+
+    @Test
     public void javaLibraryIsImported_whenJythonInterpreterIsUsedAndPathPointsToJarFile() {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final RobotProjectConfig config = new RobotProjectConfig();
@@ -222,6 +289,28 @@ public class ReferencedLibrariesEditingSupportTest {
 
         final ReferencedLibraryImporter importer = mock(ReferencedLibraryImporter.class);
         final IPath path = projectProvider.getFile("JavaLib.jar").getLocation();
+
+        final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(shellProvider.getShell(), input,
+                null, () -> env);
+
+        elementsCreator.importLibrary(importer, path);
+
+        verify(importer).importJavaLib(env, projectProvider.getProject(), config, path.toFile());
+        verifyNoMoreInteractions(importer);
+    }
+
+    @Test
+    public void javaLibraryIsImported_whenJythonInterpreterIsUsedAndPathPointsToZipFile() {
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProjectConfig config = new RobotProjectConfig();
+        final RedProjectEditorInput input = mock(RedProjectEditorInput.class);
+        when(input.getRobotProject()).thenReturn(robotProject);
+        when(input.getProjectConfiguration()).thenReturn(config);
+        final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
+        when(env.getInterpreter()).thenReturn(SuiteExecutor.Jython);
+
+        final ReferencedLibraryImporter importer = mock(ReferencedLibraryImporter.class);
+        final IPath path = projectProvider.getFile("JavaLib.zip").getLocation();
 
         final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(shellProvider.getShell(), input,
                 null, () -> env);

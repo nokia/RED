@@ -54,30 +54,28 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
     public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment, final IProject project,
             final RobotProjectConfig config, final File library) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-        return importLib(builder, library, libClass -> true, RedImages.getPythonLibraryImage());
+        return importLib(builder, library, libClass -> true);
     }
 
     @Override
     public Collection<ReferencedLibrary> importPythonLib(final IRuntimeEnvironment environment, final IProject project,
             final RobotProjectConfig config, final File library, final String name) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-        return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name),
-                RedImages.getPythonLibraryImage());
+        return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name));
     }
 
     @Override
     public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment, final IProject project,
             final RobotProjectConfig config, final File library) {
-        final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-        return importLib(builder, library, libClass -> true, RedImages.getJavaClassImage());
+        final ILibraryStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
+        return importLib(builder, library, libClass -> true);
     }
 
     @Override
     public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment, final IProject project,
             final RobotProjectConfig config, final File library, final String name) {
-        final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-        return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name),
-                RedImages.getJavaClassImage());
+        final ILibraryStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
+        return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name));
     }
 
     public ReferencedLibrary importLibFromSpecFile(final File library) {
@@ -86,7 +84,7 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
     }
 
     private Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder, final File library,
-            final Predicate<ILibraryClass> shouldInclude, final ImageDescriptor image) {
+            final Predicate<ILibraryClass> shouldInclude) {
         final List<ILibraryClass> classes = new ArrayList<>();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> {
@@ -112,7 +110,7 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
             return new ArrayList<>();
         } else {
             final List<ILibraryClass> classesToImport = classes.size() > 1
-                    ? askUserToSelectClasses(library, classes, image)
+                    ? askUserToSelectClasses(library, classes)
                     : classes;
             return classesToImport.stream()
                     .map(libClass -> libClass.toReferencedLibrary(library.getAbsolutePath()))
@@ -120,9 +118,8 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
         }
     }
 
-    private List<ILibraryClass> askUserToSelectClasses(final File library, final List<ILibraryClass> classes,
-            final ImageDescriptor image) {
-        final LabelProvider labelProvider = createLabelProvider(image);
+    private List<ILibraryClass> askUserToSelectClasses(final File library, final List<ILibraryClass> classes) {
+        final LabelProvider labelProvider = createLabelProvider();
         final ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell, labelProvider);
         dialog.setMultipleSelection(true);
         dialog.setTitle("Select library class");
@@ -135,11 +132,14 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
 
     }
 
-    private static LabelProvider createLabelProvider(final ImageDescriptor image) {
+    private static LabelProvider createLabelProvider() {
         return new LabelProvider() {
 
             @Override
             public Image getImage(final Object element) {
+                final ImageDescriptor image = ((ILibraryClass) element).getType() == LibraryType.JAVA
+                        ? RedImages.getJavaClassImage()
+                        : RedImages.getPythonLibraryImage();
                 return ImagesManager.getImage(image);
             }
 

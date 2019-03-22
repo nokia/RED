@@ -104,7 +104,7 @@ public class PythonLibStructureBuilderTest {
     }
 
     @Test
-    public void allEntriesAreProvided() throws Exception {
+    public void allEntriesAreProvidedWithCorrectNameAndType() throws Exception {
         when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName",
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
@@ -116,6 +116,8 @@ public class PythonLibStructureBuilderTest {
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName",
                 "module.ClassName.ClassName", "module.OtherClassName", "module.OtherClassName.OtherClassName");
+        assertThat(classes.stream().map(ILibraryClass::getType)).containsExactly(LibraryType.PYTHON, LibraryType.PYTHON,
+                LibraryType.PYTHON, LibraryType.PYTHON, LibraryType.PYTHON);
     }
 
     @Test
