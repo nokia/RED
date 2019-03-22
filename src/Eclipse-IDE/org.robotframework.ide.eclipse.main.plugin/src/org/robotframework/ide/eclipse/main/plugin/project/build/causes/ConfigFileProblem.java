@@ -97,7 +97,7 @@ public enum ConfigFileProblem implements IProblemCause {
             return "Missing excluded resource '%s'";
         }
     },
-    JAVA_LIB_NOT_A_JAR_FILE {
+    JAVA_LIB_NOT_A_JAR_OR_ZIP_FILE {
 
         @Override
         public boolean hasResolution() {
@@ -111,7 +111,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "The path '%s' for Java library should point to .jar file. Keywords from this library will not be accessible";
+            return "The path '%s' for Java library should point to .jar or .zip file. Keywords from this library will not be accessible";
         }
     },
     JAVA_LIB_IN_NON_JAVA_ENV {

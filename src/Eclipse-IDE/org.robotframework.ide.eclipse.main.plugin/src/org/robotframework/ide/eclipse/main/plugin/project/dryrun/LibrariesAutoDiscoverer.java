@@ -51,7 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 
 import com.google.common.collect.Streams;
@@ -271,7 +271,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private void addJavaLibrary(final RobotDryRunLibraryImport libraryImport) {
-            final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(
+            final ArchiveStructureBuilder jarStructureBuilder = new ArchiveStructureBuilder(
                     robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
                     robotProject.getProject());
             try {

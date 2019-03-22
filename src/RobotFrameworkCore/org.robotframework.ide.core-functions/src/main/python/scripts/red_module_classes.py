@@ -20,18 +20,18 @@ def get_classes_from_module(module_location):
     module_names_collector = _get_module_names_collector()
     class_names = set()
 
-    if module_location.endswith('__init__.py'):
+    if module_location.lower().endswith('__init__.py'):
         pythonpathsetter.add_path(os.path.dirname(module_directory))
         inside_file_names = module_names_collector._try_to_find_names_in_module(module_name, module_location)
         inside_file_names.extend(module_names_collector._try_to_find_names_in_path([module_directory], _find_names_in_module))
         class_names.update(_combine_module_name_parts(inside_file_names, module_name))
 
-    elif module_location.endswith('.py'):
+    elif module_location.lower().endswith('.py'):
         pythonpathsetter.add_path(module_directory)
         inside_file_names = module_names_collector._try_to_find_names_in_module(module_name, module_location)
         class_names.update(_combine_module_name_parts(inside_file_names, module_name))
 
-    elif module_location.endswith(".zip") or module_location.endswith(".jar"):
+    elif isJarOrZip(module_location):
         pythonpathsetter.add_path(module_location)
         class_names.update(module_names_collector._try_to_find_names_in_archive([module_location], _find_names_in_archive_module))
 
@@ -133,6 +133,10 @@ def _try_to_find_names_in_archive(path, names_finder):
             pass  # some modules can't be loaded  separately
 
     return result
+
+
+def isJarOrZip(module_location):
+    return module_location.lower().endswith(".jar") or module_location.lower().endswith(".zip")
 
 
 class ModuleNamesCollectorForPython2():

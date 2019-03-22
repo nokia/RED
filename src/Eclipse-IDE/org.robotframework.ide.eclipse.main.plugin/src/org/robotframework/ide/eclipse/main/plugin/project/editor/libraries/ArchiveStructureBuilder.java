@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
-public class JarStructureBuilder implements ILibraryStructureBuilder {
+public class ArchiveStructureBuilder implements ILibraryStructureBuilder {
 
     private final IRuntimeEnvironment environment;
 
@@ -34,7 +34,7 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
 
     private final IProject project;
 
-    public JarStructureBuilder(final IRuntimeEnvironment environment, final RobotProjectConfig config,
+    public ArchiveStructureBuilder(final IRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
         this.config = config;
@@ -44,20 +44,20 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
 
     @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) {
-        if (uri.getPath().endsWith(".jar")) {
-            return provideEntriesFromJarFile(uri);
+        if (uri.getPath().toLowerCase().endsWith(".jar") || uri.getPath().toLowerCase().endsWith(".zip")) {
+            return provideEntriesFromArchiveFile(uri);
         } else {
             return new ArrayList<>();
         }
     }
 
-    private Collection<ILibraryClass> provideEntriesFromJarFile(final URI uri) {
-        final List<ILibraryClass> jarClasses = new ArrayList<>();
+    private Collection<ILibraryClass> provideEntriesFromArchiveFile(final URI uri) {
+        final List<ILibraryClass> classes = new ArrayList<>();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(new File(uri)))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {
-                    jarClasses.add(JarClass.createFromZipJavaEntry(entry.getName()));
+                    classes.add(JavaClass.createFromZipJavaEntry(entry.getName()));
                 }
                 entry = zipStream.getNextEntry();
             }
@@ -65,42 +65,36 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
             // nothing to do
         }
 
-        jarClasses.addAll(providePythonEntriesFromJarFile(uri));
+        classes.addAll(providePythonEntriesFromArchiveFile(uri));
 
-        return jarClasses;
+        return classes;
     }
 
-    private Collection<JarClass> providePythonEntriesFromJarFile(final URI uri) {
+    private Collection<ILibraryClass> providePythonEntriesFromArchiveFile(final URI uri) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(uri);
 
-        final List<JarClass> jarClasses = new ArrayList<>();
-        for (final ILibraryClass pythonClass : pythonClasses) {
-            jarClasses.add(new JarClass(pythonClass.getQualifiedName()));
-        }
-
-        return jarClasses;
+        return pythonLibStructureBuilder.provideEntriesFromFile(uri);
     }
 
     private boolean isJavaClass(final String entryName) {
         return entryName.endsWith(".class");
     }
 
-    public static final class JarClass implements ILibraryClass {
+    public static final class JavaClass implements ILibraryClass {
 
         private final String qualifiedName;
 
         @VisibleForTesting
-        JarClass(final String qualifiedName) {
+        JavaClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
         }
 
         @VisibleForTesting
-        static JarClass createFromZipJavaEntry(final String name) {
+        static JavaClass createFromZipJavaEntry(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
-            return new JarClass(qualifiedName);
+            return new JavaClass(qualifiedName);
         }
 
         @Override
@@ -109,15 +103,20 @@ public class JarStructureBuilder implements ILibraryStructureBuilder {
         }
 
         @Override
+        public LibraryType getType() {
+            return LibraryType.JAVA;
+        }
+
+        @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
-            return ReferencedLibrary.create(LibraryType.JAVA, qualifiedName,
+            return ReferencedLibrary.create(getType(), qualifiedName,
                     RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
         }
 
         @Override
         public boolean equals(final Object obj) {
-            return obj != null && JarClass.class == obj.getClass()
-                    && Objects.equal(this.qualifiedName, ((JarClass) obj).qualifiedName);
+            return obj != null && JavaClass.class == obj.getClass()
+                    && Objects.equal(this.qualifiedName, ((JavaClass) obj).qualifiedName);
         }
 
         @Override

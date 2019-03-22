@@ -88,14 +88,21 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
         }
 
         @Override
+        public LibraryType getType() {
+            return LibraryType.PYTHON;
+        }
+
+        @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             IPath pathWithoutModuleName = new Path(fullLibraryPath).removeLastSegments(1);
             final String[] nameParts = qualifiedName.split("\\.");
-            if (fullLibraryPath.endsWith("__init__.py") || nameParts.length > 1) {
+            if (fullLibraryPath.toLowerCase().endsWith(".jar") || fullLibraryPath.toLowerCase().endsWith(".zip")) {
+                pathWithoutModuleName = new Path(fullLibraryPath);
+            } else if (fullLibraryPath.endsWith("__init__.py") || nameParts.length > 1) {
                 final int segmentsToRemove = countModuleNameSegments(pathWithoutModuleName.segments(), nameParts);
                 pathWithoutModuleName = pathWithoutModuleName.removeLastSegments(segmentsToRemove);
             }
-            return ReferencedLibrary.create(LibraryType.PYTHON, qualifiedName,
+            return ReferencedLibrary.create(getType(), qualifiedName,
                     RedWorkspace.Paths.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
         }
 

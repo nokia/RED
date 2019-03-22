@@ -49,7 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Valid
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.IReferencedLibraryImporter;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator.IReferencedLibraryDetector;
@@ -232,14 +232,14 @@ class ExternalLibrariesImportCollector {
         @Override
         public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final File library) {
-            final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
+            final ILibraryStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
             return importLib(builder, library, libClass -> true);
         }
 
         @Override
         public Collection<ReferencedLibrary> importJavaLib(final IRuntimeEnvironment environment,
                 final IProject project, final RobotProjectConfig config, final File library, final String name) {
-            final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
+            final ILibraryStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
             return importLib(builder, library, libClass -> libClass.getQualifiedName().equals(name));
         }
 

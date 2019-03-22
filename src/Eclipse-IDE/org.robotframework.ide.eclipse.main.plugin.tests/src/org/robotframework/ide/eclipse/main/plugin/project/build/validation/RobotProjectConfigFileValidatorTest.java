@@ -309,7 +309,34 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenJavaLibraryFileDoesNotHaveJarExtension_notJarFileWarningIsReported() throws Exception {
+    public void whenJavaLibraryFileIsImportedFromJarFile_nothingIsReported() throws Exception {
+        projectProvider.createDir("libs");
+        projectProvider.createFile("libs/JavaLib.jar");
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
+                PROJECT_NAME + "/libs/JavaLib.jar");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Jython, mock(SystemVariableAccessor.class));
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void whenJavaLibraryFileIsImportedFromZipFile_nothingIsReported() throws Exception {
         projectProvider.createDir("libs");
         projectProvider.createFile("libs/JavaLib.zip");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
@@ -332,8 +359,36 @@ public class RobotProjectConfigFileValidatorTest {
         validator = createValidator(SuiteExecutor.Jython, mock(SystemVariableAccessor.class));
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void whenJavaLibraryIsNotImportedFromJarOrZipFile_notJarOrZipFileWarningIsReported() throws Exception {
+        projectProvider.createDir("libs");
+        projectProvider.createFile("libs/JavaLib.tar");
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
+                PROJECT_NAME + "/libs/JavaLib.tar");
+
+        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        robotProject.setStandardLibraries(new HashMap<>());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.addReferencedLibrary(refLib);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(refLib, new FilePosition(123, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
+
+        validator = createValidator(SuiteExecutor.Jython, mock(SystemVariableAccessor.class));
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_FILE, new ProblemPosition(123)));
+                .containsExactly(
+                        new Problem(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_OR_ZIP_FILE, new ProblemPosition(123)));
     }
 
     @Test
