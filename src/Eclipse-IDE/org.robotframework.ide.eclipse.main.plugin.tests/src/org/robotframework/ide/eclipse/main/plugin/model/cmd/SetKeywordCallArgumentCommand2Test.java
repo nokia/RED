@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -167,16 +166,6 @@ public class SetKeywordCallArgumentCommand2Test {
         checkArgumentsChangesProperly(call, "new_arg", index, expectedArgs);
     }
 
-    @Test
-    public void nothingChanges_whenTryingToSetEmptyValueOutsideOfArgumentsList_andCallHasEmptyName() {
-        checkArgumentsDoesNotChange(createEmptyKeywordCall(), "", 3);
-    }
-
-    @Test
-    public void nothingChanges_whenTryingToSetNullValueOutsideOfArgumentsList_andCallHasEmptyName() {
-        checkArgumentsDoesNotChange(createEmptyKeywordCall(), null, 3);
-    }
-
     private static void checkArgumentsChangesProperly(final RobotKeywordCall call, final String argToSet,
             final int argumentIndex, final List<String> expectedArgs) {
         final IEventBroker eventBroker = mock(IEventBroker.class);
@@ -218,14 +207,6 @@ public class SetKeywordCallArgumentCommand2Test {
         assertThat(call.getName()).isEqualTo(oldName);
         assertThat(call.getArguments()).containsExactlyElementsOf(oldArgs);
         assertThat(call.getComment()).isEqualTo(oldComment);
-    }
-
-    private RobotKeywordCall createEmptyKeywordCall() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
-                .appendLine("case_0")
-                .appendLine("    # comment")
-                .build();
-        return model.findSection(RobotCasesSection.class).get().getChildren().get(0).getChildren().get(0);
     }
 
     private static List<RobotCase> createTestCases() {
