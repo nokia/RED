@@ -354,7 +354,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         private Optional<File> findPydevdInPyDev() {
             return Stream.of("org.python.pydev.core", "org.python.pydev")
                     .map(Platform::getBundle)
-                    .map(bundle -> bundle == null ? null : FileLocator.find(bundle, new Path("pysrc/pydevd.py")))
+                    .map(bundle -> bundle == null ? null : FileLocator.find(bundle, new Path("pysrc/pydevd.py"), null))
                     .filter(url -> url != null)
                     .findFirst()
                     .map(this::resolveUrlToFile);
