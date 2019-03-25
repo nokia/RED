@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
@@ -66,28 +67,26 @@ public class ConvertCallToComment extends EditorCommand {
 
                 final Object parentObject = keywordCall.getLinkedElement().getParent();
 
-                RobotExecutableRow<?> newLinked = null;
+                RobotEmptyRow<?> newLinked = null;
                 if (parentObject instanceof TestCase) {
-                    final RobotExecutableRow<TestCase> tempLinked = new RobotExecutableRow<>();
-                    tempLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
+                    final RobotEmptyRow<TestCase> tempLinked = new RobotEmptyRow<>();
                     ((TestCase) parentObject).replaceElement(
                             (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
 
                 } else if (parentObject instanceof Task) {
-                    final RobotExecutableRow<Task> tempLinked = new RobotExecutableRow<>();
-                    tempLinked.getAction().setType(RobotTokenType.TASK_ACTION_NAME);
+                    final RobotEmptyRow<Task> tempLinked = new RobotEmptyRow<>();
                     ((Task) parentObject)
                             .replaceElement((RobotExecutableRow<Task>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
 
                 } else if (parentObject instanceof UserKeyword) {
-                    final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
-                    tempLinked.getAction().setType(RobotTokenType.KEYWORD_ACTION_NAME);
+                    final RobotEmptyRow<UserKeyword> tempLinked = new RobotEmptyRow<>();
                     ((UserKeyword) parentObject).replaceElement(
                             (RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
                 }
+                newLinked.getDeclaration().setType(RobotTokenType.EMPTY_CELL);
                 newEmptyLine = new RobotEmptyLine(parent, newLinked);
 
                 final int index = parent.getChildren().indexOf(keywordCall);

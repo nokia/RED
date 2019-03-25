@@ -62,7 +62,7 @@ public class ConvertCallToCommentTest {
         final RobotKeywordCall result = testCase.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEqualTo("");
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
@@ -97,7 +97,7 @@ public class ConvertCallToCommentTest {
         final RobotKeywordCall result = keyword.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEqualTo("");
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
@@ -131,7 +131,7 @@ public class ConvertCallToCommentTest {
         final RobotKeywordCall result = testCase.getChildren().get(1);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEqualTo("");
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
@@ -166,7 +166,7 @@ public class ConvertCallToCommentTest {
         final RobotKeywordCall result = keyword.getChildren().get(1);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
+                .containsExactly(RobotTokenType.EMPTY_CELL);
         assertThat(result.getName()).isEqualTo("");
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
