@@ -46,11 +46,6 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         // TODO : replace SetKeywordCallArgument with this implementation since this
         // one seems simpler
 
-        // return if there is nothing to change and DO NOT convert RobotEmptyLine
-        if (keywordCall instanceof RobotEmptyLine) {
-            return;
-        }
-
         // convert keywordCall from RobotEmptyLine to simple RobotKeywordCall if needed
         final RobotKeywordCall keywordCallToUpdate = keywordCall instanceof RobotEmptyLine
                 ? changeEmptyToExecutable(keywordCall)
