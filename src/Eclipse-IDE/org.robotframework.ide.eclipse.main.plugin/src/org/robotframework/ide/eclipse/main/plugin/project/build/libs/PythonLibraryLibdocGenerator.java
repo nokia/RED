@@ -35,8 +35,12 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     @Override
     public void generateLibdoc(final IRuntimeEnvironment environment, final EnvironmentSearchPaths additionalPaths) {
         final File libFile = new File(libPath);
-        final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
-        additionalPaths.addPythonPath(additionalLocation);
+        if (libPath.toLowerCase().endsWith(".jar") || libPath.toLowerCase().endsWith(".zip")) {
+            additionalPaths.addPythonPath(libPath);
+        } else {
+            final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
+            additionalPaths.addPythonPath(additionalLocation);
+        }
         final File outputFile = targetSpecFile.getLocation().toFile();
         if (RedPlugin.getDefault().getPreferences().isPythonLibrariesLibdocGenerationInSeparateProcessEnabled()) {
             environment.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);

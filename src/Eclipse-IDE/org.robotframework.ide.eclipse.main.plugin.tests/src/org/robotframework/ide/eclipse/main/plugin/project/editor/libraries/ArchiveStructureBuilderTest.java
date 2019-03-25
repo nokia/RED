@@ -34,14 +34,14 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder.JavaClass;
 import org.robotframework.red.junit.ProjectProvider;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JarStructureBuilderTest {
+public class ArchiveStructureBuilderTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(JarStructureBuilderTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(ArchiveStructureBuilderTest.class);
 
     @Mock
     private IRuntimeEnvironment environment;
@@ -58,7 +58,7 @@ public class JarStructureBuilderTest {
 
     @Test
     public void testGettingPythonClassesFromJarByPath() throws Exception {
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -67,7 +67,7 @@ public class JarStructureBuilderTest {
 
     @Test
     public void testGettingPythonClassesFromJarByFile() throws Exception {
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -76,7 +76,7 @@ public class JarStructureBuilderTest {
 
     @Test
     public void notJarFilesAreNotProcessed() throws Exception {
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         builder.provideEntriesFromFile(projectProvider.createFile("module.other").getLocationURI());
 
@@ -90,7 +90,7 @@ public class JarStructureBuilderTest {
         config.addPythonPath(SearchPath.create("path2"));
         config.addClassPath(SearchPath.create("path3"));
 
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -100,7 +100,7 @@ public class JarStructureBuilderTest {
     }
 
     @Test
-    public void javaEntriesFromJarFileAreProvided() throws Exception {
+    public void javaEntriesFromArchiveFileAreProvidedWithCorrectNameAndType() throws Exception {
         final File jarFile = projectProvider.createFile("lib.jar").getLocation().toFile();
         try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(jarFile))) {
             zipStream.putNextEntry(new ZipEntry("JavaClass.class"));
@@ -109,36 +109,40 @@ public class JarStructureBuilderTest {
             zipStream.putNextEntry(new ZipEntry("file.txt"));
         }
 
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(jarFile.toURI());
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("JavaClass", "A.JavaClass",
                 "A.B.JavaClass");
+        assertThat(classes.stream().map(ILibraryClass::getType)).containsExactly(LibraryType.JAVA, LibraryType.JAVA,
+                LibraryType.JAVA);
     }
 
     @Test
-    public void pythonEntriesFromJarFileAreProvided() throws Exception {
+    public void pythonEntriesFromArchiveFileAreProvidedWithCorrectNameAndType() throws Exception {
         when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName"));
 
-        final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
 
         final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation);
 
         assertThat(classes.stream().map(ILibraryClass::getQualifiedName)).containsExactly("module", "module.ClassName");
+        assertThat(classes.stream().map(ILibraryClass::getType)).containsExactly(LibraryType.PYTHON,
+                LibraryType.PYTHON);
     }
 
     @Test
-    public void jarClassesAreCreatedFromZipEntry() throws Exception {
-        assertThat(JarClass.createFromZipJavaEntry("name.class")).isEqualTo(new JarClass("name"));
-        assertThat(JarClass.createFromZipJavaEntry("dirA/name.class")).isEqualTo(new JarClass("dirA.name"));
-        assertThat(JarClass.createFromZipJavaEntry("dirA/dirB/name.class")).isEqualTo(new JarClass("dirA.dirB.name"));
+    public void javaClassesAreCreatedFromZipEntry() throws Exception {
+        assertThat(JavaClass.createFromZipJavaEntry("name.class")).isEqualTo(new JavaClass("name"));
+        assertThat(JavaClass.createFromZipJavaEntry("dirA/name.class")).isEqualTo(new JavaClass("dirA.name"));
+        assertThat(JavaClass.createFromZipJavaEntry("dirA/dirB/name.class")).isEqualTo(new JavaClass("dirA.dirB.name"));
     }
 
     @Test
     public void referenceLibraryIsCreated() throws Exception {
-        final ILibraryClass libClass = new JarClass("Java.ClassName");
+        final ILibraryClass libClass = new JavaClass("Java.ClassName");
         final IPath projectLocation = projectProvider.getProject().getLocation();
         final String fullLibraryPath = projectLocation.append("path/to/file.jar").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);

@@ -193,8 +193,9 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                 libProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_IN_NON_JAVA_ENV)
                         .formatMessageWith(libraryPath, context.getExecutorInUse()));
             }
-            if (!"jar".equals(libraryPath.getFileExtension())) {
-                libProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_FILE)
+            if (!(libraryPath.toString().toLowerCase().endsWith(".jar")
+                    || libraryPath.toString().toLowerCase().endsWith(".zip"))) {
+                libProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_OR_ZIP_FILE)
                         .formatMessageWith(libraryPath));
             }
         }
