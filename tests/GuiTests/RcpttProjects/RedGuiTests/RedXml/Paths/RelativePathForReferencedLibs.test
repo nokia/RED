@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 2:21 PM
+Save-Time: 3/25/19 2:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -132,12 +132,16 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-item "Warnings \\(6 items\\)/The path '.*libs' points to non-existing location" 
 	        | get-property caption | equals [format "The path '%s/libs' points to non-existing location"  $RED_workspace_path]
 	        | verify-true
-	}
+	}	
 	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(.* items\\)/The path '\\win_path\\/addons' is invalid" | get-property caption 
-	        | equals "The path '\\win_path/addons' is invalid" | verify-true
-	    get-item "Errors \\(.* items\\)/The path 'D:\\folder\\folder2' is invalid" | get-property caption 
-	        | equals "The path 'D:\\folder\\folder2' is invalid" | verify-true
+		get-item 
+	        -path "Errors \\(.* items\\)/The path '.*addons' is invalid" 
+	        | get-property caption | equals "The path '/root/aut-org.robotframework.red-2/\\win_path/addons' is invalid" 
+	        | verify-true
+		get-item 
+	        -path "Errors \\(.* items\\)/The path '.*folder2' is invalid" 
+	        | get-property caption | equals "The path '.*D:\\\\folder\\\\folder2' is invalid" 
+	        | verify-true
 	}
 }
 
@@ -189,13 +193,15 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	}
 }-else{
 	with [get-view Problems | get-tree] {
-	    get-item "Warnings \\(5 items\\)/The path '\\/linux_path\\/tests' points to non-existing location" 
-	        | get-property caption | equals "The path '/linux_path/tests' points to non-existing location" | verify-true
-	    get-item "Errors \\(18 items\\)/The path '\\win_path\\/addons' is invalid" | get-property caption 
-	        | equals "The path '\\win_path/addons' is invalid" | verify-true
-	    get-item "Errors \\(18 items\\)/The path 'D:\\folder\\folder2' is invalid" | get-property caption 
-	        | equals "The path 'D:\\folder\\folder2' is invalid" | verify-true
-	}
+		get-item 
+	        -path "Errors \\(.* items\\)/The path '.*addons' is invalid" 
+	        | get-property caption | equals "The path '/root/aut-org.robotframework.red-2/RobotProject/\\win_path/addons' is invalid" 
+	        | verify-true
+		get-item 
+	        -path "Errors \\(.* items\\)/The path '.*folder2' is invalid" 
+	        | get-property caption | equals "The path '/root/aut-org.robotframework.red-2/RobotProject/D:\\folder\\folder2' is invalid" 
+	        | verify-true
+	 }
 }
 
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 

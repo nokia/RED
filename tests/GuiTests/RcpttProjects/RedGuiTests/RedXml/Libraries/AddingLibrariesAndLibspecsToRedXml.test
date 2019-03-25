@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/8/19 4:31 PM
+Save-Time: 3/25/19 11:24 AM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -36,14 +36,16 @@ get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item
 set-dialog-result File "platform:/resource/RobotProject/multiply.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
+get-editor "RobotProject/red.xml" | maximize
 //add empty libspec
 exec-with-options {
 	set-dialog-result File "platform:/resource/RobotProject/empty  libspeck/empty.xml"
 	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+	wait 500
     get-window "Problem Occurred" 
         | get-label "RED was unable to find classes/modules inside '.*empty.xml' module" 
         | get-property caption 
-        | equals "RED was unable to find classes/modules inside '.*empty  libspeck\\\\empty.xml' module" 
+        | equals "RED was unable to find classes/modules inside '.*empty  libspeck[/\\\]empty.xml' module" 
         | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
@@ -135,10 +137,7 @@ set-dialog-result File "platform:/resource/RobotProject/libs/sum.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //chec if it is not dirty
-with [get-tab-folder -index 1] {
-    get-property activePage | equals "RobotProject/red.xml" | verify-true
-}
-
+get-tab-folder -index 0 | get-property activePage | equals "RobotProject/red.xml" | verify-true
 
 //add file with class name as file
 get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
@@ -163,6 +162,8 @@ with [get-window "Select library class"] {
 set-dialog-result File "platform:/resource/RobotProject/empty.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+
+get-editor "RobotProject/red.xml" | minimize
 
 //check project expolorer
 with [get-view "Project Explorer" | get-tree] {
