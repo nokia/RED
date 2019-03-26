@@ -62,18 +62,19 @@ class SourceInLibraryEditorInput implements RedDebuggerAssistantEditorInput {
 
     @Override
     public String getDetailedInformation() {
-        final String p1 = "The keyword <b>" + element.frameName + "</b> is not a User Keyword but is written in "
-                + "external library. RED debugger alone is not able to debug both Robot and python code "
-                + "however it is possible to setup cooperation with other debugger (PyDev for example).";
-        final String p2 = "For more information on setting up Robot and Python debugging sessions please refer to "
-                + "RED user guide in help system.";
+        final String p1 = "The keyword <b>" + element.frameName
+                + "</b> is not a User Keyword but is written in external library.<br/>"
+                + "RED debugger alone is not able to debug both Robot and python code " + "however it is<br/>"
+                + "possible to setup cooperation with other debugger (PyDev for example).";
+        final String p2 = "For more information on setting up Robot and Python debugging sessions please refer<br/>"
+                + "to RED user guide in help system.";
         final String p3 = "";
         final String p4 = "          <img href=\"source\"/><a href=\"source\">Click here</a> to try opening "
                 + "source of this keyword.";
         final String p5 = "";
         final String p6 = "<b>Note</b>: if you don't want to see this page you can configure debugger in "
-                + "<a href=\"preferences\">Preferences</a> so that it will never suspend inside library "
-                + "keywords when stepping.";
+                + "<a href=\"preferences\">Preferences</a><br/>"
+                + "so that it will never suspend inside library keywords when stepping.";
         
         return "<form>" + Stream.of(p1, p2, p3, p4, p5, p6).map(p -> "<p>" + p + "</p>").collect(joining(""))
                 + "</form>";
