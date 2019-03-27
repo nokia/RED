@@ -40,7 +40,7 @@ public class RobotEmptyLine extends RobotKeywordCall {
         if (tokens.size() == 1 && !tokens.get(0).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             return this;
 
-        } else if (position == 0 && tokens.size() > 1
+        } else if ((position == 0 || position == 1) && tokens.size() > 1
                 && !tokens.get(0).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) getParent();
             final int index = getIndex();
