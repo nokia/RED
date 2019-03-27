@@ -38,6 +38,9 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public void addCommentPart(final RobotToken rt) {
+        if (comments.isEmpty() && emptyToken.getText().isEmpty()) {
+            emptyToken = new RobotToken();
+        }
         fixComment(getComment(), rt);
         comments.add(rt);
     }
@@ -75,7 +78,11 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public FilePosition getBeginPosition() {
-        return emptyToken.getFilePosition();
+        if (emptyToken.getFilePosition().isNotSet() && !comments.isEmpty()) {
+            return comments.get(0).getFilePosition();
+        } else {
+            return emptyToken.getFilePosition();
+        }
     }
 
     @Override
