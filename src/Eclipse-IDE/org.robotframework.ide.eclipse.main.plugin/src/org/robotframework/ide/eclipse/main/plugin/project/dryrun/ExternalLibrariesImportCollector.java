@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
@@ -46,10 +47,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgum
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.IReferencedLibraryImporter;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator.IReferencedLibraryDetector;
@@ -61,6 +62,8 @@ import com.google.common.collect.Multimap;
 class ExternalLibrariesImportCollector {
 
     private final Set<String> standardLibraryNames;
+
+    private final IReferencedLibraryDetector libraryDetector;
 
     private final ReferencedLibraryLocator libraryLocator;
 
@@ -79,8 +82,9 @@ class ExternalLibrariesImportCollector {
                 .filter(LibraryDescriptor::isStandardLibrary)
                 .map(LibraryDescriptor::getName)
                 .collect(toSet());
+        this.libraryDetector = new DiscoveringLibraryDetector();
         this.libraryLocator = new ReferencedLibraryLocator(robotProject, new DiscoveringLibraryImporter(),
-                new DiscoveringLibraryDetector());
+                libraryDetector);
     }
 
     void collectFromSuites(final Collection<RobotSuiteFile> suites, final IProgressMonitor monitor) {
@@ -185,7 +189,12 @@ class ExternalLibrariesImportCollector {
         @Override
         protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParameterized,
                 final List<RobotToken> arguments) {
-            libraryLocator.locateByPath(currentSuite, path);
+            if (ImportPath.hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
+                libraryDetector.libraryDetectingByPathFailed(path, Optional.empty(),
+                        "The path '" + pathToken.getText() + "' contains not supported Windows separator.");
+            } else {
+                libraryLocator.locateByPath(currentSuite, path);
+            }
         }
 
     }
