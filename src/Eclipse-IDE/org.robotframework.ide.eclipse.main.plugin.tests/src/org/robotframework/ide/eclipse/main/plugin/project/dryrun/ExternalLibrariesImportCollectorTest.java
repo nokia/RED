@@ -1058,6 +1058,27 @@ public class ExternalLibrariesImportCollectorTest {
     }
 
     @Test
+    public void multipleLibraryImportsAreCollected_whenLibrariesAreImportedByPathWithNotSupportedSeparator() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite_with_windows.robot",
+                "*** Settings ***",
+                "Library  C:\\folder\\path_lib.py",
+                "Library  ${EXECDIR}\\OtherLib.py",
+                "*** Test Cases ***"));
+
+        final ExternalLibrariesImportCollector collector = new ExternalLibrariesImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport1 = createImport(NOT_ADDED, "C:\\folder\\path_lib.py");
+        final RobotDryRunLibraryImport libImport2 = createImport(NOT_ADDED,
+                robotProject.getRobotProjectHolder().getVariableMappings().get("${execdir}") + "\\OtherLib.py");
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
+    }
+
+    @Test
     public void libraryImportsAreCollected_whenVariablesAreNotResolved() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
                 "*** Settings ***",

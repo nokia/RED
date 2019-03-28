@@ -467,18 +467,6 @@ public class ReferencedLibraryLocatorTest {
     }
 
     @Test
-    public void detectingFails_whenLibraryPathContainsWindowsPathSeparator() throws Exception {
-        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
-        locator.locateByPath(suite, "C:\\folder\\path_lib.py");
-
-        verifyZeroInteractions(importer);
-
-        verify(detector).libraryDetectingByPathFailed("C:\\folder\\path_lib.py", Optional.empty(),
-                "The path 'C:\\folder\\path_lib.py' contains not supported Windows separator.");
-        verifyNoMoreInteractions(detector);
-    }
-
-    @Test
     public void pythonLibraryIsFoundByPath_whenLibraryPathContainsWindowsPathSeparator() throws Exception {
         assumeTrue(RedSystemProperties.isWindowsPlatform());
 

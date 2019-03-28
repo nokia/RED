@@ -88,9 +88,6 @@ public class ReferencedLibraryLocator {
                 if (libraryFile.isPresent()) {
                     final Entry<File, Collection<ReferencedLibrary>> imported = importByPath(libraryFile.get());
                     detector.libraryDetectedByPath(path, imported.getKey(), imported.getValue());
-                } else if (ImportPath.hasNotEscapedWindowsPathSeparator(path)) {
-                    detector.libraryDetectingByPathFailed(path, libraryFile,
-                            "The path '" + path + "' contains not supported Windows separator.");
                 } else {
                     detector.libraryDetectingByPathFailed(path, libraryFile,
                             "Unable to find library under '" + path + "' location.");
