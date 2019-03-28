@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/14/18 3:17 PM
+Save-Time: 3/28/19 3:08 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -112,5 +112,21 @@ proc "wait-for-value-in-varaibles-view" [val item] [val value] {
 	try -times 4 -delay 500  -command{
 		get-view Variables | get-tree | get-item $item | get-property "values['Value']" | equals $value | verify-true
 	}
+}
+
+
+proc "check-library-kw-editor" [val kw_name]{
+	try -times 6 -delay 500 -command{
+		get-editor $kw_name
+	}
+    
+    get-editor  $kw_name| get-canvas | get-property text 
+	    | equals [format "The keyword %s is not a User Keyword but is written in external library.RED debugger alone is not able to debug both Robot and python code however it ispossible to setup cooperation with other debugger (PyDev for example).\r\n"
+	    + "For more information on setting up Robot and Python debugging sessions please referto RED user guide in help system.\r\n"
+	    + "\r\n"
+	    + "Click here to try opening source of this keyword.\r\n"
+	    + "\r\n"
+	    + "Note: if you don't want to see this page you can configure debugger in Preferencesso that it will never suspend inside library keywords when stepping.\r\n"   $kw_name]
+	    | verify-true
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
