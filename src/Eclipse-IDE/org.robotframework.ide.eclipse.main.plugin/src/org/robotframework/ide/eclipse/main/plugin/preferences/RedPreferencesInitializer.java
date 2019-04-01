@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -43,6 +44,8 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
+        initializeFormatterPreferences(preferences);
+        initializeSaveActionsPreferences(preferences);
         initializeLibrariesPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
@@ -111,9 +114,21 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         }
     }
 
+    private void initializeFormatterPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
+        preferences.put(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
+        preferences.putInt(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
+        preferences.putBoolean(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, false);
+    }
+
+    private void initializeSaveActionsPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
+        preferences.putBoolean(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, false);
+        preferences.putBoolean(RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED, true);
+        preferences.putBoolean(RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED, false);
+    }
+
     private void initializeLibrariesPreferences(final IEclipsePreferences preferences) {
-        preferences.putBoolean(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
-        preferences.putBoolean(RedPreferences.AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED, false);
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
         preferences.putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED, true);
         preferences.putBoolean(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);

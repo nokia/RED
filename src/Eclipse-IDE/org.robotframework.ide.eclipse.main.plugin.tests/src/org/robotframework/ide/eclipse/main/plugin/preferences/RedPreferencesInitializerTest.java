@@ -18,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrat
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 
 public class RedPreferencesInitializerTest {
 
@@ -97,13 +98,35 @@ public class RedPreferencesInitializerTest {
     }
 
     @Test
+    public void byDefaultFormatterPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
+        verify(preferences).put(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
+        verify(preferences).putInt(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
+        verify(preferences).putBoolean(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, false);
+    }
+
+    @Test
+    public void byDefaultSaveActionsPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED, true);
+        verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED, false);
+    }
+
+    @Test
     public void byDefaultLibrariesPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        verify(preferences).putBoolean(RedPreferences.AUTO_DISCOVERING_ENABLED, true);
-        verify(preferences).putBoolean(RedPreferences.AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 true);

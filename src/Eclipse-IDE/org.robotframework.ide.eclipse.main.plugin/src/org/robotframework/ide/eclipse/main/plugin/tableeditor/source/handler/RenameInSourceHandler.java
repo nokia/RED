@@ -67,24 +67,5 @@ public class RenameInSourceHandler extends DIParameterizedHandler<E4RenameInSour
             }
         }
 
-//        private void foo(final RobotSuiteFile fileModel) {
-//            new KeywordDefinitionLocator(fileModel).locateKeywordDefinition(new KeywordDetector() {
-//
-//                @Override
-//                public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-//                        final KeywordSpecification kwSpec) {
-//                    return ContinueDecision.CONTINUE;
-//                }
-//
-//                @Override
-//                public ContinueDecision keywordDetected(final RobotSuiteFile file,
-//                        final RobotKeywordDefinition keyword) {
-//                    if (file == fileModel) {
-//
-//                    }
-//                    return null;
-//                }
-//            });
-//        }
     }
 }

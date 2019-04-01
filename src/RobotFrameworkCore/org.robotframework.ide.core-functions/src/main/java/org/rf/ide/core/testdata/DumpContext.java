@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata;
 
 public class DumpContext {
 
-    private String preferedSeparator = null;
+    private String preferredSeparator = null;
 
     private boolean isDirty = true;
 
@@ -15,13 +15,13 @@ public class DumpContext {
         this(null, true);
     }
 
-    public DumpContext(final String preferedSeparator, final boolean isDirty) {
-        this.preferedSeparator = preferedSeparator;
+    public DumpContext(final String preferredSeparator, final boolean isDirty) {
+        this.preferredSeparator = preferredSeparator;
         this.isDirty = isDirty;
     }
 
-    public String getPreferedSeparator() {
-        return preferedSeparator;
+    public String getPreferredSeparator() {
+        return preferredSeparator;
     }
 
     public boolean isDirty() {

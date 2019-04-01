@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -44,6 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.keys.IBindingService;
@@ -76,6 +78,10 @@ public class SuiteSourceEditor extends TextEditor {
     protected RobotSuiteFile fileModel;
 
     private SuiteSourceEditorFoldingSupport foldingSupport;
+
+    private final OnSaveSourceFormattingTrigger saveSourceFormatterTrigger = new OnSaveSourceFormattingTrigger();
+
+    private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
     public SourceViewer getViewer() {
         return (SourceViewer) getSourceViewer();
@@ -133,6 +139,8 @@ public class SuiteSourceEditor extends TextEditor {
         installPreferencesListener(viewer);
 
         activateContext();
+
+        getSite().getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
     }
 
     @Override
@@ -142,6 +150,22 @@ public class SuiteSourceEditor extends TextEditor {
         // ensure decoration support has been created and configured.
         getSourceViewerDecorationSupport(viewer);
         return viewer;
+    }
+
+    @Override
+    protected void performSave(final boolean overwrite, final IProgressMonitor progressMonitor) {
+        saveSourceFormatterTrigger.formatSourceIfRequired(this::getDocument, fileModel, progressMonitor);
+
+        super.performSave(overwrite, progressMonitor);
+
+        saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(fileModel);
+    }
+
+    @Override
+    public void dispose() {
+        getSite().getService(ICommandService.class).removeExecutionListener(saveLibDiscoveryTrigger);
+
+        super.dispose();
     }
 
     @Override

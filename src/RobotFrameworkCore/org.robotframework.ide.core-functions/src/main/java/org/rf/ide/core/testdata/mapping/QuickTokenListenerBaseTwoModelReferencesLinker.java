@@ -22,20 +22,18 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 public class QuickTokenListenerBaseTwoModelReferencesLinker {
 
     public void update(final RobotFileOutput output, final DumpedResult dumpResult) {
-        updateTokensPosition(dumpResult.mappingBetweenOldAndNewTokens());
+        updateTokensPosition(dumpResult);
         updateOldOutputTokenLines(dumpResult, output);
     }
 
-    private void updateTokensPosition(final Map<RobotToken, RobotToken> mappingBetweenOldAndNewTokens) {
-        for (final RobotToken oldToken : mappingBetweenOldAndNewTokens.keySet()) {
-            final RobotToken newToken = mappingBetweenOldAndNewTokens.get(oldToken);
-
+    private void updateTokensPosition(final DumpedResult dumpResult) {
+        dumpResult.mappingBetweenOldAndNewTokens().forEach((oldToken, newToken) -> {
             oldToken.setText(newToken.getText());
             oldToken.setLineNumber(newToken.getLineNumber());
             oldToken.setStartColumn(newToken.getStartColumn());
             oldToken.setStartOffset(newToken.getStartOffset());
             oldToken.clearDirtyFlag();
-        }
+        });
     }
 
     private void updateOldOutputTokenLines(final DumpedResult dumpResult, final RobotFileOutput output) {
@@ -47,8 +45,6 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
         for (final RobotLine line : dumpResult.newProducedLines()) {
             oldFileModel.addNewLine(replaceNewTokenWithCorrespondingOld(valuesToKeys, line));
         }
-
-        valuesToKeys.clear();
     }
 
     private RobotLine replaceNewTokenWithCorrespondingOld(final Map<RobotToken, RobotToken> valuesToKeys,
@@ -69,9 +65,9 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
 
     private <T, P> Map<P, T> reverseValuesWithKeys(final Map<T, P> toReverse) {
         final Map<P, T> reversed = new IdentityHashMap<>(toReverse.size());
-        for (final T key : toReverse.keySet()) {
-            reversed.put(toReverse.get(key), key);
-        }
+        toReverse.forEach((key, value) -> {
+            reversed.put(value, key);
+        });
 
         return reversed;
     }
