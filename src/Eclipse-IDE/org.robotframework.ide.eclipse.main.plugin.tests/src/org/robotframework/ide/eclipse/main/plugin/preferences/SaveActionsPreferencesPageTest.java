@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.ShellProvider;
 
-public class LibrariesPreferencesPageTest {
+public class SaveActionsPreferencesPageTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
@@ -32,26 +32,26 @@ public class LibrariesPreferencesPageTest {
     public void initDoesNothing() {
         final IWorkbench workbench = mock(IWorkbench.class);
 
-        final LibrariesPreferencesPage page = new LibrariesPreferencesPage();
+        final SaveActionsPreferencePage page = new SaveActionsPreferencePage();
         page.init(workbench);
 
         verifyZeroInteractions(workbench);
     }
 
     @Test
-    public void editorsForLibrariesPreferencesAreDefined_byDefault() throws Exception {
-        final LibrariesPreferencesPage page = new LibrariesPreferencesPage();
+    public void editorsForSaveActionsPreferencesAreDefined_byDefault() throws Exception {
+        final SaveActionsPreferencePage page = new SaveActionsPreferencePage();
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(3);
+        assertThat(editors).hasSize(4);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
-                names -> assertThat(names).containsOnly(
-                        RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
-                        RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
-                        RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED));
+                names -> assertThat(names).containsOnly(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED,
+                        RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED,
+                        RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED,
+                        RedPreferences.SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED));
     }
 }

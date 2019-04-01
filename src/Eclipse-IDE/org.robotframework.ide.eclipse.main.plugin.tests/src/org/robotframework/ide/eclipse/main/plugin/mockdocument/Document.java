@@ -102,32 +102,32 @@ public class Document implements IDocument {
 
     @Override
     public void addDocumentListener(final IDocumentListener listener) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removeDocumentListener(final IDocumentListener listener) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void addPrenotifiedDocumentListener(final IDocumentListener documentAdapter) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removePrenotifiedDocumentListener(final IDocumentListener documentAdapter) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void addPositionCategory(final String category) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removePositionCategory(final String category) throws BadPositionCategoryException {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
@@ -142,24 +142,24 @@ public class Document implements IDocument {
 
     @Override
     public void addPosition(final Position position) throws BadLocationException {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removePosition(final Position position) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void addPosition(final String category, final Position position)
             throws BadLocationException, BadPositionCategoryException {
-        // nothing to do currrently
+        // nothing to do currently
 
     }
 
     @Override
     public void removePosition(final String category, final Position position) throws BadPositionCategoryException {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
@@ -180,17 +180,17 @@ public class Document implements IDocument {
 
     @Override
     public void addPositionUpdater(final IPositionUpdater updater) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removePositionUpdater(final IPositionUpdater updater) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void insertPositionUpdater(final IPositionUpdater updater, final int index) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
@@ -220,17 +220,17 @@ public class Document implements IDocument {
 
     @Override
     public void addDocumentPartitioningListener(final IDocumentPartitioningListener listener) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void removeDocumentPartitioningListener(final IDocumentPartitioningListener listener) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
     public void setDocumentPartitioner(final IDocumentPartitioner partitioner) {
-        // nothing to do currrently
+        // nothing to do currently
     }
 
     @Override
@@ -273,7 +273,8 @@ public class Document implements IDocument {
         for (int i = 0; i < documentText.length(); i++) {
             if (documentText.charAt(i) == '\n' || i == documentText.length() - 1) {
                 if (noOfLines == line) {
-                    return new Region(currentLineStart, i - currentLineStart);
+                    final int length = documentText.charAt(i) == '\n' ? i - currentLineStart : i - currentLineStart + 1;
+                    return new Region(currentLineStart, length);
                 }
                 noOfLines++;
                 currentLineStart = i + 1;
@@ -324,7 +325,8 @@ public class Document implements IDocument {
 
     @Override
     public String getLineDelimiter(final int line) throws BadLocationException {
-        return "\n";
+        final int numberOfLines = getNumberOfLines();
+        return line < numberOfLines - 1 || documentText.toString().endsWith("\n") ? "\n" : null;
     }
 
     @Override

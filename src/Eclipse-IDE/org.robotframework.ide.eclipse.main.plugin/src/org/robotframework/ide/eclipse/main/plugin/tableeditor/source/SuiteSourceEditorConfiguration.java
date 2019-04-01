@@ -90,6 +90,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceFormattingStrategy;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -498,7 +500,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     public IContentFormatter getContentFormatter(final ISourceViewer sourceViewer) {
         final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
                 getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
-        formatter.setMasterStrategy(new SuiteSourceFormattingStrategy());
+        formatter.setMasterStrategy(new SuiteSourceFormattingStrategy(new SuiteSourceEditorFormatter()));
         return formatter;
     }
 }

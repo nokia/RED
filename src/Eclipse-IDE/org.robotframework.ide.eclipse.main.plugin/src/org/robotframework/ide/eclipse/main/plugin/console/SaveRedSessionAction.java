@@ -51,7 +51,7 @@ class SaveRedSessionAction extends Action {
             try {
                 if (file.exists()) {
                     final boolean shouldOverride = MessageDialog.openQuestion(shell, "File already exist",
-                            "The file " + chosenPath.toString() + "already exist. Do you want ot override it?");
+                            "The file " + chosenPath.toString() + "already exist. Do you want to override it?");
                     if (shouldOverride) {
                         file.setContents(createStream(), IResource.NONE, null);
                     }

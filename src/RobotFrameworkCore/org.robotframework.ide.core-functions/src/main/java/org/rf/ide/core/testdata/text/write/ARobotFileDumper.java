@@ -370,7 +370,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         if (sep == null) {
-            sep = Separator.matchSeparator(context.getPreferedSeparator());
+            sep = Separator.matchSeparator(context.getPreferredSeparator());
         }
 
         if (sep == null || !isAcceptableForDefault(sep)) {
