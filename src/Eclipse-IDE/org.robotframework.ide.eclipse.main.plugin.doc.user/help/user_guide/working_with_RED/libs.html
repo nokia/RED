@@ -5,6 +5,14 @@
 <body>
 <h2>Recognizing external libraries in RED</h2>
 
+<dl class="warning">
+   <dt>Warning</dt>
+   <dd>As of now RED is only able to recognize libraries for which <i>library specification</i> file can be generated
+   by <code>robot.libdoc</code> without arguments provided. This means that the library constructor
+   cannot have required arguments (only default/varargs/kwargs).
+   </dd>
+</dl>
+
 <p>In order to provide validation and keyword assistance of external libraries (any library not bundled with RobotFramework, but installed by pip or included in testcase by file path), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part.</p>
 
 <p>There are few ways to include library into red.xml.</p>
