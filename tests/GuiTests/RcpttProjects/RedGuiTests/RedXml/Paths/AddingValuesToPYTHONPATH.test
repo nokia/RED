@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 2:20 PM
+Save-Time: 4/2/19 4:14 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -51,8 +51,8 @@ proc "check-arg-file-for-relative-path"{
 //remove autodiscover
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-tree | select "Robot Framework/Libraries"
-    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-tree | select "Robot Framework/Editor/Save Actions"
+    get-group "Libraries autodiscovering" | get-button "Discover unknown libraries" | uncheck
     get-button "Apply and Close" | click
 }
 
