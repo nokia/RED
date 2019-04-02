@@ -6614,6 +6614,12 @@
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.CodeFormatterPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter"
+            name="Code Formatter">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.ContentAssistPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist"
             name="Content Assist">
@@ -6623,6 +6629,12 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.FoldingPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.folding"
             name="Folding">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.SaveActionsPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.save"
+            name="Save Actions">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"

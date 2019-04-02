@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlighting
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 import org.robotframework.red.graphics.ColorsManager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -56,7 +57,7 @@ public class RedPreferences {
     public static final String SEPARATOR_MODE = "red.editor.source.separatorMode";
     public static final String SEPARATOR_TO_USE = "red.editor.source.separatorToUse";
     public static final String SEPARATOR_JUMP_MODE_ENABLED = "red.editor.source.separatorJumpModeEnabled";
-    
+
     public static final String VARIABLES_BRACKETS_INSERTION_ENABLED = "red.editor.variables.variablesBracketsInsertionEnabled";
     public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED = "red.editor.variables.variablesBracketsInsertionWrappingEnabled";
     public static final String VARIABLES_BRACKETS_INSERTION_WRAPPING_PATTERN = "red.editor.variables.variablesBracketsInsertionWrappingPattern";
@@ -77,8 +78,16 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
-    public static final String AUTO_DISCOVERING_ENABLED = "red.libraries.autoDiscoveringEnabled";
-    public static final String AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.libraries.autoDiscoveringSummaryWindowEnabled";
+    public static final String FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED = "red.editor.formatter.separatorAdjustmentEnabled";
+    public static final String FORMATTER_SEPARATOR_TYPE = "red.editor.formatter.separatorType";
+    public static final String FORMATTER_SEPARATOR_LENGTH = "red.editor.formatter.separatorLength";
+    public static final String FORMATTER_RIGHT_TRIM_ENABLED = "red.editor.formatter.rightTrimEnabled";
+
+    public static final String SAVE_ACTIONS_CODE_FORMATTING_ENABLED = "red.editor.save.codeFormattingEnabled";
+    public static final String SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED = "red.editor.save.changedLinesOnlyEnabled";
+    public static final String SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED = "red.editor.save.autoDiscoveringEnabled";
+    public static final String SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.editor.save.autoDiscoveringSummaryWindowEnabled";
+
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
     public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
     public static final String LIBDOCS_AUTO_RELOAD_ENABLED = "red.libraries.libdocsAutoReloadEnabled";
@@ -235,12 +244,36 @@ public class RedPreferences {
         return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
     }
 
+    public boolean isFormatterSeparatorAdjustmentEnabled() {
+        return store.getBoolean(FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED);
+    }
+
+    public FormattingSeparatorType getFormatterSeparatorType() {
+        return FormattingSeparatorType.valueOf(store.getString(FORMATTER_SEPARATOR_TYPE));
+    }
+
+    public int getFormatterSeparatorLength() {
+        return store.getInt(FORMATTER_SEPARATOR_LENGTH);
+    }
+
+    public boolean isFormatterRightTrimEnabled() {
+        return store.getBoolean(FORMATTER_RIGHT_TRIM_ENABLED);
+    }
+
+    public boolean isSaveActionsCodeFormattingEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_CODE_FORMATTING_ENABLED);
+    }
+
+    public boolean isSaveActionsChangedLinesOnlyEnabled() {
+        return store.getBoolean(SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED);
+    }
+
     public boolean isAutoDiscoveringEnabled() {
-        return store.getBoolean(AUTO_DISCOVERING_ENABLED);
+        return store.getBoolean(SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED);
     }
 
     public boolean isAutoDiscoveringSummaryWindowEnabled() {
-        return store.getBoolean(AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED);
+        return store.getBoolean(SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED);
     }
 
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {

@@ -40,8 +40,6 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
@@ -51,7 +49,6 @@ import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferencesLinker;
-import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -98,8 +95,6 @@ public class RobotFormEditor extends FormEditor {
 
     private SuiteFileMarkersListener validationListener;
 
-    private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
-
     public RedClipboard getClipboard() {
         return clipboard;
     }
@@ -120,8 +115,6 @@ public class RobotFormEditor extends FormEditor {
             validationListener = new SuiteFileMarkersListener();
 
             prepareEclipseContext();
-
-            site.getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
 
             initRobotFormEditorPartListener(site.getPage());
 
@@ -272,8 +265,6 @@ public class RobotFormEditor extends FormEditor {
             dirtyEditor.doSave(monitor);
         }
         updateActivePage();
-
-        saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(suiteModel);
     }
 
     private boolean isContentTypeMismatched(final String contentTypeId) {
@@ -338,7 +329,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     public static void tryToOpen(final IFile file, final IWorkbenchPage page) {
-        final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+        final IEditorRegistry editorRegistry = page.getWorkbenchWindow().getWorkbench().getEditorRegistry();
         final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
         try {
             page.openEditor(new FileEditorInput(file), desc.getId());
@@ -371,12 +362,10 @@ public class RobotFormEditor extends FormEditor {
 
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(validationListener);
 
-        getSite().getService(ICommandService.class).removeExecutionListener(saveLibDiscoveryTrigger);
-
         clipboard.dispose();
         suiteModel.dispose();
 
-        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+        final IEventBroker eventBroker = getSite().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.SUITE_MODEL_DISPOSED, RobotElementChange.createChangedElement(suiteModel));
         RobotArtifactsValidator.revalidate(suiteModel);
     }
@@ -481,18 +470,15 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void updateSourceFromModel(final IDocument document) {
-        final RobotFileOutput fileOutput = suiteModel.getLinkedElement().getParent();
-
         final String separatorFromPreference = RedPlugin.getDefault()
                 .getPreferences()
-                .getSeparatorToUse(fileOutput.getFileFormat() == FileFormat.TSV);
+                .getSeparatorToUse(suiteModel.isTsvFile());
         final DumpContext ctx = new DumpContext(separatorFromPreference, true);
-
+        final RobotFileOutput fileOutput = suiteModel.getLinkedElement().getParent();
         final DumpedResult dumpResult = new RobotFileDumper().dump(ctx, fileOutput);
-        final String content = dumpResult.newContent();
         new QuickTokenListenerBaseTwoModelReferencesLinker().update(fileOutput, dumpResult);
 
-        document.set(content);
+        document.set(dumpResult.newContent());
     }
 
     public SuiteSourceEditor activateSourcePage() {

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -37,6 +37,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrari
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.LibraryImportCollector;
+
+import com.google.common.annotations.VisibleForTesting;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
@@ -56,6 +59,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         });
     }
 
+    @VisibleForTesting
     OnSaveLibrariesAutodiscoveryTrigger(final DiscovererFactory discovererFactory) {
         this.discovererFactory = discovererFactory;
     }
