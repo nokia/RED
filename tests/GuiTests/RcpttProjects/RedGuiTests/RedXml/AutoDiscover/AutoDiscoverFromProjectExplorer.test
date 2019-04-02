@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _eXb6MPp7EeW7_PzjO98BIw,_2JCD4B3CEeehL98jfxP8Sw
+Contexts: _eXb6MPp7EeW7_PzjO98BIw,_2JCD4B3CEeehL98jfxP8Sw,_SeyjkFVfEem357czkDciHA
 Element-Name: AutoDiscoverFromProjectExplorer
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 4:44 PM
+Save-Time: 4/2/19 5:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,12 +15,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 // don't do autodiscovery after sacing file
-get-preferences-menu | click
-with [get-window Preferences] {
-    get-tree | select "Robot Framework/Libraries"
-    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
-    get-button "Apply and Close" | click
-}
+select-to-not-run-autodiscover-after-save
 
 //select Suite to disocver
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 

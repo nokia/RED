@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _9l_cgK2nEea8FqgKy4fLvA
+Contexts: _9l_cgK2nEea8FqgKy4fLvA,_SeyjkFVfEem357czkDciHA
 Element-Name: QuickFixAndResourceInPYTHONPATH
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _i2nE4CT9EeesE7mkFuId1w
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 2:55 PM
+Save-Time: 4/2/19 6:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,12 +27,7 @@ Entry-Name: .content
 
 
 //switch off autodiscovery
-get-preferences-menu | click
-with [get-window Preferences] {
-    get-tree | select "Robot Framework/Editor/Save Actions"
-    get-group "Libraries autodiscovering" | get-button "Discover unknown libraries" | uncheck
-    get-button "Apply and Close" | click
-}
+select-to-not-run-autodiscover-after-save
 
 get-view "Project Explorer" | get-tree | select "ResourceProject/test.robot" 
     | double-click
