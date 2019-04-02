@@ -1,0 +1,51 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: AutodisoveryPreferenceChanging
+Element-Type: context
+Element-Version: 2.0
+Id: _SeyjkFVfEem357czkDciHA
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/2/19 6:15 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "select-to-not-run-autodiscover-after-save"{
+	get-preferences-menu | click
+	with [get-window Preferences] {
+	    get-tree | select "Robot Framework/Editor/Save Actions"
+	    get-group "Libraries autodiscovering" | get-button "Discover unknown libraries" | uncheck
+	    get-button "Apply and Close" | click
+	}
+}
+
+proc "select-to-run-autodiscover-after-save"{
+	get-preferences-menu | click
+	with [get-window Preferences] {
+	    get-tree | select "Robot Framework/Editor/Save Actions"
+	    get-group "Libraries autodiscovering" | get-button "Discover unknown libraries" | check
+	    get-button "Apply and Close" | click
+	}
+}
+
+
+proc "select-to-show-summary"{
+	get-preferences-menu | click
+	with [get-window Preferences] {
+	    get-tree | select "Robot Framework/Editor/Save Actions"
+	    get-group "Libraries autodiscovering" | get-button "Show discovering summary" | check
+	    get-button "Apply and Close" | click
+	}
+}
+
+proc "select-to-not-show-summary"{
+	get-preferences-menu | click
+	with [get-window Preferences] {
+	    get-tree | select "Robot Framework/Editor/Save Actions"
+	    get-group "Libraries autodiscovering" | get-button "Show discovering summary" | uncheck
+	    get-button "Apply and Close" | click
+	}
+}
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

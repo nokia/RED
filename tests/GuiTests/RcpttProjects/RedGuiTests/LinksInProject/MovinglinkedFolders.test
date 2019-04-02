@@ -1,25 +1,20 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Vm6_EGjDEeiVpru4htsSeg,_n_EF8GjBEeiVpru4htsSeg
+Contexts: _Vm6_EGjDEeiVpru4htsSeg,_n_EF8GjBEeiVpru4htsSeg,_SeyjkFVfEem357czkDciHA
 Element-Name: MovinglinkedFolders
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _BrguoGjFEeiVpru4htsSeg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 3:24 PM
+Save-Time: 4/2/19 6:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-preferences-menu | click
-with [get-window Preferences] {
-    get-tree | select "Robot Framework/Libraries"
-    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
-    get-button "Apply and Close" | click
-}
+select-to-not-run-autodiscover-after-save
 
 //add new link to folder
 get-view "Project Explorer" | get-tree | select "LINKS/dir" | get-menu -path "New/Folder" | click
