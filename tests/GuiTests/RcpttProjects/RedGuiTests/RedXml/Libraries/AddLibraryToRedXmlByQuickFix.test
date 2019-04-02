@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 6:32 PM
+Save-Time: 4/2/19 1:56 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -23,8 +23,8 @@ Entry-Name: .content
 
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-tree | select "Robot Framework/Libraries"
-    get-group "Libraries autodiscovering" | get-button "Auto discover libraries after test suite save action" | uncheck
+    get-tree | select "Robot Framework/Editor/Save Actions"
+    get-group "Libraries autodiscovering" | get-button "Discover unknown libraries" | uncheck
     get-button "Apply and Close" | click
 }
 
