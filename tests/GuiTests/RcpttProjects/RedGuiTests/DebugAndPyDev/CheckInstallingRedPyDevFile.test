@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CeYksFFyEemaBdiDDGirUQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/28/19 5:15 PM
+Save-Time: 4/2/19 4:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,7 +21,7 @@ exec-process "python" "-m" "pip" "uninstall" "-y" "red-pydevd" -ignoreStderr tru
 get-menu -path "File/New/Other..." | click
 get-window New | get-tree | select "Robot Framework/RED with PyDev debugging session" | double-click
 with [get-window "RED with PyDev debugging session"] {
-    get-table | select "Robot Framework 3.1.1 \\(Python .*\\)"
+    get-table | select "Robot Framework .* \\(Python 2.*\\)"
     
     //go to pydev
     with [get-button "Next >"] {
