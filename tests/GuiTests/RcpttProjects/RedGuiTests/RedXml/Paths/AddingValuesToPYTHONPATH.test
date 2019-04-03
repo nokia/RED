@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 6:10 PM
+Save-Time: 4/3/19 10:55 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -213,10 +213,14 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		}
 	
 	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(18 items\\)/The path '\"escpaed\\\\text\"' is invalid" | get-property caption 
-	        | equals "The path '\"escpaed\\\\text\"' is invalid" | verify-true
-	    get-item "Errors \\(18 items\\)/The path 'C:\\folder\\folder2' is invalid" | get-property caption 
-	        | equals "The path 'C:\\folder\\folder2' is invalid" | verify-true
+	    get-item 
+	        -path "Errors \\(18 items\\)/The path '.*text\"' is invalid" 
+	        | get-property caption | equals [format "The path '%s/\"escpaed\\\\text\"' is invalid" $RED_workspace_path]
+	        | verify-true
+	    get-item 
+	        -path "Errors \\(18 items\\)/The path '.*C:\\\\folder\\\\folder2' is invalid" 
+	        | get-property caption | equals [format "The path '/root/aut-org.robotframework.red-2/C:\\folder\\folder2' is invalid" $RED_workspace_path]
+	        | verify-true
 	}
 
 }
