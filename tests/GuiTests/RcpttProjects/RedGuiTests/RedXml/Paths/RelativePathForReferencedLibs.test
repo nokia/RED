@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 6:06 PM
+Save-Time: 4/3/19 11:04 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -131,7 +131,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-view Problems | get-tree] {
 		get-item 
 	        -path "Errors \\(.* items\\)/The path '.*addons' is invalid" 
-	        | get-property caption | equals "The path '/root/aut-org.robotframework.red-2/\\win_path/addons' is invalid" 
+	        | get-property caption | equals [format "The path '%s/\\win_path/addons' is invalid" $RED_workspace_path ]
 	        | verify-true
 		get-item 
 	        -path "Errors \\(.* items\\)/The path '.*folder2' is invalid" 
@@ -188,15 +188,16 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	}
 }-else{
 	with [get-view Problems | get-tree] {
-		get-item 
+	    get-item 
 	        -path "Errors \\(.* items\\)/The path '.*addons' is invalid" 
-	        | get-property caption | equals "The path '.*/RobotProject/\\win_path/addons' is invalid" 
-	        | verify-true
-		get-item 
+	        | get-property caption 
+	        | equals [format "The path '%s/RobotProject/\\win_path/addons' is invalid" $RED_workspace_path] | verify-true
+	    get-item 
 	        -path "Errors \\(.* items\\)/The path '.*folder2' is invalid" 
-	        | get-property caption | equals "The path '.*/RobotProject/D:\\folder\\folder2' is invalid" 
+	        | get-property caption 
+	        | equals [format "The path '%s/RobotProject/D:\\folder\\folder2' is invalid" $RED_workspace_path]
 	        | verify-true
-	 }
+	}
 }
 
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
