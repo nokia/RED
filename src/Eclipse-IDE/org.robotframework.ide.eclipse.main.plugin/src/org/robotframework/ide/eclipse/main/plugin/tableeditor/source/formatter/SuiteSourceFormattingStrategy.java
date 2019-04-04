@@ -38,23 +38,25 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
             regionToFormat = new Region(0, documentToFormat.getLength());
         } else {
             try {
-                final IRegion region = (IRegion) context.getProperty(FormattingContextProperties.CONTEXT_REGION);
-
-                final int startLine = documentToFormat.getLineOfOffset(region.getOffset());
-                final int endLine = documentToFormat.getLineOfOffset(region.getOffset() + region.getLength());
-
-                final int startLineBeginOffset = documentToFormat.getLineInformation(startLine).getOffset();
-                final IRegion endLineRegion = documentToFormat.getLineInformation(endLine);
-                final int endLineBeginOffset = endLineRegion.getOffset() + endLineRegion.getLength();
-                final String lastDelimiter = documentToFormat.getLineDelimiter(endLine);
-                final int lastDelimiterLength = lastDelimiter != null ? lastDelimiter.length() : 0;
-
-                regionToFormat = new Region(startLineBeginOffset,
-                        endLineBeginOffset - startLineBeginOffset + lastDelimiterLength);
+                final IRegion selection = (IRegion) context.getProperty(FormattingContextProperties.CONTEXT_REGION);
+                regionToFormat = findEnclosingLinesRegion(selection);
             } catch (final BadLocationException e) {
                 regionToFormat = new Region(0, documentToFormat.getLength());
             }
         }
+    }
+
+    private IRegion findEnclosingLinesRegion(final IRegion selection) throws BadLocationException {
+        final int startLine = documentToFormat.getLineOfOffset(selection.getOffset());
+        final int endLine = documentToFormat.getLineOfOffset(selection.getOffset() + selection.getLength());
+
+        final int startLineBeginOffset = documentToFormat.getLineInformation(startLine).getOffset();
+        final IRegion endLineRegion = documentToFormat.getLineInformation(endLine);
+        final int endLineBeginOffset = endLineRegion.getOffset() + endLineRegion.getLength();
+        final String lastDelimiter = documentToFormat.getLineDelimiter(endLine);
+        final int lastDelimiterLength = lastDelimiter != null ? lastDelimiter.length() : 0;
+
+        return new Region(startLineBeginOffset, endLineBeginOffset - startLineBeginOffset + lastDelimiterLength);
     }
 
     @Override
@@ -64,7 +66,11 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
 
     @Override
     public void format() {
-        sourceFormatter.format(documentToFormat, regionToFormat);
+        try {
+            sourceFormatter.format(documentToFormat, regionToFormat);
+        } catch (final BadLocationException e) {
+            // some regions where not formatted
+        }
     }
 
     @Override

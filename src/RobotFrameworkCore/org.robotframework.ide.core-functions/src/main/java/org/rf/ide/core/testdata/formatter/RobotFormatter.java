@@ -11,14 +11,15 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.base.Strings;
-
 public class RobotFormatter {
 
     private final String lineDelimiter;
 
-    public RobotFormatter(final String lineDelimiter) {
-        this.lineDelimiter = Strings.nullToEmpty(lineDelimiter);
+    private final boolean skipDelimiterInLastLine;
+
+    public RobotFormatter(final String lineDelimiter, final boolean skipDelimiterInLastLine) {
+        this.lineDelimiter = lineDelimiter;
+        this.skipDelimiterInLastLine = skipDelimiterInLastLine;
     }
 
     public String format(final String content, final ILineFormatter... lineFormatters) throws IOException {
@@ -38,8 +39,10 @@ public class RobotFormatter {
                     line = formatter.format(line);
                 }
                 formattedContent.append(line);
-                formattedContent.append(lineDelimiter);
                 line = reader.readLine();
+                if (line != null || !skipDelimiterInLastLine) {
+                    formattedContent.append(lineDelimiter);
+                }
             }
         }
         return formattedContent.toString();

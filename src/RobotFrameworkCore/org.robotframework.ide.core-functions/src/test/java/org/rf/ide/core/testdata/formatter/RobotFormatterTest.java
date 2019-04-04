@@ -20,7 +20,7 @@ public class RobotFormatterTest {
 
     @Test
     public void sameContentIsReturned_whenLineFormattersAreEmpty() throws Exception {
-        final RobotFormatter formatter = new RobotFormatter("\n");
+        final RobotFormatter formatter = new RobotFormatter("\n", true);
         final List<ILineFormatter> lineFormatters = spy(new ArrayList<>());
 
         final String formatted = formatter.format("abc", lineFormatters);
@@ -33,7 +33,7 @@ public class RobotFormatterTest {
 
     @Test
     public void sameContentIsReturned_whenContentIsEmpty() throws Exception {
-        final RobotFormatter formatter = new RobotFormatter("\n");
+        final RobotFormatter formatter = new RobotFormatter("\n", true);
 
         final String formatted = formatter.format("", line -> line + " formatted");
 
@@ -42,7 +42,7 @@ public class RobotFormatterTest {
 
     @Test
     public void formattedContentIsReturned_whenSingleLineFormatterIsProvided() throws Exception {
-        final RobotFormatter formatter = new RobotFormatter("\n");
+        final RobotFormatter formatter = new RobotFormatter("\n", false);
 
         final String formatted = formatter.format("abc\ndef\nghi\n", line -> "1 " + line + " 2");
 
@@ -51,7 +51,7 @@ public class RobotFormatterTest {
 
     @Test
     public void formattedContentIsReturned_whenSeveralLineFormattersAreProvided() throws Exception {
-        final RobotFormatter formatter = new RobotFormatter("\n");
+        final RobotFormatter formatter = new RobotFormatter("\n", false);
         final List<ILineFormatter> lineFormatters = new ArrayList<>();
         lineFormatters.add(line -> "prefix " + line);
         lineFormatters.add(line -> "1 " + line + " 2");
@@ -60,6 +60,46 @@ public class RobotFormatterTest {
         final String formatted = formatter.format("abc\ndef\nghi\n", lineFormatters);
 
         assertThat(formatted).isEqualTo("1 prefix abc 2$$$\n1 prefix def 2$$$\n1 prefix ghi 2$$$\n");
+    }
+
+    @Test
+    public void formattedContentIsReturned_whenEndsWithLineDelimiterAndSkippingLastLineDelimiterIsEnabled()
+            throws Exception {
+        final RobotFormatter formatter = new RobotFormatter("\n", true);
+
+        final String formatted = formatter.format("abc\ndef\nghi\n", line -> line + line);
+
+        assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi");
+    }
+
+    @Test
+    public void formattedContentIsReturned_whenDoesNotEndWithLineDelimiterAndSkippingLastLineDelimiterIsEnabled()
+            throws Exception {
+        final RobotFormatter formatter = new RobotFormatter("\n", true);
+
+        final String formatted = formatter.format("abc\ndef\nghi", line -> line + line);
+
+        assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi");
+    }
+
+    @Test
+    public void formattedContentIsReturned_whenEndsWithLineDelimiterAndSkippingLastLineDelimiterIsDisabled()
+            throws Exception {
+        final RobotFormatter formatter = new RobotFormatter("\n", false);
+
+        final String formatted = formatter.format("abc\ndef\nghi\n", line -> line + line);
+
+        assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi\n");
+    }
+
+    @Test
+    public void formattedContentIsReturned_whenDoesNotEndWithLineDelimiterAndSkippingLastLineDelimiterIsDisabled()
+            throws Exception {
+        final RobotFormatter formatter = new RobotFormatter("\n", false);
+
+        final String formatted = formatter.format("abc\ndef\nghi", line -> line + line);
+
+        assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi\n");
     }
 
 }

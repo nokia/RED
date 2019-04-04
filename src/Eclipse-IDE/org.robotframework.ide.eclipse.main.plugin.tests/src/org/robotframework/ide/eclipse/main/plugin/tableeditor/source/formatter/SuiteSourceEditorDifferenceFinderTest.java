@@ -51,12 +51,12 @@ public class SuiteSourceEditorDifferenceFinderTest {
     }
 
     @Test
-    public void changedLinesAreEmpty_whenCurrentDocumentIsEmpty() throws Exception {
+    public void changedLinesAreNotEmpty_whenCurrentDocumentIsEmpty() throws Exception {
         setFileContentsKeepingHistory(file, "line1", "line2");
 
         final Document currentDocument = new Document();
 
-        assertThat(calculateChangedLines(currentDocument)).isEmpty();
+        assertThat(calculateChangedLines(currentDocument)).containsExactly(0);
     }
 
     @Test
