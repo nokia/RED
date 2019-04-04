@@ -62,12 +62,12 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final Document document = new Document("first  line", "second  line");
+        final Document document = new Document("first  line", "second  line", "", "");
         final Document documentSpy = spy(document);
 
         formatter.format(documentSpy, new Region(0, documentSpy.getLength()));
 
-        assertThat(document).isEqualTo(new Document("first  line", "second  line"));
+        assertThat(document).isEqualTo(new Document("first  line", "second  line", "", ""));
 
         verify(documentSpy, never()).replace(anyInt(), anyInt(), anyString());
     }
@@ -125,7 +125,7 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n");
+        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
 
         final String formatted = formatter.format("case \n  \n  Keyword  123 \t \n   [Return]   456   \n",
                 robotFormatter);
@@ -140,7 +140,7 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n");
+        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
 
         final String formatted = formatter.format("  Keyword      123  \n   OtherKeyword   456\n", robotFormatter);
 
@@ -154,7 +154,7 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n");
+        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
 
         final String formatted = formatter.format("  Keyword      123  \n   OtherKeyword   456\n", robotFormatter);
 
@@ -168,11 +168,11 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n");
+        final RobotFormatter robotFormatter = new RobotFormatter("\n", true);
 
-        final String formatted = formatter.format("\tKeyword\t 123\t\n", robotFormatter);
+        final String formatted = formatter.format("\tKeyword\t 123\t\n\tNext \t \t line", robotFormatter);
 
-        assertThat(formatted).isEqualTo("  Keyword  123  \n");
+        assertThat(formatted).isEqualTo("  Keyword  123  \n  Next  line");
     }
 
     @Test
@@ -183,7 +183,7 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
         final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n");
+        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
 
         final String formatted = formatter.format("case \n  \n  Keyword    123 \t \n   [Return]    456 \t\t  \n",
                 robotFormatter);

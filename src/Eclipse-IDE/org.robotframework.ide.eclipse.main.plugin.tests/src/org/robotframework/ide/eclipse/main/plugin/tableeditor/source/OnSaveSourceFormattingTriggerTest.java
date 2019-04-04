@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -48,16 +49,18 @@ public class OnSaveSourceFormattingTriggerTest {
     }
 
     @Test
-    public void formattingIsNotStarted_whenItIsDisabled() {
+    public void formattingIsNotStarted_whenItIsDisabled() throws Exception {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
         final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
-        trigger.formatSourceIfRequired(Document::new, suite, new NullProgressMonitor());
+        trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
         verifyZeroInteractions(formatter);
+        verifyZeroInteractions(selectionUpdater);
     }
 
     @Test
@@ -66,43 +69,53 @@ public class OnSaveSourceFormattingTriggerTest {
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.tsv"));
         final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
-        trigger.formatSourceIfRequired(Document::new, suite, new NullProgressMonitor());
+        trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
         verifyZeroInteractions(formatter);
+        verifyZeroInteractions(selectionUpdater);
     }
 
     @Test
-    public void formattingIsStartedForWholeDocument_whenItIsEnabled() {
+    public void formattingIsStartedForWholeDocument_whenItIsEnabled() throws Exception {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, false);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
         final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final Document document = new Document("line1", "line2", "line3");
         final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
-        trigger.formatSourceIfRequired(() -> document, suite, new NullProgressMonitor());
+        trigger.formatSourceIfRequired(() -> document, selectionUpdater, suite, new NullProgressMonitor());
 
         verify(formatter).format(document, new Region(0, document.getLength()));
         verifyNoMoreInteractions(formatter);
+        verify(selectionUpdater).saveSelection(document);
+        verify(selectionUpdater).fixSelection(document);
+        verifyNoMoreInteractions(selectionUpdater);
     }
 
     @Test
-    public void formattingIsStartedForChangedLines_whenItIsEnabled() {
+    public void formattingIsStartedForChangedLines_whenItIsEnabled() throws Exception {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, true);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
         final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final Document document = new Document("line1", "line2", "line3");
         final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
-        trigger.formatSourceIfRequired(() -> document, suite, new NullProgressMonitor());
+        trigger.formatSourceIfRequired(() -> document, selectionUpdater, suite, new NullProgressMonitor());
 
         verify(formatter).format(document, newArrayList(0, 1, 2));
         verifyNoMoreInteractions(formatter);
+        verify(selectionUpdater).saveSelection(document);
+        verify(selectionUpdater).fixSelection(document);
+        verifyNoMoreInteractions(selectionUpdater);
     }
 
 }

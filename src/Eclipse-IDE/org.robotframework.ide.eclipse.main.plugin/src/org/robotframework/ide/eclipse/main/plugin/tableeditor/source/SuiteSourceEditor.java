@@ -63,6 +63,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
 import org.robotframework.red.swt.StyledTextWrapper;
 import org.robotframework.red.swt.SwtThread;
@@ -154,7 +155,10 @@ public class SuiteSourceEditor extends TextEditor {
 
     @Override
     protected void performSave(final boolean overwrite, final IProgressMonitor progressMonitor) {
-        saveSourceFormatterTrigger.formatSourceIfRequired(this::getDocument, fileModel, progressMonitor);
+        final SuiteSourceEditorSelectionFixer selectionFixer = new SuiteSourceEditorSelectionFixer(
+                getSelectionProvider());
+        saveSourceFormatterTrigger.formatSourceIfRequired(this::getDocument, selectionFixer, fileModel,
+                progressMonitor);
 
         super.performSave(overwrite, progressMonitor);
 

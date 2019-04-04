@@ -56,7 +56,7 @@ public class SuiteSourceFormattingStrategyTest {
 
         format(formatter, context);
 
-        verify(formatter).format(document, new Region(12, 6));
+        verify(formatter).format(document, new Region(12, 5));
         verifyNoMoreInteractions(formatter);
     }
 
@@ -72,7 +72,7 @@ public class SuiteSourceFormattingStrategyTest {
 
         format(formatter, context);
 
-        verify(formatter).format(document, new Region(6, 12));
+        verify(formatter).format(document, new Region(6, 11));
         verifyNoMoreInteractions(formatter);
     }
 
