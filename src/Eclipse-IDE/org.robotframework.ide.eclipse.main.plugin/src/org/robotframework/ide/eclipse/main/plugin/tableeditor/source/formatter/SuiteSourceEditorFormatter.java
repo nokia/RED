@@ -26,22 +26,27 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 public class SuiteSourceEditorFormatter {
 
-    public void format(final IDocument document, final IRegion region) {
-        try {
-            final String content = document.get(region.getOffset(), region.getLength());
-            final String formattedContent = format(content, new RobotFormatter(document.getLineDelimiter(0)));
-            if (!content.equals(formattedContent)) {
-                document.replace(region.getOffset(), region.getLength(), formattedContent);
-            }
-        } catch (final BadLocationException e) {
-            // some regions where not formatted
+    public void format(final IDocument document, final IRegion region) throws BadLocationException {
+        final String content = document.get(region.getOffset(), region.getLength());
+        final RobotFormatter robotFormatter = createFormatter(document, region);
+        final String formattedContent = format(content, robotFormatter);
+        if (!content.equals(formattedContent)) {
+            document.replace(region.getOffset(), region.getLength(), formattedContent);
         }
     }
 
-    public void format(final IDocument document, final List<Integer> lines) {
+    private RobotFormatter createFormatter(final IDocument document, final IRegion region) throws BadLocationException {
+        final int regionLastLine = document.getLineOfOffset(region.getOffset() + region.getLength() - 1);
+        final String lineDelimiter = Strings.nullToEmpty(document.getLineDelimiter(0));
+        final boolean skipDelimiterInLastLine = Strings.isNullOrEmpty(document.getLineDelimiter(regionLastLine));
+        return new RobotFormatter(lineDelimiter, skipDelimiterInLastLine);
+    }
+
+    public void format(final IDocument document, final List<Integer> lines) throws BadLocationException {
         DocumentRewriteSession session = null;
         if (document instanceof IDocumentExtension4) {
             session = ((IDocumentExtension4) document).startRewriteSession(DocumentRewriteSessionType.SEQUENTIAL);
@@ -55,8 +60,6 @@ public class SuiteSourceEditorFormatter {
                 final int lastDelimiterLength = lastDelimiter != null ? lastDelimiter.length() : 0;
                 format(document, new Region(region.getOffset(), region.getLength() + lastDelimiterLength));
             }
-        } catch (final BadLocationException e) {
-            // some regions where not formatted
         } finally {
             if (session != null) {
                 ((IDocumentExtension4) document).stopRewriteSession(session);

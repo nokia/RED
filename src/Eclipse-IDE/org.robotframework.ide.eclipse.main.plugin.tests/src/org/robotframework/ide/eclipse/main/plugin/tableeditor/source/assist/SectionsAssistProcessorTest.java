@@ -83,7 +83,7 @@ public class SectionsAssistProcessorTest {
 
     @Test
     public void allSectionsProposalsButTestCasesAreProvided_whenInFirstColumnOfResourceFile() {
-        final List<String> lines = newArrayList("");
+        final List<String> lines = newArrayList("*** Keywords ***", "");
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = new Document(lines);
@@ -92,19 +92,19 @@ public class SectionsAssistProcessorTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 17);
 
         assertThat(proposals).hasSize(6)
                 .haveExactly(6,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
-                new Document("*** Comments ***", ""),
-                new Document("*** Keywords ***", ""),
-                new Document("*** Test Cases ***", ""),
-                new Document("*** Tasks ***", ""),
-                new Document("*** Variables ***", ""),
-                new Document("*** Settings ***", ""));
+                new Document("*** Keywords ***", "*** Comments ***", ""),
+                new Document("*** Keywords ***", "*** Keywords ***", ""),
+                new Document("*** Keywords ***", "*** Test Cases ***", ""),
+                new Document("*** Keywords ***", "*** Tasks ***", ""),
+                new Document("*** Keywords ***", "*** Variables ***", ""),
+                new Document("*** Keywords ***", "*** Settings ***", ""));
     }
 
     @Test

@@ -40,25 +40,15 @@ public class Document implements IDocument {
     }
 
     public Document(final List<String> content) {
-        this.documentText = new StringBuilder();
-        for (final String line : content) {
-            this.documentText.append(line);
-            this.documentText.append("\n");
-        }
+        this(String.join("\n", content));
     }
 
     public Document(final String firstLine, final String... lines) {
-        this.documentText = new StringBuilder(firstLine);
-        this.documentText.append("\n");
-
-        for (final String line : lines) {
-            this.documentText.append(line);
-            this.documentText.append("\n");
-        }
+        this(String.join("\n", firstLine, String.join("\n", lines)));
     }
 
     private void assertOffsetWithinLimits(final int offset) throws BadLocationException {
-        if (offset < 0 || offset >= documentText.length()) {
+        if (offset < 0 || offset > documentText.length()) {
             throw new BadLocationException();
         }
     }
@@ -247,13 +237,13 @@ public class Document implements IDocument {
     public int getLineOfOffset(final int offset) throws BadLocationException {
         assertOffsetWithinLimits(offset);
 
-        int noOfLines = 0;
+        int currentLine = 0;
         for (int i = 0; i < offset; i++) {
             if (documentText.charAt(i) == '\n') {
-                noOfLines++;
+                currentLine++;
             }
         }
-        return noOfLines;
+        return currentLine;
     }
 
     @Override
@@ -263,20 +253,19 @@ public class Document implements IDocument {
 
     @Override
     public IRegion getLineInformation(final int line) throws BadLocationException {
-        if (line < 0 || line > getNumberOfLines()) {
+        if (line < 0 || line >= getNumberOfLines()) {
             throw new BadLocationException();
         }
 
         int currentLineStart = 0;
 
-        int noOfLines = 0;
-        for (int i = 0; i < documentText.length(); i++) {
-            if (documentText.charAt(i) == '\n' || i == documentText.length() - 1) {
-                if (noOfLines == line) {
-                    final int length = documentText.charAt(i) == '\n' ? i - currentLineStart : i - currentLineStart + 1;
-                    return new Region(currentLineStart, length);
+        int currentLine = 0;
+        for (int i = 0; i <= documentText.length(); i++) {
+            if (i == documentText.length() || documentText.charAt(i) == '\n') {
+                if (currentLine == line) {
+                    return new Region(currentLineStart, i - currentLineStart);
                 }
-                noOfLines++;
+                currentLine++;
                 currentLineStart = i + 1;
             }
         }
@@ -298,18 +287,12 @@ public class Document implements IDocument {
         assertOffsetWithinLimits(offset);
         assertOffsetWithinLimits(Math.max(0, offset + length - 1));
 
-        int noOfLines = 0;
-        for (int i = offset; i < offset + length; i++) {
-            if (documentText.charAt(i) == '\n') {
-                noOfLines++;
-            }
-        }
-        return noOfLines;
+        return computeNumberOfLines(documentText.substring(offset, offset + length));
     }
 
     @Override
     public int computeNumberOfLines(final String text) {
-        int noOfLines = 0;
+        int noOfLines = 1;
         for (int i = 0; i < text.length(); i++) {
             if (text.charAt(i) == '\n') {
                 noOfLines++;
@@ -325,8 +308,7 @@ public class Document implements IDocument {
 
     @Override
     public String getLineDelimiter(final int line) throws BadLocationException {
-        final int numberOfLines = getNumberOfLines();
-        return line < numberOfLines - 1 || documentText.toString().endsWith("\n") ? "\n" : null;
+        return line < getNumberOfLines() - 1 || documentText.toString().endsWith("\n") ? "\n" : null;
     }
 
     @Override
