@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _a7l9oLkNEeWzJthH3JoEWQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/8/19 12:17 PM
+Save-Time: 4/4/19 2:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -89,52 +89,52 @@ with [get-editor "RobotProject/red.xml" | get-section Libraries | get-table
 //check Problems
 get-tab-folder -index 4 | get-tab-item Problems | click
 with [get-view Problems | get-tree] {
-    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+    get-item -path "Errors \\(6 items\\)/'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" 
         | get-property "values['Description']" 
-        | equals "Library specification file was not generated for 'Remote' library" | verify-true
-    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+        | equals "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" | verify-true
+    get-item -path "Errors \\(6 items\\)/'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" 
         | get-property "values['Resource']" | equals "red.xml" | verify-true
-    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+    get-item -path "Errors \\(6 items\\)/'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" 
         | get-property "values['Path']" | equals "/RobotProject" | verify-true
-    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+    get-item -path "Errors \\(6 items\\)/'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" 
         | get-property "values['Location']" | equals "line 7" | verify-true
-    get-item -path "Errors \\(6 items\\)/Library specification file was not generated for 'Remote' library" 
+    get-item -path "Errors \\(6 items\\)/'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" 
         | get-property "values['Type']" | equals "Robot Problem" | verify-true
     
     //second remote    
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 1 
         | get-property "values['Description']" 
-        | equals "Library specification file was not generated for 'Remote' library" | verify-true
+        | equals "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 1 
         | get-property "values['Resource']" | equals "red.xml" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 1 
         | get-property "values['Path']" | equals "/RobotProject" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 1 
         | get-property "values['Location']" | equals "line 8" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 1 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 1 
         | get-property "values['Type']" | equals "Robot Problem" | verify-true
     
     //3. remote
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 2 
         | get-property "values['Description']" 
-        | equals "Library specification file was not generated for 'Remote' library" | verify-true
+        | equals "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 2 
         | get-property "values['Resource']" | equals "red.xml" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 2 
         | get-property "values['Path']" | equals "/RobotProject" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 2 
         | get-property "values['Location']" | equals "line 9" | verify-true
     get-item -path "Errors \\(6 items\\)" | get-item 
-        -path "Library specification file was not generated for 'Remote' library" -index 2 
+        -path "'Remote' library specification file was not generated. Try to reload it manually in Project Explorer" -index 2 
         | get-property "values['Type']" | equals "Robot Problem" | verify-true
 }
 
