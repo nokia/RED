@@ -163,7 +163,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Library specification file was not generated for '%s' library";
+            return "'%s' library specification file was not generated. Try to reload it manually in Project Explorer";
         }
 
         @Override
