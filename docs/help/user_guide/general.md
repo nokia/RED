@@ -35,12 +35,17 @@ validation.
 ### Automatic source formatting CTRL+SHIFT+F
 
 Formatting source is Eclipse based mechanism which provides code formatting
-with arbitrary ruleset.  
-For now, **code formatting in RED is meant to be proof of functionality, it is
-not configurable.**  
-In near future we will provide a way to include custom rule sets for code
-formatting and check style.  
-It is invoked by right click menu in Source editor.  
+with several predefined rules which are disabled by default.  
+
+Source code formatting preferences can be configured at `[ Window ->
+Preferences -> Robot Framework -> Editor -> Code
+Formatter](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter\)'\))`
+
+It is invoked by right click menu in Source editor or automatically as editor
+save action, which can be configured at `[ Window -> Preferences -> Robot
+Framework -> Editor -> Save
+Actions](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.save\)'\))`  
+
   
   
 ![](images/gen_5.png)  
