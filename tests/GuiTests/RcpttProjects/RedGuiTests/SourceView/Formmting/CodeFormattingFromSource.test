@@ -1,0 +1,218 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CodeFormattingFromSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _qDZwIFeeEemi06ncdTtjmA
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/5/19 3:46 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1  \n"
+    + "       Should Be Equal As Strings    t1    t2    " 
+
+// set to adjust sepataror lengths   
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Code Formatter"
+    get-button "Adjust separator lengths" | check
+    get-button "Apply and Close" | click
+}
+
+//save file - no changes
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 16 50
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1  \n"
+    + "       Should Be Equal As Strings    t1    t2    " | verify-true
+    
+//reformat code    
+get-editor "TestFile.robot" | get-editbox | get-menu -path "Source/Format source" | click
+get-button "Show Whitespace Characters" | click
+
+// now 4 spaces are between elemntsl
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library    String\n"
+    + "Library    DateTime\n\n"
+    + "*** Test Cases ***    \n"
+    + "test\n"
+    + "    log    7\n"
+    + "    log    8\n"
+    + "    log    9    \n"
+    + "    Should Be Equal As Integers    55    66    \n \n\n"
+    + "* ** Keywords ***    \n"
+    + "kw 1    \n"
+    + "    Should Be Equal As Strings    t1    t2    " | verify-true
+    
+// add new line    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 16 47
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "log  12"
+    get-menu -path "Source/Format source" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 17 | verify-true
+    get-property "caretPosition.column" | equals 12 | verify-true
+}
+
+//check error for to big spaces
+get-preferences-menu | click
+get-window Preferences | get-editbox -after [get-label "Separator length"] | set-text 0
+get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an Integer between 2 and 10" 
+    | verify-true
+get-window Preferences | get-editbox -after [get-label "Separator length"] | set-text 11
+get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an Integer between 2 and 10" 
+    | verify-true
+    
+// set 10    
+with [get-window Preferences] {
+    get-editbox -after [get-label "Separator length"] | set-text 10
+    get-button Apply | click
+    get-button "Apply and Close" | click
+}
+
+//save - no action
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 17 14
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library    String\n"
+    + "Library    DateTime\n\n"
+    + "*** Test Cases ***    \n"
+    + "test\n"
+    + "    log    7\n"
+    + "    log    8\n"
+    + "    log    9    \n"
+    + "    Should Be Equal As Integers    55    66    \n \n\n"
+    + "* ** Keywords ***    \n"
+    + "kw 1    \n"
+    + "    Should Be Equal As Strings    t1    t2    \n"
+    + "    log    12" | verify-true
+    
+// reformat    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 11 39
+    get-menu -path "Source/Format source" | click
+}
+
+// 10 spaces as separtor
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library          String\n"
+    + "Library          DateTime\n\n"
+    + "*** Test Cases ***          \n"
+    + "test\n"
+    + "          log          7\n"
+    + "          log          8\n"
+    + "          log          9          \n"
+    + "          Should Be Equal As Integers          55          66          \n \n\n"
+    + "* ** Keywords ***          \n"
+    + "kw 1          \n"
+    + "          Should Be Equal As Strings          t1          t2          \n"
+    + "          log          12" | verify-true
+    
+// trime line at the right    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Separator length"] | set-text 3
+    get-button "Right trim lines" | check
+    get-button "Apply and Close" | click
+}
+
+// add 3 spaces at the end of line and reformat
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 17 26
+    type-text "   "
+    key-type "M1+M2+f"
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Settings ***\n\n"
+        + "Library   String\n"
+        + "Library   DateTime\n\n"
+        + "*** Test Cases ***\n"
+        + "test\n"
+        + "   log   7\n"
+        + "   log   8\n"
+        + "   log   9\n"
+        + "   Should Be Equal As Integers   55   66\n\n\n"
+        + "* ** Keywords ***\n"
+        + "kw 1\n"
+        + "   Should Be Equal As Strings   t1   t2\n"
+        + "   log   12" | verify-true
+        
+    // here was bug - new lie was added    
+    get-property "caretPosition.line" | equals 17 | verify-true
+    get-property "caretPosition.column" | equals 12 | verify-true
+}
+
+//reset text
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1  \n"
+    + "       Should Be Equal As Strings    t1    t2    " 
+
+  
+get-button "Save (M1+S)" | click
+
+// set pad spaces
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-combo -after [get-label "Separator type"] | select "pad spaces in columns dynamically"
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 16 21
+    set-caret-pos 16 21
+    get-menu -path "Source/Format source" | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library              String\n"
+    + "Library              DateTime\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "                     log                           7\n"
+    + "                     log                           8\n"
+    + "                     log                           9\n"
+    + "                     Should Be Equal As Integers   55   66\n\n\n"
+    + "* ** Keywords ***\n"
+    + "kw 1\n"
+    + "                     Should Be Equal As Strings    t1   t2" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -1,0 +1,337 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CodeFormattingAfterSave
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _f4ioMFeqEemi06ncdTtjmA
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/5/19 5:20 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1  \n"
+    + "       Should Be Equal As Strings    t1    t2    " 
+
+get-button "Show Whitespace Characters" | click
+
+// activate save action    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Save Actions"
+    with [get-group "Source code formatting"] {
+        get-button "Format editor contents" | check
+        
+        // go to formating
+        get-link "Configure formatter settings on <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter\">Code Formatter</a> preference page." 
+            | click-link
+    }
+    get-button "Adjust separator lengths" | check
+    get-button "Apply and Close" | click
+}
+get-button "Save (M1+S)" | click
+
+
+// add new kw and spaces at the end
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 16 47
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "log     78"
+    key-type "M1+s"
+    set-caret-pos 16 47
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library    String\n"
+    + "Library    DateTime\n\n"
+    + "*** Test Cases ***    \n"
+    + "test\n"
+    + "    log    7\n"
+    + "    log    8\n"
+    + "    log    9    \n"
+    + "    Should Be Equal As Integers    55    66    \n \n\n"
+    + "* ** Keywords ***    \n"
+    + "kw 1    \n"
+    + "    Should Be Equal As Strings    t1    t2    \n"
+    + "    log    78" | verify-true
+    
+// add spaces after Library and log    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 17 14
+    type-text "  "
+    set-caret-pos 3 18
+    type-text "  "
+    hover-text 16 18
+}
+
+// add triming at the end
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Right trim lines" | check
+    get-button "Apply and Close" | click
+}
+
+get-button "Save (M1+S)" | click
+
+// spaces removed
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Settings ***\n\n"
+        + "Library    String\n"
+        + "Library    DateTime\n\n"
+        + "*** Test Cases ***\n"
+        + "test\n"
+        + "    log    7\n"
+        + "    log    8\n"
+        + "    log    9\n"
+        + "    Should Be Equal As Integers    55    66\n\n\n"
+        + "* ** Keywords ***\n"
+        + "kw 1\n"
+        + "    Should Be Equal As Strings    t1    t2\n"
+        + "    log    78" | verify-true
+    get-property "caretPosition.line" | equals 3 | verify-true
+    get-property "caretPosition.column" | equals 18 | verify-true
+}
+
+
+
+
+// add new kw
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 17 14
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text Sh
+        key-type "M1+SPACE"
+        wait 200
+        key-type Down -times 3
+        key-type Enter
+    }
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    get-text-viewer | key-type ESC
+}
+
+//check tha coursor is at the end
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 18 | verify-true
+    get-property "caretPosition.column" | equals 55 | verify-true
+}
+// add speces between args
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 18 34
+    type-text "  "
+    key-type "M1+s"
+}
+
+//check text and caret
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Settings ***\n\n"
+        + "Library    String\n"
+        + "Library    DateTime\n\n"
+        + "*** Test Cases ***\n"
+        + "test\n"
+        + "    log    7\n"
+        + "    log    8\n"
+        + "    log    9\n"
+        + "    Should Be Equal As Integers    55    66\n\n\n"
+        + "* ** Keywords ***\n"
+        + "kw 1\n"
+        + "    Should Be Equal As Strings    t1    t2\n"
+        + "    log    78\n"
+        + "    Should Be Equal As Integers    first    second" | verify-true
+    get-property "caretPosition.line" | equals 18 | verify-true
+    get-property "caretPosition.column" | equals 36 | verify-true
+}
+
+//change to padding
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-combo -after [get-label "Separator type"] | select "pad spaces in columns dynamically"
+    get-button "Apply and Close" | click
+}
+
+//add very long kw
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 18 51
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "HEre is very long kw name that is longer then kw section    and this is  its arg"
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library               String\n"
+    + "Library               DateTime\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "                      log                                                         7\n"
+    + "                      log                                                         8\n"
+    + "                      log                                                         9\n"
+    + "                      Should Be Equal As Integers                                 55             66\n\n\n"
+    + "* ** Keywords ***\n"
+    + "kw 1\n"
+    + "                      Should Be Equal As Strings                                  t1             t2\n"
+    + "                      log                                                         78\n"
+    + "                      Should Be Equal As Integers                                 first          second\n"
+    + "                      HEre is very long kw name that is longer then kw section    and this is    its arg" 
+    | verify-true
+    
+//reset prefernce    
+get-preferences-menu | click
+get-window Preferences | get-button "Restore Defaults" | click
+with [get-window Preferences] {
+    get-button "Adjust separator lengths" | get-property selected | equals false | verify-true
+    get-button "Right trim lines" | get-property selected | equals false | verify-true
+}
+
+// set 5 spaces as seperator
+with [get-window Preferences] {
+    get-button "Adjust separator lengths" | check
+    get-editbox -after [get-label "Separator length"] | set-text 5
+    get-button "Right trim lines" | check
+    get-button "Apply and Close" | click
+}
+
+//reset text
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1  \n"
+    + "       Should Be Equal As Strings    t1    t2    " 
+    
+// go to TC table
+with [get-editor "TestFile.robot"] {
+    with [get-tab-folder] {
+        get-tab-item "Test Cases" | click
+        get-tab-item Source | click
+    }
+}
+
+//check that text was not changed
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n \n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1\n"
+    + "       Should Be Equal As Strings    t1    t2    "  | verify-true
+    
+// add new kw to TC     
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test/Should Be Equal As Integers"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "new kw"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text 2
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n"
+    + "    new kw    2\n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1\n"
+    + "       Should Be Equal As Strings    t1    t2    " | verify-true
+
+// add new kw to KW
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw 1/Should Be Equal As Strings" | click
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text kw2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 2
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 4
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library           String\n"
+    + "Library  DateTime\n\n"
+    + "*** Test Cases ***     \n"
+    + "test\n"
+    + "    log  7\n"
+    + "    log      8\n"
+    + "       log   9           \n"
+    + "    Should Be Equal As Integers    55      66    \n"
+    + "    new kw    2\n\n"
+    + "* ** Keywords ***   \n"
+    + "kw 1\n"
+    + "       Should Be Equal As Strings    t1    t2    \n"
+    + "    kw2    2    \\    4" | verify-true
+    
+// save on Varaible table  
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+get-button "Save (M1+S)" | click
+
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+    + "Library     String\n"
+    + "Library     DateTime\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "     log     7\n"
+    + "     log     8\n"
+    + "     log     9\n"
+    + "     Should Be Equal As Integers     55     66\n"
+    + "     new kw     2\n\n"
+    + "* ** Keywords ***\n"
+    + "kw 1\n"
+    + "     Should Be Equal As Strings     t1     t2\n"
+    + "     kw2     2     \\     4" | verify-true
+    
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
