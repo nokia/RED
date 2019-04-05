@@ -152,7 +152,7 @@ public class ReferencedLibraryLocator {
     private Entry<File, Collection<ReferencedLibrary>> importPythonModuleLibrary(final File libraryFile) {
         return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, null),
                 () -> newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getParentFile().getName(),
-                        new Path(libraryFile.getPath()).removeLastSegments(2).toPortableString())));
+                        new Path(libraryFile.getPath()).toPortableString())));
     }
 
     private Entry<File, Collection<ReferencedLibrary>> importLibsFromFileWithCaching(final LibImportCacheKey key,

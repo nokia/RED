@@ -68,8 +68,7 @@ public class KeywordsAutoDiscovererTest {
                 "def kw_x():",
                 "  return 0",
                 "def   kw_abc ():",
-                "  pass"
-                ));
+                "  pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -86,12 +85,10 @@ public class KeywordsAutoDiscovererTest {
         libraries.putAll(createLibrary("First",
                 "#comment",
                 "def kw_x():",
-                "  pass"
-                ));
+                "  pass"));
         libraries.putAll(createLibrary("Second",
                 "def kw_x():",
-                "  pass"
-                ));
+                "  pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -120,8 +117,7 @@ public class KeywordsAutoDiscovererTest {
                 "class SignatureDecorated(object):",
                 "    @precheck()",
                 "    def decorated_kw(self):",
-                "        pass"
-                ));
+                "        pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -141,8 +137,7 @@ public class KeywordsAutoDiscovererTest {
                 "  pass",
                 "@keyword(name='Deco')",
                 "def decorated_method():",
-                "  pass"
-                ));
+                "  pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -161,8 +156,7 @@ public class KeywordsAutoDiscovererTest {
                 "  def get_keyword_names(self):",
                 "    return ['Dyna Kw', 'Other Kw']",
                 "  def run_keyword(self, name, args):",
-                "    pass"
-                ));
+                "    pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -178,15 +172,13 @@ public class KeywordsAutoDiscovererTest {
         projectProvider.createFile("libs/Parent.py",
                 "class Parent:",
                 "  def parent_kw(self, arg):",
-                "    pass"
-                );
+                "    pass");
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Child",
                 "import Parent",
                 "class Child(Parent.Parent):",
                 "  def child_kw(self, arg):",
-                "    pass"
-                ));
+                "    pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -201,14 +193,12 @@ public class KeywordsAutoDiscovererTest {
     public void testKeywordsFromImportedLibraries() throws Exception {
         projectProvider.createFile("libs/External.py",
                 "def ex_kw(args):",
-                "  pass"
-                );
+                "  pass");
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Internal",
                 "from External import ex_kw",
                 "def int_kw(args):",
-                "  pass"
-                ));
+                "  pass"));
         configureProject(libraries);
 
         new KeywordsAutoDiscoverer(robotProject).start();
@@ -224,7 +214,7 @@ public class KeywordsAutoDiscovererTest {
         final IFile sourceFile = projectProvider.createFile("libs/" + name + ".py", lines);
 
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, name,
-                sourceFile.getFullPath().makeRelative().removeLastSegments(1).toPortableString());
+                sourceFile.getFullPath().makeRelative().toPortableString());
 
         return ImmutableMap.of(library, LibrarySpecification.create(name));
     }

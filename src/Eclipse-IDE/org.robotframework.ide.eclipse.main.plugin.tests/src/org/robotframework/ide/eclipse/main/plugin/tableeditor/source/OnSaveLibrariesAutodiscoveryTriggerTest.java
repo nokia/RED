@@ -98,11 +98,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 "Library  C:\\Users\\Lib.py.py");
 
         final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/known1.py");
         final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "known2",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/known2.py");
         final ReferencedLibrary refLib3 = ReferencedLibrary.create(LibraryType.PYTHON, "knownInResource",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/knownInResource.py");
 
         final LibraryDescriptor desc1 = LibraryDescriptor.ofReferencedLibrary(refLib1);
         final LibraryDescriptor desc2 = LibraryDescriptor.ofReferencedLibrary(refLib2);

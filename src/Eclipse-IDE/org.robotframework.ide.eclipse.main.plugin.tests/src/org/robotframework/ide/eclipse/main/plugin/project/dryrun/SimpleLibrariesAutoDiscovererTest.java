@@ -102,7 +102,8 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", PROJECT_NAME + "/libs")));
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib",
+                        PROJECT_NAME + "/libs/CorrectLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLib",
                 projectProvider.getFile("libs/CorrectLib.py"), newHashSet(suite.getFile())))));
@@ -122,7 +123,9 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "proj_module", PROJECT_NAME)));
+                .has(sameFieldsAs(
+                        ReferencedLibrary.create(LibraryType.PYTHON, "proj_module",
+                                PROJECT_NAME + "/proj_module/__init__.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "proj_module",
                 projectProvider.getFile("proj_module/__init__.py"), newHashSet(suite.getFile())))));
@@ -142,7 +145,8 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", PROJECT_NAME + "/libs")));
+                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB",
+                        PROJECT_NAME + "/libs/CorrectLibWithClasses.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLibWithClasses.ClassB",
                 projectProvider.getFile("libs/CorrectLibWithClasses.py"), newHashSet(suite.getFile())))));
@@ -166,7 +170,8 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "module.ModuleLib", PROJECT_NAME + "/python_path")));
+                ReferencedLibrary.create(LibraryType.PYTHON, "module.ModuleLib",
+                        PROJECT_NAME + "/python_path/module/ModuleLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "module.ModuleLib",
                 projectProvider.getFile("python_path/module/ModuleLib.py"), newHashSet(suite.getFile())))));

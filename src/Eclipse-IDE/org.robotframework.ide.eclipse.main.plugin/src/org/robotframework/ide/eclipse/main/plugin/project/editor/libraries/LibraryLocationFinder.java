@@ -24,6 +24,17 @@ public class LibraryLocationFinder {
             return findStandardLibPath(robotProject, libSpec);
         } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
             final LibraryDescriptor descriptor = libSpec.getDescriptor();
+            return Optional
+                    .of(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getPath())));
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<IPath> findFullPath(final RobotProject robotProject, final LibrarySpecification libSpec) {
+        if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
+            return findStandardLibPath(robotProject, libSpec);
+        } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
+            final LibraryDescriptor descriptor = libSpec.getDescriptor();
             return findReferenceLibPath(descriptor, libSpec);
         }
         return Optional.empty();

@@ -72,7 +72,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibrary() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/LibClass.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass");
         libSpec.setDescriptor(libDesc);
@@ -88,7 +88,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryWithQualifiedName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass.LibClass",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/LibClass.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.LibClass");
         libSpec.setDescriptor(libDesc);
@@ -104,7 +104,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryWithQualifiedNameAndDifferentClassName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass.OtherClass",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/LibClass.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.OtherClass");
         libSpec.setDescriptor(libDesc);
@@ -120,7 +120,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/modOuter/__init__.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter");
         libSpec.setDescriptor(libDesc);
@@ -136,7 +136,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryNestedModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/modOuter/modInner/__init__.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner");
         libSpec.setDescriptor(libDesc);
@@ -152,7 +152,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryFromModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner.ModLib",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/modOuter/modInner/ModLib.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib");
         libSpec.setDescriptor(libDesc);
@@ -168,7 +168,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibraryFromModuleWithQualifiedName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner.ModLib.ModLib",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/modOuter/modInner/ModLib.py");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib.ModLib");
         libSpec.setDescriptor(libDesc);

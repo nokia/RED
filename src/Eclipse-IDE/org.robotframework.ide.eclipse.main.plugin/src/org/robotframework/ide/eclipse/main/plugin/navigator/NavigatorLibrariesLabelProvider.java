@@ -10,6 +10,8 @@ import static org.eclipse.jface.viewers.Stylers.mixingStyler;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -62,7 +64,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
 
         } else if (element instanceof LibrarySpecification) {
             final LibrarySpecification libSpec = (LibrarySpecification) element;
-           
+
             final StyledString label = new StyledString();
             label.append(modificationDecoration(libSpec));
             label.append(libSpec.getName());
@@ -87,8 +89,17 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
     }
 
     private static String pathDecoration(final LibraryDescriptor descriptor) {
-        final String path = descriptor.getPath();
-        return path == null ? "" : " " + path;
+        final String fullPath = descriptor.getPath();
+        final String name = descriptor.getName();
+        if (fullPath == null) {
+            return "";
+        }
+        IPath path = new Path(fullPath).removeLastSegments(1);
+        final String[] nameParts = name.split("\\.");
+        for (int i = nameParts.length - 1; i >= 0; i--) {
+            path = nameParts[i].equals(path.lastSegment()) ? path.removeLastSegments(1) : path;
+        }
+        return " " + path.toPortableString();
     }
 
     private static String numberOfKeywordsDecoration(final LibrarySpecification libSpec) {

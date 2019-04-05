@@ -54,6 +54,10 @@ public class RedEclipseProjectConfig {
         return Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()));
     }
 
+    public IPath resolveToAbsolutePath(final String path) {
+        return Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(path));
+    }
+
     public EnvironmentSearchPaths createAdditionalEnvironmentSearchPaths() {
         return new EnvironmentSearchPaths(resolvePaths(config.getClassPaths()), resolvePaths(config.getPythonPaths()));
     }
@@ -81,6 +85,7 @@ public class RedEclipseProjectConfig {
         return config.getReferencedLibraries()
                 .stream()
                 .filter(lib -> lib.provideType() == libType)
+                .map(ReferencedLibrary::getParentPath)
                 .map(this::resolveToAbsolutePath)
                 .map(IPath::toOSString)
                 .collect(toList());

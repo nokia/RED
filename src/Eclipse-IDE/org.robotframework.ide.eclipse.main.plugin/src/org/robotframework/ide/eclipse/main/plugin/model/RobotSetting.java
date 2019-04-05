@@ -158,8 +158,8 @@ public class RobotSetting extends RobotKeywordCall {
         final AModelElement<?> linkedElement = getLinkedElement();
         if (linkedElement instanceof IRegionCacheable<?>) {
             final List<FileRegion> regions = ((IRegionCacheable<?>) linkedElement).getContinuousRegions();
-            // the linked element may be made from couple of elements defined in different places
-            // inside the file
+            // the linked element may be made from couple of elements defined in different
+            // places inside the file
             for (final FileRegion region : regions) {
                 if (!region.getStart().isNotSet() && region.getStart().getOffset() <= offset
                         && offset <= region.getEnd().getOffset()) {
@@ -199,8 +199,8 @@ public class RobotSetting extends RobotKeywordCall {
         final String libNameOrPath = RobotExpressions.unescapeSpaces(args.get(0));
         if (indexedLibraries.containsKey(libNameOrPath)
                 && !indexedLibraries.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
-            // by-name import of non-remote; only remote libraries are currently used multiple
-            // times
+            // by-name import of non-remote; only remote libraries are currently used
+            // multiple times
             return Optional.of(new ImportedLibrary(indexedLibraries.get(libNameOrPath).get(0), extractLibraryAlias()));
 
         } else if (indexedLibraries.containsKey(libNameOrPath)
@@ -250,7 +250,7 @@ public class RobotSetting extends RobotKeywordCall {
                 .filter(entry -> entry.getValue() != null)
                 .filter(entry -> entry.getKey().isReferencedLibrary())
                 .filter(entry -> {
-                    final IPath entryPath = new Path(entry.getKey().getFilepath());
+                    final IPath entryPath = new Path(entry.getKey().getPath());
                     final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
                     final IPath libPath2 = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
