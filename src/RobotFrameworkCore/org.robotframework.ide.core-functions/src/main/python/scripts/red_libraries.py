@@ -120,4 +120,4 @@ if __name__ == '__main__':
     class_paths = __decode_unicode_if_needed(sys.argv[4].split(";")) if len(sys.argv) == 5 else []
 
     robot_session_server.__extend_paths(python_paths, class_paths)
-    print(create_libdoc(libname, format))
+    print("Libdoc >" + create_libdoc(libname, format))
