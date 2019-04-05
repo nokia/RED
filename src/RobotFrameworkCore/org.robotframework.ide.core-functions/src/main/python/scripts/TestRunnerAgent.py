@@ -247,12 +247,27 @@ class TestRunnerAgent:
         
     def _send_version(self):
         robot_version = 'Robot Framework ' + version.get_full_version()
-        info = {'cmd_line': ' '.join(sys.argv), 
+        info = {'cmd_line': ' '.join(self._get_command_line()), 
                 'python' : sys.version, 
                 'robot' : robot_version, 
                 'protocol' : self.RED_AGENT_PROTOCOL_VERSION,
                 'pid' : os.getpid()}
         self._send_to_server(AgentEventMessage.VERSION, info)
+    
+    def _get_command_line(self):
+        if sys.version_info[0] > 2 or os.name != 'nt':
+            return sys.argv
+
+        # Python 2 does not support unicode in sys.argv on Windows platforms
+        # this is a workaround from https://bugs.python.org/issue2128
+        from ctypes import WINFUNCTYPE, windll, POINTER, byref, c_int
+        from ctypes.wintypes import LPWSTR, LPCWSTR
+        GetCommandLineW = WINFUNCTYPE(LPWSTR)(("GetCommandLineW", windll.kernel32))
+        CommandLineToArgvW = WINFUNCTYPE(POINTER(LPWSTR), LPCWSTR, POINTER(c_int)) \
+                                (("CommandLineToArgvW", windll.shell32))
+        argc = c_int(0)
+        argv_unicode = CommandLineToArgvW(GetCommandLineW(), byref(argc))
+        return [argv_unicode[i].encode('utf-8') for i in range(0, argc.value)]
 
     def start_suite(self, name, attrs):
         attrs_copy = copy.copy(attrs)
