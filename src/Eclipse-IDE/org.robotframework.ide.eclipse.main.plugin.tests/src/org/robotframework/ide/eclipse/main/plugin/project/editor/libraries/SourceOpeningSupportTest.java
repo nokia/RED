@@ -80,7 +80,7 @@ public class SourceOpeningSupportTest {
     @Before
     public void beforeTest() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/testlib.py");
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
@@ -117,7 +117,7 @@ public class SourceOpeningSupportTest {
         final File nonWorkspaceLib = tempFolder.newFile("linkedLib.py");
         final LibrarySpecification linkedLibSpec = LibrarySpecification.create("linkedLib");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
-                .create(LibraryType.PYTHON, "linkedLib", nonWorkspaceLib.getParentFile().getAbsolutePath()));
+                .create(LibraryType.PYTHON, "linkedLib", nonWorkspaceLib.getAbsolutePath()));
         linkedLibSpec.setDescriptor(libDesc);
 
         final IFile linkedFile = projectProvider.getFile("linkedLib.py");
@@ -137,7 +137,7 @@ public class SourceOpeningSupportTest {
         final File nonWorkspaceLib = tempFolder.newFile("outsideLib.py");
         final LibrarySpecification nonWorkspaceLibSpec = LibrarySpecification.create("outsideLib");
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
-                .create(LibraryType.PYTHON, "outsideLib", nonWorkspaceLib.getParentFile().getAbsolutePath()));
+                .create(LibraryType.PYTHON, "outsideLib", nonWorkspaceLib.getAbsolutePath()));
         nonWorkspaceLibSpec.setDescriptor(libDesc);
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, nonWorkspaceLibSpec));

@@ -109,8 +109,7 @@ public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
                             StatusManager.SHOW);
             return new ArrayList<>();
         } else {
-            final List<ILibraryClass> classesToImport = classes.size() > 1
-                    ? askUserToSelectClasses(library, classes)
+            final List<ILibraryClass> classesToImport = classes.size() > 1 ? askUserToSelectClasses(library, classes)
                     : classes;
             return classesToImport.stream()
                     .map(libClass -> libClass.toReferencedLibrary(library.getAbsolutePath()))

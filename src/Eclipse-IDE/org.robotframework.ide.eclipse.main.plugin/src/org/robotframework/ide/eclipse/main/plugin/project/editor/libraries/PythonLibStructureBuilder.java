@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -94,37 +93,8 @@ public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
         @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
-            IPath pathWithoutModuleName = new Path(fullLibraryPath).removeLastSegments(1);
-            final String[] nameParts = qualifiedName.split("\\.");
-            if (fullLibraryPath.toLowerCase().endsWith(".jar") || fullLibraryPath.toLowerCase().endsWith(".zip")) {
-                pathWithoutModuleName = new Path(fullLibraryPath);
-            } else if (fullLibraryPath.endsWith("__init__.py") || nameParts.length > 1) {
-                final int segmentsToRemove = countModuleNameSegments(pathWithoutModuleName.segments(), nameParts);
-                pathWithoutModuleName = pathWithoutModuleName.removeLastSegments(segmentsToRemove);
-            }
-            return ReferencedLibrary.create(getType(), qualifiedName,
-                    RedWorkspace.Paths.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
-        }
-
-        private int countModuleNameSegments(final String[] pathSegments, final String[] nameParts) {
-            int moduleNameSegments = 0;
-            int currentMatch = 1;
-            while (currentMatch <= pathSegments.length && currentMatch <= nameParts.length) {
-                boolean currentPatsMatch = true;
-                for (int i = 0; i < currentMatch; i++) {
-                    final String currentNamePart = nameParts[i];
-                    final String currentPathSegment = pathSegments[pathSegments.length - currentMatch + i];
-                    if (!currentNamePart.equals(currentPathSegment)) {
-                        currentPatsMatch = false;
-                        break;
-                    }
-                }
-                if (currentPatsMatch) {
-                    moduleNameSegments = currentMatch;
-                }
-                currentMatch++;
-            }
-            return moduleNameSegments;
+            return ReferencedLibrary.create(LibraryType.PYTHON, qualifiedName,
+                    RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
         }
 
         @Override

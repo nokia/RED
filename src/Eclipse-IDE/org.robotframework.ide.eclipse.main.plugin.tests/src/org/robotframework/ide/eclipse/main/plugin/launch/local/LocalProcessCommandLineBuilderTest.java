@@ -682,8 +682,10 @@ public class LocalProcessCommandLineBuilderTest {
     @Test
     public void commandLineContainsPythonPathsForPythonLibrariesAddedToRedXml() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1/PyLib1.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2/PyLib2/__init__.py"));
         projectProvider.configure(config);
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);

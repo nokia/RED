@@ -118,8 +118,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
     private boolean validateConfigVersion(final ConfigVersion version, final RobotProjectConfigWithLines config) {
         // this should be updated when current version does not support older versions
-        final boolean isValidVersion = RobotProjectConfig.CURRENT_VERSION.equals(version.getVersion())
-                || "1".equals(version.getVersion()) || "1.0".equals(version.getVersion());
+        final boolean isValidVersion = RobotProjectConfig.CURRENT_VERSION.equals(version.getVersion());
         if (!isValidVersion) {
             final RobotProblem invalidVersionProblem = RobotProblem.causedBy(ConfigFileProblem.INVALID_VERSION)
                     .formatMessageWith(version.getVersion(), RobotProjectConfig.CURRENT_VERSION);

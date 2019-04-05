@@ -150,9 +150,9 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addReferencedLibrary(
                 ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", PROJECT_NAME + "/lib2.jar"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1/PyLib1.py"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2/PyLib2/__init__.py"));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig,
                 new EnvironmentVariableReplacer(variableAccessor));
