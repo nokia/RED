@@ -142,7 +142,8 @@ def isJarOrZip(module_location):
 class ModuleNamesCollectorForPython2():
     def _try_to_find_names_in_module(self, module_name, module_location):
         with open(module_location) as f:
-            code = compile(f.read(), module_location, 'exec')
+            path = module_location.encode('utf-8') if isinstance(module_location, unicode) else module_location
+            code = compile(f.read(), path, 'exec')
         return self._extract_names_from_code_object_for_python2(code)
     
     
