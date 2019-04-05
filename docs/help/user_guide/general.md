@@ -51,6 +51,10 @@ Actions](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferen
 ![](images/gen_5.png)  
   
 
+Note
+
+    RED does not support source formatting in *.tsv files 
+
 ### Quick Fix - Ctrl+1
 
 Quick Fix is an Eclipse mechanism to provide user with predefined action for
