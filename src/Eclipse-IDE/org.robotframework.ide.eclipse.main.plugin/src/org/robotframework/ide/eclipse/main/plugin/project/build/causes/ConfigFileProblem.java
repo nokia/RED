@@ -13,9 +13,20 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveLibraryFromConfigurationFileFixer;
+import org.robotframework.ide.eclipse.main.plugin.refactoring.RedXmlVersionUpdater;
 
 public enum ConfigFileProblem implements IProblemCause {
     INVALID_VERSION {
+        
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(IMarker marker) {
+            return newArrayList(new RedXmlVersionUpdater());
+        }
 
         @Override
         public String getProblemDescription() {

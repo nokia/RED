@@ -23,7 +23,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
- *
  */
 public class KeywordDocumentationHyperlink implements RedHyperlink {
 
@@ -36,7 +35,6 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
     private final LibrarySpecification libSpec;
 
     private final KeywordSpecification kwSpec;
-
 
     public KeywordDocumentationHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec,
             final KeywordSpecification kwSpec) {
@@ -90,7 +88,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return LibraryLocationFinder.findPath(model.createRobotProject(project), libSpec)
+        return LibraryLocationFinder.findFullPath(model.createRobotProject(project), libSpec)
                 .map(path -> "[" + path + "]")
                 .orElse("");
     }

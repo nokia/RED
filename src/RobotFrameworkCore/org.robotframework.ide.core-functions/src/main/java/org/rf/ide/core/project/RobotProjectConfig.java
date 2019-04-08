@@ -447,6 +447,19 @@ public class RobotProjectConfig {
             return path;
         }
 
+        public String getParentPath() {
+            if (LibraryType.PYTHON == provideType()) {
+                int lastCharsToRemove = name.length() + 4; // separator + extension ".py"
+                if (path.endsWith("__init__.py")) {
+                    // + 1 for additional separator, extension already counted
+                    lastCharsToRemove += "__init__".length() + 1;
+                }
+                return path.length() > lastCharsToRemove ? path.substring(0, path.length() - lastCharsToRemove) : "";
+            } else {
+                return path;
+            }
+        }
+
         public LibraryType provideType() {
             return LibraryType.valueOf(type);
         }
@@ -457,14 +470,15 @@ public class RobotProjectConfig {
                 return false;
             } else if (obj.getClass() == getClass()) {
                 final ReferencedLibrary other = (ReferencedLibrary) obj;
-                return Objects.equals(type, other.type) && Objects.equals(name, other.name);
+                return Objects.equals(type, other.type) && Objects.equals(name, other.name)
+                        && Objects.equals(path, other.path);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, name);
+            return Objects.hash(type, name, path);
         }
 
         @Override
@@ -474,7 +488,9 @@ public class RobotProjectConfig {
     }
 
     public static enum LibraryType {
-        VIRTUAL, PYTHON, JAVA
+        VIRTUAL,
+        PYTHON,
+        JAVA
     }
 
     @XmlRootElement(name = "remoteLocation")

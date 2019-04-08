@@ -142,7 +142,7 @@ public class PythonLibStructureBuilderTest {
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
-                projectProvider.getProject().getName() + "/folder")));
+                projectProvider.getProject().getName() + "/folder/libName.py")));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class PythonLibStructureBuilderTest {
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.libName",
-                projectProvider.getProject().getName() + "/folder")));
+                projectProvider.getProject().getName() + "/folder/nameA/nameB/libName.py")));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class PythonLibStructureBuilderTest {
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moduleName",
-                projectProvider.getProject().getName() + "/folder")));
+                projectProvider.getProject().getName() + "/folder/moduleName/__init__.py")));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class PythonLibStructureBuilderTest {
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.moduleName",
-                projectProvider.getProject().getName() + "/folder")));
+                projectProvider.getProject().getName() + "/folder/nameA/nameB/moduleName/__init__.py")));
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {

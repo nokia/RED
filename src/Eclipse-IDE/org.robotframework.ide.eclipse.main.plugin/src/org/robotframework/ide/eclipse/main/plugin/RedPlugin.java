@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -24,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListe
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
+import org.robotframework.ide.eclipse.main.plugin.refactoring.RedXmlVersionUpdater;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -60,6 +63,7 @@ public class RedPlugin extends AbstractUIPlugin {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
             RedPreferencesFixer.updatePreferencesWithoutPrefixesIfNeeded(getPreferenceStore());
+            enableRedXmlVersionChecker();
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
         }
@@ -130,6 +134,11 @@ public class RedPlugin extends AbstractUIPlugin {
         } else {
             return null;
         }
+    }
+    
+    private static void enableRedXmlVersionChecker() {
+        RedXmlVersionUpdater.checkAlreadyOpenedProjects();
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(new RedXmlVersionUpdater(), IResourceChangeEvent.POST_CHANGE);
     }
 
     private static class RobotTestExecutionServiceManager {

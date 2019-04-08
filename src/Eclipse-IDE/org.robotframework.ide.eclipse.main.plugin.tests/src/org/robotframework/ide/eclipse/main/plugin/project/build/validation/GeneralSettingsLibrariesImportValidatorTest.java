@@ -695,7 +695,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenThereIsProblemWithLibraryArgumentsWhenImportedByPath() throws Exception {
-        final String libPath = projectProvider.getProject().getName();
+        final String libPath = projectProvider.getProject().getName() + "/lib.py";
         final String libName = "lib";
 
         final IFile libFile = projectProvider.createFile("lib.py");
@@ -953,7 +953,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_1() throws Exception {
-        final String libPath = projectProvider.getProject().getName();
+        final String libPath = projectProvider.getProject().getName() + "/lib.py";
         final String libName = "lib";
 
         final IFile libFile = projectProvider.createFile("lib.py");
@@ -971,7 +971,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_2() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libPath = projectProvider.getProject().getName() + "/directory/lib.py";
         final String libName = "lib";
 
         final IFolder dir = projectProvider.createDir("directory");
@@ -990,7 +990,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_3() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libPath = projectProvider.getProject().getName() + "/directory/lib/__init__.py";
         final String libName = "lib";
 
         final IFolder dir1 = projectProvider.createDir("directory");
@@ -1036,7 +1036,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMajorProblemsAreReported_whenLibraryFileExistLocallyButIsImportedUsingAbsolutePath()
             throws Exception {
 
-        final String libPath = projectProvider.getProject().getName();
+        final String libPath = projectProvider.getProject().getName() + "/lib.py";
         final String libName = "lib";
 
         final IFile libFile = projectProvider.createFile("lib.py");
@@ -1057,7 +1057,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMajorProblemsAreReported_whenLibraryFileExistLocallyAsALinkToExternalFile() throws Exception {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
 
-        final String libPath = tmpFile.getParent().replaceAll("\\\\", "/");
+        final String libPath = tmpFile.getPath().replaceAll("\\\\", "/");
         final String libName = "external_nested_lib";
 
         resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
@@ -1073,7 +1073,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromWorkspace() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/dir";
+        final String libPath = projectProvider.getProject().getName() + "/dir/lib.py";
 
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/lib.py");
@@ -1096,7 +1096,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder.getRoot(), "external_dir/external_nested_lib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
@@ -1117,7 +1117,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/linking_dir";
+        final String libPath = projectProvider.getProject().getName() + "/linking_dir/external_nested_lib.py";
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
@@ -1139,7 +1139,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/dir";
+        final String libPath = projectProvider.getProject().getName() + "/dir/lib.py";
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/lib.py");
 
@@ -1174,7 +1174,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
-                dir.getAbsolutePath());
+                dir.getAbsolutePath() + "/external_nested_lib.py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -1188,7 +1188,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/linking_dir";
+        final String libPath = projectProvider.getProject().getName() + "/linking_dir/external_nested_lib.py";
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
         resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));

@@ -106,29 +106,35 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenConfigHasOldSupportedVersion_itHasNoValidationIssues() throws Exception {
+    public void whenConfigHasOldVersionFormat_InvalidVersionProblemIsReported() throws Exception {
         final RobotProjectConfig config = RobotProjectConfig.create();
-        config.setVersion("1");
+        config.setVersion("1.0");
+
         final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getVersion(), new FilePosition(3, 0));
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
-        assertThat(reporter.getReportedProblems()).isEmpty();
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.INVALID_VERSION, new ProblemPosition(3)));
     }
 
     @Test
-    public void whenConfigHasOldVersionFormat_itHasNoValidationIssues() throws Exception {
+    public void whenConfigHasOldSupportedVersion_InvalidVersionProblemIsReported() throws Exception {
         final RobotProjectConfig config = RobotProjectConfig.create();
-        config.setVersion("1.0");
+        config.setVersion("1");
+
         final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getVersion(), new FilePosition(3, 0));
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
                 new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
-        assertThat(reporter.getReportedProblems()).isEmpty();
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.INVALID_VERSION, new ProblemPosition(3)));
     }
 
     @Test
@@ -386,9 +392,8 @@ public class RobotProjectConfigFileValidatorTest {
         validator = createValidator(SuiteExecutor.Jython, mock(SystemVariableAccessor.class));
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
-        assertThat(reporter.getReportedProblems())
-                .containsExactly(
-                        new Problem(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_OR_ZIP_FILE, new ProblemPosition(123)));
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ConfigFileProblem.JAVA_LIB_NOT_A_JAR_OR_ZIP_FILE, new ProblemPosition(123)));
     }
 
     @Test
@@ -420,7 +425,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenRemoteLocationHostDoesNotExist_unreachableHostProblemIsReported() throws Exception {
-        // opens the socket in order to find port, but the socket gets closed immediately
+        // opens the socket in order to find port, but the socket gets closed
+        // immediately
         final RemoteLocation remoteLocation = RemoteLocation.create("http://127.0.0.1:" + findFreePort() + "/");
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addRemoteLocation(remoteLocation);
@@ -439,8 +445,8 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenRemoteLocationHostDoesExist_nothingIsReported() throws Exception {
-        // opens the socket in order to find port, but the socket remains open till the test end, so
-        // no validation error is expected
+        // opens the socket in order to find port, but the socket remains open till the
+        // test end, so no validation error is expected
         try (ServerSocket socket = new ServerSocket(0)) {
             final RemoteLocation remoteLocation = RemoteLocation
                     .create("http://127.0.0.1:" + socket.getLocalPort() + "/");
@@ -635,8 +641,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenPathContainsUnknownEnvironmentVariables_unknownEnvVariableProblemsAreReported()
-            throws Exception {
+    public void whenPathContainsUnknownEnvironmentVariables_unknownEnvVariableProblemsAreReported() throws Exception {
         final SearchPath searchPath = SearchPath
                 .create("%{ENV_VAR}/%{UNKNOWN_ENV_VARIABLE_1}/%{UNKNOWN_ENV_VARIABLE_2}/path");
 

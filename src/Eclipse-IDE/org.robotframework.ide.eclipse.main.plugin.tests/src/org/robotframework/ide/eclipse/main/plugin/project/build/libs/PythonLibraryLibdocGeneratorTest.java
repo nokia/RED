@@ -66,7 +66,7 @@ public class PythonLibraryLibdocGeneratorTest {
                 true);
 
         final String libName = "ModuleClass";
-        final IFile libFile = robotProject.getFile("lib/module");
+        final IFile libFile = robotProject.getFile("lib/module/" + libName + ".py");
         final String libPath = libFile.getLocation().toString();
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         final IFile targetSpecFile = libspecsFolder.getXmlSpecFile("ModuleClass_1234567");
@@ -81,8 +81,8 @@ public class PythonLibraryLibdocGeneratorTest {
 
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 
-        verify(runtimeEnvironment).createLibdocInSeparateProcess(libName, targetSpecFile.getLocation().toFile(), format,
-                additionalPaths);
+        verify(runtimeEnvironment).createLibdocInSeparateProcess(libFile.getLocation().toPortableString(),
+                targetSpecFile.getLocation().toFile(), format, additionalPaths);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class PythonLibraryLibdocGeneratorTest {
                 false);
 
         final String libName = "ModuleClass";
-        final IFile libFile = robotProject.getFile("lib/module");
+        final IFile libFile = robotProject.getFile("lib/module/" + libName + ".py");
         final String libPath = libFile.getLocation().toString();
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         final IFile targetSpecFile = libspecsFolder.getXmlSpecFile("ModuleClass_1234567");
@@ -107,7 +107,7 @@ public class PythonLibraryLibdocGeneratorTest {
 
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 
-        verify(runtimeEnvironment).createLibdoc(libName, targetSpecFile.getLocation().toFile(),
-                format, additionalPaths);
+        verify(runtimeEnvironment).createLibdoc(libFile.getLocation().toPortableString(),
+                targetSpecFile.getLocation().toFile(), format, additionalPaths);
     }
 }
