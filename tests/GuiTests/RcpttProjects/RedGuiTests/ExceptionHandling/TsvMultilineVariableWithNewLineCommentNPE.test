@@ -6,28 +6,13 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _m0j4EKV3EeWcDJJ2TRzOng
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 1/7/16 12:50 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/8/19 12:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-/*
-Check if there is NPE with multiline TSV comment 
-*/
-
-get-view "Project Explorer" | get-tree | select "ExceptionHandling/tsv_test.tsv" | double-click
-with [get-editor "tsv_test.tsv" | get-text-viewer] {
-    key-type Enter
-    set-caret-pos 1 1
-    type-text "*** Variables ***"
-    key-type Enter
-    type-text "${test}	testvalue"
-	key-type Enter
-	type-text "...	#comment"
-
-}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
