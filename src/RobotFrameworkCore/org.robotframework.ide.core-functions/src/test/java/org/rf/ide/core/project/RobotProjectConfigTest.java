@@ -345,36 +345,32 @@ public class RobotProjectConfigTest {
     @Test
     public void excludedPathIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"), ExcludedPath.create("def"));
         config.setExcludedPaths(paths);
 
         final boolean result = config.addExcludedPath("ghi");
 
         assertThat(result).isTrue();
-        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"), ExcludedPath.create("ghi"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"), ExcludedPath.create("def"),
+                ExcludedPath.create("ghi"));
     }
 
     @Test
     public void excludedPathIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"), ExcludedPath.create("def"));
         config.setExcludedPaths(paths);
 
         final boolean result = config.addExcludedPath("def");
 
         assertThat(result).isFalse();
-        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"), ExcludedPath.create("def"));
     }
 
     @Test
     public void excludedPathIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"), ExcludedPath.create("def"));
         config.setExcludedPaths(paths);
 
         final boolean result = config.removeExcludedPath("def");
@@ -386,26 +382,38 @@ public class RobotProjectConfigTest {
     @Test
     public void excludedPathIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"), ExcludedPath.create("def"));
         config.setExcludedPaths(paths);
 
         final boolean result = config.removeExcludedPath("ghi");
 
         assertThat(result).isFalse();
-        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        assertThat(config.getExcludedPaths()).containsExactly(ExcludedPath.create("abc"), ExcludedPath.create("def"));
     }
 
     @Test
     public void excludedPathIsChecked() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"),
-                ExcludedPath.create("def"));
+        final List<ExcludedPath> paths = newArrayList(ExcludedPath.create("abc"), ExcludedPath.create("def"));
         config.setExcludedPaths(paths);
 
         assertThat(config.isExcludedPath("abc")).isTrue();
         assertThat(config.isExcludedPath("ghi")).isFalse();
+    }
+
+    @Test
+    public void sameReferencedLibrariesFromDifferentPaths_areAllAdded() throws Exception {
+        final RobotProjectConfig config = new RobotProjectConfig();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"))).isTrue();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def"))).isTrue();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi"))).isTrue();
+
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"))).isFalse();
+
+        assertThat(config.getReferencedLibraries()).containsExactly(
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi"));
     }
 
 }
