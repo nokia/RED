@@ -43,7 +43,10 @@ public class PythonLibraryLibdocGeneratorTest {
     public static void beforeClass() throws Exception {
         projectProvider.createDir("lib");
         projectProvider.createDir("lib/module");
+        projectProvider.createDir("lib/outerModule");
         projectProvider.createFile("lib/module/ModuleClass.py", "class ModuleClass(object):", "  def kw():", "   pass");
+        projectProvider.createFile("lib/outerModule/libFile.py", "class ModuleClass(object):", "  def kw():",
+                "   pass");
     }
 
     @Before
@@ -109,5 +112,28 @@ public class PythonLibraryLibdocGeneratorTest {
 
         verify(runtimeEnvironment).createLibdoc(libFile.getLocation().toPortableString(),
                 targetSpecFile.getLocation().toFile(), format, additionalPaths);
+    }
+
+    @Test
+    public void verifyIfCreateLibdocMethodInSeparateProcessIsCalled_forLibraryNameWithDots() {
+        preferenceUpdater.setValue(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
+                true);
+        final String libName = "outerModule.libFile.ModuleClass";
+        final String libPath = robotProject.getFile("lib/outerModule/libFile.py").getLocation().toString();
+        final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
+        final IFile targetSpecFile = libspecsFolder.getXmlSpecFile("ModuleClass_1234567");
+        final LibdocFormat format = LibdocFormat.XML;
+        final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectProvider.getProject(),
+                robotProject.getRobotProjectConfig()).createAdditionalEnvironmentSearchPaths();
+
+        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
+                targetSpecFile, format);
+
+        final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
+
+        pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
+
+        verify(runtimeEnvironment).createLibdocInSeparateProcess(libName, targetSpecFile.getLocation().toFile(), format,
+                additionalPaths);
     }
 }
