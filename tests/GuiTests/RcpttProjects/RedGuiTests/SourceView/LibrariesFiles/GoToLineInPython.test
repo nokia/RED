@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _H31jIOhpEeaQF4EqtSuP0w
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 5:30 PM
+Save-Time: 4/10/19 12:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -167,7 +167,7 @@ with [get-view Problems | get-tree] {
         | get-property index | equals 1 | verify-true
     get-item "Warnings \\(4 items\\)/Given keyword name 'MyLib' is not consistent with keyword definition 'My Lib'" 
         | get-property index | equals 2 | verify-true
-    get-item "Warnings \\(4 items\\)/The path .*LibsFromPythonPath is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
+    get-item -path "Warnings \\(4 items\\)/The path .*GuiTests\\/RcpttProjects\\/RedGuiTests\\/TestData\\/LibsFromPythonPath\\/LibFromPythonPath.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
         | get-property index | equals 3 | verify-true
 }
 
