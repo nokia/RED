@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Hjl3AFH1Eei8P-qAbw1qjQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/8/19 4:48 PM
+Save-Time: 4/10/19 2:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,7 +58,8 @@ get-editor "simple_lib.py" | close
 
 //click on [Documentation] link
 click-link-in-doc-view "Documentation"
-check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  -args "\[\]" -intro "Documentation for test library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
+check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  -args "\[\]" 
+	-intro "Documentation for library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
 
 //open lib from module
 get-view "Project Explorer" | get-tree 
@@ -83,7 +84,8 @@ check-documentation-view -kw_name "Log Messages" -project_name "project_b"  -lib
 
 //simple_lib
 get-view "Documentation View" | get-button Back | click
-check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  -args "\[\]" -intro "Documentation for test library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
+check-documentation-view-for-library -file_name simple_lib -project_name project_b -source simple_lib  
+	-args "\[\]" -intro "Documentation for library <code>simple_lib</code>." -shortcuts [list "Simple Lib"]
 
 //list
 get-view "Documentation View" | get-button Back | click
@@ -113,7 +115,8 @@ get-view "Project Explorer" | get-tree
     | select "project_b/Robot Referenced libraries/AutoItLibrary project_b\\/AutoItLibrary.xml \\(100\\)/Auto It Set Option" 
     | double-click
     
-check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  -arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
+check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  
+	-arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
 	-spec     "method AutoItSetOption"
    
 //go back    
@@ -122,7 +125,8 @@ check-documentation-view  -kw_name "Simple Lib" -project_name "project_b" -libra
 
 //go to kw from xml
 get-view "Documentation View" | get-button Forward | click  
-check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  -arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
+check-documentation-view -kw_name "Auto It Set Option" -project_name "project_b"  -library "AutoItLibrary"  
+	-arguments "\[strOption=&lt;PyOleEmpty object at 0x02D94690&gt;, nValue=&lt;PyOleEmpty object at 0x02D94690&gt;\]" 
 	-spec     "method AutoItSetOption"  
     
     
