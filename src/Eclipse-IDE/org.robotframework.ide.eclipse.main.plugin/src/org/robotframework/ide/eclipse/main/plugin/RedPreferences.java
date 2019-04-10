@@ -102,6 +102,7 @@ public class RedPreferences {
     public static final String LAUNCH_AGENT_CONNECTION_TIMEOUT = "red.launch.agentConnectionTimeout";
     public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
     public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
+    public static final String LAUNCH_ENVIRONMENT_VARIABLES = "red.launch.environmentVariables";
 
     public static final String LIMIT_MSG_LOG_OUTPUT = "red.launch.msgLogLimitEnabled";
     public static final String LIMIT_MSG_LOG_LENGTH = "red.launch.msgLogLimit";
@@ -349,6 +350,24 @@ public class RedPreferences {
 
     public String getLaunchAdditionalExecutableFileArguments() {
         return store.getString(LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
+    }
+
+    public Map<String, String> getLaunchEnvironmentVariables() {
+        final String jsonMapping = store.getString(LAUNCH_ENVIRONMENT_VARIABLES);
+        if (jsonMapping.isEmpty()) {
+            return new LinkedHashMap<>();
+        }
+
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final TypeReference<Map<String, String>> stringToStringMapType = new TypeReference<Map<String, String>>() {
+            };
+
+            return mapper.readValue(jsonMapping, stringToStringMapType);
+
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public boolean shouldUseSingleCommandLineArgument() {

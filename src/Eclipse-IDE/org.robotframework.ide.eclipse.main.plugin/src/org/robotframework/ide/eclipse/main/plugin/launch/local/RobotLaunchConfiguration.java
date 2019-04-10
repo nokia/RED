@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static com.google.common.collect.Iterables.getFirst;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
@@ -37,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
@@ -99,19 +97,18 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.fillDefaults();
-        final IProject project = suitesMapping.isEmpty() ? null : getFirst(suitesMapping.keySet(), null).getProject();
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        if (robotProject != null) {
-            robotConfig.setInterpreter(robotProject.getRuntimeEnvironment().getInterpreter());
-        }
 
+        final IProject project = suitesMapping.keySet().stream().findFirst().map(IResource::getProject).orElse(null);
         if (project != null) {
             robotConfig.setProjectName(project.getName());
+
+            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
+            robotConfig.setInterpreter(robotProject.getRuntimeEnvironment().getInterpreter());
         }
         robotConfig.updateTestCases(suitesMapping);
         robotConfig.setIsGeneralPurposeEnabled(type == RobotLaunchConfigurationType.GENERAL_PURPOSE);
 
-        robotConfig.setEnvironmentVariables(ImmutableMap.of("PYTHONIOENCODING", "utf8"));
+        robotConfig.setEnvironmentVariables(RedPlugin.getDefault().getPreferences().getLaunchEnvironmentVariables());
     }
 
     public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,

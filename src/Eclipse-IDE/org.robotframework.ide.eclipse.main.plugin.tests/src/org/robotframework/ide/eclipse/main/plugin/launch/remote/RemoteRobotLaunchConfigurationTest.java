@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.junit.Rule;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.RunConfigurationProvider;
 
@@ -25,6 +27,9 @@ public class RemoteRobotLaunchConfigurationTest {
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
             RemoteRobotLaunchConfiguration.TYPE_ID);
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationPrepared() throws CoreException {
@@ -57,6 +62,26 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(43_981);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getConfigurationVersion())
+                .isEqualTo(RemoteRobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
+    }
+
+    @Test
+    public void defaultConfigurationObtained_whenDefaultValuesAreDefinedInPreferences() throws Exception {
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "some.host.com.pl");
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, 12345);
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, 666);
+
+        final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration
+                .prepareDefault(projectProvider.getProject());
+        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
+
+        assertThat(config.getType()).isEqualTo(runConfigurationProvider.getType());
+        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
+        assertThat(robotConfig.isUsingRemoteAgent()).isTrue();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("some.host.com.pl");
+        assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(12345);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(666);
         assertThat(robotConfig.getConfigurationVersion())
                 .isEqualTo(RemoteRobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
     }
