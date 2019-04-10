@@ -31,6 +31,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -82,8 +83,10 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
                             // TODO: Importing project would not trigger this.
                             // IFile.exists() == false;
-                            if (!config.isNullConfig()
+                            if (PlatformUI.isWorkbenchRunning() // do not do anything for headless
+                                    && !config.isNullConfig()
                                     && !RobotProjectConfig.CURRENT_VERSION.equals(config.getVersion().getVersion())) {
+
                                 askAndUpdateRedXml(newArrayList(robotProject));
                             }
                         }
@@ -98,6 +101,9 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
     }
 
     public static void checkAlreadyOpenedProjects() {
+        if (!PlatformUI.isWorkbenchRunning()) { // do not do anything for headless
+            return;
+        }
         List<RobotProject> projectsToUpdate = Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
                 .filter(p -> RobotProjectNature.hasRobotNature(p))
                 .map(p -> RedPlugin.getModelManager().getModel().createRobotProject(p))
