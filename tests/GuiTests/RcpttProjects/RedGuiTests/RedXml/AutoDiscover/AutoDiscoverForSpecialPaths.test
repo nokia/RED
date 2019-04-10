@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/25/19 11:36 AM
+Save-Time: 4/9/19 4:21 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -186,11 +186,13 @@ with [get-window "Discovering libraries summary" | get-tree] {
 //check if file were added to red.xml
 get-window "Discovering libraries summary" | get-button OK | click
 get-tab-folder -index 1 | get-tab-item "*RobotProject/red.xml" | click
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
-    get-property itemCount | equals 4 | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "multiply - RobotProject" | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "add - RobotProject/libs" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
+with [get-editor "RobotProject/red.xml" | get-section Libraries | get-table] {
+    get-property "getItems().length" | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "add - RobotProject/libs/add.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "lib_with_args - RobotProject/libs/lib_with_args.py" 
+        | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "multiply - RobotProject/multiply.py" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "...add new library file" | verify-true
 }
 get-button "Save \((Ctrl|M1)\+S\)" | click
 

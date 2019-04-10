@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uuVDgK_-EeaOOtfbYFWVRw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 2:05 PM
+Save-Time: 4/9/19 12:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,9 +30,8 @@ proc "check-errors" [val nr_of_errors ] [val childCount ]{
 				$nr_of_errors | each [val error_nr]{
 					get-view Problems | get-tree | get-item [$all_errors| get $error_nr]
 						| get-property enablement | equals false | verify-true
-			}
-	
-	}
+			   }
+		}
 }	
 
 check-errors -nr_of_errors [list 0 1 2 3 4 5 6] -childCount 7
@@ -62,10 +61,10 @@ wait-for-loading-red-xml -editor_name "ProjectForAnalysis/red.xml"
 get-editor "ProjectForAnalysis/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 with [get-editor "ProjectForAnalysis/red.xml" | get-section "Libraries"] {
     with [get-table] {
-        select "here_is_class.Cat - ProjectForAnalysis" | key-type "M2+ARROW_DOWN"
-        select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs"
-        key-type "M2+ARROW_DOWN"
-        select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs" "only_function - ProjectForAnalysis"
+        select "here_is_class.Cat - ProjectForAnalysis\\/here_is_class.py" | key-type "M2+ARROW_DOWN"
+	    select "only_function - ProjectForAnalysis\\/only_function.py" "here_is_class.Cat - ProjectForAnalysis\\/here_is_class.py"
+	    key-type "M2+ARROW_DOWN"
+	    select "SumTwoDigits - ProjectForAnalysis\\/libs\\/SumTwoDigits.py" "only_function - ProjectForAnalysis\\/only_function.py" "here_is_class.Cat - ProjectForAnalysis\\/here_is_class.py"
         key-type Del
     }
 }
@@ -143,9 +142,9 @@ get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" |
 
 //remove all items in red.xml
 get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/red.xml" | double-click
-with [get-editor "ProjectForAnalysis/red.xml" | get-section "Libraries" | get-table] {
-    select "here_is_class.Cat - ProjectForAnalysis" | key-type "M2+ARROW_DOWN"
-    select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs"
+with [get-editor "ProjectForAnalysis/red.xml" | get-section Libraries | get-table] {
+    select "here_is_class.Cat - ProjectForAnalysis\\/here_is_class.py" | key-type "M2+ARROW_DOWN"
+    select "SumTwoDigits - ProjectForAnalysis\\/libs\\/SumTwoDigits.py" "here_is_class.Cat - ProjectForAnalysis\\/here_is_class.py"
     key-type Del
 }
 
