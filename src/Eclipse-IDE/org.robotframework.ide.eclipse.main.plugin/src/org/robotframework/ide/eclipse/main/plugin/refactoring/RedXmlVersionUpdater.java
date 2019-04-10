@@ -104,7 +104,9 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
                 .filter(p -> !RobotProjectConfig.CURRENT_VERSION
                         .equals(p.getRobotProjectConfig().getVersion().getVersion()))
                 .collect(Collectors.toList());
-        askAndUpdateRedXml(projectsToUpdate);
+        if (projectsToUpdate.size() > 0) {
+            askAndUpdateRedXml(projectsToUpdate);
+        }
     }
 
     @Override
@@ -212,37 +214,34 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
     }
 
     private static List<RobotProject> askUserAboutUpdateRedXml(final List<RobotProject> robotProjects) {
-        if ((robotProjects != null) && (robotProjects.size() > 0)) {
-            final String redXmlDetectedVersion = robotProjects.get(0).getRobotProjectConfig().getVersion().getVersion();
-            final List<String> projectNames = robotProjects.stream()
-                    .map(RobotProject::getName)
-                    .collect(Collectors.toList());
+        final String redXmlDetectedVersion = robotProjects.get(0).getRobotProjectConfig().getVersion().getVersion();
+        final List<String> projectNames = robotProjects.stream()
+                .map(RobotProject::getName)
+                .collect(Collectors.toList());
 
-            final Evaluation<List<RobotProject>> projectsEval = new Evaluation<List<RobotProject>>() {
+        final Evaluation<List<RobotProject>> projectsEval = new Evaluation<List<RobotProject>>() {
 
-                @Override
-                public List<RobotProject> runCalculation() {
-                    final Shell shell = Display.getCurrent().getActiveShell();
-                    final ListSelectionDialog dialog = new ListSelectionDialog(shell, projectNames,
-                            ArrayContentProvider.getInstance(), new LabelProvider(),
-                            "RED detected old version of configuration file: \"" + redXmlDetectedVersion
-                                    + "\", but now \"" + RobotProjectConfig.CURRENT_VERSION + "\" is in use."
-                                    + "\nSelect projects which you want to auto-update."
-                                    + "\nRemark: After updating your projects would be incompatible with old RED versions.");
-                    dialog.setTitle("Red.xml auto-updater");
-                    dialog.setInitialElementSelections(projectNames);
-                    if (dialog.open() == Window.OK) {
-                        return robotProjects.stream()
-                                .filter(p -> Arrays.asList(dialog.getResult()).contains(p.getName()))
-                                .collect(Collectors.toList());
-                    }
-
-                    return new ArrayList<>();
+            @Override
+            public List<RobotProject> runCalculation() {
+                final Shell shell = Display.getCurrent().getActiveShell();
+                final ListSelectionDialog dialog = new ListSelectionDialog(shell, projectNames,
+                        ArrayContentProvider.getInstance(), new LabelProvider(),
+                        "RED detected old version of configuration file: \"" + redXmlDetectedVersion + "\", but now \""
+                                + RobotProjectConfig.CURRENT_VERSION + "\" is in use."
+                                + "\nSelect projects which you want to auto-update."
+                                + "\nRemark: After updating your projects would be incompatible with old RED versions.");
+                dialog.setTitle("Red.xml auto-updater");
+                dialog.setInitialElementSelections(projectNames);
+                if (dialog.open() == Window.OK) {
+                    return robotProjects.stream()
+                            .filter(p -> Arrays.asList(dialog.getResult()).contains(p.getName()))
+                            .collect(Collectors.toList());
                 }
-            };
-            return SwtThread.syncEval(projectsEval);
-        }
-        return new ArrayList<>();
+
+                return new ArrayList<>();
+            }
+        };
+        return SwtThread.syncEval(projectsEval);
     }
 
     static class RobotProjectListContainer {
