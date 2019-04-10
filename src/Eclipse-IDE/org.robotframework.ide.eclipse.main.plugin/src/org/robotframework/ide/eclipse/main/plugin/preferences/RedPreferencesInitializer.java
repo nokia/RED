@@ -150,6 +150,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, AgentConnectionServer.DEFAULT_CONNECTION_PORT);
         preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
                 AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT);
+        preferences.put(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES, "{\"PYTHONIOENCODING\":\"utf8\"}");
         preferences.put(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR, IssuesStrategy.PROMPT.name().toLowerCase());
         preferences.putBoolean(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS, false);
     }
