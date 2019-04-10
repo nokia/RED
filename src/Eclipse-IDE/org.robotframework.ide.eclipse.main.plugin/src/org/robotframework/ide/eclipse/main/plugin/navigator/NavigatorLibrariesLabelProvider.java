@@ -36,7 +36,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
     @Override
     public String getText(final Object element) {
         if (element instanceof RobotProjectDependencies) {
-            return "Robot Standard libraries";
+            return ((RobotProjectDependencies) element).getName();
         } else if (element instanceof LibrarySpecification) {
             return ((LibrarySpecification) element).getName();
         }
