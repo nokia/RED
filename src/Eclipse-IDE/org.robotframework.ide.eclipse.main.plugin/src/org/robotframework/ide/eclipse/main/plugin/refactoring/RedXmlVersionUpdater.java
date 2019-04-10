@@ -104,7 +104,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
                 .filter(p -> !RobotProjectConfig.CURRENT_VERSION
                         .equals(p.getRobotProjectConfig().getVersion().getVersion()))
                 .collect(Collectors.toList());
-        if (projectsToUpdate.size() > 0) {
+        if (!projectsToUpdate.isEmpty()) {
             askAndUpdateRedXml(projectsToUpdate);
         }
     }
