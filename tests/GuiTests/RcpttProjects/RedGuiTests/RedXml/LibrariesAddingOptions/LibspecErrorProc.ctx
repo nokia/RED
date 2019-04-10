@@ -5,8 +5,8 @@ Element-Name: LibspecErrorProc
 Element-Type: context
 Element-Version: 2.0
 Id: _VwgyEChbEeiftdZfQXkTXA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 5/23/18 10:50 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/9/19 11:47 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -39,5 +39,4 @@ proc "check-error-for-libspec" [val file_name] [val lib_name] [val path] [val pr
 	    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
 	} -allowStatusDialog
 }
-
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KASD8JISEea_J4BglwdxcA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 2:12 PM
+Save-Time: 4/9/19 5:05 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -82,7 +82,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
     get-item -path "pthRedTest.api.LogLib.LogLib" | get-property "image.path" 
         | equals ".*success_big.png" | verify-true
 }
-
+get-window "Discovering libraries summary" | get-button OK | click
 
 //check if 2 paths were added to red.xml
 get-view "Project Explorer" | get-tree | select "ImportFromSitePkg/red.xml" | double-click
@@ -95,17 +95,17 @@ if [ get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-editor "ImportFromSitePkg/red.xml" | get-section "Libraries" | get-table] {
 	    get-property itemCount | equals 3 | verify-true
 	    get-property "getItems().TableItem[1].getText()" 
-	        | equals [format "pthRedTest.api.LogLib.LogLib - %s/lib/site-packages" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
+	        | equals [format "pthRedTest.api.LogLib.LogLib - %s/lib/site-packages/pthRedTest/api/LogLib.py" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
 	    get-property "getItems().TableItem[0].getText()" 
-	        | equals [format "pthRedTest.api.dump.Dump - %s/lib/site-packages" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
+	        | equals [format "pthRedTest.api.dump.Dump - %s/lib/site-packages/pthRedTest/api/dump.py" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
 	}	
 }-else{
 	with [get-editor "ImportFromSitePkg/red.xml" | get-section "Libraries" | get-table] {
 	    get-property itemCount | equals 3 | verify-true
 	    get-property "getItems().TableItem[1].getText()" 
-	        | equals  "pthRedTest.api.LogLib.LogLib - /usr/lib/python2.7/site-packages" | verify-true
+	        | equals  "pthRedTest.api.LogLib.LogLib - /usr/lib/python2.7/site-packages/pthRedTest/api/LogLib.py" | verify-true
 	    get-property "getItems().TableItem[0].getText()" 
-	        | equals  "pthRedTest.api.dump.Dump - /usr/lib/python2.7/site-packages" | verify-true
+	        | equals  "pthRedTest.api.dump.Dump - /usr/lib/python2.7/site-packages/pthRedTest/api/dump.py" | verify-true
 	}	
 }					
 
@@ -127,21 +127,21 @@ with [get-view Problems | get-tree] {
 if [ get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-view Problems | get-tree] {
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-	        | equals [format "The path %s/lib/site-packages is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
+	        | equals [format "The path %s/lib/site-packages/pthRedTest/api/dump.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
 	            [replace -input $python_exe_path -old "\\" -new "/"]] 
 	        	| verify-true
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
-	        | equals [format "The path %s/lib/site-packages is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
+	        | equals [format "The path %s/lib/site-packages/pthRedTest/api/LogLib.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
 	        	[replace -input $python_exe_path -old "\\" -new "/"]] 
 	        	| verify-true
 	}
 }-else{
 	with [get-view Problems | get-tree] {
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-	        | equals "The path /usr/lib/python2.7/site-packages is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
+	        | equals "The path /usr/lib/python2.7/site-packages/pthRedTest/api/dump.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
 	        	| verify-true
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
-	        | equals "The path /usr/lib/python2.7/site-packages is absolute. RED prefers using workspace-relative paths which makes your projects more portable"| verify-true
+	        | equals "The path /usr/lib/python2.7/site-packages//pthRedTest/api/LogLib.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"| verify-true
 	}
 }	
 
