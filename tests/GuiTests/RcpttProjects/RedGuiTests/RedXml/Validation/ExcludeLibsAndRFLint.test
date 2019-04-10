@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _c2s9wAaSEeiksYLFL8zyCg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 3:17 PM
+Save-Time: 4/10/19 11:36 AM
 Testcase-Type: ecl
 Verifications: _boFGIAagEeiksYLFL8zyCg
 
@@ -178,8 +178,8 @@ with [get-editor "FirstProject/red.xml" | get-section "Excluded project parts" |
 with [get-editor "FirstProject/red.xml"] {
     get-tab-folder | get-tab-item "Libraries" | click
     with [get-section "Libraries" | get-table] {
-        select "add3 - FirstProject\\/libs" | key-type Del
-        select "remove - FirstProject\\/libs" | key-type Del
+       select "add3 - FirstProject\\/libs\\/add3.py" | key-type Del
+       select "remove - FirstProject\\/libs\\/remove.py" | key-type Del
     }
 }
 get-button "Save (M1+S)" | click

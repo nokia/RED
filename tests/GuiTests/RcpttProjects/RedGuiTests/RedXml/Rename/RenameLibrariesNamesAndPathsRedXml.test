@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/8/19 5:30 PM
+Save-Time: 4/10/19 11:51 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,14 +44,15 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject/here_is_class.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
 // close red.xml
 get-view "Project Explorer" | click
 get-editor "red.xml" | close
@@ -68,14 +69,16 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/here_is_classNewName.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
+    
 // close red.xml
 get-view "Project Explorer" | click
 get-editor "red.xml" | close
@@ -109,14 +112,16 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
+    
 // copy library to second project
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/only_function.py" | get-menu Copy | click
@@ -157,14 +162,15 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
 // rename some other file
 get-view "Project Explorer" | get-tree | select "RobotProject/empty_file" | select "RobotProject/empty_file" 
     | get-menu "Rename..." | click
@@ -178,16 +184,18 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
 get-editor "red.xml" | click
 get-view "Project Explorer" | click
 get-editor "red.xml" | close
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
