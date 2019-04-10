@@ -296,6 +296,27 @@ public class RedPreferencesTest {
         assertThat(pref1).isEqualTo(pref2);
     }
 
+    @Test
+    public void launchEnvironmentVariablesAreTakenProperlyFromStore() throws JsonProcessingException {
+        final Map<String, String> input = new LinkedHashMap<>();
+        input.put("VAR_NAME", "some value");
+        input.put("EMPTY", "");
+        input.put("lower", "1234");
+        input.put("CHARACTERS", "~!@#$%^&*()_+`-{}[];':\",./<>?");
+
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES))
+                .thenReturn(new ObjectMapper().writeValueAsString(input));
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getLaunchEnvironmentVariables()).hasSize(4)
+                .containsEntry("VAR_NAME", "some value")
+                .containsEntry("EMPTY", "")
+                .containsEntry("lower", "1234")
+                .containsEntry("CHARACTERS", "~!@#$%^&*()_+`-{}[];':\",./<>?");
+    }
+
     private static <T extends Iterable<?>> Condition<T> containingElementOnlyWhen(final Object element,
             final boolean condition) {
         return new Condition<T>() {

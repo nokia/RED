@@ -21,16 +21,17 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.environment.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.RunConfigurationProvider;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
@@ -43,6 +44,9 @@ public class RobotLaunchConfigurationTest {
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
             RobotLaunchConfiguration.TYPE_ID);
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void nullVariablesArrayIsReturned_whenThereAreNoVariablesDefined() throws Exception {
@@ -90,7 +94,9 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationIsCreated() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
         assertThat(robotConfig.getName()).isEqualTo("Resource");
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
@@ -119,7 +125,9 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
         robotConfig.setRobotArguments("arguments");
         robotConfig.setProjectName(PROJECT_NAME);
@@ -159,9 +167,11 @@ public class RobotLaunchConfigurationTest {
 
         assertThat(robotConfig.isUsingInterpreterFromProject()).isTrue();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
-        assertThat(robotConfig.getInterpreterArguments()).isEqualTo("");
-        assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
-        assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
+        assertThat(robotConfig.getInterpreterArguments()).isEmpty();
+        assertThat(robotConfig.getExecutableFilePath()).isEmpty();
+        assertThat(robotConfig.getExecutableFileArguments()).isEmpty();
+
+        assertThat(robotConfig.getEnvironmentVariables()).contains("PYTHONIOENCODING=utf8");
     }
 
     @Test
@@ -171,22 +181,64 @@ public class RobotLaunchConfigurationTest {
         final List<String> casesForRes1 = asList("case1", "case3");
         final List<String> casesForRes2 = asList("case1");
 
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareForSelectedTestCases(ImmutableMap.of(res1, casesForRes1, res2, casesForRes2));
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths())
                 .isEqualTo(ImmutableMap.of("Resource1", casesForRes1, "Resource2", casesForRes2));
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
-        assertThat(robotConfig.getRobotArguments()).isEqualTo("");
+        assertThat(robotConfig.getRobotArguments()).isEmpty();
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+        assertThat(robotConfig.getInterpreterArguments()).isEmpty();
+        assertThat(robotConfig.getExecutableFilePath()).isEmpty();
+        assertThat(robotConfig.getExecutableFileArguments()).isEmpty();
 
         assertThat(robotConfig.getEnvironmentVariables()).contains("PYTHONIOENCODING=utf8");
+    }
+
+    @Test
+    public void defaultConfigurationObtained_whenDefaultValuesAreDefinedInPreferences() throws Exception {
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "-a -b -c");
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "-d -e -f");
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH, "/path/to/script");
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS, "-g -h -i");
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES, new ObjectMapper()
+                .writeValueAsString(ImmutableMap.of("VAR_1", "some value", "VAR_2", "1234", "EMPTY_VAR", "")));
+
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        assertThat(robotConfig.getName()).isEqualTo("Resource");
+        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
+        assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
+        assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("-d -e -f");
+        assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
+        assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
+        assertThat(robotConfig.getIncludedTags()).isEmpty();
+        assertThat(robotConfig.getExcludedTags()).isEmpty();
+        assertThat(robotConfig.getConfigurationVersion())
+                .isEqualTo(RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
+
+        assertThat(robotConfig.isUsingRemoteAgent()).isFalse();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+
+        assertThat(robotConfig.isUsingInterpreterFromProject()).isTrue();
+        assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+        assertThat(robotConfig.getInterpreterArguments()).isEqualTo("-a -b -c");
+        assertThat(robotConfig.getExecutableFilePath()).isEqualTo("/path/to/script");
+        assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("-g -h -i");
+
+        assertThat(robotConfig.getEnvironmentVariables()).contains("VAR_1=some value", "VAR_2=1234", "EMPTY_VAR=");
     }
 
     @Test
@@ -196,8 +248,8 @@ public class RobotLaunchConfigurationTest {
             final IResource res = projectProvider.getFile("Resource " + i + ".fake");
             resources.add(res);
         }
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final ILaunchConfiguration config = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
         final Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
         assertThat(obtainedSuites).hasSameSizeAs(resources);
         for (int i = 0; i < resources.size(); i++) {
@@ -208,8 +260,8 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void emptySuitesObtained_whenProjectNameIsEmpty() throws CoreException {
         final List<IResource> resources = asList(projectProvider.getFile("Resource 1.fake"));
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final ILaunchConfiguration config = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
         robotConfig.setProjectName("");
         assertThat(robotConfig.collectSuitesToRun()).isEmpty();
     }
@@ -221,9 +273,10 @@ public class RobotLaunchConfigurationTest {
         final IResource unselected1 = projectProvider.getFile("Unselected1");
         final IResource unselected2 = projectProvider.getFile("Unselected2");
 
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareForSelectedTestCases(
+        final ILaunchConfiguration config = RobotLaunchConfiguration.prepareForSelectedTestCases(
                 ImmutableMap.of(res1, asList(), res2, asList(), unselected1, asList(), unselected2, asList()));
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         robotConfig.setUnselectedSuitePaths(newHashSet("Unselected1", "Unselected2"));
 
         assertThat(robotConfig.getSuitePaths()).isEqualTo(ImmutableMap.of("Resource1", asList(), "Resource2", asList(),
@@ -235,13 +288,19 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
-        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         assertThat(robotConfig.getProject()).isEqualTo(projectProvider.getProject());
     }
 
     @Test
     public void whenProjectNotInWorkspace_coreExceptionIsThrown() throws CoreException {
-        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         robotConfig.setProjectName("not_existing");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
@@ -253,7 +312,9 @@ public class RobotLaunchConfigurationTest {
     public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
         projectProvider.getProject().close(null);
 
-        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
                 .withMessage("Project '" + PROJECT_NAME + "' is currently closed")
@@ -262,7 +323,10 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void whenProjectIsEmpty_coreExceptionIsThrown() throws CoreException {
-        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         robotConfig.setProjectName("");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
@@ -272,7 +336,10 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void filePathIsAddedToRobotArguments_whenAskedForRerunWithoutExistingArguments() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
 
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
@@ -282,18 +349,15 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void filePathIsAddedToRobotArguments_whenAskedForRerunWithExistingArguments() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
         robotConfig.setRobotArguments("-a -b -c");
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
 
         assertThat(robotConfig.getRobotArguments()).isEqualTo("-a -b -c -R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
-    }
-
-    private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
-        final IResource res = projectProvider.getFile("Resource");
-        final List<IResource> resources = asList(res);
-        return new RobotLaunchConfiguration(RobotLaunchConfiguration.prepareDefault(resources));
     }
 }
