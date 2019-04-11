@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/25/19 11:24 AM
+Save-Time: 4/11/19 12:39 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -85,49 +85,63 @@ exec-with-options {
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
 //check how looks tree
+get-button Restore -index 1 | click
 
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/lib1.Selenium RobotProject\\/additional libs \\(2\\)" 
-        | get-property caption | equals "lib1.Selenium RobotProject/additional libs (2)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/lib1.Selenium RobotProject\\/additional libs \\(2\\)" 
-        | get-property "getText()" | equals "lib1.Selenium RobotProject/additional libs (2)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/lib1.Selenium RobotProject\\/additional libs \\(2\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals "Do Nothing" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/lib1.Selenium RobotProject\\/additional libs \\(2\\)" 
-        | get-property "getItems().TreeItem[1].getText()" | equals "Do Nothing Again" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property childCount | equals 3 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals Add | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[1].getText()" | equals Multiply | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[2].getText()" | equals Subtract | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property childCount 
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Do Nothing" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "Do Nothing Again" 
+        | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "lib1.Selenium RobotProject/additional libs/lib1.py (2)" | verify-true
+        
+        
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItems().length" 
         | equals 3 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals Add | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" 
-        | get-property "getItems().TreeItem[1].getText()" | equals Multiply | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" 
-        | get-property "getItems().TreeItem[2].getText()" | equals Subtract | verify-true
-
-    get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" 
-        | get-property "styles[0].foregroundColor" | equals "#957D47" | verify-true
-
-    get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals Mulitply | verify-true
-       
-
-    get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" | get-property childCount 
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Add | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals Multiply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[2].getText()" | equals Subtract | verify-true
+        
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "liby RobotProject/generated_libspec/liby.xml (3)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals Add | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[2].getItems().TreeItem[1].getText()" | equals Multiply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[2].getItems().TreeItem[2].getText()" | equals Subtract | verify-true
+        
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "liby RobotProject/libs/liby.py (3)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[3].getItems().TreeItem[0].getText()" | equals Mulitply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "multiply RobotProject/multiply.py (1)" | verify-true
+        
+        
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getItems().length" 
         | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals "Sum Two Di" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[4].getItems().TreeItem[0].getText()" | equals "Sum Two Di" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "sum RobotProject/libs/sum.py (1)" | verify-true
+        
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getText()" 
+        | equals "Robot Referenced libraries" | verify-true
 }
-
+//check color
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/Robot Referenced libraries/multiply RobotProject\\/multiply.py \\(1\\)"
+        | get-property "styles[0].foregroundColor" | equals "#957D47" | verify-true
+}
 //remove few files
 with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
-    select  "lib1.Selenium - RobotProject\\/additional libs"
+    select "lib1.Selenium - RobotProject\\/additional libs\\/lib1.py" | key-type Del
     key-type Del
     key-type "M1+s"
 }
@@ -137,7 +151,7 @@ set-dialog-result File "platform:/resource/RobotProject/libs/sum.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //chec if it is not dirty
-get-tab-folder -index 0 | get-property activePage | equals "RobotProject/red.xml" | verify-true
+get-tab-folder -index 1 | get-property activePage | equals "RobotProject/red.xml" | verify-true
 
 //add file with class name as file
 get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
@@ -163,37 +177,57 @@ set-dialog-result File "platform:/resource/RobotProject/empty.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
-get-editor "RobotProject/red.xml" | minimize
 
 //check project expolorer
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 7 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/DefaultLib RobotProject\\/classes \\(1\\)/Nirvana" 
-        | get-property index | equals 0 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/empty RobotProject \\(0\\)" | get-property childCount | equals 0 
-        | verify-true
-    get-item "RobotProject/Robot Referenced libraries/FileNOTAsClassName RobotProject\\/classes \\(0\\)" 
-        | get-property childCount | equals 0 | verify-true
-}
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property childCount | equals 3 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[0].getText()" | equals Add | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[1].getText()" | equals Multiply | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
-        | get-property "getItems().TreeItem[2].getText()" | equals Subtract | verify-true
-}
-with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property index | equals 4 
-        | verify-true
-    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property childCount 
-        | equals 3 | verify-true
-}
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
 
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" | get-property childCount 
-    | equals 1 | verify-true
-    
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().length" | equals 7 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
+        | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Nirvana | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "DefaultLib RobotProject/classes/DefaultLib.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "empty RobotProject/empty.py (0)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItemCount()" 
+        | equals 0 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "FileNOTAsClassName RobotProject/classes/FileNOTAsClassName.py (0)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[3].getItems().length" 
+        | equals 3 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[3].getItems().TreeItem[0].getText()" | equals Add | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[3].getItems().TreeItem[1].getText()" | equals Multiply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[3].getItems().TreeItem[2].getText()" | equals Subtract | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "liby RobotProject/generated_libspec/liby.xml (3)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getItems().length" 
+        | equals 3 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[4].getItems().TreeItem[0].getText()" | equals Add | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[4].getItems().TreeItem[1].getText()" | equals Multiply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[4].getItems().TreeItem[2].getText()" | equals Subtract | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "liby RobotProject/libs/liby.py (3)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[5].getItems().length" 
+        | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[5].getItems().TreeItem[0].getText()" | equals Mulitply | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "multiply RobotProject/multiply.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[6].getItems().length" 
+        | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[6].getItems().TreeItem[0].getText()" | equals "Sum Two Di" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[6].getText()" 
+        | equals "sum RobotProject/libs/sum.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getText()" 
+        | equals "Robot Referenced libraries" | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
