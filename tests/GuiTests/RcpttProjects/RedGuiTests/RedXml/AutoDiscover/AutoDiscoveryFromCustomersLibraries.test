@@ -7,12 +7,20 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ueh6UCC5EemEjfjIU9tmyw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 11:45 AM
+Save-Time: 4/11/19 5:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+// install:
+//  1. pip install pymouse
+//     a) for linux: yum install  python-xlib	
+//  2. pip install pypiwin32  - only works on windows
+//  3. pip install pandas
+
+
 
 proc "check-referenced-libs"{
 	with [get-view "Project Explorer" | get-tree] {
@@ -21,10 +29,19 @@ proc "check-referenced-libs"{
 	        | get-property enablement | equals false | verify-true
 	    get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py \\(1\\)" 
 	        | get-property enablement | equals false | verify-true
-	    get-item 
-	        -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(1\\)" 
-	        | get-property enablement | equals false | verify-true
+
 	    get-item -path "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py \\(1\\)" 
+	        | get-property enablement | equals false | verify-true
+	}
+	// lib is only for windows
+	if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
+		get-view "Project Explorer" | get-tree | get-item 
+		    -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(1\\)" 
+		    | get-property enablement | equals false | verify-true
+	    
+	}-else{
+		get-view "Project Explorer" | get-tree | get-item 
+	        -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(non-accessible\\)"
 	        | get-property enablement | equals false | verify-true
 	}
 }
@@ -80,6 +97,9 @@ get-view "Project Explorer" | get-tree | select "SpecialLibs/test.robot" | get-m
 get-window "Discovering libraries summary" | get-button OK | click
 
 //save red.xml and check Libdocks
+get-editor "SpecialLibs/red.xml" | get-section Libraries | get-table 
+    | get-item ".*" -index 0 | click
+    
 get-button "Save All (M1+M2+S)" | click
 check-referenced-libs
 
