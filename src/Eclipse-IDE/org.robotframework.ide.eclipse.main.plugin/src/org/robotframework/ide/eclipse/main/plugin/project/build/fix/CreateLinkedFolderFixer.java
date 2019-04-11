@@ -11,9 +11,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -28,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class CreateLinkedFolderFixer implements IMarkerResolution {
 
     private final String absoluteResourcePath;
+
     private final String resourcePath;
 
     public CreateLinkedFolderFixer(final String absolutePath, final String path) {
@@ -46,44 +49,40 @@ public class CreateLinkedFolderFixer implements IMarkerResolution {
 
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                return executeCreateFolderOperation(monitor, marker);
+                return executeCreateFolderOperation(marker.getResource(), monitor);
             }
         };
         job.schedule();
     }
 
     @VisibleForTesting
-    IStatus executeCreateFolderOperation(final IProgressMonitor monitor, final IMarker marker) {
+    IStatus executeCreateFolderOperation(final IResource resource, final IProgressMonitor monitor) {
         final File resourceFile = new File(absoluteResourcePath);
-        final URI linkTargetPath = URI.create(addFileSchemeToPath(resourceFile.getParent().replace("\\", "/")));
-        final IPath suitePath = marker.getResource().getParent().getFullPath();
-        final IFolder newFolderHandle = createFolderHandle(resourceFile, marker, suitePath, "");
+        final IWorkspaceRoot root = resource.getWorkspace().getRoot();
+        final IPath suitePath = resource.getParent().getFullPath();
+        final IFolder folderHandle = createFolderHandle(resourceFile, root, suitePath, "");
+        final URI linkLocation = resourceFile.getParentFile().toURI();
 
-        AbstractOperation operation = new CreateFolderOperation(newFolderHandle, linkTargetPath, "New Folder");
+        final IUndoableOperation operation = new CreateFolderOperation(folderHandle, linkLocation, "New Folder");
         try {
             operation.execute(monitor, null);
             return Status.OK_STATUS;
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             return Status.CANCEL_STATUS;
         }
     }
 
-    private static IFolder createFolderHandle(final File currentFile, final IMarker marker,
-            final IPath suitePath, final String folderName) {
-        final String parentContainerName = getParentContainer(currentFile).getName();
+    private static IFolder createFolderHandle(final File currentFile, final IWorkspaceRoot root, final IPath suitePath,
+            final String folderName) {
+        final String parentContainerName = currentFile.getParentFile().getName();
         final String newFolderName = createNewFolderName(folderName, parentContainerName);
         final IPath newFolderPath = suitePath.append(newFolderName);
-        final IFolder newFolderHandle = marker.getResource().getWorkspace().getRoot().getFolder(newFolderPath);
+        final IFolder newFolderHandle = root.getFolder(newFolderPath);
         if (newFolderHandle.exists()) {
-            final File nextParent = parentContainerName.isEmpty() ? currentFile
-                    : getParentContainer(currentFile);
-            return createFolderHandle(nextParent, marker, suitePath, newFolderName);
+            final File nextParent = parentContainerName.isEmpty() ? currentFile : currentFile.getParentFile();
+            return createFolderHandle(nextParent, root, suitePath, newFolderName);
         }
         return newFolderHandle;
-    }
-
-    private static File getParentContainer(final File file) {
-        return new File(file.getParent());
     }
 
     private static String createNewFolderName(final String folderName, final String parentContainerName) {
@@ -102,9 +101,5 @@ public class CreateLinkedFolderFixer implements IMarkerResolution {
             return matcher.group(1) + "(" + newSuffix + ")";
         }
         return folderName + "(1)";
-    }
-
-    private static String addFileSchemeToPath(final String path) {
-        return "file:/" + path;
     }
 }
