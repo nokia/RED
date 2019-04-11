@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _rKHzEC1_EeanG46zhUFEYg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 3:21 PM
+Save-Time: 4/11/19 12:14 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -57,7 +57,7 @@ set-dialog-result File "platform:/resource/a/b.py"
 get-editor "a/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-editor "a/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
-get-view "Project Explorer" | get-tree | get-item "a/Robot Referenced libraries/b a \\(1\\)/Test" 
+get-view "Project Explorer" | get-tree | get-item -path "a/Robot Referenced libraries/b a\\/b.py \\(1\\)/Test" 
     | get-property caption | equals Test | verify-true
     
 //remove project from disc    
@@ -101,9 +101,8 @@ get-editor "a/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
 //check if new libspec was generated
 wait 3000
-get-view "Project Explorer" | get-tree | get-item "a/Robot Referenced libraries/b a \\(1\\)/Lol" 
+get-view "Project Explorer" | get-tree | get-item -path "a/Robot Referenced libraries/b a\\/b.py \\(1\\)/Lol" 
     | get-property caption | equals Lol | verify-true
-
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

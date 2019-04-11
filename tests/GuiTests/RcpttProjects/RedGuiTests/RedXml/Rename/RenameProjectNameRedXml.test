@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Y5c34CjREeeF0_hmqEfhuQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 4:36 PM
+Save-Time: 4/11/19 2:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,9 +21,11 @@ with [get-view "Project Explorer" | get-tree] {
 }
 // verify if library is in Robot Referenced libraries
 get-window "Select library class" | get-table | select "here_is_class" | click -default
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/here_is_class RobotProject \\(0\\)" | get-property caption 
-    | equals "here_is_class RobotProject (0)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/here_is_class RobotProject\\/here_is_class.py \\(0\\)" 
+    | get-property "getText()" | equals "here_is_class RobotProject/here_is_class.py (0)" | verify-true
+    
+    
 // verify red.xml if name of project is correct for added library
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
     | get-menu "Open With/Text Editor" | click
@@ -54,9 +56,10 @@ with [get-view "Project Explorer" | get-tree] {
     select RobotProjectNewName | double-click
     select "RobotProjectNewName/Robot Referenced libraries" | double-click
 }
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProjectNewName/Robot Referenced libraries/here_is_class RobotProjectNewName \\(0\\)" 
-    | get-property caption | equals "here_is_class RobotProjectNewName (0)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProjectNewName/Robot Referenced libraries/here_is_class RobotProjectNewName\\/here_is_class.py \\(0\\)" 
+    | get-property "getText()" | equals "here_is_class RobotProjectNewName/here_is_class.py (0)" | verify-true
+    
 // verify red.xml if name of project is correct for added library
 get-view "Project Explorer" | get-tree | select "RobotProjectNewName/red.xml" | get-menu "Open With/Text Editor" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
@@ -127,8 +130,8 @@ get-eclipse-window | key-type "M1+s"
 wait 300
 // verify no Problmems after save changed red.xml
 get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProjectNewNameNew/Robot Referenced libraries/here_is_class RobotProjectNewNameNew \\(0\\)" 
-    | get-property caption | equals "here_is_class RobotProjectNewNameNew (0)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProjectNewNameNew/Robot Referenced libraries/here_is_class RobotProjectNewNameNew\\/here_is_class.py \\(0\\)" 
+    | get-property "getText()" | equals "here_is_class RobotProjectNewNameNew/here_is_class.py (0)" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

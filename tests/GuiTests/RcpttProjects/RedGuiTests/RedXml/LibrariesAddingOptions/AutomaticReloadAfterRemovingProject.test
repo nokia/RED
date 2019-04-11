@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fGM4sOxZEeWqTNBmS5Gi4w
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 2:42 PM
+Save-Time: 4/11/19 3:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,9 +41,10 @@ wait-for-disapearing_progressbar
 wait-for-collapsing_explorer
 
 //see if new value is in PE
-get-view "Project Explorer" | get-tree 
-    | get-item "RemovingProject/Robot Referenced libraries/file1 RemovingProject \\(1\\)/Sum 2" | get-property index 
-    | equals 0 | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RemovingProject/Robot Referenced libraries/file1 RemovingProject\\/file1.py \\(1\\)/Sum 2" 
+    | get-property index | equals 0 | verify-true
+    
 get-view "Project Explorer" | get-tree | select "SecondProject/file2.py" | select "SecondProject/file2.py" 
     | get-menu "Open With/Text Editor" | click
 
@@ -57,9 +58,9 @@ with [get-editor "file2.py" | get-text-viewer] {
 wait-for-disapearing_progressbar
 
 //check PE
-get-view "Project Explorer" | get-tree 
-    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 2" | get-property index 
-    | equals 0 | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "SecondProject/Robot Referenced libraries/file2 SecondProject\\/file2.py \\(1\\)/Multiply 2" 
+    | get-property index | equals 0 | verify-true
     
 //delete first project    
 with [get-view "Project Explorer" | get-tree] {
@@ -86,15 +87,12 @@ with [get-editor "file2.py" | get-text-viewer] {
 wait-for-disapearing_progressbar
 
 //check if new lib was generated
-get-view "Project Explorer" | get-tree 
-    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 3" | get-property index 
-    | equals 0 | verify-true
-    
-    
+get-view "Project Explorer" | get-tree | get-item 
+    -path "SecondProject/Robot Referenced libraries/file2 SecondProject\\/file2.py \\(1\\)/Multiply 3" 
+    | get-property index | equals 0 | verify-true
     
     
 //add the same project as was removed
-
 get-view "Project Explorer" | get-tree | select SecondProject | get-menu "New/Robot Project" | click
 with [get-window "New Robot project"] {
     get-editbox -after [get-label "Project name:"] | set-text RemovingProject
@@ -127,14 +125,17 @@ get-editor "RemovingProject/red.xml" | get-section Libraries | get-table | key-t
 wait-for-disapearing_progressbar
 
 //check if new lib is in PE
-get-view "Project Explorer" | get-tree 
-    | get-item "RemovingProject/Robot Referenced libraries/file1 RemovingProject \\(1\\)/New Fun" | get-property index 
-    | equals 0 | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RemovingProject/Robot Referenced libraries/file1 RemovingProject\\/file1.py \\(1\\)/New Fun" 
+    | get-property index | equals 0 | verify-true
+   
     
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RemovingProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-    get-item "RemovingProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
-        | equals 1 | verify-true
+    get-item -path "RemovingProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "file1 RemovingProject/file1.py (1)" | verify-true
+    get-item -path "RemovingProject/Robot Referenced libraries" | get-property "getText()" 
+        | equals "Robot Referenced libraries" | verify-true
 }
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

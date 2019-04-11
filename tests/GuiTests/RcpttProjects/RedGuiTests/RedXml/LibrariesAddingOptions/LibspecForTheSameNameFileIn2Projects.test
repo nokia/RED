@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _zjQ2cB69Eee9TPFQf7JN1Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/11/17 11:46 AM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/11/19 3:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -50,12 +50,14 @@ with [get-view "Project Explorer" | get-tree] {
     select "Abc/sum.py" | get-menu "Robot Framework/Add Library to red.xml" | click
 }
 //check if were generated
-with [get-view "Project Explorer" | get-tree] {
-    get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Fun 1" | get-property index | equals 0 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar" | get-property index | equals 0 
-        | verify-true
-}
-
+get-view "Project Explorer" | get-tree | get-item -path "Abc/Robot Referenced libraries/sum Abc\\/sum.py \\(1\\)/Fun 1" 
+    | get-property index | equals 0 | verify-true
+    
+ 
+ get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/sum RobotProject\\/sum.py \\(1\\)/Bar" | get-property index 
+    | equals 0 | verify-true
+       
 //change first lib - chnage function name (foo)
 with [get-editor "sum.py" | get-text-viewer] {
     set-caret-pos 1 9
@@ -64,10 +66,10 @@ with [get-editor "sum.py" | get-text-viewer] {
     key-type "M1+s"
 }
 //check if was updated
-get-view "Project Explorer" | get-tree | get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Foo" 
+get-view "Project Explorer" | get-tree | get-item -path "Abc/Robot Referenced libraries/sum Abc\\/sum.py \\(1\\)/Foo" 
     | get-property index | equals 0 | verify-true
 get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar" | get-property index | equals 0 
+    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/sum.py \\(1\\)/Bar" | get-property index | equals 0 
     | verify-true
     
 //change second library    
@@ -79,10 +81,11 @@ with [get-editor "sum.py" -index 1] {
         key-type "M1+s"
     }
 }
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar 2" | get-property index | equals 0 
-    | verify-true
-get-view "Project Explorer" | get-tree | get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Foo" 
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/sum RobotProject\\/sum.py \\(1\\)/Bar 2" | get-property index 
+    | equals 0 | verify-true
+    
+get-view "Project Explorer" | get-tree | get-item -path "Abc/Robot Referenced libraries/sum Abc\\/sum.py \\(1\\)/Foo" 
     | get-property index | equals 0 | verify-true
     
     

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8paAQNFwEeWl7fLmvSqX3Q
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 11:26 AM
+Save-Time: 4/11/19 12:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,9 +23,9 @@ get-view "Project Explorer" | get-tree | select "RobotProject/multiply.py"
 get-tab-folder -index 1 | get-property tabCount | equals 0 | verify-true
 
 //check that libspec was generated
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" | get-property caption 
-    | equals "multiply RobotProject (1)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/multiply RobotProject\\/multiply.py \\(1\\)" | get-property caption 
+    | equals "multiply RobotProject/multiply.py (1)" | verify-true
     
 //open file and check that file was added    
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click

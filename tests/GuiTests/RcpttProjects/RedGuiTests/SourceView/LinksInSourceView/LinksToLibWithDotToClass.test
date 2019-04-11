@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _WZVa8LkvEeWzhqlyblQz1g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 2:23 PM
+Save-Time: 4/11/19 3:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,9 +46,9 @@ get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type
 
 // check if libdoc is generated
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs \\(2\\)" 
+    get-item "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs\\/lib1.py (2)" 
         | get-property "getItems().TreeItem[0].getText()" | equals "Do Nothing" | verify-true
-    get-item "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs \\(2\\)" 
+    get-item  "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs\\/lib1.py (2)"
         | get-property "getItems().TreeItem[1].getText()" | equals "Do Nothing Again" | verify-true
 }
 
