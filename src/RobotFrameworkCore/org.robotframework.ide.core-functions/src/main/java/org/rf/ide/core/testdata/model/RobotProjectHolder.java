@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +33,8 @@ public class RobotProjectHolder {
 
     private RobotProjectConfig currentConfiguration;
 
-    private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
+    // files may be parsed in several threads
+    private final List<RobotFileOutput> readableProjectFiles = Collections.synchronizedList(new ArrayList<>());
 
     private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
 
@@ -140,10 +142,6 @@ public class RobotProjectHolder {
         readableProjectFiles.remove(robotOutput);
     }
 
-    public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
-        return robotOutput != null && shouldBeLoaded(robotOutput.getProcessedFile());
-    }
-
     public boolean shouldBeLoaded(final File file) {
         final RobotFileOutput foundFile = findFileByName(file);
         return foundFile == null || file.lastModified() != foundFile.getLastModificationEpochTime();
@@ -169,8 +167,7 @@ public class RobotProjectHolder {
                 && robotFile.getProcessedFile().getAbsolutePath().equals(file.getAbsolutePath()));
     }
 
-    @VisibleForTesting
-    RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
+    private RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
         return readableProjectFiles.stream().filter(criteria).findFirst().orElse(null);
     }
 }
