@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: https://jira3.int.net.nokia.com/projects/RED/issues/RED-1060
 Id: _aCLYsB0wEeirJIfaEnmyJw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 5:00 PM
+Save-Time: 4/11/19 11:10 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -61,18 +61,14 @@ get-view "Project Explorer" | get-tree | get-item -path "Lib/Robot Referenced li
 
 //first doesn't have children
 get-view "Project Explorer" | get-tree | get-item 
-    -path "Lib/Robot Referenced libraries/moduleLib.api Lib\\/libraries \\(0\\)" | get-property childCount | equals 0 
-    | verify-true
+    -path "Lib/Robot Referenced libraries/moduleLib.api Lib\\/libraries\\/moduleLib\\/__init__.py \\(0\\)" 
+    | get-property childCount | equals 0 | verify-true
     
 //one kw    
 with [get-view "Project Explorer" | get-tree] {
-    get-item -path "Lib/Robot Referenced libraries/moduleLib.api Lib\\/libraries \\(0\\)" 
-        | get-property "getItems().length" | equals 0 | verify-true
-        
-    //    
-    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries \\(1\\)" 
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib\\/newlib.py \\(1\\)" 
         | get-property "getItems().length" | equals 1 | verify-true
-    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries \\(1\\)" 
+    get-item -path "Lib/Robot Referenced libraries/moduleLib.newlib Lib\\/libraries\\/moduleLib\\/newlib.py \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals Keyword | verify-true
 }
 

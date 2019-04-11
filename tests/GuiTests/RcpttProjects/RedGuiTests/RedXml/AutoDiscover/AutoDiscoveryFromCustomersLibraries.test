@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ueh6UCC5EemEjfjIU9tmyw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/15/19 10:23 AM
+Save-Time: 4/11/19 11:45 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,19 +16,15 @@ Entry-Name: .content
 
 proc "check-referenced-libs"{
 	with [get-view "Project Explorer" | get-tree] {
-	    get-item  -path "SpecialLibs/Robot Referenced libraries/JSONLibrary .*\\/site-packages \\(6\\)" 
+	    get-item 
+	        -path "SpecialLibs/Robot Referenced libraries/JSONLibrary .*site-packages\\/JSONLibrary\\/__init__.py \\(6\\)" 
 	        | get-property enablement | equals false | verify-true
-	    
-	    get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs \\(1\\)" 
+	    get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py \\(1\\)" 
 	        | get-property enablement | equals false | verify-true
-	
-		get-item  -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs \\(1\\)/Keyword 1" 
-		    | get-property enablement | equals false | verify-true
-	
-	    get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs \\(1\\)/Keyword 2" 
+	    get-item 
+	        -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(1\\)" 
 	        | get-property enablement | equals false | verify-true
-	        
-	    get-item -path "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs \\(1\\)/Keyword 3" 
+	    get-item -path "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py \\(1\\)" 
 	        | get-property enablement | equals false | verify-true
 	}
 }

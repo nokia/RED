@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 11:47 AM
+Save-Time: 4/11/19 11:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,9 +47,9 @@ get-editor "RobotProject/red.xml" | close
 
 
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
         | get-property childCount | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals Sum | verify-true
 }
 
@@ -67,11 +67,13 @@ with [get-editor "SumTwoDigits.py"] {
 
 //reload lib and check if keyword name was changed
 get-view "Project Explorer" | get-tree 
-    | select "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs (1)" | get-menu Reload | click
+    | select "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py (1)" 
+    | get-menu -path Reload | click
+    
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
         | get-property childCount | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
 }
 
@@ -93,11 +95,12 @@ get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced
 //check if kw doc was removed
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "SumTwoDigits RobotProject/libs (0)" | verify-true
 }
 
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(0\\)" 
+    | get-property index | equals 0 | verify-true
+    
 //revert removing
 with [get-editor "SumTwoDigits.py" | get-text-viewer] {
     key-type "M1+z"
@@ -105,13 +108,11 @@ with [get-editor "SumTwoDigits.py" | get-text-viewer] {
 }
 
 //now kw has doc
-get-view "Project Explorer" | get-tree | select "RobotProject/Robot Referenced libraries"
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItemCount()" 
-        | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "SumTwoDigits RobotProject/libs (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
+        | get-property childCount | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
 }
 
 //add new lib, that will be created
@@ -167,21 +168,26 @@ with [get-view "Project Explorer" | get-tree] {
     
     get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
         | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "here_is_class.Animal RobotProject (1)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
-        | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" 
-        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Zebra | verify-true
-        
-        
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "SumTwoDigits RobotProject/libs (1)" | verify-true
+}
 
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItems().length" 
-        | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" 
-        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
+with [get-view "Project Explorer" | get-tree] {
+    get-item 
+        -path "RobotProject/Robot Referenced libraries/here_is_class.Animal RobotProject\\/here_is_class.py \\(1\\)" 
+        | get-property "getText()" | equals "here_is_class.Animal RobotProject/here_is_class.py (1)" | verify-true
+    get-item 
+        -path "RobotProject/Robot Referenced libraries/here_is_class.Animal RobotProject\\/here_is_class.py \\(1\\)" 
+        | get-property "getItems().length" | equals 1 | verify-true
+    get-item 
+        -path "RobotProject/Robot Referenced libraries/here_is_class.Animal RobotProject\\/here_is_class.py \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals Zebra | verify-true
+        
+    // Sum    
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
+        | get-property "getText()" | equals "SumTwoDigits RobotProject/libs/SumTwoDigits.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
+        | get-property "getItems().length" | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs\\/SumTwoDigits.py \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
 }
 
 //removed added class

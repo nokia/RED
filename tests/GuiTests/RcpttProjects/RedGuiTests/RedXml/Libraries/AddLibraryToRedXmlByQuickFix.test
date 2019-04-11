@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 11:56 AM
+Save-Time: 4/10/19 4:15 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -50,19 +50,15 @@ with [get-window "Quick Fix"] {
     
 wait-for-loading-red-xml "RobotProject/red.xml" 
 //check libspec
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file\\/empty.py (0)"
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "empty RobotProject/empty_file (0)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
-        | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file\\/empty.py \\(0\\)" 
+        | get-property childCount | equals 0 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
 }
-get-view "Project Explorer" | get-tree 
-    | select "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file (0)"
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
-    | get-property childCount | equals 0 | verify-true
-    
+
+
 //check red.xml    
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
@@ -105,15 +101,16 @@ try -times 5 -delay 1000 -command{
 get-button "Save All (M1+M2+S)" | click
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 2 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "empty RobotProject/empty_file (0)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "only_function RobotProject (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file\\/empty.py \\(0\\)" 
+        | get-property index | equals 0 | verify-true
+        
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py \\(1\\)" 
+        | get-property index | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py \\(1\\)" 
+        | get-property "getItems().length" | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals News | verify-true
 }
-//check if libspec for only_function was generated
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
-    | get-property "getItems().TreeItem[0].getText()" | equals News | verify-true
 
 //use QF on file name (now path where suite is is added to PYTHONPATH)
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
@@ -159,9 +156,9 @@ get-window Clean | get-button $OK_Clean_button | click
 
 
 with [get-view "Project Explorer" | get-tree] {
-    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file\\/empty.py \\(0\\)" 
         | get-property "getExpanded()" | equals false | verify-true
-    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py \\(1\\)" 
         | get-property "getExpanded()" | equals true | verify-true
 }
 
@@ -203,36 +200,39 @@ try -times 8 -delay 1000 -command{
 
 //check if tree is expand in one case - RED-999
 with [get-view "Project Explorer" | get-tree] {
-    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file\\/empty.py \\(0\\)" 
         | get-property "getExpanded()" | equals false | verify-true
-    get-item -path "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject\\/here_is_class.py (1)"
         | get-property "getExpanded()" | equals false | verify-true
-    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py (1)"
         | get-property "getExpanded()" | equals true | verify-true
 }
 
 //check libspeck
 get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+    | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject\\/here_is_class.py (1)"
     | get-property "getItems().length" | equals 1 | verify-true
 
 get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+    | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject\\/only_function.py (1)"
     | get-property "getItems().length" | equals 1 | verify-true
            
+           
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "empty RobotProject/empty_file (0)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" 
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "empty RobotProject/empty_file/empty.py (0)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "here_is_class.Cat RobotProject/here_is_class.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItems().length" 
+        | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
         | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals Garfield | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "here_is_class.Cat RobotProject (1)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" 
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "only_function RobotProject/only_function.py (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getItems().length" 
+        | equals 1 | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" 
         | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals News | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "only_function RobotProject (1)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
-        | verify-true
 }
 
 //add here_is_class.DOG
@@ -273,7 +273,6 @@ try -times 8 -delay 1000 -command{
 	    get-property "getItems().TableItem[3].getText()" | equals "here_is_class.Dog - RobotProject/here_is_class.py" | verify-true
 	    get-property "getItemCount()" | equals 5 | verify-true
 	}
-
 }
 
 get-button "Save \((Ctrl|M1)\+S\)" | click
