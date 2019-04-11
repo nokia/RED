@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 1:54 PM
+Save-Time: 4/10/19 3:00 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -73,15 +73,20 @@ wait-for-zero-items -times 5 -delay 1000
 
 // check if libspec is generated from CalculatorLibrary
 with [get-view "Project Explorer" | get-tree] {
-    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
-        | get-property caption | equals "CalculatorLibrary ProjectWithResource/external_lib (4)" | verify-true
-    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+    get-item 
+        -path "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib\\/CalculatorLibrary.py \\(4\\)" 
+        | get-property "getItems().length" | equals 4 | verify-true
+    get-item 
+        -path "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib\\/CalculatorLibrary.py \\(4\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals "Push Button" | verify-true
-    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+    get-item 
+        -path "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib\\/CalculatorLibrary.py \\(4\\)" 
         | get-property "getItems().TreeItem[1].getText()" | equals "Push Buttons" | verify-true
-    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+    get-item 
+        -path "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib\\/CalculatorLibrary.py \\(4\\)" 
         | get-property "getItems().TreeItem[2].getText()" | equals "Result Should Be" | verify-true
-    get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
+    get-item 
+        -path "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib\\/CalculatorLibrary.py \\(4\\)" 
         | get-property "getItems().TreeItem[3].getText()" | equals "Should Cause Error" | verify-true
 }
 

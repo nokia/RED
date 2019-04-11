@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 4:46 PM
+Save-Time: 4/10/19 4:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -161,9 +161,9 @@ get-view "Project Explorer" | get-tree | select "RobotProject/resources"
 // verify if res1 is added
 get-window "Discovering libraries summary" | get-tree | get-item res1 | get-property caption | equals res1 | verify-true
 get-window "Discovering libraries summary" | get-button OK | click
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
-    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource\\/res1.py \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource/res1.py (1)" | verify-true
     
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
@@ -182,9 +182,9 @@ wait-for-discover-window
 get-window "Discovering libraries summary" | get-button OK | click
 
 // verify if res1 is added
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
-    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource\\/res1.py \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource/res1.py (1)" | verify-true
     
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
@@ -205,9 +205,10 @@ get-editor "RobotProject/red.xml" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
 get-window "Discovering libraries summary" | get-button OK | click
+
 // verify if res1 is added
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
-    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource\\/res1.py \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource/res1.py (1)" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
