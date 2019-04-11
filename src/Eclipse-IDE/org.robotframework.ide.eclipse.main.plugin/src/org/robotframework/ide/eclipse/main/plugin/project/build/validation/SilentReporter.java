@@ -24,4 +24,9 @@ class SilentReporter extends ValidationReportingStrategy {
         // this reporter will not report anything; this is used for general settings suite/test setups which are
         // validated elsewhere but here they may introduce new variables
     }
+
+    @Override
+    protected void checkMode() {
+        // this can run even in headless
+    }
 }
