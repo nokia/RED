@@ -2,47 +2,47 @@
 ## Building from sources
 
 ### Prerequisites
-- maven installed
-- network connection to allow maven to fetch updartes from Eclipse's update sites
-- python to execute RedReleaseVersionUpdater.py which updates version number of packages for proper dependency management
-- Xvfb for some unit tests, this can be bypassed by commenting/removing sections ```<reporting>``` and ```<module>../org.robotframework.ide.eclipse.main.plugin.tests</module> ``` in src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.buildParent/pom.xml 
+- Eclipse for RCP and RAP Developers
+- JDK 1.8+
+- Python 2.7+ or Python 3.4+
+- Following modules installed with pip
+	- robotframework
+	- unittest-xml-reporting
+ 
+### Eclipse settings
+- Set JDK 1.8+ as default (```Windows → Preferences → Java → Installed JREs```)
+- Check network connection, if needed define proxy servers in
+	- Eclipse preferences (```Windows → Preferences → General → Network Connections```)
+	- Maven settings.xml file (```Windows → Preferences → Maven → User Settings```)
 
-### Setup
-- source should be under src folder (just like in git repo)
-- copy PMD files (misc/scripts/building/PMD) to src/PMD folder
-- copy findbugs file (misc/scripts/building/findbugs) to src/findbugs folder
-- copy RedReleaseVersionUpdater.py (misc/scripts/building/RedReleaseVersionUpdater.py) to parent of src 
+### Project setup
+- Clone RED repository
+- Import to workspace all Eclipse project from RED/src folder (```File →  Import →  General →  Existing Projects into Workspace```)
+- Setup Maven plugin connectors
+	- Use Quick Fix (Ctrl+1) on marker with message starting from "Plugin execution not covered by lifecycle configuration"
+	- Use option "Select All" to select all pom.xml files
+	- Use option "Discover new m2e connectors" to install connectors
+	- After Eclipse restart Maven updates all projects
+	- Revert all changes in RED repository made by Maven update
 
-Folder structure should look as follows:
-```
-RedReleaseVersionUpdater.py
-src/Eclipse-IDE
-src/findbugs
-src/PMD
-src/RobotFrameworkCore
-```
-If you need to change it, check folder dependencies in maven poms and RedReleaseVersionUpdater.py
+### Product building
+- Run maven clean install with appropriate eclipse.version parameter on:
+	- org.robotframework.ide.eclipse.parent
+	- org.robotframework.ide.eclipse.product.feature.buildParent
+	- org.robotframework.ide.eclipse.product.feature.build
+	- org.robotframework.ide.eclipse.main.feature.buildParent
+	- org.robotframework.ide.eclipse.main.feature.build
+	- org.robotframework.ide.eclipse.product.product
+	- org.robotframework.ide.eclipse.main.feature.update-site
+- Clean all projects (```Project → Clean → Clean all projects```)
+- Run org.robotframework.ide.eclipse.product.plugin as Eclipse Application selecting org.robotframework.red as product to run
+- Binaries can be found under
+	- src/Eclipse-IDE/org.robotframework.ide.eclipse.product.product/target/products/
+	- src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.build/target/
 
-### Building
-Execut commands in partent to src,assign proper values to variables (*eclipseVersion* can hold string Oxygen number *version* should be in notation x.x.x)  
-
-```
-eclipseVersion=mars
-version=0.6.5
-
-python "RedReleaseVersionUpdater.py" --start-dir "dir=src/Eclipse-IDE" newVersion=$version
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.parent/pom.xml -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.product.feature.buildParent/pom.xml -Dcore.functions.dir=../../../src/RobotFrameworkCore -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.product.feature.build/pom.xml -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.buildParent/pom.xml -Dcore.functions.dir=../../../src/RobotFrameworkCore -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.build/pom.xml -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.product.product/pom.xml -Declipse.version=$eclipseVersion
-mvn clean install site -f src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.update-site/pom.xml -Declipse.version=$eclipseVersion
-```
-
-
-### Binaries
-Binaries can be found under
--  src/Eclipse-IDE/org.robotframework.ide.eclipse.product.product/target/products/
--  src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.build/target/
-
+### Remarks
+- org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar can be copied from src/RobotFrameworkCore/org.robotframework.ide.core-functions/target to src/Eclipse-IDE/org.robotframework.ide.eclipse.main.plugin/lib to avoid rebuilding all after changes in core
+- Problems like "Artifact has not been packaged yet. When used on reactor artifact, copy should be executed after packaging: see MDEP-187." can be solved like in following thread https://stackoverflow.com/questions/30642630/artifact-has-not-been-packaged-yet#answer-50745567
+by using mapping file lifecycle-mapping-metadata.xml in (```Windows → Preferences → Maven → Lifecycle Mappings```)
+- Static analysis can be run with "site" Maven goal, addition rule configuration files specified in pom.xml reporting section have to be provided
+- For release purpose RED version, description and update sites should be updated in configuration files (category.xml, feature.xml, pom.xml, feature.properties, RED.product, plugin.xml, about.ini)
