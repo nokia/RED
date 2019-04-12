@@ -37,7 +37,7 @@ public class TrashCommentsParsingTest {
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass().getResource(mainPath + "TrashCommentsAtTheBeginning.robot").toURI());
-        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+        when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));

@@ -39,7 +39,7 @@ public class RobotParserSimpleExecutableContinueTest {
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass().getResource(mainPath + "KeywordNameAsTripleDots.robot").toURI());
-        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+        when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
@@ -69,7 +69,7 @@ public class RobotParserSimpleExecutableContinueTest {
         final File file = new File(this.getClass()
                 .getResource(mainPath + "KeywordsExecWithHashCommentAndPreviousLineContinue.robot")
                 .toURI());
-        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+        when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));

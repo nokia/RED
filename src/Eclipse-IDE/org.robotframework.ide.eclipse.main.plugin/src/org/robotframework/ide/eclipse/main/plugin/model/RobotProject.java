@@ -264,7 +264,7 @@ public class RobotProject extends RobotContainer {
 
     public void clearCachedData() {
         if (projectHolder != null) {
-            projectHolder.clearModelFiles();
+            projectHolder.clearParsedFiles();
         }
     }
 

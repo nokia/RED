@@ -124,7 +124,7 @@ public class EmptyLinesInExecutableTablesFixerOutputCheckTest {
     private RobotFile getModelFile(final String fileName) throws URISyntaxException {
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         final File file = new File(RobotParser.class.getResource("parser/bugs/" + fileName).toURI());
-        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+        when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(3, 1));
         final List<RobotFileOutput> parsed = parser.parse(file);
