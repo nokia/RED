@@ -25,8 +25,6 @@ import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 
-import com.google.common.annotations.VisibleForTesting;
-
 public class RobotProjectHolder {
 
     private final IRuntimeEnvironment runtimeEnvironment;
@@ -168,6 +166,8 @@ public class RobotProjectHolder {
     }
 
     private RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
-        return readableProjectFiles.stream().filter(criteria).findFirst().orElse(null);
+        synchronized (readableProjectFiles) {
+            return readableProjectFiles.stream().filter(criteria).findFirst().orElse(null);
+        }
     }
 }
