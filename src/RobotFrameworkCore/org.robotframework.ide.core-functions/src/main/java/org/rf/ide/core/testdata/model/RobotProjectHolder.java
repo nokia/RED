@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.Set;
 
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
@@ -23,7 +24,6 @@ import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
-import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 
 public class RobotProjectHolder {
 
@@ -31,14 +31,14 @@ public class RobotProjectHolder {
 
     private RobotProjectConfig currentConfiguration;
 
-    // files may be parsed in several threads
-    private final List<RobotFileOutput> readableProjectFiles = Collections.synchronizedList(new ArrayList<>());
-
     private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
 
     private final Map<String, String> variableMappings = new HashMap<>();
 
     private final List<File> modulesSearchPaths = new ArrayList<>();
+
+    // files may be parsed in several threads
+    private final Set<RobotFileOutput> parsedModelFiles = Collections.synchronizedSet(new HashSet<>());
 
     public RobotProjectHolder() {
         this(new NullRuntimeEnvironment());
@@ -120,54 +120,50 @@ public class RobotProjectHolder {
         return map;
     }
 
-    public void addModelFile(final RobotFileOutput robotOutput) {
-        if (robotOutput != null) {
-            final File processedFile = robotOutput.getProcessedFile();
+    public void addParsedFile(final RobotFileOutput robotFile) {
+        if (robotFile != null) {
+            final File processedFile = robotFile.getProcessedFile();
             if (processedFile != null) {
-                final RobotFileOutput file = findFileByName(processedFile);
-                removeModelFile(file);
+                parsedModelFiles.remove(findParsedFileByPath(processedFile));
             }
-
-            readableProjectFiles.add(robotOutput);
+            parsedModelFiles.add(robotFile);
         }
     }
 
-    public void clearModelFiles() {
-        readableProjectFiles.clear();
+    public void clearParsedFiles() {
+        parsedModelFiles.clear();
     }
 
-    public void removeModelFile(final RobotFileOutput robotOutput) {
-        readableProjectFiles.remove(robotOutput);
+    public boolean shouldBeParsed(final File file) {
+        final RobotFileOutput robotFile = findParsedFileByPath(file);
+        return robotFile == null || file.lastModified() != robotFile.getLastModificationEpochTime();
     }
 
-    public boolean shouldBeLoaded(final File file) {
-        final RobotFileOutput foundFile = findFileByName(file);
-        return foundFile == null || file.lastModified() != foundFile.getLastModificationEpochTime();
-    }
-
-    public RobotFileOutput findFileWithImportedVariableFile(final PathsProvider pathsProvider,
+    public RobotFileOutput findParsedFileWithImportedVariableFile(final PathsProvider pathsProvider,
             final File variableFile) {
-        return findFile(robotFile -> {
-            if (robotFile != null) {
-                for (final VariablesFileImportReference reference : robotFile.getVariablesImportReferences(this,
-                        pathsProvider)) {
-                    if (reference.getVariablesFile().getAbsolutePath().equals(variableFile.getAbsolutePath())) {
-                        return true;
-                    }
+        // files may be parsed in several threads
+        synchronized (parsedModelFiles) {
+            for (final RobotFileOutput robotFile : parsedModelFiles) {
+                if (robotFile.getVariablesImportReferences(this, pathsProvider)
+                        .stream()
+                        .anyMatch(r -> r.getVariablesFile().getAbsolutePath().equals(variableFile.getAbsolutePath()))) {
+                    return robotFile;
                 }
             }
-            return false;
-        });
-    }
-
-    public RobotFileOutput findFileByName(final File file) {
-        return findFile(robotFile -> robotFile != null && robotFile.getProcessedFile() != null
-                && robotFile.getProcessedFile().getAbsolutePath().equals(file.getAbsolutePath()));
-    }
-
-    private RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
-        synchronized (readableProjectFiles) {
-            return readableProjectFiles.stream().filter(criteria).findFirst().orElse(null);
         }
+        return null;
+    }
+
+    public RobotFileOutput findParsedFileByPath(final File file) {
+        // files may be parsed in several threads
+        synchronized (parsedModelFiles) {
+            for (final RobotFileOutput robotFile : parsedModelFiles) {
+                if (robotFile.getProcessedFile() != null
+                        && robotFile.getProcessedFile().getAbsolutePath().equals(file.getAbsolutePath())) {
+                    return robotFile;
+                }
+            }
+        }
+        return null;
     }
 }

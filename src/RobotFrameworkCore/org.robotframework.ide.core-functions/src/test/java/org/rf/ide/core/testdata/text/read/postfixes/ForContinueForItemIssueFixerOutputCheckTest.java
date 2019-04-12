@@ -348,7 +348,7 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         final String mainPath = "parser/bugs/for/";
         final File file = new File(RobotParser.class.getResource(mainPath + fileName).toURI());
-        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+        when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));

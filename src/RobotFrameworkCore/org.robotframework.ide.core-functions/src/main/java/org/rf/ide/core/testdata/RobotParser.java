@@ -82,7 +82,7 @@ public class RobotParser {
                         parse(file, output);
                     }
                 }
-            } else if (robotProject.shouldBeLoaded(fileOrDir)) {
+            } else if (robotProject.shouldBeParsed(fileOrDir)) {
                 final TextualRobotFileParser parser = createParser(fileOrDir, false);
 
                 if (parser != null) {
@@ -90,14 +90,14 @@ public class RobotParser {
                     output.add(robotFile);
 
                     parser.parse(robotFile, fileOrDir);
-                    robotProject.addModelFile(robotFile);
+                    robotProject.addParsedFile(robotFile);
 
                     clearIfNeeded(robotFile);
                 }
             } else {
-                final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
-                if (fileByName != null) {
-                    output.add(fileByName);
+                final RobotFileOutput robotFile = robotProject.findParsedFileByPath(fileOrDir);
+                if (robotFile != null) {
+                    output.add(robotFile);
                 }
             }
         }

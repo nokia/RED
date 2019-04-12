@@ -145,11 +145,10 @@ public class VariablesImporter {
             final RobotProjectHolder robotProject, final VariablesImport varImport, final File varFile) {
 
         VariablesFileImportReference varImportRef = null;
-        final RobotFileOutput fileWhichImportsVariables = robotProject.findFileWithImportedVariableFile(pathsProvider,
-                varFile);
-        if (fileWhichImportsVariables != null) {
+        final RobotFileOutput robotFile = robotProject.findParsedFileWithImportedVariableFile(pathsProvider, varFile);
+        if (robotFile != null) {
             final VariablesFileImportReference variableFile = findVariableFileByPath(pathsProvider, robotProject,
-                    fileWhichImportsVariables, varFile);
+                    robotFile, varFile);
             if (isThisVariableFileTheSearchedOne(variableFile, varImport, varFile)) {
                 varImportRef = variableFile;
             }
