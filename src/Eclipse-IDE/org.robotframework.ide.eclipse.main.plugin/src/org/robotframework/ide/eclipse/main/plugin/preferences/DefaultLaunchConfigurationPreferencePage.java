@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -323,20 +322,6 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         public EnvVariable(final String name, final String value) {
             this.name = name;
             this.value = value;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj != null && obj.getClass() == EnvVariable.class) {
-                final EnvVariable that = (EnvVariable) obj;
-                return Objects.equals(this.name, that.name) && Objects.equals(this.value, that.value);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, value);
         }
 
         public String getName() {
