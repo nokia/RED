@@ -82,7 +82,7 @@ public class SetScalarValueCommandTest {
                 .isInjectedInto(new SetScalarValueCommand(variable, null));
         command.execute();
 
-        assertThat(variable.getValue()).isEqualTo("0");
+        assertThat(variable.getValue()).isEqualTo("");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 

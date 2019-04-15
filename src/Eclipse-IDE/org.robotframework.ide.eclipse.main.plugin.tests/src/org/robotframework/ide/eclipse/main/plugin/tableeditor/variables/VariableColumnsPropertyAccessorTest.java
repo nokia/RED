@@ -116,16 +116,28 @@ public class VariableColumnsPropertyAccessorTest {
     }
 
     @Test
-    public void valueChangeOfScalarIsRequestedProperly() {
+    public void valueChangeOfScalarWithSingleValueIsRequestedProperly() {
         final RobotEditorCommandsStack stack = mock(RobotEditorCommandsStack.class);
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(stack);
 
         final List<RobotVariable> variables = createVariablesForTest();
 
         accessor.setDataValue(variables.get(0), 1, "1729");
+
+        verify(stack, times(1)).execute(isA(SetScalarValueCommand.class));
+    }
+
+    @Test
+    public void valueChangeOfScalarWithManyValuesIsNotRequested() {
+        // this is done separately by details cell editor
+        final RobotEditorCommandsStack stack = mock(RobotEditorCommandsStack.class);
+        final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(stack);
+
+        final List<RobotVariable> variables = createVariablesForTest();
+
         accessor.setDataValue(variables.get(1), 1, "1729");
 
-        verify(stack, times(2)).execute(isA(SetScalarValueCommand.class));
+        verify(stack, never()).execute(any(EditorCommand.class));
     }
 
     @Test
