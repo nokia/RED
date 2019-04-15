@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -310,17 +311,27 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         }
 
         private void updateReferencedLibraryRecord(final ReferencedLibrary lib) {
-            // this method uses python search order - directory module then file
+            // this method uses python search order - directory module then file then file with
+            // class inside
             if (LibraryType.PYTHON.name().equals(lib.getType())) {
-                String oldPath = lib.getPath();
-                Path newPath = new Path(oldPath + "/" + lib.getName().replaceAll("\\.", "/") + "/__init__.py");
-                final File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(newPath).toFile();
-                if (file.exists()) {
-                    lib.setPath(newPath.toString());
-                } else {
-                    lib.setPath(oldPath + "/" + lib.getName().replaceAll("\\.", "/") + ".py");
+                String oldPathWithName = lib.getPath() + "/" + lib.getName().replaceAll("\\.", "/");
+                if (!checkAndUpdatePathIfCorrect(lib, new Path(oldPathWithName + "/__init__.py"))) {
+                    if (!checkAndUpdatePathIfCorrect(lib, new Path(oldPathWithName + ".py"))) {
+                        final IPath pathToCheck = new Path(oldPathWithName).removeLastSegments(1)
+                                .addFileExtension("py");
+                        checkAndUpdatePathIfCorrect(lib, pathToCheck);
+                    }
                 }
             }
+        }
+
+        private boolean checkAndUpdatePathIfCorrect(final ReferencedLibrary lib, final IPath pathToCheck) {
+            File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(pathToCheck).toFile();
+            if (file.exists()) {
+                lib.setPath(pathToCheck.toString());
+                return true;
+            }
+            return false;
         }
     }
 }
