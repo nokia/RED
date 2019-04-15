@@ -53,8 +53,9 @@ public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<
         if (column == 0) {
             commandsStack.execute(new SetVariableNameCommand(variable, (String) value));
         } else if (column == 1) {
-            // other types are handled by more sophisticated cell editors
-            if (variable.getType() == VariableType.SCALAR) {
+            // other types or SCALAR with many values are handled by more sophisticated
+            // cell editors
+            if (variable.getType() == VariableType.SCALAR && variable.getLinkedElement().getValueTokens().size() <= 1) {
                 commandsStack.execute(new SetScalarValueCommand(variable, (String) value));
             }
         } else if (column == 2) {
