@@ -20,13 +20,15 @@
 - Import to workspace all Eclipse project from RED/src folder (```File →  Import →  General →  Existing Projects into Workspace```)
 - Setup Maven plugin connectors
 	- Use Quick Fix (Ctrl+1) on marker with message starting from "Plugin execution not covered by lifecycle configuration"
+	- Use option "Discover new m2e connectors"
 	- Use option "Select All" to select all pom.xml files
-	- Use option "Discover new m2e connectors" to install connectors
+	- Follow instructions to install connectors
 	- After Eclipse restart Maven updates all projects
 	- Revert all changes in RED repository made by Maven update
+- Set target platform, default one can be found in org.robotframework.ide.eclipse.target-platform/pom.xml (```Windows → Preferences → Plug-in Development → Target Platform```)
 
 ### Product building
-- Run maven clean install (default eclipse.version parameter can be replaced with supported ones from org.robotframework.ide.eclipse.target-platform/pom.xml) on:
+- Build following projects in given order using Maven goals "clean install" (default eclipse.version parameter can be replaced with supported ones from org.robotframework.ide.eclipse.target-platform/pom.xml) on:
 	- org.robotframework.ide.eclipse.parent
 	- org.robotframework.ide.eclipse.product.feature.buildParent
 	- org.robotframework.ide.eclipse.product.feature.build
@@ -34,7 +36,7 @@
 	- org.robotframework.ide.eclipse.main.feature.build
 	- org.robotframework.ide.eclipse.product.product
 	- org.robotframework.ide.eclipse.main.feature.update-site
-- Clean all projects (```Project → Clean → Clean all projects```)
+- Clean all projects (```Project → Clean → Clean all projects```) and use Refresh (F5) action on them 
 - Run org.robotframework.ide.eclipse.product.plugin as Eclipse Application selecting org.robotframework.red as product to run
 - Binaries can be found under
 	- src/Eclipse-IDE/org.robotframework.ide.eclipse.product.product/target/products/
