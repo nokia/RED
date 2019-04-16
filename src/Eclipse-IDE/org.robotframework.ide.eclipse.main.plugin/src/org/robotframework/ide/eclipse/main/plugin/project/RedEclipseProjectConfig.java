@@ -9,12 +9,14 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.EnvironmentVariableReplacer;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -29,16 +31,25 @@ public class RedEclipseProjectConfig {
 
     private final RobotProjectConfig config;
 
-    private final EnvironmentVariableReplacer variableReplacer;
+    private final SystemVariableAccessor variableAccessor;
+
+    private final Supplier<EnvironmentVariableReplacer> variableReplacer;
 
     public RedEclipseProjectConfig(final IProject project, final RobotProjectConfig config) {
-        this(project, config, new EnvironmentVariableReplacer());
+        this(project, config, new SystemVariableAccessor());
     }
 
     public RedEclipseProjectConfig(final IProject project, final RobotProjectConfig config,
-            final EnvironmentVariableReplacer variableReplacer) {
+            final SystemVariableAccessor variableAccessor) {
+        this(project, config, variableAccessor, () -> new EnvironmentVariableReplacer(variableAccessor));
+    }
+
+    public RedEclipseProjectConfig(final IProject project, final RobotProjectConfig config,
+            final SystemVariableAccessor variableAccessor,
+            final Supplier<EnvironmentVariableReplacer> variableReplacer) {
         this.project = project;
         this.config = config;
+        this.variableAccessor = variableAccessor;
         this.variableReplacer = variableReplacer;
     }
 
@@ -46,7 +57,8 @@ public class RedEclipseProjectConfig {
         final IContainer base = config.getRelativityPoint().getRelativeTo() == RelativeTo.WORKSPACE
                 ? project.getWorkspace().getRoot()
                 : project;
-        final IPath resolvedPath = new Path(variableReplacer.replaceKnownEnvironmentVariables(path.getLocation()));
+        final IPath resolvedPath = new Path(
+                variableReplacer.get().replaceKnownEnvironmentVariables(path.getLocation()));
         return Paths.toAbsoluteFromRelativeIfPossible(base, resolvedPath);
     }
 
@@ -67,6 +79,7 @@ public class RedEclipseProjectConfig {
         classPaths.add(".");
         classPaths.addAll(resolveLibPaths(LibraryType.JAVA));
         classPaths.addAll(resolvePaths(config.getClassPaths()));
+        classPaths.addAll(variableAccessor.getPaths("CLASSPATH"));
         final List<String> pythonPaths = new ArrayList<>();
         pythonPaths.addAll(resolveLibPaths(LibraryType.PYTHON));
         pythonPaths.addAll(resolvePaths(config.getPythonPaths()));

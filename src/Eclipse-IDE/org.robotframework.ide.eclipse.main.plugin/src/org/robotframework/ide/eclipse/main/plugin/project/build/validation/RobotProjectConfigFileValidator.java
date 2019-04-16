@@ -221,14 +221,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final ProblemPosition position = new ProblemPosition(config.getLineFor(searchPath));
-        final EnvironmentVariableReplacer variableReplacer = new EnvironmentVariableReplacer(variableAccessor,
-                varName -> {
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configFile.getProject(),
+                config.getConfigurationModel(), variableAccessor,
+                () -> new EnvironmentVariableReplacer(variableAccessor, varName -> {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.UNKNOWN_ENV_VARIABLE)
                             .formatMessageWith("%{" + varName + "}");
                     reporter.handleProblem(problem, configFile, position);
-                });
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configFile.getProject(),
-                config.getConfigurationModel(), variableReplacer);
+                }));
         final IPath absolutePath = redConfig.resolveToAbsolutePath(searchPath);
         if (!RedWorkspace.Paths.isCorrect(absolutePath)) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)

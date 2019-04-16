@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.RedTemporaryDirectory;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -83,6 +84,9 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Mock
     private RedPreferences preferences;
+
+    @Mock
+    private SystemVariableAccessor variableAccessor;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -766,6 +770,23 @@ public class LocalProcessCommandLineBuilderTest {
     }
 
     @Test
+    public void commandLineContainsClassPathsFromSystemEnvironmentVariable() throws Exception {
+        when(variableAccessor.getPaths("CLASSPATH"))
+                .thenReturn(newArrayList("FirstClassPath.jar", "SecondClassPath.jar"));
+
+        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Jython);
+        final RobotProject robotProject = createRobotProject(projectProvider.getProject());
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+
+        final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
+
+        assertThat(commandLine.getCommandLine()).hasSize(8)
+                .containsSequence("-J-cp", String.join(File.pathSeparator,
+                        newArrayList(".", "FirstClassPath.jar", "SecondClassPath.jar")));
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
+
+    @Test
     public void commandLineDoesNotContainPathsForVariableFiles() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedVariableFile(ReferencedVariableFile.create(PROJECT_NAME + "/vars1.py"));
@@ -1085,8 +1106,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     private RunCommandLine createCommandLine(final LocalProcessInterpreter interpreter, final RobotProject robotProject,
             final RobotLaunchConfiguration robotConfig) throws CoreException, IOException {
-        return new LocalProcessCommandLineBuilder(interpreter, robotConfig, robotProject).createRunCommandLine(12345,
-                preferences);
+        return new LocalProcessCommandLineBuilder(interpreter, robotConfig, robotProject, variableAccessor)
+                .createRunCommandLine(12345, preferences);
     }
 
     private LocalProcessInterpreter createInterpreter(final SuiteExecutor interpreter) {

@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IProject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -105,6 +104,8 @@ public class RedEclipseProjectConfigTest {
         when(variableAccessor.getValue("KNOWN_2")).thenReturn(Optional.of("python"));
         when(variableAccessor.getValue("JAR")).thenReturn(Optional.of("lib.jar"));
         when(variableAccessor.getValue("FOLDER")).thenReturn(Optional.of("folder"));
+        when(variableAccessor.getPaths("CLASSPATH"))
+                .thenReturn(newArrayList("FirstClassPath.jar", "SecondClassPath.jar"));
 
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
@@ -117,8 +118,7 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addPythonPath(SearchPath.create("${INCORRECT_2}/incorrect"));
         projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/%{FOLDER}"));
 
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig,
-                new EnvironmentVariableReplacer(variableAccessor));
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
 
         assertThat(redConfig.createAdditionalEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
                 newArrayList(absolutePath("java", "lib.jar")), newArrayList(absolutePath("python", "folder"))));
@@ -132,6 +132,8 @@ public class RedEclipseProjectConfigTest {
         when(variableAccessor.getValue("KNOWN_2")).thenReturn(Optional.of("python"));
         when(variableAccessor.getValue("JAR")).thenReturn(Optional.of("lib.jar"));
         when(variableAccessor.getValue("FOLDER")).thenReturn(Optional.of("folder"));
+        when(variableAccessor.getPaths("CLASSPATH"))
+                .thenReturn(newArrayList("FirstClassPath.jar", "SecondClassPath.jar"));
 
         final RobotProjectConfig projectConfig = new RobotProjectConfig();
         projectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
@@ -154,11 +156,11 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addReferencedLibrary(
                 ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2/PyLib2/__init__.py"));
 
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig,
-                new EnvironmentVariableReplacer(variableAccessor));
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
 
         assertThat(redConfig.createExecutionEnvironmentSearchPaths()).isEqualTo(new EnvironmentSearchPaths(
-                newArrayList(".", absolutePath("lib1.jar"), absolutePath("lib2.jar"), absolutePath("java", "lib.jar")),
+                newArrayList(".", absolutePath("lib1.jar"), absolutePath("lib2.jar"), absolutePath("java", "lib.jar"),
+                        "FirstClassPath.jar", "SecondClassPath.jar"),
                 newArrayList(absolutePath("folder1"), absolutePath("folder2"), absolutePath("python", "folder"))));
     }
 
