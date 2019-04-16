@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
+import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.IRunCommandLineBuilder;
@@ -41,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 class LocalProcessCommandLineBuilder {
@@ -51,11 +53,21 @@ class LocalProcessCommandLineBuilder {
 
     private final RobotProject robotProject;
 
+    private final SystemVariableAccessor variableAccessor;
+
     LocalProcessCommandLineBuilder(final LocalProcessInterpreter interpreter,
             final RobotLaunchConfiguration robotConfig, final RobotProject robotProject) {
+        this(interpreter, robotConfig, robotProject, new SystemVariableAccessor());
+    }
+
+    @VisibleForTesting
+    LocalProcessCommandLineBuilder(final LocalProcessInterpreter interpreter,
+            final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
+            final SystemVariableAccessor variableAccessor) {
         this.interpreter = interpreter;
         this.robotConfig = robotConfig;
         this.robotProject = robotProject;
+        this.variableAccessor = variableAccessor;
     }
 
     RunCommandLine createRunCommandLine(final int port, final RedPreferences preferences)
@@ -82,8 +94,9 @@ class LocalProcessCommandLineBuilder {
     }
 
     private void addProjectConfigEntries(final IRunCommandLineBuilder builder) {
+        final IProject project = robotProject.getProject();
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(), projectConfig);
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
         final EnvironmentSearchPaths searchPaths = redConfig.createExecutionEnvironmentSearchPaths();
         builder.addLocationsToClassPath(searchPaths.getClassPaths());
         builder.addLocationsToPythonPath(searchPaths.getPythonPaths());

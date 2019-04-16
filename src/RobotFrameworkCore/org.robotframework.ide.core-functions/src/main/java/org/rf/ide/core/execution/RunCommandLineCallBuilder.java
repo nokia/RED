@@ -19,13 +19,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.rf.ide.core.RedTemporaryDirectory;
-import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.SuiteExecutor;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Streams;
 
 /**
  * @author Michal Anglart
@@ -319,10 +317,7 @@ public class RunCommandLineCallBuilder {
         }
 
         private String classPath() {
-            return Streams
-                    .concat(new SystemVariableAccessor().getPaths("CLASSPATH").stream(), classPathLocations.stream())
-                    .filter(not(Strings::isNullOrEmpty))
-                    .collect(joining(File.pathSeparator));
+            return classPathLocations.stream().filter(not(Strings::isNullOrEmpty)).collect(joining(File.pathSeparator));
         }
 
         private String pythonPath() {
