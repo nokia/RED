@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 12:39 PM
+Save-Time: 4/17/19 3:17 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -85,7 +85,7 @@ exec-with-options {
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
 
 //check how looks tree
-get-button Restore -index 1 | click
+get-editor "RobotProject/red.xml" | restore
 
 get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
 with [get-view "Project Explorer" | get-tree] {
@@ -142,7 +142,6 @@ with [get-view "Project Explorer" | get-tree] {
 //remove few files
 with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
     select "lib1.Selenium - RobotProject\\/additional libs\\/lib1.py" | key-type Del
-    key-type Del
     key-type "M1+s"
 }
 
@@ -151,7 +150,8 @@ set-dialog-result File "platform:/resource/RobotProject/libs/sum.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 
 //chec if it is not dirty
-get-tab-folder -index 1 | get-property activePage | equals "RobotProject/red.xml" | verify-true
+get-tab-folder -index 3 | get-property activePage | equals "RobotProject/red.xml" | verify-true
+get-editor "RobotProject/red.xml" | maximize
 
 //add file with class name as file
 get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
@@ -176,7 +176,7 @@ with [get-window "Select library class"] {
 set-dialog-result File "platform:/resource/RobotProject/empty.py"
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
-
+get-editor "RobotProject/red.xml" | restore
 
 //check project expolorer
 get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
@@ -230,4 +230,5 @@ with [get-view "Project Explorer" | get-tree] {
     get-item -path "RobotProject/Robot Referenced libraries" | get-property "getText()" 
         | equals "Robot Referenced libraries" | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
