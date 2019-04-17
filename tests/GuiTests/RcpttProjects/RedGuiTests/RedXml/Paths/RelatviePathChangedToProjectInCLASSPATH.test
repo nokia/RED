@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _SvnIcAiSEearkLC-7wHL-g
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 2:21 PM
+Save-Time: 4/17/19 12:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -66,13 +66,13 @@ get-view Console | get-text-viewer | get-property text
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
 	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{ 
 		get-view Console | get-text-viewer | get-object |invoke getLine  0   
-		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp .*\\\\LibsFromPythonPath;.;%s\\\\RED_TEST_JavaLib.jar -m .* --listener .*TestRunnerAgent.py:\d{1,6} .*" $new_ws_path]
+		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp \.;%s\\\\RED_TEST_JavaLib.jar;.*\\\\LibsFromPythonPath -m .* --listener .*TestRunnerAgent.py:\d{1,6} .*" $new_ws_path]
 		| verify-true 
 	
 	}
 }-else{
 	get-view Console | get-text-viewer | get-object |invoke getLine  0   
-		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp .*/LibsFromPythonPath:.:%s/RED_TEST_JavaLib.jar -m .* --listener .*TestRunnerAgent.py:\d{1,6} .*" $RED_workspace_path]
+		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp \.:%s/RED_TEST_JavaLib.jar:.*/LibsFromPythonPath -m .* --listener .*TestRunnerAgent.py:\d{1,6} .*" $RED_workspace_path]
 		| verify-true 
 }        
 
@@ -105,13 +105,13 @@ wait-for-console -times 10 -delay 2000
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
 	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{ 
 		get-view Console | get-text-viewer | get-object |invoke getLine  0   
-		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp .*\\\\LibsFromPythonPath;.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar -m .* --listener .*" $new_ws_path]
+		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp \.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar;.*\\\\LibsFromPythonPath -m .* --listener .*" $new_ws_path]
 		| verify-true 
 	
 	}
 }-else{
 	get-view Console | get-text-viewer | get-object |invoke getLine  0   
-		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp .*/LibsFromPythonPath:.:%s/jython_simple_project/RED_TEST_JavaLib.jar -m .* --listener .*" $RED_workspace_path]
+		| matches [format "Command: .* -J-Dpython.path=.*site-packages -J-cp \.:%s/jython_simple_project/RED_TEST_JavaLib.jar:.*/LibsFromPythonPath -m .* --listener .*" $RED_workspace_path]
 		| verify-true 
 }         
 //test is run    
