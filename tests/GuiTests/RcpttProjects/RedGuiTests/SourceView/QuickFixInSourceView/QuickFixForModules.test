@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JVkfkEcAEei0qKwna87CYQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 6:10 PM
+Save-Time: 4/17/19 11:41 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -78,14 +78,21 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 //check if red.xml contains 4 libs - 2 last have full path?
 get-editor "ManyModules/red.xml" | click
-with [get-editor "ManyModules/red.xml" | get-section "Libraries" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "Outer.Inner.MathModule - ManyModules" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "nested_module.module3 - ManyModules" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals [format "module2 - %s/ManyModules" $RED_workspace_path_unix_style ]
-        | verify-true
+
+with [get-editor "ManyModules/red.xml" | get-section Libraries | get-table] {
+    get-property "getItems().length" | equals 5 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Outer.Inner.MathModule - ManyModules/Outer/Inner/MathModule/__init__.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" 
+        | equals "nested_module.module3 - ManyModules/nested_module/module3/__init__.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" 
+        | equals  "module2 - ManyModules/module2/__init__.py" | verify-true
     get-property "getItems().TableItem[3].getText()" 
-        | equals "CalculatorLibrary - ManyModules/very_hidden_module/go_deeeper/and deeper" | verify-true
+        | equals "CalculatorLibrary - ManyModules/very_hidden_module/go_deeeper/and deeper/CalculatorLibrary.py" 
+        | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "...add new library file" | verify-true
 }
+
 
 //run autodiscovery on project
 get-view "Project Explorer" | get-tree | select ManyModules | get-menu 
@@ -118,21 +125,23 @@ get-button "Save All (M1+M2+S)" | click
 
 //check doc by double click
 get-view "Project Explorer" | get-tree 
-    | select "ManyModules/Robot Referenced libraries/CalculatorLibrary ManyModules\\/very_hidden_module\\/go_deeeper\\/and deeper \\(4\\)" 
+    | select "ManyModules/Robot Referenced libraries/CalculatorLibrary ManyModules\\/very_hidden_module\\/go_deeeper\\/and deeper\\/CalculatorLibrary.py \\(4\\)" 
     | double-click
+    
 get-view "Documentation View" | get-control Browser | get-property text 
     | contains "CalculatorLibrary"
     | verify-true
     
 //open KW from module    
-get-view "Project Explorer" | get-tree 
-    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules \\(2\\)/Sum" | double-click
+get-view "Project Explorer" | get-tree
+   | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules\\/Outer\\/Inner\\/MathModule\\/__init__.py \\(2\\)/Sum" 
+   | double-click
     
 check-documentation-view   -library "Outer.Inner.MathModule" -project_name "ManyModules"  -kw_name "Sum" -arguments "\[a, b\]" -spec "sum 2 int" 
 
 //open source for module
 get-view "Project Explorer" | get-tree 
-    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules (2)/Multiply" | get-menu 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules\\/Outer\\/Inner\\/MathModule\\/__init__.py (2)/Multiply"  | get-menu 
     -path "Show keyword source" | click
     
 //check that file was open and text selected    
@@ -147,7 +156,7 @@ with [get-editor "MultiplyTwoDigits.py" | get-text-viewer] {
 
 //select modile to reload
 get-view "Project Explorer" | get-tree 
-    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules (2)" 
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules\\/Outer\\/Inner\\/MathModule\\/__init__.py (non-accessible)"
     
 //check tha lib was not generated    
 exec-with-options {
