@@ -48,4 +48,3 @@
 by using mapping file lifecycle-mapping-metadata.xml in (```Windows → Preferences → Maven → Lifecycle Mappings```)
 - Static analysis can be run with "site" Maven goal, addition rule configuration files specified in pom.xml reporting section have to be provided
 - For release purpose RED version, description and update sites should be updated in configuration files (category.xml, feature.xml, pom.xml, feature.properties, RED.product, plugin.xml, about.ini)
-- For platforms newer than photon org.eclipse.equinox.ds dependency from RED.product has to be replaced with org.apache.felix.scr
