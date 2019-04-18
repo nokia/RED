@@ -1,0 +1,87 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _jjwacGHWEemost_HV90S6Q
+Element-Name: UpdateRedXmlVersion
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JpB6oGHSEemost_HV90S6Q
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 4/18/19 2:47 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//check first windows for ProjectForUpdate2
+with [get-window "Red.xml auto-updater" | get-window "Red.xml auto-updater"] {
+    with [get-table] {
+        get-property itemCount | equals 1 | verify-true
+        get-item -path ProjectForUpdate2 | get-property caption | equals ProjectForUpdate2 | verify-true
+        get-item -path ProjectForUpdate2 | get-property checked | equals true | verify-true
+    }
+    get-label "RED detected old version of configuration file: .*" 
+        | get-property caption 
+        | equals "RED detected old version of configuration file: \"1.0\", but now \"2\" is in use.\n"
+        + "Select projects which you want to auto-update.\n"
+        + "Remark: After updating your projects would be incompatible with old RED versions." | verify-true
+}
+get-window "Red.xml auto-updater" | get-window "Red.xml auto-updater" | get-button OK | click
+
+//check second window for ProjectForUpdate
+with [get-window "Red.xml auto-updater"] {
+    with [get-table] {
+        get-property itemCount | equals 1 | verify-true
+        get-item -path ProjectForUpdate | get-property caption | equals ProjectForUpdate | verify-true
+        get-item -path ProjectForUpdate | get-property checked | equals true | verify-true
+    }
+    get-label "RED detected old version of configuration file.*" 
+        | get-property caption 
+        | equals "RED detected old version of configuration file: \"1.0\", but now \"2\" is in use.\n"
+        + "Select projects which you want to auto-update.\n"
+        + "Remark: After updating your projects would be incompatible with old RED versions." | verify-true
+}
+get-window "Red.xml auto-updater" | get-button OK | click
+
+
+
+//open red.xml - path is changed to full
+with [get-view "Project Explorer" | get-tree] {
+    select ProjectForUpdate | double-click
+    select "ProjectForUpdate/red.xml" | select "ProjectForUpdate/red.xml" | get-menu -path "Open With/Text Editor" 
+        | click
+}
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>2</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"lib.MyLib\" path=\"ProjectForUpdate/lib.py\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "</projectConfiguration>" | verify-true
+    
+//open second red.xml - nothing should be changed in path - path was incorrect    
+get-view "Project Explorer" | get-tree | select "ProjectForUpdate2/red.xml" | select "ProjectForUpdate2/red.xml" 
+    | get-menu -path "Open With/Text Editor" | click
+    
+    
+get-editor "red.xml" -index 1 | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>2</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"my_lib\" path=\"DiffrentProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "</projectConfiguration>" | verify-true
+get-view Problems | click
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
