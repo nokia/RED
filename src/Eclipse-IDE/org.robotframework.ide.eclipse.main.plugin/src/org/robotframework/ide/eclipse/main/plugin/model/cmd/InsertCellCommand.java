@@ -15,32 +15,30 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class InsertCellCommand extends EditorCommand {
 
-    private final RobotKeywordCall oldCall;
-    private RobotKeywordCall newCall;
+    private final RobotSetting oldSetting;
+
+    private RobotKeywordCall newSetting;
     private final int position;
 
-    public InsertCellCommand(final RobotKeywordCall call, final int position) {
-        this.oldCall = call;
+    public InsertCellCommand(final RobotSetting newSetting, final int position) {
+        this.oldSetting = newSetting;
         this.position = position;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
+        newSetting = oldSetting.insertEmptyCellAt(position);
 
-        newCall = oldCall.insertEmptyCellAt(position);
-
-        final String topic = newCall instanceof RobotSetting
-                ? RobotModelEvents.ROBOT_SETTING_CHANGED
-                : RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
-
-        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(
-                topic, newCall.getParent());
+        RedEventBroker.using(eventBroker)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(newSetting)
+                .send(RobotModelEvents.ROBOT_SETTING_CHANGED, newSetting.getParent());
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(oldCall.equals(newCall) ? new DeleteCellCommand(newCall, position)
-                : new ReplaceRobotKeywordCallCommand(eventBroker, newCall, oldCall));
+        return newUndoCommands(oldSetting.equals(newSetting) ? new DeleteCellCommand(newSetting, position)
+                : new ReplaceRobotKeywordCallCommand(eventBroker, newSetting, oldSetting));
     }
 
 }

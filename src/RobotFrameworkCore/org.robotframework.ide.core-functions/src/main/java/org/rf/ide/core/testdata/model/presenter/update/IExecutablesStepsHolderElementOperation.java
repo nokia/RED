@@ -5,8 +5,6 @@
 */
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import java.util.List;
-
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
@@ -18,11 +16,5 @@ public interface IExecutablesStepsHolderElementOperation<T extends IExecutableSt
 
     boolean isApplicable(IRobotTokenType elementType);
 
-    AModelElement<T> create(T executablesHolder, int index, String action, List<String> args, final String comment);
-
     AModelElement<?> insert(T executablesHolder, int index, AModelElement<?> modelElement);
-
-    void update(final AModelElement<?> modelElement, final int index, final String value);
-
-    void update(final AModelElement<?> modelElement, final List<String> newArguments);
 }

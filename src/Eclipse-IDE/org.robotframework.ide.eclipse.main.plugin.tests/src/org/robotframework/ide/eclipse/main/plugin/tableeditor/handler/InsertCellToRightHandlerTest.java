@@ -16,10 +16,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertCellCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertNewCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -47,8 +49,9 @@ public class InsertCellToRightHandlerTest {
 
     @Test
     public void nothingExecuted_whenInLastColumnInTheCall() {
-        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
-        linkedElement.insertValueAt("kw", 0);
+        final RobotExecutableRow<TestCase> linkedElement = new RobotExecutableRow<>();
+        linkedElement.createToken(0);
+        linkedElement.updateToken(0, "kw");
         when(selection.getFirstElement()).thenReturn(new RobotKeywordCall(null, linkedElement));
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
         when(selectionLayerAccessor.getSelectedPositions())
@@ -61,9 +64,11 @@ public class InsertCellToRightHandlerTest {
 
     @Test
     public void commandExecuted_whenNotInLastColumnAndInsideTheCall() {
-        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
-        linkedElement.insertValueAt("kw", 0);
-        linkedElement.insertValueAt("foo", 1);
+        final RobotExecutableRow<TestCase> linkedElement = new RobotExecutableRow<>();
+        linkedElement.createToken(0);
+        linkedElement.updateToken(0, "kw");
+        linkedElement.createToken(1);
+        linkedElement.updateToken(1, "foo");
         final RobotKeywordCall call = new RobotKeywordCall(null, linkedElement);
         when(selection.getFirstElement()).thenReturn(call);
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
@@ -72,14 +77,14 @@ public class InsertCellToRightHandlerTest {
 
         new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
 
-        verify(commandsStack).execute(refEq(new InsertCellCommand(call, 1)));
+        verify(commandsStack).execute(refEq(new InsertNewCellCommand(call, 1)));
         verifyNoMoreInteractions(commandsStack);
     }
 
     @Test
     public void nothingExecuted_whenJustAfterTheWholeLineComment() {
-        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
-        final RobotKeywordCall call = new RobotKeywordCall(null, linkedElement);
+        final AModelElement<?> linkedElement = new RobotEmptyRow<TestCase>();
+        final RobotKeywordCall call = new RobotEmptyLine(null, linkedElement);
         call.setComment("#cmt"); // this is at 1st position in model but 0th column in table view
         when(selection.getFirstElement()).thenReturn(call);
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);

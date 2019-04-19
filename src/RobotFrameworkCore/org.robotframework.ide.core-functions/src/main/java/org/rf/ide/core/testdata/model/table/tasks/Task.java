@@ -103,7 +103,8 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
         return allElements.remove(element);
     }
 
-    public void removeElementAt(final int index) {
+    @Override
+    public void removeElement(final int index) {
         allElements.remove(index);
     }
 

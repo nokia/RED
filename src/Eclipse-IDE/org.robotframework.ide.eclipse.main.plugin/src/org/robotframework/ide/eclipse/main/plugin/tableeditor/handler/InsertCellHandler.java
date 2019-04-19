@@ -10,10 +10,14 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsTableValuesChangingCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellHandler.E4InsertCellHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -33,13 +37,16 @@ public class InsertCellHandler extends DIParameterizedHandler<E4InsertCellHandle
 
             final RobotKeywordCall call = (RobotKeywordCall) selection.getFirstElement();
             final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
+            final int delta = call instanceof RobotEmptyLine
+                    && ((RobotEmptyRow<?>) call.getLinkedElement()).isCommentOnly() ? 1 : 0;
 
-            final boolean isWholeLineComment = call.getAction().isPresent()
-                    && call.getAction().get().getText().isEmpty() && call.getAction().get().getFilePosition().isNotSet()
-                    && call.getArgumentTokens().isEmpty();
-
-            if (column < call.getLinkedElement().getElementTokens().size() - (isWholeLineComment ? 1 : 0)) {
-                commandsStack.execute(new InsertCellCommand(call, column));
+            if (column < call.getLinkedElement().getElementTokens().size() - delta) {
+                if (call instanceof RobotSetting) {
+                    commandsStack.execute(new InsertCellCommand((RobotSetting) call, column));
+                } else {
+                    new KeywordCallsTableValuesChangingCommandsCollector().collectForInsertion(call, column)
+                            .ifPresent(commandsStack::execute);
+                }
             }
         }
     }

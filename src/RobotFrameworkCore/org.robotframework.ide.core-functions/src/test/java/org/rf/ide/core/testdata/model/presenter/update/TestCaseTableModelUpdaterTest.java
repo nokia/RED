@@ -7,9 +7,6 @@ package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -66,52 +63,13 @@ public class TestCaseTableModelUpdaterTest {
     }
 
     @Test
-    public void handlersForKeywordCannotCreateAnything() {
-        final TestCase testCase = mock(TestCase.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.create(testCase, 0, "action", newArrayList("1", "2"), ""))
-                    .withNoCause();
-        }
-        verifyZeroInteractions(testCase);
-    }
-
-    @Test
-    public void handlersForKeywordCannotUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, 1, "value"))
-                    .withNoCause();
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
-    public void handlersForKeywordCannotBulkUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, newArrayList("a", "b", "c")))
-                    .withNoCause();
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
     public void executableRowOperationsTest() {
         final TestCase testCase = createCase();
 
         assertThat(testCase.getExecutionContext()).isEmpty();
 
-        final AModelElement<?> row = updater.createExecutableRow(testCase, 0, "some action", "comment",
-                newArrayList("a", "b", "c"));
+        final AModelElement<?> row = updater.createExecutableRow(testCase, 0,
+                newArrayList("some action", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getExecutionContext()).hasSize(1);
         final RobotExecutableRow<TestCase> addedRow = testCase.getExecutionContext().get(0);
@@ -124,34 +82,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("some action", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedRow, "new comment");
+        addedRow.updateToken(4, "#new comment");
         assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("some action", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedRow, 2, "x");
+        addedRow.updateToken(3, "x");
         assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("some action", "a", "b", "x", "#new comment");
 
-        updater.updateArgument(addedRow, 5, "z");
+        addedRow.createToken(4);
+        addedRow.createToken(5);
+        addedRow.createToken(6);
+        addedRow.updateToken(6, "z");
         assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("some action", "a", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedRow, 3, null);
+        addedRow.deleteToken(5);
         assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("some action", "a", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedRow, newArrayList("1", "2", "3"));
-        assertThat(addedRow.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("some action", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedRow);
         assertThat(testCase.getExecutionContext()).hasSize(2);
         assertThat(addedRow).isSameAs(testCase.getExecutionContext().get(0));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingExecutableRowForNullCase() {
-        updater.createExecutableRow(null, 0, "some action", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -159,12 +111,7 @@ public class TestCaseTableModelUpdaterTest {
         final TestCase testCase = createCase();
         assertThat(testCase.getExecutionContext()).isEmpty();
 
-        updater.createExecutableRow(testCase, 2, "some action", "comment", newArrayList("a", "b", "c"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        updater.createSetting(null, 0, "Setup", "comment", newArrayList("a", "b", "c"));
+        updater.createExecutableRow(testCase, 2, newArrayList("some action", "a", "b", "c", "#comment"));
     }
 
     @Test
@@ -173,8 +120,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getSetups()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Setup]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Setup]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getSetups()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getSetups().get(0);
@@ -186,29 +133,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "kw");
+        addedSetting.updateToken(1, "kw");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "kw", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "kw", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "kw", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Setup]", "kw", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Setup]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getSetups()).hasSize(2);
@@ -221,8 +167,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTags()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Tags]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Tags]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getTags()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getTags().get(0);
@@ -234,29 +180,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Tags]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Tags]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTags()).hasSize(2);
@@ -269,8 +214,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTimeouts()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Timeout]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Timeout]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getTimeouts()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getTimeouts().get(0);
@@ -282,29 +227,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Timeout]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Timeout]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTimeouts()).hasSize(2);
@@ -317,8 +261,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Teardown]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Teardown]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getTeardowns()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getTeardowns().get(0);
@@ -330,29 +274,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Teardown]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Teardown]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTeardowns()).hasSize(2);
@@ -365,8 +308,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[Template]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Template]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getTemplates()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getTemplates().get(0);
@@ -378,29 +321,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Template]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Template]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getTemplates()).hasSize(2);
@@ -413,8 +355,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0, "[unknown]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[unknown]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getUnknownSettings().get(0);
@@ -426,29 +368,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[unknown]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[unknown]", "1", "2", "3", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getUnknownSettings()).hasSize(2);
@@ -461,8 +402,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getDocumentation()).isEmpty();
 
-        final LocalSetting<TestCase> setting = (LocalSetting<TestCase>) updater.createSetting(testCase, 0,
-                "[Documentation]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> setting = updater.createSetting(testCase, 0,
+                newArrayList("[Documentation]", "a", "b", "c", "#comment"));
 
         assertThat(testCase.getDocumentation()).hasSize(1);
         final LocalSetting<TestCase> addedSetting = testCase.getDocumentation().get(0);
@@ -474,29 +415,28 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Documentation]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
                 .containsExactly("[Documentation]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Documentation]", "x", "#new comment");
+                .containsExactly("[Documentation]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Documentation]", "x", "#new comment");
+                .containsExactly("[Documentation]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Documentation]", "x", "#new comment");
+                .containsExactly("[Documentation]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Documentation]", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(addedSetting.getElementTokens()).extracting(RobotToken::getText)
-                .containsExactly("[Documentation]", "1", "#new comment");
+                .containsExactly("[Documentation]", "x", "b", "x", "", "z", "#new comment");
 
         updater.insert(testCase, 0, addedSetting);
         assertThat(testCase.getDocumentation()).hasSize(2);
@@ -534,7 +474,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordArgumentsSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Arguments]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Arguments]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 
@@ -559,7 +499,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordReturnSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Return]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Return]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 
@@ -584,7 +524,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Tags]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 
@@ -608,7 +548,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Teardown]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 
@@ -633,7 +573,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Timeout]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 
@@ -658,7 +598,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Documentation]", "a", "b", "c", "#comment"));
 
         final TestCase testCase = createCase();
 

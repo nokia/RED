@@ -35,22 +35,16 @@ public class TestCaseSettingModelOperation implements IExecutablesStepsHolderEle
         return LocalSettingTokenTypes.getTokenType(handledType, 0) == elementType;
     }
 
-    @Override
-    public AModelElement<TestCase> create(final TestCase executablesHolder, final int index, final String action,
-            final List<String> args, final String comment) {
-        throw new IllegalStateException();
-    }
-
-    public final AModelElement<TestCase> create(
+    public static LocalSetting<TestCase> create(
             final BiFunction<Integer, String, LocalSetting<TestCase>> settingCreator, final int index,
-            final String settingName, final List<String> args, final String comment) {
+            final String settingName, final List<String> args, final List<String> comments) {
 
         final LocalSetting<TestCase> newSetting = settingCreator.apply(index, settingName);
         for (final String arg : args) {
             newSetting.addToken(arg);
         }
-        if (comment != null && !comment.isEmpty()) {
-            newSetting.setComment(comment);
+        for (final String comment : comments) {
+            newSetting.addCommentPart(comment);
         }
         return newSetting;
     }
@@ -59,17 +53,5 @@ public class TestCaseSettingModelOperation implements IExecutablesStepsHolderEle
     public final AModelElement<?> insert(final TestCase testCase, final int index,
             final AModelElement<?> modelElement) {
         return testCase.addElement(index, modelElement);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final int index, final String value) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setToken(value, index + 1);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setTokens(newArguments);
     }
 }

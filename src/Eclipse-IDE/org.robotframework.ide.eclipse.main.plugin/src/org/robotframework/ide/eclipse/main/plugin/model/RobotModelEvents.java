@@ -73,6 +73,8 @@ public interface RobotModelEvents {
 
     public static final String ROBOT_KEYWORD_CALL_COMMENT_CHANGE = "robot/model/editor/file/detail/cases/keywords/changed/comment";
 
+    public static final String ROBOT_KEYWORD_CALL_CELL_CHANGE = "robot/model/editor/file/detail/cases/keywords/changed/cell";
+
 
     public static final String COLUMN_COUNT_EXCEEDED = "robot/model/editor/column_count_exceeded";
 

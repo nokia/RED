@@ -73,29 +73,25 @@ public class DumpLineUpdater {
                 }
             }
 
-            boolean isRobotToken = false;
-            if (elem instanceof RobotToken) {
-                isRobotToken = true;
-                if (artToken instanceof RobotToken) {
-                    final RobotToken rt = (RobotToken) artToken;
-                    if (rt.isDirty()) {
-                        if (rt.getText().isEmpty()) {
-                            rt.setText(helper.getEmpty());
-                        } else {
-                            final String text = formatWhiteSpace(rt.getText());
-                            rt.setText(text);
-                        }
+            if (elem instanceof RobotToken && artToken instanceof RobotToken) {
+                final RobotToken rt = (RobotToken) artToken;
+                if (rt.isDirty()) {
+                    if (rt.getText().isEmpty()) {
+                        rt.setText(helper.getEmpty());
                     } else {
-                        if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)
-                                && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
-                            rt.setText(helper.getEmpty());
-                        }
+                        final String text = formatWhiteSpace(rt.getText());
+                        rt.setText(text);
+                    }
+                } else {
+                    if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)
+                            && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
+                        rt.setText(helper.getEmpty());
                     }
                 }
             }
 
             final IRobotLineElement recalculated = cloneWithPositionRecalculate(artToken, line, outLines);
-            if (isRobotToken) {
+            if (elem instanceof RobotToken) {
                 helper.notifyTokenDumpListener((RobotToken) elem, (RobotToken) recalculated);
             }
             line.addLineElement(recalculated);
@@ -127,19 +123,14 @@ public class DumpLineUpdater {
     }
 
     private boolean isTokenToEmptyEscape(final RobotToken token) {
-        boolean result = false;
-        final List<IRobotTokenType> types = token.getTypes();
-        for (final IRobotTokenType tt : types) {
-            if (tt == RobotTokenType.VARIABLES_VARIABLE_VALUE || RobotTokenType.getTypesForSettingsTable().contains(tt)
-                    || (RobotTokenType.getTypesForTestCasesTable().contains(tt) && tt != RobotTokenType.TEST_CASE_NAME)
-                    || (RobotTokenType.getTypesForTasksTable().contains(tt) && tt != RobotTokenType.TASK_NAME)
-                    || (RobotTokenType.getTypesForKeywordsTable().contains(tt) && tt != RobotTokenType.KEYWORD_NAME)) {
-                result = true;
-                break;
-            }
+        for (final IRobotTokenType type : token.getTypes()) {
+            return type == RobotTokenType.VARIABLES_VARIABLE_VALUE
+                    || RobotTokenType.getTypesForSettingsTable().contains(type)
+                    || (RobotTokenType.getTypesForTestCasesTable().contains(type) && type != RobotTokenType.TEST_CASE_NAME)
+                    || (RobotTokenType.getTypesForTasksTable().contains(type) && type != RobotTokenType.TASK_NAME)
+                    || (RobotTokenType.getTypesForKeywordsTable().contains(type) && type != RobotTokenType.KEYWORD_NAME);
         }
-
-        return result;
+        return false;
     }
 
     private FilePosition getPosition(final RobotLine line, final List<RobotLine> outLines) {
@@ -147,20 +138,19 @@ public class DumpLineUpdater {
     }
 
     private FilePosition getPosition(final RobotLine line, final List<RobotLine> outLines, final int last) {
-        FilePosition pos = FilePosition.createNotSet();
-
         final IRobotLineElement endOfLine = line.getEndOfLine();
         if (endOfLine != null && !endOfLine.getFilePosition().isNotSet()) {
-            pos = calculateEndPosition(endOfLine, true);
-        } else if (!line.getLineElements().isEmpty()) {
-            pos = calculateEndPosition(line.getLineElements().get(line.getLineElements().size() - 1), false);
-        } else if (outLines != null && !outLines.isEmpty() && outLines.size() - last >= 0) {
-            pos = getPosition(outLines.get(outLines.size() - last), outLines, last + 1);
-        } else {
-            pos = new FilePosition(1, 0, 0);
-        }
+            return calculateEndPosition(endOfLine, true);
 
-        return pos;
+        } else if (!line.getLineElements().isEmpty()) {
+            return calculateEndPosition(line.getLineElements().get(line.getLineElements().size() - 1), false);
+
+        } else if (outLines != null && !outLines.isEmpty() && outLines.size() - last >= 0) {
+            return getPosition(outLines.get(outLines.size() - last), outLines, last + 1);
+
+        } else {
+            return new FilePosition(1, 0, 0);
+        }
     }
 
     private FilePosition calculateEndPosition(final IRobotLineElement elem, final boolean isEOL) {
@@ -228,40 +218,23 @@ public class DumpLineUpdater {
     }
 
     private String formatWhiteSpace(final String text) {
-        String result = text;
-        final StringBuilder str = new StringBuilder();
-        char lastChar = (char) -1;
-        if (text != null) {
-            final char[] cArray = text.toCharArray();
-            final int size = cArray.length;
-            for (int cIndex = 0; cIndex < size; cIndex++) {
-                final char c = cArray[cIndex];
-                if (cIndex == 0) {
-                    if (c == ' ') {
-                        str.append("\\ ");
-                    } else {
-                        str.append(c);
-                    }
-                } else if (cIndex + 1 == size) {
-                    if (c == ' ') {
-                        str.append("\\ ");
-                    } else {
-                        str.append(c);
-                    }
-                } else {
-                    if (lastChar == ' ' && c == ' ') {
-                        str.append("\\ ");
-                    } else {
-                        str.append(c);
-                    }
-                }
-
-                lastChar = c;
-            }
-
-            result = str.toString();
+        if (text == null) {
+            return null;
         }
+        final StringBuilder str = new StringBuilder();
 
-        return result;
+        final char[] chars = text.toCharArray();
+        char lastChar = (char) -1;
+        for (int i = 0; i < chars.length; i++) {
+            final char c = chars[i];
+
+            if (c == ' ' && (i == 0 || i + 1 == chars.length || lastChar == ' ')) {
+                str.append("\\ ");
+            } else {
+                str.append(c);
+            }
+            lastChar = c;
+        }
+        return str.toString();
     }
 }

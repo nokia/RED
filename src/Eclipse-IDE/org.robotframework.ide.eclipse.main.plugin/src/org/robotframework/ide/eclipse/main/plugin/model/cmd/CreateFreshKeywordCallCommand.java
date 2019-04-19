@@ -30,8 +30,6 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     private final int index;
 
-    private RobotKeywordCall newKeywordCall;
-
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent) {
         this(parent, parent.getChildren().size());
     }
@@ -51,20 +49,26 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-
+        RobotKeywordCall newCall;
         if (isEmptyContent(name, args, comment)) {
-            newKeywordCall = parent.createEmpty(index, name);
+            newCall = parent.createEmpty(index, newArrayList(name));
         } else {
-            newKeywordCall = parent.createKeywordCall(index, name, args, comment);
+            final List<String> tokens = new ArrayList<>();
+            tokens.add(name);
+            tokens.addAll(args);
+            tokens.add(comment);
+            newCall = parent.createKeywordCall(index, tokens);
         }
         RedEventBroker.using(eventBroker)
-            .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newKeywordCall)
-            .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(newCall)
+                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));
+        final RobotKeywordCall call = parent.getChildren().get(index);
+        return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(call)));
     }
 
     private static boolean isEmptyContent(final String name, final List<String> args, final String comment) {

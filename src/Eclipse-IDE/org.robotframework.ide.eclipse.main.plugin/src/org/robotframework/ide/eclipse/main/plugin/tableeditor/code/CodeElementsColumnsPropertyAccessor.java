@@ -6,19 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -29,12 +26,12 @@ public class CodeElementsColumnsPropertyAccessor implements IColumnPropertyAcces
 
     private final RobotEditorCommandsStack commandsStack;
 
-    private final TableCommandsCollector commandsCollector;
+    private final CodeTableValuesChangingCommandsCollector commandsCollector;
 
     protected int numberOfColumns;
 
     public CodeElementsColumnsPropertyAccessor(final RobotEditorCommandsStack commandsStack,
-            final TableCommandsCollector commandsCollector) {
+            final CodeTableValuesChangingCommandsCollector commandsCollector) {
         this.commandsStack = commandsStack;
         this.commandsCollector = commandsCollector;
     }
@@ -49,9 +46,9 @@ public class CodeElementsColumnsPropertyAccessor implements IColumnPropertyAcces
                 return columnIndex == 1 ? getDocumentationText(keywordCall).replaceAll("\\s+", " ").trim() : "";
             }
 
-            final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
+            final List<String> execRowView = ExecutablesRowView.rowData(keywordCall);
             if (columnIndex < execRowView.size()) {
-                return execRowView.get(columnIndex).getText();
+                return execRowView.get(columnIndex);
             }
         } else if (rowObject instanceof RobotCodeHoldingElement<?>) {
             final RobotCodeHoldingElement<?> holder = (RobotCodeHoldingElement<?>) rowObject;
@@ -77,7 +74,7 @@ public class CodeElementsColumnsPropertyAccessor implements IColumnPropertyAcces
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
         if (rowObject instanceof RobotElement) {
             commandsCollector
-                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns)
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex)
                     .ifPresent(commandsStack::execute);
         }
     }
@@ -99,21 +96,5 @@ public class CodeElementsColumnsPropertyAccessor implements IColumnPropertyAcces
     @Override
     public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
-    }
-
-    public static interface TableCommandsCollector {
-
-        public default Optional<? extends EditorCommand> collectForRemoval(final RobotElement element,
-                final int column, final int numberOfColumns) {
-            return collect(element, null, column, numberOfColumns);
-        }
-
-        public default Optional<? extends EditorCommand> collectForChange(final RobotElement element,
-                final String newValue, final int column, final int numberOfColumns) {
-            return collect(element, newValue, column, numberOfColumns);
-        }
-
-        public Optional<? extends EditorCommand> collect(final RobotElement element, final String value,
-                final int column, final int numberOfColumns);
     }
 }

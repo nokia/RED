@@ -11,19 +11,18 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.ExecRowToTaskExecRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.LocalSettingToTaskSettingMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.tasks.TaskDocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.TaskEmptyLineModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.TaskExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.tasks.TaskSettingModelOperation;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,7 +31,8 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
 
     private static final List<IExecutablesStepsHolderElementOperation<Task>> ELEMENT_OPERATIONS = newArrayList(
             new TaskEmptyLineModelOperation(), new TaskExecutableRowModelOperation(),
-            new TaskDocumentationModelOperation(), new TaskSettingModelOperation(ModelType.TASK_SETUP),
+            new TaskSettingModelOperation(ModelType.TASK_DOCUMENTATION),
+            new TaskSettingModelOperation(ModelType.TASK_SETUP),
             new TaskSettingModelOperation(ModelType.TASK_TAGS), new TaskSettingModelOperation(ModelType.TASK_TEARDOWN),
             new TaskSettingModelOperation(ModelType.TASK_TEMPLATE),
             new TaskSettingModelOperation(ModelType.TASK_TIMEOUT),
@@ -41,71 +41,48 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
             new ExecRowToTaskExecRowMorphOperation(),
             new LocalSettingToTaskSettingMorphOperation());
 
+    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<Task> createEmptyLine(final Task task, final int index, final String name) {
-        final IExecutablesStepsHolderElementOperation<Task> operationHandler = getOperationHandler(
-                ModelType.EMPTY_LINE);
-        if (operationHandler == null || task == null) {
-            throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
-        }
-        return task.addElement(index, operationHandler.create(task, index, name, null, null));
+    public AModelElement<Task> createExecutableRow(final Task task, final int index, final List<String> cells) {
+        final RobotExecutableRow<?> row = TestCaseTableModelUpdater.createExecutableRow(cells);
+        task.addElement(index, row);
+        return (RobotExecutableRow<Task>) row;
     }
 
     @Override
-    public AModelElement<Task> createSetting(final Task task, final int index, final String settingName,
-            final String comment, final List<String> args) {
-
+    public AModelElement<Task> createSetting(final Task task, final int index, final List<String> cells) {
+        if (cells.isEmpty()) {
+            throw new IllegalArgumentException("Unable to create empty setting. There is no setting name given");
+        }
+        final String settingName = cells.get(0);
         if (task == null) {
-            throw new IllegalArgumentException("Unable to create " + settingName + " setting. There is no task given");
+            throw new IllegalArgumentException(
+                    "Unable to create " + settingName + " setting. There is no parent given");
         }
         final BiFunction<Integer, String, LocalSetting<Task>> creator = getSettingCreateOperation(task, settingName);
         if (creator == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return new TaskSettingModelOperation(null).create(creator, index, settingName, args, comment);
-    }
+        final int cmtIndex = TestCaseTableModelUpdater.indexOfCommentStart(cells);
 
-    @Override
-    public AModelElement<Task> createExecutableRow(final Task task, final int index, final String action,
-            final String comment, final List<String> args) {
-
-        final IExecutablesStepsHolderElementOperation<Task> operationHandler = getOperationHandler(
-                ModelType.TASK_EXECUTABLE_ROW);
-        if (operationHandler == null || task == null) {
-            throw new IllegalArgumentException(
-                    "Unable to create " + action + " executable row. Operation handler is missing");
+        final LocalSetting<Task> newSetting = creator.apply(index, settingName);
+        for (int i = 1; i < cells.size(); i++) {
+            if (i < cmtIndex) {
+                newSetting.addToken(RobotToken.create(cells.get(i)));
+            } else {
+                newSetting.addCommentPart(RobotToken.create(cells.get(i)));
+            }
         }
-        return task.addElement(index, operationHandler.create(task, index, action, args, comment));
+        return newSetting;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        final IExecutablesStepsHolderElementOperation<Task> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to update arguments of " + modelElement + ". Operation handler is missing");
-        }
-        operationHandler.update(modelElement, index, value);
-    }
-
-    @Override
-    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
-        final IExecutablesStepsHolderElementOperation<Task> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to set arguments of " + modelElement + ". Operation handler is missing");
-        }
-        operationHandler.update(modelElement, arguments);
-    }
-
-    @Override
-    public void updateComment(final AModelElement<?> modelElement, final String value) {
-        CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
+    public AModelElement<Task> createEmptyLine(final Task task, final int index, final List<String> cells) {
+        final RobotEmptyRow<?> row = TestCaseTableModelUpdater.createEmptyLine(cells);
+        task.addElement(index, row);
+        return (RobotEmptyRow<Task>) row;
     }
 
     @Override

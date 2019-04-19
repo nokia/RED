@@ -5,6 +5,8 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +45,8 @@ public class DeleteCellCommand extends EditorCommand {
                     : Optional.empty();
         } else {
             topic = RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
-            command = new KeywordCallsTableValuesChangingCommandsCollector().collect(call, null, position);
+            command = new KeywordCallsTableValuesChangingCommandsCollector().collectForRemoval(call,
+                    newArrayList(position));
         }
 
         if (command.isPresent()) {

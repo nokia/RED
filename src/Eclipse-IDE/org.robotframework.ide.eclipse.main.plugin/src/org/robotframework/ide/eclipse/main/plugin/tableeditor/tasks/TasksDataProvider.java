@@ -12,7 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsDataProvider;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowView;
 
 class TasksDataProvider extends CodeElementsDataProvider<RobotTasksSection> {
 
@@ -33,7 +33,7 @@ class TasksDataProvider extends CodeElementsDataProvider<RobotTasksSection> {
     protected int numberOfColumns(final Object element) {
         if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
                 && ((RobotDefinitionSetting) element).isDocumentation())) {
-            return ExecutablesRowHolderCommentService.execRowView((RobotKeywordCall) element).size() + 1;
+            return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
         }
         return 0;
     }

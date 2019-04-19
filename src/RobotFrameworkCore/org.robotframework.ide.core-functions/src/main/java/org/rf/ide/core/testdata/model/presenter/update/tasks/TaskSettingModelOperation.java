@@ -35,39 +35,21 @@ public class TaskSettingModelOperation implements IExecutablesStepsHolderElement
         return LocalSettingTokenTypes.getTokenType(handledType, 0) == elementType;
     }
 
-    @Override
-    public final AModelElement<Task> create(final Task executablesHolder, final int index, final String action,
-            final List<String> args, final String comment) {
-        throw new IllegalStateException();
-    }
+    public static LocalSetting<Task> create(final BiFunction<Integer, String, LocalSetting<Task>> settingCreator,
+            final int index, final String settingName, final List<String> args, final List<String> comments) {
 
-    public final AModelElement<Task> create(final BiFunction<Integer, String, LocalSetting<Task>> settingCreator,
-            final int index, final String settingName, final List<String> args, final String comment) {
-
-        final LocalSetting<Task> tags = settingCreator.apply(index, settingName);
+        final LocalSetting<Task> newSetting = settingCreator.apply(index, settingName);
         for (final String arg : args) {
-            tags.addToken(arg);
+            newSetting.addToken(arg);
         }
-        if (comment != null && !comment.isEmpty()) {
-            tags.setComment(comment);
+        for (final String comment : comments) {
+            newSetting.addCommentPart(comment);
         }
-        return tags;
+        return newSetting;
     }
 
     @Override
     public final AModelElement<?> insert(final Task task, final int index, final AModelElement<?> modelElement) {
         return task.addElement(index, modelElement);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final int index, final String value) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setToken(value, index + 1);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setTokens(newArguments);
     }
 }

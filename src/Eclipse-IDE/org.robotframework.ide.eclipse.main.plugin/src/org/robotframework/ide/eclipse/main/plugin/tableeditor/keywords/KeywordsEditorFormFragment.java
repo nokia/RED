@@ -84,7 +84,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersCo
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor.TableCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
@@ -198,7 +197,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
         // data providers
-        final TableCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
+        final CodeTableValuesChangingCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
         final KeywordsColumnsPropertyAccessor propertyAccessor = new KeywordsColumnsPropertyAccessor(commandsStack,
                 commandsCollector);
         dataProvider = new KeywordsDataProvider(propertyAccessor, getSection());
@@ -552,20 +551,6 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.selectElementPreservingSelectedColumnsAfterOperation(call, tableInputIsReplaced());
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenKeywordCallCommentIsConverted(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE) final Event event) {
-
-        final RobotKeywordDefinition definition = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
-        final RobotKeywordCall call = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
-
-        if (definition != null && definition.getSuiteFile() == fileModel) {
-            sortModel.clear();
             selectionLayerAccessor.preserveSelectionIfNotEditingArgumentWhen(call, tableInputIsReplaced());
         }
     }
@@ -655,6 +640,10 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();
+
+                // this is done in order to ensure IEclipseContext has refreshed
+                // selection stored and does not provide old objects
+                selectionLayerAccessor.refreshSelection();
             }
         }
     }

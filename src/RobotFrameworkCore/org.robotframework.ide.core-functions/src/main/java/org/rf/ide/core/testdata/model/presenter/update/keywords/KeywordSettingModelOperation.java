@@ -35,22 +35,16 @@ public class KeywordSettingModelOperation implements IExecutablesStepsHolderElem
         return LocalSettingTokenTypes.getTokenType(handledType, 0) == elementType;
     }
 
-    @Override
-    public AModelElement<UserKeyword> create(final UserKeyword executablesHolder, final int index, final String action,
-            final List<String> args, final String comment) {
-        throw new IllegalStateException();
-    }
-
-    public final AModelElement<UserKeyword> create(
+    public static LocalSetting<UserKeyword> create(
             final BiFunction<Integer, String, LocalSetting<UserKeyword>> settingCreator, final int index,
-            final String settingName, final List<String> args, final String comment) {
+            final String settingName, final List<String> args, final List<String> comments) {
 
         final LocalSetting<UserKeyword> newSetting = settingCreator.apply(index, settingName);
         for (final String arg : args) {
             newSetting.addToken(arg);
         }
-        if (comment != null && !comment.isEmpty()) {
-            newSetting.setComment(comment);
+        for (final String comment : comments) {
+            newSetting.addCommentPart(comment);
         }
         return newSetting;
     }
@@ -59,17 +53,5 @@ public class KeywordSettingModelOperation implements IExecutablesStepsHolderElem
     public final AModelElement<UserKeyword> insert(final UserKeyword keyword, final int index,
             final AModelElement<?> modelElement) {
         return keyword.addElement(index, modelElement);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final int index, final String value) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setToken(value, index + 1);
-    }
-
-    @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
-        final LocalSetting<?> setting = (LocalSetting<?>) modelElement;
-        setting.setTokens(newArguments);
     }
 }

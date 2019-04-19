@@ -90,7 +90,8 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         return allElements.remove(element);
     }
 
-    public void removeElementAt(final int index) {
+    @Override
+    public void removeElement(final int index) {
         allElements.remove(index);
     }
 

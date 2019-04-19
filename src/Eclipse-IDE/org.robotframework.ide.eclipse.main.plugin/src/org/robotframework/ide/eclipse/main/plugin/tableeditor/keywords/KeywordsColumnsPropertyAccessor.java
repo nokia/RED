@@ -11,11 +11,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableValuesChangingCommandsCollector;
 
 class KeywordsColumnsPropertyAccessor extends CodeElementsColumnsPropertyAccessor {
 
     KeywordsColumnsPropertyAccessor(final RobotEditorCommandsStack commandsStack,
-            final TableCommandsCollector commandsCollector) {
+            final CodeTableValuesChangingCommandsCollector commandsCollector) {
         super(commandsStack, commandsCollector);
     }
 

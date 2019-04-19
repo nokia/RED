@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -24,7 +25,7 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHolder, Serializable {
 
     private static final long serialVersionUID = -4158729064542423691L;
 
@@ -77,7 +78,6 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     public void setAction(final RobotToken action) {
         this.action = updateOrCreate(this.action, action, getActionType());
-
         fixMissingTypes();
     }
 
@@ -212,12 +212,12 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     @Override
     public FilePosition getBeginPosition() {
-        FilePosition position = getAction().getFilePosition();
+        final FilePosition position = getAction().getFilePosition();
         if (position.isNotSet()) {
             // this may be comment row
             final List<RobotToken> tokens = getElementTokens();
             if (tokens.size() > 1) {
-                position = tokens.get(1).getFilePosition();
+                return tokens.get(1).getFilePosition();
             }
         }
         return position;
@@ -228,28 +228,26 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         fixMissingTypes();
         final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
-        tokens.addAll(compact(arguments));
-        tokens.addAll(compact(comments));
+        if (comments.isEmpty()) {
+            tokens.addAll(trimEmptyTokensAtListEnd(arguments));
+        } else {
+            tokens.addAll(arguments);
+            tokens.addAll(trimEmptyTokensAtListEnd(comments));
+        }
 
         return tokens;
     }
 
-    private List<RobotToken> compact(final List<RobotToken> elementsSingleType) {
-        final int size = elementsSingleType.size();
-        for (int i = size - 1; i >= 0; i--) {
-            if (elementsSingleType.size() == 0) {
-                break;
-            }
-
-            final RobotToken t = elementsSingleType.get(i);
-            if (t.getText() == null || t.getText().isEmpty()) {
-                elementsSingleType.remove(i);
+    private List<RobotToken> trimEmptyTokensAtListEnd(final List<RobotToken> tokens) {
+        final ListIterator<RobotToken> iterator = tokens.listIterator(tokens.size());
+        while (iterator.hasPrevious()) {
+            if (iterator.previous().isEmpty()) {
+                iterator.remove();
             } else {
                 break;
             }
         }
-
-        return elementsSingleType;
+        return tokens;
     }
 
     public boolean isExecutable() {
@@ -277,41 +275,109 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     @Override
-    public void insertValueAt(final String value, final int position) {
-        final RobotToken tokenToInsert = new RobotToken();
-        tokenToInsert.setText(value);
-        if (position == 0) { // new action
-            if (action.isNotEmpty() || !arguments.isEmpty()) { // in case of artificial comment action token
-                arguments.add(0, action);
-            } else if (value.isEmpty()) {
-                tokenToInsert.setText("\\");
-            }
-            action = tokenToInsert;
-        } else if (arguments.isEmpty() && !action.isNotEmpty()) { // whole line comment
-            comments.add(position, tokenToInsert);
-        } else if (position - 1 <= arguments.size()) { // new argument
-            if (position - 1 == arguments.size() && value.isEmpty()) {
-                tokenToInsert.setText("\\");
-            }
-            arguments.add(position - 1, tokenToInsert);
-        } else if (position - 1 - arguments.size() <= comments.size()) { // new comment part
-            comments.add(position - 1 - arguments.size(), tokenToInsert);
+    public void createToken(final int index) {
+        final int argsIndex = index - 1;
+        final int commentsIndex = index - arguments.size() - 1;
+
+        if (index == 0) {
+            arguments.add(0, action);
+            action = RobotToken.create("");
+            fixMissingTypes();
+
+        } else if (0 <= argsIndex && argsIndex <= arguments.size()) {
+            arguments.add(argsIndex, RobotToken.create("", getArgumentType()));
+
+        } else if (1 <= commentsIndex && commentsIndex <= comments.size()) {
+            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
         }
-        fixMissingTypes();
     }
 
-    public <P> RobotExecutableRow<P> copy() {
-        final RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
-        execRow.setAction(getAction().copyWithoutPosition());
-        for (final RobotToken arg : getArguments()) {
-            execRow.addArgument(arg.copyWithoutPosition());
-        }
+    @Override
+    public void updateToken(final int index, final String newValue) {
+        final int argsIndex = index - 1;
+        final int commentsIndex = index - 1 - arguments.size();
 
-        for (final RobotToken cmPart : getComment()) {
-            execRow.addCommentPart(cmPart.copyWithoutPosition());
-        }
+        if (index == 0 && newValue.trim().startsWith("#")) {
+            throw new IllegalArgumentException();
 
-        return execRow;
+        } else if (index == 0) {
+            action.setText(newValue);
+
+        } else if (0 <= argsIndex && argsIndex < arguments.size()) {
+            arguments.get(argsIndex).setText(newValue);
+
+            if (newValue.trim().startsWith("#")) {
+                for (int i = arguments.size() - 1; i >= argsIndex; i--) {
+                    comments.add(0, arguments.remove(i));
+                }
+                fixCommentsTypes();
+            }
+
+        } else if (comments.isEmpty() && arguments.size() <= argsIndex) {
+            final int repeat = argsIndex - arguments.size();
+            for (int i = 0; i < repeat; i++) {
+                addArgument(RobotToken.create("\\"));
+            }
+            if (newValue.trim().startsWith("#")) {
+                addCommentPart(RobotToken.create(newValue));
+            } else {
+                addArgument(RobotToken.create(newValue));
+            }
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            comments.get(commentsIndex).setText(newValue);
+
+            while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
+                final RobotToken toMove = comments.remove(0);
+                toMove.setType(getArgumentType());
+                arguments.add(toMove);
+            }
+            fixCommentsTypes();
+
+        } else if (comments.size() <= commentsIndex) {
+            final int repeat = commentsIndex - comments.size() + 1;
+            for (int i = 0; i < repeat; i++) {
+                addCommentPart(RobotToken.create("\\"));
+            }
+            comments.get(commentsIndex).setText(newValue);
+        }
+    }
+
+    @Override
+    public void deleteToken(final int index) {
+        final int argsIndex = index - 1;
+        final int commentsIndex = index - 1 - arguments.size();
+
+        if (index == 0 && arguments.isEmpty()) {
+            throw new IllegalArgumentException();
+
+        } else if (index == 0) {
+            action = arguments.remove(0);
+            fixMissingTypes();
+
+        } else if (0 <= argsIndex && argsIndex < arguments.size()) {
+            arguments.remove(argsIndex);
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            comments.remove(commentsIndex);
+
+            while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
+                final RobotToken toMove = comments.remove(0);
+                toMove.setType(getArgumentType());
+                arguments.add(toMove);
+            }
+            fixCommentsTypes();
+        }
+    }
+
+    @Override
+    public void rewriteFrom(final CommonStep<?> other) {
+        final RobotExecutableRow<?> otherRow = (RobotExecutableRow<?>) other;
+        this.action = otherRow.action;
+        this.arguments.clear();
+        this.arguments.addAll(otherRow.arguments);
+        this.comments.clear();
+        this.comments.addAll(otherRow.comments);
     }
 
     private void fixMissingTypes() {
@@ -326,6 +392,18 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
                 token.getTypes().remove(RobotTokenType.UNKNOWN);
                 token.getTypes().remove(getActionType());
                 fixForTheType(token, getArgumentType(), true);
+            }
+        }
+    }
+
+    private void fixCommentsTypes() {
+        for (int i = 0; i < comments.size(); i++) {
+            final RobotToken token = comments.get(i);
+            if (i == 0) {
+                token.setType(RobotTokenType.START_HASH_COMMENT);
+
+            } else if (i > 0) {
+                token.setType(RobotTokenType.COMMENT_CONTINUE);
             }
         }
     }

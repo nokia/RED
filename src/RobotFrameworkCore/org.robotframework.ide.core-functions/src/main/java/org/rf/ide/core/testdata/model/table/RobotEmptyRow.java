@@ -11,16 +11,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+public class RobotEmptyRow<T> extends CommonStep<T> implements ICommentHolder, Serializable {
 
     private static final long serialVersionUID = -3838003731139030172L;
+
+    public static boolean isEmpty(final String text) {
+        return Pattern.matches("^[\\s]*$", text);
+    }
 
     private RobotToken emptyToken = new RobotToken();
 
@@ -31,16 +34,26 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
         emptyToken = empty;
     }
 
+    public RobotToken getEmptyToken() {
+        return emptyToken;
+    }
+
     @Override
     public boolean isPresent() {
         return true;
     }
 
+    public boolean isCommentOnly() {
+        return emptyToken.getFilePosition().isNotSet() && emptyToken.getText().isEmpty() && !emptyToken.isDirty();
+    }
+
+    public boolean isEmptyLine() {
+        return comments.isEmpty() && emptyToken.getFilePosition().isNotSet() && emptyToken.getText().isEmpty()
+                && !emptyToken.isDirty();
+    }
+
     @Override
     public void addCommentPart(final RobotToken rt) {
-        if (comments.isEmpty() && emptyToken.getText().isEmpty()) {
-            emptyToken = new RobotToken();
-        }
         fixComment(getComment(), rt);
         comments.add(rt);
     }
@@ -78,7 +91,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public FilePosition getBeginPosition() {
-        if (emptyToken.getFilePosition().isNotSet() && !comments.isEmpty()) {
+        if (isCommentOnly() && !comments.isEmpty()) {
             return comments.get(0).getFilePosition();
         } else {
             return emptyToken.getFilePosition();
@@ -88,7 +101,9 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
-        tokens.add(emptyToken);
+        if (!isCommentOnly()) {
+            tokens.add(emptyToken);
+        }
         tokens.addAll(comments);
         return tokens;
     }
@@ -105,22 +120,119 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     }
 
     @Override
-    public void insertValueAt(final String value, final int position) {
+    public void createToken(final int index) {
+        final int commentsIndex = isCommentOnly() ? index : index - 1;
 
-        if (position == 0 && emptyToken.getFilePosition().isNotSet()) {
-            final RobotToken tokenToInsert = RobotToken.create("\\");
-            setEmpty(tokenToInsert);
+        if (isCommentOnly() && index == 0) {
+            setEmpty(RobotToken.create(""));
+            emptyToken.markAsDirty();
 
-        } else if (!comments.isEmpty() && position - 1 <= comments.size()) {
-            final RobotToken tokenToInsert = RobotToken.create("");
-            tokenToInsert.setType(RobotTokenType.COMMENT_CONTINUE);
+        } else if (!isCommentOnly() && (index == 0 || index == 1)) {
+            throw new IllegalArgumentException();
 
-            final int shift = emptyToken.getFilePosition().isNotSet() ? 1 : 0;
-            comments.add(position - 1 + shift, tokenToInsert);
+        } else if (1 <= commentsIndex && commentsIndex <= comments.size()) {
+            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
         }
     }
 
-    public static boolean isEmpty(final String text) {
-        return Pattern.matches("^[\\s]*$", text);
+    @Override
+    public void updateToken(final int index, final String newValue) {
+        final int commentsIndex = isCommentOnly() ? index : index - 1;
+
+        if (index == 0) {
+            if (isCommentOnly() && newValue.trim().startsWith("#")) {
+                if (comments.isEmpty()) {
+                    addCommentPart(RobotToken.create(newValue));
+                } else {
+                    comments.get(0).setText(newValue);
+                }
+                fixCommentsTypes();
+
+            } else if (isCommentOnly() && comments.size() > 1 && !comments.get(1).getText().trim().startsWith("#")) {
+                throw new IllegalArgumentException();
+
+            } else if (isCommentOnly() && !newValue.isEmpty() && !newValue.equals("\\")) {
+                throw new IllegalArgumentException();
+
+            } else if (isCommentOnly()) {
+                setEmpty(RobotToken.create(newValue));
+                emptyToken.markAsDirty();
+                comments.remove(0);
+                fixCommentsTypes();
+
+            } else if (newValue.trim().startsWith("#")) {
+                emptyToken = new RobotToken();
+                comments.add(0, RobotToken.create(newValue));
+                fixCommentsTypes();
+
+            } else if (!newValue.isEmpty() && !newValue.equals("\\")) {
+                throw new IllegalArgumentException();
+
+            } else {
+                emptyToken.setText(newValue);
+            }
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            if (commentsIndex == 0 && !newValue.trim().startsWith("#") && comments.size() > 1
+                    && !comments.get(1).getText().trim().startsWith("#")) {
+                throw new IllegalArgumentException();
+
+            }
+            comments.get(commentsIndex).setText(newValue);
+            fixCommentsTypes();
+
+        } else if (comments.size() <= commentsIndex) {
+            final int repeat = commentsIndex - comments.size() + 1;
+            for (int i = 0; i < repeat; i++) {
+                addCommentPart(RobotToken.create("\\"));
+            }
+            comments.get(commentsIndex).setText(newValue);
+        }
+    }
+
+    @Override
+    public void deleteToken(final int index) {
+        final int commentsIndex = isCommentOnly() ? index : index - 1;
+
+        if (index == 0 && !isCommentOnly()) {
+            emptyToken = new RobotToken();
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            if (commentsIndex == 0 && comments.size() > 1) {
+                if (isCommentOnly() && comments.get(1).getText().trim().equals("")
+                        || comments.get(1).getText().trim().equals("\\") && (comments.size() == 2
+                                || comments.size() > 2 && comments.get(2).getText().trim().startsWith("#"))) {
+                    comments.remove(0);
+                    setEmpty(comments.remove(0));
+                    fixCommentsTypes();
+                    return;
+
+                } else if (!comments.get(1).getText().trim().startsWith("#")) {
+                    throw new IllegalArgumentException();
+                }
+            }
+            comments.remove(commentsIndex);
+            fixCommentsTypes();
+        }
+    }
+
+    private void fixCommentsTypes() {
+        for (int i = 0; i < comments.size(); i++) {
+            final RobotToken token = comments.get(i);
+            if (i == 0) {
+                token.setType(RobotTokenType.START_HASH_COMMENT);
+
+            } else if (i > 0) {
+                token.setType(RobotTokenType.COMMENT_CONTINUE);
+            }
+        }
+    }
+
+    @Override
+    public void rewriteFrom(final CommonStep<?> other) {
+        final RobotEmptyRow<?> otherRow = (RobotEmptyRow<?>) other;
+        this.emptyToken = otherRow.emptyToken;
+        this.comments.clear();
+        this.comments.addAll(otherRow.comments);
     }
 }

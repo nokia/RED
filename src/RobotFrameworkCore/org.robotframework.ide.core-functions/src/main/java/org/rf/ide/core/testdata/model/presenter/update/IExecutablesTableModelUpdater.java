@@ -11,13 +11,11 @@ import org.rf.ide.core.testdata.model.AModelElement;
 
 public interface IExecutablesTableModelUpdater<T> {
 
-    public AModelElement<T> createSetting(final T executablesHolder, final int index, final String settingName,
-            final String comment, final List<String> args);
+    public AModelElement<T> createExecutableRow(final T executablesHolder, final int index, List<String> cells);
 
-    public AModelElement<T> createExecutableRow(final T executablesHolder, final int index, final String action,
-            final String comment, final List<String> args);
+    public AModelElement<T> createSetting(final T executablesHolder, final int index, List<String> cells);
 
-    public AModelElement<T> createEmptyLine(final T executablesHolder, final int index, final String name);
+    public AModelElement<T> createEmptyLine(final T executablesHolder, final int index, List<String> cells);
 
     /**
      * Inserts element into {@code executablesHolder} under given index. Usually the
@@ -34,11 +32,5 @@ public interface IExecutablesTableModelUpdater<T> {
      * @return Actual object which was inserted into {@code executablesHolder}
      */
     public AModelElement<?> insert(final T executablesHolder, final int index, final AModelElement<?> modelElement);
-
-    public void updateArgument(final AModelElement<?> modelElement, final int index, final String value);
-
-    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments);
-
-    public void updateComment(final AModelElement<?> modelElement, final String value);
 
 }

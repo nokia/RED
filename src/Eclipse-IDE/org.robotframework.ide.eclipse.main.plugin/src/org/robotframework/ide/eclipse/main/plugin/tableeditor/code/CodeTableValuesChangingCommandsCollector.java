@@ -5,42 +5,98 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateArgumentSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCodeHolderNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor.TableCommandsCollector;
 
-public class CodeTableValuesChangingCommandsCollector implements TableCommandsCollector {
+public class CodeTableValuesChangingCommandsCollector {
 
-    @Override
-    public Optional<? extends EditorCommand> collect(final RobotElement element, final String value, final int column,
-            final int numberOfColumns) {
+    public List<? extends EditorCommand> collectForRemoval(final RobotElement element, final List<Integer> columns) {
+        final List<EditorCommand> commands = new ArrayList<>();
 
-        if (element instanceof RobotCase) {
-            final RobotCase testCase = (RobotCase) element;
-            return column == 0 ? Optional.of(new SetCodeHolderNameCommand(testCase, value)) : Optional.empty();
+        if (element instanceof RobotCodeHoldingElement<?>) {
+            final RobotCodeHoldingElement<?> codeHolder = (RobotCodeHoldingElement<?>) element;
 
-        } else if (element instanceof RobotTask) {
-            final RobotTask task = (RobotTask) element;
-            return column == 0 ? Optional.of(new SetCodeHolderNameCommand(task, value)) : Optional.empty();
+            if (columns.contains(Integer.valueOf(0))) {
+                commands.add(new SetCodeHolderNameCommand(codeHolder, null));
+            }
 
-        } else if (element instanceof RobotKeywordDefinition) {
-            final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
+            if (element instanceof RobotKeywordDefinition) {
+                final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
+
+                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                if (argumentsSetting != null) {
+                    final List<String> data = ExecutablesRowView.rowData(argumentsSetting);
+                    final List<Integer> filteredColumns = columns.stream()
+                            .mapToInt(Integer::valueOf)
+                            .filter(i -> i > 0 && i < data.size())
+                            .sorted()
+                            .mapToObj(Integer::valueOf)
+                            .collect(toList());
+                    for (int i = filteredColumns.size() - 1; i >= 0; i--) {
+                        data.remove(filteredColumns.get(i).intValue());
+                    }
+
+                    if (data.size() == 1) {
+                        // there is only [Argument] cell left
+                        commands.add(new DeleteKeywordCallCommand(newArrayList(argumentsSetting)));
+
+                    } else {
+                        new KeywordCallsTableValuesChangingCommandsCollector()
+                                .collectForRemoval(argumentsSetting, filteredColumns)
+                                .ifPresent(commands::add);
+                    }
+                }
+            }
+        } else {
+            new KeywordCallsTableValuesChangingCommandsCollector()
+                    .collectForRemoval((RobotKeywordCall) element, columns)
+                    .ifPresent(commands::add);
+        }
+        return commands;
+    }
+
+    public Optional<? extends EditorCommand> collectForChange(final RobotElement element, final String value,
+            final int column) {
+
+        if (element instanceof RobotCodeHoldingElement<?>) {
+            final RobotCodeHoldingElement<?> codeHolder = (RobotCodeHoldingElement<?>) element;
+
             if (column == 0) {
-                return Optional.of(new SetCodeHolderNameCommand(keywordDef, value));
+                return Optional.of(new SetCodeHolderNameCommand(codeHolder, value));
 
-            } else if (column > 0 && column <= numberOfColumns - 1) {
-                return Optional.of(new SetKeywordDefinitionArgumentCommand(keywordDef, column - 1, value));
+            } else if (column > 0 && element instanceof RobotKeywordDefinition) {
+                final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
+
+                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                if (argumentsSetting == null) {
+                    return Optional.of(new CreateArgumentSettingCommand(keywordDef, column, value));
+                } else {
+                    return new KeywordCallsTableValuesChangingCommandsCollector().collectForUpdate(argumentsSetting,
+                            value, column);
+                }
             }
             return Optional.empty();
+
+        } else if (element instanceof RobotKeywordCall && value != null) {
+            return new KeywordCallsTableValuesChangingCommandsCollector().collectForUpdate((RobotKeywordCall) element,
+                    value, column);
+
         } else {
-            return new KeywordCallsTableValuesChangingCommandsCollector().collect(element, value, column);
+            return Optional.empty();
         }
     }
 }

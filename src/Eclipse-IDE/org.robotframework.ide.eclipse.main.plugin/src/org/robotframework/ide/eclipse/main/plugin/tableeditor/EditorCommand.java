@@ -39,11 +39,11 @@ public abstract class EditorCommand {
         this.parent = parent;
     }
 
-    protected List<EditorCommand> newUndoCommands(final EditorCommand newUndoCommand) {
+    protected final List<EditorCommand> newUndoCommands(final EditorCommand newUndoCommand) {
         return newUndoCommands(newArrayList(newUndoCommand));
     }
 
-    protected List<EditorCommand> newUndoCommands(final List<EditorCommand> newUndoCommands) {
+    protected final List<EditorCommand> newUndoCommands(final List<EditorCommand> newUndoCommands) {
         for (final EditorCommand newUndoCommand : newUndoCommands) {
             newUndoCommand.eventBroker = this.eventBroker;
             newUndoCommand.parent = parent != null ? parent : this;

@@ -161,8 +161,12 @@ public class RobotToken implements IRobotLineElement, Serializable {
         isDirty = false;
     }
 
+    public boolean isEmpty() {
+        return text == null || text.isEmpty();
+    }
+
     public boolean isNotEmpty() {
-        return this.getText() != null && !this.getText().isEmpty();
+        return !isEmpty();
     }
 
     @Override

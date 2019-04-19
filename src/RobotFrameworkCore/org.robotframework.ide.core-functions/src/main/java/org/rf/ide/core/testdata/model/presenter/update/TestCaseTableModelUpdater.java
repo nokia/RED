@@ -11,19 +11,18 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.ExecRowToTestExecRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.LocalSettingToTestSettingMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseDocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseEmptyLineModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseSettingModelOperation;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -32,7 +31,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     private static final List<IExecutablesStepsHolderElementOperation<TestCase>> ELEMENT_OPERATIONS = newArrayList(
             new TestCaseEmptyLineModelOperation(), new TestCaseExecutableRowModelOperation(),
-            new TestCaseDocumentationModelOperation(), new TestCaseSettingModelOperation(ModelType.TEST_CASE_SETUP),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_DOCUMENTATION),
+            new TestCaseSettingModelOperation(ModelType.TEST_CASE_SETUP),
             new TestCaseSettingModelOperation(ModelType.TEST_CASE_TAGS),
             new TestCaseSettingModelOperation(ModelType.TEST_CASE_TEARDOWN),
             new TestCaseSettingModelOperation(ModelType.TEST_CASE_TEMPLATE),
@@ -42,25 +42,43 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             new ExecRowToTestExecRowMorphOperation(),
             new LocalSettingToTestSettingMorphOperation());
 
+    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<TestCase> createEmptyLine(final TestCase testCase, final int index, final String name) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                ModelType.EMPTY_LINE);
-        if (operationHandler == null || testCase == null) {
-            throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
-        }
-        final AModelElement<TestCase> row = operationHandler.create(testCase, index, name, null, null);
+    public RobotExecutableRow<TestCase> createExecutableRow(final TestCase testCase, final int index,
+            final List<String> cells) {
+        final RobotExecutableRow<?> row = createExecutableRow(cells);
         testCase.addElement(index, row);
+        return (RobotExecutableRow<TestCase>) row;
+    }
+
+    static RobotExecutableRow<?> createExecutableRow(final List<String> cells) {
+        if (cells.isEmpty()) {
+            throw new IllegalArgumentException("Unable to create empty call");
+        }
+        final int cmtIndex = indexOfCommentStart(cells);
+        
+        final RobotExecutableRow<?> row = new RobotExecutableRow<>();
+        row.setAction(RobotToken.create(cells.get(0)));
+        for (int i = 1; i < cells.size(); i++) {
+            if (i < cmtIndex) {
+                row.addArgument(RobotToken.create(cells.get(i)));
+            } else {
+                row.addCommentPart(RobotToken.create(cells.get(i)));
+            }
+        }
         return row;
     }
 
     @Override
-    public AModelElement<TestCase> createSetting(final TestCase testCase, final int index, final String settingName,
-            final String comment, final List<String> args) {
-
+    public LocalSetting<TestCase> createSetting(final TestCase testCase, final int index,
+            final List<String> cells) {
+        if (cells.isEmpty()) {
+            throw new IllegalArgumentException("Unable to create empty setting. There is no setting name given");
+        }
+        final String settingName = cells.get(0);
         if (testCase == null) {
             throw new IllegalArgumentException(
-                    "Unable to create " + settingName + " setting. There is no test case given");
+                    "Unable to create " + settingName + " setting. There is no parent given");
         }
         final BiFunction<Integer, String, LocalSetting<TestCase>> creator = getSettingCreateOperation(testCase,
                 settingName);
@@ -68,48 +86,53 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return new TestCaseSettingModelOperation(null).create(creator, index, settingName, args, comment);
+        final int cmtIndex = indexOfCommentStart(cells);
+
+        final LocalSetting<TestCase> newSetting = creator.apply(index, settingName);
+        for (int i = 1; i < cells.size(); i++) {
+            if (i < cmtIndex) {
+                newSetting.addToken(RobotToken.create(cells.get(i)));
+            } else {
+                newSetting.addCommentPart(RobotToken.create(cells.get(i)));
+            }
+        }
+        return newSetting;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<TestCase> createExecutableRow(final TestCase testCase, final int index, final String action,
-            final String comment, final List<String> args) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                ModelType.TEST_CASE_EXECUTABLE_ROW);
-        if (operationHandler == null || testCase == null) {
-            throw new IllegalArgumentException(
-                    "Unable to create " + action + " executable row. Operation handler is missing");
-        }
-        final AModelElement<TestCase> row = operationHandler.create(testCase, index, action, args, comment);
+    public RobotEmptyRow<TestCase> createEmptyLine(final TestCase testCase, final int index,
+            final List<String> cells) {
+        final RobotEmptyRow<?> row = createEmptyLine(cells);
         testCase.addElement(index, row);
+        return (RobotEmptyRow<TestCase>) row;
+    }
+
+    static RobotEmptyRow<?> createEmptyLine(final List<String> cells) {
+        final RobotEmptyRow<?> row = new RobotEmptyRow<>();
+
+        if (!cells.isEmpty()) {
+            final int cmtIndex = indexOfCommentStart(cells);
+            if (cmtIndex > 0) {
+                final RobotToken emptyToken = RobotToken.create(cells.get(0), RobotTokenType.EMPTY_CELL);
+                emptyToken.markAsDirty();
+                row.setEmpty(emptyToken);
+            }
+
+            for (int i = cmtIndex; i < cells.size(); i++) {
+                row.addCommentPart(RobotToken.create(cells.get(i)));
+            }
+        }
         return row;
     }
 
-    @Override
-    public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to update arguments of " + modelElement + ". Operation handler is missing");
+    static int indexOfCommentStart(final List<String> data) {
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).trim().startsWith("#")) {
+                return i;
+            }
         }
-        operationHandler.update(modelElement, index, value);
-    }
-
-    @Override
-    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
-        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to set arguments of " + modelElement + ". Operation handler is missing");
-        }
-        operationHandler.update(modelElement, arguments);
-    }
-
-    @Override
-    public void updateComment(final AModelElement<?> modelElement, final String value) {
-        CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
+        return data.size();
     }
 
     @Override

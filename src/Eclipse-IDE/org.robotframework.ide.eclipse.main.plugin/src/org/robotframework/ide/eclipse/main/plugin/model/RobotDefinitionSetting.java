@@ -58,20 +58,6 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         return arguments;
     }
 
-    @Override
-    public boolean shouldAddCommentMark() {
-        final RobotToken declaration = getLinkedElement().getDeclaration();
-        if (declaration.isDirty()) {
-            if (declaration.getText().isEmpty()) {
-                return true;
-            } else {
-                return !declaration.getText().trim().startsWith("#");
-            }
-        } else {
-            return !declaration.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-        }
-    }
-
     public boolean isArguments() {
         return getLinkedElement().getModelType() == ModelType.USER_KEYWORD_ARGUMENTS;
     }
@@ -111,20 +97,5 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         final ModelType modelType = getLinkedElement().getModelType();
         return modelType == ModelType.TEST_CASE_TAGS || modelType == ModelType.TASK_TAGS
                 || modelType == ModelType.USER_KEYWORD_TAGS;
-    }
-
-    @Override
-    public RobotKeywordCall insertEmptyCellAt(final int position) {
-        if (position > 0) {
-            return super.insertEmptyCellAt(position);
-        }
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) getParent();
-        final int index = getIndex();
-        parent.removeChild(this);
-        final List<String> args = getArguments();
-        args.add(0, super.getName());
-        final RobotKeywordCall resultCall = parent.createKeywordCall(index, "", args, getComment());
-        resultCall.resetStored();
-        return resultCall;
     }
 }
