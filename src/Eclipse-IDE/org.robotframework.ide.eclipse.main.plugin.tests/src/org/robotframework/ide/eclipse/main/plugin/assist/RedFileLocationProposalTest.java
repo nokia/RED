@@ -11,12 +11,12 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.Range;

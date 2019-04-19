@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
-import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.junit.Rule;
@@ -25,6 +23,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.robotframework.red.jface.viewers.ActivationCharPreservingTextCellEditor;
+import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.viewers.ElementAddingToken;
 

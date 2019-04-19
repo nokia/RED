@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.search;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
+import org.robotframework.red.jface.viewers.Stylers;
 
 /**
  * @author Michal Anglart

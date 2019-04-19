@@ -8,7 +8,6 @@ package org.robotframework.red.nattable.configs;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -20,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPrefere
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
+import org.robotframework.red.jface.viewers.Stylers;
 
 /**
  * @author lwlodarc

@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
@@ -51,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFi
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.swt.SimpleProgressBar;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;

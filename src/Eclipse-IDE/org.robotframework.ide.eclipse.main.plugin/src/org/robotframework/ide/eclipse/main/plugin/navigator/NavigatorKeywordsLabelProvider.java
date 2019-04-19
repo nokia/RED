@@ -5,16 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import static org.eclipse.jface.viewers.Stylers.mixingStyler;
+import static org.robotframework.red.jface.viewers.Stylers.mixingStyler;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.Stylers;
 
 public class NavigatorKeywordsLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 

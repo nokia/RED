@@ -23,7 +23,6 @@ import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.StyledText;
@@ -52,6 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksListener;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 

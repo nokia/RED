@@ -6,19 +6,19 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.validation;
 
 import static java.util.stream.Collectors.joining;
-import static org.eclipse.jface.viewers.Stylers.withForeground;
+import static org.robotframework.red.jface.viewers.Stylers.withForeground;
 
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
