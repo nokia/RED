@@ -81,24 +81,6 @@ public class RobotEmptyLineTest {
         assertComment(createCallsFromKeywordForTest());
     }
 
-    @Test
-    public void emptyLineShouldNotBeCommented_whenNotCommented() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
-                .appendLine("t1")
-                .appendLine("")
-                .appendLine("  Log  arg")
-                .build();
-        final List<RobotKeywordCall> calls = model.findSection(RobotCasesSection.class)
-                .get()
-                .getChildren()
-                .get(0)
-                .getChildren();
-        assertThat(calls).hasSize(2);
-        assertThat(calls.get(0).getName()).isEqualTo("");
-        assertThat(calls.get(0).getComment()).isEmpty();
-        assertThat(calls.get(0).shouldAddCommentMark()).isFalse();
-    }
-
     private static void assertArguments(final List<RobotEmptyLine> list) {
         assertThat(list).allMatch(el -> el.getArguments().isEmpty());
     }
@@ -118,37 +100,6 @@ public class RobotEmptyLineTest {
                 .map(s -> s.map(RobotToken::getText).collect(joining("")))
                 .collect(toList());
         assertThat(comments).containsExactly("", "# whole line commented", "", "", "", "");
-    }
-
-    @Test
-    public void insertCell_shouldDoNothing() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
-                .appendLine("t1")
-                .appendLine("")
-                .appendLine("  Log  arg")
-                .build();
-        final RobotKeywordCall emptyBefore = model.findSection(RobotCasesSection.class)
-                .get()
-                .getChildren()
-                .get(0)
-                .getChildren()
-                .get(0);
-        final List<RobotToken> emptyTokenBefore = emptyBefore.getLinkedElement().getElementTokens();
-
-        emptyBefore.insertEmptyCellAt(0);
-
-        final RobotKeywordCall emptyAfter = model.findSection(RobotCasesSection.class)
-                .get()
-                .getChildren()
-                .get(0)
-                .getChildren()
-                .get(0);
-        final List<RobotToken> emptyTokenAfter = emptyAfter.getLinkedElement().getElementTokens();
-
-        assertThat(emptyAfter).isEqualTo(emptyBefore);
-        assertThat(emptyTokenAfter).hasSameSizeAs(emptyTokenBefore);
-        assertThat(emptyTokenAfter).hasSize(1);
-        assertThat(emptyTokenAfter.get(0).getText().trim()).isEmpty();
     }
 
     @Test

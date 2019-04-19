@@ -26,7 +26,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.base.Preconditions;
 
-public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Serializable {
 
     private static final long serialVersionUID = 5810286313565051692L;
 
@@ -59,13 +59,49 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
         return modelType;
     }
 
+    @Override
+    public List<RobotToken> getComment() {
+        return Collections.unmodifiableList(comments);
+    }
+
+    public void addCommentPart(final String commentToken) {
+        addCommentPart(RobotToken.create(commentToken));
+    }
+
+    @Override
+    public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
+        comments.add(rt);
+    }
+
+    @Override
+    public void setComment(final String comment) {
+        setComment(RobotToken.create(comment));
+    }
+
+    @Override
+    public void setComment(final RobotToken comment) {
+        comments.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(final int index) {
+        comments.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        comments.clear();
+    }
+
     public void changeModelType(final ModelType type) {
         // firstly we remove types of tokens tied to old model type
         removeTypes(0);
 
         // then we change the type and properly add token types tied to new model type
         this.modelType = type;
-        fixTypes();
+        fixTokensTypes();
     }
 
     private void removeTypes(final int startingIndex) {
@@ -126,31 +162,11 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
         return super.removeElementFromList(tokens, index);
     }
 
-    @Override
-    public void insertValueAt(final String value, final int position) {
-        final RobotToken tokenToInsert = RobotToken.create(value);
-        if (1 <= position && position <= tokens.size()) {
-            removeTypes(position);
-            tokens.add(position, tokenToInsert);
-            fixTypes();
-
-        } else if (position > tokens.size()) {
-            final int commentsIndex = position - tokens.size();
-            fixForTheType(tokenToInsert,
-                    commentsIndex == 0 ? RobotTokenType.START_HASH_COMMENT : RobotTokenType.COMMENT_CONTINUE);
-            if (commentsIndex == 0) {
-                comments.get(0).getTypes().remove(RobotTokenType.START_HASH_COMMENT);
-                comments.get(0).getTypes().add(RobotTokenType.COMMENT_CONTINUE);
-            }
-            comments.add(commentsIndex, tokenToInsert);
-        }
-    }
-
     public void addToken(final RobotToken token) {
         this.tokens.add(fixType(token, tokens.size()));
     }
 
-    private void fixTypes() {
+    private void fixTokensTypes() {
         for (int i = 0; i < tokens.size(); i++) {
             fixType(tokens.get(i), i);
         }
@@ -185,6 +201,7 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
             }
             tokens.set(index, RobotToken.create(tokenText, LocalSettingTokenTypes.getTokenType(modelType, index)));
         }
+        fixTokensTypes();
     }
 
     public void setTokens(final List<String> tokenTexts) {
@@ -197,39 +214,167 @@ public class LocalSetting<T> extends AModelElement<T> implements ICommentHolder,
     }
 
     @Override
-    public List<RobotToken> getComment() {
-        return Collections.unmodifiableList(comments);
-    }
+    public void createToken(final int index) {
+        final int commentIndex = index - tokens.size();
 
-    public void addCommentPart(final String commentToken) {
-        addCommentPart(RobotToken.create(commentToken));
-    }
+        if (index == 0) {
+            throw new IllegalArgumentException();
 
-    @Override
-    public void addCommentPart(final RobotToken rt) {
-        fixComment(getComment(), rt);
-        comments.add(rt);
-    }
+        } else if (0 < index && index <= tokens.size()) {
+            removeTypes(index);
+            tokens.add(index, RobotToken.create("", LocalSettingTokenTypes.getTokenType(modelType, index)));
+            fixTokensTypes();
 
-    @Override
-    public void setComment(final String comment) {
-        setComment(RobotToken.create(comment));
+        } else if (0 <= commentIndex && commentIndex <= comments.size()) {
+            comments.add(commentIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
+        }
     }
 
     @Override
-    public void setComment(final RobotToken comment) {
-        comments.clear();
-        addCommentPart(comment);
+    public void updateToken(final int index, final String newValue) {
+        final int commentsIndex = index - tokens.size();
+
+        if (index == 0) {
+            final ModelType newModelType = findNewModelType(newValue);
+            if (modelType != newModelType) {
+                changeModelType(newModelType);
+            }
+            tokens.get(0).setText(newValue);
+
+        } else if (0 < index && index < tokens.size()) {
+            tokens.get(index).setText(newValue);
+
+            if (newValue.trim().startsWith("#")) {
+                for (int i = tokens.size() - 1; i >= index; i--) {
+                    comments.add(0, tokens.remove(i));
+                }
+                fixCommentsTypes();
+            }
+
+        } else if (comments.isEmpty() && tokens.size() <= index) {
+            final int repeat = index - tokens.size();
+            for (int i = 0; i < repeat; i++) {
+                addToken("\\");
+            }
+            if (newValue.trim().startsWith("#")) {
+                addCommentPart(RobotToken.create(newValue));
+            } else {
+                addToken(newValue);
+            }
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            comments.get(commentsIndex).setText(newValue);
+
+            if (commentsIndex == 0) {
+                while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
+                    final RobotToken toMove = comments.remove(0);
+                    toMove.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
+                    toMove.getTypes().remove(RobotTokenType.COMMENT_CONTINUE);
+                    tokens.add(toMove);
+                }
+                fixTokensTypes();
+            }
+            fixCommentsTypes();
+
+        } else if (comments.size() <= commentsIndex) {
+            final int repeat = commentsIndex - comments.size() + 1;
+            for (int i = 0; i < repeat; i++) {
+                addCommentPart(RobotToken.create("\\"));
+            }
+            comments.get(commentsIndex).setText(newValue);
+        }
+    }
+
+    private ModelType findNewModelType(final String newValue) {
+        final AModelElement<?> parent = (AModelElement<?>) getParent();
+        if (parent == null) {
+            return ModelType.UNKNOWN;
+        } else {
+            RobotTokenType settingDefTokenType = findTokenType(parent.getModelType(), newValue);
+            if (settingDefTokenType == RobotTokenType.UNKNOWN && newValue.startsWith("[") && newValue.endsWith("]")) {
+                settingDefTokenType = getUnkownSettingTokenType(parent.getModelType());
+            }
+            if (settingDefTokenType == RobotTokenType.UNKNOWN) {
+                throw new IllegalArgumentException();
+            }
+            return LocalSettingTokenTypes.getModelTypeFromDeclarationType(settingDefTokenType);
+        }
+    }
+
+    private RobotTokenType findTokenType(final ModelType modelType, final String newDef) {
+        switch (modelType) {
+            case TEST_CASE:
+                return RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(newDef);
+            case TASK:
+                return RobotTokenType.findTypeOfDeclarationForTaskSettingTable(newDef);
+            case USER_KEYWORD:
+                return RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(newDef);
+            default:
+                return RobotTokenType.UNKNOWN;
+        }
+    }
+
+    private RobotTokenType getUnkownSettingTokenType(final ModelType modelType) {
+        switch (modelType) {
+            case TEST_CASE:
+                return RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION;
+            case TASK:
+                return RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION;
+            case USER_KEYWORD:
+                return RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION;
+            default:
+                return RobotTokenType.UNKNOWN;
+        }
     }
 
     @Override
-    public void removeCommentPart(final int index) {
-        comments.remove(index);
+    public void deleteToken(final int index) {
+        final int commentsIndex = index - tokens.size();
+
+        if (index == 0) {
+            throw new IllegalArgumentException();
+
+        } else if (0 < index && index < tokens.size()) {
+            removeTypes(index);
+            tokens.remove(index);
+            fixTokensTypes();
+
+        } else if (0 <= commentsIndex && commentsIndex < comments.size()) {
+            comments.remove(commentsIndex);
+
+            if (commentsIndex == 0) {
+                while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
+                    final RobotToken toMove = comments.remove(0);
+                    toMove.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
+                    toMove.getTypes().remove(RobotTokenType.COMMENT_CONTINUE);
+                    tokens.add(toMove);
+                }
+                fixTokensTypes();
+            }
+            fixCommentsTypes();
+        }
+    }
+
+    private void fixCommentsTypes() {
+        for (int i = 0; i < comments.size(); i++) {
+            final RobotToken token = comments.get(i);
+            if (i == 0) {
+                token.setType(RobotTokenType.START_HASH_COMMENT);
+
+            } else if (i > 0) {
+                token.setType(RobotTokenType.COMMENT_CONTINUE);
+            }
+        }
     }
 
     @Override
-    public void clearComment() {
-        comments.clear();
+    public void rewriteFrom(final CommonStep<?> other) {
+        final LocalSetting<?> otherSetting = (LocalSetting<?>) other;
+        this.modelType = otherSetting.modelType;
+        this.tokens.clear();
+        this.tokens.addAll(otherSetting.tokens);
+        this.comments.clear();
+        this.comments.addAll(otherSetting.comments);
     }
 
     @Override

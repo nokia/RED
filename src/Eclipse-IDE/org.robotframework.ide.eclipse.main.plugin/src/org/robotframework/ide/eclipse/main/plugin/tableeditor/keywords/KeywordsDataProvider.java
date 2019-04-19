@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsDataProvider;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowView;
 
 class KeywordsDataProvider extends CodeElementsDataProvider<RobotKeywordsSection> {
 
@@ -48,7 +48,7 @@ class KeywordsDataProvider extends CodeElementsDataProvider<RobotKeywordsSection
         } else if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
                 && ((RobotDefinitionSetting) element).isDocumentation())) {
             // add 1 for empty cell
-            return ExecutablesRowHolderCommentService.execRowView((RobotKeywordCall) element).size() + 1;
+            return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
         }
         return 0;
     }

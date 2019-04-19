@@ -79,7 +79,7 @@ class EndTerminatedForLoopsFixer implements IPostProcessFixer {
                         addType(forDeclarationRow, RobotTokenType.FOR_WITH_END);
                         for (final RobotExecutableRow<T> r : toMark) {
                             final FilePosition fp = r.getAction().getFilePosition().copy();
-                            r.insertValueAt("", 0);
+                            r.createToken(0);
                             r.getAction().setFilePosition(fp);
                             addType(r, RobotTokenType.FOR_WITH_END_CONTINUATION);
                         }

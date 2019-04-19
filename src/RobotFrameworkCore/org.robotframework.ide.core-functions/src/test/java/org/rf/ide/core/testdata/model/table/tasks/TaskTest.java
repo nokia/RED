@@ -92,7 +92,7 @@ public class TaskTest {
         task.addElement(child3);
         assertThat(task.getElements()).containsExactly(child1, child2, child3);
 
-        task.removeElementAt(1);
+        task.removeElement(1);
         assertThat(task.getElements()).containsExactly(child1, child3);
     }
 

@@ -57,19 +57,23 @@ public class FilePosition implements Serializable {
     }
 
     public boolean isNotSet() {
-        return (getLine() == NOT_SET && getColumn() == NOT_SET && getOffset() == NOT_SET);
+        return getLine() == NOT_SET && getColumn() == NOT_SET && getOffset() == NOT_SET;
+    }
+
+    public boolean isSet() {
+        return !isNotSet();
     }
 
     public boolean isBefore(final FilePosition other) {
-        return (compare(other) == ECompareResult.LESS_THAN.getValue());
+        return compare(other) == ECompareResult.LESS_THAN.getValue();
     }
 
     public boolean isAfter(final FilePosition other) {
-        return (compare(other) == ECompareResult.GREATER_THAN.getValue());
+        return compare(other) == ECompareResult.GREATER_THAN.getValue();
     }
 
     public boolean isSamePlace(final FilePosition other) {
-        return (compare(other) == ECompareResult.EQUAL_TO.getValue());
+        return compare(other) == ECompareResult.EQUAL_TO.getValue();
     }
 
     public int compare(final FilePosition other) {

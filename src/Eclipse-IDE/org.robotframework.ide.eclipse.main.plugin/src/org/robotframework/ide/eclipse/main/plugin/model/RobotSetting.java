@@ -181,6 +181,12 @@ public class RobotSetting extends RobotKeywordCall {
         return new PageActivatingOpeningStrategy(this);
     }
 
+    public RobotKeywordCall insertEmptyCellAt(final int position) {
+        getLinkedElement().insertValueAt("", position);
+        resetStored();
+        return this;
+    }
+
     public Optional<ImportedLibrary> getImportedLibrary() {
         final RobotProject project = getSuiteFile().getRobotProject();
         return getImportedLibrary(Multimaps.index(project.getLibrarySpecifications(), LibrarySpecification::getName));

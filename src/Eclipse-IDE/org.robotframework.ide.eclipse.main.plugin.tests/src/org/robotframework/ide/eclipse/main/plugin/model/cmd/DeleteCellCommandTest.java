@@ -5,6 +5,7 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -13,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class DeleteCellCommandTest {
         for (final RobotKeywordCall call : robotCase.getChildren()) {
             final int index = call.getIndex();
             final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
+            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
             final int tokensNumber = callTokens.size();
             for (int i = 0; i < tokensNumber; i++) {
                 final DeleteCellCommand command = new DeleteCellCommand(call, i);
@@ -86,18 +86,20 @@ public class DeleteCellCommandTest {
         final RobotKeywordCall callAfter = robotCase.getChildren().get(0);
 
         assertThat(callAfter.getLinkedElement().getElementTokens().stream().map(RobotToken::getText)
-                .collect(Collectors.toList())).containsExactly("");
+                .collect(toList())).isEmpty();
 
         for (final EditorCommand toUndo : command.getUndoCommands()) {
             toUndo.execute();
         }
         final List<String> currentLabels = robotCase.getChildren().get(0).getLinkedElement().getElementTokens()
-                .stream().map(RobotToken::getText).collect(Collectors.toList());
+                .stream()
+                .map(RobotToken::getText)
+                .collect(toList());
 
         assertThat(currentLabels).containsExactly("call");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, callAfter)));
     }
 
     @Test
@@ -111,15 +113,14 @@ public class DeleteCellCommandTest {
         final RobotKeywordCall call = robotCase.getChildren().get(0);
 
         final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-        final List<String> allLabelsWithFirstEmpty = callTokens.stream().map(RobotToken::getText)
-                .collect(Collectors.toList());
+        final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
         for (int i = 1; i < 3; i++) {
             final DeleteCellCommand command = new DeleteCellCommand(call, i);
             command.setEventBroker(eventBroker);
             command.execute();
 
             final RobotKeywordCall callAfter = robotCase.getChildren().get(0);
-            assertThat_valueAtPosition_wasDeleted(i + 1, allLabelsWithFirstEmpty, callAfter);
+            assertThat_valueAtPosition_wasDeleted(i, allLabels, callAfter);
 
             final IRobotCodeHoldingElement parent = call.getParent();
             final int index = call.getIndex();
@@ -127,10 +128,12 @@ public class DeleteCellCommandTest {
                 toUndo.execute();
             }
             final List<String> currentLabels = parent.getChildren().get(index).getLinkedElement().getElementTokens()
-                    .stream().map(RobotToken::getText).collect(Collectors.toList());
+                    .stream()
+                    .map(RobotToken::getText)
+                    .collect(toList());
 
             assertThat(currentLabels)
-                    .containsExactlyElementsOf(allLabelsWithFirstEmpty);
+                    .containsExactlyElementsOf(allLabels);
         }
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
@@ -149,8 +152,7 @@ public class DeleteCellCommandTest {
 
         final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
         final List<String> allLabels = callTokens.stream().map(RobotToken::getText)
-                .collect(Collectors.toList());
-        allLabels.remove(0); // first artificial comment token is empty and not visible for the user
+                .collect(toList());
         final DeleteCellCommand command = new DeleteCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
@@ -164,15 +166,14 @@ public class DeleteCellCommandTest {
             toUndo.execute();
         }
         final List<String> currentLabels = parent.getChildren().get(index).getLinkedElement().getElementTokens()
-                .stream().map(RobotToken::getText).collect(Collectors.toList());
+                .stream()
+                .map(RobotToken::getText)
+                .collect(toList());
 
-        allLabels.add(0, ""); // re-add artificial empty token just for testing purposes
+        assertThat(currentLabels).containsExactlyElementsOf(allLabels);
 
-        assertThat(currentLabels)
-                .containsExactlyElementsOf(allLabels);
-
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, call)));
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, callAfter)));
     }
 
     @Test
@@ -188,7 +189,7 @@ public class DeleteCellCommandTest {
         for (final RobotKeywordCall call : robotKeyword.getChildren()) {
             final int index = call.getIndex();
             final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
+            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
             final int tokensNumber = callTokens.size();
             for (int i = 0; i < tokensNumber; i++) {
                 final DeleteCellCommand command = new DeleteCellCommand(call, i);
@@ -220,19 +221,21 @@ public class DeleteCellCommandTest {
 
         final RobotKeywordCall callAfter = robotKeyword.getChildren().get(0);
 
-        assertThat(callAfter.getLinkedElement().getElementTokens().stream().map(RobotToken::getText)
-                .collect(Collectors.toList())).containsExactly("");
+        assertThat(callAfter.getLinkedElement().getElementTokens().stream().map(RobotToken::getText).collect(toList()))
+                .isEmpty();
 
         for (final EditorCommand toUndo : command.getUndoCommands()) {
             toUndo.execute();
         }
         final List<String> currentLabels = robotKeyword.getChildren().get(0).getLinkedElement().getElementTokens()
-                .stream().map(RobotToken::getText).collect(Collectors.toList());
+                .stream()
+                .map(RobotToken::getText)
+                .collect(toList());
 
         assertThat(currentLabels).containsExactly("call");
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, callAfter)));
     }
 
     @Test
@@ -247,15 +250,14 @@ public class DeleteCellCommandTest {
         final RobotKeywordCall call = robotKeyword.getChildren().get(0);
 
         final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-        final List<String> allLabelsWithFirstEmpty = callTokens.stream().map(RobotToken::getText)
-                .collect(Collectors.toList());
+        final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
         for (int i = 1; i < 3; i++) {
             final DeleteCellCommand command = new DeleteCellCommand(call, i);
             command.setEventBroker(eventBroker);
             command.execute();
 
             final RobotKeywordCall callAfter = robotKeyword.getChildren().get(0);
-            assertThat_valueAtPosition_wasDeleted(i + 1, allLabelsWithFirstEmpty, callAfter);
+            assertThat_valueAtPosition_wasDeleted(i, allLabels, callAfter);
 
             final IRobotCodeHoldingElement parent = call.getParent();
             final int index = call.getIndex();
@@ -263,10 +265,12 @@ public class DeleteCellCommandTest {
                 toUndo.execute();
             }
             final List<String> currentLabels = parent.getChildren().get(index).getLinkedElement().getElementTokens()
-                    .stream().map(RobotToken::getText).collect(Collectors.toList());
+                    .stream()
+                    .map(RobotToken::getText)
+                    .collect(toList());
 
             assertThat(currentLabels)
-                    .containsExactlyElementsOf(allLabelsWithFirstEmpty);
+                    .containsExactlyElementsOf(allLabels);
         }
 
         verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
@@ -286,8 +290,7 @@ public class DeleteCellCommandTest {
 
         final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
         final List<String> allLabels = callTokens.stream().map(RobotToken::getText)
-                .collect(Collectors.toList());
-        allLabels.remove(0); // first artificial comment token is empty and not visible for the user
+                .collect(toList());
         final DeleteCellCommand command = new DeleteCellCommand(call, 0);
         command.setEventBroker(eventBroker);
         command.execute();
@@ -301,15 +304,14 @@ public class DeleteCellCommandTest {
             toUndo.execute();
         }
         final List<String> currentLabels = parent.getChildren().get(index).getLinkedElement().getElementTokens()
-                .stream().map(RobotToken::getText).collect(Collectors.toList());
+                .stream()
+                .map(RobotToken::getText)
+                .collect(toList());
 
-        allLabels.add(0, ""); // re-add artificial empty token just for testing purposes
+        assertThat(currentLabels).containsExactlyElementsOf(allLabels);
 
-        assertThat(currentLabels)
-                .containsExactlyElementsOf(allLabels);
-
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, call)));
+        verify(eventBroker, times(2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+                eq(ImmutableMap.of(IEventBroker.DATA, robotKeyword, RobotModelEvents.ADDITIONAL_DATA, callAfter)));
     }
 
     @Test
@@ -324,7 +326,7 @@ public class DeleteCellCommandTest {
         for (final RobotKeywordCall call : robotImports.getChildren()) {
             final int index = call.getIndex();
             final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
+            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
             final int tokensNumber = callTokens.size();
             for (int i = 2; i < tokensNumber; i++) {
                 final DeleteCellCommand command = new DeleteCellCommand(call, i);
@@ -357,7 +359,7 @@ public class DeleteCellCommandTest {
         for (final RobotKeywordCall call : robotImports.getChildren()) {
             final int index = call.getIndex();
             final List<RobotToken> callTokens = call.getLinkedElement().getElementTokens();
-            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(Collectors.toList());
+            final List<String> allLabels = callTokens.stream().map(RobotToken::getText).collect(toList());
             final int tokensNumber = callTokens.size();
             for (int i = 2; i < tokensNumber; i++) {
                 final DeleteCellCommand command = new DeleteCellCommand(call, i);
@@ -376,7 +378,7 @@ public class DeleteCellCommandTest {
     private void assertThat_valueAtPosition_wasDeleted(final int deletedPosition, final List<String> allLabels,
             final RobotKeywordCall call) {
         final List<String> currentLabels = call.getLinkedElement().getElementTokens().stream().map(RobotToken::getText)
-                .collect(Collectors.toList());
+                .collect(toList());
         final List<String> oneLessLabels = new ArrayList<>(allLabels);
         oneLessLabels.remove(deletedPosition);
 
@@ -391,7 +393,9 @@ public class DeleteCellCommandTest {
             command.execute();
         }
         final List<String> currentLabels = parent.getChildren().get(index).getLinkedElement().getElementTokens()
-                .stream().map(RobotToken::getText).collect(Collectors.toList());
+                .stream()
+                .map(RobotToken::getText)
+                .collect(toList());
 
         assertThat(currentLabels).containsExactlyElementsOf(allLabels);
     }

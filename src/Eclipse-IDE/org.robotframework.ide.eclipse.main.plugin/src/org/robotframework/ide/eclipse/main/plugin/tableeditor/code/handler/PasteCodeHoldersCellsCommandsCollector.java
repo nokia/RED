@@ -15,14 +15,13 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableValuesChangingCommandsCollector;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowView;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
 
@@ -72,7 +71,7 @@ public abstract class PasteCodeHoldersCellsCommandsCollector extends PasteRobotE
 
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
         new CodeTableValuesChangingCommandsCollector()
-                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex, tableColumnsCount)
+                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex)
                 .ifPresent(pasteCommands::add);
 
         return pasteCommands;
@@ -90,9 +89,9 @@ public abstract class PasteCodeHoldersCellsCommandsCollector extends PasteRobotE
             }
         }
 
-        final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
+        final List<String> execRowView = ExecutablesRowView.rowData(keywordCall);
         if (clipboardElementColumnIndex < execRowView.size()) {
-            return newArrayList(execRowView.get(clipboardElementColumnIndex).getText());
+            return newArrayList(execRowView.get(clipboardElementColumnIndex));
         }
         return new ArrayList<>();
     }

@@ -19,10 +19,7 @@ import java.util.stream.Stream;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
@@ -50,35 +47,26 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends 
 
     public abstract IExecutablesTableModelUpdater<T> getModelUpdater();
 
-    public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
-            final String comment) {
-
+    public RobotKeywordCall createKeywordCall(final int index, final List<String> tokens) {
         final RobotExecutableRow<?> robotExecutableRow = (RobotExecutableRow<?>) getModelUpdater()
-                .createExecutableRow(getLinkedElement(), index, name, null, args);
+                .createExecutableRow(getLinkedElement(), index, tokens);
 
-        CommentServiceHandler.update(robotExecutableRow, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, comment);
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
         getChildren().add(index, call);
         return call;
     }
 
-    public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
-            final String comment) {
-        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), index, settingName,
-                null,
-                args);
+    public RobotDefinitionSetting createSetting(final int index, final List<String> tokens) {
+        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), index, tokens);
 
-        CommentServiceHandler.update((ICommentHolder) newModelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE,
-                comment);
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
         getChildren().add(index, setting);
-
         return setting;
     }
 
-    public RobotEmptyLine createEmpty(final int index, final String name) {
+    public RobotEmptyLine createEmpty(final int index, final List<String> tokens) {
         final RobotEmptyRow<?> robotEmptyRow = (RobotEmptyRow<?>) getModelUpdater().createEmptyLine(getLinkedElement(),
-                index, name);
+                index, tokens);
 
         final RobotEmptyLine emptyLine = new RobotEmptyLine(this, robotEmptyRow);
         getChildren().add(index, emptyLine);
@@ -108,6 +96,11 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends 
     public void removeChild(final RobotKeywordCall child) {
         getChildren().remove(child);
         getLinkedElement().removeElement((AModelElement) child.getLinkedElement());
+    }
+
+    public void removeChild(final int index) {
+        getChildren().remove(index);
+        getLinkedElement().removeElement(index);
     }
 
     public abstract void moveChildDown(final RobotKeywordCall keywordCall);

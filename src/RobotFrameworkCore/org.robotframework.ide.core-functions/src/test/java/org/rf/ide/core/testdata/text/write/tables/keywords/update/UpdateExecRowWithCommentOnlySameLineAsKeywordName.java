@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -93,11 +92,8 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordName extends RobotForm
         final List<UserKeyword> keywords = table.getKeywords();
         final UserKeyword userKeyword = keywords.get(0);
 
-        final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
-
         final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getExecutionContext().get(0);
-        execOneRow.getAction().setText("${c} =");
-        execKeyUpdater.update(execOneRow, 1, "d_new");
+        execOneRow.updateToken(2, "d_new");
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
@@ -116,11 +112,8 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordName extends RobotForm
         final List<UserKeyword> keywords = table.getKeywords();
         final UserKeyword userKeyword = keywords.get(0);
 
-        final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
-
         final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getExecutionContext().get(0);
-        execOneRow.getAction().setText("${c} =");
-        execKeyUpdater.update(execOneRow, 1, "d_new");
+        execOneRow.updateToken(2, "d_new");
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(

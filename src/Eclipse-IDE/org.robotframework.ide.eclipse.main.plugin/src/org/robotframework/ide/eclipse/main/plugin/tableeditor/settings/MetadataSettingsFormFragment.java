@@ -521,6 +521,10 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                     : null;
             if (suite == fileModel) {
                 refreshTable();
+
+                // this is done in order to ensure IEclipseContext has refreshed
+                // selection stored and does not provide old objects
+                selectionLayerAccessor.refreshSelection();
             }
         }
     }

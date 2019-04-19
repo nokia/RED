@@ -87,7 +87,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesElementsLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesElementsStyleConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor.TableCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
@@ -202,7 +201,7 @@ class TasksFormFragment implements ISectionFormFragment {
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
         // data providers
-        final TableCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
+        final CodeTableValuesChangingCommandsCollector commandsCollector = new CodeTableValuesChangingCommandsCollector();
         final CodeElementsColumnsPropertyAccessor propertyAccessor = new CodeElementsColumnsPropertyAccessor(
                 commandsStack, commandsCollector);
         dataProvider = new TasksDataProvider(propertyAccessor, getSection());
@@ -536,20 +535,6 @@ class TasksFormFragment implements ISectionFormFragment {
 
         if (task != null && task.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.selectElementPreservingSelectedColumnsAfterOperation(call, tableInputIsReplaced());
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenKeywordCallCommentIsConverted(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE) final Event event) {
-
-        final RobotTask task = Events.get(event, IEventBroker.DATA, RobotTask.class);
-        final RobotKeywordCall call = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
-
-        if (task != null && task.getSuiteFile() == fileModel) {
-            sortModel.clear();
             selectionLayerAccessor.preserveSelectionIfNotEditingArgumentWhen(call, tableInputIsReplaced());
         }
     }
@@ -640,6 +625,10 @@ class TasksFormFragment implements ISectionFormFragment {
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();
+
+                // this is done in order to ensure IEclipseContext has refreshed
+                // selection stored and does not provide old objects
+                selectionLayerAccessor.refreshSelection();
             }
         }
     }

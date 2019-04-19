@@ -8,9 +8,6 @@ package org.rf.ide.core.testdata.model.presenter.update;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -78,85 +75,13 @@ public class TaskTableModelUpdaterTest {
     }
 
     @Test
-    public void handlersForKeywordCannotCreateAnything() {
-        final Task task = mock(Task.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.create(task, 0, "action", newArrayList("1", "2"), ""));
-        }
-        verifyZeroInteractions(task);
-    }
-
-    @Test
-    public void handlersForKeywordCannotUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, 1, "value"));
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
-    public void handlersForKeywordCannotBulkUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : keywordModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, newArrayList("a", "b", "c")));
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
-    public void handlersForTestCaseCannotCreateAnything() {
-        final Task task = mock(Task.class);
-        for (final ModelType kwModelType : testCaseModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.create(task, 0, "action", newArrayList("1", "2"), ""));
-        }
-        verifyZeroInteractions(task);
-    }
-
-    @Test
-    public void handlersForTestCaseCannotUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType kwModelType : testCaseModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(kwModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, 1, "value"));
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
-    public void handlersForTestCaseCannotBulkUpdateAnything() {
-        final AModelElement<?> element = mock(AModelElement.class);
-        for (final ModelType tcModelType : testCaseModelTypes) {
-            final IExecutablesStepsHolderElementOperation<Task> handler = updater.getOperationHandler(tcModelType);
-
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> handler.update(element, newArrayList("a", "b", "c")));
-        }
-        verifyZeroInteractions(element);
-    }
-
-    @Test
     public void executableRowOperationsTest() {
         final Task task = createTask();
 
         assertThat(task.getExecutionContext()).isEmpty();
 
-        final AModelElement<?> row = updater.createExecutableRow(task, 0, "some action", "comment",
-                newArrayList("a", "b", "c"));
+        final AModelElement<?> row = updater.createExecutableRow(task, 0,
+                newArrayList("some action", "a", "b", "c", "#comment"));
 
         assertThat(task.getExecutionContext()).hasSize(1);
         final RobotExecutableRow<Task> addedRow = task.getExecutionContext().get(0);
@@ -168,42 +93,32 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedRow)).containsExactly("some action", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedRow, "new comment");
+        addedRow.updateToken(4, "#new comment");
         assertThat(cellsOf(addedRow)).containsExactly("some action", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedRow, 2, "x");
+        addedRow.updateToken(3, "x");
         assertThat(cellsOf(addedRow)).containsExactly("some action", "a", "b", "x", "#new comment");
 
-        updater.updateArgument(addedRow, 5, "z");
+        addedRow.createToken(4);
+        addedRow.createToken(5);
+        addedRow.createToken(6);
+        addedRow.updateToken(6, "z");
         assertThat(cellsOf(addedRow)).containsExactly("some action", "a", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedRow, 3, null);
+        addedRow.deleteToken(5);
         assertThat(cellsOf(addedRow)).containsExactly("some action", "a", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedRow, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedRow)).containsExactly("some action", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedRow);
         assertThat(task.getExecutionContext()).hasSize(2);
         assertThat(addedRow).isSameAs(task.getExecutionContext().get(0));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingExecutableRowForNullCase() {
-        updater.createExecutableRow(null, 0, "some action", "comment", newArrayList("a", "b", "c"));
-    }
+     }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
         final Task task = createTask();
         assertThat(task.getExecutionContext()).isEmpty();
 
-        updater.createExecutableRow(task, 2, "some action", "comment", newArrayList("a", "b", "c"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        updater.createSetting(null, 0, "Setup", "comment", newArrayList("a", "b", "c"));
+        updater.createExecutableRow(task, 2, newArrayList("some action", "a", "b", "c", "#comment"));
     }
 
     @Test
@@ -212,8 +127,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getSetups()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[Setup]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[Setup]", "a", "b", "c", "#comment"));
 
         assertThat(task.getSetups()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getSetups().get(0);
@@ -224,28 +139,28 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "kw");
+        addedSetting.updateToken(1, "kw");
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "kw", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "kw", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "kw", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "kw", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Setup]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getSetups()).hasSize(2);
         assertThat(addedSetting).isSameAs(task.getSetups().get(0));
-    }
+     }
 
     @Test
     public void tagsSettingOperationsTest() {
@@ -253,8 +168,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getTags()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[Tags]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[Tags]", "a", "b", "c", "#comment"));
 
         assertThat(task.getTags()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getTags().get(0);
@@ -265,23 +180,23 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Tags]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getTags()).hasSize(2);
@@ -294,8 +209,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getTimeouts()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[Timeout]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[Timeout]", "a", "b", "c", "#comment"));
 
         assertThat(task.getTimeouts()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getTimeouts().get(0);
@@ -306,23 +221,23 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Timeout]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getTimeouts()).hasSize(2);
@@ -335,8 +250,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getTeardowns()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[Teardown]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[Teardown]", "a", "b", "c", "#comment"));
 
         assertThat(task.getTeardowns()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getTeardowns().get(0);
@@ -347,23 +262,23 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Teardown]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getTeardowns()).hasSize(2);
@@ -376,8 +291,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getTeardowns()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[Template]", "comment",
-                newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[Template]", "a", "b", "c", "#comment"));
 
         assertThat(task.getTemplates()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getTemplates().get(0);
@@ -388,23 +303,23 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Template]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getTemplates()).hasSize(2);
@@ -417,8 +332,8 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(task.getTeardowns()).isEmpty();
 
-        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0, "[unknown]",
-                "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
+                newArrayList("[unknown]", "a", "b", "c", "#comment"));
 
         assertThat(task.getUnknownSettings()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getUnknownSettings().get(0);
@@ -429,23 +344,23 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
+        addedSetting.updateToken(1, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
+        addedSetting.updateToken(3, "x");
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "x", "b", "x", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
+        addedSetting.createToken(4);
+        addedSetting.createToken(5);
+        addedSetting.createToken(6);
+        addedSetting.updateToken(6, "z");
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "x", "b", "x", "", "", "z", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
+        addedSetting.deleteToken(5);
         assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "x", "b", "x", "", "z", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[unknown]", "1", "2", "3", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getUnknownSettings()).hasSize(2);
@@ -459,7 +374,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(task.getDocumentation()).isEmpty();
 
         final LocalSetting<Task> setting = (LocalSetting<Task>) updater.createSetting(task, 0,
-                "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                newArrayList("[Documentation]", "a", "b", "c", "#comment"));
 
         assertThat(task.getDocumentation()).hasSize(1);
         final LocalSetting<Task> addedSetting = task.getDocumentation().get(0);
@@ -470,23 +385,21 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "a", "b", "c", "#comment");
 
-        updater.updateComment(addedSetting, "new comment");
+        addedSetting.updateToken(4, "#new comment");
         assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "a", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 0, "x");
-        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "x", "#new comment");
+        addedSetting.updateToken(1, "x");
+        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "x", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 2, "x");
-        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "x", "#new comment");
+        addedSetting.createToken(2);
+        addedSetting.updateToken(2, "y");
+        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "x", "y", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 5, "z");
-        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "x", "#new comment");
+        addedSetting.deleteToken(1);
+        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "y", "b", "c", "#new comment");
 
-        updater.updateArgument(addedSetting, 3, null);
-        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "#new comment");
-
-        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
-        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "1", "#new comment");
+        addedSetting.deleteToken(2);
+        assertThat(cellsOf(addedSetting)).containsExactly("[Documentation]", "y", "c", "#new comment");
 
         updater.insert(task, 0, addedSetting);
         assertThat(task.getDocumentation()).hasSize(2);
@@ -516,14 +429,13 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(row)).containsExactly("action", "a", "b", "#comment");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT,
-                RobotTokenType.TASK_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
     public void keywordArgumentsSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Arguments]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Arguments]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -545,7 +457,7 @@ public class TaskTableModelUpdaterTest {
     @Test
     public void keywordReturnSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Return]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Return]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -559,16 +471,15 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_SETTING_UNKNOWN);
 
         assertThat(cellsOf(setting)).containsExactly("[Return]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Tags]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -582,16 +493,15 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_TAGS);
 
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_TAGS_DECLARATION, RobotTokenType.TASK_SETTING_TAGS,
-                RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS,
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TAGS_DECLARATION,
+                RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS,
                 RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
     public void keywordTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Teardown]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -605,8 +515,8 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_TEARDOWN);
 
         assertThat(cellsOf(setting)).containsExactly("[Teardown]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_TEARDOWN, RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEARDOWN,
+                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
@@ -614,7 +524,7 @@ public class TaskTableModelUpdaterTest {
     @Test
     public void keywordTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Timeout]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -628,16 +538,15 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_TIMEOUT);
 
         assertThat(cellsOf(setting)).containsExactly("[Timeout]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_TIMEOUT, RobotTokenType.TASK_SETTING_TIMEOUT_VALUE,
-                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TIMEOUT,
+                RobotTokenType.TASK_SETTING_TIMEOUT_VALUE, RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE,
+                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
     public void keywordDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
         final LocalSetting<?> keywordSetting = (LocalSetting<?>) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, newArrayList("[Documentation]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -650,12 +559,10 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getParent()).isSameAs(task);
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_DOCUMENTATION);
 
-        assertThat(cellsOf(setting)).containsExactly("[Documentation]", "a", "b", "c",
-                "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_DOCUMENTATION, RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT,
+        assertThat(cellsOf(setting)).containsExactly("[Documentation]", "a", "b", "c", "#comment");
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_DOCUMENTATION,
                 RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -679,10 +586,9 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_SETUP);
 
         assertThat(cellsOf(setting)).containsExactly("[Setup]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME,
-                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_SETUP,
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME, RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -706,8 +612,8 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_TEMPLATE);
 
         assertThat(cellsOf(setting)).containsExactly("[Template]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME,
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEMPLATE,
+                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME,
                 RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
                 RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
     }
@@ -733,10 +639,9 @@ public class TaskTableModelUpdaterTest {
         assertThat(setting.getModelType()).isEqualTo(ModelType.TASK_SETTING_UNKNOWN);
 
         assertThat(cellsOf(setting)).containsExactly("[something]", "a", "b", "c", "#comment");
-        assertThat(typesOf(setting)).containsExactly(
-                RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
+        assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
     @Test
@@ -767,8 +672,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseTemplateArgumentsSettingIsProperlyMorphedIntoTemplateSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Template]", "comment", newArrayList("a", "b"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Template]", "a", "b", "#comment"));
 
         final Task task = createTask();
 
@@ -789,8 +694,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Tags]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -811,8 +716,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseSetupSettingIsProperlyMorphedIntoSetupSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Setup]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Setup]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -833,8 +738,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Teardown]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -856,8 +761,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Timeout]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 
@@ -878,8 +783,8 @@ public class TaskTableModelUpdaterTest {
 
     @Test
     public void testCaseDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
-        final LocalSetting<TestCase> tcSetting = (LocalSetting<TestCase>) new TestCaseTableModelUpdater()
-                .createSetting(createTestCase(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
+        final LocalSetting<TestCase> tcSetting = new TestCaseTableModelUpdater()
+                .createSetting(createTestCase(), 0, newArrayList("[Documentation]", "a", "b", "c", "#comment"));
 
         final Task task = createTask();
 

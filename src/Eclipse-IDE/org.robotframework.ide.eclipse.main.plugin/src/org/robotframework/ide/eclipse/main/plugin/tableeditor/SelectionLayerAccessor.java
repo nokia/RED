@@ -224,7 +224,7 @@ public class SelectionLayerAccessor {
     public void selectElementPreservingSelectedColumnsAfterOperation(final Object elementToSelect,
             final Runnable operation) {
         operation.run();
-        SwtThread.asyncExec(() -> {
+        SwtThread.syncExec(() -> {
             final Set<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
             selectionProvider.setSelection(new StructuredSelection(elementToSelect));
             reestablishSelection(selectionLayer.getSelectedCellPositions(),
@@ -268,6 +268,16 @@ public class SelectionLayerAccessor {
         }
         if (selectionLayer.isCellPositionSelected(anchorColumn, anchorRow)) {
             selectionLayer.moveSelectionAnchor(anchorColumn, anchorRow);
+        }
+    }
+
+    public void refreshSelection() {
+        final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
+        selectionLayer.clear();
+
+        for (final PositionCoordinate coordinate : positions) {
+            selectionLayer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
+                    coordinate.getRowPosition(), false, true));
         }
     }
 }

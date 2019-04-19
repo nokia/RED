@@ -29,4 +29,6 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
     public void replaceElement(final AModelElement<T> oldElement, final AModelElement<T> newElement);
 
     boolean removeElement(final AModelElement<T> element);
+
+    void removeElement(final int index);
 }

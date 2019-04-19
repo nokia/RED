@@ -11,19 +11,18 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.ExecRowToKeywordExecRowMorphOperation;
-import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordDocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordEmptyLineModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordSettingModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.LocalSettingToKeywordSettingMorphOperation;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -36,7 +35,7 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
     private static final List<IExecutablesStepsHolderElementOperation<UserKeyword>> ELEMENT_OPERATIONS = newArrayList(
             new KeywordEmptyLineModelOperation(), new KeywordExecutableRowModelOperation(),
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_ARGUMENTS),
-            new KeywordDocumentationModelOperation(),
+            new KeywordSettingModelOperation(ModelType.USER_KEYWORD_DOCUMENTATION),
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_TAGS),
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_RETURN),
             new KeywordSettingModelOperation(ModelType.USER_KEYWORD_TEARDOWN),
@@ -46,26 +45,25 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             new ExecRowToKeywordExecRowMorphOperation(),
             new LocalSettingToKeywordSettingMorphOperation());
 
+    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<UserKeyword> createEmptyLine(final UserKeyword userKeyword, final int index, final String name) {
-        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                ModelType.EMPTY_LINE);
-        if (operationHandler == null || userKeyword == null) {
-            throw new IllegalArgumentException(
-                    "Unable to create empty line. Operation handler is missing");
-        }
-        final AModelElement<UserKeyword> row = operationHandler.create(userKeyword, index, name, null, null);
+    public AModelElement<UserKeyword> createExecutableRow(final UserKeyword userKeyword, final int index,
+            final List<String> cells) {
+        final RobotExecutableRow<?> row = TestCaseTableModelUpdater.createExecutableRow(cells);
         userKeyword.addElement(index, row);
-        return row;
+        return (AModelElement<UserKeyword>) row;
     }
 
     @Override
-    public AModelElement<UserKeyword> createSetting(final UserKeyword userKeyword, final int index, final String settingName,
-            final String comment, final List<String> args) {
-
+    public AModelElement<UserKeyword> createSetting(final UserKeyword userKeyword, final int index,
+            final List<String> cells) {
+        if (cells.isEmpty()) {
+            throw new IllegalArgumentException("Unable to create empty setting. There is no setting name given");
+        }
+        final String settingName = cells.get(0);
         if (userKeyword == null) {
             throw new IllegalArgumentException(
-                    "Unable to create " + settingName + " setting. There is no keyword given");
+                    "Unable to create " + settingName + " setting. There is no parent given");
         }
         final BiFunction<Integer, String, LocalSetting<UserKeyword>> creator = getSettingCreateOperation(userKeyword,
                 settingName);
@@ -73,60 +71,17 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return new KeywordSettingModelOperation(null).create(creator, index, settingName, args, comment);
-    }
+        final int cmtIndex = TestCaseTableModelUpdater.indexOfCommentStart(cells);
 
-    @Override
-    public AModelElement<UserKeyword> createExecutableRow(final UserKeyword userKeyword, final int index,
-            final String action, final String comment, final List<String> args) {
-        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                ModelType.USER_KEYWORD_EXECUTABLE_ROW);
-        if (operationHandler == null || userKeyword == null) {
-            throw new IllegalArgumentException(
-                    "Unable to create " + action + " executable row. Operation handler is missing");
+        final LocalSetting<UserKeyword> newSetting = creator.apply(index, settingName);
+        for (int i = 1; i < cells.size(); i++) {
+            if (i < cmtIndex) {
+                newSetting.addToken(RobotToken.create(cells.get(i)));
+            } else {
+                newSetting.addCommentPart(RobotToken.create(cells.get(i)));
+            }
         }
-        final AModelElement<UserKeyword> row = operationHandler.create(userKeyword, index, action, args, comment);
-        userKeyword.addElement(index, row);
-        return row;
-    }
-
-    @Override
-    public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to update arguments of " + modelElement + ". Operation handler is missing");
-        }
-        operationHandler.update(modelElement, index, value);
-    }
-
-    @Override
-    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
-        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException(
-                    "Unable to set arguments of " + modelElement + ". Operation handler is missing");
-        }
-        operationHandler.update(modelElement, arguments);
-    }
-
-    @Override
-    public void updateComment(final AModelElement<?> modelElement, final String value) {
-        CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
-    }
-
-    @Override
-    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
-            final AModelElement<?> modelElement) {
-        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
-                modelElement.getModelType());
-        if (operationHandler == null) {
-            throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
-                    + userKeyword.getName().getText() + " keyword. Operation handler is missing");
-        }
-        return operationHandler.insert(userKeyword, index, modelElement);
+        return newSetting;
     }
 
     private BiFunction<Integer, String, LocalSetting<UserKeyword>> getSettingCreateOperation(final UserKeyword userKeyword,
@@ -141,6 +96,27 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             case KEYWORD_SETTING_TIMEOUT: return userKeyword::newTimeout;
             default: return userKeyword::newUnknownSetting;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AModelElement<UserKeyword> createEmptyLine(final UserKeyword userKeyword, final int index,
+            final List<String> cells) {
+        final RobotEmptyRow<?> row = TestCaseTableModelUpdater.createEmptyLine(cells);
+        userKeyword.addElement(index, row);
+        return (RobotEmptyRow<UserKeyword>) row;
+    }
+
+    @Override
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
+                modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
+                    + userKeyword.getName().getText() + " keyword. Operation handler is missing");
+        }
+        return operationHandler.insert(userKeyword, index, modelElement);
     }
 
     @VisibleForTesting

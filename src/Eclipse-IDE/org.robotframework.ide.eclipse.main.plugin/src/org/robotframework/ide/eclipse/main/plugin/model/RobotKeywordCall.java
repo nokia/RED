@@ -173,16 +173,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         comment = null;
     }
 
-    public boolean shouldAddCommentMark() {
-        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-        final RobotToken action = row.getAction();
-        if (action.getText().isEmpty()) {
-            return (row.getComment().isEmpty() || !row.getComment().get(0).getText().trim().startsWith("#"));
-        } else {
-            return !action.getText().trim().startsWith("#");
-        }
-    }
-
     @Override
     public String getComment() {
         if (comment == null) {
@@ -287,11 +277,5 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.getName();
         this.getArguments();
         this.getComment();
-    }
-
-    public RobotKeywordCall insertEmptyCellAt(final int position) {
-        linkedElement.insertValueAt("", position);
-        resetStored();
-        return this;
     }
 }

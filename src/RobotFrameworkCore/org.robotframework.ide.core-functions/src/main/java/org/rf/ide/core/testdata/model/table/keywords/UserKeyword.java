@@ -82,7 +82,8 @@ public class UserKeyword extends AModelElement<KeywordTable>
         return allElements.remove(element);
     }
 
-    public void removeElementAt(final int index) {
+    @Override
+    public void removeElement(final int index) {
         allElements.remove(index);
     }
 
