@@ -37,11 +37,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.RowExposingTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -69,6 +66,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.jface.viewers.RowExposingTreeViewer;
+import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
+import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Viewers;
 

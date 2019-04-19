@@ -17,10 +17,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.robotframework.red.jface.viewers.Stylers;
 
 import com.google.common.base.Preconditions;
 

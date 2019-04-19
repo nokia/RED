@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.search.ui.text.Match;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -28,6 +27,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;

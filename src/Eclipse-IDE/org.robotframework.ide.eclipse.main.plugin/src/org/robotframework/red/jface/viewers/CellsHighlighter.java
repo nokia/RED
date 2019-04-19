@@ -3,8 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.eclipse.jface.viewers;
+package org.robotframework.red.jface.viewers;
 
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.FocusCellHighlighter;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;

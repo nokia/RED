@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.function.Supplier;
 
-import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -21,6 +20,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Rule;
 import org.junit.Test;
+import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.robotframework.red.junit.ShellProvider;
 
 public class ElementsAddingEditingSupportTest {

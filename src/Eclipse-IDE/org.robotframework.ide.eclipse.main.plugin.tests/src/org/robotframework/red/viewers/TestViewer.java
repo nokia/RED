@@ -13,8 +13,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 
 /**
  * @author Michal Anglart

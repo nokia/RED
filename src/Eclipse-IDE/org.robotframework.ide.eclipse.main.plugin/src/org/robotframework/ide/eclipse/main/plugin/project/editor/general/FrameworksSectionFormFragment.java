@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -58,6 +57,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;

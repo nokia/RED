@@ -5,12 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import org.eclipse.jface.viewers.CellsHighlighter;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,6 +17,8 @@ import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.robotframework.red.jface.viewers.CellsHighlighter;
+import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 
 import com.google.common.annotations.VisibleForTesting;
 

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.custom.StyleRange;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
@@ -25,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordProposalInput;
+import org.robotframework.red.jface.viewers.Stylers;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Range;

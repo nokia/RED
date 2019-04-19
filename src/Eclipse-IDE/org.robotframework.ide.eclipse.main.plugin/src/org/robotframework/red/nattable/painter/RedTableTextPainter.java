@@ -5,7 +5,7 @@
  */
 package org.robotframework.red.nattable.painter;
 
-import static org.eclipse.jface.viewers.Stylers.mixingStyler;
+import static org.robotframework.red.jface.viewers.Stylers.mixingStyler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -34,6 +33,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
 import org.robotframework.red.nattable.TableCellStringData;
 import org.robotframework.red.nattable.TableCellsStrings;

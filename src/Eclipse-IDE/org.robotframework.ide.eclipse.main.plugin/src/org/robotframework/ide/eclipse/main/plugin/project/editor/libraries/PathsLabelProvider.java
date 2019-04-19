@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -20,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 

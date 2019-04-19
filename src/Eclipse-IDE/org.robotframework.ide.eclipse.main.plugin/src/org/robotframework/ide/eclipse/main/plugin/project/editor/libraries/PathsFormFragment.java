@@ -22,10 +22,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.RowExposingTableViewer;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -55,6 +52,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.jface.viewers.RowExposingTableViewer;
+import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
+import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.Viewers;
 
 /**

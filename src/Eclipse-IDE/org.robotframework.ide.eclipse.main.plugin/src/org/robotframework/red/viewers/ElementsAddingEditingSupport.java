@@ -7,12 +7,12 @@ package org.robotframework.red.viewers;
 
 import java.util.function.Supplier;
 
-import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
 
 import com.google.common.annotations.VisibleForTesting;
 

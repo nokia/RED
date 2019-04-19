@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.SWT;
@@ -24,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 /**
