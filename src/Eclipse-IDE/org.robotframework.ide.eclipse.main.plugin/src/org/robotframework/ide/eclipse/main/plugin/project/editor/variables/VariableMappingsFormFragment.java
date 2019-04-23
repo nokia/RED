@@ -41,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.ElementAddingToken;
@@ -70,7 +69,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
-    private RowExposingTableViewer viewer;
+    private TableViewer viewer;
 
     TableViewer getViewer() {
         return viewer;
@@ -103,8 +102,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     }
 
     private void createViewer(final Composite parent) {
-        viewer = new RowExposingTableViewer(parent,
-                SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        viewer = new TableViewer(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());

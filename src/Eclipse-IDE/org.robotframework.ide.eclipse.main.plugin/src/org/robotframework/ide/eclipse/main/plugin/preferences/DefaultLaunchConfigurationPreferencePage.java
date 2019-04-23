@@ -47,7 +47,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.ElementAddingToken;
@@ -209,7 +208,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
     }
 
     private TableViewer createEnvironmentVariablesViewer(final Composite parent) {
-        final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
+        final TableViewer viewer = new TableViewer(parent,
                 SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
