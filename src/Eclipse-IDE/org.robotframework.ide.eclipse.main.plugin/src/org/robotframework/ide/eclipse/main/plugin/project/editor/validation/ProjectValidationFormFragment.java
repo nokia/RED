@@ -37,6 +37,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
@@ -46,7 +47,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PlatformUI;
@@ -66,7 +66,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.jface.viewers.RowExposingTreeViewer;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.swt.SwtThread;
@@ -91,7 +90,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
-    private RowExposingTreeViewer viewer;
+    private TreeViewer viewer;
 
     private Button excludeFilesBtn;
 
@@ -130,7 +129,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void createViewer(final Composite parent) {
-        viewer = new RowExposingTreeViewer(parent,
+        viewer = new TreeViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
@@ -222,9 +221,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
             final ISelection selection = viewer.getSelection();
 
-            final TreeItem topTreeItem = viewer.getTree().getTopItem();
-            final Object topItem = topTreeItem == null ? null : topTreeItem.getData();
-
             final IProject project = editorInput.getRobotProject().getProject();
             final IWorkspaceRoot wsRoot = project.getWorkspace().getRoot();
             final ProjectTreeElement wrappedRoot = new ProjectTreeElement(wsRoot, false);
@@ -233,9 +229,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             addMissingEntriesToTree(wrappedRoot, wrappedRoot.getAll());
 
             viewer.setInput(wrappedRoot);
-            if (topItem != null) {
-                viewer.setTopItem(topItem);
-            }
 
             viewer.setSelection(selection);
 

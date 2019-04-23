@@ -48,7 +48,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priori
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.ElementAddingToken;
@@ -110,7 +109,7 @@ public class TasksPreferencePage extends RedPreferencePage {
     }
 
     private TableViewer createTagsViewer(final Composite parent) {
-        final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
+        final TableViewer viewer = new TableViewer(parent,
                 SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         GridDataFactory.fillDefaults().indent(10, 0).grab(true, true).applyTo(viewer.getTable());

@@ -46,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVari
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.jface.viewers.RowExposingTreeViewer;
 import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
@@ -109,7 +108,7 @@ public class ActiveStringSubstitutionSetsPreferencePage extends RedPreferencePag
     }
 
     private TreeViewer createSetsViewer(final Composite parent) {
-        final RowExposingTreeViewer viewer = new RowExposingTreeViewer(parent,
+        final TreeViewer viewer = new TreeViewer(parent,
                 SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         GridDataFactory.fillDefaults().indent(10, 0).grab(true, true).span(2, 1).applyTo(viewer.getTree());
@@ -143,7 +142,7 @@ public class ActiveStringSubstitutionSetsPreferencePage extends RedPreferencePag
         return viewer;
     }
 
-    private void createViewerMenu(final RowExposingTreeViewer viewer) {
+    private void createViewerMenu(final TreeViewer viewer) {
         final Runnable selectionRemover = () -> {
             final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
             final List<StringVariablesCollection> setsToRemove = Selections.getElements(selection,

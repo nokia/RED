@@ -43,7 +43,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
@@ -67,9 +66,9 @@ class LibrariesFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
-    private RowExposingTableViewer referencedLibrariesViewer;
+    private TableViewer referencedLibrariesViewer;
 
-    private RowExposingTableViewer remoteLocationsViewer;
+    private TableViewer remoteLocationsViewer;
 
     private IRuntimeEnvironment environment;
 
@@ -116,15 +115,15 @@ class LibrariesFormFragment implements ISectionFormFragment {
         return section;
     }
 
-    private RowExposingTableViewer createLibraryViewer(final Composite parent, final ViewerConfiguration config) {
-        final RowExposingTableViewer viewer = createViewer(parent, config);
+    private TableViewer createLibraryViewer(final Composite parent, final ViewerConfiguration config) {
+        final TableViewer viewer = createViewer(parent, config);
         createColumns(viewer, config);
         createContextMenu(viewer, config);
         return viewer;
     }
 
-    private RowExposingTableViewer createViewer(final Composite parent, final ViewerConfiguration config) {
-        final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
+    private TableViewer createViewer(final Composite parent, final ViewerConfiguration config) {
+        final TableViewer viewer = new TableViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
@@ -144,7 +143,7 @@ class LibrariesFormFragment implements ISectionFormFragment {
         return viewer;
     }
 
-    private void createColumns(final RowExposingTableViewer viewer, final ViewerConfiguration config) {
+    private void createColumns(final TableViewer viewer, final ViewerConfiguration config) {
         ViewerColumnsFactory.newColumn(config.getName())
                 .withWidth(200)
                 .withMinWidth(200)
@@ -155,7 +154,7 @@ class LibrariesFormFragment implements ISectionFormFragment {
                 .createFor(viewer);
     }
 
-    private void createContextMenu(final RowExposingTableViewer viewer, final ViewerConfiguration config) {
+    private void createContextMenu(final TableViewer viewer, final ViewerConfiguration config) {
         final String menuId = config.getMenuId();
 
         final MenuManager manager = new MenuManager(config.getMenuText(), menuId);
@@ -263,7 +262,7 @@ class LibrariesFormFragment implements ISectionFormFragment {
 
         RedCommonLabelProvider getLabelProvider();
 
-        EditingSupport getEditingSupport(RowExposingTableViewer viewer);
+        EditingSupport getEditingSupport(TableViewer viewer);
     }
 
     private class ReferencedLibrariesViewerConfiguration implements ViewerConfiguration {
@@ -299,7 +298,7 @@ class LibrariesFormFragment implements ISectionFormFragment {
         }
 
         @Override
-        public EditingSupport getEditingSupport(final RowExposingTableViewer viewer) {
+        public EditingSupport getEditingSupport(final TableViewer viewer) {
             final ReferencedLibraryCreator elementsCreator = new ReferencedLibraryCreator(viewer.getTable().getShell(),
                     editorInput, eventBroker, () -> environment);
             return new ReferencedLibrariesEditingSupport(viewer, elementsCreator);
@@ -339,7 +338,7 @@ class LibrariesFormFragment implements ISectionFormFragment {
         }
 
         @Override
-        public EditingSupport getEditingSupport(final RowExposingTableViewer viewer) {
+        public EditingSupport getEditingSupport(final TableViewer viewer) {
             final RemoteLocationCreator elementsCreator = new RemoteLocationCreator(viewer.getTable().getShell(),
                     editorInput, eventBroker);
             return new RemoteLocationsEditingSupport(viewer, elementsCreator, editorInput, eventBroker);

@@ -50,7 +50,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
@@ -94,7 +93,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     }
 
     private TableViewer createRulesViewer(final Composite parent) {
-        final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
+        final TableViewer viewer = new TableViewer(parent,
                 SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         GridDataFactory.fillDefaults().indent(10, 0).grab(true, true).applyTo(viewer.getTable());
@@ -160,7 +159,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     }
 
     private TableViewer createRulesFilesViewer(final Composite parent) {
-        final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
+        final TableViewer viewer = new TableViewer(parent,
                 SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         GridDataFactory.fillDefaults().indent(10, 0).grab(true, true).applyTo(viewer.getTable());

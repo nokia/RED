@@ -107,8 +107,8 @@ public class ViewersConfigurator {
         });
     }
 
-    public static void enableContextMenuOnHeader(final RowExposingTreeViewer viewer,
-            final MenuProvider viewerMenuProvider, final MenuProvider headerMenuProvider) {
+    public static void enableContextMenuOnHeader(final ColumnViewer viewer, final MenuProvider viewerMenuProvider,
+            final MenuProvider headerMenuProvider) {
         final Control control = viewer.getControl();
         control.addMenuDetectListener(new MenuDetectListener() {
             @Override
@@ -156,8 +156,9 @@ public class ViewersConfigurator {
         }
         throw new IllegalStateException("Given control has to be Tree or Table");
     }
-    
+
     public interface MenuProvider {
+
         Menu provide();
     }
 }

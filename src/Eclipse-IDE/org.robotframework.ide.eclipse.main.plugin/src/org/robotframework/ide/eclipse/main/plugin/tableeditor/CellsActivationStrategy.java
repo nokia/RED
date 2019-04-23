@@ -9,33 +9,26 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerEditor;
-import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
-import org.robotframework.red.jface.viewers.CellsHighlighter;
-import org.robotframework.red.jface.viewers.RowExposingTableViewer;
 
 import com.google.common.annotations.VisibleForTesting;
 
 public class CellsActivationStrategy {
 
-    public static void addActivationStrategy(final RowExposingTableViewer viewer, final RowTabbingStrategy rowTabbing) {
-        final CellsHighlighter highlighter = new CellsHighlighter(viewer);
-        final TableViewerFocusCellManager fcm = new TableViewerFocusCellManager(viewer, highlighter);
+    public static void addActivationStrategy(final TableViewer viewer, final RowTabbingStrategy rowTabbing) {
         final ColumnViewerEditorActivationStrategy activationSupport = createActivationSupport(viewer);
-        TableViewerEditor.create(viewer, fcm, activationSupport, createStyle(rowTabbing));
+        TableViewerEditor.create(viewer, activationSupport, createStyle(rowTabbing));
     }
 
     public static void addActivationStrategy(final TreeViewer viewer, final RowTabbingStrategy rowTabbing) {
-        final CellsHighlighter highlighter = new CellsHighlighter(viewer);
-        final TreeViewerFocusCellManager fcm = new TreeViewerFocusCellManager(viewer, highlighter);
         final ColumnViewerEditorActivationStrategy activationSupport = createActivationSupport(viewer);
-        TreeViewerEditor.create(viewer, fcm, activationSupport, createStyle(rowTabbing));
+        TreeViewerEditor.create(viewer, activationSupport, createStyle(rowTabbing));
     }
 
     private static int createStyle(final RowTabbingStrategy rowTabbing) {
