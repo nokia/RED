@@ -76,8 +76,6 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
 
-    private List<IRuntimeEnvironment> installations;
-
     private Composite parent;
     private CheckboxTableViewer viewer;
     private ProgressBar progressBar;
@@ -86,8 +84,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     private Button removeButton;
     private Button discoverButton;
 
+    private List<IRuntimeEnvironment> installations = new ArrayList<>();
     private boolean dirty = false;
-
 
     public InstalledRobotsPreferencesPage() {
         super("Installed Robot Frameworks");
