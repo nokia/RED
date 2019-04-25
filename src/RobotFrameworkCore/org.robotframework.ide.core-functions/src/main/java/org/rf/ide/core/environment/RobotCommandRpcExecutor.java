@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.apache.ws.commons.util.NamespaceContextImpl;
 import org.apache.xmlrpc.XmlRpcException;
@@ -36,7 +37,7 @@ import org.apache.xmlrpc.parser.TypeParser;
 import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializerImpl;
-import org.rf.ide.core.RedSystemProperties;
+import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
@@ -46,67 +47,50 @@ import org.rf.ide.core.rflint.RfLintRule;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 
 /**
  * @author mmarzec
  */
-class RobotCommandRpcExecutor implements RobotCommandExecutor {
+abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     private static final int CONNECTION_TIMEOUT = 30;
 
-    private final String interpreterPath;
-
     private final SuiteExecutor interpreterType;
-
-    private final File scriptFile;
-
-    private boolean isExternal = false;
-
-    private XmlRpcServer server;
 
     private XmlRpcClient client;
 
-    RobotCommandRpcExecutor(final String interpreterPath, final SuiteExecutor interpreterType, final File scriptFile) {
-        this.interpreterPath = interpreterPath;
+    RobotCommandRpcExecutor(final SuiteExecutor interpreterType) {
         this.interpreterType = interpreterType;
-        this.scriptFile = scriptFile;
     }
 
-    void waitForEstablishedConnection() {
-        isExternal = RedSystemProperties.shouldConnectToRunningServer();
+    abstract void initialize();
 
-        if (isExternal) {
-            client = createClient(RedSystemProperties.getSessionServerAddress());
-        } else {
-            final int port = findFreePort();
-            server = new XmlRpcServer();
-            server.start(port);
-            client = createClient("127.0.0.1:" + port);
+    abstract void establishConnection();
+
+    abstract boolean isAlive();
+
+    abstract void kill();
+
+    void connectToServer(final String url) {
+        try {
+            client = createClient(new URL(url));
+        } catch (final MalformedURLException e) {
+            // can't happen here
         }
         waitForConnectionToServer(CONNECTION_TIMEOUT);
     }
 
-    private static int findFreePort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (final IOException e) {
-            throw new RobotCommandExecutorException("Unable to find empty port for XML-RPC server", e);
-        }
-    }
-
-    private static XmlRpcClient createClient(final String hostAndPort) {
+    private static XmlRpcClient createClient(final URL serverUrl) {
         final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        try {
-            config.setServerURL(new URL("http://" + hostAndPort));
-            config.setConnectionTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
-            config.setReplyTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
-        } catch (final MalformedURLException e) {
-            // can't happen here
-        }
+        config.setServerURL(serverUrl);
+        config.setConnectionTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
+        config.setReplyTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
         final XmlRpcClient client = new XmlRpcClient();
         final XmlRpcSun15HttpTransportFactory transportFactory = new XmlRpcSun15HttpTransportFactory(client);
         transportFactory.setProxy(Proxy.NO_PROXY);
@@ -133,20 +117,6 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 kill();
                 break;
             }
-        }
-    }
-
-    boolean isAlive() {
-        return !isExternal() && server.isAlive();
-    }
-
-    boolean isExternal() {
-        return isExternal;
-    }
-
-    void kill() {
-        if (!isExternal()) {
-            server.kill();
         }
     }
 
@@ -430,109 +400,221 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         return result.get("result");
     }
 
-    private class XmlRpcServer {
+    static class InternalRobotCommandRpcExecutor extends RobotCommandRpcExecutor {
 
-        private Process process;
+        private static final List<String> SCRIPT_FILES = ImmutableList.of("robot_session_server.py",
+                "classpath_updater.py", "red_keyword_autodiscover.py", "red_libraries.py",
+                "red_library_autodiscover.py", "red_module_classes.py", "red_modules.py", "red_variables.py",
+                "rflint_integration.py", "SuiteVisitorImportProxy.py", "TestRunnerAgent.py");
 
-        private void start(final int port) {
+        private final String interpreterPath;
+
+        private final Supplier<List<PythonProcessListener>> processListeners;
+
+        private final List<File> serverScripts = new ArrayList<>();
+
+        private XmlRpcServer server;
+
+        InternalRobotCommandRpcExecutor(final SuiteExecutor interpreterType, final String interpreterPath,
+                final Supplier<List<PythonProcessListener>> processListeners) {
+            super(interpreterType);
+            this.interpreterPath = interpreterPath;
+            this.processListeners = processListeners;
+        }
+
+        @Override
+        void initialize() {
+            if (serverScripts.isEmpty()) {
+                serverScripts.addAll(copyScripts());
+            } else if (!serverScripts.stream().allMatch(File::exists)) {
+                serverScripts.clear();
+                serverScripts.addAll(copyScripts());
+            }
+        }
+
+        @VisibleForTesting
+        static List<File> copyScripts() {
             try {
-                process = new ProcessBuilder(interpreterPath, scriptFile.getPath(), String.valueOf(port)).start();
+                final List<File> files = new ArrayList<>();
+                for (final String scriptFile : SCRIPT_FILES) {
+                    files.add(RedTemporaryDirectory.copyScriptFile(scriptFile));
+                }
+                return files;
+            } catch (final IOException e) {
+                throw new XmlRpcServerException("Unable to create temporary directory for XML-RPC server", e);
+            }
+        }
+
+        @Override
+        void establishConnection() {
+            final String serverPath = serverScripts.get(0).getPath();
+            final int port = findFreePort();
+            server = new XmlRpcServer();
+            try {
+                server.start(serverPath, port);
+            } catch (final IOException e) {
+                throw new XmlRpcServerException(
+                        String.format("Unable to start XML-RPC server (interpreter: %s, server: %s, port: %d)",
+                                interpreterPath, serverPath, port),
+                        e);
+            }
+
+            final String url = "http://127.0.0.1:" + port;
+            connectToServer(url);
+
+            if (!isAlive()) {
+                throw new XmlRpcServerException(
+                        String.format("Unable to start XML-RPC server (interpreter: %s, server: %s, port: %d)",
+                                interpreterPath, serverPath, port));
+            }
+        }
+
+        private static int findFreePort() {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                return socket.getLocalPort();
+            } catch (final IOException e) {
+                throw new XmlRpcServerException("Unable to find free port for XML-RPC server", e);
+            }
+        }
+
+        @Override
+        boolean isAlive() {
+            return server != null && server.isAlive();
+        }
+
+        @Override
+        void kill() {
+            if (isAlive()) {
+                try {
+                    server.kill();
+                } catch (final InterruptedException e) {
+                    throw new XmlRpcServerException("Unable to kill XML-RPC server", e);
+                }
+            }
+        }
+
+        private class XmlRpcServer {
+
+            private Process process;
+
+            private void start(final String serverPath, final int port) throws IOException {
+                process = new ProcessBuilder(interpreterPath, serverPath, String.valueOf(port)).start();
 
                 final Semaphore semaphore = new Semaphore(0);
                 startStdOutReadingThread(semaphore);
                 startStdErrReadingThread(semaphore);
-            } catch (final IOException e) {
-                throw new RobotCommandExecutorException("Unable to start XML-RPC server on file: " + interpreterPath,
-                        e);
             }
-        }
 
-        private boolean isAlive() {
-            return process != null && process.isAlive();
-        }
+            private boolean isAlive() {
+                return process != null && process.isAlive();
+            }
 
-        private void kill() {
-            if (isAlive()) {
-                try {
-                    new OSProcessHelper().destroyProcessTree(process);
-                } catch (final ProcessHelperException e) {
-                    e.printStackTrace();
-                }
-                process.destroyForcibly();
-                try {
+            private void kill() throws InterruptedException {
+                if (isAlive()) {
+                    try {
+                        new OSProcessHelper().destroyProcessTree(process);
+                    } catch (final ProcessHelperException e) {
+                        e.printStackTrace();
+                    }
+                    process.destroyForcibly();
                     process.waitFor();
-                } catch (final InterruptedException e) {
-                    throw new RobotCommandExecutorException("Unable to kill XML-RPC server", e);
                 }
             }
-        }
 
-        private void startStdOutReadingThread(final Semaphore semaphore) {
-            new Thread(() -> {
-                for (final PythonProcessListener listener : getListeners()) {
-                    listener.processStarted(interpreterPath, process);
-                }
-                semaphore.release();
-                final InputStream inputStream = process.getInputStream();
-                try (final BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inputStream, Charsets.UTF_8))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        for (final PythonProcessListener listener : getListeners()) {
-                            listener.lineRead(process, line);
+            private void startStdOutReadingThread(final Semaphore semaphore) {
+                new Thread(() -> {
+                    for (final PythonProcessListener listener : processListeners.get()) {
+                        listener.processStarted(interpreterPath, process);
+                    }
+                    semaphore.release();
+                    final InputStream inputStream = process.getInputStream();
+                    try (final BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(inputStream, Charsets.UTF_8))) {
+                        String line = reader.readLine();
+                        while (line != null) {
+                            for (final PythonProcessListener listener : processListeners.get()) {
+                                listener.lineRead(process, line);
+                            }
+                            line = reader.readLine();
                         }
-                        line = reader.readLine();
-                    }
-                } catch (final IOException e) {
-                    // that fine
-                } finally {
-                    for (final PythonProcessListener listener : getListeners()) {
-                        listener.processEnded(process);
-                    }
-                }
-            }).start();
-        }
-
-        private void startStdErrReadingThread(final Semaphore semaphore) {
-            new Thread(() -> {
-                try {
-                    semaphore.acquire();
-                } catch (final InterruptedException e) {
-                    // that fine
-                }
-                final InputStream inputStream = process.getErrorStream();
-                try (final BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inputStream, Charsets.UTF_8))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        for (final PythonProcessListener listener : getListeners()) {
-                            listener.errorLineRead(process, line);
+                    } catch (final IOException e) {
+                        // ignore it
+                    } finally {
+                        for (final PythonProcessListener listener : processListeners.get()) {
+                            listener.processEnded(process);
                         }
-                        line = reader.readLine();
                     }
-                } catch (final IOException e) {
-                    // that fine
-                }
-            }).start();
+                }).start();
+            }
+
+            private void startStdErrReadingThread(final Semaphore semaphore) {
+                new Thread(() -> {
+                    try {
+                        semaphore.acquire();
+                    } catch (final InterruptedException e) {
+                        // ignore it
+                    }
+                    final InputStream inputStream = process.getErrorStream();
+                    try (final BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(inputStream, Charsets.UTF_8))) {
+                        String line = reader.readLine();
+                        while (line != null) {
+                            for (final PythonProcessListener listener : processListeners.get()) {
+                                listener.errorLineRead(process, line);
+                            }
+                            line = reader.readLine();
+                        }
+                    } catch (final IOException e) {
+                        // ignore it
+                    }
+                }).start();
+            }
+
         }
 
-        private List<PythonProcessListener> getListeners() {
-            // copy for avoiding concurrent modification
-            return new ArrayList<>(PythonInterpretersCommandExecutors.getInstance().getListeners());
+        @SuppressWarnings("serial")
+        private static class XmlRpcServerException extends RuntimeException {
+
+            private XmlRpcServerException(final String message) {
+                super(message);
+            }
+
+            private XmlRpcServerException(final String message, final Throwable cause) {
+                super(message, cause);
+            }
         }
 
     }
 
-    @SuppressWarnings("serial")
-    static class RobotCommandExecutorException extends RuntimeException {
+    static class ExternalRobotCommandRpcExecutor extends RobotCommandRpcExecutor {
 
-        RobotCommandExecutorException(final String message) {
-            super(message);
+        private final String serverAndPort;
+
+        ExternalRobotCommandRpcExecutor(final SuiteExecutor interpreterType, final String serverAndPort) {
+            super(interpreterType);
+            this.serverAndPort = serverAndPort;
         }
 
-        RobotCommandExecutorException(final String message, final Throwable cause) {
-            super(message, cause);
+        @Override
+        void initialize() {
+            // nothing to do
         }
+
+        @Override
+        void establishConnection() {
+            connectToServer("http://" + serverAndPort);
+        }
+
+        @Override
+        boolean isAlive() {
+            return true;
+        }
+
+        @Override
+        void kill() {
+            // nothing to do
+        }
+
     }
 
     private static class XmlRpcTypeFactoryWithNil extends TypeFactoryImpl {

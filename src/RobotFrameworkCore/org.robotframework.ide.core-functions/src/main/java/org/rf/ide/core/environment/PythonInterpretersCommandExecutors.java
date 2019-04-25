@@ -5,30 +5,21 @@
  */
 package org.rf.ide.core.environment;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.rf.ide.core.RedTemporaryDirectory;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
-import org.rf.ide.core.environment.RobotCommandRpcExecutor.RobotCommandExecutorException;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
+import org.rf.ide.core.environment.RobotCommandRpcExecutor.ExternalRobotCommandRpcExecutor;
+import org.rf.ide.core.environment.RobotCommandRpcExecutor.InternalRobotCommandRpcExecutor;
 
 /**
  * @author Michal Anglart
  */
 class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
-
-    @VisibleForTesting
-    static final List<String> SCRIPT_FILES = ImmutableList.of("robot_session_server.py", "classpath_updater.py",
-            "red_keyword_autodiscover.py", "red_libraries.py", "red_library_autodiscover.py", "red_module_classes.py",
-            "red_modules.py", "red_variables.py", "rflint_integration.py", "SuiteVisitorImportProxy.py",
-            "TestRunnerAgent.py");
 
     private static class InstanceHolder {
 
@@ -43,68 +34,47 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
 
     private final List<PythonProcessListener> processListeners = new ArrayList<>();
 
-    private final List<File> xmlRpcServerScriptFiles = new ArrayList<>();
-
     private PythonInterpretersCommandExecutors() {
-        initializeScripts();
+        // instance of this class should not be created outside
     }
 
-    List<PythonProcessListener> getListeners() {
-        return processListeners;
+    synchronized List<PythonProcessListener> getListeners() {
+        // copy for avoiding concurrent modification
+        return Collections.unmodifiableList(new ArrayList<>(processListeners));
     }
 
-    void addProcessListener(final PythonProcessListener listener) {
+    synchronized void addProcessListener(final PythonProcessListener listener) {
         processListeners.add(listener);
     }
 
-    void removeProcessListener(final PythonProcessListener listener) {
+    synchronized void removeProcessListener(final PythonProcessListener listener) {
         processListeners.remove(listener);
     }
 
     @Override
-    public synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {
-        final String pathAsName = interpreterPath.getInterpreterPath();
-        final RobotCommandRpcExecutor executor = executors.remove(pathAsName);
+    public synchronized void resetExecutorFor(final PythonInstallationDirectory location) {
+        final String interpreterPath = location.getInterpreterPath();
+        final RobotCommandRpcExecutor executor = executors.remove(interpreterPath);
         if (executor != null) {
             executor.kill();
         }
     }
 
     @Override
-    public synchronized RobotCommandExecutor getRobotCommandExecutor(
-            final PythonInstallationDirectory interpreterPath) {
-        if (!xmlRpcServerScriptFiles.stream().allMatch(File::exists)) {
-            xmlRpcServerScriptFiles.clear();
-            initializeScripts();
+    public synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory location) {
+        RobotCommandRpcExecutor executor = executors.get(location.getInterpreterPath());
+        if (executor == null || !executor.isAlive()) {
+            executor = RedSystemProperties.shouldConnectToRunningServer()
+                    ? new ExternalRobotCommandRpcExecutor(location.getInterpreter(),
+                            RedSystemProperties.getSessionServerAddress())
+                    : new InternalRobotCommandRpcExecutor(location.getInterpreter(), location.getInterpreterPath(),
+                            this::getListeners);
+            executor.initialize();
+            executor.establishConnection();
+            executors.put(location.getInterpreterPath(), executor);
+        } else {
+            executor.initialize();
         }
-
-        final String pathAsName = interpreterPath.getInterpreterPath();
-        if (new File(pathAsName).exists()) {
-            RobotCommandRpcExecutor executor = executors.get(pathAsName);
-            if (executor != null && (executor.isAlive() || executor.isExternal())) {
-                return executor;
-            } else if (executor != null) {
-                executors.remove(pathAsName);
-            }
-            executor = new RobotCommandRpcExecutor(pathAsName, interpreterPath.getInterpreter(),
-                    xmlRpcServerScriptFiles.get(0));
-            executor.waitForEstablishedConnection();
-            if (executor.isAlive() || executor.isExternal()) {
-                executors.put(pathAsName, executor);
-                return executor;
-            }
-        }
-
-        throw new RobotCommandExecutorException("Unable to start XML-RPC server on file: " + interpreterPath);
-    }
-
-    private void initializeScripts() {
-        try {
-            for (final String scriptFile : SCRIPT_FILES) {
-                xmlRpcServerScriptFiles.add(RedTemporaryDirectory.copyScriptFile(scriptFile));
-            }
-        } catch (final IOException e) {
-            throw new RobotCommandExecutorException("Unable to create temporary directory for XML-RPC server", e);
-        }
+        return executor;
     }
 }

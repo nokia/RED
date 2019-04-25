@@ -18,14 +18,15 @@ import org.junit.Test;
 
 import com.google.common.io.Files;
 
-public class PythonInterpretersCommandExecutorsTest {
+public class RobotCommandRpcExecutorTest {
 
     @Test
-    public void allRobotSessionServerFilesAreDefined() throws Exception {
-        final File[] resourceFiles = getResourceFiles("/scripts");
-        final List<String> robotSessionServerFiles = filterPythonScriptFiles(resourceFiles,
+    public void allRobotSessionServerFilesAreCreated() throws Exception {
+        final List<File> createdScripts = RobotCommandRpcExecutor.InternalRobotCommandRpcExecutor.copyScripts();
+        final List<String> robotSessionServerFiles = filterPythonScriptFiles(getResourceFiles("/scripts"),
                 name -> !name.equals("interruptor.py"));
-        assertThat(PythonInterpretersCommandExecutors.SCRIPT_FILES).containsAll(robotSessionServerFiles);
+
+        assertThat(createdScripts).extracting(File::getName).containsAll(robotSessionServerFiles);
     }
 
     private static List<String> filterPythonScriptFiles(final File[] files, final Predicate<String> namePredicate) {
@@ -37,7 +38,7 @@ public class PythonInterpretersCommandExecutorsTest {
     }
 
     private static File[] getResourceFiles(final String folder) throws Exception {
-        final String path = PythonInterpretersCommandExecutors.class.getResource(folder).getFile();
+        final String path = RobotCommandRpcExecutor.class.getResource(folder).getFile();
         return new File(URLDecoder.decode(path, "UTF-8")).listFiles();
     }
 }

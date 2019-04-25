@@ -9,7 +9,7 @@ import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInsta
 
 public interface RobotCommandsExecutors {
 
-    RobotCommandExecutor getRobotCommandExecutor(PythonInstallationDirectory interpreterPath);
+    RobotCommandExecutor getRobotCommandExecutor(PythonInstallationDirectory location);
 
     void resetExecutorFor(PythonInstallationDirectory location);
 
