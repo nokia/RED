@@ -33,6 +33,16 @@ Window -> Preferences -> General ->
 Workspace](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Workspace\)'\))`
 change **Text file encoding** to UTF-8).
 
+  * ### Unicode characters in paths with Python 2 on Windows platform
+
+Python 2 does not always support unicode characters in paths on Windows. Using
+such characters may cause problems with starting RED XML-RPC server or running
+Robot tests. When unicode characters are used in paths, Python 3 is
+recommended.
+
+Workaround for XML-RPC server starting problems is changing TEMP folder path
+to path without unicode characters.
+
   * ### GTK3 issues under Linux
 
 It was observed that using GTK3 library with Eclipse causes unexpected
