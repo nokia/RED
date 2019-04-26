@@ -458,7 +458,7 @@ if __name__ == '__main__':
     print('# RED session server started @' + str(PORT))
     print('# python version: ' + sys.version)
     print('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
-    print('# script path: ' + __file__)
+    print('# script path: ' + str(__file__.encode('utf-8')))
     print('\n')
 
     server.serve_forever()
