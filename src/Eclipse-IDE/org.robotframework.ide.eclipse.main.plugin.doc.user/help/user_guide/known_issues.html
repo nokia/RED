@@ -39,6 +39,14 @@
 		Window -&gt; Preferences -&gt; General -&gt; Workspace</a></code> change <b>Text file encoding</b> to UTF-8).</p> 
 	</li>
 	<li>
+		<h3>Unicode characters in paths with Python 2 on Windows platform</h3>
+		<p>Python 2 does not always support unicode characters in paths on Windows. 
+		Using such characters may cause problems with starting RED XML-RPC server or running Robot tests. 
+		When unicode characters are used in paths, Python 3 is recommended.
+		</p>
+		<p>Workaround for XML-RPC server starting problems is changing TEMP folder path to path without unicode characters.</p> 
+	</li>
+	<li>
 		<h3>GTK3 issues under Linux</h3>
 	
 		<p>It was observed that using GTK3 library with Eclipse causes unexpected graphical glitches.
