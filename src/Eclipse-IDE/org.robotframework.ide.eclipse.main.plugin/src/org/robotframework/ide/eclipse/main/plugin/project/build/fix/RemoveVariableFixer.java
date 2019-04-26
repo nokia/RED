@@ -53,7 +53,7 @@ public class RemoveVariableFixer extends RedSuiteMarkerResolution {
             final Range<Integer> defRange = RobotProblem.getRangeOf(marker);
             if (defRange.contains(variable.getDefinitionPosition().getOffset())) {
                 try {
-                    return createProposal(document, variable);
+                    return createProposal(document, variable.getPosition());
                 } catch (final BadLocationException e) {
                     return Optional.empty();
                 }
@@ -62,26 +62,23 @@ public class RemoveVariableFixer extends RedSuiteMarkerResolution {
         return Optional.empty();
     }
 
-    private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotVariable variable)
+    private Optional<ICompletionProposal> createProposal(final IDocument document, final Position position)
             throws BadLocationException {
-        final Position position = variable.getPosition();
         final int offset = position.getOffset();
         final int length = position.getLength();
 
         int shift = 0;
-
         if (document.getLength() > length + offset) {
             int ch = document.getChar(offset + length + shift);
             while (ch == '\r' || ch == '\n' || ch == ' ') {
-                if (ch == -1) {
-                    break;
-                }
                 ch = document.getChar(offset + length + shift);
                 shift++;
             }
+        } else {
+            shift = document.getLength() - length - offset + 1;
         }
 
         return Optional.of(new CompletionProposal("", offset, length + shift - 1, offset,
-                ImagesManager.getImage(RedImages.getUserKeywordImage()), getLabel(), null, null));
+                ImagesManager.getImage(RedImages.getRobotVariableImage()), getLabel(), null, null));
     }
 }

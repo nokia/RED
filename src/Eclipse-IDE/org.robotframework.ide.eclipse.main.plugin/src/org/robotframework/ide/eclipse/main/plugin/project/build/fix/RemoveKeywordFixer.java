@@ -53,7 +53,7 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
             final Range<Integer> defRange = RobotProblem.getRangeOf(marker);
             if (defRange.contains(keyword.getDefinitionPosition().getOffset())) {
                 try {
-                    return createProposal(document, keyword);
+                    return createProposal(document, keyword.getPosition());
                 } catch (final BadLocationException e) {
                     return Optional.empty();
                 }
@@ -62,9 +62,8 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
         return Optional.empty();
     }
 
-    private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotKeywordDefinition keyword)
+    private Optional<ICompletionProposal> createProposal(final IDocument document, final Position position)
             throws BadLocationException {
-        final Position position = keyword.getPosition();
         final int offset = position.getOffset();
         final int length = position.getLength();
 
@@ -72,9 +71,6 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
         if (document.getLength() > length + offset) {
             int ch = document.getChar(offset + length + shift);
             while (ch == '\r' || ch == '\n' || ch == ' ') {
-                if (ch == -1) {
-                    break;
-                }
                 ch = document.getChar(offset + length + shift);
                 shift++;
             }
