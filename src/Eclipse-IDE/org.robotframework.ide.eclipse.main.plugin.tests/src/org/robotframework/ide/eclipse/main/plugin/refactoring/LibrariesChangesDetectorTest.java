@@ -1,8 +1,8 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static org.mockito.ArgumentMatchers.argThat;
@@ -124,13 +124,18 @@ public class LibrariesChangesDetectorTest {
         final IPath beforeRefactorPath = Path.fromPortableString("project/resource/abc");
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/abc"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "abc.c", "project/resource"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "abc.c.d", "project/resource"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.x", "project"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc", "project"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc.z", "project"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c", "project/resource/abc/c/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c.d", "project/resource/abc/c/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.x", "project/resource/x.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc", "project/resource/abc/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc.z", "project/resource/abc/z.py"));
 
         final LibrariesChangesDetector detector = new LibrariesChangesDetector(beforeRefactorPath, Optional.empty(),
                 config);
@@ -153,30 +158,69 @@ public class LibrariesChangesDetectorTest {
         final IPath beforeRefactorPath = Path.fromPortableString("project/resource/abc");
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/abc"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "abc.c", "project/resource"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "abc.c.d", "project/resource"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.x", "projectt"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc", "project"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc.z", "project"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c", "project/resource/abc/c/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c.d", "project/resource/abc/c/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.x", "project/resource/x.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc", "project/resource/abc/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc.z", "project/resource/abc/z.py"));
 
         final LibrariesChangesDetector detector = new LibrariesChangesDetector(beforeRefactorPath,
                 Optional.of(Path.fromPortableString("project/resource/xyz")), config);
         detector.detect(processor);
 
         verify(processor).pathModified(same(config.getReferencedLibraries().get(0)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/xyz"))));
-        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/xyz"))));
-        verify(processor).pathModified(same(config.getReferencedLibraries().get(2)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c", "project/resource"))));
-        verify(processor).pathModified(same(config.getReferencedLibraries().get(3)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c.d", "project/resource"))));
-        verify(processor).pathModified(same(config.getReferencedLibraries().get(5)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz", "project"))));
-        verify(processor).pathModified(same(config.getReferencedLibraries().get(6)),
-                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz.z", "project"))));
+                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/xyz/d.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)), argThat(
+                hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/xyz/d.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(2)), argThat(hasSameFields(
+                ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c", "project/resource/xyz/c/__init__.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(3)), argThat(
+                hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "xyz.c.d", "project/resource/xyz/c/d.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(5)), argThat(hasSameFields(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz", "project/resource/xyz/__init__.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(6)), argThat(hasSameFields(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.xyz.z", "project/resource/xyz/z.py"))));
+        verifyNoMoreInteractions(processor);
+    }
+
+    @Test
+    public void pythonLibraryIsReportedForModification_whenLibraryFileNameIsChanged() {
+        @SuppressWarnings("unchecked")
+        final RedXmlChangesProcessor<ReferencedLibrary> processor = mock(RedXmlChangesProcessor.class);
+
+        final IPath beforeRefactorPath = Path.fromPortableString("project/resource/abc/d.py");
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "d.x", "project/resource/abc/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "d", "project/resource/abc/d/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c", "project/resource/abc/c/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "abc.c.d", "project/resource/abc/c/d.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.x", "project/resource/x.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc", "project/resource/abc/__init__.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.abc.z", "project/resource/abc/z.py"));
+
+        final LibrariesChangesDetector detector = new LibrariesChangesDetector(beforeRefactorPath,
+                Optional.of(Path.fromPortableString("project/resource/abc/w.py")), config);
+        detector.detect(processor);
+
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)),
+                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "w", "project/resource/abc/w.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)), argThat(
+                hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "w.x", "project/resource/abc/w.py"))));
         verifyNoMoreInteractions(processor);
     }
 
