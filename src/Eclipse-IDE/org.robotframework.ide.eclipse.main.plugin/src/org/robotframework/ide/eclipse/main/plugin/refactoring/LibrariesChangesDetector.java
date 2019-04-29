@@ -1,16 +1,16 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.joining;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -121,14 +121,18 @@ class LibrariesChangesDetector {
                     final Optional<IPath> transformedPath = Changes.transformAffectedPath(beforeRefactorPath,
                             afterRefactorPath.get(), potentiallyAffectedPath);
                     if (transformedPath.isPresent()) {
-                        final IPath lastSegments = transformedPath.get()
-                                .makeRelative()
-                                .removeFileExtension()
-                                .removeFirstSegments(transformedPath.get().segmentCount() - i)
-                                .append(new Path(
-                                        segmentedName.subList(i, segmentedName.size()).stream().collect(joining("/"))));
 
-                        final String name = Stream.of(lastSegments.segments()).collect(joining("."));
+                        final String affectedSegment = beforeRefactorPath.removeFileExtension().lastSegment();
+                        final int changedSegmentId = segmentedName.lastIndexOf(affectedSegment);
+                        final int nameToPathCorrection = beforeRefactorPath.segmentCount() - 1 - changedSegmentId;
+                        List<String> newNameSegments = new ArrayList<>();
+                        for (int j = 0; j < segmentedName.size(); j++) {
+                            newNameSegments.add(j <= changedSegmentId
+                                    ? transformedPath.get().removeFileExtension().segment(j + nameToPathCorrection)
+                                    : segmentedName.get(j));
+                        }
+
+                        final String name = newNameSegments.stream().collect(joining("."));
                         final String path = transformedPath.get()
                                 .makeRelative()
                                 .removeLastSegments(i)
