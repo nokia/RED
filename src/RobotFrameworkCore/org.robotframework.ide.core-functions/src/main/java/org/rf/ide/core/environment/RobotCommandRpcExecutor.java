@@ -77,13 +77,13 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     abstract void kill();
 
-    void connectToServer(final String url) {
+    void connectToServer(final String url, final String interpreterPath) {
         try {
             client = createClient(new URL(url));
         } catch (final MalformedURLException e) {
             // can't happen here
         }
-        waitForConnectionToServer(CONNECTION_TIMEOUT);
+        waitForConnectionToServer(CONNECTION_TIMEOUT, interpreterPath);
     }
 
     private static XmlRpcClient createClient(final URL serverUrl) {
@@ -100,11 +100,11 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
         return client;
     }
 
-    private void waitForConnectionToServer(final int timeoutInSec) {
+    private void waitForConnectionToServer(final int timeoutInSec, final String interpreterPath) {
         final long start = System.currentTimeMillis();
         while (true) {
             try {
-                callRpcFunction("checkServerAvailability");
+                callRpcFunction("checkServerAvailability", interpreterPath);
                 break;
             } catch (final XmlRpcException e) {
                 try {
@@ -460,7 +460,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
 
             final String url = "http://127.0.0.1:" + port;
-            connectToServer(url);
+            connectToServer(url, interpreterPath);
 
             if (!isAlive()) {
                 throw new XmlRpcServerException(
@@ -602,7 +602,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
         @Override
         void establishConnection() {
-            connectToServer("http://" + serverAndPort);
+            connectToServer("http://" + serverAndPort, "");
         }
 
         @Override
