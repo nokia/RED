@@ -30,6 +30,8 @@ STD_ARGS_LOGGER.addHandler(args_handler)
 
 RED_DRYRUN_PROCESSES = []
 
+INTERPRETER_PATH = sys.executable
+
 
 def encode_result_or_exception(func):
     import traceback
@@ -131,8 +133,10 @@ def cleanup_sys_path(to_call):
 @logresult
 @encode_result_or_exception
 @logargs
-def check_server_availability():
-    pass
+def check_server_availability(interpreter_path):
+    global INTERPRETER_PATH
+    if interpreter_path != "":
+        INTERPRETER_PATH = interpreter_path
 
 
 @logresult
@@ -219,8 +223,10 @@ def start_library_auto_discovering(port, data_source_path, project_location_path
                                    excluded_paths, python_paths, class_paths):
     import subprocess
     import os
-
-    command = [sys.executable]
+    
+    global INTERPRETER_PATH
+    
+    command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_library_autodiscover.py'))
     command.append(str(port))
     command.append(__encode_unicode_if_needed(data_source_path))
@@ -241,7 +247,9 @@ def start_keyword_auto_discovering(port, data_source_path, python_paths, class_p
     import subprocess
     import os
 
-    command = [sys.executable]
+    global INTERPRETER_PATH
+    
+    command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_keyword_autodiscover.py'))
     command.append(str(port))
     command.append(__encode_unicode_if_needed(data_source_path))
@@ -263,16 +271,17 @@ def stop_auto_discovering():
 @encode_result_or_exception
 @logargs
 def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, additional_arguments):
+    global INTERPRETER_PATH
+    
     import subprocess
     import os
-
     try:
         import rflint
         import rflint_integration
     except Exception as e:
-        raise RuntimeError('There is no rflint module installed for ' + sys.executable + ' interpreter')
-
-    command = [sys.executable]
+        raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
+    
+    command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
     command.append(host)
     command.append(str(port))
@@ -328,8 +337,10 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
         import Queue as queue
     except:
         import queue
-
-    command = [sys.executable]
+    
+    global INTERPRETER_PATH
+    
+    command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_libraries.py'))
     command.append(__encode_unicode_if_needed(libname))
     command.append(format)
