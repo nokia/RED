@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -40,41 +39,40 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
             return Optional.of(new SetDocumentationSettingCommand((RobotDefinitionSetting) call, value));
         }
 
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
-
+        if (data.size() == 1 && data.get(0).isEmpty() && column > 0) {
+            data.set(0, "\\");
+        }
         final int repeat = column - data.size() + 1;
         for (int i = 0; i < repeat; i++) {
             data.add("\\");
-            tokens.add(RobotToken.create("\\"));
         }
         data.set(column, value);
-        tokens.get(column).setText(value);
 
         final int index = call.getIndex();
         if (isCall(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, data));
 
         } else if (isCall(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, data));
 
         } else if (isCall(call)) {
             return Optional.of(new UpdateStepCellCommand(call, value, column));
 
         } else if (isLocalSetting(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, data));
 
         } else if (isLocalSetting(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, data));
 
         } else if (isLocalSetting(call)) {
             return Optional.of(new UpdateStepCellCommand(call, value, column));
 
         } else if (isEmpty(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, data));
 
         } else if (isEmpty(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, data));
 
         } else if (isEmpty(call)) {
             return Optional.of(new UpdateStepCellCommand(call, value, column));
@@ -83,34 +81,31 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
     }
 
     public Optional<? extends EditorCommand> collectForInsertion(final RobotKeywordCall call, final int column) {
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
 
         if (column < 0 || column > data.size()) {
             return Optional.empty();
         }
-
-        tokens.add(column, RobotToken.create(""));
         data.add(column, "");
 
         final int index = call.getIndex();
         if (isCall(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, data));
 
         } else if (isCall(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, data));
 
         } else if (isLocalSetting(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, data));
 
         } else if (isLocalSetting(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, data));
 
         } else if (isEmpty(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, data));
 
         } else if (isEmpty(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, data));
 
         } else {
             return Optional.of(new InsertNewCellCommand(call, column));
@@ -120,9 +115,7 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
     public Optional<? extends EditorCommand> collectForRemoval(final RobotKeywordCall call,
             final List<Integer> columns) {
 
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
-
         final int[] filteredColumns = columns.stream()
                 .mapToInt(Integer::valueOf)
                 .filter(i -> i >= 0 && i < data.size())
@@ -133,34 +126,33 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
         }
 
         for (int i = filteredColumns.length - 1; i >= 0; i--) {
-            tokens.remove(filteredColumns[i]);
             data.remove(filteredColumns[i]);
         }
 
         final int index = call.getIndex();
         if (isCall(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceCall(call, index, data));
 
         } else if (isCall(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceCall(call, index, data));
 
         } else if (isCall(call)) {
             return Optional.of(new RemoveStepCellCommand(call, filteredColumns));
 
         } else if (isLocalSetting(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceSetting(call, index, data));
 
         } else if (isLocalSetting(call) && looksLikeEmpty(data)) {
-            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, tokens));
+            return Optional.of(ReplaceWithEmptyCommand.replaceSetting(call, index, data));
 
         } else if (isLocalSetting(call)) {
             return Optional.of(new RemoveStepCellCommand(call, filteredColumns));
 
         } else if (isEmpty(call) && looksLikeCall(data)) {
-            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithCallCommand.replaceEmpty(call, index, data));
 
         } else if (isEmpty(call) && looksLikeSetting(data)) {
-            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, tokens));
+            return Optional.of(ReplaceWithSettingCommand.replaceEmpty(call, index, data));
 
         } else if (isEmpty(call)) {
             return Optional.of(new RemoveStepCellCommand(call, filteredColumns));
