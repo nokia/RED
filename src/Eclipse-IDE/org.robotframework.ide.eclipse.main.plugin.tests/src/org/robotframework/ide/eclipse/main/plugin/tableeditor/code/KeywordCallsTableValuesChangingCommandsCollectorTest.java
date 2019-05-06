@@ -46,9 +46,9 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  Log  msg")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotKeywordCall orignalCall = getChild(robotCase, 0);
+        final RobotKeywordCall originalCall = getChild(robotCase, 0);
 
-        final List<EditorCommand> undoCmds = insertCell(orignalCall, 0);
+        final List<EditorCommand> undoCmds = insertCell(originalCall, 0);
 
         final RobotKeywordCall callAfterExecution = getChild(robotCase, 0);
         assertThat(getCells(callAfterExecution)).containsExactly("");

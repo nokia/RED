@@ -25,6 +25,7 @@ public class RemoveStepCellCommand extends EditorCommand {
         this.call = stepWrapper;
         this.columns = new int[] { column };
     }
+
     public RemoveStepCellCommand(final RobotKeywordCall stepWrapper, final int[] columns) {
         this.call = stepWrapper;
         this.columns = columns;

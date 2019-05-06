@@ -39,9 +39,7 @@ class ExecutableHolderEmptyLineDumper extends ExecutableTableElementDumper {
 
     private List<RobotToken> getEmpty(final RobotEmptyRow<?> emptyRow) {
         final List<RobotToken> keys = new ArrayList<>();
-        // if (emptyRow.getEmptyToken() != null) {
-            keys.add(emptyRow.getEmptyToken());
-        // }
+        keys.add(emptyRow.getEmptyToken());
         return keys;
     }
 }
