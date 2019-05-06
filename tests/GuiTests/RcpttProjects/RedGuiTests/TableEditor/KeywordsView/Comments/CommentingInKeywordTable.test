@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _aCDm4Bn4EeeFDPIa06fUxQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/20/19 11:37 AM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 4/25/19 3:39 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,16 +121,16 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw1\n"
     + "    [Documentation]    this is doc\n"
     + "    ...    continued here\n"
-    + "    # log  7z\n"
+    + "    # log    7z\n"
     + "    # Should Be Equal    123g    123g\n"
-    + "    # Catenate    r  s  t  u  w\n"
+    + "    # Catenate    r    s    t    u    w\n"
     + "    [Return]    game3\n\n"
     + "kw 2\n"
     + "    # # fgh\n"
     + "    # fgh\n"
     + "    # [Teardown]    Convert To Boolean    false1\n"
-    + "    # :FOR    ${x}  IN RANGE    10\n"
-    + "    # \\    log  ${x}\n"
+    + "    # :FOR    ${x}    IN RANGE    10\n"
+    + "    # \\    log    ${x}\n"
     + "    # \\    Convert To Bytes    cat" | verify-true
 
 //go back to Kwywords table    
@@ -187,14 +187,14 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    ...    continued here\n"
     + "    log    7z\n"
     + "    Should Be Equal    123g    123g\n"
-    + "    # Catenate    r  s  t  u  w\n"
+    + "    # Catenate    r    s    t    u    w\n"
     + "    [Return]    game3\n\n"
     + "kw 2\n"
     + "    # fgh\n"
     + "    fgh\n"
     + "    [Teardown]    Convert To Boolean    false1\n"
     + "    :FOR    ${x}    IN RANGE    10\n"
-    + "    # \\    log  ${x}\n"
+    + "    # \\    log    ${x}\n"
     + "    # \\    Convert To Bytes    cat" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
