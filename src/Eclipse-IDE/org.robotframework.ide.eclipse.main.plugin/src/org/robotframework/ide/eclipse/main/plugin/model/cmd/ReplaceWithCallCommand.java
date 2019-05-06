@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -20,26 +17,27 @@ import org.robotframework.services.event.RedEventBroker;
 public class ReplaceWithCallCommand extends EditorCommand {
 
     public static ReplaceWithCallCommand replaceEmpty(final RobotKeywordCall empty, final int index,
-            final List<RobotToken> tokens) {
+            final List<String> tokens) {
         return new ReplaceWithCallCommand(empty, index, tokens, ReplaceWithEmptyCommand::replaceCall);
     }
 
     public static ReplaceWithCallCommand replaceSetting(final RobotKeywordCall setting, final int index,
-            final List<RobotToken> tokens) {
+            final List<String> tokens) {
         return new ReplaceWithCallCommand(setting, index, tokens, ReplaceWithSettingCommand::replaceCall);
     }
 
     private final RobotKeywordCall call;
     private final int index;
-    private final List<RobotToken> tokens;
 
-    private List<RobotToken> oldTokens;
+    private final List<String> tokens;
+
+    private List<String> oldTokens;
     private RobotKeywordCall newCall;
 
-    private final TripleFunction<RobotKeywordCall, Integer, List<RobotToken>, EditorCommand> undoCommandProvider;
+    private final TripleFunction<RobotKeywordCall, Integer, List<String>, EditorCommand> undoCommandProvider;
 
-    private ReplaceWithCallCommand(final RobotKeywordCall call, final int index, final List<RobotToken> tokens,
-            final TripleFunction<RobotKeywordCall, Integer, List<RobotToken>, EditorCommand> undoCommandProvider) {
+    private ReplaceWithCallCommand(final RobotKeywordCall call, final int index, final List<String> tokens,
+            final TripleFunction<RobotKeywordCall, Integer, List<String>, EditorCommand> undoCommandProvider) {
         this.call = call;
         this.index = index;
         this.tokens = tokens;
@@ -48,11 +46,11 @@ public class ReplaceWithCallCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        oldTokens = ExecutablesRowView.rowTokens(call);
+        oldTokens = ExecutablesRowView.rowData(call);
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
         parent.removeChild(index);
-        newCall = parent.createKeywordCall(index, tokens.stream().map(RobotToken::getText).collect(toList()));
+        newCall = parent.createKeywordCall(index, tokens);
 
         RedEventBroker.using(eventBroker)
                 .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
