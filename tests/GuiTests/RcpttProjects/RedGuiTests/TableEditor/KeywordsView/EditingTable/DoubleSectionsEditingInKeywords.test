@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _GWpiMGRcEeayWasF5RXANg
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/19/18 11:54 AM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 4/29/19 11:34 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -52,7 +52,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my kw\n"
     + "    [Documentation]    my doc\n"
     + "    Convert To Binary    42442\n"
-    + "    [Teardown]    a    b    c    d\n"
+    + "    [Teardown]    a    b    c   d\n"
     + "    [Teardown]  fff" | verify-true
     
 //reset
@@ -96,7 +96,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my kw\n"
     + "    [Documentation]    my doc\n"
     + "    Convert To Binary    42442\n"
-    + "    [Teardown]    a    b    c    \    new item\n"
+    + "    [Teardown]    a    b    c   \    new item\n"
     + "    [Teardown]  fff\n"
     + "    \n" | verify-true  
         
@@ -198,7 +198,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Keyword 2\n"
     + "    [Documentation]  44 aa\n"
     + "    log  6\n"
-    + "    [Teardown]    Log    55\n"
+    + "    [Teardown]    Log   55    \n"
     + "    [Teardown]    Convert To Binary    66" | verify-true
     
     
@@ -240,7 +240,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Keyword 2\n"
     + "    [Documentation]  44 aa\n"
     + "    log  6\n"
-    + "    [Teardown]    Log    999    \    \    new item\n"
+    + "    [Teardown]    Log   999    \    \    new item\n"
     + "    [Teardown]    Convert To Binary    66" | verify-true
 
 //----------------------------------------------- arguments --------------------------------------------
