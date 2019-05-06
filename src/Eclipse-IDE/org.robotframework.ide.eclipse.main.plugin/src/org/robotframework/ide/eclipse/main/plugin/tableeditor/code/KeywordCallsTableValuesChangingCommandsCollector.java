@@ -40,7 +40,7 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
             return Optional.of(new SetDocumentationSettingCommand((RobotDefinitionSetting) call, value));
         }
 
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, t -> t.copyWithoutPosition());
+        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
 
         final int repeat = column - data.size() + 1;
@@ -83,7 +83,7 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
     }
 
     public Optional<? extends EditorCommand> collectForInsertion(final RobotKeywordCall call, final int column) {
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, t -> t.copyWithoutPosition());
+        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
 
         if (column < 0 || column > data.size()) {
@@ -120,7 +120,7 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
     public Optional<? extends EditorCommand> collectForRemoval(final RobotKeywordCall call,
             final List<Integer> columns) {
 
-        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, t -> t.copyWithoutPosition());
+        final List<RobotToken> tokens = ExecutablesRowView.rowTokens(call, RobotToken::copyWithoutPosition);
         final List<String> data = ExecutablesRowView.rowData(call);
 
         final int[] filteredColumns = columns.stream()
