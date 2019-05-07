@@ -162,7 +162,9 @@ class ExecutableUnitsFixer {
                 }
                 isContinue = true;
             } else if (rowType == RowType.COMMENTED_HASH) {
-                if (isContinue) {
+                if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                    continue;
+                } else if (isContinue) {
                     if (!execLine.getAction().getText().equals("\\")) {
                         execLine.getAction().setText("\\");
                         execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);

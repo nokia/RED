@@ -47,11 +47,9 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
                 return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
 
             } else if (text.isEmpty()) {
-                if (fileFormat == FileFormat.TSV) {
+                if (fileFormat == FileFormat.TSV
+                        || action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
                     return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
-
-                } else if (action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
-                    return true;
                 }
                 return false;
             } else {
