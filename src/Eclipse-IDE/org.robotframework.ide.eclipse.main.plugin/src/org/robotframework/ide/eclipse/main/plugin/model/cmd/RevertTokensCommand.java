@@ -64,6 +64,7 @@ class RevertTokensCommand extends EditorCommand {
 
         linkedElement.rewriteFrom(sourceElement);
 
+        call.resetStored();
         if (linkedElement.getModelType() != oldType) {
             RedEventBroker.using(eventBroker)
                     .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)

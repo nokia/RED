@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8iDRAAIQEem2eqc5VAM7yw
 Runtime-Version: 2.4.1.201903190000
-Save-Time: 4/26/19 1:06 PM
+Save-Time: 5/7/19 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -115,7 +115,7 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
 check-keyword-row -file "TestFile.robot" -row 1 -kw "kw"
 check-keyword-row -file "TestFile.robot" -row 2 -kw "FOR" -c1 "${w}" -c2 "IN" -c3 "10"
 check-keyword-row -file "TestFile.robot" -row 3 -kw "" -c1 "log" -c2 8
-check-keyword-row -file "TestFile.robot" -row 4 -kw  "\\"   -c1 "#comment"
+check-keyword-row -file "TestFile.robot" -row 4 -kw  ""   -c1 "#comment"
 check-keyword-row -file "TestFile.robot" -row 5 -kw  "END"
 check-keyword-row -file "TestFile.robot" -row 6 -kw "..."
 
@@ -144,7 +144,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw\n"
     + "    FOR    ${w}   IN    10\n"
     + "        log  8    new item\n"
-    + "    \\        #comment\n"
+    + "        #comment\n"
     + "    END" | verify-true
     
 // go to TC and add text after END    
@@ -171,7 +171,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw\n"
     + "    FOR    ${w}   IN    10\n"
     + "        log  8    new item\n"
-    + "    \\        #comment\n"
+    + "        #comment\n"
     + "    END" | verify-true
     
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click

@@ -182,7 +182,13 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             final RobotExecutableRow<T> executableRow) {
 
         final RobotEmptyRow<T> emptyRow = new RobotEmptyRow<>();
+        final boolean isForWithEndConinuation = executableRow.getAction()
+                .getTypes()
+                .contains(RobotTokenType.FOR_WITH_END_CONTINUATION);
         emptyRow.setEmpty(executableRow.getAction());
+        if (isForWithEndConinuation) {
+            emptyRow.getEmptyToken().getTypes().add(RobotTokenType.FOR_WITH_END_CONTINUATION);
+        }
         for (final RobotToken commentToken : executableRow.getComment()) {
             emptyRow.addCommentPart(commentToken);
         }
