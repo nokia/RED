@@ -235,15 +235,6 @@ public class SelectionLayerAccessor {
         });
     }
 
-    public void preserveSelectionIfNotEditingArgumentWhen(final Object elementToSelect, final Runnable operation) {
-        final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
-        if (positions.length == 1 && positions[0].getColumnPosition() == 0) {
-            selectElementPreservingSelectedColumnsAfterOperation(elementToSelect, operation);
-        } else {
-            preserveSelectionWhen(operation, Function.identity());
-        }
-    }
-
     private void reestablishSelection(final PositionCoordinate[] positions,
             final Function<PositionCoordinate, PositionCoordinate> mapper) {
         final PositionCoordinate anchor = selectionLayer.getSelectionAnchor();

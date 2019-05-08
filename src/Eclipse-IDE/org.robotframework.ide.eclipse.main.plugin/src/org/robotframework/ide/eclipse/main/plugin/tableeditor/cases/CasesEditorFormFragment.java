@@ -530,11 +530,10 @@ class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final Event event) {
 
         final RobotCase testCase = Events.get(event, IEventBroker.DATA, RobotCase.class);
-        final RobotKeywordCall call = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
 
         if (testCase != null && testCase.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionIfNotEditingArgumentWhen(call, tableInputIsReplaced());
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
     }
 
