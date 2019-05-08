@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ueh6UCC5EemEjfjIU9tmyw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 5:37 PM
+Save-Time: 5/8/19 3:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,6 +19,7 @@ Entry-Name: .content
 //     a) for linux: yum install  python-xlib	
 //  2. pip install pypiwin32  - only works on windows
 //  3. pip install pandas
+//  4. pip install -U robotframework-jsonlibrary
 
 
 

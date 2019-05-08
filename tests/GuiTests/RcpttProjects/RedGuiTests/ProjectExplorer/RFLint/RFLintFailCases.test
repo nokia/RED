@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 9/25/18 2:38 PM
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 5/8/19 3:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,7 +46,8 @@ exec-with-options {
     //check details    
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-        | get-property text -raw | invoke toLowerCase  | contains [format [str"RuntimeError: There is no rflint module installed for %s interpreter"]  [os-specific [concat $jython_path"\\jython.exe"] "/usr/local/lib/jython/bin/jython"] | invoke toLowerCase ]
+        | get-property text -raw | invoke toLowerCase  | contains [format [str "RuntimeError: There is no rflint module installed for %s interpreter" ] 
+         [os-specific [concat $jython_path"\\jython.exe"] "/usr/local/bin/jython"] | invoke toLowerCase ]
         | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
@@ -54,8 +55,7 @@ exec-with-options {
 
 //check if after clean is error
 get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Robot Framework/Clean RfLint problems" 
-    | click
-    
+    | click   
 verify-error {get-window "Problem Occurred" }
   
 //select python again    
