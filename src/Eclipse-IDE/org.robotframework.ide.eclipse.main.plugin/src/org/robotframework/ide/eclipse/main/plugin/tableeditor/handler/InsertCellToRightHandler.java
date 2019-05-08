@@ -10,8 +10,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
-import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertCellCommand;
@@ -37,10 +35,8 @@ public class InsertCellToRightHandler extends DIParameterizedHandler<E4InsertCel
 
             final RobotKeywordCall call = (RobotKeywordCall) selection.getFirstElement();
             final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
-            final int delta = call instanceof RobotEmptyLine
-                    && ((RobotEmptyRow<?>) call.getLinkedElement()).isCommentOnly() ? 1 : 0;
             
-            if (column < call.getLinkedElement().getElementTokens().size() - (1 + delta)) {
+            if (column < call.getLinkedElement().getElementTokens().size() - 1) {
                 if (call instanceof RobotSetting) {
                     commandsStack.execute(new InsertCellCommand((RobotSetting) call, column + 1));
                 } else {
