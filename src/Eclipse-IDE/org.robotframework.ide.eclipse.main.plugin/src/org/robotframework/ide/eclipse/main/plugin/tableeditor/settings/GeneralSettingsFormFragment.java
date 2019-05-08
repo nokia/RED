@@ -925,7 +925,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 // this is done in order to ensure IEclipseContext has refreshed
                 // selection stored and does not provide old objects
-                selectionLayerAccessor.refreshSelection();
+                if (table.isPresent()) {
+                    selectionLayerAccessor.refreshSelection();
+                }
             }
         }
     }
