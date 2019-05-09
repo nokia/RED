@@ -13,7 +13,6 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -70,7 +69,7 @@ public class SelectionsPropertyTester extends PropertyTester {
         if (selected == null || !(selected instanceof RobotKeywordCall)) {
             return false;
         }
-        return !(selected instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) selected).isDocumentation());
+        return !(selected instanceof RobotKeywordCall && ((RobotKeywordCall) selected).isDocumentationSetting());
     }
 
     private static boolean isMetadataSelected(final IStructuredSelection selection) {

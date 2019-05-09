@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Control;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -192,7 +191,7 @@ class TagsProposalsSupport {
         }
 
         private Stream<SourcedTag> extractTagProposalsFromCase(final RobotCodeHoldingElement<?> theCase) {
-            return theCase.findSetting(RobotDefinitionSetting::isTags)
+            return theCase.findSetting(RobotKeywordCall::isTagsSetting)
                     .filter(setting -> setting.getArguments() != null)
                     .map(Stream::of)
                     .orElseGet(Stream::empty)

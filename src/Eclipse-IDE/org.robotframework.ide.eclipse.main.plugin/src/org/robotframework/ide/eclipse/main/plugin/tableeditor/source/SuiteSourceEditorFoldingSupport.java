@@ -36,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -206,7 +205,7 @@ class SuiteSourceEditorFoldingSupport {
         if (casesSection.isPresent()) {
             for (final RobotCase test : casesSection.get().getChildren()) {
                 for (final RobotKeywordCall call : test.getChildren()) {
-                    if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
+                    if (call.isDocumentationSetting()) {
                         positions.add(call.getPosition());
                     }
                 }
@@ -221,7 +220,7 @@ class SuiteSourceEditorFoldingSupport {
         if (tasksSection.isPresent()) {
             for (final RobotTask task : tasksSection.get().getChildren()) {
                 for (final RobotKeywordCall call : task.getChildren()) {
-                    if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
+                    if (call.isDocumentationSetting()) {
                         positions.add(call.getPosition());
                     }
                 }
@@ -236,7 +235,7 @@ class SuiteSourceEditorFoldingSupport {
         if (keywordsSection.isPresent()) {
             for (final RobotKeywordDefinition keyword : keywordsSection.get().getChildren()) {
                 for (final RobotKeywordCall call : keyword.getChildren()) {
-                    if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
+                    if (call.isDocumentationSetting()) {
                         positions.add(call.getPosition());
                     }
                 }

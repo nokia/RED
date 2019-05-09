@@ -29,7 +29,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -151,8 +150,8 @@ public class VariableDefinitionLocator {
             final IRobotCodeHoldingElement parent) {
         if (parent instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) parent;
-            final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
-            if (argumentsSetting != null && argumentsSetting.isArguments()) {
+            final RobotKeywordCall argumentsSetting = keywordDef.getArgumentsSetting();
+            if (argumentsSetting != null && argumentsSetting.isArgumentsSetting()) {
                 final LocalSetting<?> args = (LocalSetting<?>) argumentsSetting.getLinkedElement();
                 final List<RobotToken> argTokens = args.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
                         .collect(toList());

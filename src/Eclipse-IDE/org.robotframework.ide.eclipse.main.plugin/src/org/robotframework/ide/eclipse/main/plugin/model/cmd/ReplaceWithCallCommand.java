@@ -28,11 +28,9 @@ public class ReplaceWithCallCommand extends EditorCommand {
 
     private final RobotKeywordCall call;
     private final int index;
-
     private final List<String> tokens;
 
     private List<String> oldTokens;
-    private RobotKeywordCall newCall;
 
     private final TripleFunction<RobotKeywordCall, Integer, List<String>, EditorCommand> undoCommandProvider;
 
@@ -49,18 +47,14 @@ public class ReplaceWithCallCommand extends EditorCommand {
         oldTokens = ExecutablesRowView.rowData(call);
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
-        parent.removeChild(index);
-        newCall = parent.createKeywordCall(index, tokens);
+        parent.replaceWithKeywordCall(index, tokens);
 
-        RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                .to(newCall)
-                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+        RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(undoCommandProvider.apply(newCall, index, oldTokens));
+        return newUndoCommands(undoCommandProvider.apply(call, index, oldTokens));
     }
 
     @FunctionalInterface

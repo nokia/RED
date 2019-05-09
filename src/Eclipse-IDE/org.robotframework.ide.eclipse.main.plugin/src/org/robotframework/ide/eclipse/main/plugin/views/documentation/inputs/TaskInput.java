@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
@@ -92,9 +92,9 @@ public class TaskInput extends InternalElementInput<RobotTask> {
         return builder.toString();
     }
 
-    public static class TaskOnSettingInput extends InternalElementInput<RobotDefinitionSetting> {
+    public static class TaskOnSettingInput extends InternalElementInput<RobotKeywordCall> {
 
-        public TaskOnSettingInput(final RobotDefinitionSetting element) {
+        public TaskOnSettingInput(final RobotKeywordCall element) {
             super(element);
         }
 

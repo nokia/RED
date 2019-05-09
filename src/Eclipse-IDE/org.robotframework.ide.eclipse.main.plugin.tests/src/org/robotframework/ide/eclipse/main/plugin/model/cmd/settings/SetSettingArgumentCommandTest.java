@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -18,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -26,67 +28,67 @@ public class SetSettingArgumentCommandTest {
 
     @Test
     public void testUndoRedoOnFirstArgumentInNotMovingArgsSetting() {
-        for (final RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
-            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
+        for (final RobotSetting setting : createSettingWithNotMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(setting, 0, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
-            verifyArguments(call, 3, 0, "");
+            verifyArguments(setting, 3, 0, "");
 
             final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
-            verifyArguments(call, 3, 0, "1");
+            verifyArguments(setting, 3, 0, "1");
 
             final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
-            verifyArguments(call, 3, 0, "\\");
+            verifyArguments(setting, 3, 0, "\\");
 
-            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
+            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, setting);
         }
     }
 
     @Test
     public void testUndoRedoOnSecondArgumentInNotMovingArgsSetting() {
-        for (final RobotKeywordCall call : createSettingWithNotMovingFirstArgument()) {
-            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 1, null);
+        for (final RobotSetting setting : createSettingWithNotMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(setting, 1, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
-            verifyArguments(call, 2, 1, "3");
+            verifyArguments(setting, 2, 1, "3");
 
             final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
-            verifyArguments(call, 3, 1, "2");
+            verifyArguments(setting, 3, 1, "2");
 
             final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
-            verifyArguments(call, 2, 1, "3");
+            verifyArguments(setting, 2, 1, "3");
 
-            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
+            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, setting);
         }
     }
 
     @Test
     public void testUndoRedoOnFirstArgumentInMovingArgsSetting() {
-        for (final RobotKeywordCall call : createSettingWithMovingFirstArgument()) {
-            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(call, 0, null);
+        for (final RobotSetting setting : createSettingWithMovingFirstArgument()) {
+            final SetSettingArgumentCommand command = new SetSettingArgumentCommand(setting, 0, null);
 
             final IEventBroker eventBroker = mock(IEventBroker.class);
             ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
-            verifyArguments(call, 2, 0, "2");
+            verifyArguments(setting, 2, 0, "2");
 
             final EditorCommand undoCommand = command.getUndoCommands().get(0);
             undoCommand.execute();
-            verifyArguments(call, 3, 0, "1");
+            verifyArguments(setting, 3, 0, "1");
 
             final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
             redoCommand.execute();
-            verifyArguments(call, 2, 0, "2");
+            verifyArguments(setting, 2, 0, "2");
 
-            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
+            verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, setting);
         }
     }
 
@@ -95,7 +97,7 @@ public class SetSettingArgumentCommandTest {
         assertThat(call.getArguments().get(indexToVerify)).isEqualTo(expectedValue);
     }
 
-    private static List<RobotKeywordCall> createSettingWithNotMovingFirstArgument() {
+    private static List<RobotSetting> createSettingWithNotMovingFirstArgument() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Suite Setup    1   2   3   # old comment")
                 .appendLine("Suite Teardown    1   2   3   # old comment")
@@ -108,15 +110,25 @@ public class SetSettingArgumentCommandTest {
                 .appendLine("Variables    1   2   3   # old comment")
                 .appendLine("Resource    1   2   3   # old comment")
                 .build();
-        return model.findSection(RobotSettingsSection.class).get().getChildren();
+        return model.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .map(RobotSetting.class::cast)
+                .collect(toList());
     }
 
-    private static List<RobotKeywordCall> createSettingWithMovingFirstArgument() {
+    private static List<RobotSetting> createSettingWithMovingFirstArgument() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Force Tags    1   2   3   # old comment")
                 .appendLine("Default Tags    1   2   3   # old comment")
                 .build();
-        return model.findSection(RobotSettingsSection.class).get().getChildren();
+        return model.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .map(RobotSetting.class::cast)
+                .collect(toList());
     }
 
 }

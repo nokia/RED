@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -26,8 +25,6 @@ import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.collect.Iterables;
 
 public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends ARobotSectionTable> & IExecutableStepsHolder<?>>
         implements IRobotCodeHoldingElement, Serializable {
@@ -56,24 +53,48 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends 
         return call;
     }
 
-    public RobotDefinitionSetting createSetting(final int index, final List<String> tokens) {
+    public RobotKeywordCall createSetting(final int index, final List<String> tokens) {
         final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), index, tokens);
 
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
+        final RobotKeywordCall setting = new RobotKeywordCall(this, newModelElement);
         getChildren().add(index, setting);
         return setting;
     }
 
-    public RobotEmptyLine createEmpty(final int index, final List<String> tokens) {
+    public RobotKeywordCall createEmpty(final int index, final List<String> tokens) {
         final RobotEmptyRow<?> robotEmptyRow = (RobotEmptyRow<?>) getModelUpdater().createEmptyLine(getLinkedElement(),
                 index, tokens);
 
-        final RobotEmptyLine emptyLine = new RobotEmptyLine(this, robotEmptyRow);
+        final RobotKeywordCall emptyLine = new RobotKeywordCall(this, robotEmptyRow);
         getChildren().add(index, emptyLine);
         return emptyLine;
     }
 
-    public abstract void removeUnitSettings(final RobotKeywordCall call);
+    public void replaceWithKeywordCall(final int index, final List<String> tokens) {
+        getLinkedElement().removeElement(index);
+        final RobotExecutableRow<?> robotExecutableRow = (RobotExecutableRow<?>) getModelUpdater()
+                .createExecutableRow(getLinkedElement(), index, tokens);
+
+        calls.get(index).setLinkedElement(robotExecutableRow);
+        calls.get(index).resetStored();
+    }
+
+    public void replaceWithSetting(final int index, final List<String> tokens) {
+        getLinkedElement().removeElement(index);
+        final AModelElement<?> localSetting = getModelUpdater().createSetting(getLinkedElement(), index, tokens);
+
+        calls.get(index).setLinkedElement(localSetting);
+        calls.get(index).resetStored();
+    }
+
+    public void replaceWithEmpty(final int index, final List<String> tokens) {
+        getLinkedElement().removeElement(index);
+        final RobotEmptyRow<?> robotEmptyRow = (RobotEmptyRow<?>) getModelUpdater().createEmptyLine(getLinkedElement(),
+                index, tokens);
+
+        calls.get(index).setLinkedElement(robotEmptyRow);
+        calls.get(index).resetStored();
+    }
 
     public void insertKeywordCall(final int index, final RobotKeywordCall call) {
         call.setParent(this);
@@ -206,26 +227,21 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<? extends 
         return count;
     }
 
-    public boolean hasSettings() {
-        return Iterables.any(calls, instanceOf(RobotDefinitionSetting.class));
-    }
-
-    public Optional<RobotDefinitionSetting> findSetting(final Predicate<RobotDefinitionSetting> settingPredicate) {
+    public Optional<RobotKeywordCall> findSetting(final Predicate<RobotKeywordCall> settingPredicate) {
         return findSettings(settingPredicate).findFirst();
     }
 
-    public Optional<RobotDefinitionSetting> findSetting(final ModelType... modelTypes) {
-        return findSettings(modelTypes).findFirst();
-    }
-
-    private Stream<RobotDefinitionSetting> findSettings(final Predicate<RobotDefinitionSetting> settingPredicate) {
+    private Stream<RobotKeywordCall> findSettings(final Predicate<RobotKeywordCall> settingPredicate) {
         return getChildren().stream()
-                .filter(RobotDefinitionSetting.class::isInstance)
-                .map(RobotDefinitionSetting.class::cast)
+                .filter(RobotKeywordCall::isLocalSetting)
                 .filter(settingPredicate);
     }
 
-    protected final Stream<RobotDefinitionSetting> findSettings(final ModelType... modelTypes) {
+    public Optional<RobotKeywordCall> findSetting(final ModelType... modelTypes) {
+        return findSettings(modelTypes).findFirst();
+    }
+
+    protected final Stream<RobotKeywordCall> findSettings(final ModelType... modelTypes) {
         final Set<ModelType> typesToFind = newHashSet(modelTypes);
         return findSettings(setting -> typesToFind.contains(setting.getLinkedElement().getModelType()));
     }

@@ -5,15 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteCellCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsTableValuesChangingCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteCellHandler.E4DeleteCellHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -35,7 +39,12 @@ public class DeleteCellHandler extends DIParameterizedHandler<E4DeleteCellHandle
             final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
 
             if (column < call.getLinkedElement().getElementTokens().size()) {
-                commandsStack.execute(new DeleteCellCommand(call, column));
+                if (call instanceof RobotSetting) {
+                    commandsStack.execute(new DeleteCellCommand((RobotSetting) call, column));
+                } else {
+                    new KeywordCallsTableValuesChangingCommandsCollector().collectForRemoval(call, newArrayList(column))
+                            .ifPresent(commandsStack::execute);
+                }
             }
         }
     }

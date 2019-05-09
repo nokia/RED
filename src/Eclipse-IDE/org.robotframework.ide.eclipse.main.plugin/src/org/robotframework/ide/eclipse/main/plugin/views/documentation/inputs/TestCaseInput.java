@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
 public class TestCaseInput extends InternalElementInput<RobotCase> {
@@ -92,9 +92,9 @@ public class TestCaseInput extends InternalElementInput<RobotCase> {
         return builder.toString();
     }
 
-    public static class TestCaseOnSettingInput extends InternalElementInput<RobotDefinitionSetting> {
+    public static class TestCaseOnSettingInput extends InternalElementInput<RobotKeywordCall> {
 
-        public TestCaseOnSettingInput(final RobotDefinitionSetting element) {
+        public TestCaseOnSettingInput(final RobotKeywordCall element) {
             super(element);
         }
 

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ReplaceWithCallCommand.TripleFunction;
@@ -30,17 +29,15 @@ public class ReplaceWithSettingCommand extends EditorCommand {
 
     private final RobotKeywordCall call;
     private final int index;
-
     private final List<String> tokens;
 
-    private RobotDefinitionSetting newSetting;
     private List<String> oldTokens;
 
-    private final TripleFunction<RobotDefinitionSetting, Integer, List<String>, EditorCommand> undoCommandProvider;
+    private final TripleFunction<RobotKeywordCall, Integer, List<String>, EditorCommand> undoCommandProvider;
 
 
     private ReplaceWithSettingCommand(final RobotKeywordCall call, final int index, final List<String> tokens,
-            final TripleFunction<RobotDefinitionSetting, Integer, List<String>, EditorCommand> undoCommandProvider) {
+            final TripleFunction<RobotKeywordCall, Integer, List<String>, EditorCommand> undoCommandProvider) {
         this.call = call;
         this.index = index;
         this.tokens = tokens;
@@ -52,17 +49,13 @@ public class ReplaceWithSettingCommand extends EditorCommand {
         oldTokens = ExecutablesRowView.rowData(call);
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
-        parent.removeChild(index);
-        newSetting = parent.createSetting(index, tokens);
+        parent.replaceWithSetting(index, tokens);
 
-        RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                .to(newSetting)
-                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+        RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(undoCommandProvider.apply(newSetting, index, oldTokens));
+        return newUndoCommands(undoCommandProvider.apply(call, index, oldTokens));
     }
 }

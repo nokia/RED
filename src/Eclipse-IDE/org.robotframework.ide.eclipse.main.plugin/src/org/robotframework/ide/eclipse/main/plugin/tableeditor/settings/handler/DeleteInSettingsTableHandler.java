@@ -18,7 +18,7 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -92,7 +92,7 @@ public class DeleteInSettingsTableHandler extends DIParameterizedHandler<E4Delet
                     return new SetSettingArgumentCommand(selectedSetting, columnIndex - 1, null);
                 }
             } else if (columnIndex == tableColumnCount - 1) {
-                return new SetKeywordCallCommentCommand(selectedSetting, null);
+                return new SetSettingCommentCommand(selectedSetting, null);
             }
             return null;
         }

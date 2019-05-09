@@ -525,18 +525,6 @@ class TasksFormFragment implements ISectionFormFragment {
         }
     }
 
-    @Inject
-    @Optional
-    private void whenKeywordCallIsConverted(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final Event event) {
-
-        final RobotTask task = Events.get(event, IEventBroker.DATA, RobotTask.class);
-        if (task != null && task.getSuiteFile() == fileModel) {
-            sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
-        }
-    }
-
     private Runnable tableInputIsReplaced() {
         return () -> {
             final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();

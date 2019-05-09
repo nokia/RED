@@ -15,11 +15,11 @@ import static org.mockito.Mockito.when;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.setting.Metadata;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteCellCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -34,8 +34,9 @@ public class DeleteCellHandlerTest {
 
     @Test
     public void nothingExecuted_whenInColumnAfterTheCall() {
-        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
-        when(selection.getFirstElement()).thenReturn(new RobotKeywordCall(null, linkedElement));
+        final Metadata linkedElement = new Metadata(RobotToken.create("Metadata"));
+        final RobotKeywordCall setting = new RobotSetting(null, linkedElement);
+        when(selection.getFirstElement()).thenReturn(setting);
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
         when(selectionLayerAccessor.getSelectedPositions())
                 .thenReturn(new PositionCoordinate[] { new PositionCoordinate(null, 3, 0) });
@@ -47,16 +48,16 @@ public class DeleteCellHandlerTest {
 
     @Test
     public void commandExecuted_whenInsideTheCall() {
-        final AModelElement<?> linkedElement = new RobotExecutableRow<TestCase>();
-        final RobotKeywordCall call = new RobotKeywordCall(null, linkedElement);
-        when(selection.getFirstElement()).thenReturn(call);
+        final Metadata linkedElement = new Metadata(RobotToken.create("Metadata"));
+        final RobotKeywordCall setting = new RobotSetting(null, linkedElement);
+        when(selection.getFirstElement()).thenReturn(setting);
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
         when(selectionLayerAccessor.getSelectedPositions())
                 .thenReturn(new PositionCoordinate[] { new PositionCoordinate(null, 0, 0) });
 
         new E4DeleteCellHandler().deleteCell(commandsStack, editor, selection);
 
-        verify(commandsStack).execute(refEq(new DeleteCellCommand(call, 0)));
+        verify(commandsStack).execute(refEq(new DeleteCellCommand((RobotSetting) setting, 0)));
         verifyNoMoreInteractions(commandsStack);
     }
 }

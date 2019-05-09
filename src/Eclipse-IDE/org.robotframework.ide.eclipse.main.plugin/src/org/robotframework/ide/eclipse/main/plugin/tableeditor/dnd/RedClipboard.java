@@ -15,8 +15,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -145,8 +143,7 @@ public class RedClipboard {
     protected final boolean hasKeywordCallsOnly(final RobotKeywordCall[] content) {
         if (content != null) {
             for (final Object item : content) {
-                if (item.getClass() != RobotKeywordCall.class && item.getClass() != RobotDefinitionSetting.class
-                        && item.getClass() != RobotEmptyLine.class) {
+                if (item.getClass() != RobotKeywordCall.class) {
                     return false;
                 }
             }

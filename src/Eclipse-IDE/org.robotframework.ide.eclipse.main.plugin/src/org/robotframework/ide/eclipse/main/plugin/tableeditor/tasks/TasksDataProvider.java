@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
@@ -22,7 +21,7 @@ class TasksDataProvider extends CodeElementsDataProvider<RobotTasksSection> {
     }
 
     @Override
-    protected boolean shouldAddSetting(final RobotDefinitionSetting setting) {
+    protected boolean shouldAddSetting(final RobotKeywordCall setting) {
         @SuppressWarnings("unchecked")
         final AModelElement<Task> linkedSetting = (AModelElement<Task>) setting.getLinkedElement();
         final Task task = linkedSetting.getParent();
@@ -31,9 +30,12 @@ class TasksDataProvider extends CodeElementsDataProvider<RobotTasksSection> {
 
     @Override
     protected int numberOfColumns(final Object element) {
-        if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) element).isDocumentation())) {
-            return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+        if (element instanceof RobotKeywordCall) {
+            final RobotKeywordCall call = (RobotKeywordCall) element;
+
+            if (!call.isDocumentationSetting()) {
+                return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+            }
         }
         return 0;
     }

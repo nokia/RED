@@ -13,7 +13,7 @@ import java.util.List;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -76,7 +76,7 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
             final String valueToPaste = valuesToPaste.get(0);
             final RobotSetting selectedSetting = (RobotSetting) selectedElement;
             if (selectedElementColumnIndex == tableColumnsCount - 1) {
-                pasteCommands.add(new SetKeywordCallCommentCommand(selectedSetting, valueToPaste));
+                pasteCommands.add(new SetSettingCommentCommand(selectedSetting, valueToPaste));
             } else {
                 if (selectedSetting.getGroup() == SettingsGroup.METADATA) {
                     pasteCommands.add(new SetSettingArgumentCommand(selectedSetting, selectedElementColumnIndex,

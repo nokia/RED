@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.CommonStep;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -34,23 +33,14 @@ public class UpdateStepCellCommand extends EditorCommand {
         final CommonStep<?> linkedElement = (CommonStep<?>) call.getLinkedElement();
         oldElement = RevertTokensCommand.clone(linkedElement);
 
-        final ModelType oldType = linkedElement.getModelType();
-
         if (value == null) {
             linkedElement.deleteToken(column);
         } else {
             linkedElement.updateToken(column, value);
         }
-
         call.resetStored();
-        if (linkedElement.getModelType() != oldType) {
-            RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                    .to(call)
-                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, call.getParent());
-        } else {
-            RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
-        }
+
+        RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
 
     @Override

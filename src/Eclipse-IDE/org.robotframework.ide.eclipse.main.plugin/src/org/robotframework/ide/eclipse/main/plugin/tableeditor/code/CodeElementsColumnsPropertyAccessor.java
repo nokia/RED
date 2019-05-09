@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -41,8 +40,7 @@ public class CodeElementsColumnsPropertyAccessor implements IColumnPropertyAcces
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
 
-            if (columnIndex > 0 && keywordCall instanceof RobotDefinitionSetting
-                    && ((RobotDefinitionSetting) keywordCall).isDocumentation()) {
+            if (columnIndex > 0 && keywordCall.isDocumentationSetting()) {
                 return columnIndex == 1 ? getDocumentationText(keywordCall).replaceAll("\\s+", " ").trim() : "";
             }
 

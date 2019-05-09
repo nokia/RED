@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -83,8 +82,8 @@ public abstract class CodeElementsDataProvider<T extends RobotFileInternalElemen
         final List<RobotKeywordCall> allCalls = holder.getChildren();
         final List<RobotKeywordCall> filteredCalls = new ArrayList<>();
         for (final RobotKeywordCall call : allCalls) {
-            if (call instanceof RobotDefinitionSetting) {
-                if (shouldAddSetting((RobotDefinitionSetting) call)) {
+            if (call.isLocalSetting()) {
+                if (shouldAddSetting(call)) {
                     filteredCalls.add(call);
                 }
             } else {
@@ -94,7 +93,7 @@ public abstract class CodeElementsDataProvider<T extends RobotFileInternalElemen
         return filteredCalls;
     }
 
-    protected abstract boolean shouldAddSetting(final RobotDefinitionSetting setting);
+    protected abstract boolean shouldAddSetting(final RobotKeywordCall setting);
 
     private int countColumnsNumber() {
         // add 1 for name column

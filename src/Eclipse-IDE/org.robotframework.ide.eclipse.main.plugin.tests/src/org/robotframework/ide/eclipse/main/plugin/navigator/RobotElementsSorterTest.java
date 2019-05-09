@@ -14,7 +14,6 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.NamedElement;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.ParentElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -43,7 +42,6 @@ public class RobotElementsSorterTest {
         assertThat(sorter.category(mock(RobotSettingsSection.class))).isZero();
         assertThat(sorter.category(mock(RobotVariablesSection.class))).isZero();
         assertThat(sorter.category(mock(RobotKeywordCall.class))).isZero();
-        assertThat(sorter.category(mock(RobotDefinitionSetting.class))).isZero();
         assertThat(sorter.category(mock(ArtificialGroupingRobotElement.class))).isZero();
         assertThat(sorter.category(mock(RobotSetting.class))).isZero();
         assertThat(sorter.category(mock(RobotCase.class))).isZero();

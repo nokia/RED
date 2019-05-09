@@ -57,7 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSuppo
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -483,7 +482,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
                 RobotKeywordCall.class);
 
         if (def != null && def.getSuiteFile() == fileModel) {
-            if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isArguments()) {
+            if (keywordCall != null && keywordCall.isArgumentsSetting()) {
                 // when arguments were added, we don't need to reload the input for data
                 // provider;
                 // this also does not influence selections
@@ -506,11 +505,10 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final Event event) {
         final RobotKeywordDefinition definition = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
-        final RobotDefinitionSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
-                RobotDefinitionSetting.class);
+        final RobotKeywordCall setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
-            if (setting != null && setting.isArguments()) {
+            if (setting != null && setting.isArgumentsSetting()) {
                 // when arguments were removed, we don't need to reload the input for data
                 // provider;
                 // this also does not influence selections
@@ -538,19 +536,6 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
         if (definition.getSuiteFile() == fileModel) {
             sortModel.clear();
             selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenKeywordCallIsConverted(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final Event event) {
-
-        final RobotKeywordDefinition definition = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
-
-        if (definition != null && definition.getSuiteFile() == fileModel) {
-            sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
     }
 

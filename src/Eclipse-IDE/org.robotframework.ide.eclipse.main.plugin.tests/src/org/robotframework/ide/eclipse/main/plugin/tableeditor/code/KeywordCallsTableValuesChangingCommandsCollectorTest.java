@@ -6,8 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -19,13 +19,10 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-
-import com.google.common.collect.ImmutableMap;
 
 public class KeywordCallsTableValuesChangingCommandsCollectorTest {
 
@@ -46,24 +43,19 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  Log  msg")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotKeywordCall originalCall = getChild(robotCase, 0);
+        final RobotKeywordCall call = getChild(robotCase, 0);
 
-        final List<EditorCommand> undoCmds = insertCell(originalCall, 0);
+        final List<EditorCommand> undoCmds = insertCell(call, 0);
 
-        final RobotKeywordCall callAfterExecution = getChild(robotCase, 0);
-        assertThat(getCells(callAfterExecution)).containsExactly("");
+        assertThat(getCells(call)).containsExactly("");
 
         for (final EditorCommand toUndo : undoCmds) {
             toUndo.execute();
         }
 
-        final RobotKeywordCall callAfterUndo = getChild(robotCase, 0);
-        assertThat(getCells(callAfterExecution)).containsExactly("");
+        assertThat(getCells(call)).containsExactly("");
 
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(
-                ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, callAfterExecution)));
-        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.of(IEventBroker.DATA, robotCase, RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
 
     @Test
@@ -141,7 +133,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
@@ -158,7 +150,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
@@ -175,7 +167,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
@@ -192,7 +184,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
@@ -209,7 +201,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
@@ -226,7 +218,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
                 .appendLine("  [Template]  arg1  arg2  arg3  #comment1  comment2")
                 .build();
         final RobotCase robotCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting settingBefore = (RobotDefinitionSetting) getChild(robotCase, 0);
+        final RobotKeywordCall settingBefore = getChild(robotCase, 0);
         assertThat(getCells(settingBefore)).containsExactly("[Template]", "arg1", "arg2", "arg3", "#comment1",
                 "comment2");
 
