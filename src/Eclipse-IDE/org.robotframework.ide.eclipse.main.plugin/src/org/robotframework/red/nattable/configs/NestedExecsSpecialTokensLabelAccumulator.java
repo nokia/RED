@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 
 public class NestedExecsSpecialTokensLabelAccumulator implements IConfigLabelAccumulator {
@@ -58,9 +57,8 @@ public class NestedExecsSpecialTokensLabelAccumulator implements IConfigLabelAcc
                     call.getArgumentTokens().subList(0, Math.min(call.getArgumentTokens().size(), columnPosition)));
             return tokens;
 
-        } else if (rowObject instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) rowObject).isExecutableSetting()) {
-            final ExecutableSetting setting = ((RobotDefinitionSetting) rowObject).getExecutableSetting();
+        } else if (rowObject instanceof RobotKeywordCall && ((RobotKeywordCall) rowObject).isExecutableSetting()) {
+            final ExecutableSetting setting = ((RobotKeywordCall) rowObject).getExecutableSetting();
 
             final List<RobotToken> tokens = new ArrayList<>();
             tokens.add(setting.getKeywordName());

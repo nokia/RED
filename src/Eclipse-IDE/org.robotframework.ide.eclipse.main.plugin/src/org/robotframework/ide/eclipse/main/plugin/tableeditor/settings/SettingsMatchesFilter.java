@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -28,8 +27,8 @@ public class SettingsMatchesFilter {
             final Object elem = ((Entry<?, ?>) element).getValue();
             if (elem instanceof RobotSetting) {
                 return settingMatches((RobotSetting) elem);
-            } else if (elem instanceof RobotDefinitionSetting) {
-                return settingMatches((RobotDefinitionSetting) elem);
+            } else if (elem instanceof RobotKeywordCall && ((RobotKeywordCall) elem).isLocalSetting()) {
+                return settingMatches((RobotKeywordCall) elem);
             }
             return false;
         }

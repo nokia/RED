@@ -19,7 +19,6 @@ import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
@@ -63,7 +62,7 @@ public class CasesElementsLabelAccumulatorTest {
     @Test
     public void callNameShouldBeLabeledInFirstColumn() {
         for (final RobotKeywordCall call : createTestCase().getChildren()) {
-            if (call.getClass() == RobotKeywordCall.class) {
+            if (call.isExecutable()) {
                 labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CASE_CALL_CONFIG_LABEL, 0);
             } else {
                 thereIsNoSuchLabel(call, CasesElementsLabelAccumulator.CASE_CALL_CONFIG_LABEL);
@@ -76,7 +75,7 @@ public class CasesElementsLabelAccumulatorTest {
         for (final RobotKeywordCall call : Iterables.concat(createTestCase().getChildren(),
                 createTemplatedCase().getChildren())) {
 
-            if (call instanceof RobotDefinitionSetting) {
+            if (call.isLocalSetting()) {
                 labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL, 0);
             }
         }
@@ -85,7 +84,7 @@ public class CasesElementsLabelAccumulatorTest {
     @Test
     public void documentationIsNotEditableForArgumentsColumnsOtherThatFirstOne() {
         for (final RobotKeywordCall call : createTestCase().getChildren()) {
-            if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
+            if (call.isDocumentationSetting()) {
                 labelIsAccumulatedAt(call, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL, 2, 3, 4, 5);
             } else {
                 thereIsNoSuchLabel(call, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);

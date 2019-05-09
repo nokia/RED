@@ -8,14 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
 
-public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyAccessor<RobotKeywordCall> {
+public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyAccessor<RobotSetting> {
     
     private static ImmutableBiMap<Integer, String> properties = ImmutableBiMap.of(0, "name", 1, "value", 2, "comment");
     
@@ -26,7 +26,7 @@ public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyA
     }
 
     @Override
-    public Object getDataValue(RobotKeywordCall rowObject, int columnIndex) {
+    public Object getDataValue(final RobotSetting rowObject, final int columnIndex) {
         final List<String> arguments = rowObject.getArguments();
         if (columnIndex == 0) {
             return arguments.isEmpty() ? "" : arguments.get(0);
@@ -39,12 +39,12 @@ public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyA
     }
 
     @Override
-    public void setDataValue(RobotKeywordCall rowObject, int columnIndex, Object newValue) {
+    public void setDataValue(final RobotSetting rowObject, final int columnIndex, final Object newValue) {
         final String newStringValue = newValue != null ? (String) newValue : "";
         if (columnIndex < 2) {
             commandsStack.execute(new SetSettingArgumentCommand(rowObject, columnIndex, newStringValue));
         } else if (columnIndex == 2) {
-            commandsStack.execute(new SetKeywordCallCommentCommand(rowObject, newStringValue));
+            commandsStack.execute(new SetSettingCommentCommand(rowObject, newStringValue));
         }
     }
 
@@ -54,12 +54,12 @@ public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyA
     }
 
     @Override
-    public String getColumnProperty(int columnIndex) {
+    public String getColumnProperty(final int columnIndex) {
         return properties.get(columnIndex);
     }
 
     @Override
-    public int getColumnIndex(String propertyName) {
+    public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
     }
 

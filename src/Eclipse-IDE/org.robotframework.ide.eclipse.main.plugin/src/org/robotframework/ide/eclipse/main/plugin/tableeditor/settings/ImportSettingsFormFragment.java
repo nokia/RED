@@ -58,7 +58,6 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyper
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -222,7 +221,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
-        final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
+        final GlazedListsEventLayer<RobotSetting> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
@@ -233,7 +232,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new SettingsDynamicTableColumnHeaderLabelAccumulator(dataProvider));
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
-        final SortHeaderLayer<RobotKeywordCall> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
+        final SortHeaderLayer<RobotSetting> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
                 columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
                 dataProvider.getSortedList());
 

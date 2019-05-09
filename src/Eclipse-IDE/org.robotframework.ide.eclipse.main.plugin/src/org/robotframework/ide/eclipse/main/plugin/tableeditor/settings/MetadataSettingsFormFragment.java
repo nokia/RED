@@ -222,7 +222,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
-        final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
+        final GlazedListsEventLayer<RobotSetting> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
@@ -232,7 +232,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider, theme);
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
-        final SortHeaderLayer<RobotKeywordCall> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
+        final SortHeaderLayer<RobotSetting> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
                 columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
                 dataProvider.getSortedList());
 

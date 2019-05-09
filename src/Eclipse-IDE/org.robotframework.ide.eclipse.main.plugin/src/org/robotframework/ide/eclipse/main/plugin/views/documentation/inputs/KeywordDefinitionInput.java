@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri;
 
@@ -90,9 +90,9 @@ public class KeywordDefinitionInput extends InternalElementInput<RobotKeywordDef
         return builder.toString();
     }
     
-    public static class KeywordDefinitionOnSettingInput extends InternalElementInput<RobotDefinitionSetting> {
+    public static class KeywordDefinitionOnSettingInput extends InternalElementInput<RobotKeywordCall> {
 
-        public KeywordDefinitionOnSettingInput(final RobotDefinitionSetting element) {
+        public KeywordDefinitionOnSettingInput(final RobotKeywordCall element) {
             super(element);
         }
 

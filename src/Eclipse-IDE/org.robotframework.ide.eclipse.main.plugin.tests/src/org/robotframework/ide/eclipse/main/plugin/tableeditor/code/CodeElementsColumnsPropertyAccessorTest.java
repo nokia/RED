@@ -12,7 +12,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -48,7 +48,7 @@ public class CodeElementsColumnsPropertyAccessorTest {
     public void wholeDocumentationIsWrittenInSecondColumnAndNothingInOtherColumns() {
         final int numberOfColumns = 7;
         final RobotCase testCase = createTestCase("case 1");
-        final RobotDefinitionSetting documentation = testCase.findSetting(ModelType.TEST_CASE_DOCUMENTATION).get();
+        final RobotKeywordCall documentation = testCase.findSetting(ModelType.TEST_CASE_DOCUMENTATION).get();
 
         final CodeElementsColumnsPropertyAccessor propertyAccessor = new CodeElementsColumnsPropertyAccessor(
                 new RobotEditorCommandsStack(), null);

@@ -21,7 +21,6 @@ import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -146,8 +145,8 @@ public class Documentations {
         if (element instanceof RobotSetting) {
             final RobotSetting setting = (RobotSetting) element;
             return !(setting.isDocumentation() || setting.isLibraryImport() || setting.isResourceImport());
-        } else if (element instanceof RobotDefinitionSetting) {
-            return !((RobotDefinitionSetting) element).isDocumentation();
+        } else if (element instanceof RobotKeywordCall && ((RobotKeywordCall) element).isLocalSetting()) {
+            return !((RobotKeywordCall) element).isDocumentationSetting();
         }
         return element instanceof RobotKeywordCall;
     }
@@ -166,15 +165,15 @@ public class Documentations {
         } else if (element instanceof RobotTask) {
             return Optional.of(new TaskInput((RobotTask) element));
 
-        } else if (element instanceof RobotDefinitionSetting) {
-            final RobotDefinitionSetting setting = (RobotDefinitionSetting) element;
-            if (setting.isDocumentation() && setting.getParent() instanceof RobotCase) {
+        } else if (element instanceof RobotKeywordCall && ((RobotKeywordCall) element).isLocalSetting()) {
+            final RobotKeywordCall setting = (RobotKeywordCall) element;
+            if (setting.isDocumentationSetting() && setting.getParent() instanceof RobotCase) {
                 return Optional.of(new TestCaseOnSettingInput(setting));
 
-            } else if (setting.isDocumentation() && setting.getParent() instanceof RobotTask) {
+            } else if (setting.isDocumentationSetting() && setting.getParent() instanceof RobotTask) {
                 return Optional.of(new TaskOnSettingInput(setting));
 
-            } else if (setting.isDocumentation() && setting.getParent() instanceof RobotKeywordDefinition) {
+            } else if (setting.isDocumentationSetting() && setting.getParent() instanceof RobotKeywordDefinition) {
                 return Optional.of(new KeywordDefinitionOnSettingInput(setting));
             }
 

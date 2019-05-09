@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,12 +20,14 @@ import java.util.stream.Stream;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
@@ -34,6 +37,19 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
+
+    private static final EnumSet<RobotTokenType> NON_ARG_TYPES = EnumSet.of(RobotTokenType.START_HASH_COMMENT,
+            RobotTokenType.COMMENT_CONTINUE, RobotTokenType.TEST_CASE_SETTING_SETUP,
+            RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
+            RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+            RobotTokenType.TEST_CASE_SETTING_TIMEOUT, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
+            RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_DOCUMENTATION,
+            RobotTokenType.TASK_SETTING_TAGS_DECLARATION, RobotTokenType.TASK_SETTING_TEARDOWN,
+            RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.TASK_SETTING_TIMEOUT,
+            RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION, RobotTokenType.KEYWORD_SETTING_ARGUMENTS,
+            RobotTokenType.KEYWORD_SETTING_DOCUMENTATION, RobotTokenType.KEYWORD_SETTING_TAGS,
+            RobotTokenType.KEYWORD_SETTING_TEARDOWN, RobotTokenType.KEYWORD_SETTING_RETURN,
+            RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
 
     private static final long serialVersionUID = 1L;
 
@@ -61,15 +77,20 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public String getName() {
-        if (isExecutable() && linkedElement.getClass() == RobotExecutableRow.class) {
+        final RobotToken declaration = linkedElement.getDeclaration();
+
+        if (isExecutable()) {
             @SuppressWarnings("unchecked")
             final RobotExecutableRowView view = RobotExecutableRowView
                     .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
             if (wasNotUpdatedWithAssignment()) {
-                linkedElement.getDeclaration().setText(view.getTokenRepresentation(linkedElement.getDeclaration()));
+                declaration.setText(view.getTokenRepresentation(declaration));
             }
+        } else if (isLocalSetting()) {
+            final String nameInBrackets = declaration.getText();
+            return nameInBrackets.substring(1, nameInBrackets.length() - 1);
         }
-        return linkedElement.getDeclaration().getText();
+        return declaration.getText();
     }
 
     private boolean wasNotUpdatedWithAssignment() {
@@ -78,9 +99,13 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     public String getLabel() {
-        if (isExecutable()) {
+        if (isEmptyLine()) {
+            return "";
+
+        } else if (isExecutable()) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
             return row.buildLineDescription().getAction().getToken().getText();
+
         } else {
             return linkedElement.getElementTokens().get(0).getText();
         }
@@ -111,13 +136,60 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     public boolean isExecutable() {
-        final ModelType type = linkedElement.getModelType();
-        return type == ModelType.TEST_CASE_EXECUTABLE_ROW || type == ModelType.TASK_EXECUTABLE_ROW
-                || type == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        return linkedElement instanceof RobotExecutableRow;
     }
 
     public boolean isExecutableInsideForWithEndLoop() {
         return getLinkedElement().getDeclaration().getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION);
+    }
+
+    public boolean isEmptyLine() {
+        return linkedElement instanceof RobotEmptyRow;
+    }
+
+    public boolean isLocalSetting() {
+        return linkedElement instanceof LocalSetting;
+    }
+
+    public boolean isArgumentsSetting() {
+        return isLocalSetting() && getLinkedElement().getModelType() == ModelType.USER_KEYWORD_ARGUMENTS;
+    }
+
+    public boolean isDocumentationSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.TEST_CASE_DOCUMENTATION || modelType == ModelType.TASK_DOCUMENTATION
+                || modelType == ModelType.USER_KEYWORD_DOCUMENTATION;
+    }
+
+    public boolean isExecutableSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_SETUP || modelType == ModelType.TEST_CASE_TEARDOWN
+                || modelType == ModelType.TASK_SETUP || modelType == ModelType.TASK_TEARDOWN
+                || modelType == ModelType.USER_KEYWORD_TEARDOWN);
+    }
+
+    public ExecutableSetting getExecutableSetting() {
+        if (isExecutableSetting()) {
+            return ((LocalSetting<?>) getLinkedElement()).adaptTo(ExecutableSetting.class);
+        }
+        throw new IllegalStateException("Non-executable setting cannot be viewed as executable one");
+    }
+
+    public boolean isTemplateSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.TASK_TEMPLATE);
+    }
+
+    public boolean isTeardownSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_TEARDOWN || modelType == ModelType.TASK_TEARDOWN
+                || modelType == ModelType.USER_KEYWORD_TEARDOWN);
+    }
+
+    public boolean isTagsSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_TAGS || modelType == ModelType.TASK_TAGS
+                || modelType == ModelType.USER_KEYWORD_TAGS);
     }
 
     @Override
@@ -126,24 +198,35 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     public List<String> getArguments() {
-        if (arguments == null) {
-            final Stream<RobotToken> tokensWithoutComments = linkedElement.getElementTokens().stream().filter(token -> {
-                final List<IRobotTokenType> types = token.getTypes();
-                final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                return !types.contains(RobotTokenType.START_HASH_COMMENT)
-                        && !types.contains(RobotTokenType.COMMENT_CONTINUE)
-                        && type != RobotTokenType.KEYWORD_ACTION_NAME && type != RobotTokenType.TEST_CASE_ACTION_NAME
-                        && type != RobotTokenType.TASK_ACTION_NAME;
-            });
+        if (isEmptyLine()) {
+            return new ArrayList<>();
+
+        } else if (arguments == null) {
 
             if (isExecutable()) {
+                final Stream<RobotToken> tokensWithoutComments = linkedElement.getElementTokens()
+                        .stream()
+                        .filter(token -> {
+                            final List<IRobotTokenType> types = token.getTypes();
+                            final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                            return !types.contains(RobotTokenType.START_HASH_COMMENT)
+                                    && !types.contains(RobotTokenType.COMMENT_CONTINUE)
+                                    && type != RobotTokenType.KEYWORD_ACTION_NAME
+                                    && type != RobotTokenType.TEST_CASE_ACTION_NAME
+                                    && type != RobotTokenType.TASK_ACTION_NAME;
+                        });
                 @SuppressWarnings("unchecked")
                 final RobotExecutableRowView view = RobotExecutableRowView
                         .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
 
                 arguments = tokensWithoutComments.map(tokenViaExecutableView(view)).collect(toList());
-            } else {
-                arguments = tokensWithoutComments.map(RobotToken::getText).collect(toList());
+
+            } else if (isLocalSetting()) {
+                arguments = getLinkedElement().getElementTokens().stream().filter(token -> {
+                    final List<IRobotTokenType> types = token.getTypes();
+                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                    return !NON_ARG_TYPES.contains(type);
+                }).map(RobotToken::getText).collect(toList());
             }
         }
         return arguments;

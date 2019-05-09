@@ -26,8 +26,6 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
@@ -67,13 +65,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         final UserKeyword keyword = getLinkedElement();
 
         for (final AModelElement<UserKeyword> el : keyword.getElements()) {
-            if (el instanceof RobotExecutableRow) {
-                getChildren().add(new RobotKeywordCall(this, el));
-            } else if (el instanceof RobotEmptyRow) {
-                getChildren().add(new RobotEmptyLine(this, el));
-            } else {
-                getChildren().add(new RobotDefinitionSetting(this, el));
-            }
+            getChildren().add(new RobotKeywordCall(this, el));
         }
     }
 
@@ -87,14 +79,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return RedImages.getUserKeywordImage();
     }
 
-    public RobotDefinitionSetting getArgumentsSetting() {
+    public RobotKeywordCall getArgumentsSetting() {
         return findSetting(ModelType.USER_KEYWORD_ARGUMENTS).orElse(null);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void removeUnitSettings(final RobotKeywordCall call) {
-        getLinkedElement().removeElement((AModelElement<UserKeyword>) call.getLinkedElement());
     }
 
     public String getDocumentation() {
@@ -115,12 +101,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
-        final List<RobotDefinitionSetting> argSettings = findSettings(ModelType.USER_KEYWORD_ARGUMENTS)
-                .collect(toList());
+        final List<RobotKeywordCall> argSettings = findSettings(ModelType.USER_KEYWORD_ARGUMENTS).collect(toList());
         return ArgumentsDescriptor.createDescriptor(getArguments(argSettings.size() == 1 ? argSettings.get(0) : null));
     }
 
-    private List<String> getArguments(final RobotDefinitionSetting argumentsSetting) {
+    private List<String> getArguments(final RobotKeywordCall argumentsSetting) {
         // embedded arguments are not provided for descriptor or documentation
         if (argumentsSetting != null) {
             return ((LocalSetting<?>) argumentsSetting.getLinkedElement())

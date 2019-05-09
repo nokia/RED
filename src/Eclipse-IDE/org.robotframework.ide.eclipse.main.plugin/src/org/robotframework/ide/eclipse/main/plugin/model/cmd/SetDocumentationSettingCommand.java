@@ -11,20 +11,20 @@ import java.util.Objects;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 
 public class SetDocumentationSettingCommand extends EditorCommand {
 
-    private final RobotDefinitionSetting docSetting;
+    private final RobotKeywordCall docSetting;
 
     private final String value;
 
     private String oldDoc;
 
-    public SetDocumentationSettingCommand(final RobotDefinitionSetting docSetting, final String value) {
+    public SetDocumentationSettingCommand(final RobotKeywordCall docSetting, final String value) {
         this.docSetting = docSetting;
         this.value = value;
     }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.PasteCodeHoldersCellsCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
@@ -39,7 +39,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteCodeHoldersCellsCo
             return newArrayList(codeHolder.getName());
 
         } else if (clipboardElementColumnIndex > 0 && clipboardElementColumnIndex < tableColumnsCount - 1) {
-            final RobotDefinitionSetting argumentsSetting = ((RobotKeywordDefinition) codeHolder).getArgumentsSetting();
+            final RobotKeywordCall argumentsSetting = ((RobotKeywordDefinition) codeHolder).getArgumentsSetting();
             final int argIndex = clipboardElementColumnIndex - 1;
             if (argumentsSetting != null && argIndex < argumentsSetting.getArguments().size()) {
                 return newArrayList(argumentsSetting.getArguments().get(argIndex));

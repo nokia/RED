@@ -181,7 +181,7 @@ public class RobotSetting extends RobotKeywordCall {
         return new PageActivatingOpeningStrategy(this);
     }
 
-    public RobotKeywordCall insertEmptyCellAt(final int position) {
+    public RobotSetting insertEmptyCellAt(final int position) {
         getLinkedElement().insertValueAt("", position);
         resetStored();
         return this;

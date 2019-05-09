@@ -25,8 +25,8 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
 
     private RobotSettingsSection section;
 
-    private SortedList<RobotKeywordCall> imports;
-    private FilterList<RobotKeywordCall> filteredImports;
+    private SortedList<RobotSetting> imports;
+    private FilterList<RobotSetting> filteredImports;
 
     private SettingsMatchesFilter filter;
 
@@ -64,7 +64,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
 
     private void createLists(final RobotSettingsSection section) {
         if (imports == null) {
-            imports = new SortedList<>(GlazedLists.<RobotKeywordCall>eventListOf(), null);
+            imports = new SortedList<>(GlazedLists.<RobotSetting> eventListOf(), null);
             filteredImports = new FilterList<>(imports);
         }
         if (section != null) {
@@ -74,7 +74,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
         }
     }
 
-    SortedList<RobotKeywordCall> getSortedList() {
+    SortedList<RobotSetting> getSortedList() {
         return imports;
     }
 
@@ -104,8 +104,8 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     public Object getDataValue(final int columnIndex, final int rowIndex) {
         if (section != null) {
             final Object element = getRowObject(rowIndex);
-            if (element instanceof RobotKeywordCall) {
-                return propertyAccessor.getDataValue((RobotKeywordCall) element, columnIndex);
+            if (element instanceof RobotSetting) {
+                return propertyAccessor.getDataValue((RobotSetting) element, columnIndex);
             } else if (element instanceof AddingToken && columnIndex == 0 && !isFilterSet()) {
                 return ((AddingToken) element).getLabel();
             }
@@ -119,9 +119,9 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
             return;
         }
         final Object element = getRowObject(rowIndex);
-        if (element instanceof RobotKeywordCall) {
+        if (element instanceof RobotSetting) {
             final String newStringValue = newValue != null ? (String) newValue : "";
-            propertyAccessor.setDataValue((RobotKeywordCall) element, columnIndex, newStringValue);
+            propertyAccessor.setDataValue((RobotSetting) element, columnIndex, newStringValue);
         }
     }
 

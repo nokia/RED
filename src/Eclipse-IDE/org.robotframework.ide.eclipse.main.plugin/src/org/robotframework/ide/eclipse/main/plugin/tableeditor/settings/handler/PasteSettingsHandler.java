@@ -22,9 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.InsertSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -94,7 +94,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                 }
                 final String comment = settingsFromClipboard[0].getComment();
                 if (comment != null && !comment.isEmpty()) {
-                    commandsStack.execute(new SetKeywordCallCommentCommand(firstSelectedSetting, comment));
+                    commandsStack.execute(new SetSettingCommentCommand(firstSelectedSetting, comment));
                 }
             }
         }

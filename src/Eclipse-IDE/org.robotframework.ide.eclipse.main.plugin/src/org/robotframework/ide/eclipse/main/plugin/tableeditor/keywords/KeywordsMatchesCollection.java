@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsMatchesCollection;
 
@@ -13,6 +12,6 @@ class KeywordsMatchesCollection extends CodeElementsMatchesCollection {
 
     @Override
     protected boolean shouldMatchLabel(final RobotKeywordCall call) {
-        return !(call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isArguments());
+        return !call.isArgumentsSetting();
     }
 }

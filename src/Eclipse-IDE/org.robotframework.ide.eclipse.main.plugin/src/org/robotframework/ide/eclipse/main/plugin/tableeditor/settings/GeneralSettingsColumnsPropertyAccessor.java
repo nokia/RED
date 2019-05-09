@@ -16,8 +16,8 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -71,7 +71,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
                 if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetSettingArgumentCommand(setting, columnIndex - 1, newStringValue));
                 } else if (columnIndex == (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallCommentCommand(setting, newStringValue));
+                    commandsStack.execute(new SetSettingCommentCommand(setting, newStringValue));
                 }
             } else if (columnIndex > 0 && newValue != null && section != null) {
                 if (columnIndex == (numberOfColumns - 1)) {

@@ -37,7 +37,6 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -184,8 +183,7 @@ public class DocumentationView implements DocumentationDisplayer {
         if (currentInput == null) {
             return;
         }
-        if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isDocumentation()
-                && currentInput.contains(keywordCall)) {
+        if (keywordCall.isDocumentationSetting() && currentInput.contains(keywordCall)) {
             reloadCurrentInput();
 
         } else if (keywordCall instanceof RobotSetting && ((RobotSetting) keywordCall).isDocumentation()

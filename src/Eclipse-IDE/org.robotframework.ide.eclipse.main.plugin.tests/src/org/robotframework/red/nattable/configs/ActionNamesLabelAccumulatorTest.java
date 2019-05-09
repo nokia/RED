@@ -15,7 +15,7 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -43,7 +43,7 @@ public class ActionNamesLabelAccumulatorTest {
 
     @Test
     public void labelIsNotAdded_forEmptyLine() {
-        final RobotKeywordCall call = new RobotKeywordCall(null, new RobotExecutableRow<>());
+        final RobotKeywordCall call = new RobotKeywordCall(null, new RobotEmptyRow<>());
         when(dataProvider.getRowObject(0)).thenReturn(call);
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
         assertThat(labels.getLabels()).isEmpty();

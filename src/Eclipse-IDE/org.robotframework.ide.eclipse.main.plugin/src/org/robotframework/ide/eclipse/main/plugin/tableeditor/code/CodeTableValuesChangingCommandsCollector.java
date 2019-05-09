@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -37,7 +36,7 @@ public class CodeTableValuesChangingCommandsCollector {
             if (element instanceof RobotKeywordDefinition) {
                 final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
 
-                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                final RobotKeywordCall argumentsSetting = keywordDef.getArgumentsSetting();
                 if (argumentsSetting != null) {
                     final List<String> data = ExecutablesRowView.rowData(argumentsSetting);
                     final List<Integer> filteredColumns = columns.stream()
@@ -81,7 +80,7 @@ public class CodeTableValuesChangingCommandsCollector {
             } else if (column > 0 && element instanceof RobotKeywordDefinition) {
                 final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
 
-                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                final RobotKeywordCall argumentsSetting = keywordDef.getArgumentsSetting();
                 if (argumentsSetting == null) {
                     return Optional.of(new CreateArgumentSettingCommand(keywordDef, column, value));
                 } else {

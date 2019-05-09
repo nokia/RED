@@ -31,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -376,7 +375,7 @@ public class InsertKeywordCallsCommandTest {
                 ModelType.USER_KEYWORD_RETURN, "Return", newArrayList("arg1", "arg2"), "#comment");
     }
 
-    private void testCaseSettingIsProperlyInsertedIntoTestCase(final RobotDefinitionSetting setting,
+    private void testCaseSettingIsProperlyInsertedIntoTestCase(final RobotKeywordCall setting,
             final ModelType expectedTypeAfterInsert, final String expectedName, final List<String> expectedArguments,
             final String expectedComment) {
         final RobotCase testCase = createTestCaseForInsertions();
@@ -388,7 +387,7 @@ public class InsertKeywordCallsCommandTest {
                 .execute();
 
         assertThat(testCase.getChildren().size()).isEqualTo(3);
-        assertThat(testCase.getChildren().get(0)).isExactlyInstanceOf(RobotDefinitionSetting.class);
+        assertThat(testCase.getChildren().get(0)).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(testCase.getChildren().get(0).getLinkedElement().getModelType()).isEqualTo(expectedTypeAfterInsert);
         assertThat(testCase.getChildren().get(0).getName()).isEqualTo(expectedName);
         assertThat(testCase.getChildren().get(0).getArguments()).containsExactlyElementsOf(expectedArguments);
@@ -400,7 +399,7 @@ public class InsertKeywordCallsCommandTest {
         verifyNoMoreInteractions(eventBroker);
     }
 
-    private void testCaseSettingIsProperlyInsertedIntoKeyword(final RobotDefinitionSetting setting,
+    private void testCaseSettingIsProperlyInsertedIntoKeyword(final RobotKeywordCall setting,
             final ModelType expectedTypeAfterInsert, final String expectedName, final List<String> expectedArguments,
             final String expectedComment) {
         final RobotKeywordDefinition keyword = createKeywordForInsertions();
@@ -412,7 +411,7 @@ public class InsertKeywordCallsCommandTest {
                 .execute();
 
         assertThat(keyword.getChildren().size()).isEqualTo(3);
-        assertThat(keyword.getChildren().get(0)).isExactlyInstanceOf(RobotDefinitionSetting.class);
+        assertThat(keyword.getChildren().get(0)).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(keyword.getChildren().get(0).getLinkedElement().getModelType()).isEqualTo(expectedTypeAfterInsert);
         assertThat(keyword.getChildren().get(0).getName()).isEqualTo(expectedName);
         assertThat(keyword.getChildren().get(0).getArguments()).containsExactlyElementsOf(expectedArguments);
@@ -520,7 +519,7 @@ public class InsertKeywordCallsCommandTest {
                 ModelType.TEST_CASE_TEMPLATE, "Template", newArrayList("arg1", "arg2"), "#comment");
     }
 
-    private void keywordSettingIsProperlyInsertedIntoKeyword(final RobotDefinitionSetting setting,
+    private void keywordSettingIsProperlyInsertedIntoKeyword(final RobotKeywordCall setting,
             final ModelType expectedTypeAfterInsert, final String expectedName, final List<String> expectedArguments,
             final String expectedComment) {
         final RobotKeywordDefinition keyword = createKeywordForInsertions();
@@ -532,7 +531,7 @@ public class InsertKeywordCallsCommandTest {
                 .execute();
 
         assertThat(keyword.getChildren().size()).isEqualTo(3);
-        assertThat(keyword.getChildren().get(0)).isExactlyInstanceOf(RobotDefinitionSetting.class);
+        assertThat(keyword.getChildren().get(0)).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(keyword.getChildren().get(0).getLinkedElement().getModelType()).isEqualTo(expectedTypeAfterInsert);
         assertThat(keyword.getChildren().get(0).getName()).isEqualTo(expectedName);
         assertThat(keyword.getChildren().get(0).getArguments()).containsExactlyElementsOf(expectedArguments);
@@ -544,7 +543,7 @@ public class InsertKeywordCallsCommandTest {
         verifyNoMoreInteractions(eventBroker);
     }
 
-    private void keywordSettingIsProperlyInsertedIntoTestCase(final RobotDefinitionSetting setting,
+    private void keywordSettingIsProperlyInsertedIntoTestCase(final RobotKeywordCall setting,
             final ModelType expectedTypeAfterInsert, final String expectedName, final List<String> expectedArguments,
             final String expectedComment) {
         final RobotCase testCase = createTestCaseForInsertions();
@@ -556,7 +555,7 @@ public class InsertKeywordCallsCommandTest {
                 .execute();
 
         assertThat(testCase.getChildren().size()).isEqualTo(3);
-        assertThat(testCase.getChildren().get(0)).isExactlyInstanceOf(RobotDefinitionSetting.class);
+        assertThat(testCase.getChildren().get(0)).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(testCase.getChildren().get(0).getLinkedElement().getModelType()).isEqualTo(expectedTypeAfterInsert);
         assertThat(testCase.getChildren().get(0).getName()).isEqualTo(expectedName);
         assertThat(testCase.getChildren().get(0).getArguments()).containsExactlyElementsOf(expectedArguments);
@@ -634,135 +633,135 @@ public class InsertKeywordCallsCommandTest {
         return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseTagsSetting() {
+    private static RobotKeywordCall createTestCaseTagsSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_TAGS,
                 RobotToken.create("[Tags]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseSetupSetting() {
+    private static RobotKeywordCall createTestCaseSetupSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_SETUP,
                 RobotToken.create("[Setup]"));
         linkedElement.addToken("call");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseTeardownSetting() {
+    private static RobotKeywordCall createTestCaseTeardownSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_TEARDOWN,
                 RobotToken.create("[Teardown]"));
         linkedElement.addToken("call");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseTimeoutSetting() {
+    private static RobotKeywordCall createTestCaseTimeoutSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_TIMEOUT,
                 RobotToken.create("[Timeout]"));
         linkedElement.addToken("10");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseTemplateSetting() {
+    private static RobotKeywordCall createTestCaseTemplateSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_TEMPLATE,
                 RobotToken.create("[Template]"));
         linkedElement.addToken("call");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseDocumentationSetting() {
+    private static RobotKeywordCall createTestCaseDocumentationSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION,
                 RobotToken.create("[Documentation]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createTestCaseUnknownSetting(final String settingName) {
+    private static RobotKeywordCall createTestCaseUnknownSetting(final String settingName) {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_SETTING_UNKNOWN,
                 RobotToken.create("[" + settingName + "]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordTagsSetting() {
+    private static RobotKeywordCall createKeywordTagsSetting() {
         final LocalSetting<TestCase> linkedElement = new LocalSetting<>(ModelType.TEST_CASE_TAGS,
                 RobotToken.create("[Tags]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordArgumentsSetting() {
+    private static RobotKeywordCall createKeywordArgumentsSetting() {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_ARGUMENTS,
                 RobotToken.create("[Arguments]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordTeardownSetting() {
+    private static RobotKeywordCall createKeywordTeardownSetting() {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_TEARDOWN,
                 RobotToken.create("[Teardown]"));
         linkedElement.addToken("call");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordTimeoutSetting() {
+    private static RobotKeywordCall createKeywordTimeoutSetting() {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_TIMEOUT,
                 RobotToken.create("[Timeout]"));
         linkedElement.addToken("10");
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordReturnSetting() {
+    private static RobotKeywordCall createKeywordReturnSetting() {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_RETURN,
                 RobotToken.create("[Return]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordDocumentationSetting() {
+    private static RobotKeywordCall createKeywordDocumentationSetting() {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION,
                 RobotToken.create("[Documentation]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 
-    private static RobotDefinitionSetting createKeywordUnknownSetting(final String settingName) {
+    private static RobotKeywordCall createKeywordUnknownSetting(final String settingName) {
         final LocalSetting<UserKeyword> linkedElement = new LocalSetting<>(ModelType.USER_KEYWORD_SETTING_UNKNOWN,
                 RobotToken.create("[" + settingName + "]"));
         linkedElement.addToken("arg1");
         linkedElement.addToken("arg2");
         linkedElement.setComment("comment");
-        return new RobotDefinitionSetting(null, linkedElement);
+        return new RobotKeywordCall(null, linkedElement);
     }
 }

@@ -10,7 +10,6 @@ import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
@@ -34,7 +33,7 @@ public class KeywordsElementsLabelAccumulator implements IConfigLabelAccumulator
         final Object rowObject = dataProvider.getRowObject(rowPosition);
 
         if (columnPosition == 0) {
-            if (rowObject instanceof RobotDefinitionSetting) {
+            if (rowObject instanceof RobotKeywordCall && ((RobotKeywordCall) rowObject).isLocalSetting()) {
                 configLabels.addLabel(KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
                 
             } else if (rowObject instanceof RobotKeywordDefinition) {
@@ -51,10 +50,10 @@ public class KeywordsElementsLabelAccumulator implements IConfigLabelAccumulator
                     configLabels.addLabelOnTop(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
                 }
             }
-                
+
         } else if (columnPosition > 0) {
-            if (columnPosition > 1 && rowObject instanceof RobotDefinitionSetting
-                    && ((RobotDefinitionSetting) rowObject).isDocumentation()) {
+            if (columnPosition > 1 && rowObject instanceof RobotKeywordCall
+                    && ((RobotKeywordCall) rowObject).isDocumentationSetting()) {
 
                 configLabels.addLabelOnTop(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
 

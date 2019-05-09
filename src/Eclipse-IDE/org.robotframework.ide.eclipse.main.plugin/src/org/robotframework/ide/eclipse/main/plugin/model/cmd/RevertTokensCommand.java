@@ -12,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.CommonStep;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -59,20 +58,12 @@ class RevertTokensCommand extends EditorCommand {
     @Override
     public void execute() {
         final CommonStep<?> linkedElement = (CommonStep<?>) call.getLinkedElement();
-        final ModelType oldType = linkedElement.getModelType();
         oldClone = clone(linkedElement);
 
         linkedElement.rewriteFrom(sourceElement);
-
         call.resetStored();
-        if (linkedElement.getModelType() != oldType) {
-            RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                    .to(call)
-                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, call.getParent());
-        } else {
-            RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
-        }
+
+        RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
 
     @Override

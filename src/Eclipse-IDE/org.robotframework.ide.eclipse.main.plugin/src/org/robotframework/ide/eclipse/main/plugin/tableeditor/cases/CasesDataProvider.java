@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsDataProvider;
@@ -21,7 +20,7 @@ class CasesDataProvider extends CodeElementsDataProvider<RobotCasesSection> {
     }
 
     @Override
-    protected boolean shouldAddSetting(final RobotDefinitionSetting setting) {
+    protected boolean shouldAddSetting(final RobotKeywordCall setting) {
         @SuppressWarnings("unchecked")
         final AModelElement<TestCase> linkedSetting = (AModelElement<TestCase>) setting.getLinkedElement();
         final TestCase testCase = linkedSetting.getParent();
@@ -30,9 +29,12 @@ class CasesDataProvider extends CodeElementsDataProvider<RobotCasesSection> {
 
     @Override
     protected int numberOfColumns(final Object element) {
-        if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) element).isDocumentation())) {
-            return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+        if (element instanceof RobotKeywordCall) {
+            final RobotKeywordCall call = (RobotKeywordCall) element;
+
+            if (!call.isDocumentationSetting()) {
+                return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+            }
         }
         return 0;
     }

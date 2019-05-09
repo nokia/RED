@@ -11,7 +11,6 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -25,8 +24,8 @@ class KeywordsDataProvider extends CodeElementsDataProvider<RobotKeywordsSection
     }
 
     @Override
-    protected boolean shouldAddSetting(final RobotDefinitionSetting setting) {
-        if (setting.isArguments()) {
+    protected boolean shouldAddSetting(final RobotKeywordCall setting) {
+        if (setting.isArgumentsSetting()) {
             return false;
         }
         @SuppressWarnings("unchecked")
@@ -38,17 +37,20 @@ class KeywordsDataProvider extends CodeElementsDataProvider<RobotKeywordsSection
     @Override
     protected int numberOfColumns(final Object element) {
         if (element instanceof RobotKeywordDefinition) {
-            final RobotDefinitionSetting argumentsSetting = ((RobotKeywordDefinition) element).getArgumentsSetting();
+            final RobotKeywordCall argumentsSetting = ((RobotKeywordDefinition) element).getArgumentsSetting();
             if (argumentsSetting != null) {
                 final LocalSetting<?> arguments = (LocalSetting<?>) argumentsSetting.getLinkedElement();
                 // add 2 for keyword definition and empty cell
                 return arguments.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT).collect(toList()).size() + 2;
             }
 
-        } else if (element instanceof RobotKeywordCall && !(element instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) element).isDocumentation())) {
-            // add 1 for empty cell
-            return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+        } else if (element instanceof RobotKeywordCall) {
+            final RobotKeywordCall call = (RobotKeywordCall) element;
+
+            if (!call.isDocumentationSetting()) {
+                // add 1 for empty cell
+                return ExecutablesRowView.rowTokens((RobotKeywordCall) element).size() + 1;
+            }
         }
         return 0;
     }

@@ -23,7 +23,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -120,7 +120,7 @@ public class DocumentationsTest {
     public void keywordOnDocSettingInputIsFoundForDocumentationSettingInRobotCase() {
         final RobotKeywordDefinition keyword = new RobotKeywordDefinition(null,
                 new UserKeyword(RobotToken.create("keyword")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(keyword,
+        final RobotKeywordCall setting = new RobotKeywordCall(keyword,
                 new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
@@ -131,7 +131,7 @@ public class DocumentationsTest {
     public void noInputIsFoundOnSomeKeywordSettingOtherThanDocumentation() {
         final RobotKeywordDefinition keyword = new RobotKeywordDefinition(null,
                 new UserKeyword(RobotToken.create("keyword")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(keyword,
+        final RobotKeywordCall setting = new RobotKeywordCall(keyword,
                 new LocalSetting<>(ModelType.USER_KEYWORD_ARGUMENTS, RobotToken.create("[Arguments]")));
 
         assertThat(Documentations.findInput(setting)).isEmpty();
@@ -148,7 +148,7 @@ public class DocumentationsTest {
     @Test
     public void testCaseOnDocSettingInputIsFoundForDocumentationSettingInRobotCase() {
         final RobotCase testCase = new RobotCase(null, new TestCase(RobotToken.create("test")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(testCase,
+        final RobotKeywordCall setting = new RobotKeywordCall(testCase,
                 new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
@@ -158,7 +158,7 @@ public class DocumentationsTest {
     @Test
     public void noInputIsFoundOnSomeTestSettingOtherThanDocumentation() {
         final RobotCase testCase = new RobotCase(null, new TestCase(RobotToken.create("test")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(testCase,
+        final RobotKeywordCall setting = new RobotKeywordCall(testCase,
                 new LocalSetting<>(ModelType.TEST_CASE_TEMPLATE, RobotToken.create("[Template]")));
 
         assertThat(Documentations.findInput(setting)).isEmpty();
@@ -175,7 +175,7 @@ public class DocumentationsTest {
     @Test
     public void taskOnDocSettingInputIsFoundForDocumentationSettingInRobotTask() {
         final RobotTask task = new RobotTask(null, new Task(RobotToken.create("task")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(task,
+        final RobotKeywordCall setting = new RobotKeywordCall(task,
                 new LocalSetting<>(ModelType.TASK_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
@@ -185,7 +185,7 @@ public class DocumentationsTest {
     @Test
     public void noInputIsFoundOnSomeTaskSettingOtherThanDocumentation() {
         final RobotTask task = new RobotTask(null, new Task(RobotToken.create("task")));
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(task,
+        final RobotKeywordCall setting = new RobotKeywordCall(task,
                 new LocalSetting<>(ModelType.TASK_TEMPLATE, RobotToken.create("[Template]")));
 
         assertThat(Documentations.findInput(setting)).isEmpty();

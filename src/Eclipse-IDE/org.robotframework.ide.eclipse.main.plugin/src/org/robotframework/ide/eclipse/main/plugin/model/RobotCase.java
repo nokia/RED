@@ -22,8 +22,6 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -55,13 +53,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         final TestCase testCase = getLinkedElement();
 
         for (final AModelElement<TestCase> el : testCase.getElements()) {
-            if (el instanceof RobotExecutableRow) {
-                getChildren().add(new RobotKeywordCall(this, el));
-            } else if (el instanceof RobotEmptyRow) {
-                getChildren().add(new RobotEmptyLine(this, el));
-            } else {
-                getChildren().add(new RobotDefinitionSetting(this, el));
-            }
+            getChildren().add(new RobotKeywordCall(this, el));
         }
     }
 
@@ -75,12 +67,6 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         final TestCase testCase = getLinkedElement();
         return testCase != null && testCase.isDataDrivenTestCase() ? RedImages.getTemplatedTestCaseImage()
                 : RedImages.getTestCaseImage();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void removeUnitSettings(final RobotKeywordCall call) {
-        getLinkedElement().removeElement((AModelElement<TestCase>) call.getLinkedElement());
     }
 
     public String getDocumentation() {

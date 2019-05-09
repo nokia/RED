@@ -19,7 +19,6 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.SpecialKeywords;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 
 /**
@@ -79,16 +78,15 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                     }
                 }
             }
-        } else if (call instanceof RobotDefinitionSetting) {
-            final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
-            if (setting.isTemplate() && columnPosition > 0) {
+        } else if (call.isLocalSetting()) {
+            if (call.isTemplateSetting() && columnPosition > 0) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
-            } else if (setting.isExecutableSetting() && columnPosition == 1) {
+            } else if (call.isExecutableSetting() && columnPosition == 1) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
-            } else if (setting.isExecutableSetting() && columnPosition > 1) {
-                final ExecutableSetting kwBasedSetting = setting.getExecutableSetting();
+            } else if (call.isExecutableSetting() && columnPosition > 1) {
+                final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
 
                 final List<RobotToken> allTokens = new ArrayList<>();
                 allTokens.add(kwBasedSetting.getKeywordName());

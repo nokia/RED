@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -45,7 +45,7 @@ public class CreateArgumentSettingCommand extends EditorCommand {
         tokens.set(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS.getRepresentation().get(0));
         tokens.set(index, value);
 
-        final RobotDefinitionSetting setting = definition.createSetting(0, tokens);
+        final RobotKeywordCall setting = definition.createSetting(0, tokens);
 
         executed = true;
         RedEventBroker.using(eventBroker)

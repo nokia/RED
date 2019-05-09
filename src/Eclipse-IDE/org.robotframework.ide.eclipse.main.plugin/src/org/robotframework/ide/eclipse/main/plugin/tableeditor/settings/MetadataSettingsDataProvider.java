@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -23,8 +24,8 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
 
     private RobotSettingsSection section;
 
-    private SortedList<RobotKeywordCall> metadata;
-    private FilterList<RobotKeywordCall> filteredMetadata;
+    private SortedList<RobotSetting> metadata;
+    private FilterList<RobotSetting> filteredMetadata;
 
     private MetadataMatchesFilter filter;
 
@@ -53,7 +54,7 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
         }
     }
 
-    SortedList<RobotKeywordCall> getSortedList() {
+    SortedList<RobotSetting> getSortedList() {
         return metadata;
     }
 
@@ -83,8 +84,8 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
     public Object getDataValue(final int columnIndex, final int rowIndex) {
         if (section != null) {
             final Object element = getRowObject(rowIndex);
-            if (element instanceof RobotKeywordCall) {
-                return propertyAccessor.getDataValue((RobotKeywordCall) element, columnIndex);
+            if (element instanceof RobotSetting) {
+                return propertyAccessor.getDataValue((RobotSetting) element, columnIndex);
             } else if (element instanceof AddingToken && columnIndex == 0 && !isFilterSet()) {
                 return ((AddingToken) element).getLabel();
             }
@@ -98,8 +99,8 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
             return;
         }
         final Object metadataSetting = getRowObject(rowIndex);
-        if (metadataSetting instanceof RobotKeywordCall) {
-            propertyAccessor.setDataValue((RobotKeywordCall) metadataSetting, columnIndex, newValue);
+        if (metadataSetting instanceof RobotSetting) {
+            propertyAccessor.setDataValue((RobotSetting) metadataSetting, columnIndex, newValue);
         }
     }
 

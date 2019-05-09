@@ -16,7 +16,6 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -80,8 +79,7 @@ public abstract class PasteCodeHoldersCellsCommandsCollector extends PasteRobotE
     private List<String> getValuesFromKeywordCall(final RobotKeywordCall keywordCall,
             final int clipboardElementColumnIndex) {
 
-        if (clipboardElementColumnIndex > 0 && keywordCall instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) keywordCall).isDocumentation()) {
+        if (clipboardElementColumnIndex > 0 && keywordCall.isDocumentationSetting()) {
             if (clipboardElementColumnIndex == 1) {
                 return newArrayList(getDocumentationText(keywordCall));
             } else {

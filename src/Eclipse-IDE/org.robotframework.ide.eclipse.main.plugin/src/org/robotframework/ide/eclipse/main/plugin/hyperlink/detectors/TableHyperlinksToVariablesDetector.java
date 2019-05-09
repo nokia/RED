@@ -15,8 +15,8 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileTableElementHyperlink;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
@@ -74,8 +74,8 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
     protected IHyperlink createLocalVariableHyperlink(final RobotFileInternalElement element, final String varName,
             final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
         // because Arguments element is masking under keyword definition in table
-        final RobotFileInternalElement realElement = element instanceof RobotDefinitionSetting
-                && ((RobotDefinitionSetting) element).isArguments() ? (RobotFileInternalElement) element.getParent()
+        final RobotFileInternalElement realElement = element instanceof RobotKeywordCall
+                && ((RobotKeywordCall) element).isArgumentsSetting() ? (RobotFileInternalElement) element.getParent()
                         : element;
         return new SuiteFileTableElementHyperlink(fromRegion, suiteFile, realElement, varName);
     }

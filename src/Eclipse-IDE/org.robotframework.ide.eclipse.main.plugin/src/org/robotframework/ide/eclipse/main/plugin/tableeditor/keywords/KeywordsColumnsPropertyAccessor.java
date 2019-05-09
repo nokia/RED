@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
@@ -28,7 +28,7 @@ class KeywordsColumnsPropertyAccessor extends CodeElementsColumnsPropertyAccesso
                 return keywordDef.getName();
 
             } else if (columnIndex > 0 && columnIndex <= (numberOfColumns - 1)) {
-                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                final RobotKeywordCall argumentsSetting = keywordDef.getArgumentsSetting();
                 if (argumentsSetting != null) {
                     final List<String> arguments = argumentsSetting.getArguments();
                     if ((columnIndex - 1) < arguments.size()) {
