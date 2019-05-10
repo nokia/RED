@@ -18,7 +18,6 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
@@ -213,7 +212,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, bodyViewportLayer,
+                selectionProvider);
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
@@ -299,7 +299,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         if (focus) {
             table.setFocus();
         }
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { robotVariable }));
+        selectionLayerAccessor.selectElementAndScrollToTopIfNotVisible(table, robotVariable);
     }
 
     @Override

@@ -269,7 +269,8 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false, true);
-        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, bodyViewportLayer,
+                selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
         new CodeTableContentTooltip(table, markersContainer, dataProvider, SettingTarget.KEYWORD);
@@ -371,7 +372,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
         if (focus) {
             table.setFocus();
         }
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
+        selectionLayerAccessor.selectElementAndScrollToTopIfNotVisible(table, element);
     }
 
     public void clearSettingsSelection() {

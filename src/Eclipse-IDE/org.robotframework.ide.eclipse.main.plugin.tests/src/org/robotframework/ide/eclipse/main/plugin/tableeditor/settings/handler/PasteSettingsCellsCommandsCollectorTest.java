@@ -290,7 +290,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         }
         when(selectionLayer.getSelectedCellPositions()).thenReturn(selectedPositions);
 
-        return new SelectionLayerAccessor(null, selectionLayer, null);
+        return new SelectionLayerAccessor(null, selectionLayer, null, null);
     }
 
     private SerializablePositionCoordinate[] createPositionsToCopy(final int[] columnsToCopy, final int[] rowsToCopy) {

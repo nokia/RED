@@ -264,7 +264,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, bodyViewportLayer,
+                selectionProvider);
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
@@ -368,7 +369,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         if (focus) {
             table.setFocus();
         }
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
+        selectionLayerAccessor.selectElementAndScrollToTopIfNotVisible(table, setting);
     }
 
     public void clearSettingsSelection() {

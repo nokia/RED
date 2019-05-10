@@ -578,7 +578,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, null, selectionProvider);
 
         // tooltips support
         new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider, fileModel.isRpaSuiteFile());
