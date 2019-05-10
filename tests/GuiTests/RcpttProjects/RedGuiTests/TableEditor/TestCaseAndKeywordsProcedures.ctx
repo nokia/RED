@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/6/19 2:27 PM
+Save-Time: 5/10/19 4:21 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -20,14 +20,14 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 //HINT: do not use hexstring in comments! As parameter in procedure they are converted to decimal value
 
 proc "compare-rows" [val file] [val table ][val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]{
-	if [$extended_col | eq false]{
-		get-editor $file | get-canvas -after [get-label $table] -index 1 
-			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 6 | verify-true
-	}-else{
-		get-editor $file | get-canvas -after [get-label $table] -index 1 
-			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | int | equals 7 | verify-true
-	}
-		
+	get-editor $file | get-canvas -after [get-label $table] -index 1 
+			| get-property "getLayer().getBodyLayer().getColumnCount()"  -raw | let [val row_nr -input]{
+		if [$extended_col | eq false]{
+			$row_nr  | int | equals 6 | assert-true [concat "Row number is not equal 6: " $row_nr]
+		}-else{
+			$row_nr  | int | equals 7 | assert-true [concat "Row number is not equal 7: " $row_nr]
+		}
+	}	
 	get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $tc -row $row -col 1 
 	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
@@ -159,4 +159,5 @@ proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile
 			|invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false 
 			| assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
 }
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
