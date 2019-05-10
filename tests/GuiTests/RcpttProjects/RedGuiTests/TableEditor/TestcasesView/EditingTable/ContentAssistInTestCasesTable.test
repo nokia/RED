@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/12/18 4:17 PM
+Save-Time: 5/10/19 4:30 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -294,6 +294,9 @@ with [get-editor "TestFile.robot"] {
 }
 
 get-editor "TestFile.robot" | maximize
+if [get-by-os -linux "Linux" -win "Windows"| equals "Linux"]{
+	get-eclipse-window | get-object | save-screenshot "/home/table.png"
+}	
 check-test_case-row -file "TestFile.robot" -row 1 -tc "new test"  -extended_col true
 check-test_case-row -file "TestFile.robot" -row 2 -tc "And this is my kw"  -c1 "Convert To Bytes" -c2 "input" -c3 "${CURDIR}" -c4 "&{EMPTY}" -c5 "${TEST_NAME}"   -extended_col true
 check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be Equal As Integers" -c1 "first" -c2 "second"  -extended_col true
@@ -301,5 +304,8 @@ check-test_case-row -file "TestFile.robot" -row 4 -tc "But Catenate"   -extended
 check-test_case-row -file "TestFile.robot" -row 5 -tc "[Teardown]"   -extended_col true
 check-test_case-row -file "TestFile.robot" -row 6 -tc "This is ${a1} and next ${DEBUG_FILE}&{myDict}" -c1 "arg ${:}"  -extended_col true
 check-test_case-row -file "TestFile.robot" -row 7 -tc "..."    -extended_col true
-get-editor "TestFile.robot" | minimize
+get-editor "TestFile.robot" | restore
+
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
