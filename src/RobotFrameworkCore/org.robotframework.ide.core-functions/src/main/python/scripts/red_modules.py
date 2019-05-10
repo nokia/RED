@@ -25,12 +25,12 @@ def get_module_path(module_name):
                 if 'file:' in source:
                     source = source[source.index('file:') + 5:]
 
-                if '.jar!' in source:
-                    source = source[:source.rindex('.jar!')] + '.jar'
-                elif '.jar/' in source:
-                    source = source[:source.rindex('.jar/')] + '.jar'
-                elif '.jar\\' in source:
-                    source = source[:source.rindex('.jar\\')] + '.jar'
+                if '.jar!' in source.lower():
+                    source = _modify_source_path_for_jar_files(source, '.jar!')
+                elif '.jar/' in source.lower():
+                    source = _modify_source_path_for_jar_files(source, '.jar/')
+                elif '.jar\\' in source.lower():
+                    source = _modify_source_path_for_jar_files(source, '.jar\\')
 
                 return source
         raise e
@@ -48,3 +48,11 @@ def _find_jar_source_path(module_name):
         return source
     else:
         return module.getResource('/' + module_name.replace('.', '/') + ".class").getPath()
+    
+
+def _modify_source_path_for_jar_files(source, jar_part):
+    jar_part_index = source.lower().rindex(jar_part)
+    jar_extension = source[jar_part_index:jar_part_index+4]
+    
+    return source[:jar_part_index] + jar_extension
+
