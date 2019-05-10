@@ -57,7 +57,7 @@ public class RobotDryRunLibraryImport {
             return DryRunLibraryType.REMOTE;
         } else if (source != null) {
             final String path = source.getPath();
-            if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
+            if (path.toLowerCase().endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
                 return DryRunLibraryType.JAVA;
             } else if (path.endsWith(".py")) {
                 return DryRunLibraryType.PYTHON;

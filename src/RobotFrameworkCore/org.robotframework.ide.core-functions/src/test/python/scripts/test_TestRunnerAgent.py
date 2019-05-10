@@ -34,6 +34,13 @@ class SourcePathExtractionTests(unittest.TestCase):
         self.assertEqual('/path_to_file.jar', _extract_source_path('jar:file:/path_to_file.jar!/JavaClass.class'))
         self.assertEqual('/path_to_file.jar', _extract_source_path('file:/path_to_file.jar/PyModule.py'))
         self.assertEqual('/path_to_file.jar', _extract_source_path('file:/path_to_file.jar\\PyModule.py'))
+        
+        self.assertEqual('path_to_file.JAR', _extract_source_path('path_to_file.JAR'))
+        self.assertEqual('/path_to_file.JAR', _extract_source_path('file:/path_to_file.JAR'))
+        self.assertEqual('/path_to_file.JAR', _extract_source_path('jar:file:/path_to_file.JAR'))
+        self.assertEqual('/path_to_file.JAR', _extract_source_path('jar:file:/path_to_file.JAR!/JavaClass.class'))
+        self.assertEqual('/path_to_file.JAR', _extract_source_path('file:/path_to_file.JAR/PyModule.py'))
+        self.assertEqual('/path_to_file.JAR', _extract_source_path('file:/path_to_file.JAR\\PyModule.py'))
 
     def test_extracting_path_to_compiled_python_file(self):
         self.assertEqual('path_to_file.py', _extract_source_path('path_to_file.py'))

@@ -42,7 +42,7 @@ def _collect_source_paths(start_path, recursive=True, excluded_paths=[]):
             _, extension = os.path.splitext(file)
             if extension == ".py" and not root in python_paths:
                 python_paths.append(root)
-            elif extension == ".jar" and 'Jython' in platform.python_implementation():
+            elif extension.lower() == ".jar" and 'Jython' in platform.python_implementation():
                 class_paths.append(os.path.join(root, file))
 
         # FIXME: check if such limit is still needed for virtualenv
