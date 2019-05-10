@@ -123,18 +123,25 @@ def _extract_source_path(source):
     if 'file:' in source:
         source = source[source.index('file:') + 5:]
 
-    if '.jar!' in source:
-        source = source[:source.rindex('.jar!')] + '.jar'
-    elif '.jar/' in source:
-        source = source[:source.rindex('.jar/')] + '.jar'
-    elif '.jar\\' in source:
-        source = source[:source.rindex('.jar\\')] + '.jar'
+    if '.jar!' in source.lower():
+        source = _modify_source_path_for_jar_files(source, '.jar!')
+    elif '.jar/' in source.lower():
+        source = _modify_source_path_for_jar_files(source, '.jar/')
+    elif '.jar\\' in source.lower():
+        source = _modify_source_path_for_jar_files(source, '.jar\\')
     elif source.endswith('.pyc'):
         source = source[:-1]
     elif source.endswith('$py.class'):
         source = source[:-9] + '.py'
 
     return source
+
+
+def _modify_source_path_for_jar_files(source, jar_part):
+    jar_part_index = source.lower().rindex(jar_part)
+    jar_extension = source[jar_part_index:jar_part_index+4]
+    
+    return source[:jar_part_index] + jar_extension
 
 
 class RedResponseMessage:

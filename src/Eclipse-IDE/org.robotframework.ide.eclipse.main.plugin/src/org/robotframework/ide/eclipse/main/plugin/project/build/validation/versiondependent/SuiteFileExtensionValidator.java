@@ -47,7 +47,7 @@ class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         final String extension = file.getFileExtension();
-        if (!"robot".equals(extension)) {
+        if (!"robot".equalsIgnoreCase(extension)) {
             final Optional<? extends RobotSuiteFileSection> suiteSection = fileModel.findSection(suiteSectionClass);
             if (suiteSection.isPresent()) {
                 final RobotSuiteFileSection section = suiteSection.get();

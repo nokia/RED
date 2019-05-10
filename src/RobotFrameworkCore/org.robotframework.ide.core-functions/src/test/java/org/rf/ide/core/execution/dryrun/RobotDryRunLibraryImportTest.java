@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 
@@ -40,6 +39,7 @@ public class RobotDryRunLibraryImportTest {
                 { "PythonSourceLibrary", new URI("file:///source.py"), DryRunLibraryType.PYTHON },
                 { "JavaSourceLibrary", new URI("file:///source.java"), DryRunLibraryType.JAVA },
                 { "JarSourceLibrary", new URI("file:///source.jar"), DryRunLibraryType.JAVA },
+                { "JarUpperSourceLibrary", new URI("file:///SOURCE.JAR"), DryRunLibraryType.JAVA },
                 { "ClassSourceLibrary", new URI("file:///source.class"), DryRunLibraryType.JAVA },
                 { "Remote", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE },
                 { "Remote http://9.8.7.6:1234", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE } });

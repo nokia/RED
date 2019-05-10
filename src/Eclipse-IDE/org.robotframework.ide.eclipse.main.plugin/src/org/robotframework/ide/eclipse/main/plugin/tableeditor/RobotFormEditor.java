@@ -270,7 +270,7 @@ public class RobotFormEditor extends FormEditor {
     private boolean isContentTypeMismatched(final String contentTypeId) {
         return suiteModel.isSuiteFile() && !ASuiteFileDescriber.isSuiteFile(contentTypeId)
                 || suiteModel.isRpaSuiteFile() && !ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)
-                || suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
+                || suiteModel.isResourceFile() && !"resource".equalsIgnoreCase(suiteModel.getFileExtension())
                         && !ASuiteFileDescriber.isResourceFile(contentTypeId);
     }
 
@@ -289,12 +289,12 @@ public class RobotFormEditor extends FormEditor {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "tests suite", "a Tasks", "tasks suite"));
 
-        } else if (suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
+        } else if (suiteModel.isResourceFile() && !"resource".equalsIgnoreCase(suiteModel.getFileExtension())
                 && ASuiteFileDescriber.isSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Test Cases", "tests suite"));
 
-        } else if (suiteModel.isResourceFile() && !"resource".equals(suiteModel.getFileExtension())
+        } else if (suiteModel.isResourceFile() && !"resource".equalsIgnoreCase(suiteModel.getFileExtension())
                 && ASuiteFileDescriber.isRpaSuiteFile(contentTypeId)) {
             return MessageDialog.openConfirm(getSite().getShell(), title,
                     String.format(description, "resource", "a Tasks", "tasks suite"));

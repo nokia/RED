@@ -110,7 +110,7 @@ public class ReferencedLibraryLocator {
     }
 
     private Entry<File, Collection<ReferencedLibrary>> importByName(final File library, final String name) {
-        if (library.getName().endsWith(".jar")) {
+        if (library.getName().toLowerCase().endsWith(".jar")) {
             return importJavaLibrary(library, name);
         } else if (isPythonModule(library)) {
             return importPythonModuleLibrary(new File(library, "__init__.py"));
