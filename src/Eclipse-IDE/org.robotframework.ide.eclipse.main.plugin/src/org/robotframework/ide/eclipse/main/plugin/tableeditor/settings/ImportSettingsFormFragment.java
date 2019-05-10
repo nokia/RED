@@ -264,7 +264,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, bodyViewportLayer,
+                selectionProvider);
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
@@ -374,7 +375,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         if (focus) {
             table.setFocus();
         }
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
+        selectionLayerAccessor.selectElementAndScrollToTopIfNotVisible(table, setting);
     }
 
     public void clearSettingsSelection() {
