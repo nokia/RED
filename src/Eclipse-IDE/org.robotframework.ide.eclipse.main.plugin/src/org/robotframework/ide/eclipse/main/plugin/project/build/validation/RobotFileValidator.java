@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage.LogLevel;
@@ -66,6 +65,11 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
     protected void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
 
+        fileModel.parse(); // otherwise the file can be not-yet-parsed
+        if (fileModel.getLinkedElement() == null) {
+            return;
+        }
+
         new UnknownTablesValidator(validationContext, fileModel, reporter).validate(null);
         new TestCaseTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
                 .validate(null);
@@ -84,11 +88,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
     }
 
     private void checkRobotFileOutputStatus(final RobotSuiteFile fileModel) {
-        final RobotFile linkedElement = fileModel.getLinkedElement();
-        if (linkedElement == null) {
-            return;
-        }
-        final RobotFileOutput robotFileOutput = linkedElement.getParent();
+        final RobotFileOutput robotFileOutput = fileModel.getLinkedElement().getParent();
         if (robotFileOutput == null) {
             return;
         }

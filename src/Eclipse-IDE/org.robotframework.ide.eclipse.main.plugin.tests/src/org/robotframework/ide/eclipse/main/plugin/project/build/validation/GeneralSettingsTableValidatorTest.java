@@ -445,7 +445,7 @@ public class GeneralSettingsTableValidatorTest {
                 new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(4, Range.closed(64, 81))),
                 new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(5, Range.closed(86, 104))));
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inSuiteSetup() {
         final List<KeywordEntity> accessibleKws = newArrayList(
@@ -466,7 +466,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, suiteSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
         });
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inSuiteTeardown() {
         final List<KeywordEntity> accessibleKws = newArrayList(
@@ -487,7 +487,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, suiteTeardown("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
         });
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inTestSetup() {
         final List<KeywordEntity> accessibleKws = newArrayList(
@@ -508,7 +508,7 @@ public class GeneralSettingsTableValidatorTest {
             softly.assertThat(problemsOf(context, testSetup("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
         });
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inTestTeardown() {
         final List<KeywordEntity> accessibleKws = newArrayList(

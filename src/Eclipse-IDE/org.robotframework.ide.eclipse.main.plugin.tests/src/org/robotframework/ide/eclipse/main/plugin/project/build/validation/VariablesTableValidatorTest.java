@@ -7,50 +7,33 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.Contexts.prepareContext;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
-import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
 public class VariablesTableValidatorTest {
-
-    private MockReporter reporter;
-
-    @Before
-    public void beforeTest() {
-        reporter = new MockReporter();
-    }
 
     @Test
     public void nothingIsReported_whenThereIsNoVariablesSection() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("").build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.wasProblemReported()).isFalse();
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
     }
 
     @Test
@@ -63,12 +46,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.wasProblemReported()).isFalse();
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
     }
 
 
@@ -80,13 +60,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.INVALID_TYPE, new ProblemPosition(2, Range.closed(18, 21))));
     }
 
@@ -98,13 +74,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.INVALID_NAME, new ProblemPosition(2, Range.closed(18, 25))));
     }
 
@@ -117,13 +89,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsOnly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(2, Range.closed(18, 24))),
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(3, Range.closed(28, 34))));
     }
@@ -136,13 +104,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext(newHashSet("${b}"));
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsOnly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX,
                         new ProblemPosition(2, Range.closed(27, 28))),
                 new Problem(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX,
@@ -159,13 +123,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(5);
-        assertThat(reporter.getReportedProblems()).containsOnly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(29, 33))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(43, 47))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(49, 53))),
@@ -183,13 +143,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
-        assertThat(reporter.getReportedProblems()).containsOnly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.INVALID_TYPE, new ProblemPosition(2, Range.closed(18, 24))),
                 new Problem(VariablesProblem.INVALID_NAME, new ProblemPosition(3, Range.closed(28, 33))),
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(4, Range.closed(37, 43))),
@@ -205,13 +161,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT,
                         new ProblemPosition(2, Range.closed(18, 25))),
                 new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT,
@@ -228,12 +180,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.wasProblemReported()).isFalse();
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
 
     }
 
@@ -244,13 +193,9 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).containsExactly(
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_NAME,
                         new ProblemPosition(2, Range.closed(18, 22))));
     }
@@ -264,21 +209,16 @@ public class VariablesTableValidatorTest {
                 .build();
 
         final FileValidationContext context = prepareContext();
-        final VariablesTableValidator validator = new VariablesTableValidator(context,
-                file.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter));
-        validator.validate(null);
 
-        assertThat(reporter.wasProblemReported()).isFalse();
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
     }
 
-    private static FileValidationContext prepareContext() {
-        return prepareContext(new HashSet<>());
-    }
-
-    private static FileValidationContext prepareContext(final Set<String> variables) {
-        final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
-        return new FileValidationContext(parentContext, mock(IFile.class), null, variables);
+    private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
+            throws CoreException {
+        final MockReporter reporter = new MockReporter();
+        new VariablesTableValidator(context, fileModel.findSection(RobotVariablesSection.class), reporter,
+                new VersionDependentValidators(context, reporter)).validate(new NullProgressMonitor());
+        return reporter.getReportedProblems();
     }
 }
