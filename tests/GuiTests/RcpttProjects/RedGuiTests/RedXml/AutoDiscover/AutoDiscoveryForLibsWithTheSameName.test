@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pnFPAHWDEemyUfih4aykGg
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/13/19 4:09 PM
+Save-Time: 5/13/19 4:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,19 +18,19 @@ get-view "Project Explorer" | get-tree | select "TheSameLibs/red.xml" | double-c
 with [get-editor "TheSameLibs/red.xml"] {
     with [get-tab-folder] {
         get-tab-item Libraries | click
-        double-click
 	}
 }
+
+//add 2 libs with the same name
 set-dialog-result File "platform:/resource/TheSameLibs/b_lib.py"
 get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
 get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item -path "b_lib - TheSameLibs\\/b_lib.py" 
     | get-property caption | equals "b_lib - TheSameLibs/b_lib.py" | verify-true
-with [get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table] {
-    get-cell 1 0 | click
-    get-cell 1 0 | mouse down -count 2
-}
+
 set-dialog-result File "platform:/resource/TheSameLibs/folder/b_lib.py"
 get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+
+//check if both are added
 with [get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table] {
     get-property "getItems().TableItem[0].getText()" | equals "b_lib - TheSameLibs/b_lib.py" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "b_lib - TheSameLibs/folder/b_lib.py" | verify-true
@@ -60,5 +60,35 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + ".*: FAIL : No keyword with name 'Fun From Folder' found.\n"
     + "Ending test: TheSameLibs.Test.dasd" | verify-true
     
-    
+
+//remove all libs
+with [get-editor "TheSameLibs/red.xml"] {
+    click
+    with [get-section Libraries | get-table] {
+        select "...add new library file" "b_lib - TheSameLibs\\/b_lib.py" "b_lib - TheSameLibs\\/folder\\/b_lib.py"
+        key-type Del
+        key-type "M1+s"
+    }
+}
+
+//save file to run autodiscovery
+get-view "Project Explorer" | get-tree | select "TheSameLibs/test.robot" | double-click
+with [get-editor "test.robot"] {
+    click
+    with [get-text-viewer] {
+        type-text " "
+        key-type "M1+s"
+    }
+}
+
+//checkif 2 files were added
+get-editor "TheSameLibs/red.xml" | click
+with [get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table] {
+    get-item -path "b_lib - TheSameLibs\\/folder\\/b_lib.py" | get-property caption 
+        | equals "b_lib - TheSameLibs/folder/b_lib.py" | verify-true
+    get-item -path "b_lib - TheSameLibs\\/b_lib.py" | get-property caption | equals "b_lib - TheSameLibs/b_lib.py" 
+        | verify-true
+}    
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
