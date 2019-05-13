@@ -1,0 +1,64 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9yBeUHWDEemyUfih4aykGg
+Element-Name: AutoDiscoveryForLibsWithTheSameName
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _pnFPAHWDEemyUfih4aykGg
+Runtime-Version: 2.3.0.201806262310
+Save-Time: 5/13/19 4:09 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "TheSameLibs/red.xml" | double-click
+with [get-editor "TheSameLibs/red.xml"] {
+    with [get-tab-folder] {
+        get-tab-item Libraries | click
+        double-click
+	}
+}
+set-dialog-result File "platform:/resource/TheSameLibs/b_lib.py"
+get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item -path "b_lib - TheSameLibs\\/b_lib.py" 
+    | get-property caption | equals "b_lib - TheSameLibs/b_lib.py" | verify-true
+with [get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table] {
+    get-cell 1 0 | click
+    get-cell 1 0 | mouse down -count 2
+}
+set-dialog-result File "platform:/resource/TheSameLibs/folder/b_lib.py"
+get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+with [get-editor "TheSameLibs/red.xml" | get-section Libraries | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "b_lib - TheSameLibs/b_lib.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "b_lib - TheSameLibs/folder/b_lib.py" | verify-true
+}
+get-button "Save (M1+S)" | click
+
+get-view "Project Explorer" | get-tree | get-item  "TheSameLibs/Robot Referenced libraries" | expand-all
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "TheSameLibs/Robot Referenced libraries" | get-property "getItems().length" | equals 2 | verify-true
+    get-item -path "TheSameLibs/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "b_lib TheSameLibs/b_lib.py (1)" | verify-true
+    get-item -path "TheSameLibs/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Fun From Roor" | verify-true
+    get-item -path "TheSameLibs/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "b_lib TheSameLibs/folder/b_lib.py (1)" | verify-true
+    get-item -path "TheSameLibs/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "Fun From Folder" 
+        | verify-true
+}
+
+//libs can be added but are not visible both
+get-view "Project Explorer" | get-tree | select "TheSameLibs/test.robot" | get-menu -path "Run As/1 Robot Test" | click
+wait-for-console
+
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: TheSameLibs.Test.dasd\n"
+    + ".*: FAIL : No keyword with name 'Fun From Folder' found.\n"
+    + "Ending test: TheSameLibs.Test.dasd" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
