@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 4:21 PM
+Save-Time: 5/13/19 12:55 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -28,7 +28,8 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	}-else{
 		get-editor "windows_path.robot" | get-text-viewer |type-text [concat $home_path "/ext_lib/external_lib.py" ]
 	}
-	
+	get-view Problems | get-tree | get-item "Errors (18 items)" | expand-all
+	wait 2000
 	//check error about full windows path for: c:\folder\file.py
 	try -times 4 -delay 1000 -command{
 		get-view Problems | get-tree | get-item 
@@ -45,19 +46,18 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	}
 	//check if is warnings about lib outside ws
 	with [get-view Problems | get-tree] {
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
 	        | equals "Path '.*external_lib.py' is absolute. It is preferred to use relative paths" 
 	        | verify-true
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
 	        | equals "Path '.*external_lib.py' points to location outside your workspace" 
 	        | verify-true
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-	        | equals "The '*.ROBOT' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+
+	    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "The '*.tsv' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
 	        | equals "The '*.tsv' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
-	    get-item -path "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
 	        | equals "The '*.txt' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
 	}
 

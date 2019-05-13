@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JVkfkEcAEei0qKwna87CYQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/17/19 11:41 AM
+Save-Time: 5/13/19 2:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -173,7 +173,7 @@ exec-with-options {
 
 //click double times - error for doc
 get-view "Project Explorer" | get-tree 
-    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules \\(non-accessible\\)"
+    | select "ManyModules/Robot Referenced libraries/Outer.Inner.MathModule ManyModules\\/Outer\\/Inner\\/MathModule\\/__init__.py (non-accessible)"
 exec-with-options {
     get-view "Project Explorer" | get-tree | double-click
     get-window "Problem Occurred" | get-button "Details >>" | click
