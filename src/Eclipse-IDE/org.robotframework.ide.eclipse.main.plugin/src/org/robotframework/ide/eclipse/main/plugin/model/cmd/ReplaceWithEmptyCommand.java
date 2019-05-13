@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -54,9 +53,10 @@ public class ReplaceWithEmptyCommand extends EditorCommand {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
         parent.replaceWithEmpty(index, tokens);
 
-        final RobotToken firstToken = call.getLinkedElement().getElementTokens().get(0);
-        firstToken.setFilePosition(firstTokenPosition);
-        firstToken.markAsDirty();
+        call.getLinkedElement().getElementTokens().stream().findFirst().ifPresent(token -> {
+            token.setFilePosition(firstTokenPosition);
+            token.markAsDirty();
+        });
 
         RedEventBroker.using(eventBroker).send(RobotModelEvents.ROBOT_KEYWORD_CALL_CELL_CHANGE, call);
     }
