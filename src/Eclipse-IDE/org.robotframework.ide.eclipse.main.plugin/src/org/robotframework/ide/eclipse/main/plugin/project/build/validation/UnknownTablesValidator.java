@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -48,14 +49,10 @@ class UnknownTablesValidator implements ModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        fileModel.parse(); // otherwise the file can be not-yet-parsed
+        final RobotFile model = fileModel.getLinkedElement();
+        final List<RobotLine> content = model.getFileContent();
 
-        final RobotFile astModel = fileModel.getLinkedElement();
-        if (astModel == null) {
-            return;
-        }
-
-        for (final RobotLine line : astModel.getFileContent()) {
+        for (final RobotLine line : content) {
             for (final IRobotLineElement lineElement : line.getLineElements()) {
                 for (final IRobotTokenType type : lineElement.getTypes()) {
                     if (type == RobotTokenType.USER_OWN_TABLE_HEADER) {
