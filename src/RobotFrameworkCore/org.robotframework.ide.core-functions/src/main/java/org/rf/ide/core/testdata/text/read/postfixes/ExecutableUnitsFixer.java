@@ -207,7 +207,6 @@ class ExecutableUnitsFixer {
                 }
             }
         }
-
         return false;
     }
 
@@ -257,34 +256,36 @@ class ExecutableUnitsFixer {
         } else if (rowDesc.getRowType() == RowType.SETTING) {
             return;
         } else {
-            toUpdate = (RobotExecutableRow<T>) newExecutionContext.get(newExecutionContext.size() - 1);
+            final AModelElement<T> lastRewritten = newExecutionContext.get(newExecutionContext.size() - 1);
+            if (lastRewritten instanceof RobotExecutableRow) {
+                toUpdate = (RobotExecutableRow<T>) lastRewritten;
+            } else {
+                return;
+            }
         }
 
         boolean wasComment = false;
         boolean shouldMerge = false;
-        final List<RobotToken> elementTokens = rowDesc.getRow().getElementTokens();
-        final int size = elementTokens.size();
-        for (int i = 0; i < size; i++) {
-            final RobotToken rt = elementTokens.get(i);
+        for (final RobotToken token : rowDesc.getRow().getElementTokens()) {
             if (rowDesc.getRowType() == RowType.FOR_CONTINUE && toUpdate.getAction().getFilePosition().isNotSet()
-                    && "\\".equals(rt.getText())) {
-                toUpdate.setAction(rt);
+                    && "\\".equals(token.getText())) {
+                toUpdate.setAction(token);
             }
 
-            if (rt == previousLineContinueToken) {
+            if (token == previousLineContinueToken) {
                 shouldMerge = true;
                 continue;
             }
 
             if (shouldMerge) {
-                if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || wasComment) {
+                if (token.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || wasComment) {
                     wasComment = true;
-                    toUpdate.addCommentPart(rt);
+                    toUpdate.addCommentPart(token);
                 } else {
                     if (toUpdate.getAction().getFilePosition().isNotSet()) {
-                        toUpdate.setAction(rt);
+                        toUpdate.setAction(token);
                     } else {
-                        toUpdate.addArgument(rt);
+                        toUpdate.addArgument(token);
                     }
                 }
             }
@@ -292,28 +293,24 @@ class ExecutableUnitsFixer {
     }
 
     private <T extends AModelElement<? extends ARobotSectionTable>> void applyArtificialForLineContinue(
-            final List<AModelElement<T>> newExecutionContext, final int lastForIndex,
-            final int lastForExecutableIndex) {
-        for (int line = lastForIndex + 1; line <= lastForExecutableIndex; line++) {
-            newExecutionContext.get(line).getDeclaration().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
+            final List<AModelElement<T>> executionContext, final int forStart, final int forEnd) {
+        for (int line = forStart + 1; line <= forEnd; line++) {
+            executionContext.get(line).getDeclaration().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
         }
     }
 
     private Optional<RobotToken> getPreviousLineContinueToken(final List<RobotToken> tokens) {
         Optional<RobotToken> token = Optional.empty();
         for (final RobotToken rt : tokens) {
-            String text = rt.getText();
-            if (text != null) {
-                text = text.trim();
-            }
-            if (rt.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE) && "...".equals(text.trim())) {
+            final String text = rt.getText().trim();
+            if (rt.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE) && "...".equals(text)) {
                 token = Optional.of(rt);
-            } else if (text != null) {
-                if (text.equals("\\") || text.isEmpty()) {
-                    continue;
-                } else {
-                    break;
-                }
+
+            } else if (text.equals("\\") || text.isEmpty()) {
+                continue;
+
+            } else {
+                break;
             }
         }
         return token;
@@ -321,13 +318,13 @@ class ExecutableUnitsFixer {
 
     private <T extends AModelElement<? extends ARobotSectionTable>> List<IExecutableRowDescriptor<T>> preBuildDescriptors(
             final List<AModelElement<T>> executionContext) {
-        final List<IExecutableRowDescriptor<T>> descs = new ArrayList<>(0);
 
-        for (final AModelElement<T> p : executionContext) {
-            if (p instanceof RobotExecutableRow) {
-                descs.add(((RobotExecutableRow<T>) p).buildLineDescription());
+        final List<IExecutableRowDescriptor<T>> descs = new ArrayList<>(0);
+        for (final AModelElement<T> elem : executionContext) {
+            if (elem instanceof RobotExecutableRow) {
+                descs.add(((RobotExecutableRow<T>) elem).buildLineDescription());
             } else {
-                descs.add(new SettingDescriptor<>(p));
+                descs.add(new SettingDescriptor<>(elem));
             }
         }
         return descs;
@@ -351,7 +348,6 @@ class ExecutableUnitsFixer {
                 }
             }
         }
-
         return false;
     }
 }
