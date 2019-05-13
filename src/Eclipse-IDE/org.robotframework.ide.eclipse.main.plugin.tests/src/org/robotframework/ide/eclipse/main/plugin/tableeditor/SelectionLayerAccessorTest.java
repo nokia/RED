@@ -45,14 +45,14 @@ public class SelectionLayerAccessorTest {
             }
         }
         selectionLayer = new SelectionLayer(uniqueIndexLayer);
-        sla = new SelectionLayerAccessor(dataProvider, selectionLayer, null);
+        sla = new SelectionLayerAccessor(dataProvider, selectionLayer, null, null);
     }
 
     @Test
     public void testGetLastSelectedRowPosition() {
         final IUniqueIndexLayer uniqueIndexLayer = mock(IUniqueIndexLayer.class);
         final SelectionLayer selectionLayer = new SelectionLayer(uniqueIndexLayer);
-        final SelectionLayerAccessor sla = new SelectionLayerAccessor(null, selectionLayer, null);
+        final SelectionLayerAccessor sla = new SelectionLayerAccessor(null, selectionLayer, null, null);
         selectionLayer.setLastSelectedCell(5, 6);
         assertThat(sla.getLastSelectedRowPosition()).isEqualTo(6);
     }

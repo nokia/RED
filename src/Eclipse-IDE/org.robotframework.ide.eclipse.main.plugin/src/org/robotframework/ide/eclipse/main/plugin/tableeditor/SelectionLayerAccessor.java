@@ -21,11 +21,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
+import org.eclipse.nebula.widgets.nattable.viewport.command.ShowRowInViewportCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
@@ -43,10 +46,14 @@ public class SelectionLayerAccessor {
 
     private final ISelectionProvider selectionProvider;
 
+    private final ViewportLayer viewportLayer;
+
     public SelectionLayerAccessor(final IRowDataProvider<? extends Object> dataProvider,
-            final SelectionLayer selectionLayer, final ISelectionProvider selectionProvider) {
+            final SelectionLayer selectionLayer, final ViewportLayer viewportLayer,
+            final ISelectionProvider selectionProvider) {
         this.dataProvider = dataProvider;
         this.selectionLayer = selectionLayer;
+        this.viewportLayer = viewportLayer;
         this.selectionProvider = selectionProvider;
     }
 
@@ -270,5 +277,19 @@ public class SelectionLayerAccessor {
             selectionLayer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
                     coordinate.getRowPosition(), false, true));
         }
+    }
+
+    public void selectElementAndScrollToTopIfNotVisible(final NatTable table, final Object element) {
+        @SuppressWarnings("unchecked")
+        final int elementRow = ((IRowDataProvider<Object>) dataProvider).indexOfRowObject(element);
+        final int viewportPosition = viewportLayer.getRowPositionByIndex(elementRow);
+        final int viewportHeight = viewportLayer.getRowCount();
+        final boolean isDownBelow = viewportPosition >= viewportHeight;
+        if (isDownBelow) {
+            final int viewPortTargetPosition = Math.min(elementRow + viewportHeight, dataProvider.getRowCount() - 1);
+            table.doCommand(new ShowRowInViewportCommand(viewportLayer, viewPortTargetPosition));
+        }
+
+        selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
     }
 }
