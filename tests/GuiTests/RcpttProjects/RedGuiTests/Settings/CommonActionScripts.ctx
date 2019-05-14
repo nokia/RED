@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/6/19 3:48 PM
+Save-Time: 5/14/19 4:00 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -169,14 +169,13 @@ proc "wait-for-console" [val times 4] [val delay 1000]{
 }
 
 
-proc "wait-for-message-log" [val times 4] [val delay 1000] [val last_line ".*"]{
+proc "wait-for-message-log" [val times 4] [val delay 1000] [val last_line ".*"] [val test_type "test"]{
 	try -times $times -delay $delay -command{
 		get-view "Message Log" | get-editbox | get-property text | equals "" | verify-false
-		get-view "Message Log" | get-editbox | get-property text | matches [format "(.*\n)+Ending test: %s" $last_line]| verify-true
+		get-view "Message Log" | get-editbox | get-property text | matches [format "(.*\n)+Ending %s: %s" $test_type $last_line]| verify-true
 
 	}
 }
-
 
 proc "wait-for-loading-red-xml" [val editor_name]{
 	try -times 10 -delay 1000 -command{
