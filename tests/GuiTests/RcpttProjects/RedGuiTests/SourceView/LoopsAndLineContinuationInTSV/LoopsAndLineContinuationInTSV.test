@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7xd9UMD2EeWqU8ILayOzQw
 Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/10/18 11:20 AM
+Save-Time: 5/14/19 3:47 PM
 Testcase-Type: ecl
 Verifications: _SjOlgIr4Eea71boqaFnZ5w
 
@@ -44,6 +44,48 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
 }
 
 //3
+get-view Problems | get-tree | select "Errors (14 items)/Keyword name cannot be empty"  | double-click
+with [get-editor "tsv_check.tsv" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 29 | verify-true
+    get-property "caretPosition.column" | equals 13 | verify-true
+}
+
+// 4
+get-view Problems | get-tree | select [get-item -path "Errors \\(14 items\\)" | get-item 
+    -path "Keyword name cannot be empty" -index 1] | double-click
+with [get-editor "tsv_check.tsv" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 37 | verify-true
+    get-property "caretPosition.column" | equals 9 | verify-true
+    get-property "getSelectionText()" | equals "" | verify-true
+}
+
+// 5
+get-view Problems | get-tree| select [get-item -path "Errors (14 items)" | get-item -path "Keyword name cannot be empty" -index 2]  | double-click
+with [get-editor "tsv_check.tsv" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 41 | verify-true
+    get-property "caretPosition.column" | equals 13 | verify-true
+}
+
+// 6
+get-view Problems | get-tree | select [get-item -path "Errors \\(14 items\\)" | get-item 
+    -path "Keyword name cannot be empty" -index 3] | double-click
+with [get-editor "tsv_check.tsv" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 43 | verify-true
+    get-property "caretPosition.column" | equals 6 | verify-true
+}
+
+// 7
+get-view Problems | get-tree | select [get-item -path "Errors (14 items)" | get-item 
+    -path "Keyword name cannot be empty" -index 4] | double-click
+with [get-editor "tsv_check.tsv" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 54 | verify-true
+    get-property "caretPosition.column" | equals 6 | verify-true
+    get-property "getSelectionText()" | equals "\\" | verify-true
+}
+
+
+
+// 8
 //error like it was in good order 
 get-view Problems | get-tree | select "Errors (14 items)/There is no keyword to execute specified" 
     | double-click
@@ -52,7 +94,7 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.column" | equals 6 | verify-true
 }
 
-//4
+//9
 get-view Problems | get-tree | select "Errors \\(14 items\\)/Unknown keyword '...  #ok'" | double-click
 with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.line" | equals 33 | verify-true
@@ -60,7 +102,7 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "getSelectionText()" | equals "...  #ok" | verify-true
 }
 
-//5
+//10
 get-view Problems | get-tree | select [get-item "Errors \\(14 items\\)" | get-item "Unknown keyword '...  #ok'" 
     -index 1] | double-click
 with [get-editor "tsv_check.tsv" | get-text-viewer] {
@@ -69,7 +111,7 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "getSelectionText()" | equals "...  #ok" | verify-true
 }    
 
-//6
+//11
 get-view Problems | get-tree | select "Errors \\(14 items\\)/Unknown keyword '...  #ok4'" | double-click
 with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.line" | equals 31 | verify-true
@@ -77,7 +119,7 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "getSelectionText()" | equals "...  #ok4" | verify-true
 }
 
-///7
+///12
 get-view Problems | get-tree | select [get-item "Errors \\(14 items\\)" | get-item "Unknown keyword '...  #ok4'" 
     -index 1] | double-click
 with [get-editor "tsv_check.tsv" | get-text-viewer] {
@@ -85,7 +127,7 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.column" | equals 14 | verify-true
     get-property "getSelectionText()" | equals "...  #ok4" | verify-true
 }
-//8
+//13
 get-view Problems | get-tree | select "Errors \\(14 items\\)/Unknown keyword '...  ok'" | double-click
 with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.line" | equals 50 | verify-true
@@ -93,46 +135,5 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "getSelectionText()" | equals "...  ok" | verify-true
 }
 
-//9
-get-view Problems | get-tree | select "Errors \\(14 items\\)/Unknown keyword ''" | double-click
-with [get-editor "tsv_check.tsv" | get-text-viewer] {
-    get-property "caretPosition.line" | equals 37 | verify-true
-    get-property "caretPosition.column" | equals 9 | verify-true
-    get-property "isTextSelected()" | equals false | verify-true
-}
 
-//10
-get-view Problems | get-tree | select [get-item "Errors \\(14 items\\)" | get-item "Unknown keyword ''" -index 1] 
-    | double-click
-with [get-editor "tsv_check.tsv" | get-text-viewer] {
-    get-property "caretPosition.line" | equals 41 | verify-true
-    get-property "caretPosition.column" | equals 13 | verify-true
-    get-property "isTextSelected()" | equals false | verify-true
-}
-
-//11
-get-view Problems | get-tree | select "Errors \\(14 items\\)/Unknown keyword '\\\\'" | double-click
-with [get-editor "tsv_check.tsv" | get-text-viewer] {
-    get-property "caretPosition.line" | equals 29 | verify-true
-    get-property "caretPosition.column" | equals 13 | verify-true
-    get-property "getSelectionText()" | equals "" | verify-true
-}
-
-//12
-get-view Problems | get-tree | select [get-item "Errors \\(14 items\\)" | get-item "Unknown keyword '\\\\'" -index 1] 
-    | double-click
-with [get-editor "tsv_check.tsv" | get-text-viewer] {
-    get-property "caretPosition.line" | equals 43 | verify-true
-    get-property "caretPosition.column" | equals 6 | verify-true
-    get-property "getSelectionText()" | equals "\\" | verify-true
-}
-
-//13
-get-view Problems | get-tree | select [get-item "Errors (14 items)" | get-item "Unknown keyword '\\\\'" -index 2] 
-    | double-click
-with [get-editor "tsv_check.tsv" | get-text-viewer] {
-    get-property "caretPosition.line" | equals 54 | verify-true
-    get-property "caretPosition.column" | equals 6 | verify-true
-    get-property "getSelectionText()" | equals "\\" | verify-true
-}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
