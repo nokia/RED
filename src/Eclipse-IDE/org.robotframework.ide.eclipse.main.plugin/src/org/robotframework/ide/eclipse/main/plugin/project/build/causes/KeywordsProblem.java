@@ -58,6 +58,13 @@ public enum KeywordsProblem implements IProblemCause {
             return fixers;
         }
     },
+    EMPTY_KEYWORD_NAME {
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword name cannot be empty";
+        }
+    },
     AMBIGUOUS_KEYWORD {
 
         @Override

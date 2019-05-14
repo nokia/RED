@@ -173,6 +173,20 @@ public class TestCaseValidatorTest {
     }
 
     @Test
+    public void emptyKeywordNameInExecutableRowIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  \\  1  2")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.EMPTY_KEYWORD_NAME, new ProblemPosition(3, Range.closed(26, 27))));
+    }
+
+    @Test
     public void undeclaredKeywordInExecutableRowIsReported() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")

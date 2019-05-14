@@ -74,7 +74,11 @@ class KeywordCallValidator implements ModelUnitValidator {
                 : new ProblemPosition(keywordNameToken.getLineNumber(),
                         Range.closed(keywordNameToken.getStartOffset(), keywordNameToken.getEndOffset()));
 
-        if (!nameToUse.isPresent()) {
+        if (!nameToUse.isPresent() && (name.isEmpty() || name.equals("\\"))) {
+            reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_NAME),
+                    validationContext.getFile(), position);
+
+        } else if (!nameToUse.isPresent()) {
             reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name),
                     validationContext.getFile(), position, ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
                             AdditionalMarkerAttributes.ORIGINAL_NAME, getActualKeywordName()));

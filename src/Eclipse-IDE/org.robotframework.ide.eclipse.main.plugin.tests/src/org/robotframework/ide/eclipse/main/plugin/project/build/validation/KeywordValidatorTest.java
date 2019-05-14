@@ -267,6 +267,20 @@ public class KeywordValidatorTest {
     }
 
     @Test
+    public void emptyKeywordNameInExecutableRowIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  \\  1  2")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.EMPTY_KEYWORD_NAME, new ProblemPosition(3, Range.closed(27, 28))));
+    }
+
+    @Test
     public void undeclaredKeywordInExecutableRowIsReported() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
