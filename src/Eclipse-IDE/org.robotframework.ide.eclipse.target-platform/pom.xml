@@ -27,7 +27,6 @@
 		<profile>
 			<id>photon-profile</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>photon</value>
@@ -40,6 +39,7 @@
 		<profile>
 			<id>2018-09-profile</id>
 			<activation>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>2018-09</value>
