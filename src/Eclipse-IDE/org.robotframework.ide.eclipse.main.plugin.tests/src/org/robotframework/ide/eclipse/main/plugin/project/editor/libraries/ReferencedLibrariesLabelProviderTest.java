@@ -66,7 +66,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorLibImageIsReturnedAsItsImage() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
         assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryErrorImage()));
@@ -74,7 +74,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningLibImageIsReturnedAsItsImage() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
         assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryWarnImage()));
@@ -88,39 +88,39 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonDecoratedLibNameIsReturnedAsLabel() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
         final StyledString styledLabel = provider.getStyledText(library);
-        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path");
+        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 5, null, null, SWT.NORMAL),
-                new StyleRange(5, 13, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+                new StyleRange(5, 22, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
     }
 
     @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorDecoratedLibNameIsReturnedAsLabel() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
         final StyledString styledLabel = provider.getStyledText(library);
-        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path");
+        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(
                 new StyleRange(0, 5, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL),
-                new StyleRange(5, 13, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+                new StyleRange(5, 22, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
     }
 
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningDecoratedLibNameIsReturnedAsLabel() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
 
         final StyledString styledLabel = provider.getStyledText(library);
-        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path");
+        assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(
                 new StyleRange(0, 5, ColorsManager.getColor(255, 165, 0), null, SWT.NORMAL),
-                new StyleRange(5, 13, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+                new StyleRange(5, 22, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithProblemsIsGiven_tooltipTextWithAllProblemDescriptionsIsReturned() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details"),
                         new RedXmlProblem(Severity.ERROR, "other error details"),
@@ -154,7 +154,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonTooltipTextIsReturned() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
         assertThat(provider.getToolTipText(library)).isNull();
@@ -162,7 +162,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorTooltipImageIsReturned() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
@@ -171,7 +171,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningTooltipImageIsReturned() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
 
@@ -180,7 +180,7 @@ public class ReferencedLibrariesLabelProviderTest {
 
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonTooltipImageIsReturned() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
         assertThat(provider.getToolTipImage(library)).isNull();

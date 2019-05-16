@@ -1,8 +1,8 @@
 /*
-* Copyright 2018 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2018 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.rf.ide.core.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -64,11 +64,7 @@ public final class LibraryDescriptor {
     }
 
     public String getFilepath() {
-        if (path != null && type == LibraryType.PYTHON) {
-            return path + "/" + name.replaceAll("\\.", "/");
-        } else {
-            return path;
-        }
+        return path;
     }
 
     public List<String> getArguments() {

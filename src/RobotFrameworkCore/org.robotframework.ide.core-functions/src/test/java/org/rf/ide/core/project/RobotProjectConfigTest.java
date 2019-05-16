@@ -24,63 +24,69 @@ public class RobotProjectConfigTest {
     @Test
     public void referenceLibraryIsAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedLibrary> libs = newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+        final List<ReferencedLibrary> libs = newArrayList(
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
         config.setReferencedLibraries(libs);
 
-        final boolean result = config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi"));
+        final boolean result = config
+                .addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi/Lib3.py"));
 
         assertThat(result).isTrue();
         assertThat(config.getReferencedLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi/Lib3.py"));
     }
 
     @Test
     public void referenceLibraryIsNotAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedLibrary> libs = newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+        final List<ReferencedLibrary> libs = newArrayList(
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
         config.setReferencedLibraries(libs);
 
-        final boolean result = config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+        final boolean result = config
+                .addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
 
         assertThat(result).isFalse();
         assertThat(config.getReferencedLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
     }
 
     @Test
     public void referenceLibraryIsRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedLibrary> libs = newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+        final List<ReferencedLibrary> libs = newArrayList(
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
         config.setReferencedLibraries(libs);
 
-        final boolean result = config
-                .removeReferencedLibraries(newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def")));
+        final boolean result = config.removeReferencedLibraries(
+                newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py")));
 
         assertThat(result).isTrue();
         assertThat(config.getReferencedLibraries())
-                .containsExactly(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"));
+                .containsExactly(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"));
     }
 
     @Test
     public void referenceLibraryIsNotRemoved() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        final List<ReferencedLibrary> libs = newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+        final List<ReferencedLibrary> libs = newArrayList(
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
         config.setReferencedLibraries(libs);
 
-        final boolean result = config
-                .removeReferencedLibraries(newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi")));
+        final boolean result = config.removeReferencedLibraries(
+                newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "Lib3", "ghi/Lib3.py")));
 
         assertThat(result).isFalse();
         assertThat(config.getReferencedLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib1", "abc/Lib1.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib2", "def/Lib2.py"));
     }
 
     @Test
@@ -404,16 +410,20 @@ public class RobotProjectConfigTest {
     @Test
     public void sameReferencedLibrariesFromDifferentPaths_areAllAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"))).isTrue();
-        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def"))).isTrue();
-        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi"))).isTrue();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc/Lib.py")))
+                .isTrue();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def/Lib.py")))
+                .isTrue();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi/Lib.py")))
+                .isTrue();
 
-        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"))).isFalse();
+        assertThat(config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc/Lib.py")))
+                .isFalse();
 
         assertThat(config.getReferencedLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def"),
-                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "abc/Lib.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "def/Lib.py"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi/Lib.py"));
     }
 
 }
