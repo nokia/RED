@@ -94,9 +94,7 @@ public class CombinedLibrariesAutoDiscovererTest {
 
         // this should not be found in any case
         projectProvider.createFile("notUsedLib.py", "def kw():", " pass");
-        projectProvider.createFile("notUsedTest.robot",
-                "*** Settings ***",
-                "Library  notUsedLib.py",
+        projectProvider.createFile("notUsedTest.robot", "*** Settings ***", "Library  notUsedLib.py",
                 "*** Test Cases ***");
     }
 
@@ -116,30 +114,24 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_whenExistAndAreCorrect() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ./libs/SomePathLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
-                "*** Settings ***",
-                "Library  ./other/dir/OtherPathLib.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ./other/dir/OtherPathLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("suite3.robot",
-                "*** Settings ***",
-                "Library  module",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  module", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -155,17 +147,15 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_forRobotResourceFile() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("resource.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "Library  NotExisting.py"));
+                "*** Settings ***", "Library  ./libs/SomePathLib.py", "Library  NotExisting.py"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -181,19 +171,17 @@ public class CombinedLibrariesAutoDiscovererTest {
                 VariableMapping.create("${XYZ}", "${ABC}/dir")));
         projectProvider.configure(config);
 
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  ${var}/SomePathLib.py",
-                "Library  ${xyz}/OtherPathLib.py",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
+                "Library  ${var}/SomePathLib.py", "Library  ${xyz}/OtherPathLib.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "OtherPathLib", projectProvider.getFile("other/dir/OtherPathLib.py"),
@@ -209,27 +197,22 @@ public class CombinedLibrariesAutoDiscovererTest {
         projectProvider.createDir("A/B/C");
         projectProvider.createDir("A/B/C/D");
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("A/B/C/D/suite1.robot",
-                "*** Settings ***",
-                "Library  ../../../../libs/SomePathLib.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ../../../../libs/SomePathLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("A/B/C/D/suite2.robot",
-                "*** Settings ***",
-                "Library  ../../../../other/dir/OtherPathLib.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ../../../../other/dir/OtherPathLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("A/B/C/D/suite3.robot",
-                "*** Settings ***",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(2);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -243,23 +226,20 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_forResourceAndSuite() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ./libs/SomePathLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("resource.robot",
-                "*** Settings ***",
-                "Library  ./other/dir/OtherPathLib.py",
-                "Library  NotExisting.py"));
+                "*** Settings ***", "Library  ./other/dir/OtherPathLib.py", "Library  NotExisting.py"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(2);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -281,10 +261,7 @@ public class CombinedLibrariesAutoDiscovererTest {
         resourceCreator.createLink(tmpFile.toURI(), linkedFile);
 
         final String libPath = projectProvider.getFile("libs/SomePathLib.py").getLocation().toPortableString();
-        projectProvider.createFile(linkedFile,
-                "*** Settings ***",
-                "Library  " + libPath,
-                "*** Test Cases ***");
+        projectProvider.createFile(linkedFile, "*** Settings ***", "Library  " + libPath, "*** Test Cases ***");
 
         final RobotSuiteFile suite = model.createSuiteFile(linkedFile);
 
@@ -293,8 +270,8 @@ public class CombinedLibrariesAutoDiscovererTest {
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "SomePathLib",
                 projectProvider.getFile("libs/SomePathLib.py"), newHashSet(linkedFile)))));
@@ -304,34 +281,26 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_whenImportedFromSeveralSuites() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "Library  module",
-                "*** Test Cases ***"));
-        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "Library  ./other/dir/OtherPathLib.py",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
-        final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("suite3.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "Library  module",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+                "*** Settings ***", "Library  ./libs/SomePathLib.py", "Library  module", "*** Test Cases ***"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(
+                projectProvider.createFile("suite2.robot", "*** Settings ***", "Library  ./libs/SomePathLib.py",
+                        "Library  ./other/dir/OtherPathLib.py", "Library  NotExisting.py", "*** Test Cases ***"));
+        final RobotSuiteFile suite3 = model.createSuiteFile(
+                projectProvider.createFile("suite3.robot", "*** Settings ***", "Library  ./libs/SomePathLib.py",
+                        "Library  module", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -350,29 +319,27 @@ public class CombinedLibrariesAutoDiscovererTest {
         config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
-        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
-                "*** Settings ***",
-                "Library  LibWithClasses.ClassA",
-                "Library  LibWithClasses.ClassC",
-                "*** Test Cases ***"));
-        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
-                "*** Settings ***",
-                "Library  LibWithClasses.ClassA",
-                "Library  LibWithClasses.ClassB",
-                "Library  NotExisting.ClassName",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite1 = model
+                .createSuiteFile(projectProvider.createFile("suite1.robot", "*** Settings ***",
+                        "Library  LibWithClasses.ClassA", "Library  LibWithClasses.ClassC", "*** Test Cases ***"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(
+                projectProvider.createFile("suite2.robot", "*** Settings ***", "Library  LibWithClasses.ClassA",
+                        "Library  LibWithClasses.ClassB", "Library  NotExisting.ClassName", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassA", PROJECT_NAME + "/libs/LibWithClasses.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassB", PROJECT_NAME + "/libs/LibWithClasses.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassC", PROJECT_NAME + "/libs/LibWithClasses.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassA",
+                        PROJECT_NAME + "/libs/LibWithClasses.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassB",
+                        PROJECT_NAME + "/libs/LibWithClasses.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassC",
+                        PROJECT_NAME + "/libs/LibWithClasses.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "LibWithClasses.ClassA", projectProvider.getFile("libs/LibWithClasses.py"),
@@ -393,8 +360,7 @@ public class CombinedLibrariesAutoDiscovererTest {
                 "*** Settings ***", "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("suite3.robot",
                 "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/",
-                "Library  Remote  http://127.0.0.1:8000/",
-                "*** Test Cases ***"));
+                "Library  Remote  http://127.0.0.1:8000/", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
@@ -403,12 +369,11 @@ public class CombinedLibrariesAutoDiscovererTest {
         assertThat(robotProject.getRobotProjectConfig().getRemoteLocations()).containsExactly(
                 RemoteLocation.create("http://127.0.0.1:8000/"), RemoteLocation.create("http://127.0.0.1:9000/"));
 
-        verify(summaryHandler)
-                .accept(argThat(hasLibImports(
-                        createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
-                                newHashSet(suite1.getFile(), suite3.getFile())),
-                        createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
-                                newHashSet(suite2.getFile(), suite3.getFile())))));
+        verify(summaryHandler).accept(argThat(hasLibImports(
+                createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
+                        newHashSet(suite1.getFile(), suite3.getFile())),
+                createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
+                        newHashSet(suite2.getFile(), suite3.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 
@@ -443,12 +408,8 @@ public class CombinedLibrariesAutoDiscovererTest {
 
     @Test
     public void nothingIsAddedToProjectConfig_whenNoLibrariesAreFound() throws Exception {
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  NotExisting.py",
-                "Library  not_existing/",
-                "Library  SomePathLib.py",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
+                "Library  NotExisting.py", "Library  not_existing/", "Library  SomePathLib.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
@@ -466,22 +427,20 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void nothingIsAddedToProjectConfig_whenImportedLibraryIsAlreadyAdded() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py"));
         projectProvider.configure(config);
 
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  ./libs/SomePathLib.py",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
+                "Library  ./libs/SomePathLib.py", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(1);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ALREADY_EXISTING, "SomePathLib", projectProvider.getFile("libs/SomePathLib.py"),
@@ -492,14 +451,9 @@ public class CombinedLibrariesAutoDiscovererTest {
 
     @Test
     public void dryRunDiscoveringIsRun_whenSomeLibrariesImportedByNameAreNotDiscovered() throws Exception {
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  SomePathLib",
-                "Library  module",
-                "Library  ./other/dir/OtherPathLib.py",
-                "Library  ErrorLib",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
+                "Library  SomePathLib", "Library  module", "Library  ./other/dir/OtherPathLib.py", "Library  ErrorLib",
+                "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
@@ -509,12 +463,13 @@ public class CombinedLibrariesAutoDiscovererTest {
         verify(discovererSpy).startDryRunDiscovering(any(), eq(newHashSet("ErrorLib", "SomePathLib")));
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "module", projectProvider.getFile("module/__init__.py"),
@@ -534,13 +489,9 @@ public class CombinedLibrariesAutoDiscovererTest {
         config.setPythonPaths(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
         projectProvider.configure(config);
 
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
-                "*** Settings ***",
-                "Library  module",
-                "Library  SomePathLib",
-                "Library  ./other/dir/OtherPathLib.py",
-                "Library  NotExisting.py",
-                "*** Test Cases ***"));
+        final RobotSuiteFile suite = model.createSuiteFile(
+                projectProvider.createFile("suite.robot", "*** Settings ***", "Library  module", "Library  SomePathLib",
+                        "Library  ./other/dir/OtherPathLib.py", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite), summaryHandler);
@@ -550,12 +501,13 @@ public class CombinedLibrariesAutoDiscovererTest {
         verify(discovererSpy, times(0)).startDryRunDiscovering(any(), anySet());
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).hasSize(3);
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1)).has(sameFieldsAs(
-                ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib", PROJECT_NAME + "/other/dir/OtherPathLib.py")));
-        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(0)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "module", PROJECT_NAME + "/module/__init__.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(1))
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPathLib",
+                        PROJECT_NAME + "/other/dir/OtherPathLib.py")));
+        assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries().get(2)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "SomePathLib", PROJECT_NAME + "/libs/SomePathLib.py")));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
                 createImport(ADDED, "module", projectProvider.getFile("module/__init__.py"),

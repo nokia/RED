@@ -56,34 +56,6 @@ public class LibraryLocationFinder {
             final LibrarySpecification libSpec) {
         final IPath libPath = RedWorkspace.Paths
                 .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getFilepath()));
-        final Optional<IPath> libPathToModule = tryToFindPathToModule(libPath);
-        if (libPathToModule.isPresent()) {
-            return libPathToModule;
-        }
-        final Optional<IPath> libPathWithExtension = tryToFindPathWithExtension(libPath);
-        if (libPathWithExtension.isPresent()) {
-            return libPathWithExtension;
-        } else if (libSpec.getName().contains(".")) {
-            final Optional<IPath> pathWithoutQualifiedPart = tryToFindPathWithoutQualifiedPart(libPath);
-            if (pathWithoutQualifiedPart.isPresent()) {
-                return pathWithoutQualifiedPart;
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<IPath> tryToFindPathWithExtension(final IPath libPath) {
-        final IPath pathWithExtension = libPath.addFileExtension("py");
-        return Optional.of(pathWithExtension).filter(path -> path.toFile().exists());
-    }
-
-    private static Optional<IPath> tryToFindPathWithoutQualifiedPart(final IPath libPath) {
-        final IPath pathWithoutQualifiedPart = libPath.removeLastSegments(1).addFileExtension("py");
-        return Optional.of(pathWithoutQualifiedPart).filter(path -> path.toFile().exists());
-    }
-
-    private static Optional<IPath> tryToFindPathToModule(final IPath libPath) {
-        final IPath pathToModule = libPath.append("__init__.py");
-        return Optional.of(pathToModule).filter(path -> path.toFile().exists());
+        return Optional.of(libPath).filter(path -> path.toFile().exists());
     }
 }

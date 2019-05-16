@@ -55,14 +55,11 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.robot",
-                "*** Keywords ***",
-                "res_kw",
-                "  log  10");
+        projectProvider.createFile("file.robot", "*** Keywords ***", "res_kw", "  log  10");
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
-                projectProvider.getProject().getName()));
+                projectProvider.getProject().getName() + ".py"));
 
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
@@ -78,10 +75,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenRegionsIsOutsideOfFile() throws Exception {
-        final IFile file = projectProvider.createFile("f0.robot",
-                "*** Test Cases ***",
-                "case",
-                "  Log  10");
+        final IFile file = projectProvider.createFile("f0.robot", "*** Test Cases ***", "case", "  Log  10");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
 
@@ -95,14 +89,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenGivenLocationIsNotOverKeyword() throws Exception {
-        final IFile file = projectProvider.createFile("f1.robot",
-                "*** Test Cases ***",
-                "case",
-                "  kw1  ${x}",
-                "  kw2  ${y}",
-                "*** Keywords ***",
-                "kw1",
-                "kw2");
+        final IFile file = projectProvider.createFile("f1.robot", "*** Test Cases ***", "case", "  kw1  ${x}",
+                "  kw2  ${y}", "*** Keywords ***", "kw1", "kw2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
 
@@ -134,10 +122,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInKeywordsTable() throws Exception {
-        final IFile file = projectProvider.createFile("f2.robot",
-                "*** Test Cases ***",
-                "case",
-                "  kw1  ${x}");
+        final IFile file = projectProvider.createFile("f2.robot", "*** Test Cases ***", "case", "  kw1  ${x}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
@@ -154,12 +139,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInResourceFile() throws Exception {
-        final IFile file = projectProvider.createFile("f3.robot",
-                "*** Test Cases ***",
-                "case",
-                "  kw1  ${x}",
-                "*** Settings ***",
-                "Resource  file.robot");
+        final IFile file = projectProvider.createFile("f3.robot", "*** Test Cases ***", "case", "  kw1  ${x}",
+                "*** Settings ***", "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
@@ -176,12 +157,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInLibrary() throws Exception {
-        final IFile file = projectProvider.createFile("f4.robot",
-                "*** Test Cases ***",
-                "case",
-                "  some_kw  ${x}",
-                "*** Settings ***",
-                "Library  testlib");
+        final IFile file = projectProvider.createFile("f4.robot", "*** Test Cases ***", "case", "  some_kw  ${x}",
+                "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
@@ -202,12 +179,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInKeywordsTable() throws Exception {
-        final IFile file = projectProvider.createFile("f5.robot",
-                "*** Test Cases ***",
-                "case",
-                "  kw1  ${x}",
-                "*** Keywords ***",
-                "kw1");
+        final IFile file = projectProvider.createFile("f5.robot", "*** Test Cases ***", "case", "  kw1  ${x}",
+                "*** Keywords ***", "kw1");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotKeywordDefinition kw1 = suiteFile.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
@@ -231,17 +204,15 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInResourceFile() throws Exception {
-        final IFile file = projectProvider.createFile("f6.robot",
-                "*** Test Cases ***",
-                "case",
-                "  res_kw  ${x}",
-                "*** Settings ***",
-                "Resource  file.robot");
+        final IFile file = projectProvider.createFile("f6.robot", "*** Test Cases ***", "case", "  res_kw  ${x}",
+                "*** Settings ***", "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotSuiteFile resSuiteFile = model.createSuiteFile(projectProvider.getFile("file.robot"));
-        final RobotKeywordDefinition resKw = resSuiteFile.findSection(RobotKeywordsSection.class).get()
-                .getChildren().get(0);
+        final RobotKeywordDefinition resKw = resSuiteFile.findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0);
         final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
@@ -264,12 +235,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInLibrary() throws Exception {
-        final IFile file = projectProvider.createFile("f7.robot",
-                "*** Test Cases ***",
-                "case",
-                "  lib_kw  ${x}",
-                "*** Settings ***",
-                "Library  testlib");
+        final IFile file = projectProvider.createFile("f7.robot", "*** Test Cases ***", "case", "  lib_kw  ${x}",
+                "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
@@ -299,16 +266,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void hyperlinksAreProvided_whenKeywordIsUsedInGherkinStyle() throws Exception {
-        final IFile file = projectProvider.createFile("f8.robot",
-                "*** Test Cases ***",
-                "case",
-                "  given kw",
-                "  and kw",
-                "  but kw",
-                "  when kw",
-                "  then kw",
-                "*** Keywords ***",
-                "kw");
+        final IFile file = projectProvider.createFile("f8.robot", "*** Test Cases ***", "case", "  given kw",
+                "  and kw", "  but kw", "  when kw", "  then kw", "*** Keywords ***", "kw");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(projectProvider.getFileContent(file));
@@ -336,18 +295,11 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void multipleHyperlinksAreProvided_whenKeywordIsDefinedMultipleTimes() throws Exception {
-        final IFile file = projectProvider.createFile("f9.robot",
-                "*** Test Cases ***",
-                "case",
-                "  res_kw  ${x}",
-                "*** Keywords ***",
-                "res_kw",
-                "*** Settings ***",
-                "Resource  file.robot");
+        final IFile file = projectProvider.createFile("f9.robot", "*** Test Cases ***", "case", "  res_kw  ${x}",
+                "*** Keywords ***", "res_kw", "*** Settings ***", "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final RobotKeywordDefinition kw = suiteFile.findSection(RobotKeywordsSection.class)
-                .get().getChildren().get(0);
+        final RobotKeywordDefinition kw = suiteFile.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
         final Document document = new Document(projectProvider.getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
@@ -369,11 +321,14 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         assertThat(hyperlinks[2]).isInstanceOf(CompoundHyperlink.class);
         assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks()).hasSize(2);
         assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks().get(0)).isInstanceOf(RegionsHyperlink.class);
-        assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks().get(1)).isInstanceOf(SuiteFileSourceRegionHyperlink.class);
+        assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks().get(1))
+                .isInstanceOf(SuiteFileSourceRegionHyperlink.class);
 
         assertThat(hyperlinks[3]).isInstanceOf(CompoundHyperlink.class);
         assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks()).hasSize(2);
-        assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(0)).isInstanceOf(UserKeywordDocumentationHyperlink.class);
-        assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(1)).isInstanceOf(UserKeywordDocumentationHyperlink.class);
+        assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(0))
+                .isInstanceOf(UserKeywordDocumentationHyperlink.class);
+        assertThat(((CompoundHyperlink) hyperlinks[3]).getHyperlinks().get(1))
+                .isInstanceOf(UserKeywordDocumentationHyperlink.class);
     }
 }

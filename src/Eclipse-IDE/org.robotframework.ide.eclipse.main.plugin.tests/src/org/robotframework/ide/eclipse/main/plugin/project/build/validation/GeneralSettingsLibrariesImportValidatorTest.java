@@ -148,8 +148,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryIsImportedWithToManyNamedArguments() {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=60  timeout=30");
 
-        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(62, 72))));
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(62, 72))));
     }
 
     @Test
@@ -182,8 +182,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryIsImportedWithNamedUriNotInConfig() {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000");
 
-        assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 59))));
     }
 
@@ -489,8 +489,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 60))),
-                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
-                        new ProblemPosition(2, Range.closed(62, 75))));
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(62, 75))));
     }
 
     @Test
@@ -500,8 +499,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(49, 75))),
-                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
-                        new ProblemPosition(2, Range.closed(34, 47))));
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(34, 47))));
     }
 
     @Test
@@ -511,8 +509,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))),
-                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
-                        new ProblemPosition(2, Range.closed(34, 47))));
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(34, 47))));
     }
 
     @Test
@@ -522,8 +519,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))),
-                new Problem(ArgumentProblem.INVALID_TIME_FORMAT,
-                        new ProblemPosition(2, Range.closed(58, 63))));
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(58, 63))));
     }
 
     @Test
@@ -681,7 +677,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
 
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
+                libPath + "/" + libName + ".py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -900,7 +897,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final IFile libFile = projectProvider.createFile("lib.py");
 
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
+                libPath + "/" + libName + ".py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -919,7 +917,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFolder dir = projectProvider.createDir("directory");
         projectProvider.createFile("directory/lib.py");
 
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
+                libPath + "/" + libName + ".py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -939,7 +938,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFolder dir2 = projectProvider.createDir("directory/lib");
         projectProvider.createFile("directory/lib/__init__.py");
 
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
+                libPath + "/" + libName + "/__init__.py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -1019,7 +1019,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFolder dir2 = projectProvider.createDir("directory/lib");
         projectProvider.createFile("directory/lib/__init__.py");
 
-        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
+                libPath + "/" + libName + ".py");
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
@@ -1267,9 +1268,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private RobotSuiteFile createLibraryImportingSuite(final String toImport) {
         try {
-            final IFile file = projectProvider.createFile("suite.robot",
-                    "*** Settings ***",
-                    "Library  " + toImport);
+            final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  " + toImport);
             final RobotSuiteFile suite = model.createSuiteFile(file);
             suite.dispose();
             return suite;

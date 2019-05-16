@@ -54,12 +54,13 @@ public class RedXmlInFileChangesCollectorTest {
         config.addExcludedPath("a");
         config.addExcludedPath("a/b");
         config.addExcludedPath("c");
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs"));
-        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib", PROJECT_NAME + "/libs"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs/lib.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib",
+                PROJECT_NAME + "/libs/inner_lib/__init__.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib.inside",
+                PROJECT_NAME + "/libs/inner_lib/inside.py"));
         config.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "inner_lib.inside", PROJECT_NAME + "/libs"));
-        config.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/inner_lib"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/inner_lib/inside.py"));
         projectProvider.configure(config);
     }
 
@@ -129,7 +130,7 @@ public class RedXmlInFileChangesCollectorTest {
         final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
         assertThat(config.getReferencedLibraries()).hasSize(1);
         assertThat(config.getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs/lib.py")));
     }
 
     @Test
@@ -146,13 +147,13 @@ public class RedXmlInFileChangesCollectorTest {
         final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
         assertThat(config.getReferencedLibraries()).hasSize(4);
         assertThat(config.getReferencedLibraries().get(0))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs")));
-        assertThat(config.getReferencedLibraries().get(1))
-                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moved", PROJECT_NAME + "/libs")));
-        assertThat(config.getReferencedLibraries().get(2)).has(
-                sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moved.inside", PROJECT_NAME + "/libs")));
-        assertThat(config.getReferencedLibraries().get(3)).has(
-                sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/moved")));
+                .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "lib", PROJECT_NAME + "/libs/lib.py")));
+        assertThat(config.getReferencedLibraries().get(1)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "moved", PROJECT_NAME + "/libs/moved/__init__.py")));
+        assertThat(config.getReferencedLibraries().get(2)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "moved.inside", PROJECT_NAME + "/libs/moved/inside.py")));
+        assertThat(config.getReferencedLibraries().get(3)).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "inside", PROJECT_NAME + "/libs/moved/inside.py")));
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {
