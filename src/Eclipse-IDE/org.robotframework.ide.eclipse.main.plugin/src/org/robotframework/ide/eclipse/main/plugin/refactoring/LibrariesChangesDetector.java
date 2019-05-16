@@ -5,15 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.joining;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -104,51 +103,87 @@ class LibrariesChangesDetector {
         // in case of Python libraries part of path can be encoded in name separated by dots
         // (pythonic notation for modules)
         final List<String> segmentedName = Splitter.on('.').splitToList(pythonLibrary.getName());
+        final IPath potentiallyAffectedPath = Path.fromPortableString(pythonLibrary.getPath());
 
-        for (int i = 0; i <= segmentedName.size(); i++) {
-            // the module may be a directory or .py file
-            for (final String extension : newHashSet("", ".py")) {
+        if (afterRefactorPath.isPresent()) {
 
-                final List<String> currentPartFromName = segmentedName.subList(0, i);
-                final String partOfPathFromName = currentPartFromName.stream()
-                        .collect(joining("/", currentPartFromName.isEmpty() ? "" : "/", ""));
+            final Optional<IPath> transformedPath = Changes.transformAffectedPath(beforeRefactorPath,
+                    afterRefactorPath.get(), potentiallyAffectedPath);
+            if (transformedPath.isPresent()) {
+                final String name = getNewLibraryName(segmentedName);
+                final String path = transformedPath.get().makeRelative().toPortableString();
 
-                final IPath potentiallyAffectedPath = Path
-                        .fromPortableString(pythonLibrary.getPath() + partOfPathFromName + extension);
+                final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, name, path);
+                processor.pathModified(pythonLibrary, modifiedLibrary);
+                return;
+            }
 
-                if (afterRefactorPath.isPresent()) {
+        } else if (beforeRefactorPath.isPrefixOf(potentiallyAffectedPath)) {
+            processor.pathRemoved(config, pythonLibrary);
+            return;
+        }
+    }
 
-                    final Optional<IPath> transformedPath = Changes.transformAffectedPath(beforeRefactorPath,
-                            afterRefactorPath.get(), potentiallyAffectedPath);
-                    if (transformedPath.isPresent()) {
+    private String getNewLibraryName(final List<String> segmentedName) {
+        final String[] beforeSegments = beforeRefactorPath.removeFileExtension().segments();
+        final String[] afterSegments = afterRefactorPath.get().removeFileExtension().segments();
+        final Range nameInPath = getNameRangeInPath(segmentedName.toArray(new String[segmentedName.size()]),
+                beforeSegments);
+        final Range changeInBeforePath = getChangeRangeInPaths(beforeSegments, afterSegments);
+        final String changedNamePart = getNewNamePart(beforeSegments, afterSegments, changeInBeforePath);
 
-                        final String affectedSegment = beforeRefactorPath.removeFileExtension().lastSegment();
-                        final int changedSegmentId = segmentedName.lastIndexOf(affectedSegment);
-                        final int nameToPathCorrection = beforeRefactorPath.segmentCount() - 1 - changedSegmentId;
-                        List<String> newNameSegments = new ArrayList<>();
-                        for (int j = 0; j < segmentedName.size(); j++) {
-                            newNameSegments.add(j <= changedSegmentId
-                                    ? transformedPath.get().removeFileExtension().segment(j + nameToPathCorrection)
-                                    : segmentedName.get(j));
-                        }
-
-                        final String name = newNameSegments.stream().collect(joining("."));
-                        final String path = transformedPath.get()
-                                .makeRelative()
-                                .removeLastSegments(i)
-                                .toPortableString();
-
-                        final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, name,
-                                path);
-                        processor.pathModified(pythonLibrary, modifiedLibrary);
-                        return;
-                    }
-
-                } else if (beforeRefactorPath.isPrefixOf(potentiallyAffectedPath)) {
-                    processor.pathRemoved(config, pythonLibrary);
-                    return;
+        List<String> name = new ArrayList<>();
+        for (int i = 0; i < beforeSegments.length; i++) {
+            if (nameInPath.contains(i)) {
+                if (changeInBeforePath.contains(i)) {
+                    name.add(changedNamePart);
+                    i = changeInBeforePath.end - 1;
+                } else {
+                    name.add(beforeSegments[i]);
                 }
             }
         }
+        // add unmodified name part and possible class name
+        for (int i = nameInPath.size(); i < segmentedName.size(); i++) {
+            name.add(segmentedName.get(i));
+        }
+        return String.join(".", name);
+    }
+
+    private String getNewNamePart(String[] beforeSegments, String[] afterSegments, Range changeInBeforePath) {
+        final int lastSegmentsToRemove = beforeSegments.length - changeInBeforePath.end + 1;
+        return String.join(".", Arrays.copyOfRange(afterSegments, changeInBeforePath.start,
+                afterSegments.length - lastSegmentsToRemove + 1));
+    }
+
+    private Range getNameRangeInPath(final String[] segmentedName, String[] beforeSegments) {
+        if ("__init__".equals(beforeSegments[beforeSegments.length - 1])) {
+            beforeSegments = Arrays.copyOfRange(beforeSegments, 0, beforeSegments.length - 1);
+        }
+        final String pathToCompare = String.join(".", beforeSegments);
+        for (int i = segmentedName.length; i > 0; i--) {
+            if (pathToCompare.endsWith(String.join(".", Arrays.copyOfRange(segmentedName, 0, i)))) {
+                return new Range(beforeSegments.length - i, beforeSegments.length);
+            }
+        }
+        return new Range(-1, -1);
+    }
+
+    private Range getChangeRangeInPaths(final String[] beforeSegments, final String[] afterSegments) {
+        final Range result = new Range(0, 0);
+        for (int i = 0; i < beforeSegments.length && i < afterSegments.length; i++) {
+            if (!beforeSegments[i].equals(afterSegments[i])) {
+                result.start = i;
+                break;
+            }
+        }
+        final int pathShift = afterSegments.length - beforeSegments.length;
+        for (int i = beforeSegments.length - 1; i > 0 && i + pathShift >= 0; i--) {
+            if (!beforeSegments[i].equals(afterSegments[i + pathShift])) {
+                result.end = i + 1;
+                return result;
+            }
+        }
+        return result;
     }
 }

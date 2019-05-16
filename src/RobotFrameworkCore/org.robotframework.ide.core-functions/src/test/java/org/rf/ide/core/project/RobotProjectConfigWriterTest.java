@@ -1,8 +1,8 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.rf.ide.core.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +17,7 @@ public class RobotProjectConfigWriterTest {
     @Test
     public void javaLibraryIsProperlyWrittenAsFragment() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.JAVA, "java_lib", "path/to/lib");
-        
+
         final String fragment = new RobotProjectConfigWriter().writeFragment(library);
         assertThat(fragment).doesNotContain("<%xml")
                 .contains("<referencedLibrary")
@@ -30,7 +30,7 @@ public class RobotProjectConfigWriterTest {
     public void virtualLibraryIsProperlyWrittenAsFragment() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.VIRTUAL, "my_lib",
                 "path/to/libspec.xml");
-        
+
         final String fragment = new RobotProjectConfigWriter().writeFragment(library);
         assertThat(fragment).doesNotContain("<%xml")
                 .contains("<referencedLibrary")
@@ -41,26 +41,28 @@ public class RobotProjectConfigWriterTest {
 
     @Test
     public void pythonLibraryIsProperlyWrittenAsFragment() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "module.class", "path/to/lib");
-        
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "module.class",
+                "path/to/lib/module.py");
+
         final String fragment = new RobotProjectConfigWriter().writeFragment(library);
         assertThat(fragment).doesNotContain("<%xml")
                 .contains("<referencedLibrary")
                 .contains("type=\"PYTHON\"")
                 .contains("name=\"module.class\"")
-                .contains("path=\"path/to/lib\"");
+                .contains("path=\"path/to/lib/module.py\"");
     }
 
     @Test
     public void libraryIsProperlyWrittenAsFragment_withNonAsciiCharacters() {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "module.ąęółżźćń", "path/ą/ę");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "module.ąęółżźćń",
+                "path/ą/ę/module.py");
 
         final String fragment = new RobotProjectConfigWriter().writeFragment(library);
         assertThat(fragment).doesNotContain("<%xml")
                 .contains("<referencedLibrary")
                 .contains("type=\"PYTHON\"")
                 .contains("name=\"module.ąęółżźćń\"")
-                .contains("path=\"path/ą/ę\"");
+                .contains("path=\"path/ą/ę/module.py\"");
     }
 
     @Test
@@ -68,9 +70,7 @@ public class RobotProjectConfigWriterTest {
         final ExcludedPath path = ExcludedPath.create("some/excluded/path");
 
         final String fragment = new RobotProjectConfigWriter().writeFragment(path);
-        assertThat(fragment).doesNotContain("<%xml")
-                .contains("<excludedPath")
-                .contains("path=\"some/excluded/path\"");
+        assertThat(fragment).doesNotContain("<%xml").contains("<excludedPath").contains("path=\"some/excluded/path\"");
     }
 
     @Test
@@ -78,9 +78,7 @@ public class RobotProjectConfigWriterTest {
         final ExcludedPath path = ExcludedPath.create("ą/ę");
 
         final String fragment = new RobotProjectConfigWriter().writeFragment(path);
-        assertThat(fragment).doesNotContain("<%xml")
-                .contains("<excludedPath")
-                .contains("path=\"ą/ę\"");
+        assertThat(fragment).doesNotContain("<%xml").contains("<excludedPath").contains("path=\"ą/ę\"");
     }
 
 }

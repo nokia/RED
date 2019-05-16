@@ -1,14 +1,13 @@
 /*
-* Copyright 2018 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2018 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.rf.ide.core.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -52,26 +51,27 @@ public class LibraryDescriptorTest {
         assertThat(descriptor.isReferencedLibrary()).isFalse();
         assertThat(descriptor.getKeywordsScope()).isEqualTo(KeywordScope.STD_LIBRARY);
 
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofStandardRemoteLibrary(RemoteLocation.create("http://uri")))).isTrue();
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofStandardRemoteLibrary(RemoteLocation.create("http://otheruri")))).isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri"))))
+                .isTrue();
+        assertThat(
+                descriptor.equals(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://otheruri"))))
+                        .isFalse();
 
-        assertThat(descriptor.hashCode()).isEqualTo(LibraryDescriptor
-                .ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).hashCode());
-        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofStandardRemoteLibrary(RemoteLocation.create("http://otheruri")).hashCode());
+        assertThat(descriptor.hashCode())
+                .isEqualTo(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(
+                LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://otheruri")).hashCode());
     }
 
     @Test
     public void testReferencedLibraryDescriptorProperties() {
         final LibraryDescriptor descriptor = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"));
 
         assertThat(descriptor.getName()).isEqualTo("lib");
         assertThat(descriptor.getArguments()).isEmpty();
         assertThat(descriptor.getLibraryType()).isEqualTo(LibraryType.PYTHON);
-        assertThat(descriptor.getPath()).isEqualTo("path/to/library");
+        assertThat(descriptor.getPath()).isEqualTo("path/to/library/lib.py");
         assertThat(descriptor.getKeywordsScope()).isEqualTo(KeywordScope.REF_LIBRARY);
 
         assertThat(descriptor.isStandardLibrary()).isFalse();
@@ -79,22 +79,30 @@ public class LibraryDescriptorTest {
         assertThat(descriptor.isReferencedLibrary()).isTrue();
 
         assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library")))).isTrue();
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))))
+                        .isTrue();
         assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library")))).isFalse();
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"))))
+                        .isFalse();
         assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library")))).isFalse();
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"))))
+                        .isFalse();
         assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other")))).isFalse();
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"))))
+                        .isFalse();
 
         assertThat(descriptor.hashCode()).isEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library")).hashCode());
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))
+                .hashCode());
         assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library")).hashCode());
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"))
+                .hashCode());
         assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library")).hashCode());
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"))
+                .hashCode());
         assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other")).hashCode());
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"))
+                .hashCode());
     }
 
     @Test
@@ -103,11 +111,12 @@ public class LibraryDescriptorTest {
         assertThat(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).getFilepath())
                 .isNull();
         assertThat(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library"))
-                .getFilepath()).isEqualTo("path/to/library/lib");
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))
+                .getFilepath()).isEqualTo("path/to/library/lib.py");
         assertThat(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib.a.b", "path/to/library"))
-                .getFilepath()).isEqualTo("path/to/library/lib/a/b");
+                .ofReferencedLibrary(
+                        ReferencedLibrary.create(LibraryType.PYTHON, "lib.a.b", "path/to/library/lib/a.py"))
+                .getFilepath()).isEqualTo("path/to/library/lib/a.py");
     }
 
     @Test
@@ -128,7 +137,7 @@ public class LibraryDescriptorTest {
     @Test
     public void filenameOfReferencedLibraryIsItsNameWithAbbreviatedHashedSuffix() {
         final LibraryDescriptor descriptor = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"));
 
         assertThat(descriptor.generateLibspecFileName()).matches("^lib_[0-9a-fA-F]{7}$");
     }

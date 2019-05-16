@@ -40,7 +40,7 @@ public class KeywordDocumentationHyperlinkTest {
     @Before
     public void before() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
-                projectProvider.getProject().getName());
+                projectProvider.getProject().getName() + "/testlib.py");
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
@@ -48,9 +48,8 @@ public class KeywordDocumentationHyperlinkTest {
         projectProvider.createFile("testlib.py");
         projectProvider.configure(config);
 
-        final Map<LibraryDescriptor, LibrarySpecification> refLibs = Libraries.createRefLib(
-                ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName()),
-                "keyword");
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = Libraries.createRefLib(ReferencedLibrary.create(
+                LibraryType.PYTHON, "testlib", projectProvider.getProject().getName() + "/testlib.py"), "keyword");
         libSpec = refLibs.values().iterator().next();
         kwSpec = libSpec.getKeywords().get(0);
 
