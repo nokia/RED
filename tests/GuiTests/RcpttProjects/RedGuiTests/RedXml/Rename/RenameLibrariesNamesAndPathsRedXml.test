@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/13/19 3:19 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/16/19 4:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -130,16 +130,19 @@ with [get-view "Project Explorer" | get-tree] {
     select "RobotProjectTwo/only_function.py" | get-menu "Robot Framework/Add Library to red.xml" | click
 }
 // verify if libraries is in Robot Referenced libraries of second project
-get-view "Project Explorer" | get-tree 
-    | get-item "RobotProjectTwo/Robot Referenced libraries/only_function RobotProjectTwo \\(1\\)" 
-    | get-property caption | equals "only_function RobotProjectTwo (1)" | verify-true
+get-view "Project Explorer" | get-tree | get-item 
+    -path "RobotProjectTwo/Robot Referenced libraries/only_function RobotProjectTwo\\/only_function.py \\(1\\)" 
+    | get-property caption | equals "only_function RobotProjectTwo/only_function.py (1)" | verify-true
+    
+    
 // verify if libraries is in Robot Referenced libraries of first project
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "here_is_classNewName RobotProject/folder (0)" | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "only_function RobotProject (1)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "here_is_classNewName RobotProject/folder/here_is_classNewName.py (0)" | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "only_function RobotProject/only_function.py (1)" | verify-true
 }
+
 // rename Suite with UTF-8 chars
 get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | get-menu "Rename..." | click
 with [get-window "Rename Resource"] {
