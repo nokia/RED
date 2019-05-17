@@ -25,6 +25,7 @@ import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -150,9 +151,11 @@ public class ReferencedLibraryLocator {
     }
 
     private Entry<File, Collection<ReferencedLibrary>> importPythonModuleLibrary(final File libraryFile) {
+
         return importLibsFromFileWithCaching(new LibImportCacheKey(libraryFile, null),
                 () -> newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getParentFile().getName(),
-                        new Path(libraryFile.getPath()).toPortableString())));
+                        RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(libraryFile.getAbsolutePath()))
+                                .toPortableString())));
     }
 
     private Entry<File, Collection<ReferencedLibrary>> importLibsFromFileWithCaching(final LibImportCacheKey key,

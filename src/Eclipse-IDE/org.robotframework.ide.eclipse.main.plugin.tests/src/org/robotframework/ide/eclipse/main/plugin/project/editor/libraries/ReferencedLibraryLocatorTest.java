@@ -42,6 +42,7 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -49,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Refer
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReferencedLibraryLocatorTest {
@@ -176,7 +178,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq("dir_lib.py"),
                 eq(projectProvider.getFile("dir_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", PROJECT_NAME + "/dir_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -194,7 +196,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq("${CURDIR}/dir_lib.py"),
                 eq(projectProvider.getFile("dir_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", PROJECT_NAME + "/dir_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -209,7 +211,7 @@ public class ReferencedLibraryLocatorTest {
         verify(detector).libraryDetectedByPath(eq(absolutePath),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getFile("python_path/py_module/__init__.py"))));
+                        PROJECT_NAME + "/python_path/py_module/__init__.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -224,7 +226,7 @@ public class ReferencedLibraryLocatorTest {
         verify(detector).libraryDetectedByPath(eq(absolutePath + "/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getFile("python_path/py_module/__init__.py"))));
+                        PROJECT_NAME + "/python_path/py_module/__init__.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -239,7 +241,7 @@ public class ReferencedLibraryLocatorTest {
         verify(detector).libraryDetectedByPath(eq(relativePath + "/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getFile("python_path/py_module/__init__.py"))));
+                        PROJECT_NAME + "/python_path/py_module/__init__.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -309,7 +311,7 @@ public class ReferencedLibraryLocatorTest {
         verify(detector).libraryDetectedByName(eq("py_module"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
                 argThat(isSingleLibrary(LibraryType.PYTHON, "py_module",
-                        projectProvider.getFile("python_path/py_module/__init__.py"))));
+                        PROJECT_NAME + "/python_path/py_module/__init__.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -327,7 +329,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByName(eq("path_lib"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -345,7 +347,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByName(eq("dir_lib"),
                 eq(projectProvider.getFile("dir_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", PROJECT_NAME + "/dir_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -369,7 +371,7 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByName(eq("JavaLib"),
                 eq(projectProvider.getFile("JavaLib.jar").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.JAVA, "JavaLib", libResource)));
+                argThat(isSingleLibrary(LibraryType.JAVA, "JavaLib", PROJECT_NAME + "/JavaLib.jar")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -389,13 +391,13 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq("python_path/path_lib.py"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verify(detector).libraryDetectedByPath(eq("./python_path/path_lib.py"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verify(detector).libraryDetectedByPath(eq("../" + PROJECT_NAME + "/python_path/path_lib.py"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -417,10 +419,10 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq("python_path/Path_Lib.py"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verify(detector).libraryDetectedByPath(eq("../" + PROJECT_NAME + "/python_path/../python_path/PaTh_LiB.py"),
                 eq(projectProvider.getFile("python_path/path_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "path_lib", PROJECT_NAME + "/python_path/path_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -460,13 +462,13 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector, times(3)).libraryDetectedByName(eq("NameA"),
                 eq(projectProvider.getFile("JavaLib.jar").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.JAVA, "NameA", libResource)));
+                argThat(isSingleLibrary(LibraryType.JAVA, "NameA", PROJECT_NAME + "/JavaLib.jar")));
         verify(detector, times(2)).libraryDetectedByName(eq("NameB"),
                 eq(projectProvider.getFile("JavaLib.jar").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.JAVA, "NameB", libResource)));
+                argThat(isSingleLibrary(LibraryType.JAVA, "NameB", PROJECT_NAME + "/JavaLib.jar")));
         verify(detector, times(1)).libraryDetectedByName(eq("NameC"),
                 eq(projectProvider.getFile("JavaLib.jar").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.JAVA, "NameC", libResource)));
+                argThat(isSingleLibrary(LibraryType.JAVA, "NameC", PROJECT_NAME + "/JavaLib.jar")));
         verifyNoMoreInteractions(detector);
     }
 
@@ -486,35 +488,39 @@ public class ReferencedLibraryLocatorTest {
 
         verify(detector).libraryDetectedByPath(eq(libResource.getLocation().toOSString()),
                 eq(projectProvider.getFile("dir_lib.py").getLocation().toFile()),
-                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", libResource)));
+                argThat(isSingleLibrary(LibraryType.PYTHON, "dir_lib", PROJECT_NAME + "/dir_lib.py")));
         verifyNoMoreInteractions(detector);
     }
 
     private void setupJavaImport(final IResource libResource) {
         final String name = libResource.getLocation().removeFileExtension().lastSegment();
-        final String path = libResource.getLocation().toPortableString();
+        final String path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(libResource.getLocation())
+                .toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.JAVA, name, path);
-        when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
+        when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class), any(RobotProjectConfig.class),
+                any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupJavaImport(final IResource libResource, final String name) {
-        final String path = libResource.getLocation().toPortableString();
+        final String path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(libResource.getLocation())
+                .toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.JAVA, name, path);
-        when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class),
-                any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
+        when(importer.importJavaLib(any(IRuntimeEnvironment.class), any(IProject.class), any(RobotProjectConfig.class),
+                any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupPythonImport(final IResource libResource) {
         final String name = libResource.getLocation().removeFileExtension().lastSegment();
-        final String path = libResource.getLocation().toPortableString();
+        final String path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(libResource.getLocation())
+                .toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, name, path);
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
                 any(RobotProjectConfig.class), any(File.class))).thenReturn(Collections.singletonList(lib));
     }
 
     private void setupPythonImport(final IResource libResource, final String name) {
-        final String path = libResource.getLocation().toPortableString();
+        final String path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(libResource.getLocation())
+                .toPortableString();
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, name, path);
         when(importer.importPythonLib(any(IRuntimeEnvironment.class), any(IProject.class),
                 any(RobotProjectConfig.class), any(File.class), eq(name))).thenReturn(Collections.singletonList(lib));
@@ -533,12 +539,14 @@ public class ReferencedLibraryLocatorTest {
     }
 
     static ArgumentMatcher<Collection<ReferencedLibrary>> isSingleLibrary(final LibraryType type, final String name,
-            final IResource resource) {
+            final String path) {
         return toMatch -> {
-            final Optional<ReferencedLibrary> first = toMatch.stream().findFirst();
-            return toMatch.size() == 1 && first.isPresent() && Objects.equal(type.toString(), first.get().getType())
-                    && Objects.equal(name, first.get().getName())
-                    && Objects.equal(resource.getLocation().toPortableString(), first.get().getPath());
+            if (toMatch.size() != 1) {
+                return false;
+            }
+            final ReferencedLibrary first = Iterables.getOnlyElement(toMatch);
+            return Objects.equal(type.toString(), first.getType()) && Objects.equal(name, first.getName())
+                    && Objects.equal(path, first.getPath());
         };
     }
 
