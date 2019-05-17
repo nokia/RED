@@ -38,7 +38,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
         // instance of this class should not be created outside
     }
 
-    synchronized List<PythonProcessListener> getListeners() {
+    List<PythonProcessListener> getListeners() {
         // copy for avoiding concurrent modification
         return Collections.unmodifiableList(new ArrayList<>(processListeners));
     }

@@ -427,6 +427,15 @@ def __shutdown_server_when_parent_process_becomes_unavailable(server):
     server.shutdown()
 
 
+def __get_script_path():
+    is_py2 = sys.version_info < (3, 0, 0)
+    is_tty = sys.stdout.isatty()
+    
+    decoded = __file__.decode(sys.getfilesystemencoding()) if is_py2 else __file__
+    encoded = decoded.encode(sys.stdout.encoding if is_tty else 'utf-8')
+    return encoded if is_py2 else str(encoded, 'utf-8')
+
+
 if __name__ == '__main__':
     from threading import Thread
     import socket
@@ -469,7 +478,7 @@ if __name__ == '__main__':
     print('# RED session server started @' + str(PORT))
     print('# python version: ' + sys.version)
     print('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
-    print('# script path: ' + str(__file__.encode('utf-8')))
+    print('# script path: ' + __get_script_path())
     print('\n')
 
     server.serve_forever()
