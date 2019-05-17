@@ -498,7 +498,10 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             private Process process;
 
             private void start(final String serverPath, final int port) throws IOException {
-                process = new ProcessBuilder(interpreterPath, serverPath, String.valueOf(port)).start();
+                final ProcessBuilder processBuilder = new ProcessBuilder(interpreterPath, serverPath,
+                        String.valueOf(port));
+                processBuilder.environment().put("PYTHONIOENCODING", "utf8");
+                process = processBuilder.start();
 
                 final Semaphore semaphore = new Semaphore(0);
                 startStdOutReadingThread(semaphore);
