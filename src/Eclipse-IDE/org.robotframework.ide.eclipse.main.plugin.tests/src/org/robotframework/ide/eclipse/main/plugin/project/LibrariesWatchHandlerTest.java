@@ -83,7 +83,7 @@ public class LibrariesWatchHandlerTest {
     }
 
     @Test
-    public void testRegisterPythonLibrary_whenLibraryPathIsNotDirectory() {
+    public void testRegisterPythonLibrary_whenLibraryIsSimpleFile() {
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -102,37 +102,18 @@ public class LibrariesWatchHandlerTest {
     }
 
     @Test
-    public void testRegisterPythonLibrary_whenLibraryPathIsDirectory() {
-        final IProject project = createNewProjectMock(true);
-        final RobotProject robotProject = createNewRobotProject(project);
-        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
-        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
-                pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
-
-        librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
-
-        assertThat(librariesWatchHandler.getRegisteredPaths()).hasSize(1)
-                .containsEntry(PYTHON_LIBRARY_FILE_NAME, pythonLibraryFile.getParentFile().getPath());
-        assertThat(librariesWatchHandler.getRegisteredRefLibraries()).hasSize(1)
-                .containsEntry(referencedLibrary, new Path(pythonLibraryFile.getPath()).toPortableString());
-        assertThat(librariesWatchHandler.getLibrarySpecifications().get(libSpec)).hasSize(1)
-                .containsOnly(pythonLibraryFile.getName());
-    }
-
-    @Test
     public void testRegisterPythonLibrary_whenMultipleClassesFromLibraryAreUsed() {
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
-                pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
+                pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
         final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
-                pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
+                pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         final ReferencedLibrary referencedLibrary3 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
-                pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
+                pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec3 = createNewLibSpec(referencedLibrary3);
 
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
@@ -161,7 +142,7 @@ public class LibrariesWatchHandlerTest {
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
-                pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
+                pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
@@ -181,7 +162,7 @@ public class LibrariesWatchHandlerTest {
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(JAVA_LIBRARY_NAME,
-                javaLibraryFile.getParentFile().getPath(), LibraryType.JAVA);
+                javaLibraryFile.getPath(), LibraryType.JAVA);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
@@ -230,12 +211,12 @@ public class LibrariesWatchHandlerTest {
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
-                pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
+                pythonLibraryFile.getPath(), LibraryType.PYTHON);
         LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME, pythonLibraryFile.getParentFile().getPath(),
+        referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME, pythonLibraryFile.getPath(),
                 LibraryType.PYTHON);
         libSpec = createNewLibSpec(referencedLibrary);
         final KeywordSpecification kwSpec = createNewKeywordSpec("someNewKeyword", newArrayList("arg"));
@@ -282,8 +263,7 @@ public class LibrariesWatchHandlerTest {
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
-                pythonModuleLibraryFolder.getPath() + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME,
-                LibraryType.PYTHON);
+                pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
@@ -328,8 +308,7 @@ public class LibrariesWatchHandlerTest {
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
-                pythonModuleLibraryFolder.getPath() + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME,
-                LibraryType.PYTHON);
+                pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(1);
@@ -448,8 +427,7 @@ public class LibrariesWatchHandlerTest {
         preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
 
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
-                pythonModuleLibraryFolder.getPath() + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME,
-                LibraryType.PYTHON);
+                pythonModuleLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);
@@ -472,8 +450,7 @@ public class LibrariesWatchHandlerTest {
         preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
 
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
-                pythonModuleLibraryFolder.getPath() + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME,
-                LibraryType.PYTHON);
+                pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);

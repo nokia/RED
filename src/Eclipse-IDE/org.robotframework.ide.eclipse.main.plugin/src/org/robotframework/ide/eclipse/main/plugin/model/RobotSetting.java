@@ -244,27 +244,27 @@ public class RobotSetting extends RobotKeywordCall {
     private Optional<ImportedLibrary> findSpecForPath(final String path) {
         final RobotSuiteFile suiteFile = getSuiteFile();
         final RobotProject project = suiteFile.getRobotProject();
-        final Optional<IPath> possiblePath = new RobotProjectPathsProvider(project)
+        final Optional<IPath> candidate = new RobotProjectPathsProvider(project)
                 .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
                 .map(URI::getPath)
                 .map(Path::new);
-        if (!possiblePath.isPresent()) {
+        if (!candidate.isPresent()) {
             return Optional.empty();
         }
 
         return project.getLibraryEntriesStream()
                 .filter(entry -> entry.getValue() != null)
                 .filter(entry -> entry.getKey().isReferencedLibrary())
-                .filter(entry -> {
-                    final IPath entryPath = new Path(entry.getKey().getPath());
-                    final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-                    final IPath libPath2 = RedWorkspace.Paths
-                            .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-                    return possiblePath.get().equals(libPath1) || possiblePath.get().equals(libPath2);
-                })
+                .filter(entry -> specPathMatches(candidate.get(), new Path(entry.getKey().getPath())))
                 .map(Entry::getValue)
                 .map(spec -> new ImportedLibrary(spec, extractLibraryAlias()))
                 .findFirst();
+    }
+
+    private boolean specPathMatches(final IPath absolutePath, final IPath refLibPath) {
+        return absolutePath.equals(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath))
+                || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.equals(
+                        RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1)));
     }
 
     public Optional<IResource> getImportedResource() {

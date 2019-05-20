@@ -106,17 +106,17 @@ public class LibraryDescriptorTest {
     }
 
     @Test
-    public void filepathIsProperlyProvided() {
-        assertThat(LibraryDescriptor.ofStandardLibrary("StdLib").getFilepath()).isNull();
-        assertThat(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).getFilepath())
+    public void pathIsProperlyProvided() {
+        assertThat(LibraryDescriptor.ofStandardLibrary("StdLib").getPath()).isNull();
+        assertThat(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).getPath())
                 .isNull();
         assertThat(LibraryDescriptor
                 .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))
-                .getFilepath()).isEqualTo("path/to/library/lib.py");
+                .getPath()).isEqualTo("path/to/library/lib.py");
         assertThat(LibraryDescriptor
                 .ofReferencedLibrary(
                         ReferencedLibrary.create(LibraryType.PYTHON, "lib.a.b", "path/to/library/lib/a.py"))
-                .getFilepath()).isEqualTo("path/to/library/lib/a.py");
+                .getPath()).isEqualTo("path/to/library/lib/a.py");
     }
 
     @Test
