@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LISQcBCbEeeG6d5optx6Vw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/31/17 10:07 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/20/19 11:05 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,6 +27,7 @@ get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspectiv
     | get-menu "Run As/1 Robot Test" | click
     
 // console Command should have --argumentfile part
+wait-for-console -times 4 -delay 500
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*\n"
     + "Suite Executor: Robot Framework .*\n"
