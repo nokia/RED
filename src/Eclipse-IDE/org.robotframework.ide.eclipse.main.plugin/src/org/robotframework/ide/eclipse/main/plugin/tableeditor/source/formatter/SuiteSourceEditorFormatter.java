@@ -30,22 +30,6 @@ import com.google.common.base.Strings;
 
 public class SuiteSourceEditorFormatter {
 
-    public void format(final IDocument document, final IRegion region) throws BadLocationException {
-        final String content = document.get(region.getOffset(), region.getLength());
-        final RobotFormatter robotFormatter = createFormatter(document, region);
-        final String formattedContent = format(content, robotFormatter);
-        if (!content.equals(formattedContent)) {
-            document.replace(region.getOffset(), region.getLength(), formattedContent);
-        }
-    }
-
-    private RobotFormatter createFormatter(final IDocument document, final IRegion region) throws BadLocationException {
-        final int regionLastLine = document.getLineOfOffset(region.getOffset() + region.getLength() - 1);
-        final String lineDelimiter = Strings.nullToEmpty(document.getLineDelimiter(0));
-        final boolean skipDelimiterInLastLine = Strings.isNullOrEmpty(document.getLineDelimiter(regionLastLine));
-        return new RobotFormatter(lineDelimiter, skipDelimiterInLastLine);
-    }
-
     public void format(final IDocument document, final List<Integer> lines) throws BadLocationException {
         DocumentRewriteSession session = null;
         if (document instanceof IDocumentExtension4) {
@@ -67,6 +51,22 @@ public class SuiteSourceEditorFormatter {
         }
     }
 
+    public void format(final IDocument document, final IRegion region) throws BadLocationException {
+        final String content = document.get(region.getOffset(), region.getLength());
+        final RobotFormatter robotFormatter = createFormatter(document, region);
+        final String formattedContent = format(content, robotFormatter);
+        if (!content.equals(formattedContent)) {
+            document.replace(region.getOffset(), region.getLength(), formattedContent);
+        }
+    }
+
+    private RobotFormatter createFormatter(final IDocument document, final IRegion region) throws BadLocationException {
+        final int regionLastLine = document.getLineOfOffset(region.getOffset() + region.getLength() - 1);
+        final String lineDelimiter = Strings.nullToEmpty(document.getLineDelimiter(0));
+        final boolean skipDelimiterInLastLine = Strings.isNullOrEmpty(document.getLineDelimiter(regionLastLine));
+        return new RobotFormatter(lineDelimiter, skipDelimiterInLastLine);
+    }
+
     @VisibleForTesting
     String format(final String content, final RobotFormatter formatter) {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
@@ -82,9 +82,9 @@ public class SuiteSourceEditorFormatter {
                         lineFormatters.add(new AdjustsConstantSeparatorsFormatter(separatorLength));
                         break;
                     case DYNAMIC:
-                        final List<Integer> columnLengths = AdjustsDynamicSeparatorsFormatter
-                                .countColumnLengths(toFormat);
-                        lineFormatters.add(new AdjustsDynamicSeparatorsFormatter(separatorLength, columnLengths));
+                        final int cellLengthLimit = preferences.getFormatterIgnoredCellLengthLimit();
+                        lineFormatters.add(
+                                AdjustsDynamicSeparatorsFormatter.create(toFormat, separatorLength, cellLengthLimit));
                         break;
                     default:
                         throw new IllegalStateException("Unrecognized formatting mode");

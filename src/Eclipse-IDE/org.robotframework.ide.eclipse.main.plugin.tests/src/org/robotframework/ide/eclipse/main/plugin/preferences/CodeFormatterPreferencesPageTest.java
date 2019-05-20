@@ -46,16 +46,18 @@ public class CodeFormatterPreferencesPageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(4);
+        assertThat(editors).hasSize(6);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED,
+                        RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED,
                         RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED));
         assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_SEPARATOR_TYPE));
         assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,
-                names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_SEPARATOR_LENGTH));
+                names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_SEPARATOR_LENGTH,
+                        RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT));
     }
 }

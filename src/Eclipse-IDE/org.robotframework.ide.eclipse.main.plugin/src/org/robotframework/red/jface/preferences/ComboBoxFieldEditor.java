@@ -74,6 +74,10 @@ public class ComboBoxFieldEditor extends FieldEditor {
         createControl(parent);
     }
 
+    public String getSelectedValue() {
+        return value;
+    }
+
     /**
      * Checks whether given <code>String[][]</code> is of "type"
      * <code>String[][2]</code>.
@@ -199,7 +203,7 @@ public class ComboBoxFieldEditor extends FieldEditor {
         return 2;
     }
 
-    private Combo getComboBoxControl(final Composite parent) {
+    public Combo getComboBoxControl(final Composite parent) {
         if (combo == null) {
             combo = new Combo(parent, SWT.READ_ONLY);
             for (int i = 0; i < entryNamesAndValues.length; i++) {

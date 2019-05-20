@@ -118,6 +118,8 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
         preferences.put(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferences.putInt(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
+        preferences.putBoolean(RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED, true);
+        preferences.putInt(RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT, 40);
         preferences.putBoolean(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, false);
     }
 

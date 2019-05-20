@@ -7,11 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
-import java.util.function.Consumer;
-
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -27,14 +25,13 @@ public class CodeFormatterPreferencePage extends RedFieldEditorPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter";
 
-    private Consumer<Boolean> separatorAdjustmentEnablementUpdater;
+    private Composite parent;
 
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
 
         createLink(parent);
-
         createFormatterEditors(parent);
     }
 
@@ -58,9 +55,7 @@ public class CodeFormatterPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     private void createFormatterEditors(final Composite parent) {
-        final Composite buttonsParent = new Composite(parent, SWT.NONE);
-        GridLayoutFactory.fillDefaults().applyTo(buttonsParent);
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(buttonsParent);
+        this.parent = parent;
 
         final BooleanFieldEditor separatorAdjustmentEditor = new BooleanFieldEditor(
                 RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, "Adjust separator lengths", parent);
@@ -70,22 +65,27 @@ public class CodeFormatterPreferencePage extends RedFieldEditorPreferencePage {
                 "Separator type", "", 25, createFormattingSeparatorTypeLabelsAndValues(), parent);
         addField(separatorTypeEditor);
 
-        final IntegerFieldEditor separatorLength = new IntegerFieldEditor(RedPreferences.FORMATTER_SEPARATOR_LENGTH,
-                "Separator length", parent, 2);
-        separatorLength.setValidRange(2, 10);
-        addField(separatorLength);
-        GridDataFactory.fillDefaults().indent(25, 2).applyTo(separatorLength.getLabelControl(parent));
+        final IntegerFieldEditor separatorLengthEditor = new IntegerFieldEditor(
+                RedPreferences.FORMATTER_SEPARATOR_LENGTH, "Separator length", parent, 2);
+        separatorLengthEditor.setValidRange(2, 10);
+        addField(separatorLengthEditor);
+        GridDataFactory.fillDefaults().indent(25, 2).applyTo(separatorLengthEditor.getLabelControl(parent));
+
+        final BooleanFieldEditor ignoreLongCellsEditor = new BooleanFieldEditor(
+                RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED,
+                "Ignore cells longer than limit when adjusting dynamically", parent);
+        addField(ignoreLongCellsEditor);
+        GridDataFactory.fillDefaults().indent(25, 2).applyTo(ignoreLongCellsEditor.getDescriptionControl(parent));
+
+        final IntegerFieldEditor ignoredCellsLengthEditor = new IntegerFieldEditor(
+                RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT, "Cell length limit ", parent, 3);
+        ignoredCellsLengthEditor.setValidRange(0, 999);
+        addField(ignoredCellsLengthEditor);
+        GridDataFactory.fillDefaults().indent(50, 2).applyTo(ignoredCellsLengthEditor.getLabelControl(parent));
 
         final BooleanFieldEditor rightTrimEditor = new BooleanFieldEditor(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED,
                 "Right trim lines", parent);
         addField(rightTrimEditor);
-
-        separatorAdjustmentEnablementUpdater = value -> {
-            separatorTypeEditor.setEnabled(value, parent);
-            separatorLength.setEnabled(value, parent);
-        };
-        separatorAdjustmentEnablementUpdater
-                .accept(getPreferenceStore().getBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED));
     }
 
     private String[][] createFormattingSeparatorTypeLabelsAndValues() {
@@ -96,11 +96,22 @@ public class CodeFormatterPreferencePage extends RedFieldEditorPreferencePage {
     }
 
     @Override
+    protected void initialize() {
+        super.initialize();
+
+        refreshEditorsEnablement();
+    }
+
+    @Override
     public void propertyChange(final PropertyChangeEvent event) {
-        if (event.getSource() instanceof BooleanFieldEditor
-                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
-                        .equals(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED)) {
-            separatorAdjustmentEnablementUpdater.accept((Boolean) event.getNewValue());
+        if (event.getSource() instanceof FieldEditor) {
+            final FieldEditor editor = (FieldEditor) event.getSource();
+
+            if (editor.getPreferenceName().equals(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED)
+                    || editor.getPreferenceName().equals(RedPreferences.FORMATTER_SEPARATOR_TYPE)
+                    || editor.getPreferenceName().equals(RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED)) {
+                refreshEditorsEnablement();
+            }
         }
         super.propertyChange(event);
     }
@@ -109,8 +120,29 @@ public class CodeFormatterPreferencePage extends RedFieldEditorPreferencePage {
     protected void performDefaults() {
         super.performDefaults();
 
-        separatorAdjustmentEnablementUpdater
-                .accept(getPreferenceStore().getDefaultBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED));
+        refreshEditorsEnablement();
     }
 
+    private void refreshEditorsEnablement() {
+        final BooleanFieldEditor adjustmentEditor = (BooleanFieldEditor) getFieldEditor(
+                RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED);
+        final ComboBoxFieldEditor sepTypeEditor = (ComboBoxFieldEditor) getFieldEditor(
+                RedPreferences.FORMATTER_SEPARATOR_TYPE);
+        final IntegerFieldEditor sepLengthEditor = (IntegerFieldEditor) getFieldEditor(
+                RedPreferences.FORMATTER_SEPARATOR_LENGTH);
+        final BooleanFieldEditor cellIgnoreEditor = (BooleanFieldEditor) getFieldEditor(
+                RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED);
+        final IntegerFieldEditor cellLengthEditor = (IntegerFieldEditor) getFieldEditor(
+                RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT);
+
+        final boolean adjustingIsEnabled = adjustmentEditor.getBooleanValue();
+        final FormattingSeparatorType separatorType = FormattingSeparatorType.valueOf(sepTypeEditor.getSelectedValue());
+        final boolean limitIsEnabled = cellIgnoreEditor.getBooleanValue();
+
+        sepTypeEditor.setEnabled(adjustingIsEnabled, parent);
+        sepLengthEditor.setEnabled(adjustingIsEnabled, parent);
+        cellIgnoreEditor.setEnabled(adjustingIsEnabled && separatorType == FormattingSeparatorType.DYNAMIC, parent);
+        cellLengthEditor.setEnabled(
+                adjustingIsEnabled && separatorType == FormattingSeparatorType.DYNAMIC && limitIsEnabled, parent);
+    }
 }

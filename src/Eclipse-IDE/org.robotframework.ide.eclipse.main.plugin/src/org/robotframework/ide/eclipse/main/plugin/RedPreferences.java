@@ -81,6 +81,8 @@ public class RedPreferences {
     public static final String FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED = "red.editor.formatter.separatorAdjustmentEnabled";
     public static final String FORMATTER_SEPARATOR_TYPE = "red.editor.formatter.separatorType";
     public static final String FORMATTER_SEPARATOR_LENGTH = "red.editor.formatter.separatorLength";
+    public static final String FORMATTER_IGNORE_LONG_CELLS_ENABLED = "red.editor.formatter.ignoreLongCellsEnabled";
+    public static final String FORMATTER_LONG_CELL_LENGTH_LIMIT = "red.editor.formatter.longCellLengthLimit";
     public static final String FORMATTER_RIGHT_TRIM_ENABLED = "red.editor.formatter.rightTrimEnabled";
 
     public static final String SAVE_ACTIONS_CODE_FORMATTING_ENABLED = "red.editor.save.codeFormattingEnabled";
@@ -255,6 +257,13 @@ public class RedPreferences {
 
     public int getFormatterSeparatorLength() {
         return store.getInt(FORMATTER_SEPARATOR_LENGTH);
+    }
+
+    public int getFormatterIgnoredCellLengthLimit() {
+        if (store.getBoolean(FORMATTER_IGNORE_LONG_CELLS_ENABLED)) {
+            return store.getInt(FORMATTER_LONG_CELL_LENGTH_LIMIT);
+        }
+        return -1;
     }
 
     public boolean isFormatterRightTrimEnabled() {

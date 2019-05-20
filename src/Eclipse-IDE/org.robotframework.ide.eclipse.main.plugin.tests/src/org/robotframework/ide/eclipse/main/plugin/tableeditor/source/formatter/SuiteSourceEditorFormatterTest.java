@@ -158,7 +158,7 @@ public class SuiteSourceEditorFormatterTest {
 
         final String formatted = formatter.format("  Keyword      123  \n   OtherKeyword   456\n", robotFormatter);
 
-        assertThat(formatted).isEqualTo("    Keyword         123        \n    OtherKeyword    456    \n");
+        assertThat(formatted).isEqualTo("    Keyword         123    \n    OtherKeyword    456\n");
     }
 
     @Test

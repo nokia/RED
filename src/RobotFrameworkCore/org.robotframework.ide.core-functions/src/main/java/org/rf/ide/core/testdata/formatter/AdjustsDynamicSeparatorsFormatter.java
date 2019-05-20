@@ -10,12 +10,58 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 
 public class AdjustsDynamicSeparatorsFormatter implements ILineFormatter {
+
+    public static AdjustsDynamicSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength) {
+        return create(tabsFreeContent, separatorLength, -1);
+    }
+
+    public static AdjustsDynamicSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength,
+            final int cellLengthLimit) {
+        return new AdjustsDynamicSeparatorsFormatter(Strings.repeat(" ", separatorLength),
+                countColumnLengths(tabsFreeContent, cellLengthLimit));
+    }
+
+    @VisibleForTesting
+    static List<Integer> countColumnLengths(final String tabsFreeContent, final int cellLengthLimit) {
+        final List<Integer> columnLengths = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new StringReader(tabsFreeContent))) {
+            String line = reader.readLine();
+            while (line != null) {
+                updateCellLengths(line, columnLengths, cellLengthLimit);
+                line = reader.readLine();
+            }
+        } catch (final IOException e) {
+            // this won't happen since StringReader only throws IOException when trying to read
+            // after closing; similarly BufferedReader; additionally BufferedReader throws when
+            // wrapped reader is throwing
+            throw new IllegalStateException();
+        }
+        return columnLengths;
+    }
+
+    private static void updateCellLengths(final String line, final List<Integer> columnsLength,
+            final int cellLengthLimit) {
+        int column = 0;
+        for (final int length : getCellLengths(line)) {
+            if (column == columnsLength.size()) {
+                columnsLength.add(-1);
+            }
+            if (columnsLength.get(column) < length && (cellLengthLimit == -1 || length <= cellLengthLimit)) {
+                columnsLength.set(column, length);
+            }
+            column++;
+        }
+    }
+
+    private static int[] getCellLengths(final String line) {
+        return CELL_SPLITTER.splitToList(line).stream().mapToInt(String::length).toArray();
+    }
 
     private static final Splitter CELL_SPLITTER = Splitter.onPattern("\\s{2,}");
 
@@ -23,49 +69,29 @@ public class AdjustsDynamicSeparatorsFormatter implements ILineFormatter {
 
     private final List<Integer> columnLengths;
 
-    public AdjustsDynamicSeparatorsFormatter(final int separatorLength, final List<Integer> columnLengths) {
-        this.separator = Strings.repeat(" ", separatorLength);
+    @VisibleForTesting
+    AdjustsDynamicSeparatorsFormatter(final String separator, final List<Integer> columnLengths) {
+        this.separator = separator;
         this.columnLengths = columnLengths;
     }
 
     @Override
     public String format(final String line) {
-        int column = 0;
+        final List<String> cells = CELL_SPLITTER.splitToList(line);
+
         final StringBuilder formatted = new StringBuilder();
-        for (final String cell : CELL_SPLITTER.splitToList(line)) {
-            formatted.append(Strings.padEnd(cell, columnLengths.get(column), ' '));
-            formatted.append(separator);
+        int column = 0;
+        for (final String cell : cells) {
+            if (column == cells.size() - 1) {
+                formatted.append(cell);
+            } else {
+                if (column > 0 || !cell.isEmpty()) {
+                    formatted.append(Strings.padEnd(cell, columnLengths.get(column), ' '));
+                }
+                formatted.append(separator);
+            }
             column++;
         }
         return formatted.toString();
     }
-
-    public static List<Integer> countColumnLengths(final String tabsFreeContent) throws IOException {
-        final List<Integer> columnLengths = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new StringReader(tabsFreeContent))) {
-            String line = reader.readLine();
-            while (line != null) {
-                updateCellLengths(line, columnLengths);
-                line = reader.readLine();
-            }
-        }
-        return columnLengths;
-    }
-
-    private static void updateCellLengths(final String line, final List<Integer> columnsLength) {
-        int column = 0;
-        for (final Integer length : getCellLengths(line)) {
-            if (column == columnsLength.size()) {
-                columnsLength.add(length);
-            } else if (columnsLength.get(column) < length) {
-                columnsLength.set(column, length);
-            }
-            column++;
-        }
-    }
-
-    private static List<Integer> getCellLengths(final String line) {
-        return CELL_SPLITTER.splitToList(line).stream().map(String::length).collect(Collectors.toList());
-    }
-
 }

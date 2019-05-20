@@ -317,6 +317,28 @@ public class RedPreferencesTest {
                 .containsEntry("CHARACTERS", "~!@#$%^&*()_+`-{}[];':\",./<>?");
     }
 
+    @Test
+    public void formatterCellLengthLimitIsNegative_whenLimitingIsDisabled() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED)).thenReturn(false);
+        when(store.getInt(RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT)).thenReturn(42);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getFormatterIgnoredCellLengthLimit()).isEqualTo(-1);
+    }
+
+    @Test
+    public void formatterCellLengthLimitIsTakenFromStore_whenLimitingIsEnabled() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED)).thenReturn(true);
+        when(store.getInt(RedPreferences.FORMATTER_LONG_CELL_LENGTH_LIMIT)).thenReturn(42);
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getFormatterIgnoredCellLengthLimit()).isEqualTo(42);
+    }
+
     private static <T extends Iterable<?>> Condition<T> containingElementOnlyWhen(final Object element,
             final boolean condition) {
         return new Condition<T>() {
