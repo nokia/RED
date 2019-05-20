@@ -63,10 +63,6 @@ public final class LibraryDescriptor {
         return path;
     }
 
-    public String getFilepath() {
-        return path;
-    }
-
     public List<String> getArguments() {
         return arguments;
     }
