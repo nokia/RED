@@ -224,6 +224,61 @@ public class LibrariesChangesDetectorTest {
         verifyNoMoreInteractions(processor);
     }
 
+    @Test
+    public void pythonLibraryIsReportedForModification_whenLibraryFileIsMovedUp() {
+        @SuppressWarnings("unchecked")
+        final RedXmlChangesProcessor<ReferencedLibrary> processor = mock(RedXmlChangesProcessor.class);
+
+        final IPath beforeRefactorPath = Path.fromPortableString("project/resource/lib.py");
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib.class", "project/resource/lib.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "project/resource/lib.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib.otherClass", "project/other/lib.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "resource.lib.otherClass", "project/resource/lib.py"));
+
+        final LibrariesChangesDetector detector = new LibrariesChangesDetector(beforeRefactorPath,
+                Optional.of(Path.fromPortableString("project/lib.py")), config);
+        detector.detect(processor);
+
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)),
+                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "lib.class", "project/lib.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)),
+                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "project/lib.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(3)), argThat(
+                hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "lib.otherClass", "project/lib.py"))));
+        verifyNoMoreInteractions(processor);
+    }
+
+    @Test
+    public void pythonLibraryIsReportedForModification_whenLibraryFileIsMovedDown() {
+        @SuppressWarnings("unchecked")
+        final RedXmlChangesProcessor<ReferencedLibrary> processor = mock(RedXmlChangesProcessor.class);
+
+        final IPath beforeRefactorPath = Path.fromPortableString("project/lib.py");
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib.class", "project/lib.py"));
+        config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "project/lib.py"));
+        config.addReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib.otherClass", "project/other/lib.py"));
+
+        final LibrariesChangesDetector detector = new LibrariesChangesDetector(beforeRefactorPath,
+                Optional.of(Path.fromPortableString("project/resource/lib.py")), config);
+        detector.detect(processor);
+
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(0)),
+                argThat(hasSameFields(
+                        ReferencedLibrary.create(LibraryType.PYTHON, "lib.class", "project/resource/lib.py"))));
+        verify(processor).pathModified(same(config.getReferencedLibraries().get(1)),
+                argThat(hasSameFields(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "project/resource/lib.py"))));
+        verifyNoMoreInteractions(processor);
+    }
+
+
     private static ArgumentMatcher<ReferencedLibrary> hasSameFields(final ReferencedLibrary library) {
         return toMatch -> {
             return Objects.equals(library.getType(), toMatch.getType())
