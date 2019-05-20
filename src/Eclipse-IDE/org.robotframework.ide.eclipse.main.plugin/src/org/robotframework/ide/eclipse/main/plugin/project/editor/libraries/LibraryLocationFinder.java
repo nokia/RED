@@ -55,7 +55,7 @@ public class LibraryLocationFinder {
     private static Optional<IPath> findReferenceLibPath(final LibraryDescriptor descriptor,
             final LibrarySpecification libSpec) {
         final IPath libPath = RedWorkspace.Paths
-                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getFilepath()));
+                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getPath()));
         return Optional.of(libPath).filter(path -> path.toFile().exists());
     }
 }

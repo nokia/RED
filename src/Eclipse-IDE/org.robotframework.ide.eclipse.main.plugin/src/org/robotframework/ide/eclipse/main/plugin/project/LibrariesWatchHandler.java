@@ -75,15 +75,15 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     public void registerLibrary(final ReferencedLibrary library, final LibrarySpecification spec) {
         if (!registeredLibrarySpecifications.containsKey(spec)) {
-            final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
-            if (absolutePathToLibraryFile != null) {
-                final File libFile = new File(absolutePathToLibraryFile);
+            final String path = registeredRefLibraries.computeIfAbsent(library, this::findLibraryFileAbsolutePath);
+            if (path != null) {
+                final File libFile = new File(path);
                 final File libDir = libFile.getParentFile();
                 if (libDir != null && libDir.exists() && libDir.isDirectory()) {
-                    if (isPythonModule(absolutePathToLibraryFile)) {
-                        final String[] moduleFilesList = extractPythonModuleFiles(libDir);
-                        for (int i = 0; i < moduleFilesList.length; i++) {
-                            addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
+                    if (isPythonModule(path)) {
+                        final String[] moduleFiles = extractPythonModuleFiles(libDir);
+                        for (final String moduleFile : moduleFiles) {
+                            addLibraryToWatch(moduleFile, libDir.toPath(), spec);
                         }
                     } else {
                         addLibraryToWatch(libFile.getName(), libDir.toPath(), spec);
@@ -101,9 +101,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 final File libFile = new File(path);
                 final File libDir = libFile.getParentFile();
                 if (isPythonModule(path) && libDir != null && libDir.exists()) {
-                    final String[] moduleFilesList = extractPythonModuleFiles(libDir);
-                    for (int i = 0; i < moduleFilesList.length; i++) {
-                        removeLibraryToWatch(moduleFilesList[i]);
+                    final String[] moduleFiles = extractPythonModuleFiles(libDir);
+                    for (final String moduleFile : moduleFiles) {
+                        removeLibraryToWatch(moduleFile);
                     }
                 } else {
                     removeLibraryToWatch(libFile.getName());
@@ -303,56 +303,14 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     }
 
     private String findLibraryFileAbsolutePath(final ReferencedLibrary library) {
-
-        String absolutePath = registeredRefLibraries.get(library);
-        if (absolutePath != null) {
-            return absolutePath;
-        }
-        if (library.provideType() == LibraryType.VIRTUAL) {
-            return null;
-        }
-
-        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
-                robotProject.getRobotProjectConfig());
-        final IPath libraryPath = redConfig.resolveToAbsolutePath(library);
-        final File libraryFile = libraryPath.toFile();
-        if (libraryFile.exists()) {
-            if (!libraryFile.isDirectory()) {
-                absolutePath = libraryPath.toPortableString();
-            } else {
-                absolutePath = extractLibraryAbsolutePathFromDir(library, libraryPath);
+        if (library.provideType() != LibraryType.VIRTUAL) {
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(robotProject.getProject(),
+                    robotProject.getRobotProjectConfig());
+            final IPath libraryPath = redConfig.resolveToAbsolutePath(library);
+            if (libraryPath.toFile().exists()) {
+                return libraryPath.toPortableString();
             }
         }
-        if (absolutePath != null) {
-            registeredRefLibraries.put(library, absolutePath);
-        }
-        return absolutePath;
-    }
-
-    private String extractLibraryAbsolutePathFromDir(final ReferencedLibrary library, final IPath libraryPath) {
-        final String fileExtension = library.provideType() == LibraryType.PYTHON ? ".py" : ".java";
-        final String libraryName = library.getName();
-        if (libraryName.contains(".")) {
-            final String[] libraryNameElements = libraryName.split("\\.");
-            for (int i = libraryNameElements.length - 1; i >= 0; i--) {
-                final IPath libFilePath = libraryPath.append(libraryNameElements[i] + fileExtension);
-                if (libFilePath.toFile().exists()) {
-                    return libFilePath.toPortableString();
-                }
-            }
-        } else {
-            final IPath libFilePath = libraryPath.append(libraryName + fileExtension);
-            if (libFilePath.toFile().exists()) {
-                return libFilePath.toPortableString();
-            }
-        }
-
-        // try to find module init file
-        final IPath libFilePath = libraryPath.append(library.getName()).append("__init__.py");
-        if (libFilePath.toFile().exists()) {
-            return libFilePath.toPortableString();
-        }
-
         return null;
     }
 
