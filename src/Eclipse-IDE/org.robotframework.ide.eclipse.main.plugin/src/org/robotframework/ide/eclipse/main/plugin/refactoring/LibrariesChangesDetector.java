@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -147,7 +148,7 @@ class LibrariesChangesDetector {
         for (int i = nameInPath.size(); i < segmentedName.size(); i++) {
             name.add(segmentedName.get(i));
         }
-        return String.join(".", name);
+        return name.stream().filter(p -> !p.isEmpty()).collect(Collectors.joining("."));
     }
 
     private String getNewNamePart(String[] beforeSegments, String[] afterSegments, Range changeInBeforePath) {
