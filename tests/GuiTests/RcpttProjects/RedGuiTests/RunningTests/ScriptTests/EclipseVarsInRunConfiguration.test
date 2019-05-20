@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _xSBOoDQ1EeiLWMPOs-qbiA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/11/18 3:33 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/20/19 11:25 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -100,7 +100,7 @@ with [get-window "Run Configurations"] {
     get-button Run | click
 }
 
-
+wait-for-console
 get-view Console | get-text-viewer | get-property text 
     | contains [format" -M %s" $RED_workspace_path]| verify-true
      
