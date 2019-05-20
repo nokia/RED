@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/3/19 10:55 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/20/19 1:49 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -186,27 +186,27 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 }-else{
 	check-arg-file-for-relative-path
 		
-	//check warning
+	//check warnings
 	get-tab-folder -index 4 | get-tab-item Problems | click
-	get-view Problems | get-label "18 errors, 9 warnings, 0 others" | get-property caption 
-    | equals "18 errors, 9 warnings, 0 others" | verify-true
+	get-view Problems | get-label "18 errors, 8 warnings, 0 others" | get-property caption 
+    | equals "18 errors, 8 warnings, 0 others" | verify-true
     
     
 	with [get-view Problems | get-tree] {
-		    get-item "Warnings \\(9 items\\)/The path '\\/!@#$%path\\/new.file.txt' points to non-existing location" 
+		    get-item "Warnings \\(8 items\\)/The path '\\/!@#$%path\\/new.file.txt' points to non-existing location" 
 		        | get-property caption | equals "The path '/!@#$%path/new.file.txt' points to non-existing location" 
 		        | verify-true
-		    get-item "Warnings \\(9 items\\)/The path '.*a' points to non-existing location" 
+		    get-item "Warnings \\(8 items\\)/The path '.*a' points to non-existing location" 
 		        | get-property caption | equals [format "The path '%s/a' points to non-existing location" $RED_workspace_path]
 		        | verify-true
-		    get-item "Warnings \\(9 items\\)/The path '.*b' points to non-existing location" 
+		    get-item "Warnings \\(8 items\\)/The path '.*b' points to non-existing location" 
 		        | get-property caption | equals [format "The path '%s/b' points to non-existing location"  $RED_workspace_path]
 		        | verify-true
-		    get-item "Warnings \\(9 items\\)/The path '.*folder' points to non-existing location" 
+		    get-item "Warnings \\(8 items\\)/The path '.*folder' points to non-existing location" 
 		        | get-property caption 
 		        | equals [format "The path '%s/correct tab /folder' points to non-existing location"  $RED_workspace_path]
 		        | verify-true
-		    get-item "Warnings \\(9 items\\)/The path '.*not existing' points to non-existing location" 
+		    get-item "Warnings \\(8 items\\)/The path '.*not existing' points to non-existing location" 
 		        | get-property caption 
 		        | equals [format "The path '%s/not existing' points to non-existing location"  $RED_workspace_path]
 		        | verify-true
