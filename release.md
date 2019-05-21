@@ -1,3 +1,41 @@
+# RED - Robot Editor v0.8.12
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.11 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- RED with PyDev debugging session wizard
+- Source code formatter enhancements
+- Libdoc generation fixes
+- Quick variables typing in editor
+- Better support for robot empty lines
+- Enhancements in red.xml UI
+
+## GitHub issues updates
+ - #145 - In case empty line in test starts with tabulator it is propagated to table view wrongly
+ - #255 - Check pyDev debugging documentation
+ - #273 - Default env variables for launch configs
+ - #279 - Scroll table to the top when revealing the element
+ - #281 - Problem with libdoc generation when python library redirect also console msg from server
+ - #284 - Command line with unicode letters causes TestRunnerAgent exception
+ - #286 - Libdoc generation problem for SikuliLibrary
+ - #290 - Revise and update building instructions
+ - #291 - WM_Class is empty
+ - #295 - Unable to start session server when path contains non-ASCII chars
+ - #296 - Null Pointer Exception during validation
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.11
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
