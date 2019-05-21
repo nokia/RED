@@ -1,3 +1,49 @@
+RED 0.8.12 - 2019/05/21
+
+Feature
+
+	[RED-1232] - Provide quick variables typing in editor
+	[RED-1241] - Remove trailing whitespaces
+
+Enhancement
+
+	[RED-1184] - Configure/Deconfigure as Robot nature - change question so YES would keep red.xml
+	[RED-1230] - Simplify UI regarding variable files in red.xml
+	[RED-1234] - Change the way of finding interpreter execution file in python scripts
+	[RED-1235] - [GitHub #255] Check PyDev debugging documentation
+	[RED-1239] - [Github #273] Default env variables for launch configs
+	[RED-1247] - [GitHub #279] Scroll table to the top when revealing the element
+	[RED-1250] - Adding possibility to remove all libs from red.xml
+	[RED-1260] - [GitHub #291] WM_Class is empty
+
+Bug
+
+	[RED-294] - Cannot add library with the same name but from different path
+	[RED-962] - [GitHub #145] In case empty line in test starts with tabulator it is propagated to table view wrongly
+	[RED-1130] - Autodiscovery should not find windows paths when is run from Project Explorer
+	[RED-1142] - Coloring line when "\" is first in line
+	[RED-1233] - Problem with importing python classes from .jar
+	[RED-1240] - RED loads the referenced libraries with absolute path instead of relative ones
+	[RED-1244] - [GitHub #281] Problem with libdoc generation when python library redirect also console msg from server
+	[RED-1251] - [GitHub #284] Command line with unicode letters causes TestRunnerAgent exception
+	[RED-1254] - [GitHub #286] Libdoc generation problem for SikuliLibrary
+	[RED-1261] - CTRL+Z does not work correctly for scalar variable
+	[RED-1266] - [GitHub #295] Unable to start session server when path contains non-ASCII chars
+	[RED-1267] - [GitHub #296] Null Pointer Exception during validation
+
+Task
+
+	[RED-1191] - Adding tests for Tasks when RF 3.1 will be released
+	[RED-1201] - Update platform to Eclipse 2018-09 (4.9)
+	[RED-1205] - Investigate issues with OpenStack clouds
+	[RED-1214] - Consider dropping RF 2.8.x support
+	[RED-1253] - Investigate if support for extensions written in capital letter exist
+	[RED-1259] - [GitHub #290] Revise and update building instructions
+
+Sub-task
+
+	[RED-1199] - Red.xml should have full python library path
+
 RED 0.8.11 - 2019/01/31
 Feature
 
