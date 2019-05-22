@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4-8DwAMYEeeiJ58fwe1u-w
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 9:43 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/22/19 4:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -73,26 +73,27 @@ get-window "New Robot python file" |  get-button Cancel | click
 
 //------------------ from PE----------------------------------------------------------
 //open menu just as workaround
-get-view "Project Explorer" | get-tree | get-menu "New/Project..." | get-property index | equals 0 | verify-true
-
-if [$is_product| eq true]{
-	with [get-view "Project Explorer" | get-tree] {
-	    get-property "getMenu().getItems().MenuItem[0].getMenu().toString()" 
-	        | equals "Menu {P&roject..., |, Robot Project, Robot suites folder, |, &Other...\9M1+N}" | verify-true
-	    get-property "getMenu().getItems().MenuItem[0].getStyle()" | equals "[CASCADE]" | verify-true
+if [$is_eclipse_03_2019 | equals False]{
+	get-view "Project Explorer" | get-tree | get-menu "New/Project..." | get-property index | equals 0 | verify-true
+	
+	if [$is_product| eq true]{
+		with [get-view "Project Explorer" | get-tree] {
+		    get-property "getMenu().getItems().MenuItem[0].getMenu().toString()" 
+		        | equals "Menu {P&roject..., |, Robot Project, Robot suites folder, |, &Other...\9M1+N}" | verify-true
+		    get-property "getMenu().getItems().MenuItem[0].getStyle()" | equals "[CASCADE]" | verify-true
+		}
+	}-else{
+		with [get-view "Project Explorer" | get-tree] {
+		    get-property "getMenu().getItems().MenuItem[0].getMenu().toString()" 
+		        | equals "Menu {P&roject..., |, Robot Project, Robot suites folder, |, E&xample..., |, &Other...\9M1+N}" | verify-true
+		    get-property "getMenu().getItems().MenuItem[0].getStyle()" | equals "[CASCADE]" | verify-true
+		}
 	}
-}-else{
-	with [get-view "Project Explorer" | get-tree] {
-	    get-property "getMenu().getItems().MenuItem[0].getMenu().toString()" 
-	        | equals "Menu {P&roject..., |, Robot Project, Robot suites folder, |, E&xample..., |, &Other...\9M1+N}" | verify-true
-	    get-property "getMenu().getItems().MenuItem[0].getStyle()" | equals "[CASCADE]" | verify-true
-	}
+	//try to cretae suite folder
+	get-view "Project Explorer" | get-tree | get-menu "New/Robot suites folder" | click
+	get-window "New Robot suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc
+	get-window "New Robot suites folder" | get-editbox -after [get-label "Robot Suites Folder"] | get-property text 
+	    | equals "Action impossible to finish: No project available" | verify-true
+	get-window "New Robot suites folder" | get-button Cancel | click
 }
-//try to cretae suite folder
-get-view "Project Explorer" | get-tree | get-menu "New/Robot suites folder" | click
-get-window "New Robot suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc
-get-window "New Robot suites folder" | get-editbox -after [get-label "Robot Suites Folder"] | get-property text 
-    | equals "Action impossible to finish: No project available" | verify-true
-get-window "New Robot suites folder" | get-button Cancel | click
-
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

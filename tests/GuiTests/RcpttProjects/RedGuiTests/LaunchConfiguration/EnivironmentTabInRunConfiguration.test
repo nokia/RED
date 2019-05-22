@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cufqoN2BEea53q6vmC55pw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/22/18 1:42 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/22/19 4:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -39,13 +39,15 @@ with [get-window "Run Configurations" | get-control Any -after [get-label "Name:
     //label of table
     get-property "getChildren().Control[0].getText()" | equals "Environment variables to &set:" | verify-true
     get-property "getChildren().Control[1].getChildren().length" | equals 1 | verify-true
-    get-property "getChildren().Control[2].getChildren().length" | equals 4 | verify-true
+    get-property "getChildren().Control[2].getChildren().length" | equals 6 | verify-true
     
     //buttons
     get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "N&ew..." | verify-true
     get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Se&lect..." | verify-true
     get-property "getChildren().Control[2].getChildren().Control[2].getText()" | equals "E&dit..." | verify-true
     get-property "getChildren().Control[2].getChildren().Control[3].getText()" | equals "Rem&ove" | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[4].getText()" | equals "&Copy" | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[5].getText()" | equals "&Paste" | verify-true
     
     //choice 
     get-property "getChildren().Control[3].getChildren().length" | equals 2 | verify-true

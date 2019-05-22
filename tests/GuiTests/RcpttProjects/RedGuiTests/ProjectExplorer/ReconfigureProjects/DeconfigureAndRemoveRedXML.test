@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _59DNAEd3EeaRB_Xz0tiYpg
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 5:04 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/22/19 4:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,7 +21,11 @@ with [get-window "Delete Resources"] {
 }
 
 //add non-red project
-get-view "Project Explorer" | get-tree | get-menu "New/Project..." | click
+if [$is_eclipse_03_2019]{
+	get-view "Project Explorer" | get-link "Create a project..." | click
+}-else{	
+	get-view "Project Explorer" | get-tree | get-menu "New/Project..." | click
+}	
 with [get-window "New Project"] {
     get-tree | select "General/Project"
     get-button "Next >" | click
@@ -33,7 +37,7 @@ with [get-window "New Project"] {
 get-button "View Menu" | click
 get-view "Project Explorer" |  get-menu "(Customize View...)|(Filters and Customization...)" | click
 with [get-window  "(Available Customizations)|(Filters and Customization)" ] {
-    get-tab-folder | get-tab-item Filters | click
+    get-tab-folder | get-tab-item "(Filters)|(Pre-set filters)"  | click
     with [get-table] {
         get-item ".\\* resources" | uncheck
         select "Non-Robot projects"
@@ -175,7 +179,7 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
 get-button "View Menu" | click
 get-view "Project Explorer" | get-menu "(Customize View...)|(Filters and Customization...)"  | click
 with [get-window  "(Available Customizations)|(Filters and Customization)"] {
-    get-tab-folder | get-tab-item Filters | click
+    get-tab-folder | get-tab-item "(Filters)|(Pre-set filters)" | click
     with [get-table] {
         get-item ".\\* resources" | check
         select "Non-Robot projects"
