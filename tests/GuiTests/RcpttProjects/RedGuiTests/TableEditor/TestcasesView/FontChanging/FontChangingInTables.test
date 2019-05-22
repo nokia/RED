@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Vp4pICajEeesE7mkFuId1w
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/22/19 4:54 PM
+Save-Time: 5/22/19 4:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,7 +121,7 @@ check-fonts-in-all-tables -font_size "15.75" -font_name "Courier New"
 get-preferences-menu | click
 with [get-window Preferences] {
     get-tree | select "General/Appearance/Colors and Fonts"
-    get-tree -after [get-label "Colors and Fonts \((font, size, type, )?\? = any character, \* = any string\) :"]                        
+    get-tree -after [get-label "Colors and Fonts \((font, size, type, )?\? = any character, \* = any string\)\s?:"]                        
         | select "Robot/Table Font"
     get-button Reset | click
     get-button Apply | click
