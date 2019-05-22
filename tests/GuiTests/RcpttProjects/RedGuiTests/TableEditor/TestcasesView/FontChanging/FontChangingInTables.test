@@ -7,101 +7,134 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Vp4pICajEeesE7mkFuId1w
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/22/19 4:35 PM
+Save-Time: 5/22/19 4:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-with [get-view "Project Explorer" | get-tree] {
-    select "RobotProject/TestFile.robot" | double-click
+proc "check-font-for-table" [val table_type] [val font_size "9.0"] [val font_name "Segoe UI"]{
+	with [get-editor "TestFile.robot" | get-canvas -after [get-label $table_type] -index 1] {
+	    get-property "getFont().getFontData().FontData[0].height" | equals $font_size | verify-true
+	    get-property "getFont().getFontData().FontData[0].getName()" | equals $font_name | verify-true
+	}
 }
 
+proc "check-font-for-section" [val section] [val font_size "9.0"] [val font_name "Segoe UI"]{
+	with [get-editor "TestFile.robot" | get-section $section | get-canvas] {
+	    get-property "getFont().getFontData().FontData[0].height" | equals $font_size| verify-true
+	    get-property "getFont().getFontData().FontData[0].getName()" | equals $font_name | verify-true
+	}
+}
+
+proc "check-fonts-in-all-tables" [val font_size] [val font_name]{
+	//check font in TC
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+	check-font-for-table -table_type "Test Cases" -font_size $font_size -font_name $font_name
+
+	//check font in KW	
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+	check-font-for-table -table_type "User Keywords" -font_size $font_size -font_name $font_name
+
+	//check font in Settings	
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+	check-font-for-section -section "General" -font_size $font_size -font_name $font_name
+	
+	get-editor "TestFile.robot" | get-section Metadata | click
+	check-font-for-section -section "Metadata" -font_size $font_size -font_name $font_name
+	
+	with [get-editor "TestFile.robot"] {
+	    get-section Metadata | click
+	    get-section Imports | click
+	}
+	check-font-for-section -section "Imports" -font_size $font_size -font_name $font_name
+	get-editor "TestFile.robot" | get-section Imports | click
+	
+	//check font in Variables	
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+	check-font-for-table -table_type "Variables" -font_size $font_size -font_name $font_name
+	
+	//check in Source
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+	
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    get-property "getFont().getFontData().FontData[0].height" | equals [get-by-os -win "9.75" -linux "10.0"] | verify-true
+	    get-property "getFont().getFontData().FontData[0].getName()" | equals [get-by-os -win "(Consolas|Courier New)" -linux "Monospace"] | verify-true
+	}
+}
+
+//open file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+
+//check in all tables if font was changed
+check-fonts-in-all-tables -font_size "15.75" -font_name "Courier New"
+
+
+//add new kw in TC
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1"
 with [get-editor "TestFile.robot"] {
-    with [get-text-viewer] {
-        set-caret-pos 1 19
-        key-type "NUMPAD_ENTER" "\\u000D"
-        type-text "test 1"
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 2
         key-type Enter
-        type-text "Log  12"
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "New kw"
         key-type Enter
-        type-text ":For  ${x}  In range  10"
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+//add new KW
+get-view Outline | get-tree | select "TestFile.robot/Keywords/new"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 5
         key-type Enter
-        type-text "Log  5"
-        key-type Enter
-        key-type BackSpace -times 5
-        type-text ": FOR  ${y}  in range  1  5"
-        key-type Enter
-        type-text "LOG  ${y}"
-        key-type "M1+s"
     }
 }
 
-wait 3000
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "test 1\n"
-    + "    Log  12\n"
-    + "    :For  ${x}  In range  10\n"
-    + "    \\    Log  5\n"
-    + "    : FOR  ${y}  in range  1  5\n"
-    + "    \\    LOG  ${y}" | verify-true
-    
-    
-//add tsv
-get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
-    | click
-with [get-window "New Robot Test Suite"] {
-    get-editbox -after [get-label "File name:"] | set-text "tsv_file"
-    get-button "as .tsv file" | click
-    get-button Finish | click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Variables" | click
+
+get-view Outline | get-tree | select "TestFile.robot/Variables/newDict"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Left
+        key-type Right
+        key-type Enter
+    }
+    //change dict name
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "v1"
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type  "TRAVERSE_TAB_NEXT"
 }
 
-with [get-editor "tsv_file.tsv" | get-text-viewer] {
-    set-caret-pos 1 19
-    key-type Enter
-    type-text "test 2"
-    key-type Enter
-    
-    //first loop
-    type-text ":for\t${z}\tIN\t 855"
-    key-type Enter
-    type-text Sho
-    key-type "M1+SPACE"
-    wait 300
-    key-type Enter
-    wait 100
-    type-text "${z}"
-    key-type Enter -times 2
-    key-type BackSpace -times 2
+//check that font is the same
+check-fonts-in-all-tables -font_size "15.75" -font_name "Courier New"
 
-    //second loop
-    type-text ": fOR\t${i}\tIn Range\t700\t750"
-    key-type Enter
-    type-text "Log"
-    key-type Tab
-    type-text 66
-    key-type Enter
-    
-    key-type BackSpace -times 2
-    type-text SH
-    key-type "M1+SPACE"
-    wait 300
-    key-type Down
-    wait 100
-    key-type Enter
-    wait 100
-    type-text "${SPACE}"
-    key-type "M1+s"
+
+//reset font
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "General/Appearance/Colors and Fonts"
+    get-tree -after [get-label "Colors and Fonts \((font, size, type, )?\? = any character, \* = any string\) :"]                        
+        | select "Robot/Table Font"
+    get-button Reset | click
+    get-button Apply | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
-wait 1500
-get-view Outline | get-tree | get-item "tsv_file.tsv/Test Cases" | expand-all
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 16 8
+get-button "Save (M1+S)" | click
+get-view "Project Explorer" | click
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
-try -times 4 -delay 1000 -command{
-	get-view Outline | get-tree | get-item "tsv_file.tsv/Test Cases/test 2" | get-property childCount | equals 3 
-	    | verify-true
-	    
-}
- 
+
+check-fonts-in-all-tables -font_size [get-by-os -win "[89]\.\d\d?"  -linux "1[01].0"] -font_name [get-by-os -win "(Segoe UI|Tahoma)" -linux "(Cantarell|Sans)"]
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
