@@ -7,16 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentRewriteSession;
@@ -26,14 +21,13 @@ import org.eclipse.jface.text.IDocumentRewriteSessionListener;
 import org.eclipse.jface.text.Region;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.testdata.formatter.ILineFormatter;
-import org.rf.ide.core.testdata.formatter.RobotFormatter;
+import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 import org.robotframework.red.junit.PreferenceUpdater;
 
-public class SuiteSourceEditorFormatterTest {
+public class SuiteSourceEditorCustomFormatterTest {
 
     @Rule
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
@@ -43,7 +37,8 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, false);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third  line  ", "  other  line   ");
         final Document documentSpy = spy(document);
 
@@ -61,7 +56,8 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first  line", "second  line", "", "");
         final Document documentSpy = spy(document);
 
@@ -76,7 +72,8 @@ public class SuiteSourceEditorFormatterTest {
     public void givenRegionIsFormatted() throws Exception {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third  line  ", "  other  line   ");
 
         formatter.format(document, new Region(7, document.getLength() - 7));
@@ -88,7 +85,8 @@ public class SuiteSourceEditorFormatterTest {
     public void givenLinesAreFormatted() throws Exception {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new ExtendedDocument("first ", "second   ", "  third  line  ", "  other  line   ");
 
         formatter.format(document, newArrayList(0, 3));
@@ -100,7 +98,8 @@ public class SuiteSourceEditorFormatterTest {
     public void givenLinesAreFormatted_whenDocumentContainsSingleLineWithoutDelimiter() throws Exception {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new ExtendedDocument("last   ");
 
         formatter.format(document, newArrayList(0));
@@ -112,7 +111,8 @@ public class SuiteSourceEditorFormatterTest {
     public void givenLinesAreFormatted_whenRewriteSessionIsNotStarted() throws Exception {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third ");
 
         formatter.format(document, newArrayList(0, 1));
@@ -121,16 +121,31 @@ public class SuiteSourceEditorFormatterTest {
     }
 
     @Test
+    public void givenLinesAreFormattedTogether_whenTheyAreConsecutive() throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.DYNAMIC.name());
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
+
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
+        final Document document = new Document("a  b  c  d", "efghijk  lmnopqr", "s  t");
+
+        formatter.format(document, newArrayList(1, 2));
+
+        assertThat(document).isEqualTo(new Document("a  b  c  d", "efghijk    lmnopqr", "s          t"));
+    }
+
+    @Test
     public void linesAreRightTrimmed() throws Exception {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
 
-        final String formatted = formatter.format("case \n  \n  Keyword  123 \t \n   [Return]   456   \n",
-                robotFormatter);
+        final Document document = new Document("case ", "  ", "  Keyword  123 \t ", "   [Return]   456   ", "");
+        formatter.format(document);
 
-        assertThat(formatted).isEqualTo("case\n\n  Keyword  123\n   [Return]   456\n");
+        assertThat(document.get()).isEqualTo("case\n\n  Keyword  123\n   [Return]   456\n");
     }
 
     @Test
@@ -139,12 +154,13 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
 
-        final String formatted = formatter.format("  Keyword      123  \n   OtherKeyword   456\n", robotFormatter);
+        final Document document = new Document("  Keyword      123  ", "   OtherKeyword   456", "");
+        formatter.format(document);
 
-        assertThat(formatted).isEqualTo("    Keyword    123    \n    OtherKeyword    456\n");
+        assertThat(document.get()).isEqualTo("    Keyword    123    \n    OtherKeyword    456\n");
     }
 
     @Test
@@ -153,12 +169,13 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.DYNAMIC.name());
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
 
-        final String formatted = formatter.format("  Keyword      123  \n   OtherKeyword   456\n", robotFormatter);
+        final Document document = new Document("  Keyword      123  ", "   OtherKeyword   456", "");
+        formatter.format(document);
 
-        assertThat(formatted).isEqualTo("    Keyword         123    \n    OtherKeyword    456\n");
+        assertThat(document.get()).isEqualTo("    Keyword         123    \n    OtherKeyword    456\n");
     }
 
     @Test
@@ -167,12 +184,13 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n", true);
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
 
-        final String formatted = formatter.format("\tKeyword\t 123\t\n\tNext \t \t line", robotFormatter);
+        final Document document = new Document("\tKeyword\t 123\t", "\tNext \t \t line");
+        formatter.format(document);
 
-        assertThat(formatted).isEqualTo("  Keyword  123  \n  Next  line");
+        assertThat(document.get()).isEqualTo("  Keyword  123  \n  Next  line");
     }
 
     @Test
@@ -182,26 +200,13 @@ public class SuiteSourceEditorFormatterTest {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 3);
         preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
 
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = new RobotFormatter("\n", false);
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
 
-        final String formatted = formatter.format("case \n  \n  Keyword    123 \t \n   [Return]    456 \t\t  \n",
-                robotFormatter);
+        final Document document = new Document("case ", "  ", "  Keyword    123 \t ", "   [Return]    456 \t\t  ", "");
+        formatter.format(document);
 
-        assertThat(formatted).isEqualTo("case\n\n   Keyword   123\n   [Return]   456\n");
-    }
-
-    @Test
-    public void contentIsNotChanged_whenIOExceptionIsThrownDuringFormatting() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-
-        final SuiteSourceEditorFormatter formatter = new SuiteSourceEditorFormatter();
-        final RobotFormatter robotFormatter = mock(RobotFormatter.class);
-        when(robotFormatter.format(anyString(), any(ILineFormatter.class))).thenThrow(IOException.class);
-
-        final String formatted = formatter.format("abc     def   ", robotFormatter);
-
-        assertThat(formatted).isEqualTo("abc     def   ");
+        assertThat(document.get()).isEqualTo("case\n\n   Keyword   123\n   [Return]   456\n");
     }
 
     private static class ExtendedDocument extends Document implements IDocumentExtension4 {

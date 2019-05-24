@@ -6,13 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.text.Region;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -22,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SourceDocumentFormatter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
@@ -52,11 +53,13 @@ public class OnSaveSourceFormattingTriggerTest {
     public void formattingIsNotStarted_whenItIsDisabled() throws Exception {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
 
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final RobotSuiteFile suite = spy(model.createSuiteFile(projectProvider.getFile("suite.robot")));
+
+        final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
-        final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
+        final OnSaveSourceFormattingTrigger trigger = spy(new OnSaveSourceFormattingTrigger());
+        doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
         verifyZeroInteractions(formatter);
@@ -68,10 +71,11 @@ public class OnSaveSourceFormattingTriggerTest {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.tsv"));
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
-        final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
+        final OnSaveSourceFormattingTrigger trigger = spy(new OnSaveSourceFormattingTrigger());
+        doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
         verifyZeroInteractions(formatter);
@@ -81,18 +85,17 @@ public class OnSaveSourceFormattingTriggerTest {
     @Test
     public void formattingIsStartedForWholeDocument_whenItIsEnabled() throws Exception {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, false);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final Document document = new Document("line1", "line2", "line3");
-        final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
+        final OnSaveSourceFormattingTrigger trigger = spy(new OnSaveSourceFormattingTrigger());
+        doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(() -> document, selectionUpdater, suite, new NullProgressMonitor());
 
-        verify(formatter).format(document, new Region(0, document.getLength()));
-        verifyNoMoreInteractions(formatter);
+        verify(formatter).format(document);
         verify(selectionUpdater).saveSelection(document);
         verify(selectionUpdater).fixSelection(document);
         verifyNoMoreInteractions(selectionUpdater);
@@ -104,15 +107,16 @@ public class OnSaveSourceFormattingTriggerTest {
         preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, true);
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
+
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
         final Document document = new Document("line1", "line2", "line3");
-        final OnSaveSourceFormattingTrigger trigger = new OnSaveSourceFormattingTrigger(formatter);
+        final OnSaveSourceFormattingTrigger trigger = spy(new OnSaveSourceFormattingTrigger());
+        doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(() -> document, selectionUpdater, suite, new NullProgressMonitor());
 
         verify(formatter).format(document, newArrayList(0, 1, 2));
-        verifyNoMoreInteractions(formatter);
         verify(selectionUpdater).saveSelection(document);
         verify(selectionUpdater).fixSelection(document);
         verifyNoMoreInteractions(selectionUpdater);

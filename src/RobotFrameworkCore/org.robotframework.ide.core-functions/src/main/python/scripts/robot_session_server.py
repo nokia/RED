@@ -303,7 +303,6 @@ def convert_robot_data_file(original_filepath):
     from robot.tidy import Tidy
     from base64 import b64encode
 
-    target_filepath = original_filepath.rsplit('.', 1)[0] + '.robot'
     converted_content = Tidy(format='robot').file(original_filepath)
 
     if sys.version_info < (3, 0, 0):

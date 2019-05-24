@@ -27,12 +27,12 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
+import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 import org.robotframework.red.graphics.ColorsManager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -78,6 +78,7 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
+    public static final String FORMATTER_TYPE = "red.editor.formatter.type";
     public static final String FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED = "red.editor.formatter.separatorAdjustmentEnabled";
     public static final String FORMATTER_SEPARATOR_TYPE = "red.editor.formatter.separatorType";
     public static final String FORMATTER_SEPARATOR_LENGTH = "red.editor.formatter.separatorLength";
@@ -245,6 +246,10 @@ public class RedPreferences {
 
     public LinkedModeStrategy getAssistantLinkedArgumentsMode() {
         return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
+    }
+
+    public boolean isCustomFormatterUsed() {
+        return FormatterType.valueOf(store.getString(FORMATTER_TYPE)) == FormatterType.CUSTOM;
     }
 
     public boolean isFormatterSeparatorAdjustmentEnabled() {
@@ -619,5 +624,10 @@ public class RedPreferences {
     public enum LinkedModeStrategy {
         CYCLE,
         EXIT_ON_LAST
+    }
+
+    public enum FormatterType {
+        CUSTOM,
+        TIDY
     }
 }

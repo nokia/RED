@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,10 +47,12 @@ public class CodeFormatterPreferencesPageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(6);
+        assertThat(editors).hasSize(7);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
+        assertThat(namesGroupedByType).hasEntrySatisfying(RadioGroupFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_TYPE));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED,
                         RedPreferences.FORMATTER_IGNORE_LONG_CELLS_ENABLED,

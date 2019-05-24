@@ -11,52 +11,56 @@ import java.util.function.Supplier;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.Region;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SourceDocumentFormatter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorDifferenceFinder;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
 
 import com.google.common.annotations.VisibleForTesting;
 
-class OnSaveSourceFormattingTrigger {
+public class OnSaveSourceFormattingTrigger {
 
-    private final SuiteSourceEditorFormatter formatter;
+    private final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
-    OnSaveSourceFormattingTrigger() {
-        this(new SuiteSourceEditorFormatter());
-    }
-
-    @VisibleForTesting
-    OnSaveSourceFormattingTrigger(final SuiteSourceEditorFormatter formatter) {
-        this.formatter = formatter;
-    }
 
     void formatSourceIfRequired(final Supplier<IDocument> documentSupplier,
             final SuiteSourceEditorSelectionFixer selectionFixer, final RobotSuiteFile fileModel,
             final IProgressMonitor progressMonitor) {
+
+        final SourceDocumentFormatter formatter = getFormatter(fileModel);
+
         if (shouldFormat(fileModel)) {
             final IDocument document = documentSupplier.get();
             try {
                 selectionFixer.saveSelection(document);
 
-                if (RedPlugin.getDefault().getPreferences().isSaveActionsChangedLinesOnlyEnabled()) {
+                if (shouldFormatChangedLinesOnly()) {
                     final List<Integer> linesToFormat = SuiteSourceEditorDifferenceFinder
                             .calculateChangedLines(fileModel.getFile(), document, progressMonitor);
                     formatter.format(document, linesToFormat);
                 } else {
-                    formatter.format(document, new Region(0, document.getLength()));
+                    formatter.format(document);
                 }
-
                 selectionFixer.fixSelection(document);
+
             } catch (final BadLocationException e) {
                 // some regions where not formatted
             }
         }
     }
 
+    @VisibleForTesting
+    public SourceDocumentFormatter getFormatter(final RobotSuiteFile fileModel) {
+        return SourceDocumentFormatter.create(preferences, fileModel.getRuntimeEnvironment());
+    }
+
     private boolean shouldFormat(final RobotSuiteFile fileModel) {
-        return !fileModel.isTsvFile() && RedPlugin.getDefault().getPreferences().isSaveActionsCodeFormattingEnabled();
+        return !fileModel.isTsvFile() && preferences.isSaveActionsCodeFormattingEnabled();
+    }
+
+    private boolean shouldFormatChangedLinesOnly() {
+        return preferences.isSaveActionsChangedLinesOnlyEnabled();
     }
 }

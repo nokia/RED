@@ -6,7 +6,7 @@
 package org.rf.ide.core.testdata.formatter;
 
 @FunctionalInterface
-public interface ILineFormatter {
+interface ILineFormatter {
 
     String format(String line);
 }

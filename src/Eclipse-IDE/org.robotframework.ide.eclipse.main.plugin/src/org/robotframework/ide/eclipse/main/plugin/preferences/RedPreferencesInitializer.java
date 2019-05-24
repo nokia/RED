@@ -16,17 +16,18 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
+import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FormatterType;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -115,6 +116,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeFormatterPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.FORMATTER_TYPE, FormatterType.CUSTOM.name());
         preferences.putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
         preferences.put(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferences.putInt(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);

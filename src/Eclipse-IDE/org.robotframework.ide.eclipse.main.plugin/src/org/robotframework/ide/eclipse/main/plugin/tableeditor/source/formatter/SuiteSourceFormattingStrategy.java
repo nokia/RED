@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter;
 
+import java.util.function.Supplier;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -20,13 +22,13 @@ import org.eclipse.jface.text.formatter.IFormattingStrategyExtension;
  */
 public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IFormattingStrategyExtension {
 
-    private final SuiteSourceEditorFormatter sourceFormatter;
+    private final Supplier<SourceDocumentFormatter> sourceFormatter;
 
     private IDocument documentToFormat;
 
     private IRegion regionToFormat;
 
-    public SuiteSourceFormattingStrategy(final SuiteSourceEditorFormatter sourceFormatter) {
+    public SuiteSourceFormattingStrategy(final Supplier<SourceDocumentFormatter> sourceFormatter) {
         this.sourceFormatter = sourceFormatter;
     }
 
@@ -67,7 +69,7 @@ public class SuiteSourceFormattingStrategy implements IFormattingStrategy, IForm
     @Override
     public void format() {
         try {
-            sourceFormatter.format(documentToFormat, regionToFormat);
+            sourceFormatter.get().format(documentToFormat, regionToFormat);
         } catch (final BadLocationException e) {
             // some regions where not formatted
         }

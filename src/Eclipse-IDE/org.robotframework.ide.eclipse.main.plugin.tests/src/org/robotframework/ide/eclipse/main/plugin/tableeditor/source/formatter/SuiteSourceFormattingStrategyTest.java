@@ -22,8 +22,8 @@ public class SuiteSourceFormattingStrategyTest {
 
     @Test
     public void nothingHappens_whenStringIsFormatted() throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
-        final SuiteSourceFormattingStrategy strategy = new SuiteSourceFormattingStrategy(formatter);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
+        final SuiteSourceFormattingStrategy strategy = new SuiteSourceFormattingStrategy(() -> formatter);
 
         assertThat(strategy.format("", false, "", null)).isNull();
         verifyZeroInteractions(formatter);
@@ -31,7 +31,7 @@ public class SuiteSourceFormattingStrategyTest {
 
     @Test
     public void wholeDocumentIsFormatted_whenContextDocumentPropertyIsSetToTrue() throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
         final IDocument document = new Document("line1", "line2", "line3");
 
         final FormattingContext context = new FormattingContext();
@@ -46,7 +46,7 @@ public class SuiteSourceFormattingStrategyTest {
 
     @Test
     public void singleRegionLineIsFormatted_whenContextDocumentPropertyIsSetToFalse() throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
         final IDocument document = new Document("line1", "line2", "line3");
 
         final FormattingContext context = new FormattingContext();
@@ -62,7 +62,7 @@ public class SuiteSourceFormattingStrategyTest {
 
     @Test
     public void multipleRegionLinesAreFormatted_whenContextDocumentPropertyIsSetToFalse() throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
         final IDocument document = new Document("line1", "line2", "line3");
 
         final FormattingContext context = new FormattingContext();
@@ -79,7 +79,7 @@ public class SuiteSourceFormattingStrategyTest {
     @Test
     public void wholeDocumentIsFormatted_whenContextDocumentPropertyIsSetToFalseAndDocumentHasOneLine()
             throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
         final IDocument document = new Document("singleLine");
 
         final FormattingContext context = new FormattingContext();
@@ -96,7 +96,7 @@ public class SuiteSourceFormattingStrategyTest {
     @Test
     public void wholeDocumentIsFormatted_whenContextDocumentPropertyIsSetToFalseAndIncorrectRegionIsSet()
             throws Exception {
-        final SuiteSourceEditorFormatter formatter = mock(SuiteSourceEditorFormatter.class);
+        final SuiteSourceEditorCustomFormatter formatter = mock(SuiteSourceEditorCustomFormatter.class);
         final IDocument document = new Document("line1", "line2", "line3");
 
         final FormattingContext context = new FormattingContext();
@@ -110,8 +110,8 @@ public class SuiteSourceFormattingStrategyTest {
         verifyNoMoreInteractions(formatter);
     }
 
-    private void format(final SuiteSourceEditorFormatter formatter, final FormattingContext context) {
-        final SuiteSourceFormattingStrategy strategy = new SuiteSourceFormattingStrategy(formatter);
+    private void format(final SuiteSourceEditorCustomFormatter formatter, final FormattingContext context) {
+        final SuiteSourceFormattingStrategy strategy = new SuiteSourceFormattingStrategy(() -> formatter);
         strategy.formatterStarts(context);
         strategy.format();
         strategy.formatterStops();

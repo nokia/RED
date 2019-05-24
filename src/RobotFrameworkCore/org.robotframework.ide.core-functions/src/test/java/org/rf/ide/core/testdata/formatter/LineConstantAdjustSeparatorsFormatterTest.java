@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class AdjustsConstantSeparatorsFormatterTest {
+public class LineConstantAdjustSeparatorsFormatterTest {
 
     @Test
     public void separatorLengthsAreAdjusted() throws Exception {
-        final ILineFormatter formatter = new AdjustsConstantSeparatorsFormatter(2);
+        final ILineFormatter formatter = new LineConstantAdjustSeparatorsFormatter(2);
 
         assertThat(formatter.format("text")).isEqualTo("text");
         assertThat(formatter.format(" text")).isEqualTo(" text");

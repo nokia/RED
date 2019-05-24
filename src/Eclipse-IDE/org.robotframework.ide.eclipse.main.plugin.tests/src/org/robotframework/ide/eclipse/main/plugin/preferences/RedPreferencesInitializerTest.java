@@ -10,15 +10,16 @@ import static org.mockito.Mockito.verify;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
+import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FormatterType;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter.FormattingSeparatorType;
 
 public class RedPreferencesInitializerTest {
 
@@ -104,6 +105,7 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
+        verify(preferences).put(RedPreferences.FORMATTER_TYPE, FormatterType.CUSTOM.name());
         verify(preferences).putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
         verify(preferences).put(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         verify(preferences).putInt(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);

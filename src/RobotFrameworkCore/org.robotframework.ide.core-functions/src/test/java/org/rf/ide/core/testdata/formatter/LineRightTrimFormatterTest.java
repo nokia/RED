@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class RightTrimFormatterTest {
+public class LineRightTrimFormatterTest {
 
     @Test
     public void linesAreRightTrimmed() throws Exception {
-        final ILineFormatter formatter = new RightTrimFormatter();
+        final ILineFormatter formatter = new LineRightTrimFormatter();
 
         assertThat(formatter.format("text")).isEqualTo("text");
         assertThat(formatter.format("text ")).isEqualTo("text");

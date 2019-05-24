@@ -15,15 +15,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 
-public class AdjustsDynamicSeparatorsFormatter implements ILineFormatter {
+class LineDynamicAdjustSeparatorsFormatter implements ILineFormatter {
 
-    public static AdjustsDynamicSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength) {
+    static LineDynamicAdjustSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength) {
         return create(tabsFreeContent, separatorLength, -1);
     }
 
-    public static AdjustsDynamicSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength,
+    static LineDynamicAdjustSeparatorsFormatter create(final String tabsFreeContent, final int separatorLength,
             final int cellLengthLimit) {
-        return new AdjustsDynamicSeparatorsFormatter(Strings.repeat(" ", separatorLength),
+        return new LineDynamicAdjustSeparatorsFormatter(Strings.repeat(" ", separatorLength),
                 countColumnLengths(tabsFreeContent, cellLengthLimit));
     }
 
@@ -70,7 +70,7 @@ public class AdjustsDynamicSeparatorsFormatter implements ILineFormatter {
     private final List<Integer> columnLengths;
 
     @VisibleForTesting
-    AdjustsDynamicSeparatorsFormatter(final String separator, final List<Integer> columnLengths) {
+    LineDynamicAdjustSeparatorsFormatter(final String separator, final List<Integer> columnLengths) {
         this.separator = separator;
         this.columnLengths = columnLengths;
     }

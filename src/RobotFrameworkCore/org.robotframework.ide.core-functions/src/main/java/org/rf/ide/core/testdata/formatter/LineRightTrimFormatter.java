@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.testdata.formatter;
 
-public class RightTrimFormatter implements ILineFormatter {
+class LineRightTrimFormatter implements ILineFormatter {
 
     @Override
     public String format(final String line) {

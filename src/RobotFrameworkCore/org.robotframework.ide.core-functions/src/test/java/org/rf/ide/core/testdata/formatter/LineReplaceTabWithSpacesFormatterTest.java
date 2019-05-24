@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class ReplaceTabWithSpacesFormatterTest {
+public class LineReplaceTabWithSpacesFormatterTest {
 
     @Test
     public void tabsAreReplacedWithSpaces() throws Exception {
-        final ILineFormatter formatter = new ReplaceTabWithSpacesFormatter(2);
+        final ILineFormatter formatter = new LineReplaceTabWithSpacesFormatter(2);
 
         assertThat(formatter.format("text")).isEqualTo("text");
         assertThat(formatter.format("text \t")).isEqualTo("text   ");

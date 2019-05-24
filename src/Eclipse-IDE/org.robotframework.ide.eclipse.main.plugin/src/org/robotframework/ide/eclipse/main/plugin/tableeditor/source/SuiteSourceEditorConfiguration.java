@@ -42,8 +42,10 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
@@ -90,7 +92,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorFormatter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SourceDocumentFormatter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceFormattingStrategy;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -498,9 +500,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IContentFormatter getContentFormatter(final ISourceViewer sourceViewer) {
+        final RedPreferences prefs = RedPlugin.getDefault().getPreferences();
+        final IRuntimeEnvironment env = editor.getFileModel().getRuntimeEnvironment();
+
         final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
                 getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
-        formatter.setMasterStrategy(new SuiteSourceFormattingStrategy(new SuiteSourceEditorFormatter()));
+        formatter
+                .setMasterStrategy(new SuiteSourceFormattingStrategy(() -> SourceDocumentFormatter.create(prefs, env)));
         return formatter;
     }
 }

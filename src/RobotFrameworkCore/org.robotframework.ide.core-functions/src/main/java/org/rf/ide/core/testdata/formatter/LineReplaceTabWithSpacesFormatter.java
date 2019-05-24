@@ -7,17 +7,17 @@ package org.rf.ide.core.testdata.formatter;
 
 import com.google.common.base.Strings;
 
-public class AdjustsConstantSeparatorsFormatter implements ILineFormatter {
+class LineReplaceTabWithSpacesFormatter implements ILineFormatter {
 
     private final String separator;
 
-    public AdjustsConstantSeparatorsFormatter(final int separatorLength) {
+    LineReplaceTabWithSpacesFormatter(final int separatorLength) {
         this.separator = Strings.repeat(" ", separatorLength);
     }
 
     @Override
     public String format(final String line) {
-        return line.replaceAll("\\s{2,}", separator);
+        return line.replaceAll("\t", separator);
     }
 
 }
