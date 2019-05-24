@@ -266,7 +266,7 @@ public class ReferencedLibraryLocatorTest {
         verifyZeroInteractions(importer);
 
         verify(detector).libraryDetectingByNameFailed(eq("not_existing"), eq(Optional.empty()),
-                startsWith("RED python session problem"));
+                startsWith("Following exception has been thrown:"));
         verifyNoMoreInteractions(detector);
     }
 

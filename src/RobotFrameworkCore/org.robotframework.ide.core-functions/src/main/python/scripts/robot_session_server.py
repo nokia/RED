@@ -41,14 +41,25 @@ def encode_result_or_exception(func):
         try:
             result['result'] = func(*args, **kwargs)
             return result
-        except:
-            msg = traceback.format_exc()
+        except Exception as e:
+            formatted_lines = traceback.format_exc().splitlines()
+            msg = __cut_unimportant_exceptions(formatted_lines)
             result['exception'] = msg
             ERR_LOGGER.exception('')
             return result
 
     return inner
 
+def __cut_unimportant_exceptions(lines):
+    traceback_found = False
+    for id, line in reversed(list(enumerate(lines))):
+        if traceback_found:
+            if line.startswith('Exception: '):
+                break
+        else:
+            if line == 'Traceback (most recent call last):':
+                traceback_found = True
+    return '\n'.join(lines[id:])
 
 def logargs(func):
 
@@ -135,7 +146,7 @@ def cleanup_sys_path(to_call):
 @logargs
 def check_server_availability(interpreter_path):
     global INTERPRETER_PATH
-    if interpreter_path != "":
+    if interpreter_path != '':
         INTERPRETER_PATH = interpreter_path
 
 
@@ -370,7 +381,7 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
             raise Exception(err.decode('UTF-8', 'replace'))
     except queue.Empty:
         process.kill()
-        raise queue.Empty("Libdoc not generated due to timeout")
+        raise queue.Empty('Libdoc not generated due to timeout')
 
 
 @logresult
@@ -463,8 +474,8 @@ if __name__ == '__main__':
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
     server.register_function(start_keyword_auto_discovering, 'startKeywordAutoDiscovering')
     server.register_function(stop_auto_discovering, 'stopAutoDiscovering')
-    server.register_function(convert_robot_data_file, "convertRobotDataFile")
-    server.register_function(run_rf_lint, "runRfLint")
+    server.register_function(convert_robot_data_file, 'convertRobotDataFile')
+    server.register_function(run_rf_lint, 'runRfLint')
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(create_libdoc_in_separate_process, 'createLibdocInSeparateProcess')
     server.register_function(create_html_doc, 'createHtmlDoc')
@@ -477,7 +488,7 @@ if __name__ == '__main__':
     robot_ver = __get_robot_version()
     print('# RED session server started @' + str(PORT))
     print('# python version: ' + sys.version)
-    print('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
+    print('# robot version: ' + (robot_ver if robot_ver else '<no robot installed>'))
     print('# script path: ' + __get_script_path())
     print('\n')
 
