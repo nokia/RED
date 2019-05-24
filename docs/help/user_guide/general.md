@@ -35,11 +35,12 @@ validation.
 ### Automatic source formatting CTRL+SHIFT+F
 
 Formatting source is Eclipse based mechanism which provides code formatting
-with several predefined rules which are disabled by default.  
+with several predefined rules which are disabled by default. Alternatively it
+is also possible to use `Robot Tidy` tool to format the source.
 
 Source code formatting preferences can be configured at `[ Window ->
 Preferences -> Robot Framework -> Editor -> Code
-Formatter](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter\)'\))`
+Formatter](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter\)'\))`.
 
 It is invoked by right click menu in Source editor or automatically as editor
 save action, which can be configured at `[ Window -> Preferences -> Robot
