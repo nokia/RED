@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _0JFPYBQ-EeWWV9IuysVI_A
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/14/18 4:48 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/22/19 5:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -65,6 +65,7 @@ with [get-view Debug | get-tree] {
 }
 
 //check Outline
+get-menu -path "Window/Show View/Outline" | click
 get-view Outline | get-button "Expand All" | click
 
 with [get-view Outline | get-tree] {
