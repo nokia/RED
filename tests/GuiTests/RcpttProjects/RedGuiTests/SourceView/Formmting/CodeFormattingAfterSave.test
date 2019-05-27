@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _f4ioMFeqEemi06ncdTtjmA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/5/19 5:20 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/27/19 11:02 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -176,17 +176,16 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Library               DateTime\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
-    + "                      log                                                         7\n"
-    + "                      log                                                         8\n"
-    + "                      log                                                         9\n"
-    + "                      Should Be Equal As Integers                                 55             66\n\n\n"
+    + "    log                            7\n"
+    + "    log                            8\n"
+    + "    log                            9\n"
+    + "    Should Be Equal As Integers    55             66\n\n\n"
     + "* ** Keywords ***\n"
     + "kw 1\n"
-    + "                      Should Be Equal As Strings                                  t1             t2\n"
-    + "                      log                                                         78\n"
-    + "                      Should Be Equal As Integers                                 first          second\n"
-    + "                      HEre is very long kw name that is longer then kw section    and this is    its arg" 
-    | verify-true
+    + "    Should Be Equal As Strings     t1             t2\n"
+    + "    log                            78\n"
+    + "    Should Be Equal As Integers    first          second\n"
+    + "    HEre is very long kw name that is longer then kw section    and this is    its arg" | verify-true 
     
 //reset prefernce    
 get-preferences-menu | click
