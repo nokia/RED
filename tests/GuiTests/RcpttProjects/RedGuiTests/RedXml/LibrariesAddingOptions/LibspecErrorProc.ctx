@@ -5,8 +5,8 @@ Element-Name: LibspecErrorProc
 Element-Type: context
 Element-Version: 2.0
 Id: _VwgyEChbEeiftdZfQXkTXA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 11:47 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/28/19 2:02 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -28,7 +28,7 @@ proc "check-error-for-libspec" [val file_name] [val lib_name] [val path] [val pr
 	        -after [get-label "See 'Details' for more information."] | get-property text 
 	        | equals [format "Library specification generation problem\n\n"
 	         + "Problem occurred during generating libdoc for '%s' library located at '.*%s'.\n"   
-	         + "RED python session problem. Following exception has been thrown by python service:\n"
+	         + "Following exception has been thrown:\n"
 	         + "            Traceback \(most recent call last\):\n"
 	         + "(.*\n)+"
 	         +  "            Exception: %s\n" 

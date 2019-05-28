@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/27/19 3:15 PM
+Save-Time: 5/28/19 3:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -260,7 +260,23 @@ with [get-editor "MainClass.py" | get-text-viewer] {
 }
 
 get-editor "MainClass.py" | get-text-viewer | set-caret-pos 12 7
-check-error-for-libspec -lib_name  "MainClass" -path "NewProject[\\\\/]imports[\\\\/]MainClass.py" -file_name "MainClass.py"
-	 -problem "Importing test library '.*NewProject[\\\\/]imports[\\\\/]MainClass.py' failed: ImportError: cannot import name SimpleClass"
+
+exec-with-options {
+    get-editor "MainClass.py" | get-text-viewer | key-type "M1+s"
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+        -after [get-label "See 'Details' for more information."] | get-property text 
+        | equals "Library specification generation problem\n\n"
+        + "Problem occurred during generating libdoc for 'MainClass' library located at '.*NewProject[\\\\/]imports[\\\\/]MainClass.py'.\n"
+        + "Following exception has been thrown:\n"
+        + "            Exception: Importing test library '.*NewProject[\\\\/]imports[\\\\/]MainClass.py' failed: ImportError: cannot import name SimpleClass\n"
+        + "            Traceback \(most recent call last\):\n"
+        + "              File \".*NewProject[\\\\/]imports[\\\\/]MainClass.py\", line 1, in <module>\n"
+        + "                from class_to_import import SimpleClass\n"
+        + "            PYTHONPATH:\n"
+        + "              (.*\n)*"
+        + "            Try --help for usage information." | verify-true
+
+} -allowStatusDialog
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
