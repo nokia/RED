@@ -123,7 +123,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         removeAllUnusedLibspecsFiles(project);
     }
 
-    private static void removeAllUnusedLibspecsFiles(final RobotProject project) {
+    public static void removeAllUnusedLibspecsFiles(final RobotProject project) {
         final LibspecsFolder libspecsFolder = project.getLibspecsFolder();
         final Set<IFile> filesToPreserve = project.getLibraryDescriptorsStream()
                 .map(LibraryDescriptor::generateLibspecFileName)
