@@ -50,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProjectBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibrariesProjectConfigurationEditorPart;
@@ -259,6 +260,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
         final RobotProject project = editorInput.getRobotProject();
         project.clearAll();
         new RedEclipseProjectConfigWriter().writeConfiguration(editorInput.getProjectConfiguration(), project);
+
+        RobotProjectBuilder.removeAllUnusedLibspecsFiles(project);
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {
