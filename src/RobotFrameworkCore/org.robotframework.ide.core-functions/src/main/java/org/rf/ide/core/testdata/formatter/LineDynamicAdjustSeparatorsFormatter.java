@@ -76,7 +76,7 @@ class LineDynamicAdjustSeparatorsFormatter implements ILineFormatter {
     }
 
     @Override
-    public String format(final String line) {
+    public String format(final int lineNumber, final String line) {
         final List<String> cells = CELL_SPLITTER.splitToList(line);
 
         final StringBuilder formatted = new StringBuilder();

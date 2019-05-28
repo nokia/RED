@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -18,9 +19,12 @@ public class RedFormatter implements RobotSourceFormatter {
 
     private final FormatterSettings settings;
 
+    private final Set<Integer> forBodyLines;
 
-    public RedFormatter(final FormatterSettings settings) {
+
+    public RedFormatter(final FormatterSettings settings, final Set<Integer> forBodyLines) {
         this.settings = settings;
+        this.forBodyLines = forBodyLines;
     }
 
     @Override
@@ -29,8 +33,8 @@ public class RedFormatter implements RobotSourceFormatter {
             final List<ILineFormatter> lineFormatters = new ArrayList<>();
             String toFormat = content;
 
+            final int separatorLength = settings.getSeparatorLength();
             if (settings.isSeparatorAdjustmentEnabled()) {
-                final int separatorLength = settings.getSeparatorLength();
                 toFormat = format(content, new LineReplaceTabWithSpacesFormatter(separatorLength));
                 switch (settings.getSeparatorType()) {
                     case CONSTANT:
@@ -49,6 +53,7 @@ public class RedFormatter implements RobotSourceFormatter {
             if (settings.isRightTrimEnabled()) {
                 lineFormatters.add(new LineRightTrimFormatter());
             }
+            lineFormatters.add(new LineIndentFormatter(forBodyLines, separatorLength));
 
             return format(toFormat, lineFormatters);
         } catch (final IOException e) {
@@ -67,18 +72,20 @@ public class RedFormatter implements RobotSourceFormatter {
             return content;
         }
 
+        int lineNumber = 0;
         final StringBuilder formattedContent = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new StringReader(content))) {
             String line = reader.readLine();
             while (line != null) {
                 for (final ILineFormatter formatter : lineFormatters) {
-                    line = formatter.format(line);
+                    line = formatter.format(lineNumber, line);
                 }
                 formattedContent.append(line);
                 line = reader.readLine();
                 if (line != null || !settings.shouldSkipDelimiterInLastLine()) {
                     formattedContent.append(settings.getLineDelimiter());
                 }
+                lineNumber++;
             }
         }
         return formattedContent.toString();

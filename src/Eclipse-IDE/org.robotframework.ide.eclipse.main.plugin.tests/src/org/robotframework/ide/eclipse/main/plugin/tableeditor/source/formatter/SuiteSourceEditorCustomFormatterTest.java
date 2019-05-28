@@ -13,24 +13,37 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentRewriteSession;
 import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentRewriteSessionListener;
 import org.eclipse.jface.text.Region;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.red.junit.PreferenceUpdater;
+import org.robotframework.red.junit.ProjectProvider;
 
 public class SuiteSourceEditorCustomFormatterTest {
 
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(SuiteSourceEditorCustomFormatterTest.class);
+
     @Rule
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+
 
     @Test
     public void documentIsNotChanged_whenFormatterPreferencesAreDisabled() throws Exception {
@@ -207,6 +220,38 @@ public class SuiteSourceEditorCustomFormatterTest {
         formatter.format(document);
 
         assertThat(document.get()).isEqualTo("case\n\n   Keyword   123\n   [Return]   456\n");
+    }
+    
+    @Test
+    public void newStyleFORLoopBodyIsIndented() throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
+
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
+
+        final RobotDocument document = robotDocument(
+                "*** Test Cases ***",
+                "case",
+                "  FOR  ${x}  IN RANGE  10",
+                "  Log  ${x}",
+                "  kw  1  2  3",
+                "  END",
+                "  kw  1  2  3");
+        formatter.format(document);
+
+        assertThat(document.get()).isEqualTo(
+                "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n    Log  ${x}\n    kw  1  2  3\n  END\n  kw  1  2  3");
+    }
+
+    private static RobotDocument robotDocument(final String... lines) {
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 1));
+        final File file = new File("file.robot");
+
+        final RobotDocument document = new RobotDocument(parser, file);
+        document.set(String.join("\n", lines));
+        return document;
     }
 
     private static class ExtendedDocument extends Document implements IDocumentExtension4 {

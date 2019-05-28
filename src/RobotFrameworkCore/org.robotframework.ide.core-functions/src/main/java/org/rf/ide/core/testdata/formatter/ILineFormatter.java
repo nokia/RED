@@ -8,5 +8,9 @@ package org.rf.ide.core.testdata.formatter;
 @FunctionalInterface
 interface ILineFormatter {
 
-    String format(String line);
+    String format(int lineNumber, String line);
+
+    default String format(final String line) {
+        return format(0, line);
+    }
 }

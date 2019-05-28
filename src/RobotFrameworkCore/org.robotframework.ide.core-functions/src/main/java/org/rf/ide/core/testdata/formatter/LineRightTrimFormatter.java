@@ -8,7 +8,7 @@ package org.rf.ide.core.testdata.formatter;
 class LineRightTrimFormatter implements ILineFormatter {
 
     @Override
-    public String format(final String line) {
+    public String format(final int lineNumber, final String line) {
         return line.replaceFirst("\\s+$", "");
     }
 

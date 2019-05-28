@@ -16,7 +16,7 @@ class LineReplaceTabWithSpacesFormatter implements ILineFormatter {
     }
 
     @Override
-    public String format(final String line) {
+    public String format(final int lineNumber, final String line) {
         return line.replaceAll("\t", separator);
     }
 

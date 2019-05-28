@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class RedFormatterTest {
 
     @Test
     public void sameContentIsReturned_whenLineFormattersAreEmpty() throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", true));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", true), new HashSet<>());
         final List<ILineFormatter> lineFormatters = spy(new ArrayList<>());
 
         final String formatted = formatter.format("abc", lineFormatters);
@@ -36,29 +37,29 @@ public class RedFormatterTest {
 
     @Test
     public void sameContentIsReturned_whenContentIsEmpty() throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", true));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", true), new HashSet<>());
 
-        final String formatted = formatter.format("", line -> line + " formatted");
+        final String formatted = formatter.format("", (k, line) -> line + " formatted");
 
         assertThat(formatted).isEqualTo("");
     }
 
     @Test
     public void formattedContentIsReturned_whenSingleLineFormatterIsProvided() throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", false));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", false), new HashSet<>());
 
-        final String formatted = formatter.format("abc\ndef\nghi\n", line -> "1 " + line + " 2");
+        final String formatted = formatter.format("abc\ndef\nghi\n", (k, line) -> "1 " + line + " 2");
 
         assertThat(formatted).isEqualTo("1 abc 2\n1 def 2\n1 ghi 2\n");
     }
 
     @Test
     public void formattedContentIsReturned_whenSeveralLineFormattersAreProvided() throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", false));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", false), new HashSet<>());
         final List<ILineFormatter> lineFormatters = new ArrayList<>();
-        lineFormatters.add(line -> "prefix " + line);
-        lineFormatters.add(line -> "1 " + line + " 2");
-        lineFormatters.add(line -> line + "$$$");
+        lineFormatters.add((k, line) -> "prefix " + line);
+        lineFormatters.add((k, line) -> "1 " + line + " 2");
+        lineFormatters.add((k, line) -> line + "$$$");
 
         final String formatted = formatter.format("abc\ndef\nghi\n", lineFormatters);
 
@@ -68,9 +69,9 @@ public class RedFormatterTest {
     @Test
     public void formattedContentIsReturned_whenEndsWithLineDelimiterAndSkippingLastLineDelimiterIsEnabled()
             throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", true));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", true), new HashSet<>());
 
-        final String formatted = formatter.format("abc\ndef\nghi\n", line -> line + line);
+        final String formatted = formatter.format("abc\ndef\nghi\n", (k, line) -> line + line);
 
         assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi");
     }
@@ -78,9 +79,9 @@ public class RedFormatterTest {
     @Test
     public void formattedContentIsReturned_whenDoesNotEndWithLineDelimiterAndSkippingLastLineDelimiterIsEnabled()
             throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", true));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", true), new HashSet<>());
 
-        final String formatted = formatter.format("abc\ndef\nghi", line -> line + line);
+        final String formatted = formatter.format("abc\ndef\nghi", (k, line) -> line + line);
 
         assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi");
     }
@@ -88,9 +89,9 @@ public class RedFormatterTest {
     @Test
     public void formattedContentIsReturned_whenEndsWithLineDelimiterAndSkippingLastLineDelimiterIsDisabled()
             throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", false));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", false), new HashSet<>());
 
-        final String formatted = formatter.format("abc\ndef\nghi\n", line -> line + line);
+        final String formatted = formatter.format("abc\ndef\nghi\n", (k, line) -> line + line);
 
         assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi\n");
     }
@@ -98,9 +99,9 @@ public class RedFormatterTest {
     @Test
     public void formattedContentIsReturned_whenDoesNotEndWithLineDelimiterAndSkippingLastLineDelimiterIsDisabled()
             throws Exception {
-        final RedFormatter formatter = new RedFormatter(createSettings("\n", false));
+        final RedFormatter formatter = new RedFormatter(createSettings("\n", false), new HashSet<>());
 
-        final String formatted = formatter.format("abc\ndef\nghi", line -> line + line);
+        final String formatted = formatter.format("abc\ndef\nghi", (k, line) -> line + line);
 
         assertThat(formatted).isEqualTo("abcabc\ndefdef\nghighi\n");
     }
