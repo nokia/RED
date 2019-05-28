@@ -394,8 +394,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final String exception = (String) result.get("exception");
             final String indent = Strings.repeat(" ", 12);
             final String indentedException = indent + exception.replaceAll("\n", "\n" + indent);
-            throw new RuntimeEnvironmentException("RED python session problem. Following exception has been thrown by "
-                    + "python service:\n" + indentedException);
+            throw new RuntimeEnvironmentException("Following exception has been thrown:\n" + indentedException);
         }
         return result.get("result");
     }
