@@ -1,0 +1,200 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: FormattingAftersSaveForChangedLines
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Z9XTMILsEemG5cruxlOj_w
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 5/30/19 5:52 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// set test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library\tOperatingSystem\n"
+    + "Library   Collections  WITH NAME    abc\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log   6\n"
+    + "    #new loop\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "            ${resp}=    Should Be Equal    first    second    \n"
+    + "        Should Be Equal As Integers    ${resp.status_code}      200\n"
+    + "    END\n"
+    + "*** Keywords ***\n\n"
+    + "test 2\n"
+    + "    \n"
+    + "    SEPLcontrol.LIPLcontrol.thisSetupSomething   ${SDV_MPlane_IP}     ${SDV_SEM_path}    ${SCFundertest}\n"
+    + "    log  7\n"
+    + "    : FOR    ${counter}           IN RANGE           0                 ${NloopHO}\n"
+    + "    \\        Set Test Variable    ${counter}\n"
+    + "    \n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}    364\n"
+    + "@{newList}    1    2         3" 
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+//change prefernce = format on changed lines
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Save Actions"
+    with [get-group "Source code formatting"] {
+        get-button "Format editor contents" | check
+        get-button "Apply only on changed lines" | check
+        get-link "Configure formatter settings on <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.editor.formatter\">Code Formatter</a> preference page." 
+            | click-link
+    }
+    //change spaces to 6
+    get-button "Adjust separator lengths" | check
+    get-editbox -after [get-label "Separator length"] | set-text 6
+    get-button "Apply and Close" | click
+}
+
+//change alias name
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 40
+    type-text 1
+    key-type "M1+s"
+}
+
+//check that only 3. line was changed
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library\tOperatingSystem\n"
+    + "Library      Collections      WITH NAME      abc1\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log   6\n"
+    + "    #new loop\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "            ${resp}=    Should Be Equal    first    second    \n"
+    + "        Should Be Equal As Integers    ${resp.status_code}      200\n"
+    + "    END\n"
+    + "*** Keywords ***\n\n"
+    + "test 2\n"
+    + "    \n"
+    + "    SEPLcontrol.LIPLcontrol.thisSetupSomething   ${SDV_MPlane_IP}     ${SDV_SEM_path}    ${SCFundertest}\n"
+    + "    log  7\n"
+    + "    : FOR    ${counter}           IN RANGE           0                 ${NloopHO}\n"
+    + "    \\        Set Test Variable    ${counter}\n"
+    + "    \n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}    364\n"
+    + "@{newList}    1    2         3" | verify-true
+    
+// add new argument    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 25 31
+    type-text "  "
+    key-type "NUMPAD_4" 4
+    key-type "M1+s"
+}
+
+//check if only last line was chnaged
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library\tOperatingSystem\n"
+    + "Library      Collections      WITH NAME      abc1\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log   6\n"
+    + "    #new loop\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "            ${resp}=    Should Be Equal    first    second    \n"
+    + "        Should Be Equal As Integers    ${resp.status_code}      200\n"
+    + "    END\n"
+    + "*** Keywords ***\n\n"
+    + "test 2\n"
+    + "    \n"
+    + "    SEPLcontrol.LIPLcontrol.thisSetupSomething   ${SDV_MPlane_IP}     ${SDV_SEM_path}    ${SCFundertest}\n"
+    + "    log  7\n"
+    + "    : FOR    ${counter}           IN RANGE           0                 ${NloopHO}\n"
+    + "    \\        Set Test Variable    ${counter}\n"
+    + "    \n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}    364\n"
+    + "@{newList}      1      2      3      4" | verify-true
+    
+//chech if reformat shortcut will changed entire file    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 20 45
+    key-type "M1+M2+f"
+}
+
+// use Tidy - it will change entire file
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Robot Tidy formatter" | click
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 20 46
+    type-text 2
+    key-type "M1+s"
+}
+
+//varibale section was moved up
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library           OperatingSystem\n"
+    + "Library           Collections    WITH NAME    abc1\n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}      364\n"
+    + "@{newList}        1    2    3    4\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log    6\n"
+    + "    #new loop\n"
+    + "    : FOR    ${index}    IN RANGE    10\n"
+    + "    \\    ${resp}=    Should Be Equal    first    second\n"
+    + "    \\    Should Be Equal As Integers    ${resp.status_code}    200\n"
+    + "${EMPTY}\n\n"
+    + "*** Keywords ***\n"
+    + "test 2\n"
+    + "    SEPLcontrol.LIPLcontrol.thisSetupSomething    ${SDV_MPlane_IP}    ${SDV_SEM_path}    ${SCFundertest}\n"
+    + "    log    7\n"
+    + "    : FOR    ${counter}    IN RANGE    0    ${NloopHO}\n"
+    + "    \\    Set Test Variable    ${counter2}" | verify-true
+    
+
+// uncheck ".. on changed lines" and Set REd formater
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "RED formatter" | click
+    get-tree | select "Robot Framework/Editor/Save Actions"
+    get-group "Source code formatting" | get-button "Apply only on changed lines" | uncheck
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 22 50
+    set-caret-pos 23 41
+    key-type "NUMPAD_3" 3
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library      OperatingSystem\n"
+    + "Library      Collections      WITH NAME      abc1\n\n"
+    + "*** Variables ***\n"
+    + "${newScalar}      364\n"
+    + "@{newList}      1      2      3      4\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "      log      6\n"
+    + "      #new loop\n"
+    + "      : FOR      ${index}      IN RANGE      10\n"
+    + "      \\      ${resp}=      Should Be Equal      first      second\n"
+    + "      \\      Should Be Equal As Integers      ${resp.status_code}      200\n"
+    + "${EMPTY}\n\n"
+    + "*** Keywords ***\n"
+    + "test 2\n"
+    + "      SEPLcontrol.LIPLcontrol.thisSetupSomething      ${SDV_MPlane_IP}      ${SDV_SEM_path}      ${SCFundertest}\n"
+    + "      log      7\n"
+    + "      : FOR      ${counter}      IN RANGE      0      ${NloopHO}\n"
+    + "      \\      Set Test Variable      ${counter23}" | verify-true   
+    
+     
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
