@@ -8,6 +8,7 @@
 
 import sys
 import logging
+import re
 
 formatter = logging.Formatter('[%(asctime)s.%(msecs)d] %(message)s', '%H:%M:%S')
 std_handler = logging.StreamHandler(sys.stdout)
@@ -43,23 +44,25 @@ def encode_result_or_exception(func):
             return result
         except Exception as e:
             formatted_lines = traceback.format_exc().splitlines()
-            msg = __cut_unimportant_exceptions(formatted_lines)
+            msg = __cut_unimportant_red_exception(formatted_lines)
             result['exception'] = msg
             ERR_LOGGER.exception('')
             return result
 
     return inner
 
-def __cut_unimportant_exceptions(lines):
-    traceback_found = False
-    for id, line in reversed(list(enumerate(lines))):
-        if traceback_found:
-            if line.startswith('Exception: '):
+def __cut_unimportant_red_exception(lines):
+    exception_id = -1
+    exception_found = False
+    for i, line in list(enumerate(lines)):
+        if line.startswith('Exception: ') or re.search('^.+Error: ', line):
+            if exception_found:
+                exception_id = i
                 break
-        else:
-            if line == 'Traceback (most recent call last):':
-                traceback_found = True
-    return '\n'.join(lines[id:])
+            else:
+                exception_found = True
+    exception_id = exception_id if exception_id > -1 else 0
+    return '\n'.join(lines[exception_id:])
 
 def logargs(func):
 
