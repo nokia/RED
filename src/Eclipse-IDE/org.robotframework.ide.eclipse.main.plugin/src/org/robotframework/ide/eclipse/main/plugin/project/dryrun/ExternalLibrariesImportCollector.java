@@ -154,7 +154,9 @@ class ExternalLibrariesImportCollector {
         }
 
         private void locateRemoteLibrary(final String name, final List<RobotToken> arguments) {
-            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final Map<String, String> variablesMapping = currentSuite.getRobotProject().getRobotProjectHolder()
+                    .getVariableMappings();
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variablesMapping);
             final Optional<String> address = resolver.getUri();
             if (address.isPresent()) {
                 final String strippedAddress = RemoteArgumentsResolver

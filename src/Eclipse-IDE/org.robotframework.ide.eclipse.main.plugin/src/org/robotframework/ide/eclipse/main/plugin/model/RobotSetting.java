@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -217,7 +218,9 @@ public class RobotSetting extends RobotKeywordCall {
                     .stream()
                     .map(arg -> RobotToken.create(arg))
                     .collect(toList());
-            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final Map<String, String> variablesMapping = getSuiteFile().getRobotProject().getRobotProjectHolder()
+                    .getVariableMappings();
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variablesMapping);
             final Optional<String> uri = resolver.getUri();
             try {
                 final RemoteLocation remoteLocation = RemoteLocation.create(uri.get());

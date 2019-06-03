@@ -6,14 +6,18 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class RemoteArgumentsResolver {
+
+    private final Map<String, String> variableMappings;
 
     private final Optional<RobotToken> uriToken;
 
@@ -25,7 +29,8 @@ public class RemoteArgumentsResolver {
 
     private final ArgumentsDescriptor descriptor;
 
-    public RemoteArgumentsResolver(final List<RobotToken> arguments) {
+    public RemoteArgumentsResolver(final List<RobotToken> arguments, final Map<String, String> variableMappings) {
+        this.variableMappings = variableMappings;
         this.uriToken = selectUriToken(arguments);
         this.uri = selectUri(uriToken, arguments);
         this.timeoutToken = selectTimeoutToken(arguments);
@@ -74,7 +79,8 @@ public class RemoteArgumentsResolver {
         } else if (arguments.size() == 1 && isTimeout(arguments.get(0).getText())) {
             return Optional.of(RemoteLocation.DEFAULT_ADDRESS);
         } else if (uriToken.isPresent()) {
-            return Optional.of(addProtocolIfNecessary(stripUriArgumentPrefixIfNecessary(uriToken.get().getText())));
+            return Optional.of(addProtocolIfNecessary(stripUriArgumentPrefixIfNecessary(
+                    RobotExpressions.resolve(variableMappings, uriToken.get().getText()))));
         }
         return Optional.empty();
     }

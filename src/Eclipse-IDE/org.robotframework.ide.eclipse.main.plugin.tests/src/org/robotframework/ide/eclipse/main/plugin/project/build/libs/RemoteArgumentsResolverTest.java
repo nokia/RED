@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +50,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
@@ -60,7 +63,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
@@ -71,7 +76,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
@@ -82,7 +89,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).contains(RemoteLocation.DEFAULT_ADDRESS);
@@ -93,7 +102,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -106,7 +117,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  http://127.0.0.1.9000/  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -117,7 +130,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -128,7 +143,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -139,7 +156,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -151,7 +170,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  127.0.0.1.9000/  30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -164,7 +185,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  127.0.0.1.9000/  30  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -176,7 +199,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1.9000/  30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -188,7 +213,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=http://127.0.0.1.9000/  timeout=30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -199,7 +226,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=127.0.0.1.9000/  timeout=30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -212,7 +241,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=127.0.0.1.9000/  timeout=30  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -225,7 +256,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  timeout=30  uri=http://127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -237,7 +270,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30  uri=127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=127.0.0.1.9000/");
         assertThat(resolver.getUri()).contains("http://127.0.0.1.9000/");
@@ -248,7 +283,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30s");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30s");
         assertThat(resolver.getTimeout()).contains("30s");
@@ -259,7 +296,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=127.0.0.1.9000  timeout=30");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30");
         assertThat(resolver.getTimeout()).contains("30");
@@ -270,7 +309,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30  uri=127.0.0.1.9000");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("timeout=30");
         assertThat(resolver.getTimeout()).contains("30");
@@ -282,7 +323,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  127.0.0.1.9000  30 hours 20 minutes");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getTimeoutToken().get().getText()).isEqualTo("30 hours 20 minutes");
         assertThat(resolver.getTimeout()).contains("30 hours 20 minutes");
@@ -295,7 +338,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  timeout=30  timeout=30  uri=127.0.0.1.9000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -310,7 +355,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  timeout=30  timeout=30  uri=127.0.0.1.9000/  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -324,7 +371,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1.9000/  30  60");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -339,7 +388,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  http://127.0.0.1.9000/  30  60  WITH NAME  alias");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -352,7 +403,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  timeout=30   timeout=60");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -366,7 +419,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=http://127.0.0.1.9000/   uri=http://127.0.0.1.10000/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken()).isEmpty();
         assertThat(resolver.getUri()).isEmpty();
@@ -377,7 +432,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getTimeoutToken()).isEmpty();
         assertThat(resolver.getTimeout()).isEmpty();
@@ -389,7 +446,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  ://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains("://127.0.0.1:8270/");
@@ -401,7 +460,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://");
         assertThat(resolver.getUri()).contains("http://");
@@ -412,7 +473,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains("://127.0.0.1:8270/");
@@ -423,7 +486,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://");
         assertThat(resolver.getUri()).contains("http://");
@@ -435,7 +500,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  urrri=http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("urrri=http://127.0.0.1:8270/");
@@ -448,7 +515,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  ^://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("^://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains("^://127.0.0.1:8270/");
@@ -460,7 +529,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  [urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("[urihttp://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains("[urihttp://127.0.0.1:8270/");
@@ -471,7 +542,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("http://127.0.0.1:8270/%");
@@ -484,7 +557,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  urrri=http://127.0.0.1:8270/  60");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("urrri=http://127.0.0.1:8270/");
@@ -497,7 +572,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=urrri(http://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("uri=urrri(http://127.0.0.1:8270/");
@@ -510,7 +587,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=}://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=}://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains("}://127.0.0.1:8270/");
@@ -522,7 +601,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=1urihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("uri=1urihttp://127.0.0.1:8270/");
@@ -534,7 +615,9 @@ public class RemoteArgumentsResolverTest {
         final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://127.0.0.1:8270/%");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText()).isEqualTo(
                 "uri=http://127.0.0.1:8270/%");
@@ -547,7 +630,9 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  uri=urrri=http://127.0.0.1:8270/  timeout=60");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("uri=urrri=http://127.0.0.1:8270/");
@@ -561,11 +646,58 @@ public class RemoteArgumentsResolverTest {
                 "Library  Remote  timeout=60  uri=;urrrihttp://127.0.0.1:8270/");
         final LibraryImport libImport = getImport(suite);
         final List<RobotToken> arguments = libImport.getArguments();
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         assertThat(resolver.getUriToken().get().getText())
                 .isEqualTo("uri=;urrrihttp://127.0.0.1:8270/");
         assertThat(resolver.getUri()).contains(";urrrihttp://127.0.0.1:8270/");
+    }
+
+    @Test
+    public void uriArgumentIsResolved_whenPositionalUriArgumentContainsVariableWithUriPartFromVariableMappings()
+            throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport(
+                "Library  Remote  http://${remotevar}/");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        variableMappings.put("${remotevar}", "127.0.0.1:8270");
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("http://${remotevar}/");
+        assertThat(resolver.getUri().get()).contains("http://127.0.0.1:8270/");
+    }
+
+    @Test
+    public void uriArgumentIsResolved_whenPositionalUriArgumentContainsVariableWithWholeUriFromVariableMappings()
+            throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  ${remotevar}");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        variableMappings.put("${remotevar}", "http://127.0.0.1:8270/library");
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("${remotevar}");
+        assertThat(resolver.getUri().get()).contains("http://127.0.0.1:8270/library");
+    }
+
+    @Test
+    public void uriArgumentIsResolved_whenNamedUriArgumentContainsVariableFromVariableMappings() throws Exception {
+        final RobotSuiteFile suite = createSuiteFileForRemoteImport("Library  Remote  uri=http://${remotevar}/");
+        final LibraryImport libImport = getImport(suite);
+        final List<RobotToken> arguments = libImport.getArguments();
+        final Map<String, String> variableMappings = suite.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        variableMappings.put("${remotevar}", "127.0.0.1:8270");
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
+
+        assertThat(resolver.getUriToken().get().getText()).isEqualTo("uri=http://${remotevar}/");
+        assertThat(resolver.getUri().get()).contains("http://127.0.0.1:8270/");
     }
 
     private RobotSuiteFile createSuiteFileForRemoteImport(final String librarySetting) throws Exception {

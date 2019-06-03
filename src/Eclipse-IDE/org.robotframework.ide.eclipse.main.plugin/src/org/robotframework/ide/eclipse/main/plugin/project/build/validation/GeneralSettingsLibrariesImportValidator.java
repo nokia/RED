@@ -106,7 +106,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
             reporter.handleProblem(problem, validationContext.getFile(), nameToken, additional);
         } else if (name.equals("Remote")) {
-            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+            final Map<String, String> variableMappings = suiteFile.getRobotProject().getRobotProjectHolder()
+                    .getVariableMappings();
+            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
             final Optional<String> address = resolver.getUri();
             if (address.isPresent()) {
                 final LibrarySpecification specification = validationContext.getLibrarySpecifications(name,
@@ -145,7 +147,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private void reportProblemOnRemoteLibraryArguments(final RobotToken nameToken, final List<RobotToken> arguments) {
-        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments);
+        final Map<String, String> variableMappings = suiteFile.getRobotProject().getRobotProjectHolder()
+                .getVariableMappings();
+        final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variableMappings);
 
         final Optional<String> address = resolver.getUri();
         if (address.isPresent()) {
