@@ -9,9 +9,7 @@ package org.rf.ide.core.rflint;
 public enum RfLintViolationSeverity {
     ERROR,
     WARNING,
-    IGNORE,
-    OTHER,
-    DEFAULT;
+    IGNORE;
 
     public static RfLintViolationSeverity from(final String severity) {
         if ("E".equals(severity)) {
@@ -21,7 +19,7 @@ public enum RfLintViolationSeverity {
         } else if ("I".equals(severity)) {
             return IGNORE;
         }
-        return OTHER;
+        throw new IllegalArgumentException();
     }
 
     public String severitySwitch() {
@@ -32,9 +30,8 @@ public enum RfLintViolationSeverity {
                 return "w";
             case IGNORE:
                 return "i";
-            default:
-                throw new IllegalStateException();
         }
+        throw new IllegalStateException();
     }
 
 }

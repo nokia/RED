@@ -124,6 +124,11 @@ public class InvalidPythonRuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
+    public List<RfLintRule> getRfLintRules(final List<String> rulesFiles) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles, final List<String> additionalArguments) {

@@ -10,11 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -84,29 +85,6 @@ public class RfLintValidationPreferencePageTest {
     }
 
     @Test
-    public void rulesTableDisplaysAllTheRules() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "Rule1;Rule2");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "DEFAULT;ERROR");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, ";100");
-
-        final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
-
-        final Table table = getRulesTable();
-        assertThat(table.getItemCount()).isEqualTo(3);
-        assertThat(table.getItem(0).getText(0)).isEqualTo("Rule1");
-        assertThat(table.getItem(0).getText(1)).isEqualTo("default");
-        assertThat(table.getItem(0).getText(2)).isEqualTo("");
-        assertThat(table.getItem(1).getText(0)).isEqualTo("Rule2");
-        assertThat(table.getItem(1).getText(1)).isEqualTo("Error");
-        assertThat(table.getItem(1).getText(2)).isEqualTo("100");
-        assertThat(table.getItem(2).getText(0)).isEqualTo("...add new rule");
-        assertThat(table.getItem(2).getText(1)).isEqualTo("");
-        assertThat(table.getItem(2).getText(2)).isEqualTo("");
-    }
-
-    @Test
     public void additionalArgumentsFieldDisplaysCustomArguments() {
         final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
         store.putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
@@ -122,7 +100,7 @@ public class RfLintValidationPreferencePageTest {
         final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
         store.putValue(RedPreferences.RFLINT_RULES_FILES, "/path/to/fst.py;/path/to/snd.py");
         store.putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "Rule1;Rule2");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "DEFAULT;ERROR");
+        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "WARNING;ERROR");
         store.putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, ";100");
         store.putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
 
@@ -144,39 +122,39 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private void assertNotEmptyValues() {
-        assertThat(getRulesTable().getItemCount()).isGreaterThan(1);
+        assertThat(getRulesTable().getItemCount()).isGreaterThanOrEqualTo(0);
         assertThat(getRulesFilesTable().getItemCount()).isGreaterThan(1);
         assertThat(getAdditionalArgumentsField().getText()).isNotEmpty();
     }
 
     private void assertEmptyValues() {
-        assertThat(getRulesTable().getItemCount()).isEqualTo(1);
+        assertThat(getRulesTable().getItemCount()).isEqualTo(0);
         assertThat(getRulesFilesTable().getItemCount()).isEqualTo(1);
         assertThat(getAdditionalArgumentsField().getText()).isEmpty();
     }
 
     private void assertNotEmptyPreferences() {
-        assertThat(RedPlugin.getDefault().getPreferences().getRfLintRules()).isNotEmpty();
+        assertThat(RedPlugin.getDefault().getPreferences().getRfLintRulesConfigs()).isNotEmpty();
         assertThat(RedPlugin.getDefault().getPreferences().getRfLintRulesFiles()).isNotEmpty();
         assertThat(RedPlugin.getDefault().getPreferences().getRfLintAdditionalArguments()).isNotEmpty();
     }
 
     private void assertEmptyPreferences() {
-        assertThat(RedPlugin.getDefault().getPreferences().getRfLintRules()).isEmpty();
+        assertThat(RedPlugin.getDefault().getPreferences().getRfLintRulesConfigs()).isEmpty();
         assertThat(RedPlugin.getDefault().getPreferences().getRfLintRulesFiles()).isEmpty();
         assertThat(RedPlugin.getDefault().getPreferences().getRfLintAdditionalArguments()).isEmpty();
     }
 
-    private Table getRulesTable() {
+    private Table getRulesFilesTable() {
         return getTables().get(0);
     }
 
-    private Table getRulesFilesTable() {
+    private Table getRulesTable() {
         return getTables().get(1);
     }
 
     private List<Table> getTables() {
-        return Stream.of(((Composite) shellProvider.getShell().getChildren()[0]).getChildren())
+        return getAllControls(shellProvider.getShell()).stream()
                 .filter(c -> c instanceof Table)
                 .map(c -> Table.class.cast(c))
                 .collect(toList());
@@ -187,12 +165,25 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Text> getTextFields() {
-        return Stream.of(((Composite) shellProvider.getShell().getChildren()[0]).getChildren())
-                .filter(c -> c instanceof Composite)
-                .map(c -> Composite.class.cast(c))
-                .flatMap(c -> Stream.of(c.getChildren()))
+        return getAllControls(shellProvider.getShell()).stream()
                 .filter(c -> c instanceof Text)
                 .map(c -> Text.class.cast(c))
                 .collect(toList());
+    }
+
+    private List<Control> getAllControls(final Control control) {
+        final List<Control> result = new ArrayList<>();
+        getAllControls(control, result);
+        return result;
+    }
+
+    private void getAllControls(final Control control, final List<Control> result) {
+        result.add(control);
+        if (control instanceof Composite) {
+            final Composite comp = (Composite) control;
+            for (final Control child : comp.getChildren()) {
+                getAllControls(child, result);
+            }
+        }
     }
 }

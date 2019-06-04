@@ -12,7 +12,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.BeforeClass;
@@ -22,6 +24,7 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
 import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintRuleConfiguration;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -52,8 +55,9 @@ public class RunRfLintHandlerTest {
         final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
+        final Map<String, RfLintRule> rules = new HashMap<>();
 
-        RunRfLintHandler.E4RunRfLintHandler.runRfLint(robotProject, suite, server, preferences);
+        RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),
@@ -69,8 +73,9 @@ public class RunRfLintHandlerTest {
         projectConfig.addExcludedPath("x/y/z");
         final RobotProject robotProject = createRobotProjectSpy(environment, projectConfig);
         final RedPreferences preferences = mock(RedPreferences.class);
+        final Map<String, RfLintRule> rules = new HashMap<>();
 
-        RunRfLintHandler.E4RunRfLintHandler.runRfLint(robotProject, suite, server, preferences);
+        RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
                 newArrayList("x", "x/y", "x/y/z"), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),
@@ -82,15 +87,27 @@ public class RunRfLintHandlerTest {
         final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
-        final List<RfLintRule> rules = newArrayList(new RfLintRule("x", RfLintViolationSeverity.ERROR, "1"),
-                new RfLintRule("y", RfLintViolationSeverity.DEFAULT, "2"),
-                new RfLintRule("z", RfLintViolationSeverity.IGNORE, "3"));
-        when(preferences.getRfLintRules()).thenReturn(rules);
+        final Map<String, RfLintRuleConfiguration> rulesConfigs = new HashMap<>();
+        rulesConfigs.put("x", new RfLintRuleConfiguration(RfLintViolationSeverity.IGNORE, null));
+        rulesConfigs.put("z", new RfLintRuleConfiguration(RfLintViolationSeverity.ERROR, "4"));
+        when(preferences.getRfLintRulesConfigs()).thenReturn(rulesConfigs);
 
-        RunRfLintHandler.E4RunRfLintHandler.runRfLint(robotProject, suite, server, preferences);
+        final Map<String, RfLintRule> rules = new HashMap<>();
+        rules.put("x", new RfLintRule("x", RfLintViolationSeverity.ERROR, "1"));
+        rules.put("y", new RfLintRule("y", RfLintViolationSeverity.WARNING, "2"));
+        rules.put("z", new RfLintRule("z", RfLintViolationSeverity.IGNORE, "3"));
+
+        RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
+
+        final List<RfLintRule> configuredRules = new ArrayList<>();
+        configuredRules.add(new RfLintRule("x", RfLintViolationSeverity.ERROR, "1",
+                new RfLintRuleConfiguration(RfLintViolationSeverity.IGNORE, null)));
+        configuredRules.add(new RfLintRule("y", RfLintViolationSeverity.WARNING, "2"));
+        configuredRules.add(new RfLintRule("z", RfLintViolationSeverity.IGNORE, "3",
+                new RfLintRuleConfiguration(RfLintViolationSeverity.ERROR, "4")));
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
-                new ArrayList<>(), suite.getLocation().toFile(), rules, new ArrayList<>(), new ArrayList<>());
+                new ArrayList<>(), suite.getLocation().toFile(), configuredRules, new ArrayList<>(), new ArrayList<>());
     }
 
     @Test
@@ -102,7 +119,8 @@ public class RunRfLintHandlerTest {
                 projectProvider.createFile("rule2.py").getLocation().toOSString());
         when(preferences.getRfLintRulesFiles()).thenReturn(ruleFiles);
 
-        RunRfLintHandler.E4RunRfLintHandler.runRfLint(robotProject, suite, server, preferences);
+        RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences,
+                new HashMap<>());
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), ruleFiles, new ArrayList<>());
@@ -117,7 +135,8 @@ public class RunRfLintHandlerTest {
         when(preferences.getRfLintAdditionalArguments())
                 .thenReturn("arg ${var} -A ${workspace_loc:/" + PROJECT_NAME + "/" + argFile.getName() + "}");
 
-        RunRfLintHandler.E4RunRfLintHandler.runRfLint(robotProject, suite, server, preferences);
+        RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences,
+                new HashMap<>());
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),

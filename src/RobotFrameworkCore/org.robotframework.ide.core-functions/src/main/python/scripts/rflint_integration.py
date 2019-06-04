@@ -150,6 +150,17 @@ class MessagesEncoder(object):
         if self._file_to_write is not None:
             self._file_to_write.close()
 
+def get_rules(rulefiles):
+    rfLint = RfLint()
+    for filename in rulefiles:
+        rfLint._load_rule_file(filename)
+    
+    _ = rfLint.all_rules    # workaround to make all the rules load into _rules dictionary
+    rules = []
+    for rule in sorted(rfLint._rules.values(), key=lambda rule: rule.name):
+        rules.append((rule.severity, rule.name, rule.doc))
+    return rules
+
 def run_analysis(host, port, project_location, excluded_paths, args):
     client = JsonClient()
     try:

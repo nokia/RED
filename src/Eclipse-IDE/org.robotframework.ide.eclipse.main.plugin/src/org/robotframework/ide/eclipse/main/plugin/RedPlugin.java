@@ -21,6 +21,7 @@ import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
+import org.rf.ide.core.rflint.RfLintRules;
 import org.rf.ide.core.watcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
@@ -84,6 +85,7 @@ public class RedPlugin extends AbstractUIPlugin {
         RobotModelManager.getInstance().dispose();
         RobotTestExecutionServiceManager.getInstance().dispose();
         RedFileWatcher.getInstance().closeWatchService();
+        RfLintRules.getInstance().dispose();
     }
 
     public RedPreferences getPreferences() {

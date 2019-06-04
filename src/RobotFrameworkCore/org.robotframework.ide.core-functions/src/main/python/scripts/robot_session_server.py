@@ -280,6 +280,18 @@ def stop_auto_discovering():
         process.kill()
     del RED_DRYRUN_PROCESSES[:]
 
+@logresult
+@encode_result_or_exception
+@cleanup_modules
+@logargs
+def get_rf_lint_rules(rulesfiles):
+    try:
+        import rflint
+        import rflint_integration
+    except Exception as e:
+        raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
+    
+    return rflint_integration.get_rules(rulesfiles)
 
 @logresult
 @encode_result_or_exception
@@ -477,6 +489,7 @@ if __name__ == '__main__':
     server.register_function(start_keyword_auto_discovering, 'startKeywordAutoDiscovering')
     server.register_function(stop_auto_discovering, 'stopAutoDiscovering')
     server.register_function(convert_robot_data_file, 'convertRobotDataFile')
+    server.register_function(get_rf_lint_rules, 'getRfLintRules')
     server.register_function(run_rf_lint, 'runRfLint')
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(create_libdoc_in_separate_process, 'createLibdocInSeparateProcess')

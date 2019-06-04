@@ -5,17 +5,32 @@
 */
 package org.rf.ide.core.rflint;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import com.google.common.base.Strings;
+
 public class RfLintRule {
 
-    private String ruleName;
+    private final String ruleName;
 
-    private RfLintViolationSeverity severity;
+    private final RfLintViolationSeverity defaultSeverity;
 
-    private String configuration;
+    private final String documentation;
 
-    public RfLintRule(final String ruleName, final RfLintViolationSeverity severity, final String configuration) {
+    private RfLintRuleConfiguration configuration;
+
+    public RfLintRule(final String ruleName, final RfLintViolationSeverity severity, final String documentation) {
+        this(ruleName, severity, documentation, null);
+    }
+
+    public RfLintRule(final String ruleName, final RfLintViolationSeverity defaultSeverity, final String documentation,
+            final RfLintRuleConfiguration configuration) {
         this.ruleName = ruleName;
-        this.severity = severity;
+        this.defaultSeverity = defaultSeverity;
+        this.documentation = documentation;
         this.configuration = configuration;
     }
 
@@ -23,35 +38,96 @@ public class RfLintRule {
         return ruleName;
     }
 
-    public void setRuleName(final String ruleName) {
-        this.ruleName = ruleName;
-    }
-
     public RfLintViolationSeverity getSeverity() {
-        return severity;
+        return defaultSeverity;
     }
 
-    public void setSeverity(final RfLintViolationSeverity severity) {
-        this.severity = severity;
+    public String getDocumentation() {
+        return documentation;
     }
 
-    public String getConfiguration() {
+    public RfLintViolationSeverity getConfiguredSeverity() {
+        return isConfigured() ? Optional.ofNullable(configuration.getSeverity()).orElse(defaultSeverity)
+                : defaultSeverity;
+    }
+
+    public String getConfiguredArguments() {
+        return isConfigured() ? Strings.nullToEmpty(configuration.getArguments()) : "";
+    }
+
+    public boolean isConfigured() {
+        return configuration != null;
+    }
+
+    public RfLintRuleConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setConfiguration(final String configuration) {
-        this.configuration = configuration;
+    public RfLintRule configure(final RfLintViolationSeverity severity) {
+        if (configuration == null) {
+            configuration = new RfLintRuleConfiguration();
+        }
+        configuration.setSeverity(severity == defaultSeverity ? null : severity);
+        if (configuration.isEmpty()) {
+            configuration = null;
+        }
+        return this;
     }
 
-    public boolean isDead() {
-        return !hasChangedSeverity() && !hasConfigurationArguments();
+    public RfLintRule configure(final String arguments) {
+        if (configuration == null) {
+            configuration = new RfLintRuleConfiguration();
+        }
+        configuration.setArguments(arguments != null && arguments.trim().isEmpty() ? null : arguments);
+        if (configuration.isEmpty()) {
+            configuration = null;
+        }
+        return this;
     }
 
-    public boolean hasChangedSeverity() {
-        return severity != RfLintViolationSeverity.DEFAULT;
+    public RfLintRule configure(final RfLintRuleConfiguration config) {
+        if (config == null) {
+            configuration = null;
+        } else {
+            configure(config.getSeverity());
+            configure(config.getArguments());
+        }
+        return this;
     }
 
-    public boolean hasConfigurationArguments() {
-        return !configuration.trim().isEmpty();
+    public List<String> getConfigurationSwitches() {
+        final List<String> switches = new ArrayList<>();
+        if (isConfigured()) {
+            if (configuration.getSeverity() != null && defaultSeverity != configuration.getSeverity()) {
+                switches.add("-" + configuration.getSeverity().severitySwitch());
+                switches.add(ruleName);
+            }
+            if (getConfiguredSeverity() != RfLintViolationSeverity.IGNORE && configuration.getArguments() != null
+                    && !configuration.getArguments().isEmpty()) {
+                switches.add("-c");
+                switches.add(ruleName + ":" + configuration.getArguments());
+            }
+        }
+        return switches;
+    }
+
+    public RfLintRule copyFresh() {
+        return new RfLintRule(ruleName, defaultSeverity, documentation);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof RfLintRule) {
+            final RfLintRule that = (RfLintRule) obj;
+            return this.ruleName.equals(that.ruleName) && this.defaultSeverity == that.defaultSeverity
+                    && this.documentation.equals(that.documentation)
+                    && Objects.equals(this.configuration, that.configuration);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ruleName, defaultSeverity, documentation, configuration);
     }
 }

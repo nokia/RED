@@ -13,49 +13,106 @@ public class RfLintRuleTest {
 
     @Test
     public void gettersTest() {
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").getRuleName()).isEqualTo("Rule");
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").getSeverity())
+        final RfLintRuleConfiguration config = new RfLintRuleConfiguration();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getRuleName()).isEqualTo("Rule");
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getSeverity())
                 .isEqualTo(RfLintViolationSeverity.ERROR);
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").getConfiguration())
-                .isEqualTo("config");
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getConfiguration()).isNull();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu", config).getConfiguration())
+                .isSameAs(config);
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").isConfigured()).isFalse();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu", config).isConfigured()).isTrue();
     }
 
     @Test
-    public void settersTest() {
-        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config");
+    public void ruleSeverityConfigurationTest() {
+        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu");
 
-        rule.setRuleName("OtherRule");
-        assertThat(rule.getRuleName()).isEqualTo("OtherRule");
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
 
-        rule.setSeverity(RfLintViolationSeverity.WARNING);
-        assertThat(rule.getSeverity()).isEqualTo(RfLintViolationSeverity.WARNING);
+        rule.configure(RfLintViolationSeverity.ERROR);
 
-        rule.setConfiguration("42");
-        assertThat(rule.getConfiguration()).isEqualTo("42");
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
+
+        rule.configure(RfLintViolationSeverity.WARNING);
+
+        assertThat(rule.isConfigured()).isTrue();
+        assertThat(rule.getConfiguration()).isNotNull();
+        assertThat(rule.getConfiguration().getSeverity()).isEqualTo(RfLintViolationSeverity.WARNING);
+        assertThat(rule.getConfiguration().getArguments()).isNull();
+
+        rule.configure(RfLintViolationSeverity.ERROR);
+
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
     }
 
     @Test
-    public void ruleHasConfiguration_ifTheConfigIsNonEmpty() {
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").hasConfigurationArguments())
-                .isTrue();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "a").hasConfigurationArguments()).isTrue();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "").hasConfigurationArguments()).isFalse();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "  ").hasConfigurationArguments()).isFalse();
+    public void ruleArgumentsConfigurationTest() {
+        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu");
+
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
+
+        rule.configure("");
+
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
+
+        rule.configure("args");
+
+        assertThat(rule.isConfigured()).isTrue();
+        assertThat(rule.getConfiguration()).isNotNull();
+        assertThat(rule.getConfiguration().getSeverity()).isNull();
+        assertThat(rule.getConfiguration().getArguments()).isEqualTo("args");
+
+        rule.configure(" ");
+
+        assertThat(rule.isConfigured()).isFalse();
+        assertThat(rule.getConfiguration()).isNull();
     }
 
     @Test
-    public void ruleHasChangedSeverity_ifTheSeverityIsNonDefault() {
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").hasChangedSeverity()).isTrue();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.WARNING, "config").hasChangedSeverity()).isTrue();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.DEFAULT, "config").hasChangedSeverity()).isFalse();
+    public void ruleCmdLineSwitchesTest() {
+        final RfLintViolationSeverity err = RfLintViolationSeverity.ERROR;
+        final RfLintViolationSeverity wrn = RfLintViolationSeverity.WARNING;
+        final RfLintViolationSeverity ign = RfLintViolationSeverity.IGNORE;
+
+        assertThat(new RfLintRule("Rule", err, "docu").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", wrn, "docu").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", ign, "docu").getConfigurationSwitches()).isEmpty();
+
+        assertThat(new RfLintRule("Rule", err, "docu").configure(wrn).getConfigurationSwitches()).containsExactly("-w",
+                "Rule");
+        assertThat(new RfLintRule("Rule", wrn, "docu").configure(ign).getConfigurationSwitches()).containsExactly("-i",
+                "Rule");
+        assertThat(new RfLintRule("Rule", ign, "docu").configure(err).getConfigurationSwitches()).containsExactly("-e",
+                "Rule");
+
+        assertThat(new RfLintRule("Rule", err, "docu").configure("a").getConfigurationSwitches()).containsExactly("-c",
+                "Rule:a");
+        assertThat(new RfLintRule("Rule", wrn, "docu").configure("b").getConfigurationSwitches()).containsExactly("-c",
+                "Rule:b");
+
+        assertThat(new RfLintRule("Rule", err, "docu").configure(wrn).configure("a").getConfigurationSwitches())
+                .containsExactly("-w", "Rule", "-c", "Rule:a");
+        assertThat(new RfLintRule("Rule", ign, "docu").configure(err).configure("c").getConfigurationSwitches())
+                .containsExactly("-e", "Rule", "-c", "Rule:c");
     }
 
     @Test
-    public void ruleIsDead_ifItHasNoConfigurationAndSeverityRemainsUnchanged() {
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.DEFAULT, "").isDead()).isTrue();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.DEFAULT, "config").isDead()).isFalse();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "").isDead()).isFalse();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "config").isDead()).isFalse();
+    public void ignoredRuleDoesNotHaveRuleConfiguration() {
+        final RfLintViolationSeverity err = RfLintViolationSeverity.ERROR;
+        final RfLintViolationSeverity wrn = RfLintViolationSeverity.WARNING;
+        final RfLintViolationSeverity ign = RfLintViolationSeverity.IGNORE;
+
+        assertThat(new RfLintRule("Rule", ign, "docu").configure("c").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", wrn, "docu").configure(ign).configure("b").getConfigurationSwitches())
+                .containsExactly("-i", "Rule");
+        assertThat(new RfLintRule("Rule", err, "docu").configure(ign).configure("c").getConfigurationSwitches())
+                .containsExactly("-i", "Rule");
 
     }
 

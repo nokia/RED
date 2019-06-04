@@ -10,6 +10,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
-import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintRuleConfiguration;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -449,22 +450,26 @@ public class RedPreferences {
         return Splitter.on(';').splitToList(allRulesFiles);
     }
 
-    public List<RfLintRule> getRfLintRules() {
+    public Map<String, RfLintRuleConfiguration> getRfLintRulesConfigs() {
         final String allRulesNames = store.getString(RFLINT_RULES_CONFIG_NAMES);
         final String allRulesSeverities = store.getString(RFLINT_RULES_CONFIG_SEVERITIES);
         final String allRulesArgs = store.getString(RFLINT_RULES_CONFIG_ARGS);
 
         if (allRulesNames.trim().isEmpty() && allRulesSeverities.trim().isEmpty() && allRulesArgs.trim().isEmpty()) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
         final List<String> names = Splitter.on(';').splitToList(allRulesNames);
         final List<String> severities = Splitter.on(';').splitToList(allRulesSeverities);
         final List<String> args = Splitter.on(';').splitToList(allRulesArgs);
 
-        final List<RfLintRule> rules = new ArrayList<>();
+        final Map<String, RfLintRuleConfiguration> rules = new HashMap<>();
         final int limit = Stream.of(names.size(), severities.size(), args.size()).min(Integer::compare).get();
         for (int i = 0; i < limit; i++) {
-            rules.add(new RfLintRule(names.get(i), RfLintViolationSeverity.valueOf(severities.get(i)), args.get(i)));
+            final RfLintRuleConfiguration config = new RfLintRuleConfiguration();
+            config.setSeverity(RfLintViolationSeverity.valueOf(severities.get(i)));
+            config.setArguments(args.get(i));
+
+            rules.put(names.get(i), config);
         }
         return rules;
     }

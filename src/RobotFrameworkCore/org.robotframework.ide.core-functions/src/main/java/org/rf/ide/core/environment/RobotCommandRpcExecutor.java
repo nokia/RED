@@ -44,6 +44,7 @@ import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification.LibdocFormat;
 import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -333,6 +334,26 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
+    public List<RfLintRule> getRfLintRules(final List<String> rulesFiles) {
+        try {
+            final List<RfLintRule> rules = new ArrayList<>();
+            final Object[] result = (Object[]) callRpcFunction("getRfLintRules", rulesFiles);
+
+            for (final Object resultRule : result) {
+                final Object[] ruleArray = (Object[]) resultRule;
+                final String severity = (String) ruleArray[0];
+                final String name = (String) ruleArray[1];
+                final String documentation = (String) ruleArray[2];
+                rules.add(new RfLintRule(name, RfLintViolationSeverity.from(severity), documentation));
+            }
+            return rules;
+
+        } catch (final XmlRpcException e) {
+            throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
+        }
+    }
+
+    @Override
     public void runRfLint(final String host, final int port, final File projectLocation,
             final List<String> excludedPaths, final File filepath, final List<RfLintRule> rules,
             final List<String> rulesFiles, final List<String> additionalArguments) {
@@ -353,14 +374,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             arguments.add(path);
         }
         for (final RfLintRule rule : rules) {
-            if (rule.hasChangedSeverity()) {
-                arguments.add("-" + rule.getSeverity().severitySwitch());
-                arguments.add(rule.getRuleName());
-            }
-            if (rule.hasConfigurationArguments()) {
-                arguments.add("-c");
-                arguments.add(rule.getRuleName() + ":" + rule.getConfiguration());
-            }
+            arguments.addAll(rule.getConfigurationSwitches());
         }
         arguments.addAll(additionalArguments);
         return arguments;

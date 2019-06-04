@@ -24,7 +24,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.junit.Test;
-import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintRuleConfiguration;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
@@ -121,27 +121,27 @@ public class RedPreferencesTest {
         when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_ARGS)).thenReturn("");
 
         final RedPreferences preferences = new RedPreferences(store);
-        assertThat(preferences.getRfLintRules()).isEmpty();
+        assertThat(preferences.getRfLintRulesConfigs()).isEmpty();
     }
 
     @Test
     public void rfLintRulesConfigIsTakenFromStore_2() {
         final IPreferenceStore store = mock(IPreferenceStore.class);
         when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_NAMES)).thenReturn("Rule1;Rule2");
-        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES)).thenReturn("DEFAULT;ERROR");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES)).thenReturn("IGNORE;ERROR");
         when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_ARGS)).thenReturn("80;");
 
         final RedPreferences preferences = new RedPreferences(store);
-        final List<RfLintRule> rules = preferences.getRfLintRules();
+        final Map<String, RfLintRuleConfiguration> rules = preferences.getRfLintRulesConfigs();
         assertThat(rules).hasSize(2);
 
-        assertThat(rules.get(0).getRuleName()).isEqualTo("Rule1");
-        assertThat(rules.get(0).getSeverity()).isEqualTo(RfLintViolationSeverity.DEFAULT);
-        assertThat(rules.get(0).getConfiguration()).isEqualTo("80");
+        assertThat(rules.keySet()).containsOnly("Rule1", "Rule2");
 
-        assertThat(rules.get(1).getRuleName()).isEqualTo("Rule2");
-        assertThat(rules.get(1).getSeverity()).isEqualTo(RfLintViolationSeverity.ERROR);
-        assertThat(rules.get(1).getConfiguration()).isEmpty();
+        assertThat(rules.get("Rule1").getSeverity()).isEqualTo(RfLintViolationSeverity.IGNORE);
+        assertThat(rules.get("Rule1").getArguments()).isEqualTo("80");
+
+        assertThat(rules.get("Rule2").getSeverity()).isEqualTo(RfLintViolationSeverity.ERROR);
+        assertThat(rules.get("Rule2").getArguments()).isEmpty();
     }
 
     @Test

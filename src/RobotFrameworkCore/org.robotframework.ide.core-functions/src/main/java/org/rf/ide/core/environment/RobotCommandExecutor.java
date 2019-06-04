@@ -50,6 +50,8 @@ interface RobotCommandExecutor {
 
     void stopAutoDiscovering();
 
+    List<RfLintRule> getRfLintRules(List<String> rulesFiles);
+
     void runRfLint(String host, int port, File projectLocation, List<String> excludedPaths, File filepath,
             List<RfLintRule> rules, List<String> rulesFiles, List<String> additionalArguments);
 

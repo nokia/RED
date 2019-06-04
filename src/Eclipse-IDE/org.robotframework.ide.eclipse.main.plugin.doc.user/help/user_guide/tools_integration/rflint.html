@@ -44,33 +44,55 @@
 	
 	<p>It is possible to configure RfLint behavior in Preferences (
 		<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint)')">
-		Window -&gt; Preferences -&gt; Robot Framework -&gt; Errors/Warnings -&gt; RfLint validation</a></code>)
+		Window -&gt; Preferences -&gt; Robot Framework -&gt; Errors/Warnings -&gt; RfLint validation</a></code>).
 	</p>
-	<img src="images/rflint_prefs.png"/>
+	
+	<h4>General tab</h4>
+	<p>On <b>General</b> tab it is possible to define:
+	</p>
+	<ul>
+        <li><b>additional rules files</b> - those files will be attached with all the rules when running RfLint analysis.
+        Those rules can be further configured at <b>Rules</b> tab,
+        <p/>
+        </li>
+        <li><b>additional arguments</b> - custom RfLint arguments that will be used for analysis. See RfLint user guide
+        for more details on possible arguments.
+        <p/>
+        </li>
+    </ul>
+    <dl class="note">
+       <dt>Note</dt>       
+       <dd>Additional arguments field accepts Eclipse <a href="../launching/string_substitution.html">string variables</a>.</dd>
+    </dl>
+	
+	
+	<img src="images/rflint_prefs1.png"/>
+	
+	<h4>Rules tab</h4>
+	<p>On <b>Rules</b> tab it is possible to configure rule severity as well as additional rule parameters.
 	
 	<ul>
-		<li>rule <b>severity</b> - rule of a given name can have severity specified: <b>default</b> means severity is 
-		unchanged, <b>Error</b> and <b>Warning</b> changes severity to one of those levels, while <b>Ignore</b> will
-		silence the rule,
+		<li>rule <b>severity</b> - rule of a given name can have severity specified: <b>Error</b> and <b>Warning</b> 
+		changes severity to one of those levels, while <b>Ignore</b> will silence the rule (Ignore can be set also by check-box),
 		<p/>
 		</li>
 		<li>rule <b>configuration</b> - as described in <a target="_blank" class="external" href="http://github.com/boakley/robotframework-lint/wiki/How-to-write-custom-rules">RfLint Wiki</a>
-		some rules can be configured. This can be done on preference page. Simply write arguments for given rule. 
-		If there are multiple arguments then they should be separated with colon (:) character,
-		<p/>
-		</li>
-		<li><b>additional rules files</b> - add python files containing custom RfLint rules so that they will 
-		be also used for analysis.
-		<p/>
-		</li>
-		<li><b>additional arguments</b> - custom RfLint arguments that will be used for analysis
+		some rules can be parameterized: simply write arguments for given rule and remember that multiple arguments
+		should be separated with colon (:) character.
 		<p/>
 		</li>
 	</ul>
-	<dl class="note">
-	   <dt>Note</dt>	   
-	   <dd>Additional arguments field accepts Eclipse <a href="../launching/string_substitution.html">string variables</a>.</dd>
-	</dl>
+    <dl class="note">
+       <dt>Note</dt>       
+       <dd>RED will only store changes to default rule configurations. The changed rule is marked with bold
+       font. It is possible that RED is storing configuration of a rule which is currently not recognised
+       by your RfLint installation and such rule is marked red.</dd>
+    </dl>
+	
+    <img src="images/rflint_prefs2.png"/>
+    
+	<br/>
+	<br/>
 	
 </body>
 </html>
