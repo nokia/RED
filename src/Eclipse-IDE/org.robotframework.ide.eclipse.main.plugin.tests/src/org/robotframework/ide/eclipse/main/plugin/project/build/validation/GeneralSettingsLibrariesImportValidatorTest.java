@@ -523,6 +523,15 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithParametrizedUriAndVariableIsNotResolved() {
+        validateLibraryImport("Remote  http://${remotevar}");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED,
+                        new ProblemPosition(2, Range.closed(34, 53))));
+    }
+
+    @Test
     public void markerIsReported_whenImportingUnknownLibraryByName() {
         validateLibraryImport("ExampleLibrary");
 
@@ -842,6 +851,24 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
             validateLibraryImport("Remote   uri=http://127.0.0.1:" + socket.getLocalPort() + "  timeout=30",
                     new HashMap<>(), libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithParametrizedUriAndVariableIsResolved()
+            throws Exception {
+        final Map<String, String> variableMappings = robotProject.getRobotProjectHolder().getVariableMappings();
+        variableMappings.put("${remotevar}", "127.0");
+
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote   http://${remotevar}.0.1:" + socket.getLocalPort() + "/", new HashMap<>(),
+                    libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }

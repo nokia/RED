@@ -22,6 +22,7 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.RobotTimeFormat;
@@ -154,7 +155,11 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         final Optional<String> address = resolver.getUri();
         if (address.isPresent()) {
             final RobotToken uriOrNameToken = resolver.getUriToken().orElse(nameToken);
-            reportProblemOnRemoteLocation(uriOrNameToken, address.get());
+            if (RobotExpressions.isParameterized(address.get())) {
+                reportUnresolvedParameterizedImport(address.get(), uriOrNameToken);
+            } else {
+                reportProblemOnRemoteLocation(uriOrNameToken, address.get());
+            }
         } else {
             new KeywordCallArgumentsValidator(validationContext, nameToken, reporter,
                     resolver.getDescriptor(), arguments).validate(new NullProgressMonitor());

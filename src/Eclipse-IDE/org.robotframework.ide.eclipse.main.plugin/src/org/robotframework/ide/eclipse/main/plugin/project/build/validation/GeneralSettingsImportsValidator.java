@@ -94,7 +94,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 .formatMessageWith(declarationToken.getText()), validationContext.getFile(), declarationToken);
     }
 
-    private void reportUnresolvedParameterizedImport(final String resolved, final RobotToken pathOrNameToken) {
+    protected void reportUnresolvedParameterizedImport(final String resolved, final RobotToken pathOrNameToken) {
         final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, resolved);
         reporter.handleProblem(
                 RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED)
