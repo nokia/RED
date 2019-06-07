@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 3:44 PM
+Save-Time: 6/7/19 4:17 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -220,7 +220,7 @@ measure-time "selectedTestTime" {
 wait-for-console
 //check error
 get-view Console | get-text-viewer | get-property text 
-    | contains  "[ ERROR ] Suite 'RunTestFromOutline' contains no tests with tag 'tag1' and named 'RunTestFromOutline.Tsv File.embeded kw' in suite 'RunTestFromOutline.Tsv File'." | verify-true
+    | contains  "[ ERROR ] Suite 'RunTestFromOutline' contains no tests matching tag 'tag1' and matching name 'RunTestFromOutline.Tsv File.embeded kw' in suite 'RunTestFromOutline.Tsv File'." | verify-true
 
 //run test from Outline - now existing config is used
 get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw" | get-menu Run | click
