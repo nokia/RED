@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/22/18 5:12 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/7/19 3:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -140,12 +140,12 @@ wait-for-console
 if [not [get-view Console | get-text-viewer | get-property text -raw
     | matches "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
-    + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
+    + "\[ ERROR \] Suite 'RobotProject' contains no tests matching tag 'test 1' and matching name 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
     + "Try --help for usage information." ]]{
     
     //check if order is different in linux sometimes
     get-view Console | get-text-viewer | get-property text 
-    	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
+    	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests matching tag 'test 1' and matching name 'RobotProject.Test For Run Config.def' in suite 'RobotProject.Test For Run Config'.\n\n"
     + "Try --help for usage information.\n"
     + "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*" | verify-true 

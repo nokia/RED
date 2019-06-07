@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dnU9IILkEemG5cruxlOj_w
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/30/19 5:56 PM
+Save-Time: 6/7/19 3:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -75,28 +75,30 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "test\n"
     + "    log    6\n"
     + "    #new loop\n"
-    + "    : FOR    ${index}    IN RANGE    10\n"
-    + "    \\    ${resp}=    Should Be Equal    first    second\n"
-    + "    \\    Should Be Equal As Integers    ${resp.status_code}    200\n"
-    + "${EMPTY}\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "        ${resp}=    Should Be Equal    first    second\n"
+    + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
+    + "    END\n"
     + "    #old loop\n"
-    + "    : FOR    ${index}    IN RANGE    10\n"
-    + "    \\    ${resp}=    Should Be Equal    first    second\n"
-    + "    \\    Should Be Equal As Integers    ${resp.status_code}    200\n\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "        ${resp}=    Should Be Equal    first    second\n"
+    + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
+    + "    END\n\n"
     + "Example\n"
     + "    Keyword    argument    another argument    # comment\n\n"
     + "test 2\n"
     + "    SEPLcontrol.LIPLcontrol.thisSetupSomething    ${SDV_MPlane_IP}    ${SDV_SEM_path}    ${SCFundertest}\n"
     + "    log    7\n"
-    + "    : FOR    ${counter}    IN RANGE    0    ${NloopHO}\n"
-    + "    \\    Set Test Variable    ${counter}\n"
-    + "    \\    Log    \"entering loop\"\n"
-    + "    \\    ${celka}=    Evaluate    ${counter}%${c}\n"
+    + "    FOR    ${counter}    IN RANGE    0    ${NloopHO}\n"
+    + "        Set Test Variable    ${counter}\n"
+    + "        Log    \"entering loop\"\n"
+    + "        ${celka}=    Evaluate    ${counter}%${c}\n"
+    + "    END\n"
     + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}    ${SDV_LOCAL_LIB_PATH}" | verify-true
     
 //add new long line and reformat    
 with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 28 90
+    set-caret-pos 30 90
     key-type "NUMPAD_ENTER" "\\u000D"
     type-text "This is very long kw with many characters and some chars like # ()-  ${z}"
     key-type "M1+s"
@@ -111,26 +113,28 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "test\n"
     + "    log    6\n"
     + "    #new loop\n"
-    + "    : FOR    ${index}    IN RANGE    10\n"
-    + "    \\    ${resp}=    Should Be Equal    first    second\n"
-    + "    \\    Should Be Equal As Integers    ${resp.status_code}    200\n\n"
-    + "${EMPTY}\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "        ${resp}=    Should Be Equal    first    second\n"
+    + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
+    + "    END\n"
     + "    #old loop\n"
-    + "    : FOR    ${index}    IN RANGE    10\n"
-    + "    \\    ${resp}=    Should Be Equal    first    second\n"
-    + "    \\    Should Be Equal As Integers    ${resp.status_code}    200\n\n"
+    + "    FOR    ${index}    IN RANGE    10\n"
+    + "        ${resp}=    Should Be Equal    first    second\n"
+    + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
+    + "    END\n\n"
     + "Example\n"
     + "    Keyword    argument    another argument    # comment\n\n"
     + "test 2\n"
     + "    SEPLcontrol.LIPLcontrol.thisSetupSomething    ${SDV_MPlane_IP}    ${SDV_SEM_path}    ${SCFundertest}\n"
     + "    log    7\n"
-    + "    : FOR    ${counter}    IN RANGE    0    ${NloopHO}\n"
-    + "    \\    Set Test Variable    ${counter}\n"
-    + "    \\    Log    \"entering loop\"\n"
-    + "    \\    ${celka}=    Evaluate    ${counter}%${c}\n"
+    + "    FOR    ${counter}    IN RANGE    0    ${NloopHO}\n"
+    + "        Set Test Variable    ${counter}\n"
+    + "        Log    \"entering loop\"\n"
+    + "        ${celka}=    Evaluate    ${counter}%${c}\n"
+    + "    END\n"
     + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}    ${SDV_LOCAL_LIB_PATH}\n"
     + "    This is very long kw with many characters and some chars like # ()-    ${z}" | verify-true
-
+    
 
 //reset
 get-editor "test.robot" | get-text-viewer | set-text "*** Settings ***\n"

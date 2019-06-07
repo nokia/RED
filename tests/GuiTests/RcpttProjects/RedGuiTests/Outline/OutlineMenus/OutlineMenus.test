@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/22/18 5:27 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/7/19 3:44 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -217,6 +217,7 @@ measure-time "selectedTestTime" {
 	get-window "Run Configurations" | get-button Run | click
 } | constrain-max duration 3500 
 
+wait-for-console
 //check error
 get-view Console | get-text-viewer | get-property text 
     | contains  "[ ERROR ] Suite 'RunTestFromOutline' contains no tests with tag 'tag1' and named 'RunTestFromOutline.Tsv File.embeded kw' in suite 'RunTestFromOutline.Tsv File'." | verify-true

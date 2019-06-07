@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _72sQgG-KEeas5uogJbgGYA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 8/23/18 3:22 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/7/19 3:09 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -88,7 +88,7 @@ get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 3" | cl
 wait 200
 get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
 check-documentation-view   -kw_name "Log"  -project_name "RobotProject" -library  "BuiltIn"
-	-arguments "\[message, level=INFO, html=False, console=False, repr=False\]" -spec "Logs the given message with the given level.*"
+	-arguments "\[message, level=INFO, html=False, console=False, repr=False, formatter=str\]" -spec "Logs the given message with the given level.*"
 
 
 
