@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cIzC4LpgEei9gP1RMN7i8g
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 4:21 PM
+Save-Time: 6/7/19 5:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -84,14 +84,14 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 wait-for-warnings -amount 3 -times 6 -delay 500
 // use QuickFix to add linked folder
 
-wait 500
+wait 2000
 with [get-view Problems] {
     click
     get-tree 
     | select "Warnings (3 items)/RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
     | key-type "M1+1"
 }
-wait 300
+wait 100
 with [get-window "Quick Fix"] {
     get-button Finish | click
 }
