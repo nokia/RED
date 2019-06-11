@@ -12,7 +12,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.swt.graphics.RGB;
+
+import com.google.common.base.Strings;
+
 class Formatters {
+
+    public static String span(final String spanContent, final RGB color) {
+        final String r = Strings.padStart(Integer.toHexString(color.red), 2, '0');
+        final String g = Strings.padStart(Integer.toHexString(color.green), 2, '0');
+        final String b = Strings.padStart(Integer.toHexString(color.blue), 2, '0');
+        final String colorHex = "#" + r + g + b;
+        return "<span style=\"color: " + colorHex + "\">" + spanContent + "</span>";
+    }
 
     static String title(final String title, final int level) {
         return "<h" + level + ">" + title + "</h" + level + ">";

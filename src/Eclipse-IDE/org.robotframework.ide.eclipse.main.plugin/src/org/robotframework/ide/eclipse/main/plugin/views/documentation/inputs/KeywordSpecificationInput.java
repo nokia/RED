@@ -118,7 +118,7 @@ public class KeywordSpecificationInput implements DocumentationViewInput {
 
     @Override
     public void showInput(final IWorkbenchPage page) {
-        // TODO : where should we open specification input? should we at all...?
+        // nothing to do
     }
 
     @Override

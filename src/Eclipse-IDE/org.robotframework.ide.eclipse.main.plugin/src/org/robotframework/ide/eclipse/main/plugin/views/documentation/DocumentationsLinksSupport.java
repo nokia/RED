@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Doc
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordDefinitionInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.KeywordSpecificationInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.LibrarySpecificationInput;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.RfLintRuleInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
@@ -85,6 +86,9 @@ public class DocumentationsLinksSupport {
         } else if (LibraryUri.isLibraryDocUri(locationUri)) {
             return new LibraryUri(locationUri, this::openLibraryDoc);
 
+        } else if (RfLintRuleDocUri.isRuleDocUri(locationUri)) {
+            return new RfLintRuleDocUri(locationUri, this::openRfLintRuleDoc);
+
         } else if (WorkspaceFileUri.isFileUri(locationUri)) {
             return new WorkspaceFileUri(locationUri, this::openFile);
 
@@ -134,6 +138,10 @@ public class DocumentationsLinksSupport {
             throw new UnableToOpenUriException(
                     "Unable to open library documentation. Cannot find given library/keyword");
         }
+    }
+
+    private void openRfLintRuleDoc(final String ruleName) {
+        displayer.displayDocumentation(new RfLintRuleInput(ruleName));
     }
 
     private void openFile(final Optional<IFile> file, @SuppressWarnings("unused") final Map<String, String> params) {
