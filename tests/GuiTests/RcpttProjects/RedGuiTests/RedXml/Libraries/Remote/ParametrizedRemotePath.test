@@ -1,0 +1,167 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YDbWsNnJEeeKxYJgF2NTmg,_gxKAQIlEEemC5c0GiYm_Dw
+Element-Name: ParametrizedRemotePath
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _V4L9gIlCEemC5c0GiYm_Dw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/11/19 2:45 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//
+//                          before test install: pip install robotremoteserver   
+//
+//
+
+
+// run PythonRemoteServer
+try -command{
+	run-python-remote-server-in-background -project_name RemoteProject -lib_name my_remote.py -timeout 3
+	run-python-remote-server-in-background -project_name RemoteProject -lib_name my_remote2.py -timeout 3	
+	
+	//open file
+	get-view "Project Explorer" | get-tree | select "RemoteProject/test.robot" | double-click
+
+	// run QF
+	with [get-editor "test.robot" | get-text-viewer] {
+	    set-caret-pos 3 25
+	    hover-text 3 25
+	    key-type "M1+1"
+	}
+	//check possibilities
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 1 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "Define '${part1}' variable" | verify-true
+	}
+	//select to add new var
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Define '${part1}' variable" 
+	    | click -default
+	with [get-window "Add variable mapping"] {
+	    get-editbox -after [get-label Value] | type-text "www.nonexist.com"
+	    get-button OK | click
+	}
+	
+	//check if in red.xml is new var
+	with [get-editor "RemoteProject/red.xml" | get-section "Variable mappings" | get-table] {
+	    get-item -path "${one}" | get-property "values['Name']" | equals "${one}" | verify-true
+	    get-item -path "${one}" | get-property "values['Value']" | equals "127.0.0.1" | verify-true
+	    get-item -path "${two}" | get-property "values['Name']" | equals "${two}" | verify-true
+	    get-item -path "${two}" | get-property "values['Value']" | equals 9000 | verify-true
+	    get-item -path "${part1}" | get-property "values['Name']" | equals "${part1}" | verify-true
+	    get-item -path "${part1}" | get-property "values['Value']" | equals "www.nonexist.com" | verify-true
+	}
+	
+	// go to problems and run !F
+	get-view Problems | click
+	get-view Problems | get-tree | get-item 
+	    -path "Errors \\(3 items\\)/The import name\\/path '${full_page}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+	    | get-property caption 
+	    | equals "The import name/path '${full_page}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+	    | verify-true
+	    
+	// run QF    
+	get-view Problems | get-tree 
+	    | select "Errors (3 items)/The import name\\/path '${full_page}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+	    | get-menu -path "Quick Fix" | click
+	    
+	// set full path    
+	with [get-window "Quick Fix"] {
+	    get-button Finish | click
+	    with [get-window "Add variable mapping"] {
+	        with [get-editbox -after [get-label Value]] {
+	            set-text-offset 5 0
+	            key-type BackSpace -times 5
+	            type-text "127.0.0.1:10000"
+	        }
+	        get-button OK | click
+	    }
+	}
+	
+	//check if new var was added
+	with [get-editor "RemoteProject/red.xml" | get-section "Variable mappings" | get-table] {
+	    get-item -path "${full_page}" | get-property "values['Name']" | equals "${full_page}" | verify-true
+	    get-item -path "${full_page}" | get-property "values['Value']" | equals "127.0.0.1:10000" | verify-true
+	}
+	
+	//save red.xml
+	get-button "Save (M1+S)" | click
+	
+	//save file to run autodiscovery
+	with [get-editor "test.robot"] {
+	    click
+	    with [get-text-viewer] {
+	        set-caret-pos 9 11
+	        type-text " "
+	        key-type "M1+s"
+	    }
+	}
+	
+	//check if libs were added
+	with [get-editor "RemoteProject/red.xml"] {
+	    click
+	    get-tab-folder | get-tab-item Libraries | click
+	}
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
+	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
+	    -index 1] {
+	    get-property "getItems().length" | equals 4 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:9000/" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "http://www.nonexist.com/web/" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "...add new remote location" | verify-true
+	}
+
+	with [get-editor "RemoteProject/red.xml"] {
+	    click
+	    get-section Libraries | get-table 
+	        -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
+	        -index 1 | select "http:\\/\\/www.nonexist.com\\/web\\/" | key-type Del
+	}
+	get-editor "test.robot" | click
+	
+	// uncommen after RED-1273 
+	
+//	//change var value - change port
+//	get-editor "RemoteProject/red.xml" | get-tab-folder | get-tab-item Variables | click
+//	with [get-editor "RemoteProject/red.xml" | get-section "Variable mappings" | get-table] {
+//	    get-cell 1 1 | click
+//	    get-cell 1 1 | mouse down -count 2
+//	    double-click
+//	    select "${two}" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+//	    with [get-editbox] {
+//	        set-text 56789
+//	        key-type "NUMPAD_ENTER" "\\u000D"
+//	    }
+//	    apply-cell-edit -deactivate
+//	}
+//	get-button "Save (M1+S)" | click
+//	get-editor "test.robot" | click
+//	get-menu -path "Project/Clean..." | click
+//	get-window Clean | get-button Clean | click
+//	
+//	//check if new value is used to error
+//	get-editor "test.robot" | get-text-viewer | set-caret-pos 10 4
+//	get-view Problems | get-tree | get-item 
+//	    -path "Errors \\(2 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:56789' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+//	    | get-property caption 
+//	    | equals "'Remote' library under 'http://127.0.0.1:56789' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+//	    | verify-true
+//	with [get-editor "test.robot" | get-text-viewer] {
+//	    hover-text 3 25
+//	    hover-text 5 24
+//	}
+
+
+		
+}-finally{
+	stop-python-remote-server  "127.0.0.1:9000"
+	stop-python-remote-server  "127.0.0.1:10000"
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

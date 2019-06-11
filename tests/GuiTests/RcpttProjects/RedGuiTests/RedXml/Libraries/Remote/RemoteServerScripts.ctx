@@ -5,8 +5,8 @@ Element-Name: RemoteServerScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _YDbWsNnJEeeKxYJgF2NTmg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 8/28/18 9:35 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/11/19 2:47 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -14,10 +14,10 @@ Entry-Name: .ecl.context
 
 proc "run-python-remote-server-in-background" [val project_name "RobotProject"] [val lib_name] [val timeout 0]{
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-				exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python\"" [concat $RED_workspace_path "\\" $project_name "\\" $lib_name] -timeout $timeout
+		exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python\"" [concat $RED_workspace_path "\\" $project_name "\\" $lib_name] -timeout $timeout
 	}-else{
-			exec-process  "gnome-terminal" "-e" [concat "python " $RED_workspace_path_unix_style "/" $project_name "/" $lib_name] -timeout $timeout
-			wait 2000
+		exec-process  "gnome-terminal" "-e" [concat "python " $RED_workspace_path_unix_style "/" $project_name "/" $lib_name] -timeout $timeout
+		wait 2000
 	}
 } 
 
