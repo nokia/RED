@@ -360,4 +360,16 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getSuitePaths()).isEmpty();
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
     }
+
+    @Test
+    public void environmentVariableIsAdded() throws CoreException {
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(projectProvider.getFile("Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        robotConfig.addEnvironmentVariable("VAR1", "value1");
+        robotConfig.addEnvironmentVariable("VAR2", "value2");
+
+        assertThat(robotConfig.getEnvironmentVariables()).contains("VAR1=value1", "VAR2=value2");
+    }
 }

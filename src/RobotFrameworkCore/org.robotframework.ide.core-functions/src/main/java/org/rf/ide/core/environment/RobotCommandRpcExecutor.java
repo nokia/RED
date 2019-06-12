@@ -302,11 +302,11 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     @Override
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv, final List<String> excludedPaths,
+            final boolean supportGevent, final boolean recursiveInVirtualenv, final List<String> excludedPaths,
             final EnvironmentSearchPaths additionalPaths) {
         try {
             callRpcFunction("startLibraryAutoDiscovering", port, dataSource.getAbsolutePath(),
-                    projectLocation.getAbsolutePath(), recursiveInVirtualenv, excludedPaths,
+                    projectLocation.getAbsolutePath(), supportGevent, recursiveInVirtualenv, excludedPaths,
                     additionalPaths.getExtendedPythonPaths(interpreterType), additionalPaths.getClassPaths());
         } catch (final XmlRpcException e) {
             throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);
@@ -314,10 +314,10 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void startKeywordAutoDiscovering(final int port, final File dataSource,
+    public void startKeywordAutoDiscovering(final int port, final File dataSource, final boolean supportGevent,
             final EnvironmentSearchPaths additionalPaths) {
         try {
-            callRpcFunction("startKeywordAutoDiscovering", port, dataSource.getAbsolutePath(),
+            callRpcFunction("startKeywordAutoDiscovering", port, dataSource.getAbsolutePath(), supportGevent,
                     additionalPaths.getExtendedPythonPaths(interpreterType), additionalPaths.getClassPaths());
         } catch (final XmlRpcException e) {
             throw new RuntimeEnvironmentException("Unable to communicate with XML-RPC server", e);

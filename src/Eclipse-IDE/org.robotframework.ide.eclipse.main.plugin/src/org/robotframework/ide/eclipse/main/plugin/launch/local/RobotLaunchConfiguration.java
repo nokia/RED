@@ -353,4 +353,13 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         launchCopy.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, mapping);
     }
 
+    public void addEnvironmentVariable(final String variable, final String value) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+
+        final Map<String, String> vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
+                new HashMap<>());
+        vars.put(variable, value);
+        launchCopy.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, vars);
+    }
+
 }

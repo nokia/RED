@@ -69,6 +69,8 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
     private Button userDbgButton;
     private ExecutableFileComposite userDevModuleChooser;
 
+    private Button geventButton;
+
     private Text clientAddress;
     private Text clientPort;
 
@@ -113,6 +115,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         createPyDevModuleControls(group);
         createPythonModuleControls(group);
         createOwnModuleControls(group);
+        createGeventCheckbox(group);
     }
 
     private void createPyDevModuleControls(final Composite parent) {
@@ -167,6 +170,15 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
                 new String[] { "*.py" });
         userDevModuleChooser.addModifyListener(e -> checkPageCompletion());
         GridDataFactory.fillDefaults().span(2, 1).indent(20, 0).applyTo(userDevModuleChooser);
+    }
+
+    private void createGeventCheckbox(final Group parent) {
+        geventButton = new Button(parent, SWT.CHECK);
+        geventButton.setText("Gevent compatible");
+        geventButton.setToolTipText("When this option is on the pydevd will be able to debug Gevent based code."
+                + " This will add GEVENT_SUPPORT environment variable to generated launch configuration.");
+        geventButton.setSelection(false);
+        geventButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> checkPageCompletion()));
     }
 
     private void createAdditionalSetupGroup(final Composite parent) {
@@ -227,6 +239,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         setMessage(null, IMessageProvider.NONE);
         setPageComplete(true);
 
+        debuggingSessionSetup.setGeventSupport(geventButton.getSelection());
         if (pyDevDbgButton.getSelection()) {
             debuggingSessionSetup.setPydevdLocation(modulesInfo.pyDevDbgModuleLocation.get());
 

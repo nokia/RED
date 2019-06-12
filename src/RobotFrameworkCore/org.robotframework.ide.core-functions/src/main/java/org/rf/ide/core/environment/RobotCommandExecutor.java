@@ -43,10 +43,11 @@ interface RobotCommandExecutor {
 
     String createHtmlDoc(String doc, DocFormat format);
 
-    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
-            List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
+    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean supportGevent,
+            boolean recursiveInVirtualenv, List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
 
-    void startKeywordAutoDiscovering(int port, File dataSource, EnvironmentSearchPaths additionalPaths);
+    void startKeywordAutoDiscovering(int port, File dataSource, boolean supportGevent,
+            EnvironmentSearchPaths additionalPaths);
 
     void stopAutoDiscovering();
 

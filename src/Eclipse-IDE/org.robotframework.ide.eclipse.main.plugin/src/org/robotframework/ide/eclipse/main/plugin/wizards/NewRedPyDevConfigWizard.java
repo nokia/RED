@@ -225,6 +225,9 @@ public class NewRedPyDevConfigWizard extends Wizard implements INewWizard {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(preparedConfig);
             robotConfig.setExecutableFilePath(exec);
             robotConfig.setExecutableFileArguments(String.join(" ", arguments));
+            if (debuggingSessionSetup.getGeventSupport()) {
+                robotConfig.addEnvironmentVariable("GEVENT_SUPPORT", "True");
+            }
             return preparedConfig.doSave();
 
         } catch (final CoreException e) {

@@ -45,13 +45,14 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 
 import com.google.common.collect.Streams;
@@ -145,10 +146,11 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     void startDryRunClient(final int port, final File dataSource) {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+
         final File projectLocation = robotProject.getProject().getLocation().toFile();
-        final boolean recursiveInVirtualenv = RedPlugin.getDefault()
-                .getPreferences()
-                .isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
+        final boolean recursiveInVirtualenv = preferences.isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
+        final boolean geventSupport = preferences.isAutodiscoveryGeventSupportEnabled();
         final RobotProjectConfig projectConfig = robotProject.getRobotProjectConfig();
         final List<String> excludedPaths = projectConfig.getExcludedPaths()
                 .stream()
@@ -158,8 +160,8 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 projectConfig).createExecutionEnvironmentSearchPaths();
 
         robotProject.getRuntimeEnvironment()
-                .startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv, excludedPaths,
-                        additionalPaths);
+                .startLibraryAutoDiscovering(port, dataSource, projectLocation, geventSupport, recursiveInVirtualenv,
+                        excludedPaths, additionalPaths);
     }
 
     void setImporters(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> suites) {
