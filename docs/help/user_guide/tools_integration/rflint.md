@@ -41,19 +41,33 @@ Note
 
 It is possible to configure RfLint behavior in Preferences ( `[ Window ->
 Preferences -> Robot Framework -> Errors/Warnings -> RfLint
-validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint\)'\))`)
+validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint\)'\))`).
 
-![](images/rflint_prefs.png)
+#### General tab
 
-  * rule **severity** \- rule of a given name can have severity specified: **default** means severity is unchanged, **Error** and **Warning** changes severity to one of those levels, while **Ignore** will silence the rule, 
+On **General** tab it is possible to define:
 
-  * rule **configuration** \- as described in [RfLint Wiki](http://github.com/boakley/robotframework-lint/wiki/How-to-write-custom-rules) some rules can be configured. This can be done on preference page. Simply write arguments for given rule. If there are multiple arguments then they should be separated with colon (:) character, 
+  * **additional rules files** \- those files will be attached with all the rules when running RfLint analysis. Those rules can be further configured at **Rules** tab, 
 
-  * **additional rules files** \- add python files containing custom RfLint rules so that they will be also used for analysis. 
-
-  * **additional arguments** \- custom RfLint arguments that will be used for analysis 
+  * **additional arguments** \- custom RfLint arguments that will be used for analysis. See RfLint user guide for more details on possible arguments. 
 
 Note
 
     Additional arguments field accepts Eclipse [string variables](../launching/string_substitution.md).
+![](images/rflint_prefs1.png)
+
+#### Rules tab
+
+On **Rules** tab it is possible to configure rule severity as well as
+additional rule parameters.
+
+  * rule **severity** \- rule of a given name can have severity specified: **Error** and **Warning** changes severity to one of those levels, while **Ignore** will silence the rule (Ignore can be set also by check-box), 
+
+  * rule **configuration** \- as described in [RfLint Wiki](http://github.com/boakley/robotframework-lint/wiki/How-to-write-custom-rules) some rules can be parameterized: simply write arguments for given rule and remember that multiple arguments should be separated with colon (:) character. 
+
+Note
+
+    RED will only store changes to default rule configurations. The changed rule is marked with bold font. It is possible that RED is storing configuration of a rule which is currently not recognised by your RfLint installation and such rule is marked red.
+![](images/rflint_prefs2.png)  
+  
 
