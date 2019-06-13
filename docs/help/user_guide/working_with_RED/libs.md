@@ -32,7 +32,7 @@ from Robot Framework option.
 
 Note
 
-    Library autodiscovering is not run on excluded project parts (see more under topic [Limiting validation scope](../validation/scope.md). 
+    Library autodiscovering is not run on excluded project parts (see more under topic [Limiting validation scope](../validation/scope.md)). 
 
 ### Quick Fix - shortcut CTRL+1
 
@@ -93,14 +93,18 @@ Libraries](javascript:executeCommand\('org.eclipse.ui.window.preferences\(prefer
 ![](images/libraries_preferences.png)  
   
 
+Warning
+
+    If the libraries you are going to debug use `Gevent` library then please select **Support Gevent during autodiscovery** checkbox. This will make it possible for autodiscovery mechanism to support such libraries. Without this you may experience hanging both when looking for libraries as well as when keyword source is being searched. 
+
 Note
 
     In some cases problems occur during libdoc generation via session server. It leads to a situation when the server hangs due to [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) between the server code and the library code.  
 To avoid this problem since version 0.8.11 libdocs are generated in a separate
-by default. Note that this solution may affect the time of libdoc generation,
-i.e. slowing down the libraries import, especially with jython interpreter. If
-you are not using problematic libraries you can disable the preference to make
-libdoc generation faster.
+process by default. Note that this solution may affect the time of libdoc
+generation, i.e. slowing down the libraries import, especially with jython
+interpreter. If you are not using problematic libraries you can disable the
+preference to make libdoc generation faster.
 
 ### Reloading libraries after change
 
@@ -121,7 +125,7 @@ window from Python execution:
 ![](images/libdoc_error.png)  
   
 This indicates that some of the dependencies are missing on your local machine
-which may affect testcase execution. To verify you can try to execute libdoc
-in console:  
-_python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
+which may affect test suites execution. To verify you can try to execute
+libdoc in console:  
+_python -m robot.libdoc <PATH_TO_LIBNAME> list _
 

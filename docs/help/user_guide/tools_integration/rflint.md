@@ -68,6 +68,14 @@ additional rule parameters.
 Note
 
     RED will only store changes to default rule configurations. The changed rule is marked with bold font. It is possible that RED is storing configuration of a rule which is currently not recognised by your RfLint installation and such rule is marked red.
-![](images/rflint_prefs2.png)  
+![](images/rflint_prefs2.png)
+
+### Displaying rules documentation
+
+It is possible to see the rule documentation straight from **Problems** view
+by using context menu action on given RfLint problem. The documentation will
+be displayed in **Documentation** view.
+
+![](images/rflint_showdoc.png)  
   
 

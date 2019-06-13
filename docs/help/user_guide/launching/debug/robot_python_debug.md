@@ -68,6 +68,10 @@ possibilities:
 It is also possible to set the address and port on which PyDev will
 communicate with the module.
 
+Warning
+
+    If the libraries you are going to debug use `Gevent` library then please select **Gevent compatible** checkbox. This will add `GEVENT_SUPPORT` environment variable set to `True`. It is required for `pydevd` in order to be able to debug such libraries. Without this the debugger sessions may hang. 
+
 #### Created launch configuration
 
 After clicking **Finish** RED will install or export `redpydevd` runner (if
