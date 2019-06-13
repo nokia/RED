@@ -146,6 +146,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
 
+    public static Optional<URI> getRobotImageUri() {
+        return getImageUri("resources", "robot.png");
+    }
+
     public static ImageDescriptor getRemoteRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot_remote.png");
     }

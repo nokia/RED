@@ -1515,6 +1515,11 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.showRfLintRuleDoc"
+          name="Show rule documentation">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.revalidateSelection"
           name="Revalidate selection">
     </command>
@@ -2017,6 +2022,10 @@
               </iterate>
            </with>
         </enabledWhen>
+     </handler>
+     <handler
+           class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ShowRfLintDocHandler"
+           commandId="org.robotframework.red.showRfLintRuleDoc">
      </handler>
      <handler
            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ZoomInTextHandler"
@@ -4016,6 +4025,36 @@
              class="org.robotframework.ide.eclipse.main.plugin.launch.variables.ActivateStringVariablesMenuItem"
              id="org.robotframework.ide.eclipse.red.activeVariablesMenuDynamic">
        </dynamic>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.eclipse.ui.views.ProblemView?before=additions">
+       <command
+             commandId="org.robotframework.red.showRfLintRuleDoc"
+             label="Show rule documentation"
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <with
+                   variable="selection">
+                <and>
+                   <count
+                            value="1">
+                   </count>
+                   <iterate
+                      ifEmpty="false">
+                      <adapt
+                            type="org.eclipse.core.resources.IMarker">
+                         <test
+                               property="org.eclipse.ui.ide.marker.type"
+                               value="org.robotframework.ide.eclipse.main.plugin.rfLintProblem">
+                         </test>
+                      </adapt>
+                   </iterate>
+                </and>
+             </with>
+          </visibleWhen>
+       </command>
     </menuContribution>
  </extension>
  <extension

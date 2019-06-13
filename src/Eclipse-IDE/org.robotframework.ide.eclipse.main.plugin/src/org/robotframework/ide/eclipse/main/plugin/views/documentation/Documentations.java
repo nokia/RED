@@ -52,29 +52,23 @@ public class Documentations {
 
     public static void showDocForKeywordSpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification, final KeywordSpecification keywordSpecification) {
-        final DocumentationViewWrapper view = display(page,
-                new KeywordSpecificationInput(project, librarySpecification, keywordSpecification));
-        if (view != null) {
-            page.activate(view);
-        }
+        showDoc(page, new KeywordSpecificationInput(project, librarySpecification, keywordSpecification));
     }
 
     public static void showDocForLibrarySpecification(final IWorkbenchPage page, final RobotProject project,
             final LibrarySpecification librarySpecification) {
-        final DocumentationViewWrapper view = display(page,
-                new LibrarySpecificationInput(project, librarySpecification));
-        if (view != null) {
-            page.activate(view);
-        }
+        showDoc(page, new LibrarySpecificationInput(project, librarySpecification));
     }
 
     public static void showDocForRobotElement(final IWorkbenchPage page, final RobotFileInternalElement element) {
-        findInput(element).ifPresent(input -> {
-            final DocumentationViewWrapper view = display(page, input);
-            if (view != null) {
-                page.activate(view);
-            }
-        });
+        findInput(element).ifPresent(input -> showDoc(page, input));
+    }
+
+    public static void showDoc(final IWorkbenchPage page, final DocumentationViewInput input) {
+        final DocumentationViewWrapper view = display(page, input);
+        if (view != null) {
+            page.activate(view);
+        }
     }
 
     public static DocumentationViewWrapper showDocForEditorSourceSelection(final IWorkbenchPage page,

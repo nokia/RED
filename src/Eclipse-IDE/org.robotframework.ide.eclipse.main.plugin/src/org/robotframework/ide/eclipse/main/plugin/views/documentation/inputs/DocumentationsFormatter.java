@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.joining;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,6 +24,8 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+
+import com.google.common.base.Functions;
 
 public class DocumentationsFormatter {
 
@@ -65,6 +68,10 @@ public class DocumentationsFormatter {
         final String doc = documentation.provideFormattedDocumentation(env);
         final Collection<String> localSymbols = documentation.getLocalSymbols();
         return writeHtml(header, doc + footer, localSymbols, localKeywordsLinker);
+    }
+
+    public String format(final String content) {
+        return writeHtml("", content, new HashSet<>(), Functions.identity());
     }
 
     private String writeHtml(final String header, final String doc, final Collection<String> localSymbols,

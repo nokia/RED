@@ -81,6 +81,8 @@ public interface IRuntimeEnvironment {
      *            Test case file with unknown library imports
      * @param projectLocation
      *            Project file
+     * @param supportGevent
+     *            If Gevent library should be supported
      * @param recursiveInVirtualenv
      *            Virtualenv recursive library source lookup switch
      * @param excludedPaths
@@ -88,8 +90,8 @@ public interface IRuntimeEnvironment {
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
      */
-    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean recursiveInVirtualenv,
-            List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
+    void startLibraryAutoDiscovering(int port, File dataSource, File projectLocation, boolean supportGevent,
+            boolean recursiveInVirtualenv, List<String> excludedPaths, EnvironmentSearchPaths additionalPaths);
 
     /**
      * Start keyword auto discovering with robot dryrun
@@ -98,10 +100,13 @@ public interface IRuntimeEnvironment {
      *            Port number for communication with AgentConnectionServer
      * @param dataSource
      *            Test case file with known library imports
+     * @param supportGevent
+     *            If Gevent library should be supported
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
      */
-    void startKeywordAutoDiscovering(int port, File dataSource, EnvironmentSearchPaths additionalPaths);
+    void startKeywordAutoDiscovering(int port, File dataSource, boolean supportGevent,
+            EnvironmentSearchPaths additionalPaths);
 
     void stopAutoDiscovering();
 

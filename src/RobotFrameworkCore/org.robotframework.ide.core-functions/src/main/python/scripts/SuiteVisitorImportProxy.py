@@ -22,10 +22,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
     LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self, handle_keywords=False):
+    def __init__(self, handle_keywords=False, support_gevent=False):
         import robot.running.namespace
         robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, self.LIB_IMPORT_TIMEOUT,
-                                                       handle_keywords)
+                                                       handle_keywords, support_gevent)
 
     def visit_suite(self, suite):
         suite.tests.clear()
@@ -46,10 +46,11 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
 
 class RedImporter(object):
-    def __init__(self, importer, lib_import_timeout, handle_keywords=False):
+    def __init__(self, importer, lib_import_timeout, handle_keywords=False, support_gevent=False):
         self.importer = importer
         self.lib_import_timeout = lib_import_timeout
         self.handle_keywords = handle_keywords
+        self.support_gevent = support_gevent
         self.func = None
         self.lock = threading.Lock()
         self.cached_lib_items = list()
@@ -83,9 +84,18 @@ class RedImporter(object):
             errors = lib_cached.errors
         else:
             try:
+                # this is required to not get blocked thread in code using gevent; if it's not supported
+                # the sleep function is just void
+                if self.support_gevent:
+                    from gevent import monkey, sleep
+                    monkey.patch_all()
+                else:
+                    sleep = lambda : None
+                
                 def to_call():
                     try:
                         libs.append(func(*args, **kwargs))
+                        sleep()
                     except:
                         errors.append(sys.exc_info())
 

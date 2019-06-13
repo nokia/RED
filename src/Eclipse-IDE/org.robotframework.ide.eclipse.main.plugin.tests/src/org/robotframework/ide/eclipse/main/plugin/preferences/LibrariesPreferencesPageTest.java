@@ -44,13 +44,14 @@ public class LibrariesPreferencesPageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(3);
+        assertThat(editors).hasSize(4);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
                 names -> assertThat(names).containsOnly(
                         RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
+                        RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT,
                         RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                         RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED));
     }

@@ -11,10 +11,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.util.Optional;
 
+import org.eclipse.swt.graphics.RGB;
 import org.junit.Test;
 
 
 public class FormattersTest {
+
+    @Test
+    public void givenTextIsProperlyInsertedIntoSpanWithGivenColor() {
+        assertThat(Formatters.span("content", new RGB(1, 2, 3)))
+                .isEqualTo("<span style=\"color: #010203\">content</span>");
+        assertThat(Formatters.span("abc", new RGB(255, 255, 255)))
+                .isEqualTo("<span style=\"color: #ffffff\">abc</span>");
+        assertThat(Formatters.span("xyz", new RGB(100, 80, 60)))
+                .isEqualTo("<span style=\"color: #64503c\">xyz</span>");
+    }
 
     @Test
     public void givenTextIsProperlyInsertedIntoTitleOfGivenLevel() {

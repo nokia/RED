@@ -115,13 +115,13 @@ public class MissingRobotRuntimeEnvironment extends RobotRuntimeEnvironment {
 
     @Override
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv, final List<String> excludedPaths,
+            final boolean supportGevent, final boolean recursiveInVirtualenv, final List<String> excludedPaths,
             final EnvironmentSearchPaths additionalPaths) {
         // nothing to do
     }
 
     @Override
-    public void startKeywordAutoDiscovering(final int port, final File dataSource,
+    public void startKeywordAutoDiscovering(final int port, final File dataSource, final boolean supportGevent,
             final EnvironmentSearchPaths additionalPaths) {
         // nothing to do
     }

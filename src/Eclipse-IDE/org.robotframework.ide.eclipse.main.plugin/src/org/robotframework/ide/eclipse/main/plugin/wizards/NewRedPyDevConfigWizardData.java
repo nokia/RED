@@ -32,6 +32,8 @@ class NewRedPyDevConfigWizardData {
     private boolean requiresInstallation;
     private boolean requiresExport;
 
+    private boolean geventSupport;
+
     boolean isInterpreterChosen() {
         return redEnvironment != null;
     }
@@ -90,6 +92,10 @@ class NewRedPyDevConfigWizardData {
         this.requiresExport = requiresExport;
     }
 
+    void setGeventSupport(final boolean geventSupport) {
+        this.geventSupport = geventSupport;
+    }
+
     File getPydevdLocation() {
         return pydevdLocation;
     }
@@ -112,6 +118,10 @@ class NewRedPyDevConfigWizardData {
 
     boolean requiresRedpydevdExport() {
         return requiresExport;
+    }
+
+    boolean getGeventSupport() {
+        return geventSupport;
     }
 
     String createPythonExecutablePath() {

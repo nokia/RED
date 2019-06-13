@@ -134,6 +134,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
     private void initializeLibrariesPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
+        preferences.putBoolean(RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT, false);
         preferences.putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED, true);
         preferences.putBoolean(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
     }

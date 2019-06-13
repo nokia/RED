@@ -40,10 +40,18 @@ public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
                 RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
                 "Add project modules recursively to PYTHONPATH/CLASSPATH during autodiscovering on virtualenv",
                 discoveringGroup);
-
-        addField(recursiveAdditionEditor);
         final Button recursiveAdditionButton = (Button) recursiveAdditionEditor.getDescriptionControl(discoveringGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(recursiveAdditionButton);
+        addField(recursiveAdditionEditor);
+
+        final BooleanFieldEditor geventSupportEditor = new BooleanFieldEditor(
+                RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT, "Support Gevent during autodiscovery",
+                discoveringGroup);
+        final Button geventSupportButton = (Button) geventSupportEditor.getDescriptionControl(discoveringGroup);
+        geventSupportButton.setToolTipText(
+                "When this option is on the autodiscovery will support libraries using Gevent");
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(geventSupportButton);
+        addField(geventSupportEditor);
 
         final Link link = new Link(discoveringGroup, SWT.NONE);
         GridDataFactory.fillDefaults().indent(5, 10).applyTo(link);
@@ -66,16 +74,14 @@ public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
         final BooleanFieldEditor libdocGenerationEditor = new BooleanFieldEditor(
                 RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 "Generate Python libraries libdocs in separate process", libGroup);
-
-        addField(libdocGenerationEditor);
         final Button libdocGenerationButton = (Button) libdocGenerationEditor.getDescriptionControl(libGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(libdocGenerationButton);
+        addField(libdocGenerationEditor);
 
         final BooleanFieldEditor libdocReloadEditor = new BooleanFieldEditor(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED,
                 "Automatically reload changed libraries", libGroup);
-
-        addField(libdocReloadEditor);
         final Button libdocReloadButton = (Button) libdocReloadEditor.getDescriptionControl(libGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(libdocReloadButton);
+        addField(libdocReloadEditor);
     }
 }

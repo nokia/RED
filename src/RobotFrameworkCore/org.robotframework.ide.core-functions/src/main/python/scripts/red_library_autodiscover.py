@@ -10,14 +10,14 @@ import sys
 import platform
 
 
-def start_auto_discovering(port, data_source_path):
+def start_auto_discovering(port, data_source_path, support_gevent):
     from robot.run import run
     from TestRunnerAgent import TestRunnerAgent
     from SuiteVisitorImportProxy import SuiteVisitorImportProxy
 
     run(data_source_path,
         listener=TestRunnerAgent(port),
-        prerunmodifier=SuiteVisitorImportProxy(),
+        prerunmodifier=SuiteVisitorImportProxy(support_gevent=support_gevent),
         runemptysuite=True,
         dryrun=True,
         output='NONE',
@@ -80,17 +80,18 @@ if __name__ == '__main__':
     port = sys.argv[1]
     data_source_path = __decode_unicode_if_needed(sys.argv[2])
     project_location_path = __decode_unicode_if_needed(sys.argv[3])
-    recursive = recursive = not _is_virtualenv() or sys.argv[4]
+    support_gevent = sys.argv[4].lower() == 'true'
+    recursive = recursive = not _is_virtualenv() or sys.argv[5].lower() == 'true'
     excluded_paths = []
     additional_paths = []
 
-    if len(sys.argv) > 5:
-        if sys.argv[5] == '-exclude':
-            excluded_paths = __decode_unicode_if_needed(sys.argv[6].split(';'))
-            if len(sys.argv) > 7:
-                additional_paths = __decode_unicode_if_needed(sys.argv[7].split(';'))
+    if len(sys.argv) > 6:
+        if sys.argv[6] == '-exclude':
+            excluded_paths = __decode_unicode_if_needed(sys.argv[7].split(';'))
+            if len(sys.argv) > 8:
+                additional_paths = __decode_unicode_if_needed(sys.argv[8].split(';'))
         else:
-            additional_paths = __decode_unicode_if_needed(sys.argv[5].split(';'))
+            additional_paths = __decode_unicode_if_needed(sys.argv[6].split(';'))
 
     python_paths, class_paths = _collect_source_paths(project_location_path, recursive, excluded_paths)
 
@@ -101,4 +102,4 @@ if __name__ == '__main__':
             cp_updater = ClassPathUpdater()
             cp_updater.add_file(class_path)
 
-    start_auto_discovering(port, data_source_path)
+    start_auto_discovering(port, data_source_path, support_gevent)

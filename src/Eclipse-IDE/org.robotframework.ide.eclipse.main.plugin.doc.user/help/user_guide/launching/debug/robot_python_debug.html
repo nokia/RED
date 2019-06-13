@@ -93,6 +93,15 @@
     <p>It is also possible to set the address and port on which PyDev will communicate with the module.
     </p>
     
+    <dl class="warning">
+       <dt>Warning</dt>
+       <dd>If the libraries you are going to debug use <code>Gevent</code> library then please select <b>Gevent 
+       compatible</b> checkbox. This will add <code>GEVENT_SUPPORT</code> environment variable set to <code>True</code>.
+       It is required for <code>pydevd</code> in order to be able to debug such libraries. Without this the debugger
+       sessions may hang.
+       </dd>
+    </dl>
+    
     <h4>Created launch configuration</h4>
     
     <p>After clicking <b>Finish</b> RED will install or export <code>redpydevd</code> runner (if neeeded) and create

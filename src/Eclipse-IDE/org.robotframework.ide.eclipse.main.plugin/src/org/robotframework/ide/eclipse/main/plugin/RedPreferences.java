@@ -93,6 +93,7 @@ public class RedPreferences {
     public static final String SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.editor.save.autoDiscoveringSummaryWindowEnabled";
 
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
+    public static final String AUTODISCOVERY_GEVENT_SUPPORT = "red.libraries.autoDiscoveryGeventSupport";
     public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
     public static final String LIBDOCS_AUTO_RELOAD_ENABLED = "red.libraries.libdocsAutoReloadEnabled";
 
@@ -294,6 +295,10 @@ public class RedPreferences {
 
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
+    }
+
+    public boolean isAutodiscoveryGeventSupportEnabled() {
+        return store.getBoolean(AUTODISCOVERY_GEVENT_SUPPORT);
     }
 
     public boolean isPythonLibrariesLibdocGenerationInSeparateProcessEnabled() {

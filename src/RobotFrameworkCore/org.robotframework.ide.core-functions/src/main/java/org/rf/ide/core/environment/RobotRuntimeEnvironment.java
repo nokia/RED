@@ -194,18 +194,18 @@ public class RobotRuntimeEnvironment implements IRuntimeEnvironment {
 
     @Override
     public void startLibraryAutoDiscovering(final int port, final File dataSource, final File projectLocation,
-            final boolean recursiveInVirtualenv, final List<String> excludedPaths,
+            final boolean supportGevent, final boolean recursiveInVirtualenv, final List<String> excludedPaths,
             final EnvironmentSearchPaths additionalPaths) {
         final RobotCommandExecutor executor = executors.getRobotCommandExecutor(location);
-        executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, recursiveInVirtualenv, excludedPaths,
-                additionalPaths);
+        executor.startLibraryAutoDiscovering(port, dataSource, projectLocation, supportGevent, recursiveInVirtualenv,
+                excludedPaths, additionalPaths);
     }
 
     @Override
-    public void startKeywordAutoDiscovering(final int port, final File dataSource,
+    public void startKeywordAutoDiscovering(final int port, final File dataSource, final boolean supportGevent,
             final EnvironmentSearchPaths additionalPaths) {
         final RobotCommandExecutor executor = executors.getRobotCommandExecutor(location);
-        executor.startKeywordAutoDiscovering(port, dataSource, additionalPaths);
+        executor.startKeywordAutoDiscovering(port, dataSource, supportGevent, additionalPaths);
     }
 
     @Override

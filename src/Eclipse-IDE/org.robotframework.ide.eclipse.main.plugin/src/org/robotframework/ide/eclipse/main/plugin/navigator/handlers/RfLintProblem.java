@@ -19,6 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 public class RfLintProblem {
 
     public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".rfLintProblem";
+    public static final String RULE_NAME = "rfLintRuleName";
+    
 
     private final String ruleName;
 
@@ -61,6 +63,7 @@ public class RfLintProblem {
             marker.setAttribute(IMarker.SEVERITY, getSeverity());
             marker.setAttribute(IMarker.LOCATION, ("line " + line).intern());
             marker.setAttribute(IMarker.LINE_NUMBER, line);
+            marker.setAttribute(RULE_NAME, ruleName);
 
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create marker!", e);

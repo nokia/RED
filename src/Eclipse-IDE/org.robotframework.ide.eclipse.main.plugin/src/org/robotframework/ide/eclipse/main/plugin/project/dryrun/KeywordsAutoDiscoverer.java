@@ -23,6 +23,7 @@ import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.libraries.LibraryDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
@@ -78,10 +79,12 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     void startDryRunClient(final int port, final File dataSource) {
+        final boolean geventSupport = RedPlugin.getDefault().getPreferences().isAutodiscoveryGeventSupportEnabled();
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(robotProject.getProject(),
                 robotProject.getRobotProjectConfig()).createExecutionEnvironmentSearchPaths();
 
-        robotProject.getRuntimeEnvironment().startKeywordAutoDiscovering(port, dataSource, additionalPaths);
+        robotProject.getRuntimeEnvironment()
+                .startKeywordAutoDiscovering(port, dataSource, geventSupport, additionalPaths);
     }
 
     private void startAddingKeywordsToProject(final IProgressMonitor monitor,
