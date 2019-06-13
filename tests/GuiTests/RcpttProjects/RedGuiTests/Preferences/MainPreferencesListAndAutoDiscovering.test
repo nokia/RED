@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _srvewJQcEeWNpL9oeriwCw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 2:29 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/13/19 11:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,14 +70,21 @@ with [get-window Preferences | get-control Any -after [get-label Libraries] -ind
     
     // add paths
     get-property "getChildren().Control[0].getText()" | equals "Libraries autodiscovering" | verify-true
-    get-property "getChildren().Control[0].getChildren().length" | equals 2 | verify-true
+    get-property "getChildren().Control[0].getChildren().length" | equals 3 | verify-true
+    
+    //add to Pythonpath
     get-property "getChildren().Control[0].getChildren().Control[0].getText()" 
         | equals "Add project modules recursively to PYTHONPATH/CLASSPATH during autodiscovering on virtualenv" 
         | verify-true
     get-property "getChildren().Control[0].getChildren().Control[0].getSelection()" | equals false | verify-true
     
-    // link
+    // Gevent
+    get-property "getChildren().Control[0].getChildren().Control[1].getSelection()" | equals false | verify-true
     get-property "getChildren().Control[0].getChildren().Control[1].getText()" 
+        | equals "Support Gevent during autodiscovery" | verify-true
+        
+    // link
+    get-property "getChildren().Control[0].getChildren().Control[2].getText()" 
         | equals "See <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.editor.save\">'Save Actions'</a> to trigger library autodiscovering on save." 
         | verify-true
         
