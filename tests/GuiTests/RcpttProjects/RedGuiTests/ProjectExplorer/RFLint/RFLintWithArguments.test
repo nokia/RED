@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gr19ADQpEeiLWMPOs-qbiA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/12/18 11:02 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/13/19 3:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
 
 with [get-window Preferences] {
-    get-editbox -after [get-label "Additional arguments"] | set-text [format "-A %s/project_a/arg_file.arg" $RED_workspace_path_unix_style]
+    get-editbox -after [get-label "Additional arguments for RfLint"] | set-text [format "-A %s/project_a/arg_file.arg" $RED_workspace_path_unix_style]
     get-button "Apply and Close" | click
 }
 
@@ -43,23 +43,19 @@ with [get-view Problems | get-tree] {
         | get-property selected | equals false | verify-true
 }
 
-//add rule in table - now TrailingBlankLines is error
+//change rule in table - now TrailingBlankLines is error
 get-preferences-menu | click
 with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
     with [get-table] {
-        get-item "...add new rule" | double-click
-        select Rule | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
-        with [get-editbox] {
-            set-text TrailingBlankLines
-            key-type Enter
-        }
-        apply-cell-edit -deactivate
-        select TrailingBlankLines | double-click
+        get-cell 15 1 | click
+        get-cell 15 1 | mouse down -count 2
+        double-click
         select TrailingBlankLines | activate-cell-edit -column 1 -type MouseDoubleClickSelection
         get-combo | select Error
         apply-cell-edit -deactivate
     }
+    get-button Apply | click
     get-button "Apply and Close" | click
 }
 
@@ -98,7 +94,7 @@ get-preferences-menu | click
 get-window Preferences | get-button "Restore Defaults" | click
 
 with [get-window Preferences] {
-    with [get-editbox -after [get-label "Additional arguments"]] {
+    with [get-editbox -after [get-label "Additional arguments for RfLint"]] {
         set-text "-A ${workspace_loc}/project_a/arg_file2.arg"
     }
     get-button "Apply and Close" | click
@@ -135,7 +131,7 @@ with [get-view Problems | get-tree] {
 //set wrong path
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-editbox -after [get-label "Additional arguments"] | set-text "-A ${workspace_loc}/project_a/arg_file23.arg"
+    get-editbox -after [get-label "Additional arguments for RfLint"] | set-text "-A ${workspace_loc}/project_a/arg_file23.arg"
     get-button "Apply and Close" | click
 }
 get-view "Project Explorer" | get-tree | select "project_a/test3.robot"
@@ -152,7 +148,7 @@ exec-with-options {
 //set param that not exist
 get-preferences-menu | click
 with [get-window Preferences] {
-    with [get-editbox -after [get-label "Additional arguments"]] {
+    with [get-editbox -after [get-label "Additional arguments for RfLint"]] {
         set-text "-A ${new_var}/project_a/arg_file2.arg"
     }
     get-button "Apply and Close" | click

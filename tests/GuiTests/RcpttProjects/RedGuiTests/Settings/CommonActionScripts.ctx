@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/14/19 4:00 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/13/19 3:58 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -142,7 +142,7 @@ proc "compare-message-log2" [val ref_content]{
 
 }
 
-proc "wait-for-errors"[val amount] [val times] [val delay]{
+proc "wait-for-errors"[val amount] [val times 4 ] [val delay 1000]{
 	try -times $times -delay $delay -command{
 		get-view Problems | get-label ".* error.*" | get-property caption 
 	    | equals [format "%s error.*"  $amount ]| verify-true

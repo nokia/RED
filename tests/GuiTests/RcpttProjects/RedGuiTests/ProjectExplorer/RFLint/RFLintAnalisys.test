@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/12/18 5:35 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/13/19 5:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -138,72 +138,175 @@ get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
 
 //check how view looks like
-with [get-window Preferences | get-table] {
-    get-property "columns[0].caption" | equals Rule | verify-true
-    get-property "columns[1].caption" | equals Severity | verify-true
-    get-property "columns[2].caption" | equals Configuration | verify-true
-    get-property "getItems().length" | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "...add new rule" | verify-true
-}
+with [get-window Preferences | get-tab-folder] {
 
-with [get-window Preferences] {
-    with [get-control Any -after [get-label "RfLint validation"] -index 9] {
-        get-property "getChildren().length" | equals 6 | verify-true
+	// 2 tabs
+    get-property "pages[0]" | equals General | verify-true
+    get-property "pages[1]" | equals Rules | verify-true
+    get-property activePage | equals General | verify-true
+    get-property tabCount | equals 2 | verify-true
+    get-property "getChildren().length" | equals 2 | verify-true
+    get-property "getChildren().Control[0].getChildren().length" | equals 3 | verify-true
+    
+    //rules
+    get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "Additional rules files" 
+        | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[1].getItems().length" | equals 1 | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[1].getItems().TableItem[0].getText()" 
+        | equals "...add new rules file" | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().length" | equals 3 | verify-true
+    
+    // additional args
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[0].getText()" 
+        | equals "Additional arguments for RfLint" | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[1].getEditable()" 
+        | equals true | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[1].getText()" | equals "" 
+        | verify-true
         
-        //configure rules
-        get-property "getChildren().Control[0].getText()" | equals "Configure rules and their severity" | verify-true
-        get-property "getChildren().Control[1].getItems().length" | equals 1 | verify-true
-        get-property "getChildren().Control[1].getItems().TableItem[0].getText()" | equals "...add new rule" 
-            | verify-true
-            
-        // python rules    
-        get-property "getChildren().Control[2].getText()" | equals "Additional rules files" | verify-true
-        get-property "getChildren().Control[3].getItems().length" | equals 1 | verify-true
-        get-property "getChildren().Control[3].getItems().TableItem[0].getText()" | equals "...add new rules file" 
-            | verify-true
-
-        // args    
-        get-property "getChildren().Control[4].getChildren().length" | equals 3 | verify-true
-        get-property "getChildren().Control[4].getChildren().Control[0].getText()" | equals "Additional arguments" 
-            | verify-true
-        get-property "getChildren().Control[4].getChildren().Control[1].getText()" | equals "" | verify-true
-        get-property "getChildren().Control[4].getChildren().Control[2].getText()" | equals "Variables..." | verify-true
-    }
+    // vars button    
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[2].getText()" 
+        | equals "Variables..." | verify-true
+    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[2].isEnabled()" | equals true 
+        | verify-true
 }
 
-//add new rule
-get-window Preferences | get-table | get-item "...add new rule" | double-click
+//rules tab
+get-window Preferences | get-tab-folder | get-tab-item Rules | click
+with [get-window Preferences | get-control Any -after [get-label "RfLint validation"] -index 13] {
+    get-property "getChildren().length" | equals 3 | verify-true
+    get-property "getChildren().Control[0].getText()" 
+        | equals "Configure rules and their severity. Following rules are available for RfLint installed in <a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.installed\">.*</a> environment:" 
+        | verify-true
 
-//check default values
+    //default rules
+    get-property "getChildren().Control[1].getItems().length" | equals 16 | verify-true
+
+    get-property "getChildren().Control[2].getChildren().length" | equals 1 | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].isLoading()" | equals false | verify-true
+}
+
+
 with [get-window Preferences | get-table] {
-    get-item -path Rule | get-property "values['Configuration']" | equals "" | verify-true
-    get-item -path Rule | get-property "values['Rule']" | equals Rule | verify-true
-    get-item -path Rule | get-property "values['Severity']" | equals default | verify-true
+    get-property "getItems().TableItem[0].getData().getSeverity().toString()" | equals ERROR | verify-true
+    get-property "getItems().TableItem[0].getData().getDocumentation()" 
+        | equals "Verify that no keywords have a name of an existing keyword in the same file" | verify-true
+    get-property "getItems().TableItem[0].getData().getRuleName()" | equals DuplicateKeywordNames | verify-true
+    
+    get-property "getItems().TableItem[1].getText()" | equals DuplicateTestNames | verify-true
+    get-property "getItems().TableItem[1].getData().getSeverity().toString()" | equals ERROR | verify-true
+    get-property "getItems().TableItem[1].getData().getDocumentation()" 
+        | equals "Verify that no tests have a name of an existing test in the same suite" | verify-true
+    get-property "getItems().TableItem[1].getData().getRuleName()" | equals DuplicateTestNames | verify-true
+    
+    get-property "getItems().TableItem[2].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[2].getData().getDocumentation()" 
+        | equals "Verify the file has fewer lines than a given threshold.\n\n"
+        + "You can configure the maximum number of lines. The default is 300." | verify-true
+    get-property "getItems().TableItem[2].getData().getRuleName()" | equals FileTooLong | verify-true
+    
+    get-property "getItems().TableItem[3].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[3].getData().getDocumentation()" 
+        | equals "Verify that there are no invalid table headers" | verify-true
+    get-property "getItems().TableItem[3].getData().getRuleName()" | equals InvalidTable | verify-true
+    
+    get-property "getItems().TableItem[4].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[4].getData().getDocumentation()" 
+        | equals "Check that a line is not too long (configurable; default=100)" | verify-true
+    get-property "getItems().TableItem[4].getData().getRuleName()" | equals LineTooLong | verify-true
+    
+    get-property "getItems().TableItem[5].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[5].getData().getDocumentation()" 
+        | equals "Warn about periods in the suite name\n\n"
+        + "Since robot uses \".\" as a path separator, using a \".\" in a suite\n"
+        + "name can lead to ambiguity." | verify-true
+    get-property "getItems().TableItem[5].getData().getRuleName()" | equals PeriodInSuiteName | verify-true
+    
+    get-property "getItems().TableItem[6].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[6].getData().getDocumentation()" 
+        | equals "Warn about periods in the testcase name\n\n"
+        + "Since robot uses \".\" as a path separator, using a \".\" in a testcase\n"
+        + "name can lead to ambiguity." | verify-true
+    get-property "getItems().TableItem[6].getData().getRuleName()" | equals PeriodInTestName | verify-true
+    
+    get-property "getItems().TableItem[7].getData().getSeverity().toString()" | equals ERROR | verify-true
+    get-property "getItems().TableItem[7].getData().getDocumentation()" 
+        | equals "Verify that a keyword has documentation" | verify-true
+    get-property "getItems().TableItem[7].getData().getRuleName()" | equals RequireKeywordDocumentation | verify-true
+    
+    get-property "getItems().TableItem[8].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[8].getData().getDocumentation()" 
+        | equals "Verify that a test suite has documentation" | verify-true
+    get-property "getItems().TableItem[8].getData().getRuleName()" | equals RequireSuiteDocumentation | verify-true
+        
+    get-property "getItems().TableItem[9].getData().getSeverity().toString()" | equals ERROR | verify-true
+    get-property "getItems().TableItem[9].getData().getDocumentation()" 
+        | equals "Verify that a test suite has documentation\n\n"
+        + "This rule is not enforced for data driven tests (\"Test Template\" in Settings)" | verify-true
+    get-property "getItems().TableItem[9].getData().getRuleName()" | equals RequireTestDocumentation | verify-true
+    
+    get-property "getItems().TableItem[10].getData().getSeverity().toString()" | equals ERROR | verify-true
+    get-property "getItems().TableItem[10].getData().getDocumentation()" 
+        | equals "Flags tags that have spaces in the tag name" | verify-true
+    get-property "getItems().TableItem[10].getData().getRuleName()" | equals TagWithSpaces | verify-true
+    
+    get-property "getItems().TableItem[11].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[11].getData().getRuleName()" | equals TooFewKeywordSteps | verify-true
+    
+    get-property "getItems().TableItem[12].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[12].getData().getDocumentation()" 
+        | equals "Tests should have at least a minimum number of steps\n\n"
+        + "This rule is configurable. The default number of required steps is 2." | verify-true
+    get-property "getItems().TableItem[12].getData().getRuleName()" | equals TooFewTestSteps | verify-true
+    
+    get-property "getItems().TableItem[13].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[13].getData().getDocumentation()" 
+        | equals "Should not have too many tests in one suite.\n\n"
+        + "The exception is if they are data-driven.\n\n"
+        + "https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure\n\n"
+        + "You can configure the maximum number of tests. The default is 10." | verify-true
+    get-property "getItems().TableItem[13].getData().getRuleName()" | equals TooManyTestCases | verify-true
+    
+    get-property "getItems().TableItem[14].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[14].getData().getDocumentation()" 
+        | equals "Workflow tests should have no more than ten steps.\n\n"
+        + "https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Workflow_tests" | verify-true
+    get-property "getItems().TableItem[14].getData().getRuleName()" | equals TooManyTestSteps | verify-true
+    
+    get-property "getItems().TableItem[15].getData().getSeverity().toString()" | equals WARNING | verify-true
+    get-property "getItems().TableItem[15].getData().getDocumentation()" 
+        | equals "Check for multiple blank lines at the end of a file\n\n"
+        + "This is a configurable. The default value is 2." | verify-true
+    get-property "getItems().TableItem[15].getData().getRuleName()" | equals TrailingBlankLines | verify-true
 }
 
 
+//change new rule
 with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
     with [get-table] {
-    	//change default rule to LineTooLong
-        select Rule | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
+        get-cell 4 2 | click
+        get-cell 4 2 | mouse down -count 2
+        double-click
+        select LineTooLong | activate-cell-edit -column 2 -type MouseDoubleClickSelection
         with [get-editbox] {
-            set-text LineTooLong
+            set-text 80
+            key-type "NUMPAD_ENTER" "\\u000D"
         }
-        //change to value = 80
         apply-cell-edit -deactivate
-        select LineTooLong | double-click
-	    select LineTooLong | activate-cell-edit -column 2 -type MouseDoubleClickSelection
-	    with [get-editbox] {
-	        set-text 80
-	        key-type "NUMPAD_ENTER" "\\u000D"
     }
-    apply-cell-edit -deactivate
-    }
-    get-button Apply | click
-    get-button "Apply and Close" | click
+}
+with [get-window Preferences | get-table] {
+    //get-item -path LineTooLong | get-property "styles[0].font" | equals "Font {1779056093}" | verify-true
+    //get-item -path LineTooLong | get-property "styles[1].font" | equals "Font {1779056093}" | verify-true
+    //get-item -path LineTooLong | get-property "styles[2].font" | equals "Font {1779056093}" | verify-true
+    //values
+    get-item -path LineTooLong | get-property "values['Configuration']" | equals 80 | verify-true
+    get-item -path LineTooLong | get-property "values['Rule']" | equals LineTooLong | verify-true
+    get-item -path LineTooLong | get-property "values['Severity']" | equals Warning | verify-true
 }
 
+get-window Preferences | get-button "Apply and Close" | click
 
 //run this new rule on project
 get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Robot Framework/Run RfLint analysis" 
@@ -283,43 +386,44 @@ with [get-view Problems | get-tree] {
     
 get-preferences-menu | click
 with [get-window Preferences] {
-
-	//change severity to error
+    get-tab-folder | get-tab-item Rules | click
     with [get-table] {
-        get-item "...add new rule" | double-click
-        select Rule | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
-        with [get-editbox] {
-            set-text PeriodInTestName
-            key-type Enter
-        }
-        apply-cell-edit -deactivate
+        get-cell 7 1 | click
+        get-cell 7 1 | click
+        get-cell 7 1 | mouse down -count 2
+        double-click
         
         //change to error
-        select PeriodInTestName | double-click
         select PeriodInTestName | activate-cell-edit -column 1 -type MouseDoubleClickSelection
         get-combo | select Error
         apply-cell-edit -deactivate
+        key-type "NUMPAD_ENTER" "\\u000D"
+        get-cell 0 2 | click
+        get-cell 0 2 | mouse down -count 2
+        double-click
         
-        //modify custom rule
-        get-item "...add new rule" | double-click
-        select Rule | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
-        with [get-editbox] {
-            set-text CustomRule
-            key-type "NUMPAD_ENTER" "\\u000D"
-        }
-        apply-cell-edit -deactivate
-        select CustomRule | double-click
+        //set cutom rule to 3
         select CustomRule | activate-cell-edit -column 2 -type MouseDoubleClickSelection
         with [get-editbox] {
             set-text 3
             key-type "NUMPAD_ENTER" "\\u000D"
         }
         apply-cell-edit -deactivate
+        get-cell 8 0 | click
     }
-    get-button "Apply and Close" | click
 }
+
+//click on rule to see doc
+get-window Preferences | get-canvas | get-property text | equals "Verify that a keyword has documentation\r\n" 
+    | verify-true
+
+//check doc with link
+with [get-window Preferences | get-table] {
+    get-cell 15 0 | click
+}
+get-window Preferences | get-canvas | get-property text | equals "Workflow tests should have no more than ten steps.\r\n"
+    + "https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Workflow_tests\r\n" | verify-true
+get-window Preferences | get-button "Apply and Close" | click
 
 //run those rules on second project
 get-view "Project Explorer" | get-tree | select "project_b"

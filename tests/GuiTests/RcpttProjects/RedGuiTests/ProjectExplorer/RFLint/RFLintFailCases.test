@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/8/19 3:13 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/13/19 5:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -71,26 +71,21 @@ get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
 
 with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
     with [get-table] {
-        get-item "...add new rule" | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
-        with [get-editbox] {
-            set-text LineTooLong
-            key-type "NUMPAD_ENTER" "\\u000D"
-        }
-        apply-cell-edit -deactivate
-        select LineTooLong | double-click
+        get-cell 4 2 | click
+        get-cell 4 2 | mouse down -count 2
+        double-click
         select LineTooLong | activate-cell-edit -column 2 -type MouseDoubleClickSelection
         with [get-editbox] {
             set-text jkl
-            key-type "NUMPAD_ENTER" "\\u000D"
+            key-type Enter
         }
         apply-cell-edit -deactivate
     }
     get-button "Apply and Close" | click
 }
-
-//run analisys and chrk error
+//run analisys and check error
 get-view "Project Explorer" | get-tree | select "project_a"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
@@ -103,47 +98,9 @@ exec-with-options {
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
-//delete rule and checkif wa removed
-get-preferences-menu | click
-get-window Preferences | get-table | select LineTooLong | get-menu -path Delete | click
-with [get-window Preferences | get-table] {
-    get-property "getItems().length" | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "...add new rule" | verify-true
-}
-
-//add new rule that not exists
-with [get-window Preferences] {
-    with [get-table] {
-        get-item "...add new rule" | double-click
-        select Rule | activate-cell-edit -type MouseDoubleClickSelection
-        with [get-editbox] {
-            set-text "my rule"
-            key-type Enter
-        }
-        apply-cell-edit -deactivate
-        select "my rule" | double-click
-        select "my rule" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
-        get-combo | select Warning
-        apply-cell-edit -deactivate
-    }
-    get-button "Apply and Close" | click
-}
-
-///run on project
-get-view "Project Explorer" | get-tree | select "project_a"
-exec-with-options {
-    get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
-    get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
-        | get-property text | contains  "UnknownRuleException: unknown rule: 'my rule'" | verify-true
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
-
-//remove rule
-get-preferences-menu | click
-get-window Preferences | get-table | select "my rule" | get-menu -path Delete | click
-
 //add empty python file
+get-preferences-menu | click
+get-window Preferences | get-button "Restore Defaults" | click
 set-dialog-result File "platform:/resource/project_b/empty_file.py"
 get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
 with [get-window Preferences] {
