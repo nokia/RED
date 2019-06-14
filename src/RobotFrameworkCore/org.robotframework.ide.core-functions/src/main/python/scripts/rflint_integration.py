@@ -151,6 +151,8 @@ class MessagesEncoder(object):
             self._file_to_write.close()
 
 def get_rules(rulefiles):
+    import inspect
+    
     rfLint = RfLint()
     for filename in rulefiles:
         rfLint._load_rule_file(filename)
@@ -158,7 +160,13 @@ def get_rules(rulefiles):
     _ = rfLint.all_rules    # workaround to make all the rules load into _rules dictionary
     rules = []
     for rule in sorted(rfLint._rules.values(), key=lambda rule: rule.name):
-        rules.append((rule.severity, rule.name, rule.doc))
+        filepath = None
+        try:
+            filepath = inspect.getfile(rule.__class__)
+        except:
+            pass
+        if filepath:
+            rules.append((rule.severity, rule.name, filepath, rule.doc))
     return rules
 
 def run_analysis(host, port, project_location, excluded_paths, args):

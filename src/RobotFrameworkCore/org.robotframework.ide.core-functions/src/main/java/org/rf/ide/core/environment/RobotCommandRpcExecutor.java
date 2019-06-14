@@ -343,8 +343,9 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 final Object[] ruleArray = (Object[]) resultRule;
                 final String severity = (String) ruleArray[0];
                 final String name = (String) ruleArray[1];
-                final String documentation = (String) ruleArray[2];
-                rules.add(new RfLintRule(name, RfLintViolationSeverity.from(severity), documentation));
+                final String filepath = (String) ruleArray[2];
+                final String documentation = (String) ruleArray[3];
+                rules.add(new RfLintRule(name, RfLintViolationSeverity.from(severity), filepath, documentation));
             }
             return rules;
 

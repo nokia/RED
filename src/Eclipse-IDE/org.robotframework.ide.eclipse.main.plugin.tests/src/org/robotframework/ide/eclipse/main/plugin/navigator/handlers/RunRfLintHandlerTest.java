@@ -93,17 +93,17 @@ public class RunRfLintHandlerTest {
         when(preferences.getRfLintRulesConfigs()).thenReturn(rulesConfigs);
 
         final Map<String, RfLintRule> rules = new HashMap<>();
-        rules.put("x", new RfLintRule("x", RfLintViolationSeverity.ERROR, "1"));
-        rules.put("y", new RfLintRule("y", RfLintViolationSeverity.WARNING, "2"));
-        rules.put("z", new RfLintRule("z", RfLintViolationSeverity.IGNORE, "3"));
+        rules.put("x", new RfLintRule("x", RfLintViolationSeverity.ERROR, "", "1"));
+        rules.put("y", new RfLintRule("y", RfLintViolationSeverity.WARNING, "", "2"));
+        rules.put("z", new RfLintRule("z", RfLintViolationSeverity.IGNORE, "", "3"));
 
         RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
 
         final List<RfLintRule> configuredRules = new ArrayList<>();
-        configuredRules.add(new RfLintRule("x", RfLintViolationSeverity.ERROR, "1",
+        configuredRules.add(new RfLintRule("x", RfLintViolationSeverity.ERROR, "", "1",
                 new RfLintRuleConfiguration(RfLintViolationSeverity.IGNORE, null)));
-        configuredRules.add(new RfLintRule("y", RfLintViolationSeverity.WARNING, "2"));
-        configuredRules.add(new RfLintRule("z", RfLintViolationSeverity.IGNORE, "3",
+        configuredRules.add(new RfLintRule("y", RfLintViolationSeverity.WARNING, "", "2"));
+        configuredRules.add(new RfLintRule("z", RfLintViolationSeverity.IGNORE, "", "3",
                 new RfLintRuleConfiguration(RfLintViolationSeverity.ERROR, "4")));
 
         verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),

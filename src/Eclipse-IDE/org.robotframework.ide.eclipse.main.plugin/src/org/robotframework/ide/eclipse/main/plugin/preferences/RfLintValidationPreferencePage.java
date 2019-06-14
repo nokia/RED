@@ -507,7 +507,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     private static class MissingRule extends RfLintRule {
 
         public MissingRule(final String ruleName, final RfLintRuleConfiguration configuration) {
-            super(ruleName, RfLintViolationSeverity.ERROR, "", configuration);
+            super(ruleName, RfLintViolationSeverity.ERROR, "", "", configuration);
         }
     }
 

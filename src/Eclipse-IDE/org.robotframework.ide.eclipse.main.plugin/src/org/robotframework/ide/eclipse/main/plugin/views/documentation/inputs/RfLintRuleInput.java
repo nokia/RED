@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -82,8 +83,13 @@ public class RfLintRuleInput implements DocumentationViewInput {
                 .map(RfLintRule::getSeverity)
                 .map(RfLintViolationSeverity::name)
                 .orElse("UNKNOWN");
+        final String filepath = Optional.ofNullable(rule)
+                .map(RfLintRule::getFilepath)
+                .map(path -> Formatters.hyperlink(new File(path).toURI(), path))
+                .orElse("unknown");
         final String defaultSeverity = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, severity);
-        return Formatters.simpleHeader(imgUri, ruleName, newArrayList("Default rule priority", defaultSeverity));
+        return Formatters.simpleHeader(imgUri, ruleName, newArrayList("Source", filepath),
+                newArrayList("Default rule priority", defaultSeverity));
     }
 
     private String createUnknownRuleBody() {

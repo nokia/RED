@@ -34,20 +34,22 @@ public class RfLintRuleInputTest {
 
         assertThat(input.contains(new Object())).isFalse();
         assertThat(input.contains("Rule")).isFalse();
-        assertThat(input.contains(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, ""))).isFalse();
+        assertThat(input.contains(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "", ""))).isFalse();
     }
 
     @Test
     public void properHtmlIsReturnedForExistingRule() {
         final Map<String, RfLintRule> allRules = new HashMap<>();
-        allRules.put("FirstRule", new RfLintRule("FirstRule", RfLintViolationSeverity.ERROR, ""));
-        allRules.put("Rule", new RfLintRule("Rule", RfLintViolationSeverity.ERROR,
+        allRules.put("FirstRule", new RfLintRule("FirstRule", RfLintViolationSeverity.ERROR, "", ""));
+        allRules.put("Rule", new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "the_source.py",
                 "this is the rule doc\n\nsecond paragraph\n\nhttp://www.somelink.com"));
-        allRules.put("ThirdRule", new RfLintRule("ThirdRule", RfLintViolationSeverity.WARNING, ""));
+        allRules.put("ThirdRule", new RfLintRule("ThirdRule", RfLintViolationSeverity.WARNING, "", ""));
 
         final RfLintRuleInput input = new RfLintRuleInput("Rule");
         final String html = input.provideHtml(null, allRules);
 
+        assertThat(html).contains("Source");
+        assertThat(html).contains("the_source.py");
         assertThat(html).contains("Default rule priority");
         assertThat(html).contains("Error");
 
@@ -64,13 +66,15 @@ public class RfLintRuleInputTest {
     @Test
     public void properHtmlIsReturnedForNonExistingRule() {
         final Map<String, RfLintRule> allRules = new HashMap<>();
-        allRules.put("FirstRule", new RfLintRule("FirstRule", RfLintViolationSeverity.ERROR, "doc1"));
-        allRules.put("SecondRule", new RfLintRule("SecondRule", RfLintViolationSeverity.ERROR, "doc2"));
-        allRules.put("ThirdRule", new RfLintRule("ThirdRule", RfLintViolationSeverity.WARNING, "doc3"));
+        allRules.put("FirstRule", new RfLintRule("FirstRule", RfLintViolationSeverity.ERROR, "", "doc1"));
+        allRules.put("SecondRule", new RfLintRule("SecondRule", RfLintViolationSeverity.ERROR, "", "doc2"));
+        allRules.put("ThirdRule", new RfLintRule("ThirdRule", RfLintViolationSeverity.WARNING, "", "doc3"));
 
         final RfLintRuleInput input = new RfLintRuleInput("Rule");
         final String html = input.provideHtml(null, allRules);
 
+        assertThat(html).contains("Source");
+        assertThat(html).contains("unknown");
         assertThat(html).contains("Default rule priority");
         assertThat(html).contains("Unknown");
 
@@ -86,7 +90,7 @@ public class RfLintRuleInputTest {
     @Test
     public void properRawDocumentationIsReturnedForExistingRule() {
         final Optional<RfLintRule> rule = Optional
-                .of(new RfLintRule("Rule", RfLintViolationSeverity.WARNING, "documentation"));
+                .of(new RfLintRule("Rule", RfLintViolationSeverity.WARNING, "", "documentation"));
         final RfLintRuleInput input = new RfLintRuleInput("Rule");
         final String raw = input.provideRawText(rule);
 
