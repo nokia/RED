@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -29,6 +30,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -170,8 +172,16 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         viewer.setContentProvider(new RulesFilesContentProvider());
 
         final Consumer<List<RulesFile>> ruleFilesConsumer = files -> {
-            rulesFiles.addAll(files);
-            reloadRules();
+            boolean added = false;
+            for (final RulesFile file : files) {
+                if (!rulesFiles.contains(file)) {
+                    rulesFiles.add(file);
+                    added = true;
+                }
+            }
+            if (added) {
+                reloadRules();
+            }
         };
         ViewerColumnsFactory.newColumn("")
                 .withWidth(300)
@@ -190,6 +200,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         final Runnable selectionRemover = () -> {
             final List<RulesFile> rulesFilesToRemove = Selections
                     .getElements((IStructuredSelection) viewer.getSelection(), RulesFile.class);
+
+            handleRulesFromRemovedFiles(rulesFilesToRemove);
+
             rulesFiles.removeAll(rulesFilesToRemove);
             rulesFilesViewer.refresh();
 
@@ -214,6 +227,37 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             }
         }));
         return viewer;
+    }
+
+    private void handleRulesFromRemovedFiles(final List<RulesFile> rulesFilesToRemove) {
+        final List<RfLintRule> configuredRulesToAsk = new ArrayList<>();
+
+        final Map<RulesFile, List<RfLintRule>> configuredRulesByFile = rules.stream()
+                .filter(RfLintRule::isConfigured)
+                .collect(groupingBy(r -> new RulesFile(r.getFilepath())));
+        for (final RulesFile file : rulesFilesToRemove) {
+            if (configuredRulesByFile.containsKey(file)) {
+                configuredRulesToAsk.addAll(configuredRulesByFile.get(file));
+            }
+        }
+        if (!configuredRulesToAsk.isEmpty()) {
+            final String rulesNames = configuredRulesToAsk.stream()
+                    .map(RfLintRule::getRuleName)
+                    .collect(joining("\n    ", "\n\n    ", "\n\n"));
+            final MessageDialog dialog = new MessageDialog(getShell(), "Configured rules detected", null,
+                    "There are configured rules defined in the files which are about to be deleted:" + rulesNames
+                            + "What should happen with those configurations?",
+                    MessageDialog.QUESTION, new String[] { "Remove all", "Preserve non-ignored", "Preserve all" }, 2);
+
+            final int result = dialog.open();
+            if (result == 0) {
+                configuredRulesToAsk.forEach(r -> r.configure((RfLintRuleConfiguration) null));
+            } else if (result == 1) {
+                configuredRulesToAsk.stream()
+                        .filter(r -> r.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE)
+                        .forEach(r -> r.configure((RfLintRuleConfiguration) null));
+            }
+        }
     }
 
     private StringFieldEditor createAdditionalArgumentsEditor(final Composite parent) {
@@ -292,8 +336,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
 
         final Runnable selectionRemover = () -> {
-            final List<RfLintRule> rulesToRemove = Selections.getElements((IStructuredSelection) viewer.getSelection(),
-                    RfLintRule.class);
+            final List<MissingRule> rulesToRemove = Selections.getElements((IStructuredSelection) viewer.getSelection(),
+                    MissingRule.class);
             rules.removeAll(rulesToRemove);
             rulesViewer.refresh();
         };
@@ -345,8 +389,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                     .getOptionalFirstElement((IStructuredSelection) viewer.getSelection(), RfLintRule.class)
                     .map(rule -> rule instanceof MissingRule
                             ? "<p><span color=\"error\">Missing rule: " + rule.getRuleName()
-                                    + " is not available in currently active environment</span></p>"
-                            : rule.getDocumentation())
+                                    + " is not available in currently active environment.</span></p>"
+                                    + "<p>This entry can be safely deleted if it is no longer needed.</p>"
+                            : "<p><b>" + rule.getFilepath() + "</b></p>" + rule.getDocumentation())
                     .map(text -> "<form>" + text.replaceAll("\\\n", "<br/>") + "</form>")
                     .orElse("<form></form>");
 
@@ -511,7 +556,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         }
     }
 
-    private static class RulesFile {
+    private static final class RulesFile {
 
         private String path;
 
@@ -525,6 +570,20 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         public void setPath(final String path) {
             this.path = path;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == RulesFile.class) {
+                final RulesFile that = (RulesFile) obj;
+                return this.path.equals(that.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return path.hashCode();
         }
     }
 
