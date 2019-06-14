@@ -14,19 +14,23 @@ public class RfLintRuleTest {
     @Test
     public void gettersTest() {
         final RfLintRuleConfiguration config = new RfLintRuleConfiguration();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getRuleName()).isEqualTo("Rule");
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getSeverity())
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu").getRuleName())
+                .isEqualTo("Rule");
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu").getSeverity())
                 .isEqualTo(RfLintViolationSeverity.ERROR);
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").getConfiguration()).isNull();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu", config).getConfiguration())
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu").getFilepath())
+                .isEqualTo("file");
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu").getConfiguration()).isNull();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu", config).getConfiguration())
                 .isSameAs(config);
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu").isConfigured()).isFalse();
-        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu", config).isConfigured()).isTrue();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu").isConfigured()).isFalse();
+        assertThat(new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "file", "docu", config).isConfigured())
+                .isTrue();
     }
 
     @Test
     public void ruleSeverityConfigurationTest() {
-        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu");
+        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "", "docu");
 
         assertThat(rule.isConfigured()).isFalse();
         assertThat(rule.getConfiguration()).isNull();
@@ -51,7 +55,7 @@ public class RfLintRuleTest {
 
     @Test
     public void ruleArgumentsConfigurationTest() {
-        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "docu");
+        final RfLintRule rule = new RfLintRule("Rule", RfLintViolationSeverity.ERROR, "", "docu");
 
         assertThat(rule.isConfigured()).isFalse();
         assertThat(rule.getConfiguration()).isNull();
@@ -80,25 +84,25 @@ public class RfLintRuleTest {
         final RfLintViolationSeverity wrn = RfLintViolationSeverity.WARNING;
         final RfLintViolationSeverity ign = RfLintViolationSeverity.IGNORE;
 
-        assertThat(new RfLintRule("Rule", err, "docu").getConfigurationSwitches()).isEmpty();
-        assertThat(new RfLintRule("Rule", wrn, "docu").getConfigurationSwitches()).isEmpty();
-        assertThat(new RfLintRule("Rule", ign, "docu").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", err, "", "docu").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", wrn, "", "docu").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", ign, "", "docu").getConfigurationSwitches()).isEmpty();
 
-        assertThat(new RfLintRule("Rule", err, "docu").configure(wrn).getConfigurationSwitches()).containsExactly("-w",
-                "Rule");
-        assertThat(new RfLintRule("Rule", wrn, "docu").configure(ign).getConfigurationSwitches()).containsExactly("-i",
-                "Rule");
-        assertThat(new RfLintRule("Rule", ign, "docu").configure(err).getConfigurationSwitches()).containsExactly("-e",
-                "Rule");
+        assertThat(new RfLintRule("Rule", err, "", "docu").configure(wrn).getConfigurationSwitches())
+                .containsExactly("-w", "Rule");
+        assertThat(new RfLintRule("Rule", wrn, "", "docu").configure(ign).getConfigurationSwitches())
+                .containsExactly("-i", "Rule");
+        assertThat(new RfLintRule("Rule", ign, "", "docu").configure(err).getConfigurationSwitches())
+                .containsExactly("-e", "Rule");
 
-        assertThat(new RfLintRule("Rule", err, "docu").configure("a").getConfigurationSwitches()).containsExactly("-c",
-                "Rule:a");
-        assertThat(new RfLintRule("Rule", wrn, "docu").configure("b").getConfigurationSwitches()).containsExactly("-c",
-                "Rule:b");
+        assertThat(new RfLintRule("Rule", err, "", "docu").configure("a").getConfigurationSwitches())
+                .containsExactly("-c", "Rule:a");
+        assertThat(new RfLintRule("Rule", wrn, "", "docu").configure("b").getConfigurationSwitches())
+                .containsExactly("-c", "Rule:b");
 
-        assertThat(new RfLintRule("Rule", err, "docu").configure(wrn).configure("a").getConfigurationSwitches())
+        assertThat(new RfLintRule("Rule", err, "", "docu").configure(wrn).configure("a").getConfigurationSwitches())
                 .containsExactly("-w", "Rule", "-c", "Rule:a");
-        assertThat(new RfLintRule("Rule", ign, "docu").configure(err).configure("c").getConfigurationSwitches())
+        assertThat(new RfLintRule("Rule", ign, "", "docu").configure(err).configure("c").getConfigurationSwitches())
                 .containsExactly("-e", "Rule", "-c", "Rule:c");
     }
 
@@ -108,10 +112,10 @@ public class RfLintRuleTest {
         final RfLintViolationSeverity wrn = RfLintViolationSeverity.WARNING;
         final RfLintViolationSeverity ign = RfLintViolationSeverity.IGNORE;
 
-        assertThat(new RfLintRule("Rule", ign, "docu").configure("c").getConfigurationSwitches()).isEmpty();
-        assertThat(new RfLintRule("Rule", wrn, "docu").configure(ign).configure("b").getConfigurationSwitches())
+        assertThat(new RfLintRule("Rule", ign, "", "docu").configure("c").getConfigurationSwitches()).isEmpty();
+        assertThat(new RfLintRule("Rule", wrn, "", "docu").configure(ign).configure("b").getConfigurationSwitches())
                 .containsExactly("-i", "Rule");
-        assertThat(new RfLintRule("Rule", err, "docu").configure(ign).configure("c").getConfigurationSwitches())
+        assertThat(new RfLintRule("Rule", err, "", "docu").configure(ign).configure("c").getConfigurationSwitches())
                 .containsExactly("-i", "Rule");
 
     }

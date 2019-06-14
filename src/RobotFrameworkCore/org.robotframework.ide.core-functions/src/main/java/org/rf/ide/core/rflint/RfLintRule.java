@@ -18,18 +18,22 @@ public class RfLintRule {
 
     private final RfLintViolationSeverity defaultSeverity;
 
+    private final String filepath;
+
     private final String documentation;
 
     private RfLintRuleConfiguration configuration;
 
-    public RfLintRule(final String ruleName, final RfLintViolationSeverity severity, final String documentation) {
-        this(ruleName, severity, documentation, null);
+    public RfLintRule(final String ruleName, final RfLintViolationSeverity defaultSeverity, final String filepath,
+            final String documentation) {
+        this(ruleName, defaultSeverity, filepath, documentation, null);
     }
 
-    public RfLintRule(final String ruleName, final RfLintViolationSeverity defaultSeverity, final String documentation,
-            final RfLintRuleConfiguration configuration) {
+    public RfLintRule(final String ruleName, final RfLintViolationSeverity defaultSeverity, final String filepath,
+            final String documentation, final RfLintRuleConfiguration configuration) {
         this.ruleName = ruleName;
         this.defaultSeverity = defaultSeverity;
+        this.filepath = filepath;
         this.documentation = documentation;
         this.configuration = configuration;
     }
@@ -40,6 +44,10 @@ public class RfLintRule {
 
     public RfLintViolationSeverity getSeverity() {
         return defaultSeverity;
+    }
+
+    public String getFilepath() {
+        return filepath;
     }
 
     public String getDocumentation() {
@@ -112,7 +120,7 @@ public class RfLintRule {
     }
 
     public RfLintRule copyFresh() {
-        return new RfLintRule(ruleName, defaultSeverity, documentation);
+        return new RfLintRule(ruleName, defaultSeverity, filepath, documentation);
     }
 
     @Override
@@ -120,6 +128,7 @@ public class RfLintRule {
         if (obj instanceof RfLintRule) {
             final RfLintRule that = (RfLintRule) obj;
             return this.ruleName.equals(that.ruleName) && this.defaultSeverity == that.defaultSeverity
+                    && this.filepath.equals(that.filepath)
                     && this.documentation.equals(that.documentation)
                     && Objects.equals(this.configuration, that.configuration);
         }
@@ -128,6 +137,6 @@ public class RfLintRule {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ruleName, defaultSeverity, documentation, configuration);
+        return Objects.hash(ruleName, defaultSeverity, filepath, documentation, configuration);
     }
 }
