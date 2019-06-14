@@ -426,4 +426,106 @@ public class RobotProjectConfigTest {
                 ReferencedLibrary.create(LibraryType.PYTHON, "Lib", "ghi/Lib.py"));
     }
 
+    @Test
+    public void nonPythonReferencedLibrary_returnsJustLibraryPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.JAVA, "javaLib", "path/to/return");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void simplePythonReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/return/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void dirPythonReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib",
+                "path/to/return/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void referencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib.class",
+                "path/to/return/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void dirReferencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib.class",
+                "path/to/return/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void nestedReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.lib",
+                "path/to/return/outer/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void nestedDirReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.lib",
+                "path/to/return/outer/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void nestedReferencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.lib.class",
+                "path/to/return/outer/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void nestedDirReferencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.lib.class",
+                "path/to/return/outer/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void evenMoreNestedReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.even.more.lib",
+                "path/to/return/outer/even/more/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void evenMoreNestedDirReferencedLibrary_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.even.more.lib",
+                "path/to/return/outer/even/more/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void evenMoreNestedReferencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.even.more.lib.class",
+                "path/to/return/outer/even/more/lib.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void evenMoreNestedDirReferencedLibraryWithClass_returnsCorrectParentPath() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "outer.even.more.lib.class",
+                "path/to/return/outer/even/more/lib/__init__.py");
+
+        assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
 }

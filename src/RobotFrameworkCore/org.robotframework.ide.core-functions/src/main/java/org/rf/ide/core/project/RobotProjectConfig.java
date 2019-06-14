@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -448,16 +449,32 @@ public class RobotProjectConfig {
         }
 
         public String getParentPath() {
-            if (LibraryType.PYTHON == provideType()) {
-                int lastCharsToRemove = name.length() + 4; // separator + extension ".py"
-                if (path.endsWith("__init__.py")) {
-                    // + 1 for additional separator, extension already counted
-                    lastCharsToRemove += "__init__".length() + 1;
-                }
-                return path.length() > lastCharsToRemove ? path.substring(0, path.length() - lastCharsToRemove) : "";
-            } else {
+            if (LibraryType.PYTHON != provideType()) {
                 return path;
             }
+            int lastCharsToRemove = path.endsWith("__init__.py") ? "/__init__.py".length() : ".py".length();
+            if (path.length() <= lastCharsToRemove) {
+                return "";
+            }
+            String parentPath = path.substring(0, path.length() - lastCharsToRemove);
+
+            String[] nameParts = name.split("\\.");
+            if (parentPath.endsWith(String.join("/", nameParts))) {
+                lastCharsToRemove = name.length() + 1; // +1 for separator
+                return parentPath.length() > lastCharsToRemove
+                        ? parentPath.substring(0, parentPath.length() - lastCharsToRemove)
+                        : "";
+            }
+            // possible module name inside file
+            String nameWithoutClass = String.join("/", Arrays.copyOf(nameParts, nameParts.length - 1));
+            if (parentPath.endsWith(nameWithoutClass)) {
+                lastCharsToRemove = nameWithoutClass.length() + 1; // +1 for separator
+                return parentPath.length() > lastCharsToRemove
+                        ? parentPath.substring(0, parentPath.length() - lastCharsToRemove)
+                        : "";
+            }
+            // probably incorrect record
+            return "";
         }
 
         public LibraryType provideType() {
