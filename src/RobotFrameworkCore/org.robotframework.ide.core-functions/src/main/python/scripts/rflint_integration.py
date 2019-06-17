@@ -163,6 +163,7 @@ def get_rules(rulefiles):
         filepath = None
         try:
             filepath = inspect.getfile(rule.__class__)
+            filepath = filepath[:-1] if filepath.lower().endswith('pyc') else filepath
         except:
             pass
         if filepath:
