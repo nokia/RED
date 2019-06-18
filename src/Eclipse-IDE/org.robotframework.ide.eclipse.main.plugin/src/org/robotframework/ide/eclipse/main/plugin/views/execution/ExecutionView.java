@@ -26,13 +26,13 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
@@ -82,7 +82,8 @@ public class ExecutionView {
     private SimpleProgressBar progressBar;
 
     private TreeViewer executionViewer;
-    
+
+    private Composite messageTextParent;
     private StyledText messageText;
 
     private IActionBars actionBars;
@@ -119,6 +120,7 @@ public class ExecutionView {
         actionBars = part.getViewSite().getActionBars();
 
         setInput();
+        hideFailureText();
     }
 
     private void createProgressLabels(final Composite parent) {
@@ -164,12 +166,34 @@ public class ExecutionView {
     }
 
     private void createFailureMessageText(final Composite parent) {
-        messageText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+        messageTextParent = new Composite(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(messageTextParent);
+        GridLayoutFactory.fillDefaults().applyTo(messageTextParent);
+
+        messageText = new StyledText(messageTextParent, SWT.H_SCROLL | SWT.V_SCROLL);
         messageText.setFont(JFaceResources.getTextFont());
         GridDataFactory.fillDefaults().grab(true, false).indent(3, 0).hint(0, 50).applyTo(messageText);
         GridLayoutFactory.fillDefaults().applyTo(messageText);
         messageText.setEditable(false);
         messageText.setAlwaysShowScrollBars(false);
+        messageText.setWordWrap(true);
+        messageText.setWrapIndent(10);
+    }
+
+    private void showFailureText() {
+        final int noOfLines = Math.min(messageText.getLineCount(), 7);
+        final int lineHeight = messageText.getLineHeight();
+        ((GridData) messageText.getLayoutData()).heightHint = noOfLines * lineHeight;
+
+        ((GridData) messageTextParent.getLayoutData()).exclude = false;
+        messageTextParent.setVisible(true);
+        messageTextParent.getParent().layout();
+    }
+
+    private void hideFailureText() {
+        ((GridData) messageTextParent.getLayoutData()).exclude = true;
+        messageTextParent.setVisible(false);
+        messageTextParent.getParent().layout();
     }
 
     private void createContextMenu(final IMenuService menuService) {
@@ -235,6 +259,7 @@ public class ExecutionView {
     private void resetControls() {
         executionViewer.setInput(null);
         messageText.setText("");
+        hideFailureText();
 
         final String mode = testsCounterLabel.getText().substring(0, testsCounterLabel.getText().indexOf(':'));
         testsCounterLabel.setText(mode + ": 0/0");
@@ -334,15 +359,16 @@ public class ExecutionView {
     }
 
     private ISelectionChangedListener createSelectionChangedListener() {
-        return new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-                final String message = Selections.getOptionalFirstElement(selection, ExecutionTreeNode.class)
-                        .map(ExecutionTreeNode::getMessage)
-                        .orElse("");
-                messageText.setText(message);
+        return event -> {
+            final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+            final String message = Selections.getOptionalFirstElement(selection, ExecutionTreeNode.class)
+                    .map(ExecutionTreeNode::getMessage)
+                    .orElse("");
+            messageText.setText(message);
+            if (message.isEmpty()) {
+                hideFailureText();
+            } else {
+                showFailureText();
             }
         };
     }
