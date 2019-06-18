@@ -10,12 +10,16 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
@@ -35,8 +39,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
+import org.robotframework.red.junit.ProjectProvider;
 
 public class SuiteSourceEditorConfigurationTest {
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(SuiteSourceEditorConfigurationTest.class);
 
     @Test
     public void coloringRulesAreCreated() throws Exception {
@@ -102,5 +110,35 @@ public class SuiteSourceEditorConfigurationTest {
             assertThat(config.getDoubleClickStrategy(sourceViewer, type))
                     .isInstanceOf(RedSourceDoubleClickStrategy.class);
         }
+    }
+
+    @Test
+    public void hyperlinkDetectorsAreEnabled_forFilesFromProject() {
+        final IFile file = projectProvider.getFile("suite.robot");
+        final RobotProject robotProject = new RobotModel().createRobotProject(file.getProject());
+        final RobotSuiteFile fileModel = new RobotSuiteFile(robotProject, file);
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final ISourceViewer sourceViewer = mock(ISourceViewer.class);
+
+        assertThat(config.getHyperlinkDetectors(sourceViewer)).isNotEmpty();
+    }
+
+    @Test
+    public void hyperlinkDetectorsAreDisabled_forFilesFromLocalStore() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().build();
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final ISourceViewer sourceViewer = mock(ISourceViewer.class);
+
+        assertThat(config.getHyperlinkDetectors(sourceViewer)).isEmpty();
     }
 }

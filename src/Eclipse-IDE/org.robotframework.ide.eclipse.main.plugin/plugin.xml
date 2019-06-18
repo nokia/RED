@@ -2222,7 +2222,7 @@
           commandId="org.robotframework.ide.eclipse.insertCell">
        <activeWhen>
          <reference
-               definitionId="org.robotframework.editorContextIsActive">
+               definitionId="org.robotframework.editorContextIsActiveAndEditable">
          </reference>
        </activeWhen>
        <enabledWhen>
@@ -2236,7 +2236,7 @@
           commandId="org.robotframework.ide.eclipse.insertCellToRight">
        <activeWhen>
          <reference
-               definitionId="org.robotframework.editorContextIsActive">
+               definitionId="org.robotframework.editorContextIsActiveAndEditable">
          </reference>
        </activeWhen>
        <enabledWhen>
@@ -2255,7 +2255,7 @@
        </enabledWhen>
        <activeWhen>
          <reference
-               definitionId="org.robotframework.editorContextIsActive">
+               definitionId="org.robotframework.editorContextIsActiveAndEditable">
          </reference>
        </activeWhen>
     </handler>
@@ -2282,7 +2282,7 @@
           commandId="org.robotframework.red.toggleCommentInTable">
        <activeWhen>
           <reference
-                definitionId="org.robotframework.editorContextIsActive">
+                definitionId="org.robotframework.editorContextIsActiveAndEditable">
           </reference>
        </activeWhen>
     </handler>

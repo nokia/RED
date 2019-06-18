@@ -396,7 +396,8 @@ public class RobotFormEditor extends FormEditor {
             final IStorage storage = input.getAdapter(IStorage.class);
             try (InputStream stream = storage.getContents()) {
                 final String content = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
-                return new RobotSuiteStreamFile(storage.getName(), content, storage.isReadOnly());
+                return new RobotSuiteStreamFile(storage.getName(), storage.getFullPath(), content,
+                        storage.isReadOnly());
             } catch (final CoreException | IOException e) {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }

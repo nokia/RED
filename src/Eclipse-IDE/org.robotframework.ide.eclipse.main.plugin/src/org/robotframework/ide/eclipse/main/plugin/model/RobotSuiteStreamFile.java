@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
@@ -20,17 +21,25 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     private final String name;
 
+    private final IPath path;
+
     private final String content;
 
     private final boolean readOnly;
 
     private RobotVersion version;
 
-    public RobotSuiteStreamFile(final String name, final String content, final boolean readOnly) {
+    public RobotSuiteStreamFile(final String name, final IPath path, final String content, final boolean readOnly) {
         super(null, null);
         this.name = name;
+        this.path = path;
         this.content = content;
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public boolean isFromLocalStorage() {
+        return true;
     }
 
     @Override
@@ -40,7 +49,12 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     public String getFileExtension() {
-        return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : null;
+        return path.getFileExtension();
+    }
+
+    @Override
+    public IPath getFullPath() {
+        return path;
     }
 
     @Override

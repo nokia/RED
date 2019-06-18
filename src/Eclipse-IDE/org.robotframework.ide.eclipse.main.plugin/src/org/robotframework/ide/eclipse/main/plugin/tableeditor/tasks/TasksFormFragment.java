@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -306,9 +307,11 @@ class TasksFormFragment implements ISectionFormFragment {
         // hyperlinks configuration
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
-                new TableHyperlinksToKeywordsDetector(dataProvider));
+        if (!fileModel.isFromLocalStorage()) {
+            detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+            detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
+                    new TableHyperlinksToKeywordsDetector(dataProvider));
+        }
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
@@ -408,7 +411,7 @@ class TasksFormFragment implements ISectionFormFragment {
     }
 
     public List<ITableHyperlinksDetector> getDetectors() {
-        return detector.getDetectors();
+        return detector == null ? new ArrayList<>() : detector.getDetectors();
     }
 
     @Inject

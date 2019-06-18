@@ -296,9 +296,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
-                new TableHyperlinksToFilesDetector(dataProvider));
+        if (!fileModel.isFromLocalStorage()) {
+            detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+            detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
+                    new TableHyperlinksToFilesDetector(dataProvider));
+        }
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
@@ -402,7 +404,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     @Override
     public List<ITableHyperlinksDetector> getDetectors() {
-        return detector.getDetectors();
+        return detector == null ? new ArrayList<>() : detector.getDetectors();
     }
 
     @Inject

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -243,8 +244,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
+        if (!fileModel.isFromLocalStorage()) {
+            detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+            detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
+        }
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
@@ -329,7 +332,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     public List<ITableHyperlinksDetector> getDetectors() {
-        return detector.getDetectors();
+        return detector == null ? new ArrayList<>() : detector.getDetectors();
     }
 
     @Inject
