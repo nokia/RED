@@ -1,0 +1,395 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nyIcUI6tEemtyOUvY7yb_Q
+Element-Name: RFLintChangeCustomRules
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _-fkNYJGpEemOWdSh6VSwkQ
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/19/19 4:42 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//
+//
+//  For this test install:
+//  pip install --upgrade robotframework-lint
+//
+
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
+
+
+// add 2 custom files
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+
+//check if rules from files were added
+get-window Preferences | get-tab-folder | get-tab-item Rules | click
+with [get-window Preferences | get-table] {
+    get-item -path CustomRule | get-property "values['Configuration']" | equals "" | verify-true
+    get-item -path CustomRule | get-property "values['Rule']" | equals CustomRule | verify-true
+    get-item -path CustomRule | get-property "values['Severity']" | equals Warning | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Configuration']" | equals "" | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Rule']" | equals TestNamesContainsX | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Severity']" | equals Warning | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Configuration']" | equals "" | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Rule']" | equals TestNamesContainsY | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Severity']" | equals Error | verify-true
+}
+
+//change severity to Error
+with [get-window Preferences | get-table] {
+    get-cell 0 1 | click
+    get-cell 0 1 | click
+    get-cell 0 1 | click
+    get-cell 0 1 | mouse down -count 2
+    double-click
+    select CustomRule | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+    get-combo | select Error
+    get-cell 0 2 | mouse down -count 1
+    apply-cell-edit -deactivate
+}
+with [get-window Preferences | get-table] {
+    select CustomRule
+    get-cell 0 2 | mouse up -count 1
+}
+
+//add 555 value
+with [get-window Preferences | get-table] {
+    get-cell 0 2 | mouse down -count 2
+    double-click
+    select CustomRule | activate-cell-edit -column 2 -type MouseDoubleClickSelection
+    with [get-editbox] {
+        set-text 555
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    apply-cell-edit -deactivate
+    
+    //change severity to error
+    get-cell 12 1 | click
+    get-cell 12 1 | click
+    get-cell 12 1 | mouse down -count 2
+    double-click
+    select TestNamesContainsX | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+    get-combo | select Error
+    apply-cell-edit -deactivate
+    key-type "NUMPAD_ENTER" "\\u000D"
+    
+    //uncheck to ignore
+    get-item -path TestNamesContainsY | uncheck
+}
+get-window Preferences | get-button Apply | click
+
+
+// go to Genreal tab and remove file
+with [get-window Preferences] {
+    with [get-tab-folder] {
+        get-tab-item General | click
+    }
+}
+
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item ".*two_rules.py" | click
+with [get-window Preferences] {
+    with [get-table] {
+        get-item ".*/my_rules/two_rules.py"| mouse down Right -count 1
+        get-item ".*/my_rules/two_rules.py"| mouse up Right -count 1
+        get-menu -path Delete | click
+    }
+}
+
+//check window with error and selec Presere all
+with [get-window Preferences | get-window "Configured rules detected"] {
+    get-label "There are configured rules defined in the files which are about to be deleted:    TestNamesContainsX    TestNamesContainsYWhat should happen with those configurations?" 
+        | get-property caption 
+        | equals "There are configured rules defined in the files which are about to be deleted:\n\n"
+        + "    TestNamesContainsX\n"
+        + "    TestNamesContainsY\n\n"
+        + "What should happen with those configurations?" | verify-true
+    get-button "Remove all" | get-property caption | equals "Remove all" | verify-true
+    get-button "Preserve non-ignored" | get-property caption | equals "Preserve non-ignored" | verify-true
+    get-button "Preserve all" | get-property caption | equals "Preserve all" | verify-true
+}
+
+get-window Preferences | get-window "Configured rules detected" | get-button "Preserve all" | click
+
+//remove second file
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item ".*customRules.py" | click
+with [get-window Preferences] {
+    with [get-table] {
+        get-item ".*/my_rules/customRules.py"| mouse down Right -count 1
+        get-item ".*/my_rules/customRules.py"| mouse up Right -count 1
+        get-menu -path Delete | click
+    }
+
+}
+
+//check error and preserve all
+get-window Preferences | get-window "Configured rules detected" 
+    | get-label "There are configured rules defined in the files which are about to be deleted:    CustomRuleWhat should happen with those configurations?" 
+    | get-property caption | equals "There are configured rules defined in the files which are about to be deleted:\n\n"
+    + "    CustomRule\n\n"
+    + "What should happen with those configurations?" | verify-true
+    
+    
+// go to rule and check text and font color    
+with [get-window Preferences] {
+    get-window "Configured rules detected" | get-button "Preserve all" | click
+    get-tab-folder | get-tab-item Rules | click
+    get-table | get-cell 0 0 | click
+}
+get-window Preferences | get-canvas | get-property text 
+    | equals "Missing rule: CustomRule is not available in currently active environment.\r\n"
+    + "This entry can be safely deleted if it is no longer needed.\r\n" | verify-true
+with [get-window Preferences | get-table] {
+    get-item -path CustomRule | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path CustomRule | get-property "styles[1].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path CustomRule | get-property "styles[2].foregroundColor" | equals "#FF0000" | verify-true
+}
+
+//// click on rule and check if is red
+//get-window Preferences | get-table | get-item "TestNamesContainsX" | click
+//with [get-window Preferences] {
+//    with [get-table] {
+//        get-item -path TestNamesContainsX | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+//        get-item -path TestNamesContainsX | get-property "styles[1].foregroundColor" | equals "#FF0000" | verify-true
+//    }
+//    get-canvas | get-property text 
+//        | equals "Missing rule: TestNamesContainsX is not available in currently active environment.\r\n"
+//        + "This entry can be safely deleted if it is no longer needed.\r\n" | verify-true
+//}
+
+//check if TestNamesContainsY is red
+get-window Preferences | get-table | get-item "TestNamesContainsY" | click
+
+with [get-window Preferences] {
+    with [get-table] {
+        get-item -path TestNamesContainsY | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+        get-item -path TestNamesContainsY | get-property "styles[1].foregroundColor" | equals "#FF0000" | verify-true
+        get-item -path TestNamesContainsY | get-property checked | equals false | verify-true
+    }
+    get-canvas | get-property text 
+        | equals "Missing rule: TestNamesContainsY is not available in currently active environment.\r\n"
+        + "This entry can be safely deleted if it is no longer needed.\r\n" | verify-true
+}
+// add 2 custom files again
+get-window Preferences | get-tab-folder | get-tab-item General | click
+
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+//check that font is now black
+get-window Preferences | get-tab-folder | get-tab-item Rules | click
+with [get-window Preferences | get-table] {
+    get-item -path CustomRule | get-property "styles[0].fontStyle" | equals normal | verify-true
+    get-item -path CustomRule | get-property "styles[1].fontStyle" | equals normal | verify-true
+    get-item -path CustomRule | get-property "styles[2].fontStyle" | equals normal | verify-true
+    get-item -path CustomRule | get-property "values['Configuration']" | equals 555 | verify-true
+    get-item -path CustomRule | get-property "values['Rule']" | equals CustomRule | verify-true
+    get-item -path CustomRule | get-property "values['Severity']" | equals Warning | verify-true
+    
+    get-item -path TestNamesContainsX | get-property "styles[0].fontStyle" | equals normal | verify-true
+    get-item -path TestNamesContainsX | get-property "styles[1].fontStyle" | equals normal | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Configuration']" | equals "" | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Rule']" | equals TestNamesContainsX | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Severity']" | equals Warning | verify-true
+    
+    get-item -path TestNamesContainsY | get-property checked | equals false | verify-true
+    get-item -path TestNamesContainsY | get-property "styles[0].fontStyle" | equals normal | verify-true
+    get-item -path TestNamesContainsY | get-property "styles[1].fontStyle" | equals normal | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Configuration']" | equals "" | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Rule']" | equals TestNamesContainsY | verify-true
+    get-item -path TestNamesContainsY | get-property "values['Severity']" | equals Ignore | verify-true
+}
+
+
+//------------------------------------- remove all rules ------------------------------------------------------
+
+
+//restore
+get-window Preferences | get-button "Restore Defaults" | click
+
+get-window Preferences | get-tab-folder | get-tab-item General | click
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+
+//change cutom rule to error
+with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
+    with [get-table] {
+        get-cell 0 1 | click
+        get-cell 0 1 | click
+        get-cell 0 1 | mouse down -count 2
+        double-click
+        select CustomRule | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+        get-combo | select Error
+        get-cell 12 0 | mouse down -count 1
+        apply-cell-edit -deactivate
+    }
+}
+with [get-window Preferences | get-table] {
+    select TestNamesContainsX
+    get-cell 12 0 | mouse up -count 1
+}
+
+//change TestNamesContainsX to be ignored
+with [get-window Preferences] {
+    with [get-table] {
+        select TestNamesContainsX
+        get-item -path TestNamesContainsX | uncheck
+        get-cell 13 2 | click
+        get-cell 13 2 | mouse down -count 2
+        double-click
+        //change TestNamesContainsX to have value 33
+        
+        select TestNamesContainsY | activate-cell-edit -column 2 -type MouseDoubleClickSelection
+        with [get-editbox] {
+            set-text 33
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        apply-cell-edit -deactivate
+    }
+    
+    //remove 2 files and remove all rules
+    get-tab-folder | get-tab-item General | click
+    with [get-table] {
+        get-cell 0 0 | click
+        key-type Del
+    }
+    get-window "Configured rules detected" | get-button "Remove all" | click
+    with [get-table] {
+        get-cell 0 0 | click
+        key-type Del
+    }
+    get-window "Configured rules detected" | get-button "Remove all" | click
+    get-tab-folder | get-tab-item Rules | click
+}
+
+get-window Preferences | get-table | get-property itemCount | equals 16 | verify-true
+verify-error {get-window Preferences | get-table | get-item -path CustomRule }
+verify-error {get-window Preferences | get-table | get-item -path TestNamesContainsX }
+verify-error {get-window Preferences | get-table | get-item -path TestNamesContainsY }
+
+
+//-------------------------------------- Preserve non-ignored -----------------------------------------------------
+//restore
+get-window Preferences | get-button "Restore Defaults" | click
+get-window Preferences | get-tab-folder | get-tab-item General | click
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+// set CustomRule and TestNamesContainsY as ignored
+with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
+    with [get-table] {
+        get-item -path CustomRule | uncheck
+        get-item -path TestNamesContainsY | uncheck
+        get-cell 12 2 | click
+        get-cell 12 2 | mouse down -count 2
+        double-click
+        
+        //set value to TestNamesContainsX
+        select TestNamesContainsX | activate-cell-edit -column 2 -type MouseDoubleClickSelection
+        with [get-editbox] {
+            set-text 321
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        apply-cell-edit -deactivate
+    }
+    //remove files
+    get-button Apply | click
+    get-tab-folder | get-tab-item General | click
+    with [get-table] {
+    	get-cell 0 0 |  click
+        get-cell 0 0 | mouse down Right -count 1
+        get-cell 0 0 | mouse up Right -count 1
+        get-menu -path Delete | click
+    }
+    //Preserve non-ignored
+    get-window "Configured rules detected" | get-button "Preserve non-ignored" | click
+    with [get-table] {
+        get-cell 0 0 | click
+        get-cell 0 0 | mouse down Right -count 1
+        get-cell 0 0 | mouse up Right -count 1
+        get-menu -path Delete | click
+    }
+    get-window "Configured rules detected" | get-button "Preserve non-ignored" | click
+    get-tab-folder | get-tab-item Rules | click
+}
+
+//only TestNamesContainsX remaines
+with [get-window Preferences | get-table] {
+    get-property itemCount | equals 17 | verify-true
+    get-item -path TestNamesContainsX | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path TestNamesContainsX | get-property "styles[1].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path TestNamesContainsX | get-property "styles[2].foregroundColor" | equals "#FF0000" | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Configuration']" | equals 321 | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Rule']" | equals TestNamesContainsX | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Severity']" | equals Error | verify-true
+}
+
+
+//-------------------------------------- mix -----------------------------------------------------
+// applay and close
+get-window Preferences |   get-button "Apply and Close" | click
+
+
+//add files again
+get-preferences-menu | click
+get-window Preferences | get-tab-folder | get-tab-item General | click
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+//add the same file - should not be added
+set-dialog-result File "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+
+//check if only 2 files are in preference
+with [get-window Preferences | get-table] {
+    get-property "getItems().TableItem[1].getText()" 
+        | equals ".*[\\\\/]project_a[\\\\/]my_rules[\\\\/]customRules.py" | verify-true
+        
+    get-property "getItems().TableItem[0].getText()" 
+        | equals ".*[\\\\/]project_a[\\\\/]my_rules[\\\\/]two_rules.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "...add new rules file" | verify-true
+}
+
+//remove file where rule was not changed
+get-window Preferences | get-table | get-item -path ".*customRules.py"  | click
+get-window Preferences | get-table | key-type Del
+
+//remove second file with Preserve non-ignored
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item ".*two_rules.py" | click
+with [get-window Preferences] {
+    with [get-table] {
+        get-item ".*/my_rules/two_rules.py"| mouse down Right -count 1
+        get-item ".*/my_rules/two_rules.py"| mouse up Right -count 1
+        get-menu -path Delete | click
+    }
+    get-window "Configured rules detected" | get-button "Preserve non-ignored" | click
+    get-tab-folder | get-tab-item Rules | click
+}
+
+
+
+// check that one rule remians
+with [get-window Preferences | get-table] {
+    get-item -path TestNamesContainsX | get-property "values['Configuration']" | equals 321 | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Rule']" | equals TestNamesContainsX | verify-true
+    get-item -path TestNamesContainsX | get-property "values['Severity']" | equals Error | verify-true
+}
+
+verify-error {get-window Preferences | get-table | get-item -path CustomRule }
+verify-error {get-window Preferences | get-table | get-item -path TestNamesContainsY}
+get-window Preferences | get-button "Apply and Close" | click
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
