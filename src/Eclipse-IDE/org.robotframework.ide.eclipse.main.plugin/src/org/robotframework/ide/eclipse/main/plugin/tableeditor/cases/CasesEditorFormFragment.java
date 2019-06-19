@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -304,9 +305,11 @@ class CasesEditorFormFragment implements ISectionFormFragment {
         // hyperlinks configuration
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
-                new TableHyperlinksToKeywordsDetector(dataProvider));
+        if (!fileModel.isFromLocalStorage()) {
+            detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+            detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
+                    new TableHyperlinksToKeywordsDetector(dataProvider));
+        }
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
@@ -406,7 +409,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     public List<ITableHyperlinksDetector> getDetectors() {
-        return detector.getDetectors();
+        return detector == null ? new ArrayList<>() : detector.getDetectors();
     }
 
     @Inject
@@ -611,7 +614,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
             if (suite == fileModel) {
                 dataProvider.setInput(getSection());
                 table.refresh();
-                
+
                 // this is done in order to ensure IEclipseContext has refreshed
                 // selection stored and does not provide old objects
                 selectionLayerAccessor.refreshSelection();

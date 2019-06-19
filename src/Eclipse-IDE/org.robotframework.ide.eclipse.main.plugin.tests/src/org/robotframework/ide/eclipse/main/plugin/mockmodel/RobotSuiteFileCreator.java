@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.mockmodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
@@ -67,7 +68,7 @@ public class RobotSuiteFileCreator {
 
     private RobotSuiteFile buildModel(final String filename, final boolean readOnly) {
         final String content = getContent();
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, content, readOnly);
+        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, new Path(filename), content, readOnly);
         if (version != null) {
             model.setRobotVersion(version);
         }

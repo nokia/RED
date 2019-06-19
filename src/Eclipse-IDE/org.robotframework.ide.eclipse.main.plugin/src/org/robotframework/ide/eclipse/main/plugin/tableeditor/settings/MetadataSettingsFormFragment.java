@@ -294,8 +294,10 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
+        if (!fileModel.isFromLocalStorage()) {
+            detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+            detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
+        }
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
@@ -395,7 +397,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     @Override
     public List<ITableHyperlinksDetector> getDetectors() {
-        return detector.getDetectors();
+        return detector == null ? new ArrayList<>() : detector.getDetectors();
     }
 
     @Inject

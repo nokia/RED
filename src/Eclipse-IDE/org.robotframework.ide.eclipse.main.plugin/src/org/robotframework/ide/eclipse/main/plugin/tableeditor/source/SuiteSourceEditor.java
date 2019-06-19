@@ -76,7 +76,7 @@ public class SuiteSourceEditor extends TextEditor {
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
-    protected RobotSuiteFile fileModel;
+    private RobotSuiteFile fileModel;
 
     private SuiteSourceEditorFoldingSupport foldingSupport;
 
@@ -127,7 +127,7 @@ public class SuiteSourceEditor extends TextEditor {
 
         installProjectionAndFolding(viewer);
 
-        if (fileModel.getFile() != null) {
+        if (!fileModel.isFromLocalStorage()) {
             new SuiteSourceCurrentCellHighlighter(fileModel, viewer.getDocument()).install(viewer);
             new SuiteSourceOccurrenceMarksHighlighter(fileModel, viewer.getDocument()).install(viewer);
         }

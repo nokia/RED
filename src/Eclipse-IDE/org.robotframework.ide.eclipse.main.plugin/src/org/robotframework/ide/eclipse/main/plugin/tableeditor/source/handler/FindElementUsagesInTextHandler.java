@@ -43,7 +43,7 @@ public class FindElementUsagesInTextHandler extends DIParameterizedHandler<E4Fin
                 final IDocument doc = viewer.getDocument();
                 final int offset = selection.getOffset();
 
-                final boolean isTsv = FindUsagesHandler.isTSV(editor);
+                final boolean isTsv = editor.provideSuiteModel().isTsvFile();
                 final IRegion token = DocumentUtilities.findCellRegion(doc, isTsv, offset).get();
 
                 selectedText = doc.get(token.getOffset(), token.getLength());

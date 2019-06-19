@@ -89,9 +89,11 @@ public class RobotArtifactsValidator {
         if (RedPlugin.getDefault().getPreferences().isValidationTurnedOff()) {
             return false;
         }
-        final IFile file = suiteModel.getFile();
-        if (file == null || !file.exists() || file.getProject() == null || !file.getProject().exists()
-                || !RobotProjectNature.hasRobotNature(file.getProject())) {
+        if (suiteModel.isFromLocalStorage() || !suiteModel.getFile().exists()) {
+            return false;
+        }
+        final IProject project = suiteModel.getFile().getProject();
+        if (project == null || !project.exists() || !RobotProjectNature.hasRobotNature(project)) {
             return false;
         }
         return suiteModel.getRobotProject().getRuntimeEnvironment().hasRobotInstalled();

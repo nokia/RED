@@ -8,34 +8,29 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class FindUsagesHandler {
 
     public static void findElements(final String place, final RobotFormEditor editor, final String selectedText) {
-        final IFile file = getUnderlyingFile(editor);
         try {
             final List<IResource> resourcesToLookInto;
+            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
             if ("workspace".equals(place)) {
-                resourcesToLookInto = getResourcesToQuery(ResourcesPlugin.getWorkspace().getRoot());
+                resourcesToLookInto = getResourcesToQuery(root);
             } else if ("project".equals(place)) {
-                resourcesToLookInto = getResourcesToQuery(file.getProject().getProject());
-
+                final IProject project = root.getFile(editor.provideSuiteModel().getFullPath()).getProject();
+                resourcesToLookInto = getResourcesToQuery(project);
             } else {
                 throw new IllegalStateException("Unknown place for searching: " + place);
             }
@@ -71,17 +66,5 @@ public class FindUsagesHandler {
             }
         }
         return resources;
-    }
-
-    public static boolean isTSV(final RobotFormEditor editor) {
-        final IFile file = getUnderlyingFile(editor);
-        return "tsv".equalsIgnoreCase(file.getFileExtension());
-    }
-
-    private static IFile getUnderlyingFile(final RobotFormEditor editor) {
-        final IEditorInput input = editor.getEditorInput();
-        final FileEditorInput editorFile = (FileEditorInput) input;
-        final IPath path = editorFile.getPath();
-        return new RedWorkspace().fileForUri(path.toFile().toURI()).get();
     }
 }

@@ -142,7 +142,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public ITextDoubleClickStrategy getDoubleClickStrategy(final ISourceViewer sourceViewer, final String contentType) {
-        return new RedSourceDoubleClickStrategy(editor.fileModel.isTsvFile());
+        return new RedSourceDoubleClickStrategy(editor.getFileModel().isTsvFile());
     }
 
     @Override
@@ -153,6 +153,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
         final RobotSuiteFile model = editor.getFileModel();
+        if (model.isFromLocalStorage()) {
+            return new IHyperlinkDetector[0];
+        }
         return new IHyperlinkDetector[] { new SourceHyperlinksToVariablesDetector(model),
                 new SourceHyperlinksToKeywordsDetector(model), new SourceHyperlinksToFilesDetector(model) };
     }
@@ -164,7 +167,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             editStrategyPreferences.refresh();
         }
         return new IAutoEditStrategy[] {
-                new RobotSuiteAutoEditStrategy(editStrategyPreferences, editor.fileModel.isTsvFile()) };
+                new RobotSuiteAutoEditStrategy(editStrategyPreferences, editor.getFileModel().isTsvFile()) };
     }
 
     @Override

@@ -202,6 +202,10 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
         return new ArrayList<>();
     }
 
+    public boolean isFromLocalStorage() {
+        return false;
+    }
+
     public boolean isEditable() {
         return !file.isReadOnly();
     }
@@ -300,6 +304,10 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
 
     public String getFileExtension() {
         return file.getFileExtension();
+    }
+
+    public IPath getFullPath() {
+        return file.getFullPath();
     }
 
     @Override

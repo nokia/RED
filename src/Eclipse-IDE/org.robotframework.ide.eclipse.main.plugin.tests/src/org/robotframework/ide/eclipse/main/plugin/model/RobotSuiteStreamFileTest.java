@@ -6,19 +6,22 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 public class RobotSuiteStreamFileTest {
 
     @Test
     public void nullEnvironmentIsReturned() throws Exception {
-        final RobotSuiteStreamFile suiteFile = new RobotSuiteStreamFile("file.robot", "abc", false);
+        final RobotSuiteStreamFile suiteFile = new RobotSuiteStreamFile("file.robot", new Path("dir/file.robot"), "abc",
+                false);
         assertThat(suiteFile.getRuntimeEnvironment()).isExactlyInstanceOf(NullRuntimeEnvironment.class);
     }
 
     @Test
     public void robotParserFileIsReturned() throws Exception {
-        final RobotSuiteStreamFile suiteFile = new RobotSuiteStreamFile("file.robot", "abc", false);
+        final RobotSuiteStreamFile suiteFile = new RobotSuiteStreamFile("file.robot", new Path("dir/file.robot"), "abc",
+                false);
         assertThat(suiteFile.getRobotParserFile()).hasName("file.robot");
     }
 }
