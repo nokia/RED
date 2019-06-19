@@ -45,13 +45,15 @@ to path without unicode characters.
 
   * ### GTK3 issues under Linux
 
-It was observed that using GTK3 library with Eclipse causes unexpected
-graphical glitches. Those glitches are system independent although occurs more
-often under Debian and Ubuntu than RedHat Most annoying one is screen
-flickering when editing large file with multiple folding sections in source
-editor. Also some of the right click actions in red.xml are not activated.
+It was observed that using GTK3 library with Eclipse (older then version
+2019-03 - in this version GTK3 is required) causes unexpected graphical
+glitches. Those glitches are system independent although occurs more often
+under Debian and Ubuntu than RedHat. Most annoying one is screen flickering
+when editing large file with multiple folding sections in source editor. Also
+some of the right click actions in red.xml are not activated.
 
-It is recommended to switch to GTK2 when working under Linux.
+It is recommended to switch to GTK2 when working under Linux for Eclipse older
+then 2019-03 and RED version 0.8.13.
 
 RED Product for Linux has configuration to use GTK2, Eclipse users should
 check and change - if necessary - to GTK2.
