@@ -140,6 +140,32 @@
 				</repository>
 			</repositories>
 		</profile>
+		<profile>
+			<id>2019-06-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>2019-06</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-2019-06</id>
+					<url>http://download.eclipse.org/releases/2019-06/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>codeaffine</id>
+					<url>http://fappel.github.io/xiliary/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
 	</profiles>
 
 	<properties>
