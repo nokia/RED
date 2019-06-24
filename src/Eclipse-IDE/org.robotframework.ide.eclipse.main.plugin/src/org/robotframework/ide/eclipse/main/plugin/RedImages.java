@@ -438,6 +438,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/tag.png");
     }
 
+    public static ImageDescriptor getRfLintRuleImage() {
+        return RedPlugin.getImageDescriptor("resources/rflint_rule.png");
+    }
+
     public static ImageDescriptor getRemoveTagImage() {
         return RedPlugin.getImageDescriptor("resources/close_tag.png");
     }

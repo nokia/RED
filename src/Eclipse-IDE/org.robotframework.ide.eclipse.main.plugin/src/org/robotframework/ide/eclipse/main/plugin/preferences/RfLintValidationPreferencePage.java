@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -19,6 +18,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,37 +31,35 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
@@ -89,30 +88,25 @@ import org.robotframework.red.swt.Listeners;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
-import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.Selections;
-import org.robotframework.red.viewers.StructuredContentProvider;
+import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Converter;
 
 public class RfLintValidationPreferencePage extends RedPreferencePage {
 
-    private final List<RfLintRule> rules = new ArrayList<>();
-    private TableViewer rulesViewer;
-    private IWebBrowser browser;
-
-    private final List<RulesFile> rulesFiles = new ArrayList<>();
-    private TableViewer rulesFilesViewer;
-
-    private StringFieldEditor argumentsEditor;
-
     private Composite progressParent;
-
     private Composite topLevelParent;
+    private Link description;
+    
+    private final List<RulesFile> rulesFiles = new ArrayList<>();
+    private final Map<RulesFile, List<RfLintRule>> rules = new LinkedHashMap<>();
 
-    private Link rulesViewerDescription;
+    private CheckboxTreeViewer rulesViewer;
+    private IWebBrowser browser;
+    private StringFieldEditor argumentsEditor;
 
 
     public RfLintValidationPreferencePage() {
@@ -123,34 +117,19 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     protected Control createContents(final Composite parent) {
         this.topLevelParent = parent;
 
-        final TabFolder tabs = new TabFolder(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().grab(true, true).hint(700, 500).applyTo(tabs);
+        description = new Link(parent, SWT.NONE);
+        description.setText("Configure rules and their severity");
+        description.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+            if (InstalledRobotsPreferencesPage.ID.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
+            }
+        }));
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).grab(true, false).applyTo(description);
 
-        final TabItem generalTab = new TabItem(tabs, SWT.NONE);
-        generalTab.setText("General");
-        final Composite generalParent = new Composite(tabs, SWT.NONE);
-        GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(generalParent);
-
-        rulesFilesViewer = createRulesFilesViewer(generalParent);
-        argumentsEditor = createAdditionalArgumentsEditor(generalParent);
-        generalTab.setControl(generalParent);
-
-
-        final TabItem rulesTab = new TabItem(tabs, SWT.NONE);
-        rulesTab.setText("Rules");
-        final Composite rulesParent = new Composite(tabs, SWT.NONE);
-        GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(rulesParent);
-
-        rulesViewer = createRulesViewer(rulesParent);
-        rulesTab.setControl(rulesParent);
-
-
-        progressParent = new Composite(parent, SWT.NONE);
-        GridLayoutFactory.fillDefaults().applyTo(progressParent);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, false).applyTo(progressParent);
-
-        final ProgressBar progressBar = new ProgressBar(progressParent, SWT.SMOOTH | SWT.INDETERMINATE);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, false).applyTo(progressBar);
+        rulesViewer = createRulesViewer(parent);
+        createDocumentationForm(parent);
+        argumentsEditor = createAdditionalArgumentsEditor(parent);
+        progressParent = createProgressBar(parent);
 
         hideProgress();
         initializeValues();
@@ -158,208 +137,95 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         return parent;
     }
 
-    private TableViewer createRulesFilesViewer(final Composite parent) {
-        final Label description = new Label(parent, SWT.NONE);
-        description.setText("Additional rules files");
-
-        final TableViewer viewer = new TableViewer(parent,
-                SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
-        GridDataFactory.fillDefaults().indent(15, 0).grab(true, true).applyTo(viewer.getTable());
-        viewer.getTable().setLinesVisible(false);
-        viewer.getTable().setHeaderVisible(false);
-
-        viewer.setContentProvider(new RulesFilesContentProvider());
-
-        final Consumer<List<RulesFile>> ruleFilesConsumer = files -> {
-            boolean added = false;
-            for (final RulesFile file : files) {
-                if (!rulesFiles.contains(file)) {
-                    rulesFiles.add(file);
-                    added = true;
-                }
-            }
-            if (added) {
-                reloadRules();
-            }
-        };
-        ViewerColumnsFactory.newColumn("")
-                .withWidth(300)
-                .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(100)
-                .labelsProvidedBy(new RulesFilesLabelProvider())
-                .editingEnabled()
-                .editingSupportedBy(new RulesFileEditingSupport(viewer,
-                        openRuleFilesDialog(parent.getShell(),
-                                ResourcesPlugin.getWorkspace().getRoot().getLocationURI(), ruleFilesConsumer)))
-                .createFor(viewer);
-
-        ViewersConfigurator.enableDeselectionPossibility(viewer);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
-
-        final Runnable selectionRemover = () -> {
-            final List<RulesFile> rulesFilesToRemove = Selections
-                    .getElements((IStructuredSelection) viewer.getSelection(), RulesFile.class);
-
-            handleRulesFromRemovedFiles(rulesFilesToRemove);
-
-            rulesFiles.removeAll(rulesFilesToRemove);
-            rulesFilesViewer.refresh();
-
-            reloadRules();
-        };
-        final Menu menu = new Menu(viewer.getTable());
-        final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
-        deleteMenuItem.setText("Delete\tDel");
-        deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
-        deleteMenuItem.addSelectionListener(widgetSelectedAdapter(e -> selectionRemover.run()));
-
-        viewer.getTable().setMenu(menu);
-        menu.addMenuListener(menuShownAdapter(e -> {
-            final boolean anyRulesFilesSelected = !Selections
-                    .getElements((IStructuredSelection) viewer.getSelection(), RulesFile.class)
-                    .isEmpty();
-            deleteMenuItem.setEnabled(anyRulesFilesSelected);
-        }));
-        viewer.getTable().addKeyListener(keyPressedAdapter(e -> {
-            if (e.keyCode == SWT.DEL) {
-                selectionRemover.run();
-            }
-        }));
-        return viewer;
-    }
-
-    private void handleRulesFromRemovedFiles(final List<RulesFile> rulesFilesToRemove) {
-        final List<RfLintRule> configuredRulesToAsk = new ArrayList<>();
-
-        final Map<RulesFile, List<RfLintRule>> configuredRulesByFile = rules.stream()
-                .filter(RfLintRule::isConfigured)
-                .collect(groupingBy(r -> new RulesFile(r.getFilepath())));
-        for (final RulesFile file : rulesFilesToRemove) {
-            if (configuredRulesByFile.containsKey(file)) {
-                configuredRulesToAsk.addAll(configuredRulesByFile.get(file));
-            }
-        }
-        if (!configuredRulesToAsk.isEmpty()) {
-            final String rulesNames = configuredRulesToAsk.stream()
-                    .map(RfLintRule::getRuleName)
-                    .collect(joining("\n    ", "\n\n    ", "\n\n"));
-            final MessageDialog dialog = new MessageDialog(getShell(), "Configured rules detected", null,
-                    "There are configured rules defined in the files which are about to be deleted:" + rulesNames
-                            + "What should happen with those configurations?",
-                    MessageDialog.QUESTION, new String[] { "Remove all", "Preserve non-ignored", "Preserve all" }, 2);
-
-            final int result = dialog.open();
-            if (result == 0) {
-                configuredRulesToAsk.forEach(r -> r.configure((RfLintRuleConfiguration) null));
-            } else if (result == 1) {
-                configuredRulesToAsk.stream()
-                        .filter(r -> r.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE)
-                        .forEach(r -> r.configure((RfLintRuleConfiguration) null));
-            }
-        }
-    }
-
-    private StringFieldEditor createAdditionalArgumentsEditor(final Composite parent) {
-        final Composite group = new Composite(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().applyTo(group);
-
-        final StringFieldEditor argumentsEditor = new StringFieldEditor(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS,
-                "Additional arguments for RfLint", group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(argumentsEditor.getLabelControl(group));
-        GridDataFactory.fillDefaults()
-                .grab(true, false)
-                .align(SWT.FILL, SWT.CENTER)
-                .indent(15, 0)
-                .applyTo(argumentsEditor.getTextControl(group));
-        argumentsEditor.setPreferenceStore(getPreferenceStore());
-        argumentsEditor.setPage(this);
-
-        BrowseButtons.selectVariableButton(group, argumentsEditor.getTextControl(group)::insert);
-
-        return argumentsEditor;
-    }
-
-    private TableViewer createRulesViewer(final Composite parent) {
-        rulesViewerDescription = new Link(parent, SWT.NONE);
-        rulesViewerDescription.setText("Configure rules and their severity");
-        rulesViewerDescription.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
-            if (InstalledRobotsPreferencesPage.ID.equals(e.text)) {
-                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-            }
-        }));
-        GridDataFactory.fillDefaults()
-                .align(SWT.FILL, SWT.BEGINNING)
-                .hint(150, SWT.DEFAULT)
-                .span(2, 1)
-                .grab(true, false)
-                .applyTo(rulesViewerDescription);
-
-        final Table table = new Table(parent,
+    private CheckboxTreeViewer createRulesViewer(final Composite parent) {
+        final Tree tree = new Tree(parent,
                 SWT.CHECK | SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        final CheckboxTableViewer viewer = new CheckboxTableViewer(table);
+        final CheckboxTreeViewer viewer = new CheckboxTreeViewer(tree);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
-        GridDataFactory.fillDefaults().indent(15, 0).grab(true, true).applyTo(viewer.getTable());
-        table.setLinesVisible(true);
-        table.setHeaderVisible(true);
+        GridDataFactory.fillDefaults().indent(15, 0).grab(true, true).applyTo(viewer.getTree());
+        tree.setLinesVisible(true);
+        tree.setHeaderVisible(true);
 
-        viewer.setCheckStateProvider(new RulesCheckedStateProvider());
-        viewer.addCheckStateListener(event -> {
-            final RfLintRule rule = (RfLintRule) event.getElement();
-            final RfLintViolationSeverity newSeverity = event.getChecked() ? null : RfLintViolationSeverity.IGNORE;
-            rule.configure(newSeverity);
+        viewer.setCheckStateProvider(new CheckedStateProvider());
+        viewer.addCheckStateListener(new CheckStateListener());
+        viewer.setContentProvider(new RulesContentProvider());
 
-            viewer.refresh(rule);
-        });
-        viewer.setContentProvider(new ListInputStructuredContentProvider());
+        final Supplier<?> ruleFilesSupplier = ruleFilesSupplier(parent);
         ViewerColumnsFactory.newColumn("Rule")
-                .withWidth(250)
-                .labelsProvidedBy(new RuleNamesLabelProvider())
+                .withWidth(500)
+                .labelsProvidedBy(new NamesLabelProvider())
+                .editingEnabled()
+                .editingSupportedBy(new NamesEditingSupport(viewer, ruleFilesSupplier))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Severity")
                 .withWidth(100)
-                .withMinWidth(30)
-                .labelsProvidedBy(new RuleSeverityLabelProvider())
+                .withMinWidth(100)
+                .labelsProvidedBy(new SeverityLabelProvider())
                 .editingEnabled()
-                .editingSupportedBy(new RuleSeverityEditingSupport(viewer))
+                .editingSupportedBy(new SeverityEditingSupport(viewer, ruleFilesSupplier))
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Configuration")
                 .withWidth(100)
                 .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(30)
-                .labelsProvidedBy(new RuleConfigurationLabelProvider())
+                .withMinWidth(100)
+                .labelsProvidedBy(new ConfigurationLabelProvider())
                 .editingEnabled()
-                .editingSupportedBy(new RuleConfigurationEditingSupport(viewer))
+                .editingSupportedBy(new ConfigurationEditingSupport(viewer, ruleFilesSupplier))
                 .createFor(viewer);
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
 
+        setupContextMenu(viewer);
+        return viewer;
+    }
+
+    private void setupContextMenu(final CheckboxTreeViewer viewer) {
+        final Tree tree = viewer.getTree();
+
         final Runnable selectionRemover = () -> {
-            final List<MissingRule> rulesToRemove = Selections.getElements((IStructuredSelection) viewer.getSelection(),
-                    MissingRule.class);
-            rules.removeAll(rulesToRemove);
+            final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+            final List<MissingRule> selectedRules = Selections.getElements(selection, MissingRule.class);
+            final List<RulesFile> selectedFiles = Selections.getElements(selection, RulesFile.class);
+
+            if (!selectedRules.isEmpty()) {
+                rules.get(RulesFile.MISSING_SOURCE).removeAll(selectedRules);
+            } else if (!selectedFiles.isEmpty()) {
+                rulesFiles.removeAll(selectedFiles);
+                selectedFiles.forEach(rules::remove);
+            }
             rulesViewer.refresh();
         };
-        final Menu menu = new Menu(table);
+        final Menu menu = new Menu(tree);
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
         deleteMenuItem.setText("Delete\tDel");
         deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
         deleteMenuItem.addSelectionListener(widgetSelectedAdapter(e -> selectionRemover.run()));
 
-        table.setMenu(menu);
+        tree.setMenu(menu);
         menu.addMenuListener(menuShownAdapter(e -> {
-            final List<RfLintRule> selectedRules = Selections.getElements((IStructuredSelection) viewer.getSelection(),
-                    RfLintRule.class);
-            deleteMenuItem.setEnabled(
-                    !selectedRules.isEmpty() && selectedRules.stream().allMatch(MissingRule.class::isInstance));
+            final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+            final List<RfLintRule> selectedRules = Selections.getElements(selection, RfLintRule.class);
+            final List<RulesFile> selectedFiles = Selections.getElements(selection, RulesFile.class);
+
+            if (!selectedFiles.isEmpty() && selectedRules.isEmpty()) {
+                deleteMenuItem.setEnabled(selectedFiles.stream().allMatch(file -> !isBuiltInFile(file)));
+
+            } else if (!selectedRules.isEmpty() && selectedFiles.isEmpty()) {
+                deleteMenuItem.setEnabled(selectedRules.stream().allMatch(MissingRule.class::isInstance));
+            } else {
+                deleteMenuItem.setEnabled(false);
+            }
         }));
-        table.addKeyListener(keyPressedAdapter(e -> {
-            if (e.keyCode == SWT.DEL) {
+        tree.addKeyListener(keyPressedAdapter(e -> {
+            if (e.keyCode == SWT.DEL && deleteMenuItem.isEnabled()) {
                 selectionRemover.run();
             }
         }));
+    }
 
+    private void createDocumentationForm(final Composite parent) {
+        final Tree tree = rulesViewer.getTree();
         final ScrolledFormText documentationText = new ScrolledFormText(parent,
                 SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, true);
         documentationText.setBackground(parent.getBackground());
@@ -386,7 +252,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         final ISelectionChangedListener selListener = e -> {
             final String doc = Selections
-                    .getOptionalFirstElement((IStructuredSelection) viewer.getSelection(), RfLintRule.class)
+                    .getOptionalFirstElement((IStructuredSelection) rulesViewer.getSelection(), RfLintRule.class)
                     .map(rule -> rule instanceof MissingRule
                             ? "<p><span color=\"error\">Missing rule: " + rule.getRuleName()
                                     + " is not available in currently active environment.</span></p>"
@@ -398,10 +264,43 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             documentationText.getFormText().setText(doc, true, true);
             documentationText.reflow(true);
         };
-        viewer.addSelectionChangedListener(selListener);
-        table.addDisposeListener(e -> viewer.removeSelectionChangedListener(selListener));
+        rulesViewer.addSelectionChangedListener(selListener);
+        tree.addDisposeListener(e -> rulesViewer.removeSelectionChangedListener(selListener));
+    }
 
-        return viewer;
+    private StringFieldEditor createAdditionalArgumentsEditor(final Composite parent) {
+        final Composite group = new Composite(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().applyTo(group);
+
+        final StringFieldEditor argumentsEditor = new StringFieldEditor(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS,
+                "Additional arguments for RfLint", group);
+        ((GridLayout) group.getLayout()).marginBottom = 30;
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(argumentsEditor.getLabelControl(group));
+        GridDataFactory.fillDefaults()
+                .grab(true, false)
+                .align(SWT.FILL, SWT.CENTER)
+                .indent(15, 0)
+                .applyTo(argumentsEditor.getTextControl(group));
+        argumentsEditor.setPreferenceStore(getPreferenceStore());
+        argumentsEditor.setPage(this);
+
+        BrowseButtons.selectVariableButton(group, argumentsEditor.getTextControl(group)::insert);
+
+        return argumentsEditor;
+    }
+
+    private Composite createProgressBar(final Composite parent) {
+        final Composite progressParent = new Composite(parent, SWT.NONE);
+        GridLayoutFactory.fillDefaults().applyTo(progressParent);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, false).applyTo(progressParent);
+
+        final ProgressBar progressBar = new ProgressBar(progressParent, SWT.SMOOTH | SWT.INDETERMINATE);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).grab(true, false).applyTo(progressBar);
+        return progressParent;
+    }
+
+    private boolean isBuiltInFile(final RulesFile rulesFile) {
+        return !rulesFiles.contains(rulesFile) && rulesFile != RulesFile.MISSING_SOURCE;
     }
 
     private void showProgress() {
@@ -422,7 +321,6 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         RfLintRules.getInstance().dispose();
         initializeRules(preferences.getRfLintRulesFiles(), preferences.getRfLintRulesConfigs());
         preferences.getRfLintRulesFiles().stream().map(RulesFile::new).forEach(rulesFiles::add);
-        rulesFilesViewer.setInput(rulesFiles);
         argumentsEditor.setStringValue(preferences.getRfLintAdditionalArguments());
     }
 
@@ -430,7 +328,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         RfLintRules.getInstance().dispose();
 
         final List<String> currentFiles = rulesFiles.stream().map(RulesFile::getPath).collect(toList());
-        final Map<String, RfLintRuleConfiguration> currentRulesConfigs = rules.stream()
+        final Map<String, RfLintRuleConfiguration> currentRulesConfigs = rules.values()
+                .stream()
+                .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .collect(toMap(RfLintRule::getRuleName, RfLintRule::getConfiguration));
         
@@ -439,21 +339,35 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private void initializeRules(final List<String> files,
             final Map<String, RfLintRuleConfiguration> ruleConfigs) {
+        final Object[] expanded = rulesViewer.getExpandedElements();
+
         rules.clear();
         final Job rulesReadingJob = Job.createSystem("Reading RfLint rules", monitor -> {
             final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
             final Map<String, RfLintRule> envRules = RfLintRules.getInstance()
                     .loadRules(() -> env.getRfLintRules(files));
             
-            rules.addAll(envRules.values());
-            ruleConfigs.entrySet()
+            final List<RfLintRule> missingRules = ruleConfigs.entrySet()
                     .stream()
                     .filter(entry -> !envRules.containsKey(entry.getKey()))
                     .map(entry -> new MissingRule(entry.getKey(), entry.getValue()))
-                    .forEach(rules::add);
+                    .collect(toList());
+            if (!missingRules.isEmpty()) {
+                rules.put(RulesFile.MISSING_SOURCE, missingRules);
+            }
 
-            rules.forEach(rule -> rule.configure(ruleConfigs.get(rule.getRuleName())));
-            rules.sort((r1, r2) -> r1.getRuleName().compareTo(r2.getRuleName()));
+            for (final RfLintRule rule : envRules.values()) {
+                final RulesFile key = new RulesFile(rule.getFilepath());
+                if (!rules.containsKey(key)) {
+                    rules.put(key, new ArrayList<>());
+                }
+                rules.get(key).add(rule);
+            }
+
+            rules.values()
+                    .stream()
+                    .flatMap(List::stream)
+                    .forEach(rule -> rule.configure(ruleConfigs.get(rule.getRuleName())));
         });
         rulesReadingJob.addJobChangeListener(new JobChangeAdapter() {
             @Override
@@ -471,36 +385,41 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                             .map(File::getAbsolutePath)
                             .orElse("<unknown>");
 
-                    rulesViewerDescription.setText("Configure rules and their severity. "
+                    description.setText("Configure rules and their severity. "
                             + "Following rules are available for RfLint installed in <a href=\""
                             + InstalledRobotsPreferencesPage.ID + "\">" + path + "</a> environment:");
 
                     rulesViewer.setInput(rules);
                     hideProgress();
                     rulesViewer.getControl().setEnabled(true);
-                    rulesFilesViewer.getControl().setEnabled(true);
+                    rulesViewer.setExpandedElements(expanded);
                 });
             };
         });
         showProgress();
         rulesViewer.getControl().setEnabled(false);
-        rulesFilesViewer.getControl().setEnabled(false);
         rulesReadingJob.schedule();
     }
 
     @Override
     public boolean performOk() {
         final String allRulesFiles = rulesFiles.stream().map(RulesFile::getPath).collect(joining(";"));
-        final String allRulesNames = rules.stream()
+        final String allRulesNames = rules.values()
+                .stream()
+                .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getRuleName)
                 .collect(joining(";"));
-        final String allRulesSeverities = rules.stream()
+        final String allRulesSeverities = rules.values()
+                .stream()
+                .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getConfiguredSeverity)
                 .map(RfLintViolationSeverity::name)
                 .collect(joining(";"));
-        final String allRulesArgs = rules.stream()
+        final String allRulesArgs = rules.values()
+                .stream()
+                .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getConfiguredArguments)
                 .collect(joining(";"));
@@ -517,14 +436,30 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     @Override
     protected void performDefaults() {
         rulesFiles.clear();
-        rulesFilesViewer.refresh();
 
-        rules.forEach(rule -> rule.configure((RfLintRuleConfiguration) null));
+        rules.values().stream().flatMap(List::stream).forEach(rule -> rule.configure((RfLintRuleConfiguration) null));
         reloadRules();
 
         argumentsEditor.loadDefault();
 
         super.performDefaults();
+    }
+
+    private Supplier<?> ruleFilesSupplier(final Composite parent) {
+        final Consumer<List<RulesFile>> ruleFilesConsumer = files -> {
+            boolean added = false;
+            for (final RulesFile file : files) {
+                if (!rulesFiles.contains(file)) {
+                    rulesFiles.add(file);
+                    added = true;
+                }
+            }
+            if (added) {
+                reloadRules();
+            }
+        };
+        return openRuleFilesDialog(parent.getShell(),
+                ResourcesPlugin.getWorkspace().getRoot().getLocationURI(), ruleFilesConsumer);
     }
 
     static Supplier<?> openRuleFilesDialog(final Shell shell, final URI startingUri,
@@ -549,14 +484,35 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         };
     }
 
-    private static class MissingRule extends RfLintRule {
+    private static Styler getRuleStyler(final RfLintRule rule) {
+        if (rule instanceof MissingRule) {
+            return Stylers.Common.ERROR_STYLER;
+        } else if (rule.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE) {
+            return Stylers.withForeground(200, 200, 200);
+        } else if (rule.isConfigured()) {
+            return Stylers.Common.BOLD_STYLER;
+        } else {
+            return Stylers.Common.EMPTY_STYLER;
+        }
+    }
+
+    private static final class MissingRule extends RfLintRule {
 
         public MissingRule(final String ruleName, final RfLintRuleConfiguration configuration) {
-            super(ruleName, RfLintViolationSeverity.ERROR, "", "", configuration);
+            super(ruleName, null, "", "", configuration);
+        }
+
+        @Override
+        public RfLintRule configure(final RfLintViolationSeverity severity) {
+            // we do not know what was the default original severity in missing rule,
+            // so when removing configured severity we just set to ERROR
+            return super.configure(severity == null ? RfLintViolationSeverity.ERROR : severity);
         }
     }
 
     private static final class RulesFile {
+        
+        private static final RulesFile MISSING_SOURCE = new RulesFile("Unknown source");
 
         private String path;
 
@@ -587,169 +543,167 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         }
     }
 
-    private static class RulesCheckedStateProvider implements ICheckStateProvider {
-
-        @Override
-        public boolean isChecked(final Object element) {
-            return ((RfLintRule) element).getConfiguredSeverity() != RfLintViolationSeverity.IGNORE;
-        }
-
-        @Override
-        public boolean isGrayed(final Object element) {
-            return false;
-        }
-    }
-
-    private static class RuleNamesLabelProvider extends RedCommonLabelProvider {
-
-        @Override
-        public StyledString getStyledText(final Object element) {
-            final RfLintRule rule = (RfLintRule) element;
-            return new StyledString(rule.getRuleName(), getRuleStyler(rule));
-        }
-
-        static Styler getRuleStyler(final RfLintRule rule) {
-            if (rule instanceof MissingRule) {
-                return Stylers.Common.ERROR_STYLER;
-            } else if (rule.isConfigured()) {
-                return Stylers.Common.BOLD_STYLER;
-            } else {
-                return Stylers.Common.EMPTY_STYLER;
-            }
-        }
-    }
-
-    private static class RuleSeverityLabelProvider extends RedCommonLabelProvider {
-
-        static Converter<String, String> severityLabelConverter = CaseFormat.UPPER_UNDERSCORE
-                .converterTo(CaseFormat.UPPER_CAMEL);
-
-        @Override
-        public StyledString getStyledText(final Object element) {
-            final RfLintRule rule = (RfLintRule) element;
-
-            return new StyledString(severityLabelConverter.convert(rule.getConfiguredSeverity().name()),
-                    RuleNamesLabelProvider.getRuleStyler(rule));
-        }
-    }
-
-    private static class RuleSeverityEditingSupport extends EditingSupport {
-
-        private final List<RfLintViolationSeverity> severities = newArrayList(RfLintViolationSeverity.ERROR,
-                RfLintViolationSeverity.WARNING, RfLintViolationSeverity.IGNORE);
-
-        public RuleSeverityEditingSupport(final ColumnViewer viewer) {
-            super(viewer);
-        }
-
-        @Override
-        protected boolean canEdit(final Object element) {
-            return true;
-        }
-
-        @Override
-        protected CellEditor getCellEditor(final Object element) {
-            final String[] items = severities.stream()
-                    .map(RfLintViolationSeverity::name)
-                    .map(RuleSeverityLabelProvider.severityLabelConverter::convert)
-                    .toArray(String[]::new);
-            return new ComboBoxCellEditor((Composite) getViewer().getControl(), items);
-        }
-
-        @Override
-        protected Object getValue(final Object element) {
-            final RfLintRule rule = (RfLintRule) element;
-            return severities.indexOf(rule.getSeverity());
-        }
-
-        @Override
-        protected void setValue(final Object element, final Object value) {
-            final int index = (int) value;
-            final RfLintRule rule = (RfLintRule) element;
-            rule.configure(index == -1 ? null : severities.get(index));
-            getViewer().refresh(rule);
-        }
-    }
-
-    private static class RuleConfigurationLabelProvider extends RedCommonLabelProvider {
-
-        @Override
-        public StyledString getStyledText(final Object element) {
-            final RfLintRule rule = (RfLintRule) element;
-            return new StyledString(rule.getConfiguredArguments(), RuleNamesLabelProvider.getRuleStyler(rule));
-        }
-    }
-
-    private static class RuleConfigurationEditingSupport extends EditingSupport {
-
-        public RuleConfigurationEditingSupport(final ColumnViewer viewer) {
-            super(viewer);
-        }
-
-        @Override
-        protected boolean canEdit(final Object element) {
-            return true;
-        }
-
-        @Override
-        protected CellEditor getCellEditor(final Object element) {
-            return new TextCellEditor((Composite) getViewer().getControl());
-        }
-
-        @Override
-        protected Object getValue(final Object element) {
-            final RfLintRule rule = (RfLintRule) element;
-            return rule.getConfiguredArguments();
-        }
-
-        @Override
-        protected void setValue(final Object element, final Object value) {
-            final RfLintRule rule = (RfLintRule) element;
-            rule.configure((String) value);
-            getViewer().refresh(element);
-        }
-    }
-
-    private static class RulesFilesContentProvider extends StructuredContentProvider {
+    private class RulesContentProvider extends TreeContentProvider {
 
         @Override
         public Object[] getElements(final Object inputElement) {
             final List<Object> all = new ArrayList<>();
-            all.addAll((List<?>) inputElement);
+            final Comparator<RulesFile> comparator = (f1, f2) -> {
+                if (f1 == RulesFile.MISSING_SOURCE) {
+                    return -1;
+                } else if (f2 == RulesFile.MISSING_SOURCE) {
+                    return 1;
+                } else {
+                    return new File(f1.getPath()).compareTo(new File(f2.getPath()));
+                }
+            };
+            Stream.concat(rules.keySet().stream().filter(f -> !rulesFiles.contains(f)).sorted(comparator),
+                    rulesFiles.stream().sorted(comparator))
+                    .forEach(all::add);
             all.add(new ElementAddingToken("rules file", true));
             return all.toArray();
         }
-    }
-
-    private static class RulesFilesLabelProvider extends RedCommonLabelProvider {
 
         @Override
-        public Image getImage(final Object element) {
-            if (element instanceof ElementAddingToken) {
-                return ImagesManager.getImage(RedImages.getAddImage());
-            }
-            return null;
+        public boolean hasChildren(final Object element) {
+            return element instanceof RulesFile;
         }
+
+        @Override
+        public Object[] getChildren(final Object element) {
+            if (element instanceof RulesFile) {
+                final RulesFile file = (RulesFile) element;
+                final List<RfLintRule> rs = rules.get(file);
+                return rs == null ? new Object[0]
+                        : rs.stream().sorted((r1, r2) -> r1.getRuleName().compareTo(r2.getRuleName())).toArray();
+            }
+            return new Object[0];
+        }
+
+        @Override
+        public Object getParent(final Object element) {
+            if (element instanceof RulesFile || element instanceof ElementAddingToken) {
+                return null;
+            }
+            final RfLintRule rule = (RfLintRule) element;
+            return rules.keySet()
+                    .stream()
+                    .filter(f -> f.getPath().equals(rule.getFilepath()))
+                    .findFirst()
+                    .orElse(null);
+        }
+    }
+
+    private class CheckedStateProvider implements ICheckStateProvider {
+
+        @Override
+        public boolean isChecked(final Object element) {
+            if (element instanceof RulesFile) {
+                final List<RfLintRule> rs = rules.get(element);
+                return rs != null
+                        && rs.stream().anyMatch(r -> r.getConfiguredSeverity() != RfLintViolationSeverity.IGNORE);
+
+            } else if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                return rule.getConfiguredSeverity() != RfLintViolationSeverity.IGNORE;
+
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean isGrayed(final Object element) {
+            if (element instanceof RulesFile) {
+                final List<RfLintRule> rs = rules.get(element);
+                return rs != null
+                        && rs.stream().anyMatch(r -> r.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE);
+            }
+            return false;
+        }
+    }
+
+    private class CheckStateListener implements ICheckStateListener {
+
+        @Override
+        public void checkStateChanged(final CheckStateChangedEvent event) {
+            final RfLintViolationSeverity newSeverity = event.getChecked() ? null : RfLintViolationSeverity.IGNORE;
+
+            if (event.getElement() instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) event.getElement();
+                rule.configure(newSeverity);
+
+                final Object parent = ((ITreeContentProvider) rulesViewer.getContentProvider()).getParent(rule);
+                rulesViewer.refresh(parent);
+
+            } else if (event.getElement() instanceof RulesFile) {
+                final RulesFile rulesFile = (RulesFile) event.getElement();
+                rules.get(rulesFile).forEach(rule -> rule.configure(newSeverity));
+
+                rulesViewer.refresh(rulesFile);
+
+            } else {
+                rulesViewer.setChecked(event.getElement(), false);
+            }
+        }
+    }
+
+    private class NamesLabelProvider extends RedCommonLabelProvider {
 
         @Override
         public StyledString getStyledText(final Object element) {
             if (element instanceof RulesFile) {
                 final RulesFile rulesFile = (RulesFile) element;
-                return new StyledString(rulesFile.getPath());
+                final StyledString label = new StyledString(rulesFile.getPath(), getRulesFileStyler(rulesFile));
+                if (isBuiltInFile(rulesFile)) {
+                    label.append(" (built-in)", Stylers.Common.ECLIPSE_DECORATION_STYLER);
+                }
+                return label;
+
+            } else if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                return new StyledString(rule.getRuleName(), getRuleStyler(rule));
+
             } else {
                 return ((ElementAddingToken) element).getStyledText();
             }
         }
+
+        private Styler getRulesFileStyler(final RulesFile rulesFile) {
+            final List<RfLintRule> rs = rules.get(rulesFile);
+            if (rulesFile == RulesFile.MISSING_SOURCE) {
+                return Stylers.Common.ERROR_STYLER;
+            } else if (rs != null && rs.stream().anyMatch(RfLintRule::isConfigured)) {
+                return Stylers.Common.BOLD_STYLER;
+            } else {
+                return Stylers.Common.EMPTY_STYLER;
+            }
+        }
+
+        @Override
+        public Image getImage(final Object element) {
+            if (element instanceof RulesFile) {
+                return ImagesManager.getImage(RedImages.getImageForFileWithExtension("py"));
+            } else if (element instanceof RfLintRule) {
+                return ImagesManager.getImage(RedImages.getRfLintRuleImage());
+            } else if (element instanceof ElementAddingToken) {
+                return ((ElementAddingToken) element).getImage();
+            }
+            return null;
+        }
     }
 
-    private class RulesFileEditingSupport extends ElementsAddingEditingSupport {
+    private class NamesEditingSupport extends ElementsAddingEditingSupport {
 
-        public RulesFileEditingSupport(final ColumnViewer viewer, final Supplier<?> creator) {
+        public NamesEditingSupport(final ColumnViewer viewer, final Supplier<?> creator) {
             super(viewer, 0, creator);
         }
 
         @Override
         protected CellEditor getCellEditor(final Object element) {
+            if (element instanceof RulesFile && isBuiltInFile((RulesFile) element)) {
+                return null;
+            }
             return new AlwaysDeactivatingCellEditor((Composite) getViewer().getControl());
         }
 
@@ -773,6 +727,136 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 final URI uri = new File(rulesFile.getPath()).toURI();
                 scheduleViewerRefreshAndEditorActivation(openRuleFilesDialog(shell, uri, ruleFilesConsumer).get());
 
+            } else {
+                super.setValue(element, value);
+            }
+        }
+    }
+
+    private static class SeverityLabelProvider extends RedCommonLabelProvider {
+
+        static Converter<String, String> severityLabelConverter = CaseFormat.UPPER_UNDERSCORE
+                .converterTo(CaseFormat.UPPER_CAMEL);
+
+        @Override
+        public StyledString getStyledText(final Object element) {
+            if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+
+                final RfLintViolationSeverity severity = rule.getConfiguredSeverity();
+                final String severityName = severity == RfLintViolationSeverity.IGNORE ? ""
+                        : severityLabelConverter.convert(severity.name());
+                return new StyledString(severityName, getRuleStyler(rule));
+            }
+            return new StyledString();
+        }
+    }
+
+    private class SeverityEditingSupport extends ElementsAddingEditingSupport {
+
+        private final List<RfLintViolationSeverity> severities = newArrayList(RfLintViolationSeverity.ERROR,
+                RfLintViolationSeverity.WARNING);
+
+        public SeverityEditingSupport(final ColumnViewer viewer, final Supplier<?> creator) {
+            super(viewer, 0, creator);
+        }
+
+        @Override
+        protected CellEditor getCellEditor(final Object element) {
+            if (element instanceof ElementAddingToken) {
+                return super.getCellEditor(element);
+            } else {
+                final String[] items = severities.stream()
+                        .map(RfLintViolationSeverity::name)
+                        .map(SeverityLabelProvider.severityLabelConverter::convert)
+                        .toArray(String[]::new);
+                return new ComboBoxCellEditor((Composite) getViewer().getControl(), items);
+            }
+        }
+
+        @Override
+        protected Object getValue(final Object element) {
+            if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                int index = severities.indexOf(rule.getConfiguredSeverity());
+                if (index == -1) {
+                    index = severities.indexOf(rule.getSeverity());
+                }
+                return index;
+        
+            } else if (element instanceof RulesFile) {
+                return 0;
+        
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        protected void setValue(final Object element, final Object value) {
+            if (element instanceof RfLintRule) {
+                final int index = (int) value;
+                final RfLintRule rule = (RfLintRule) element;
+                rule.configure(index == -1 ? null : severities.get(index));
+
+                final Object parent = ((ITreeContentProvider) getViewer().getContentProvider()).getParent(rule);
+                getViewer().refresh(parent);
+
+            } else if (element instanceof RulesFile) {
+                final RulesFile rulesFile = (RulesFile) element;
+                rules.get(rulesFile).forEach(rule -> setValue(rule, value));
+
+                getViewer().refresh(rulesFile);
+
+            } else {
+                super.setValue(element, value);
+            }
+        }
+    }
+
+    private static class ConfigurationLabelProvider extends RedCommonLabelProvider {
+
+        @Override
+        public StyledString getStyledText(final Object element) {
+            if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                return new StyledString(rule.getConfiguredArguments(), getRuleStyler(rule));
+            }
+            return new StyledString();
+        }
+    }
+
+    private static class ConfigurationEditingSupport extends ElementsAddingEditingSupport {
+
+        public ConfigurationEditingSupport(final ColumnViewer viewer, final Supplier<?> creator) {
+            super(viewer, 0, creator);
+        }
+
+        @Override
+        protected CellEditor getCellEditor(final Object element) {
+            if (element instanceof RfLintRule) {
+                return new TextCellEditor((Composite) getViewer().getControl());
+            }
+            return super.getCellEditor(element);
+        }
+
+        @Override
+        protected Object getValue(final Object element) {
+            if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                return rule.getConfiguredArguments();
+            }
+            return null;
+        }
+
+        @Override
+        protected void setValue(final Object element, final Object value) {
+            if (element instanceof RfLintRule) {
+                final RfLintRule rule = (RfLintRule) element;
+                rule.configure((String) value);
+
+                final Object parent = ((ITreeContentProvider) getViewer().getContentProvider()).getParent(rule);
+                getViewer().refresh(parent);
             } else {
                 super.setValue(element, value);
             }

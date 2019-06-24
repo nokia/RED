@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
 import org.junit.AfterClass;
 import org.junit.Rule;
@@ -52,12 +52,12 @@ public class RfLintValidationPreferencePageTest {
     }
 
     @Test
-    public void twoTablesArePlacedAtThePage() {
+    public void singleTreeIsPlacedAtThePage() {
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<Table> tables = getTables();
-        assertThat(tables).hasSize(2);
+        final List<Tree> tables = getTrees();
+        assertThat(tables).hasSize(1);
     }
 
     @Test
@@ -67,21 +67,6 @@ public class RfLintValidationPreferencePageTest {
 
         final List<Text> textFields = getTextFields();
         assertThat(textFields).hasSize(1);
-    }
-
-    @Test
-    public void rulesFilesTableDisplaysAllTheRulesFiles() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.RFLINT_RULES_FILES, "/path/to/fst.py;/path/to/snd.py");
-
-        final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
-
-        final Table table = getRulesFilesTable();
-        assertThat(table.getItemCount()).isEqualTo(3);
-        assertThat(table.getItem(0).getText()).isEqualTo("/path/to/fst.py");
-        assertThat(table.getItem(1).getText()).isEqualTo("/path/to/snd.py");
-        assertThat(table.getItem(2).getText()).isEqualTo("...add new rules file");
     }
 
     @Test
@@ -122,14 +107,12 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private void assertNotEmptyValues() {
-        assertThat(getRulesTable().getItemCount()).isGreaterThanOrEqualTo(0);
-        assertThat(getRulesFilesTable().getItemCount()).isGreaterThan(1);
+        assertThat(getRulesTree().getItemCount()).isGreaterThanOrEqualTo(0);
         assertThat(getAdditionalArgumentsField().getText()).isNotEmpty();
     }
 
     private void assertEmptyValues() {
-        assertThat(getRulesTable().getItemCount()).isEqualTo(0);
-        assertThat(getRulesFilesTable().getItemCount()).isEqualTo(1);
+        assertThat(getRulesTree().getItemCount()).isEqualTo(0);
         assertThat(getAdditionalArgumentsField().getText()).isEmpty();
     }
 
@@ -145,18 +128,14 @@ public class RfLintValidationPreferencePageTest {
         assertThat(RedPlugin.getDefault().getPreferences().getRfLintAdditionalArguments()).isEmpty();
     }
 
-    private Table getRulesFilesTable() {
-        return getTables().get(0);
+    private Tree getRulesTree() {
+        return getTrees().get(0);
     }
 
-    private Table getRulesTable() {
-        return getTables().get(1);
-    }
-
-    private List<Table> getTables() {
+    private List<Tree> getTrees() {
         return getAllControls(shellProvider.getShell()).stream()
-                .filter(c -> c instanceof Table)
-                .map(c -> Table.class.cast(c))
+                .filter(c -> c instanceof Tree)
+                .map(c -> Tree.class.cast(c))
                 .collect(toList());
     }
 

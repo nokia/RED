@@ -22,7 +22,7 @@ public class RfLintRule {
 
     private final String documentation;
 
-    private RfLintRuleConfiguration configuration;
+    protected RfLintRuleConfiguration configuration;
 
     public RfLintRule(final String ruleName, final RfLintViolationSeverity defaultSeverity, final String filepath,
             final String documentation) {
@@ -101,6 +101,10 @@ public class RfLintRule {
             configure(config.getArguments());
         }
         return this;
+    }
+
+    public void setConfiguration(final RfLintRuleConfiguration config) {
+        this.configuration = config;
     }
 
     public List<String> getConfigurationSwitches() {
