@@ -1,0 +1,157 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nyIcUI6tEemtyOUvY7yb_Q
+Element-Name: RFLintDocumentation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3Oc6wJaMEemFMYAuMwF-ow
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 6/25/19 12:00 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-rflint-documentation" [val rule_name] [val path] [val priority] [val text] [val CustomRule_link 1] [val TestNamesContainsX_link 1] 
+	[val TestNamesContainsY_link 1] [val TooFewTestSteps_link 1] {    
+    
+    get-view "Documentation View" | get-control Browser | get-property text 
+    | equals [format "<html><head><meta charset=\"utf-8\"><style>body.*</style></head>"
+            +"<body><h3><img style=\"vertical-align: top;\" "
+            +"src=\"file:/.*/docs/robot.png\"> %s</h3><p>"  //rule name
+            +"<b>Source: </b><span style=\"font-family: monospace;\">"
+            +"<a href=\"file:%s\">%s</a>" //path
+            +"</span><br><b>Default rule priority: </b>"
+            +"<span style=\"font-family: monospace;\">%s</span><br></p>"  //prio
+            +"<p>%s</p>"   // text
+            +"<h2 id=\"All Rules\">All Rules</h2><p>"
+            +"(<a href=\"rflintrule:/CustomRule\">){%s}CustomRule(</a>){%s} · "
+            +"<a href=\"rflintrule:/DuplicateKeywordNames\">DuplicateKeywordNames</a> · "
+            +"<a href=\"rflintrule:/DuplicateTestNames\">DuplicateTestNames</a> · "
+            +"<a href=\"rflintrule:/FileTooLong\">FileTooLong</a> · "
+            +"<a href=\"rflintrule:/InvalidTable\">InvalidTable</a> · "
+            +"<a href=\"rflintrule:/LineTooLong\">LineTooLong</a> · "
+            +"<a href=\"rflintrule:/PeriodInSuiteName\">PeriodInSuiteName</a> · "
+            +"<a href=\"rflintrule:/PeriodInTestName\">PeriodInTestName</a> · "
+            +"<a href=\"rflintrule:/RequireKeywordDocumentation\">RequireKeywordDocumentation</a> · "
+            +"<a href=\"rflintrule:/RequireSuiteDocumentation\">RequireSuiteDocumentation</a> · "
+            +"<a href=\"rflintrule:/RequireTestDocumentation\">RequireTestDocumentation</a> · "
+            +"<a href=\"rflintrule:/TagWithSpaces\">TagWithSpaces</a> · "
+            +"(<a href=\"rflintrule:/TestNamesContainsX\">){%s}TestNamesContainsX(</a>){%s} · "
+            +"(<a href=\"rflintrule:/TestNamesContainsY\">){%s}TestNamesContainsY(</a>){%s} · "  //1
+            +"<a href=\"rflintrule:/TooFewKeywordSteps\">TooFewKeywordSteps</a> · "
+            +"(<a href=\"rflintrule:/TooFewTestSteps\">){%s}TooFewTestSteps(</a>){%s} · "   //2
+            +"<a href=\"rflintrule:/TooManyTestCases\">TooManyTestCases</a> · "
+            +"<a href=\"rflintrule:/TooManyTestSteps\">TooManyTestSteps</a> · "
+            +"<a href=\"rflintrule:/TrailingBlankLines\">TrailingBlankLines</a></p>"
+            + "</body></html>" $rule_name $path $path $priority $text $CustomRule_link $CustomRule_link $TestNamesContainsX_link $TestNamesContainsX_link $TestNamesContainsY_link $TestNamesContainsY_link $TooFewTestSteps_link  $TooFewTestSteps_link] | verify-true
+    
+}
+ 
+ 
+ 
+//add custom files
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
+}
+set-dialog-result File "platform:/resource/project_a/my_rules/customRules.py" "platform:/resource/project_a/my_rules/two_rules.py"
+get-window Preferences | get-table -after [get-label "Additional rules files"] | get-item "...add new rules file" | double-click
+get-window Preferences | get-tab-folder | get-tab-item Rules | click
+
+
+// change LineToLong to 50
+with [get-window Preferences | get-table] {
+    select LineTooLong
+    get-cell 5 0 | mouse up -count 1
+}
+with [get-window Preferences] {
+    with [get-table] {
+        get-cell 5 2 | click
+        get-cell 5 2 | mouse down -count 2
+        double-click
+        select LineTooLong | activate-cell-edit -column 2 -type MouseDoubleClickSelection
+        get-editbox | set-text 50
+        apply-cell-edit -deactivate
+    }
+    get-button "Apply and Close" | click
+}
+
+//run analyss
+get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Robot Framework/Run RfLint analysis" 
+    | click
+    
+// go to Problmes view to open doc on TestNamesContainsY  
+with [get-view Problems] {
+    click
+    get-tree | select "Errors (2 items)/Test case name contains y character (TestNamesContainsY)" | get-menu 
+        -path "Show rule documentation" | click
+}
+check-rflint-documentation -rule_name "TestNamesContainsY" -path ".*project_a[/\\\\]my_rules[/\\\\]two_rules.py" -priority Error   
+	-text "Verify that test name does not contain y" -TestNamesContainsY_link 0
+
+//select other rule: TooFewTestSteps    
+get-view Problems | get-tree | select "Warnings (3 items)/Too few steps (1) in test case (TooFewTestSteps)" | get-menu 
+    -path "Show rule documentation" | click
+
+check-rflint-documentation -rule_name "TooFewTestSteps" -path ".*lib[/\\\\]site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]testcaseRules.py" -priority Warning   
+ -text "Tests should have at least a minimum number of steps</p><p>This rule is configurable. The default number of required steps is 2." -TooFewTestSteps_link 0
+
+//close view    
+get-view "Message Log" | click
+get-view Problems | click
+get-view "Documentation View" | close
+
+//open TestNamesContainsX rule
+get-view Problems | get-tree | select "Warnings (3 items)/Test case name contains x character (TestNamesContainsX)" 
+    | get-menu -path "Show rule documentation" | click
+    
+check-rflint-documentation -rule_name "TestNamesContainsX" -path ".*project_a[/\\\\]my_rules[/\\\\]two_rules.py"  -priority Warning   
+ -text "Verify that test name does not contain x\\\\n"
+    + "one line more</p><p>up is empty line\\\\n"
+    + "to have some long\\\\n"
+    + "documentation\\\\n"
+    + "spanning\\\\n"
+    + "couple of</p><p>lines\\\\n"
+    + "Very long line to check if textt box see this correctly. It should. I add some more characters" -TestNamesContainsX_link 0
+   
+
+//uncheck all and check if doc view is the same    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tab-folder | get-tab-item Rules | click
+    with [get-table] {
+        get-item -path TooManyTestCases | uncheck
+        get-item -path TooFewTestSteps | uncheck
+        get-item -path TooFewKeywordSteps | uncheck
+        get-item -path TestNamesContainsY | uncheck
+        get-item -path TestNamesContainsX | uncheck
+        get-item -path TagWithSpaces | uncheck
+        get-item -path RequireTestDocumentation | uncheck
+        get-item -path RequireSuiteDocumentation | uncheck
+        get-item -path RequireKeywordDocumentation | uncheck
+        get-item -path PeriodInTestName | uncheck
+        get-item -path PeriodInSuiteName | uncheck
+        get-item -path LineTooLong | uncheck
+        get-item -path InvalidTable | uncheck
+        get-item -path DuplicateKeywordNames | uncheck
+        get-item -path FileTooLong | uncheck
+        get-item -path DuplicateTestNames | uncheck
+        get-item -path DuplicateKeywordNames | uncheck
+        get-item -path TooManyTestSteps | uncheck
+    }
+    get-button "Apply and Close" | click
+}
+
+
+get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Robot Framework/Run RfLint analysis" 
+    | click
+get-view Problems | get-tree | select "Warnings (1 item)/Line 5 should be empty (CustomRule)" | get-menu 
+    -path "Show rule documentation" | click
+
+check-rflint-documentation -rule_name "CustomRule" -path ".*project_a[/\\\\]my_rules[/\\\\]customRules.py"-priority Warning   
+ -text "Here you can check empty lines after elements.\\\\nDefault empty lines value is 5." -CustomRule_link 0
+ 
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
