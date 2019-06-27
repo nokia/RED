@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -37,6 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 
@@ -264,10 +266,21 @@ public class RobotSetting extends RobotKeywordCall {
                 .findFirst();
     }
 
-    private boolean specPathMatches(final IPath absolutePath, final IPath refLibPath) {
-        return absolutePath.equals(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath))
-                || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.equals(
-                        RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1)));
+    @VisibleForTesting
+    protected boolean specPathMatches(final IPath absolutePath, final IPath refLibPath) {
+        if (RedSystemProperties.isWindowsPlatform()) {
+            return absolutePath.toPortableString()
+                    .equalsIgnoreCase(
+                            RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath).toPortableString())
+                    || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.toPortableString()
+                            .equalsIgnoreCase(RedWorkspace.Paths
+                                    .toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1))
+                                    .toPortableString());
+        } else {
+            return absolutePath.equals(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath))
+                    || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.equals(RedWorkspace.Paths
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1)));
+        }
     }
 
     public Optional<IResource> getImportedResource() {
