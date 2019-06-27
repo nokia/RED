@@ -251,15 +251,24 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         documentationText.getFormText().setColor("error", ColorsManager.getColor(255, 0, 0));
 
         final ISelectionChangedListener selListener = e -> {
-            final String doc = Selections
-                    .getOptionalFirstElement((IStructuredSelection) rulesViewer.getSelection(), RfLintRule.class)
+            final IStructuredSelection selection = (IStructuredSelection) rulesViewer.getSelection();
+            final Optional<String> ruleDoc = Selections.getOptionalFirstElement(selection, RfLintRule.class)
                     .map(rule -> rule instanceof MissingRule
                             ? "<p><span color=\"error\">Missing rule: " + rule.getRuleName()
                                     + " is not available in currently active environment.</span></p>"
                                     + "<p>This entry can be safely deleted if it is no longer needed.</p>"
                             : "<p><b>" + rule.getFilepath() + "</b></p>" + rule.getDocumentation())
-                    .map(text -> "<form>" + text.replaceAll("\\\n", "<br/>") + "</form>")
-                    .orElse("<form></form>");
+                    .map(text -> "<form>" + text.replaceAll("\\\n", "<br/>") + "</form>");
+            String doc;
+            if (ruleDoc.isPresent()) {
+                doc = ruleDoc.get();
+            } else {
+                doc = Selections.getOptionalFirstElement(selection, RulesFile.class)
+                        .filter(f -> f != RulesFile.MISSING_SOURCE && f.getExists())
+                        .map(f -> "<p><span color=\"error\">The file '" + f.getPath() + "' does not exist</span></p>")
+                        .map(text -> "<form>" + text.replaceAll("\\\n", "<br/>") + "</form>")
+                        .orElse("<form></form>");
+            }
 
             documentationText.getFormText().setText(doc, true, true);
             documentationText.reflow(true);
@@ -363,11 +372,18 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 }
                 rules.get(key).add(rule);
             }
+            for (final RulesFile file : rulesFiles) {
+                if (!rules.containsKey(file)) {
+                    rules.put(file, new ArrayList<>());
+                }
+            }
 
             rules.values()
                     .stream()
                     .flatMap(List::stream)
                     .forEach(rule -> rule.configure(ruleConfigs.get(rule.getRuleName())));
+
+            validateRulesFiles();
         });
         rulesReadingJob.addJobChangeListener(new JobChangeAdapter() {
             @Override
@@ -399,6 +415,12 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         showProgress();
         rulesViewer.getControl().setEnabled(false);
         rulesReadingJob.schedule();
+    }
+
+    private void validateRulesFiles() {
+        for (final RulesFile file : rules.keySet()) {
+            file.setExists(file == RulesFile.MISSING_SOURCE || !new File(file.getPath()).exists());
+        }
     }
 
     @Override
@@ -516,6 +538,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         private String path;
 
+        private boolean exists;
+
         public RulesFile(final String path) {
             this.path = path;
         }
@@ -526,6 +550,14 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         public void setPath(final String path) {
             this.path = path;
+        }
+
+        public void setExists(final boolean exists) {
+            this.exists = exists;
+        }
+
+        public boolean getExists() {
+            return exists;
         }
 
         @Override
@@ -600,8 +632,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         public boolean isChecked(final Object element) {
             if (element instanceof RulesFile) {
                 final List<RfLintRule> rs = rules.get(element);
-                return rs != null
-                        && rs.stream().anyMatch(r -> r.getConfiguredSeverity() != RfLintViolationSeverity.IGNORE);
+                return rs.isEmpty()
+                        || rs.stream().anyMatch(r -> r.getConfiguredSeverity() != RfLintViolationSeverity.IGNORE);
 
             } else if (element instanceof RfLintRule) {
                 final RfLintRule rule = (RfLintRule) element;
@@ -615,9 +647,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         @Override
         public boolean isGrayed(final Object element) {
             if (element instanceof RulesFile) {
-                final List<RfLintRule> rs = rules.get(element);
-                return rs != null
-                        && rs.stream().anyMatch(r -> r.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE);
+                return rules.get(element)
+                        .stream()
+                        .anyMatch(r -> r.getConfiguredSeverity() == RfLintViolationSeverity.IGNORE);
             }
             return false;
         }
@@ -670,10 +702,9 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         }
 
         private Styler getRulesFileStyler(final RulesFile rulesFile) {
-            final List<RfLintRule> rs = rules.get(rulesFile);
-            if (rulesFile == RulesFile.MISSING_SOURCE) {
+            if (rulesFile.getExists()) {
                 return Stylers.Common.ERROR_STYLER;
-            } else if (rs != null && rs.stream().anyMatch(RfLintRule::isConfigured)) {
+            } else if (rules.get(rulesFile).stream().anyMatch(RfLintRule::isConfigured)) {
                 return Stylers.Common.BOLD_STYLER;
             } else {
                 return Stylers.Common.EMPTY_STYLER;
