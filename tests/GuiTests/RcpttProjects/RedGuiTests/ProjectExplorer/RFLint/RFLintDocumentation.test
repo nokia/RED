@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3Oc6wJaMEemFMYAuMwF-ow
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/27/19 3:48 PM
+Save-Time: 6/27/19 3:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -49,8 +49,8 @@ proc "check-rflint-documentation" [val rule_name] [val path] [val priority] [val
             + "</body></html>" $rule_name $path $path $priority $text $CustomRule_link $CustomRule_link $TestNamesContainsX_link $TestNamesContainsX_link $TestNamesContainsY_link $TestNamesContainsY_link $TooFewTestSteps_link  $TooFewTestSteps_link] | verify-true 
 }
  
-global [val link "Configure rules and their severity. Following rules are available for RfLint installed in "
-    + "<a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.installed\">c:\\\\\\\\Python27</a> environment:"]
+global [val link [format "Configure rules and their severity. Following rules are available for RfLint installed in "
+    + "<a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.installed\">%s</a> environment:" [replace -input $python_exe_path -old "\\" -new  "\\\\\\\\"]]]
  
 //add custom files
 get-preferences-menu | click
@@ -134,7 +134,7 @@ with [get-window Preferences] {
         get-item -path ".*[\\\\]project_a[\\\\]my_rules[\\\\]customRules.py" | uncheck
         get-item -path ".*[\\\\]project_a[\\\\]my_rules[\\\\]two_rules.py" | uncheck
         
-        get-item -path "C:\\rcptt_2_4\\aut-aa_red_product\\project_a\\my_rules\\customRules.py/CustomRule" | check
+        get-item -path ".*project_a[\\\\]my_rules[\\\\]customRules.py/CustomRule" | check
     }
     get-button "Apply and Close" | click
 }
