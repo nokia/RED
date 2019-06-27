@@ -43,32 +43,25 @@ It is possible to configure RfLint behavior in Preferences ( `[ Window ->
 Preferences -> Robot Framework -> Errors/Warnings -> RfLint
 validation](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint\)'\))`).
 
-#### General tab
+![](images/rflint_preferences.png)
 
-On **General** tab it is possible to define:
+The table shows all available rules grouped by the source files where they are
+defined. It is possible to:
 
-  * **additional rules files** \- those files will be attached with all the rules when running RfLint analysis. Those rules can be further configured at **Rules** tab, 
+  * add **additional rules files** \- those files will be attached with all the rules when running RfLint analysis, 
 
-  * **additional arguments** \- custom RfLint arguments that will be used for analysis. See RfLint user guide for more details on possible arguments. 
+  * **ignore** rules - by checking/unchecking them. By default all the rules are not ignored. It is also possible to check/uncheck file which will apply to all the rules from this file, 
 
-Note
-
-    Additional arguments field accepts Eclipse [string variables](../launching/string_substitution.md).
-![](images/rflint_prefs1.png)
-
-#### Rules tab
-
-On **Rules** tab it is possible to configure rule severity as well as
-additional rule parameters.
-
-  * rule **severity** \- rule of a given name can have severity specified: **Error** and **Warning** changes severity to one of those levels, while **Ignore** will silence the rule (Ignore can be set also by check-box), 
+  * define rule **severity** \- each rule can have severity specified: **Error** and **Warning**. Similarly one can change severity of a file which would change severities of all its rules, 
 
   * rule **configuration** \- as described in [RfLint Wiki](http://github.com/boakley/robotframework-lint/wiki/How-to-write-custom-rules) some rules can be parameterized: simply write arguments for given rule and remember that multiple arguments should be separated with colon (:) character. 
 
-Note
+The preference page displays the rule documentation in order to have a quick
+rule overview. Custom command line arguments for RfLint can be passed using
+**Additional arguments for RfLint** field - refer toe RfLint user guide for
+more details on possible arguments.
 
-    RED will only store changes to default rule configurations. The changed rule is marked with bold font. It is possible that RED is storing configuration of a rule which is currently not recognised by your RfLint installation and such rule is marked red.
-![](images/rflint_prefs2.png)
+  
 
 ### Displaying rules documentation
 
