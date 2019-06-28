@@ -18,7 +18,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,6 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     private Composite topLevelParent;
     private Link description;
     
-    private final List<RulesFile> rulesFiles = new ArrayList<>();
     private final Map<RulesFile, List<RfLintRule>> rules = new LinkedHashMap<>();
 
     private CheckboxTreeViewer rulesViewer;
@@ -191,7 +189,6 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             if (!selectedRules.isEmpty()) {
                 rules.get(RulesFile.MISSING_SOURCE).removeAll(selectedRules);
             } else if (!selectedFiles.isEmpty()) {
-                rulesFiles.removeAll(selectedFiles);
                 selectedFiles.forEach(rules::remove);
             }
             rulesViewer.refresh();
@@ -209,8 +206,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             final List<RulesFile> selectedFiles = Selections.getElements(selection, RulesFile.class);
 
             if (!selectedFiles.isEmpty() && selectedRules.isEmpty()) {
-                deleteMenuItem.setEnabled(selectedFiles.stream().allMatch(file -> !isBuiltInFile(file)));
-
+                deleteMenuItem.setEnabled(selectedFiles.stream().allMatch(RulesFile::isAdditional));
             } else if (!selectedRules.isEmpty() && selectedFiles.isEmpty()) {
                 deleteMenuItem.setEnabled(selectedRules.stream().allMatch(MissingRule.class::isInstance));
             } else {
@@ -308,10 +304,6 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         return progressParent;
     }
 
-    private boolean isBuiltInFile(final RulesFile rulesFile) {
-        return !rulesFiles.contains(rulesFile) && rulesFile != RulesFile.MISSING_SOURCE;
-    }
-
     private void showProgress() {
         ((GridData) progressParent.getLayoutData()).exclude = false;
         progressParent.setVisible(true);
@@ -329,32 +321,41 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         RfLintRules.getInstance().dispose();
         initializeRules(preferences.getRfLintRulesFiles(), preferences.getRfLintRulesConfigs());
-        preferences.getRfLintRulesFiles().stream().map(RulesFile::new).forEach(rulesFiles::add);
+
         argumentsEditor.setStringValue(preferences.getRfLintAdditionalArguments());
     }
 
     private void reloadRules() {
         RfLintRules.getInstance().dispose();
 
-        final List<String> currentFiles = rulesFiles.stream().map(RulesFile::getPath).collect(toList());
+        final List<String> currentAdditionalFiles = rules.keySet()
+                .stream()
+                .filter(RulesFile::isAdditional)
+                .filter(rulesFile -> rulesFile != RulesFile.MISSING_SOURCE)
+                .map(RulesFile::getPath)
+                .collect(toList());
         final Map<String, RfLintRuleConfiguration> currentRulesConfigs = rules.values()
                 .stream()
                 .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .collect(toMap(RfLintRule::getRuleName, RfLintRule::getConfiguration));
         
-        initializeRules(currentFiles, currentRulesConfigs);
+        initializeRules(currentAdditionalFiles, currentRulesConfigs);
     }
 
-    private void initializeRules(final List<String> files,
+    private void initializeRules(final List<String> additionalFiles,
             final Map<String, RfLintRuleConfiguration> ruleConfigs) {
         final Object[] expanded = rulesViewer.getExpandedElements();
 
         rules.clear();
+        additionalFiles.stream()
+                .map(path -> new RulesFile(path, false))
+                .forEach(rulesFile -> rules.put(rulesFile, new ArrayList<>()));
+        
         final Job rulesReadingJob = Job.createSystem("Reading RfLint rules", monitor -> {
             final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
             final Map<String, RfLintRule> envRules = RfLintRules.getInstance()
-                    .loadRules(() -> env.getRfLintRules(files));
+                    .loadRules(() -> env.getRfLintRules(additionalFiles));
             
             final List<RfLintRule> missingRules = ruleConfigs.entrySet()
                     .stream()
@@ -366,16 +367,11 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             }
 
             for (final RfLintRule rule : envRules.values()) {
-                final RulesFile key = new RulesFile(rule.getFilepath());
+                final RulesFile key = new RulesFile(rule.getFilepath(), true);
                 if (!rules.containsKey(key)) {
                     rules.put(key, new ArrayList<>());
                 }
                 rules.get(key).add(rule);
-            }
-            for (final RulesFile file : rulesFiles) {
-                if (!rules.containsKey(file)) {
-                    rules.put(file, new ArrayList<>());
-                }
             }
 
             rules.values()
@@ -425,22 +421,23 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     @Override
     public boolean performOk() {
-        final String allRulesFiles = rulesFiles.stream().map(RulesFile::getPath).collect(joining(";"));
-        final String allRulesNames = rules.values()
-                .stream()
+        final String allRulesFiles = rules.keySet().stream()
+                .filter(RulesFile::isAdditional)
+                .filter(f -> f != RulesFile.MISSING_SOURCE)
+                .map(RulesFile::getPath)
+                .collect(joining(";"));
+        final String allRulesNames = rules.values().stream()
                 .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getRuleName)
                 .collect(joining(";"));
-        final String allRulesSeverities = rules.values()
-                .stream()
+        final String allRulesSeverities = rules.values().stream()
                 .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getConfiguredSeverity)
                 .map(RfLintViolationSeverity::name)
                 .collect(joining(";"));
-        final String allRulesArgs = rules.values()
-                .stream()
+        final String allRulesArgs = rules.values().stream()
                 .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .map(RfLintRule::getConfiguredArguments)
@@ -457,11 +454,11 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     @Override
     protected void performDefaults() {
-        rulesFiles.clear();
-
         rules.values().stream().flatMap(List::stream).forEach(rule -> rule.configure((RfLintRuleConfiguration) null));
-        reloadRules();
+        final List<RulesFile> toRemove = rules.keySet().stream().filter(RulesFile::isAdditional).collect(toList());
+        toRemove.forEach(rules::remove);
 
+        reloadRules();
         argumentsEditor.loadDefault();
 
         super.performDefaults();
@@ -471,8 +468,8 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         final Consumer<List<RulesFile>> ruleFilesConsumer = files -> {
             boolean added = false;
             for (final RulesFile file : files) {
-                if (!rulesFiles.contains(file)) {
-                    rulesFiles.add(file);
+                if (!rules.containsKey(file)) {
+                    rules.put(file, new ArrayList<>());
                     added = true;
                 }
             }
@@ -498,7 +495,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 final List<RulesFile> rules = Stream.of(chosenFiles)
                         .map(path -> new File(root, path))
                         .map(File::getAbsolutePath)
-                        .map(RulesFile::new)
+                        .map(path -> new RulesFile(path, false))
                         .collect(toList());
                 ruleFilesConsumer.accept(rules);
             }
@@ -534,14 +531,17 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private static final class RulesFile {
         
-        private static final RulesFile MISSING_SOURCE = new RulesFile("Unknown source");
+        private static final RulesFile MISSING_SOURCE = new RulesFile("Unknown source", false);
 
         private String path;
 
+        private final boolean isBuiltIn;
+
         private boolean exists;
 
-        public RulesFile(final String path) {
+        public RulesFile(final String path, final boolean isBuiltIn) {
             this.path = path;
+            this.isBuiltIn = isBuiltIn;
         }
 
         public String getPath() {
@@ -550,6 +550,14 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         public void setPath(final String path) {
             this.path = path;
+        }
+
+        public boolean isBuiltIn() {
+            return isBuiltIn;
+        }
+
+        public boolean isAdditional() {
+            return !isBuiltIn();
         }
 
         public void setExists(final boolean exists) {
@@ -580,18 +588,18 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         @Override
         public Object[] getElements(final Object inputElement) {
             final List<Object> all = new ArrayList<>();
-            final Comparator<RulesFile> comparator = (f1, f2) -> {
-                if (f1 == RulesFile.MISSING_SOURCE) {
-                    return -1;
-                } else if (f2 == RulesFile.MISSING_SOURCE) {
-                    return 1;
-                } else {
-                    return new File(f1.getPath()).compareTo(new File(f2.getPath()));
-                }
-            };
-            Stream.concat(rules.keySet().stream().filter(f -> !rulesFiles.contains(f)).sorted(comparator),
-                    rulesFiles.stream().sorted(comparator))
+            if (rules.containsKey(RulesFile.MISSING_SOURCE)) {
+                all.add(RulesFile.MISSING_SOURCE);
+            }
+            rules.keySet().stream()
+                    .filter(RulesFile::isBuiltIn)
+                    .sorted((f1, f2) -> new File(f1.getPath()).compareTo(new File(f2.getPath())))
                     .forEach(all::add);
+            rules.keySet().stream()
+                    .filter(RulesFile::isAdditional)
+                    .filter(f -> f != RulesFile.MISSING_SOURCE)
+                    .forEach(all::add);
+
             all.add(new ElementAddingToken("rules file", true));
             return all.toArray();
         }
@@ -687,7 +695,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             if (element instanceof RulesFile) {
                 final RulesFile rulesFile = (RulesFile) element;
                 final StyledString label = new StyledString(rulesFile.getPath(), getRulesFileStyler(rulesFile));
-                if (isBuiltInFile(rulesFile)) {
+                if (rulesFile.isBuiltIn()) {
                     label.append(" (built-in)", Stylers.Common.ECLIPSE_DECORATION_STYLER);
                 }
                 return label;
@@ -732,7 +740,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         @Override
         protected CellEditor getCellEditor(final Object element) {
-            if (element instanceof RulesFile && isBuiltInFile((RulesFile) element)) {
+            if (element instanceof RulesFile && ((RulesFile) element).isBuiltIn()) {
                 return null;
             }
             return new AlwaysDeactivatingCellEditor((Composite) getViewer().getControl());
