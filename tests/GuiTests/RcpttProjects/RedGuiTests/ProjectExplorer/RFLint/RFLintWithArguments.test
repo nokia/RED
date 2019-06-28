@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gr19ADQpEeiLWMPOs-qbiA
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/28/19 10:58 AM
+Save-Time: 6/28/19 11:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -94,8 +94,6 @@ with [get-view Problems | get-tree] {
 //add rule form pytohn file    
 get-preferences-menu | click
 set-dialog-result File "platform:/resource/project_a/customRules.py"
-get-window Preferences | get-tree -after [get-link $link] | double-click
-
 get-window Preferences |  get-tree  -after [get-link $link]
 	| get-item "...add new rules file" | double-click
 get-window Preferences | get-button "Apply and Close" | click
