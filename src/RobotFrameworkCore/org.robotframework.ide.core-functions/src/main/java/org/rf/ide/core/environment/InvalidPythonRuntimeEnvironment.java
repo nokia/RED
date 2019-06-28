@@ -119,7 +119,8 @@ public class InvalidPythonRuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public Map<String, Object> getVariablesFromFile(final File source, final List<String> arguments) {
+    public Map<String, Object> getVariablesFromFile(final File source, final List<String> arguments,
+            final EnvironmentSearchPaths additionalPaths) {
         return new LinkedHashMap<>();
     }
 

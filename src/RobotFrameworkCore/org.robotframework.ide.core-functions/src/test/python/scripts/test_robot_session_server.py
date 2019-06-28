@@ -188,10 +188,27 @@ class VariablesRetrievingTests(unittest.TestCase):
     def test_subsequent_calls_for_same_variable_file_name_under_different_paths_return_different_variables(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
-        response1 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'a', 'vars.py'), [])
-        response2 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'b', 'vars.py'), [])
+        response1 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'a', 'vars.py'), [], [])
+        response2 = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'b', 'vars.py'), [], [])
 
         self.assertNotEqual(response1, response2)
+        
+    def test_variables_are_not_returned_for_variable_file_importing_module_not_visible_in_pythonpath(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'vars_modules', 'a', 'b.py'), [], [])
+        
+        self.assertIn('Traceback', response['exception'])
+        self.assertTrue(response['result'] is None)
+        
+    def test_variables_are_returned_for_variable_file_importing_module_visible_in_pythonpath(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        additional_path = os.path.join(parent_path, 'res_test_robot_session_server', 'vars_modules')
+
+        response = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'vars_modules', 'a', 'b.py'), [], [additional_path])
+        
+        self.assertTrue(response['exception'] is None)
+        self.assertDictEqual(response['result'], {'x':'1', 'y':'2', 'z':'3'})
 
 
 class RobotFilesConvertingTests(unittest.TestCase):

@@ -24,7 +24,7 @@ interface RobotCommandExecutor {
 
     List<String> getClassesFromModule(File moduleLocation, EnvironmentSearchPaths additionalPaths);
 
-    Map<String, Object> getVariables(File source, List<String> arguments);
+    Map<String, Object> getVariables(File source, List<String> arguments, EnvironmentSearchPaths additionalPaths);
 
     Map<String, Object> getGlobalVariables();
 

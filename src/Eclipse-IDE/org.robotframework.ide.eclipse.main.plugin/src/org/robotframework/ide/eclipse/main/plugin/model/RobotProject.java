@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.environment.RobotVersion;
@@ -321,7 +322,13 @@ public class RobotProject extends RobotContainer {
         referencedVariableFiles = new ArrayList<>();
         for (final ReferencedVariableFile varFile : config.getReferencedVariableFiles()) {
             try {
-                final Map<String, Object> varsMap = env.getVariablesFromFile(findSource(varFile), new ArrayList<>());
+                final List<String> pythonPaths = new RobotProjectPathsProvider(this).createPathsProvider()
+                        .provideUserSearchPaths()
+                        .stream()
+                        .map(File::getAbsolutePath)
+                        .collect(toList());
+                final Map<String, Object> varsMap = env.getVariablesFromFile(findSource(varFile), new ArrayList<>(),
+                        new EnvironmentSearchPaths(new ArrayList<>(), pythonPaths));
                 varFile.setVariables(varsMap);
                 referencedVariableFiles.add(varFile);
             } catch (final RuntimeEnvironmentException e) {

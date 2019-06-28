@@ -166,9 +166,10 @@ public class RobotRuntimeEnvironment implements IRuntimeEnvironment {
     }
 
     @Override
-    public Map<String, Object> getVariablesFromFile(final File source, final List<String> arguments) {
+    public Map<String, Object> getVariablesFromFile(final File source, final List<String> arguments,
+            final EnvironmentSearchPaths additionalPaths) {
         final RobotCommandExecutor executor = executors.getRobotCommandExecutor(location);
-        return executor.getVariables(source, arguments);
+        return executor.getVariables(source, arguments, additionalPaths);
     }
 
     @Override

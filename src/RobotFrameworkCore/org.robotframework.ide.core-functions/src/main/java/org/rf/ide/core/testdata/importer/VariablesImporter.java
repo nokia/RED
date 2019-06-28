@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.importer;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
@@ -93,8 +96,14 @@ public class VariablesImporter {
                         // could not find import reference in project, so will ask interpreter
                         Map<?, ?> variablesFromFile = new HashMap<>();
                         try {
+                            final List<String> pythonPaths = pathsProvider.provideUserSearchPaths()
+                                    .stream()
+                                    .map(File::getAbsolutePath)
+                                    .collect(toList());
+
                             variablesFromFile = robotProject.getRuntimeEnvironment()
-                                    .getVariablesFromFile(varFile, varFileArguments);
+                                    .getVariablesFromFile(varFile, varFileArguments,
+                                            new EnvironmentSearchPaths(new ArrayList<>(), pythonPaths));
                         } catch (final Exception e) {
                             reportError(String.format("Problem importing variable file '%s'. %s", path, e.getMessage()),
                                     currentRobotFile, varImport, robotFile);

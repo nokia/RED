@@ -63,7 +63,8 @@ public interface IRuntimeEnvironment {
 
     Map<String, Object> getGlobalVariables();
 
-    Map<String, Object> getVariablesFromFile(File source, List<String> arguments);
+    Map<String, Object> getVariablesFromFile(File source, List<String> arguments,
+            EnvironmentSearchPaths additionalPaths);
 
     List<RfLintRule> getRfLintRules(List<String> rulesFiles);
 

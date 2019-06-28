@@ -122,11 +122,12 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final File source, final List<String> arguments) {
+    public Map<String, Object> getVariables(final File source, final List<String> arguments,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
             final Map<String, Object> variables = new LinkedHashMap<>();
             final Map<?, ?> varToValueMapping = (Map<?, ?>) callRpcFunction("getVariables", source.getAbsolutePath(),
-                    arguments);
+                    arguments, additionalPaths.getExtendedPythonPaths(interpreterType));
             for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
                 variables.put((String) entry.getKey(), entry.getValue());
             }
