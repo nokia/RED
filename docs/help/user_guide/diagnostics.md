@@ -1,54 +1,63 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../help/user_guide/user_guide.html">User guide</a> &gt; 
 
-## Diagnostics
-
-### Session server
-
-RED is using small python script `robot_session_server.py` as a bridge between
-the IDE itself and your **Robot Framework** installation. This is needed for
-various reasons: checking RF version so that files are validated accordingly,
-generating library documentations, running **RfLint** , providing variables
-from python files and so on.
-
-Sometimes when diagnosing problems with RED it may be desirable to take a look
-at operations performed by `robot_session_server.py` process. By default this
-server runs in background invisibly for users. There are however two
-possibilities to have a deeper look.
-
-#### 1\. Displaying server console
-
-  1. Exit RED 
-  2. edit `RED.ini` file (or `eclipse.ini` if you're using eclipse with RED installed as a feature) 
-  3. add `-Dred.showSessionConsole=true` line somewhere after `-vmargs` line 
-  4. start RED/eclipse again 
-
-After starting again there should be server output visible in **Console**
-view. Server is logging every call coming from RED together with arguments as
-well as results/exceptions of that call.
-
-#### 2\. Running server manually and connecting to it
-
-Firstly server script files has to be obtained. They can be downloaded from [
+<h2>Diagnostics</h2>
+<h3>Session server</h3>
+<p>RED is using small python script <code>robot_session_server.py</code> as a bridge between the IDE itself and
+your <b>Robot Framework</b> installation. This is needed for various reasons: checking RF version so that files
+are validated accordingly, generating library documentations, running <b>RfLint</b>, providing variables from 
+python files and so on.
+</p>
+<p>Sometimes when diagnosing problems with RED it may be desirable to take a look at operations performed by 
+<code>robot_session_server.py</code> process. By default this server runs in background invisibly for users.
+There are however two possibilities to have a deeper look. 
+</p>
+<h4>1. Displaying server console</h4>
+<ol>
+<li>Exit RED
+    </li>
+<li>edit <code>RED.ini</code> file (or <code>eclipse.ini</code> if you're using eclipse with RED installed as 
+    a feature)
+    </li>
+<li>add <code>-Dred.showSessionConsole=true</code> line somewhere after <code>-vmargs</code> line
+    </li>
+<li>start RED/eclipse again
+    </li>
+</ol>
+<p>After starting again there should be server output visible in <b>Console</b> view. Server is logging every call
+coming from RED together with arguments as well as results/exceptions of that call.
+</p>
+<h4>2. Running server manually and connecting to it</h4>
+<p>Firstly server script files has to be obtained. They can be downloaded from 
+<a class="external" href="https://github.com/nokia/RED/tree/master/src/RobotFrameworkCore/org.robotframework.ide.core-functions/src/main/python/scripts" target="_blank">
 GitHub
-](https://github.com/nokia/RED/tree/master/src/RobotFrameworkCore/org.robotframework.ide
-.core-functions/src/main/python/scripts) (all files except
-`TestRunnerAgent.py` are needed). Alternatively those files can be copied from
-temporary directory of your system when RED is running: go to temporary
-directory and look for a directory with name starting from `RobotTempDir`
-containing same python files as on GitHub.
-
-  1. Start server by issuing: 
-
-python robot_session_server.py 12345
-
-in command line
-
-  2. this will start server on port `12345` at `localhost`
-  3. exit RED 
-  4. edit `RED.ini` file (or `eclipse.ini` if you're using eclipse with RED installed as a feature) 
-  5. add `-Dred.connectToServerAt=127.0.0.1:12345` line somewhere after `-vmargs` line 
-  6. start RED/eclipse again 
-
-After starting again RED should connect to manually started session server.
-
+</a> (all files except <code>TestRunnerAgent.py</code> are needed). Alternatively those files can be copied from
+temporary directory of your system when RED is running: go to temporary directory and look for a directory with
+name starting from <code>RobotTempDir</code> containing same python files as on GitHub.
+</p>
+<ol>
+<li>Start server by issuing:
+        <div class="code">python robot_session_server.py 12345
+        </div>
+        in command line
+    </li>
+<li>this will start server on port <code>12345</code> at <code>localhost</code>
+</li>
+<li>exit RED
+    </li>
+<li>edit <code>RED.ini</code> file (or <code>eclipse.ini</code> if you're using eclipse with RED installed as 
+    a feature)
+    </li>
+<li>add <code>-Dred.connectToServerAt=127.0.0.1:12345</code> line somewhere after <code>-vmargs</code> line
+    </li>
+<li>start RED/eclipse again
+    </li>
+</ol>
+<p>After starting again RED should connect to manually started session server. 
+</p>
+</body>
+</html>

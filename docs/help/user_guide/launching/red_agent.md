@@ -1,74 +1,84 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
-[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
-
-## RED Agent
-
-RED Tests Runner Agent is something of which you should be aware if you're
-planning to [launch tests using remote configuration](remote_launch.md) or
-if you're [writing own script](local_launch_scripting.md) which will run the
-tests in local configuration. The agent is a python script which should be
-attached to test execution as a listener (see [ Listener interface
-](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html
-#listener-interface) topic in RF User Guide).
-
-Agent is responsible for listening to execution events happening in running
-tests, so without agent both **Message Log** and **Execution** views will not
-work. The script is also responsible for stopping/resuming tests on
-breakpoints, so RED debugging capabilities also only work when agent was
-injected into tests execution.
-
-### Obtaining agent script
-
-You can always obtain agent script from RED within Preferences dialog (at `[
-Window -> Preferences -> Robot Framework -> Default Launch Configurations
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))`,
-use **Export Client Script** button). Additionally the file may be saved
-straight from launch configuration dialog.
-
-Warning
-
-    Agent script is a subject of changes, so it may happen that script exported from RED version `x` is not able to work properly with RED version `y` and vice versa. From version `0.7.6` onwards both script and RED are checking and handling this when establishing connection, so you will be notified. **Important** : script taken from RED older than `0.7.6` will not work with newer RED and vice-versa without notifying you (possibly even hanging infinitely). 
-
-### Taking agent into Robot Tests execution
-
-Agent script have to be injected into Robot tests using [ listeners
-mechanism](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html
-#listener-interface). When starting Robot execution pass the listener as
-follows:
-
-` _robot_ --listener /path/to/script/TestRunnerAgent.py:ARG1:ARG2:ARG3
-_other_arguments_ `
-
-Agent script can take up to 3 arguments which are added to script path after
-colon ( **:** ) separator, the arguments themselves are also separated with a
-colon ( **:** ). The arguments are:
-
-  * **HOST** \- IP number of a server to which agent should connect and send execution data, 
-  * **PORT** \- port number of a server, 
-  * **TIMEOUT** \- when connecting to server agent will try to connect as long as the timeout is reached (in seconds) 
-
-  * When script is used with only one parameter it has to be the **PORT** number: 
-
-` _robot_ --listener /path/to/script/TestRunnerAgent.py:12345
-_other_arguments_ `
-
-in this case `HOST=localhost`, `PORT=12345` and `TIMEOUT=30`
-
-  * When script is used with two parameters it has to be the **HOST** and **PORT** number (in this order): 
-
-` _robot_ --listener /path/to/script/TestRunnerAgent.py:192.168.0.5:54321
-_other_arguments_ `
-
-in this case `HOST=192.168.0.5`, `PORT=54321` and `TIMEOUT=30`
-
-  * When script is used with three parameters it all of them has to be defined (in **HOST** , **PORT** , **TIMEOUT** order): 
-
-` _robot_ --listener /path/to/script/TestRunnerAgent.py:192.168.0.7:12321:60
-_other_arguments_ `
-
-in this case `HOST=192.168.0.7`, `PORT=12321` and `TIMEOUT=60`
-
-  
-  
-
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
+	<h2>RED Agent</h2>
+<p>RED Tests Runner Agent is something of which you should be aware if you're planning 
+	to <a href="remote_launch.html">launch tests using remote configuration</a> or if you're 
+	<a href="local_launch_scripting.html">writing own script</a> which will run the tests in 
+	local configuration. The agent is a python script which should be attached to test execution as a listener (see 
+	<a class="external" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface" target="_blank">
+	Listener interface
+	</a> topic in RF User Guide).
+	</p>
+<p>Agent is responsible for listening to execution events happening in running tests, so without agent
+	both <b>Message Log</b> and <b>Execution</b> views will not work. The script is also responsible for
+	stopping/resuming tests on breakpoints, so RED debugging capabilities also only work when agent 
+	was injected into tests execution.
+	</p>
+<h3>Obtaining agent script</h3>
+<p>You can always obtain agent script from RED within Preferences dialog
+	(at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
+	Window -&gt; Preferences -&gt; Robot Framework -&gt; Default Launch Configurations
+	</a></code>, use <b>Export Client Script</b> button). Additionally the file may be saved
+	straight from launch configuration dialog.
+	</p>
+<dl class="warning">
+<dt>Warning</dt>
+<dd>Agent script is a subject of changes, so it may happen that script exported from RED version
+	   <code>x</code> is not able to work properly with RED version <code>y</code> and 
+	   vice versa. From version <code>0.7.6</code> onwards both script and RED are checking and handling
+	   this when establishing connection, so you will be notified. <b>Important</b>: script taken from RED older than 
+	   <code>0.7.6</code> will not work with newer RED and vice-versa without notifying you
+	   (possibly even hanging infinitely).
+	   </dd>
+</dl>
+<h3 id="command_line_usage">Taking agent into Robot Tests execution</h3>
+<p>Agent script have to be injected into Robot tests using 
+	<a class="external" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface" target="_blank">
+	listeners mechanism</a>. When starting Robot execution pass the listener as follows:
+	</p>
+<div class="code"><code>
+<i>robot</i> --listener /path/to/script/TestRunnerAgent.py:ARG1:ARG2:ARG3 <i>other_arguments</i>
+</code></div>
+<p>Agent script can take up to 3 arguments which are added to script path after colon (<b>:</b>) separator, 
+	the arguments themselves are also separated with a colon (<b>:</b>). The arguments are:
+	</p>
+<ul>
+<li><b>HOST</b> - IP number of a server to which agent should connect and send execution data,
+		<li><b>PORT</b> - port number of a server,
+		<li><b>TIMEOUT</b> - when connecting to server agent will try to connect as long as the timeout is reached
+		(in seconds)  
+		</li>
+</li></li></ul>
+<ul>
+<li>
+			When script is used with only one parameter it has to be the <b>PORT</b> number:
+			<div class="code"><code>
+<i>robot</i> --listener /path/to/script/TestRunnerAgent.py:12345 <i>other_arguments</i>
+</code></div>
+			in this case <code>HOST=localhost</code>, <code>PORT=12345</code> and <code>TIMEOUT=30</code><p></p>
+</li>
+<li>
+			When script is used with two parameters it has to be the <b>HOST</b> and <b>PORT</b>
+			number (in this order):
+			<div class="code"><code>
+<i>robot</i> --listener /path/to/script/TestRunnerAgent.py:192.168.0.5:54321 <i>other_arguments</i>
+</code></div>
+			in this case <code>HOST=192.168.0.5</code>, <code>PORT=54321</code> and <code>TIMEOUT=30</code><p></p>
+</li>
+<li>
+			When script is used with three parameters it all of them has to be defined (in <b>HOST</b>, <b>PORT</b>, 
+			<b>TIMEOUT</b> order):
+			<div class="code"><code>
+<i>robot</i> --listener /path/to/script/TestRunnerAgent.py:192.168.0.7:12321:60 <i>other_arguments</i>
+</code></div>
+			in this case <code>HOST=192.168.0.7</code>, <code>PORT=12321</code> and <code>TIMEOUT=60</code>
+</li>
+</ul>
+<br/>
+<br/>
+</body>
+</html>

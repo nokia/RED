@@ -1,41 +1,40 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
-[Validation](http://nokia.github.io/RED/help/user_guide/validation.md) >
-
-## Limiting validation scope
-
-When working with bigger projects, it is good to limit validation scope to
-project parts relevant to current work to speed up validation and reduce test
-error markers to be relevant to files under scope.
-
-Excluded project parts are still parsed so code completion is preserved, just
-validation is omitted thus validation errors and warnings are skipped for
-excluded folders.
-
-Note
-
-    Excluded project parts will be skipped also in other features connected to validation like Library Autodiscovering and Robot Framework Lint analysis. 
-
-Include/exclude can be triggered in Project Explorer under right click menu on
-selected folders:
-
-![](images/exclude_1.png)
-
-Include/exclude can also be found in red.xml editor under Validation table -
-include/exclude action is available as right click menu.
-
-Note
-
-    All hidden project parts (files and folders with names starting with ".") are automatically excluded from validation. 
-
-In case of big amounts of .txt or .tsv files which are not Robot test cases,
-validation can be excluded on files bigger than size threshold.
-
-Note
-
-    File size limit is not taken into account during validation of files currently edited within Suite Editor. 
-![](images/exclude_2.png)
-
-Note that exclude folders are grayed out, exclude state is inherited from
-parent folders.
-
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/validation.html">Validation</a> &gt; 
+<h2>Limiting validation scope</h2>
+<p>When working with bigger projects, it is good to limit validation scope to project parts relevant to current work to 
+speed up validation and reduce test error markers to be relevant to files under scope.
+</p>
+<p>Excluded project parts are still parsed so code completion is preserved, just validation is omitted thus validation 
+errors and warnings are skipped for excluded folders.
+</p>
+<dl class="note">
+<dt>Note</dt>
+<dd>Excluded project parts will be skipped also in other features connected to validation like Library Autodiscovering and Robot Framework Lint analysis.
+   </dd>
+</dl>
+<p>Include/exclude can be triggered in Project Explorer under right click menu on selected folders:</p>
+<img src="images/exclude_1.png"/>
+<p>Include/exclude can also be found in red.xml editor under Validation table - include/exclude action is available 
+as right click menu.
+</p>
+<dl class="note">
+<dt>Note</dt>
+<dd>All hidden project parts (files and folders with names starting with ".") are automatically excluded from validation.
+   </dd>
+</dl>
+<p>In case of big amounts of .txt or .tsv files which are not Robot test cases, validation can be excluded on files 
+bigger than size threshold.</p>
+<dl class="note">
+<dt>Note</dt>
+<dd>File size limit is not taken into account during validation of files currently edited within Suite Editor.
+   </dd>
+</dl>
+<img src="images/exclude_2.png"/>
+<p>Note that exclude folders are grayed out, exclude state is inherited from parent folders.
+</p>
+</body>
+</html>

@@ -1,31 +1,19 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
-[Working with
-RED](http://nokia.github.io/RED/help/user_guide/working_with_RED.md) >
-
-## Custom python/class paths and path relativeness
-
-Settings available in **`red.xml -> Libraries`**
-
-### Custom python/class paths
-
-Certain RED usage scenarios such as library development, requires custom path
-for python/jython interpreter to fulfill dependencies.  
-Either this can be done on OS level by updating environment variables or can
-be included in red.xml.  
-Path entries can be absolute or relative, they will be taken into use anytime
-when interpreter executes (testcase and debug run or libdoc generation).  
-  
-  
-![](images/custom_path.png)  
-  
-
-### Path relativeness
-
-By default, relative paths are resolved around Project scope although in some
-scenarios like storing Robot testsuites in one project and libraries in other,
-there is a need to change relativeness regards to Workspace.  
-This can be changed in **`red.xml -> Libraries -> Paths`** part.  
-**Note that relativeness setting is used together with class/python path and
-libraries only.**
-
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/working_with_RED.html">Working with RED</a> &gt; 
+<h2>Custom python/class paths and path relativeness</h2>
+Settings available in <b><code>red.xml -&gt; Libraries</code></b>
+<h3>Custom python/class paths</h3>
+Certain RED usage scenarios such as library development, requires custom path for python/jython interpreter to fulfill dependencies. <br/>
+Either this can be done on OS level by updating environment variables or can be included in red.xml.<br/>
+Path entries can be absolute or relative, they will be taken into use anytime when interpreter executes (testcase and debug run or libdoc generation). <br/>
+<br/><br/><img src="images/custom_path.png"/> <br/><br/>
+<h3>Path relativeness</h3>
+By default, relative paths are resolved around Project scope although in some scenarios like storing Robot testsuites in one project and libraries in other, there is a need to change relativeness regards to Workspace.<br/>
+This can be changed in <b><code>red.xml -&gt; Libraries -&gt; Paths</code></b> part.
+<br/><b>Note that relativeness setting is used together with class/python path and libraries only.</b>
+</body>
+</html>

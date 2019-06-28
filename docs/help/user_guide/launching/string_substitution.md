@@ -1,78 +1,66 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
-[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
-
-## Parameterizing launches
-
-Eclipse string substitution feature allows using built-in or custom variables
-in different places - for example in launch configurations where they are
-resolved and replaced with their values prior to launch.
-
-### Using variables
-
-![](images/ui_eclipse_variables_usage.png)
-
-In the example above built-in `${workspace_loc}` variable is used to change
-the output directory where Robot will put log or report files.
-
-In places where using variables is possible there is additional button which
-opens variables selection dialog:
-
-![](images/ui_eclipse_variables.png)
-
-RED accepts string substitution variables in following locations:
-
-  * **Launch configuration** dialog: **Robot** tab - for setting additional Robot Framework arguments, 
-  * **Launch configuration** dialog: **Executor** tab - for setting additional interpreter or additional executable file arguments as well as executable file path,
-  * **RfLint validation** preference page - for setting additional arguments,
-  * **Default launch configuration** preference page - in fields corresponding to those in **Launch configuration dialog**.
-
-When tests are run or RfLint validation is started RED replaces all known
-variables in command line with actual string values.
-
-### Creating custom variables
-
-Custom string substitution variables can be created and configured at `[
-Window -> Preferences -> Run/Debug -> String
-Substitution](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage\)"\))`
-preference page.
-
-### Overriding custom variables in variables sets
-
-Once variables are used in launch configurations it would be sometimes useful
-to be able to switch between different values. For example the launch
-configuration may add `--variablefile path/to/file${env_no}.py` so that it
-would be possible to execute tests with e.g. `file1.py` or `file7.py`. Of
-course value of custom variable can be freely changed at **String
-Substitution** preference page but this could be tedious task when executing
-tests against multiple variable files.
-
-In order to be able to quickly change between different values the RED Active
-string substitution sets feature can be used.
-
-### Defining different variables sets
-
-The variables sets can be configured at `[ Window -> Preferences -> Robot
-Framework -> Launching -> Active String Substitution
-sets](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets\)"\))`
-preference page:
-
-![](images/ui_active_variables.png)
-
-Each set defined here provides possibility to differently override values of
-custom string variables and there can be multiple sets defined. In the example
-above the `${env_no}` is differently overridden in two sets while `${var}` is
-not overridden and default value will be always used (the empty string in this
-case).
-
-### Changing active variables set
-
-At given point in time at most one set can be made _active_. RED would use
-values from this set when resolving those variables prior to launch. Active
-set can be chosen either at the preference page (using context menu option) or
-from main toolbar in application thus providing quick shortcut to switch
-between different sets of values as depicted below:
-
-![](images/ui_active_variables_toolbar.png)  
-  
-
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
+	<h2>Parameterizing launches</h2>
+<p>Eclipse string substitution feature allows using built-in or custom variables in different places - for example
+	in launch configurations where they are resolved and replaced with their values prior to launch.
+	</p>
+<h3>Using variables</h3>
+<img src="images/ui_eclipse_variables_usage.png"/>
+<p>In the example above built-in <code>${workspace_loc}</code> variable is used to change the output directory where
+	Robot will put log or report files.
+	</p>
+<p>In places where using variables is possible there is additional button which opens variables selection dialog:
+	</p>
+<img src="images/ui_eclipse_variables.png"/>
+<p>RED accepts string substitution variables in following locations:</p>
+<ul>
+<li><b>Launch configuration</b> dialog: <b>Robot</b> tab -  for setting additional Robot Framework arguments,
+		</li>
+<li><b>Launch configuration</b> dialog: <b>Executor</b> tab - for setting additional interpreter or additional 
+		executable file arguments as well as executable file path,</li>
+<li><b>RfLint validation</b> preference page - for setting additional arguments,</li>
+<li><b>Default launch configuration</b> preference page - in fields corresponding to those in 
+		<b>Launch configuration dialog</b>.</li>
+</ul>
+<p>When tests are run or RfLint validation is started RED replaces all known variables in command line with actual 
+	string values.
+	</p>
+<h3>Creating custom variables</h3>
+<p>Custom string substitution variables can be created and configured at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage)")'>
+    Window -&gt; Preferences -&gt; Run/Debug -&gt; String Substitution</a></code> preference page.
+    </p>
+<h3>Overriding custom variables in variables sets</h3>
+<p>Once variables are used in launch configurations it would be sometimes useful to be able to switch between
+    different values. For example the launch configuration may add <code>--variablefile path/to/file${env_no}.py</code>
+    so that it would be possible to execute tests with e.g. <code>file1.py</code> or <code>file7.py</code>. Of course
+    value of custom variable can be freely changed at <b>String Substitution</b> preference page but this could be
+    tedious task when executing tests against multiple variable files. 
+    </p>
+<p>In order to be able to quickly change between different values the RED Active string substitution sets feature
+    can be used.
+    </p>
+<h3>Defining different variables sets</h3>
+<p>The variables sets can be configured at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets)")'>
+    Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching -&gt; Active String Substitution sets</a></code> preference page:
+    </p>
+<img src="images/ui_active_variables.png"/>
+<p>Each set defined here provides possibility to differently override values of custom string variables and
+    there can be multiple sets defined. In the example above the <code>${env_no}</code> is differently overridden
+    in two sets while <code>${var}</code> is not overridden and default value will be always used (the empty string
+    in this case).
+    </p>
+<h3>Changing active variables set</h3>
+<p>At given point in time at most one set can be made <i>active</i>. RED would use values from this set when
+    resolving those variables prior to launch. Active set can be chosen either at the preference page (using context
+    menu option) or from main toolbar in application thus providing quick shortcut to switch between different sets
+    of values as depicted below:
+    </p>
+<img src="images/ui_active_variables_toolbar.png"/>
+<br/>
+<br/>
+</body>
+</html>

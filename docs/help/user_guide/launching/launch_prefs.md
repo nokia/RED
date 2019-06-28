@@ -1,41 +1,49 @@
-[RED - Robot Editor User Guide](http://nokia.github.io/RED/help/index.md) >
-[User guide](http://nokia.github.io/RED/help/user_guide/user_guide.md) >
-[Launching Tests](http://nokia.github.io/RED/help/user_guide/launching.md) >
-
-## Launching preferences
-
-### General launching preferences
-
-General preferences used when launching Robot tests can be found at `[ Window
--> Preferences -> Robot Framework ->
-Launching](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch\)'\))`
-preference page. Following settings can be changed:
-
-  * **Pass Robot arguments using arguments file** \- when enabled RED will put all the Robot arguments inside arguments file (temporary file) and call Robot using `--argumentfile` argument; when disabled all the Robot arguments are passed directly in command line call. 
-  * **Pass selected suite as data source** \- when enabled RED will use path to suite during single suite execution (Robot `__init__` files from outside that data source will not be run); when disabled path to project is used as data source, even for single suite run. 
-  * **Pass Robot execution command line as single argument** \- when tests are [launched using custom executable file](local_launch_scripting.md) the actual command line call is either passed as a single argument (when preference is enabled) or simply as a sequence of arguments (when disabled). 
-  * **Limit Message Log output** \- when enabled RED will apply provided characters limit in Message Log view. 
-
-### Default launch configurations
-
-All arguments which are set at `[ Window -> Preferences -> Robot Framework ->
-Launching -> Default Launch
-Configurations](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))`
-preference page will be used by RED when new launch configuration is
-automatically created. This may happen for example when launching suites from
-**Project Explorer** and there is no launch configuration matching selected
-suites (read [launching](ui_elements.html#launching) paragraph to see when RED
-automatically creates launch configurations).
-
-Note
-
-    Additional arguments and executable file path preferences accept Eclipse [string variables](string_substitution.md).
-
-### Default behavior of Run/Debug actions
-
-Run and Debug actions, depending on preferences, can use previously used or
-created launch configuration or create a new one. Standard behavior can be
-changed at `[ Window -> Preferences -> Run/Debug ->
-Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))`
-under Launch Operation.
-
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
+	<h2>Launching preferences</h2>
+<h3>General launching preferences</h3>
+<p>General preferences used when launching Robot tests can be found at
+	<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch)')">
+	Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching</a></code>
+	preference page. Following settings can be changed:
+	</p>
+<ul>
+<li><b>Pass Robot arguments using arguments file</b> - when enabled RED will put all the Robot arguments
+		inside arguments file (temporary file) and call Robot using <code>--argumentfile</code> argument; when
+		disabled all the Robot arguments are passed directly in command line call.
+		</li>
+<li><b>Pass selected suite as data source</b> - when enabled RED will use path to suite during single suite execution (Robot <code>__init__</code> files from outside that data source will not be run); when
+		disabled path to project is used as data source, even for single suite run.
+		</li>
+<li><b>Pass Robot execution command line as single argument</b> - when tests are 
+		<a href="local_launch_scripting.html">launched using custom executable file</a> the actual command line call is either
+		passed as a single argument (when preference is enabled) or simply as a sequence of arguments (when disabled).
+		</li>
+<li><b>Limit Message Log output</b> - when enabled RED will apply provided characters limit in Message Log view.
+		</li>
+</ul>
+<h3>Default launch configurations</h3>
+<p>All arguments which are set at 
+	<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
+	Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching -&gt; Default Launch Configurations</a></code>
+	preference page will be used by RED when new launch configuration is automatically created. This may happen
+	for example when launching suites from <b>Project Explorer</b> and there is no launch configuration matching
+	selected suites (read <a href="ui_elements.html#launching">launching</a> paragraph to see when RED automatically
+	creates launch configurations).    
+	</p>
+<dl class="note">
+<dt>Note</dt>
+<dd>Additional arguments and executable file path preferences accept Eclipse <a href="string_substitution.html">string variables</a>.</dd>
+</dl>
+<h3>Default behavior of Run/Debug actions</h3>
+<p>
+    Run and Debug actions, depending on preferences, can use previously used or created launch configuration or create a new one.
+    Standard behavior can be changed at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage)")'>
+    Window -&gt; Preferences -&gt; Run/Debug -&gt; Launching</a></code> under Launch Operation.
+    </p>
+</body>
+</html>
