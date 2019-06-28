@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -36,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImportsValidator {
@@ -80,19 +82,34 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         validateWithSpec(spec, path, pathToken, arguments, true);
     }
 
-    private LibrarySpecification findSpecification(final IPath candidate) {
+    @VisibleForTesting
+    protected LibrarySpecification findSpecification(final IPath candidate) {
         final Map<LibraryDescriptor, LibrarySpecification> libs = validationContext
                 .getReferencedLibrarySpecifications();
         for (final LibraryDescriptor descriptor : libs.keySet()) {
             final IPath entryPath = new Path(descriptor.getPath());
             IPath libPath = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-            if (candidate.equals(libPath)) {
-                return libs.get(descriptor);
-            }
-            if ("__init__.py".equals(entryPath.lastSegment())) {
-                libPath = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.removeLastSegments(1));
+            if (RedSystemProperties.isWindowsPlatform()) {
+                if (candidate.toPortableString().equalsIgnoreCase(libPath.toPortableString())) {
+                    return libs.get(descriptor);
+                }
+                if ("__init__.py".equals(entryPath.lastSegment())) {
+                    libPath = RedWorkspace.Paths
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.removeLastSegments(1));
+                    if (candidate.toPortableString().equalsIgnoreCase(libPath.toPortableString())) {
+                        return libs.get(descriptor);
+                    }
+                }
+            } else {
                 if (candidate.equals(libPath)) {
                     return libs.get(descriptor);
+                }
+                if ("__init__.py".equals(entryPath.lastSegment())) {
+                    libPath = RedWorkspace.Paths
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.removeLastSegments(1));
+                    if (candidate.equals(libPath)) {
+                        return libs.get(descriptor);
+                    }
                 }
             }
         }

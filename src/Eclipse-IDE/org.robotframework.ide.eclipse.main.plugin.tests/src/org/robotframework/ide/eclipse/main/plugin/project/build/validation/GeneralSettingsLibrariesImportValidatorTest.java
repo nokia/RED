@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
+import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryConstructor;
@@ -641,6 +643,20 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         assertThat(reporter.getReportedProblems())
                 .contains(new Problem(GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
+                        new ProblemPosition(2, Range.closed(26, 26 + absPath.length()))));
+    }
+
+    @Test
+    public void onlyOneMarkerIsReported_whenFileIsImportedFromOutsideOfWorkspaceByPoKeMoNPath_onWindows() {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "ExTeRnAl_NeStEd_LiB.py");
+
+        final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
+        validateLibraryImport(absPath);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
                         new ProblemPosition(2, Range.closed(26, 26 + absPath.length()))));
     }
 

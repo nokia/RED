@@ -7,11 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.rf.ide.core.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
 public class RobotSettingTest {
@@ -65,6 +70,38 @@ public class RobotSettingTest {
                 newArrayList("# c"))) {
             assertThat(setting.getArguments()).containsExactly("a", "b", "c", "d", "e");
         }
+    }
+
+    @Test
+    public void pathMatches_specificationWithSameLibraryPath() {
+        final String libPath = "path/to/lib.py";
+        IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        absolute = absolute.append(libPath);
+        final IPath libIPath = new Path(libPath);
+
+        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+    }
+
+    @Test
+    public void pathDoesNotMatch_specificationWithAnotherLibraryPath() {
+        final String libPath = "path/to/lib.py";
+        IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        absolute = absolute.append("path/to/another_lib.py");
+        final IPath libIPath = new Path(libPath);
+
+        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isFalse();
+    }
+
+    @Test
+    public void pathMatches_specificationWithPoKeMoNLibraryPath_onWindows() {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final String libPath = "PaTh/To/LiB.py";
+        IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        absolute = absolute.append("path/to/lib.py");
+        final IPath libIPath = new Path(libPath);
+
+        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
     }
 
     private static void assertNames(final List<RobotKeywordCall> settings) {
