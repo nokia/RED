@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gr19ADQpEeiLWMPOs-qbiA
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/19/19 11:39 AM
+Save-Time: 6/28/19 10:58 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,7 +20,10 @@ Entry-Name: .content
 //  pip install --upgrade robotframework-lint
 //
 
-
+global [val link [format "Configure rules and their severity. Following rules are available for RfLint installed in "
+    + "<a href=\"org.robotframework.ide.eclipse.main.plugin.preferences.installed\">%s</a> environment:" [replace -input $python_exe_path -old "\\" -new  "\\\\\\\\"]]]
+ 
+ 
 //open preference and add arg file with full path
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
@@ -53,19 +56,21 @@ with [get-view Problems | get-tree] {
 //change rule in table - now TrailingBlankLines is error
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-tab-folder | get-tab-item Rules | click
-    with [get-table] {
-        get-cell 15 1 | click
-        get-cell 15 1 | mouse down -count 2
+    with [get-tree 
+        -after [get-link $link]] {
+        get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)" $sys_sep $sys_sep $sys_sep] | expand
+        get-cell 4 1 | click
+        get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)" $sys_sep $sys_sep $sys_sep]  | expand
+        get-cell 4 1 | mouse down -count 2
         double-click
-        select TrailingBlankLines | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+        select [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/TrailingBlankLines" $sys_sep $sys_sep $sys_sep]
+            | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+        get-cell 4 1 | mouse up -count 2
         get-combo | select Error
         apply-cell-edit -deactivate
     }
-    get-button Apply | click
     get-button "Apply and Close" | click
 }
-
 //run analize and check if one warning was changed to error
 get-view "Project Explorer" | get-tree | select "project_a/test3.robot" | get-menu 
 	-path "Robot Framework/Run RfLint analysis" | click
@@ -89,13 +94,15 @@ with [get-view Problems | get-tree] {
 //add rule form pytohn file    
 get-preferences-menu | click
 set-dialog-result File "platform:/resource/project_a/customRules.py"
-with [get-window Preferences] {
-    get-table -after [get-label "Additional rules files"] |  get-item "...add new rules file" | double-click
-    get-button "Apply and Close" | click
-}
+get-window Preferences | get-tree -after [get-link $link] | double-click
+
+get-window Preferences |  get-tree  -after [get-link $link]
+	| get-item "...add new rules file" | double-click
+get-window Preferences | get-button "Apply and Close" | click
+
 get-view "Project Explorer" | get-tree | select "project_a/test3.robot" | get-menu 
     -path "Robot Framework/Run RfLint analysis" | click
-    
+        
 //set new file using workspace_path variable (other rules are removed)
 get-preferences-menu | click
 get-window Preferences | get-button "Restore Defaults" | click
@@ -113,6 +120,7 @@ exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu -path "Robot Framework/Run RfLint analysis" | click
 } -allowStatusDialog    
     
+wait-for-errors -amount 3 -times 3 -delay 1000    
 //check new errors     
 with [get-view Problems | get-tree] {
     get-item -path "Errors \\(3 items\\)" | get-property "getItems().TreeItem[0].getText()" 
