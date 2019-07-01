@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/1/19 11:26 AM
+Save-Time: 7/1/19 4:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -331,12 +331,6 @@ with [get-window Preferences | get-tree
 with [get-window Preferences | get-tree 
     -after [get-link $link]] {
     get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/LineTooLong"  $sys_sep $sys_sep $sys_sep]
-        | get-property "styles[0].font" | equals "Font {252322823}" | verify-true
-    get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/LineTooLong"  $sys_sep $sys_sep $sys_sep]
-        | get-property "styles[1].font" | equals "Font {252322823}" | verify-true
-    get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/LineTooLong"  $sys_sep $sys_sep $sys_sep]
-        | get-property "styles[2].font" | equals "Font {252322823}" | verify-true
-    get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/LineTooLong"  $sys_sep $sys_sep $sys_sep]
         | get-property "values['Configuration']" | equals 80 | verify-true
     get-item -path [format ".*site-packages\\%srflint\\%srules\\%sotherRules.py \\(built-in\\)/LineTooLong"  $sys_sep $sys_sep $sys_sep]
         | get-property "values['Rule']" | equals LineTooLong | verify-true
@@ -462,7 +456,7 @@ with [get-window Preferences | get-tree
 
 
 get-window Preferences | get-canvas | get-property text 
-    | equals ".*[/[/\\\\]]lib[/\\\\]site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]keywordRules.py\r\n"
+    | equals ".*site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]keywordRules.py\r\n"
     + "Verify that a keyword has documentation\r\n" | verify-true
    
 //check doc with link - TooManyTestSteps
@@ -471,7 +465,7 @@ with [get-window Preferences | get-tree -after [get-link $link]] {
     get-cell 10 0 | click
 }
 get-window Preferences | get-canvas | get-property text 
-    | equals ".*[/\\\\]lib[/\\\\]site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]testcaseRules.py\r\n"
+    | equals ".*[/\\\\]site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]testcaseRules.py\r\n"
     + "Workflow tests should have no more than ten steps.\r\n"
     + "https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Workflow_tests\r\n" | verify-true
     

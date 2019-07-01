@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-fkNYJGpEemOWdSh6VSwkQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/1/19 3:58 PM
+Save-Time: 7/1/19 4:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -135,19 +135,6 @@ with [get-window Preferences | get-tree
 //check taht font is bold
 with [get-window Preferences | get-tree 
     -after [get-link $link]] {
-    get-item -path [ format ".*project_a\\%smy_rules\\%scustomRules.py/CustomRule" $sys_sep $sys_sep] 
-        | get-property "styles[0].font" | equals "Font {252322823}" | verify-true
-    get-item -path [ format ".*project_a\\%smy_rules\\%scustomRules.py/CustomRule" $sys_sep $sys_sep] 
-        | get-property "styles[1].font" | equals "Font {252322823}" | verify-true
-    get-item -path [ format ".*project_a\\%smy_rules\\%scustomRules.py/CustomRule" $sys_sep $sys_sep] 
-        | get-property "styles[2].font" | equals "Font {252322823}" | verify-true
-    
-    // TestNamesContainsX is bold too
-    get-item -path [ format ".*project_a\\%smy_rules\\%stwo_rules.py/TestNamesContainsX" $sys_sep $sys_sep] 
-        | get-property "styles[0].font" | equals "Font {252322823}" | verify-true
-    get-item -path [ format ".*project_a\\%smy_rules\\%stwo_rules.py/TestNamesContainsX" $sys_sep $sys_sep] 
-        | get-property "styles[1].font" | equals "Font {252322823}" | verify-true
-        
     // TestNamesContainsY is not checked and greyed-out
     get-item -path [ format ".*project_a\\%smy_rules\\%stwo_rules.py/TestNamesContainsY" $sys_sep $sys_sep] 
         | get-property checked | equals false | verify-true
@@ -184,12 +171,11 @@ with [get-window Preferences | get-tree
     get-item -path [ format ".*project_a\\%smy_rules\\%stwo_rules.py" $sys_sep $sys_sep ]
         | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
 }
-with [get-window Preferences | get-tree 
-    -after [get-link $link]] {
-    get-cell 7 0 | click
-}
 
 //check text after clicking on file name that was removed
+get-window Preferences | maximize
+get-window Preferences | get-tree -after [get-link $link]| get-cell 7 0 | click
+
 get-window Preferences | get-canvas | get-property text 
     | equals [format "The file '.*project_a\\%smy_rules\\%stwo_rules.py' does not exist\r\n" $sys_sep $sys_sep] 
     | verify-true
@@ -242,21 +228,19 @@ get-window Preferences | get-button "Apply and Close" | click
 get-view "Project Explorer" | get-tree | select "project_a/my_rules/abc.py" | key-type F2
 with [get-window "Rename Resource"] {
     with [get-editbox -after [get-label "New name:"]] {
-        set-text "CustomRules.py"
+        set-text "customRules.py"
     }
     get-button OK | click
 }
 
 //open preference and check that custom rules are not red
 get-preferences-menu | click
+get-window Preferences | maximize
 get-window Preferences | get-tree 
     -after [get-link $link] 
     | get-cell 6 0 | click
-get-window Preferences | get-tree 
-    -after [get-link $link] 
-    | get-item -path [format ".*project_a\\%smy_rules\\%scustomRules.py" $sys_sep $sys_sep]
-    | get-property "styles[0].font" | equals "Font {252322823}" | verify-true
-    
+
+
 //2 rules are not recognized    
 with [get-window Preferences | get-tree 
     -after [get-link $link]] {
