@@ -26,7 +26,7 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 

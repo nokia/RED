@@ -145,6 +145,7 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
+        verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         verify(preferences).putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         verify(preferences).put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");

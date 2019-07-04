@@ -37,12 +37,12 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Variables";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.SETTINGS_SECTION, SuiteSourcePartitionScanner.VARIABLES_SECTION);

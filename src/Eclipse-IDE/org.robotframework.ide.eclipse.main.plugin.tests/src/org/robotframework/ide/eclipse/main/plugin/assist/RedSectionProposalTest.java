@@ -56,7 +56,7 @@ public class RedSectionProposalTest {
 
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("section");
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         final StyleRange[] ranges = proposal.getStyledLabel().getStyleRanges();
         assertThat(ranges).hasSize(1);

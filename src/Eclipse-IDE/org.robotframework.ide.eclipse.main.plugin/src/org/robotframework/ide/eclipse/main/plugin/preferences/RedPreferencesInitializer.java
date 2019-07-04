@@ -101,6 +101,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED, false);
         preferences.putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         preferences.putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");

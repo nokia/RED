@@ -39,12 +39,12 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Variable definitions";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 

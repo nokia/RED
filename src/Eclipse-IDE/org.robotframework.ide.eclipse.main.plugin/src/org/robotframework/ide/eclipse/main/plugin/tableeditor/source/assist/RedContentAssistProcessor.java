@@ -18,7 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 /**
  * @author Michal Anglart
  */
-public abstract class RedContentAssistProcessor extends DefaultContentAssistProcessor {
+public abstract class RedContentAssistProcessor extends DefaultContentAssistProcessor
+        implements IRedContentAssistProcessor {
 
     protected final SuiteSourceAssistantContext assist;
 
@@ -27,10 +28,6 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
     public RedContentAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
-
-    protected abstract String getProposalsTitle();
-
-    protected abstract List<String> getApplicableContentTypes();
 
     @Override
     public final ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
@@ -70,7 +67,8 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
     protected abstract List<? extends ICompletionProposal> computeProposals(IDocument document, final int offset,
             final int cellLength, final String userContent, boolean isAtTheEndOfLine) throws BadLocationException;
 
-    protected final boolean isInApplicableContentType(final IDocument document, final int offset)
+    @Override
+    public final boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {
         return getApplicableContentTypes().contains(getVirtualContentType(document, offset));
     }

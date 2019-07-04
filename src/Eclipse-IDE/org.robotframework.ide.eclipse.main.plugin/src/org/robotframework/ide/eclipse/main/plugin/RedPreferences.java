@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
+import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
 import org.rf.ide.core.rflint.RfLintRuleConfiguration;
@@ -70,6 +72,7 @@ public class RedPreferences {
     public static final String FOLDABLE_DOCUMENTATION = "red.editor.folding.foldableDocumentation";
     public static final String FOLDING_LINE_LIMIT = "red.editor.folding.lineLimit";
 
+    public static final String ASSISTANT_AUTO_INSERT_ENABLED = "red.editor.assistant.autoInsertEnabled";
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "red.editor.assistant.autoActivationEnabled";
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "red.editor.assistant.autoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "red.editor.assistant.autoActivationChars";
@@ -91,6 +94,8 @@ public class RedPreferences {
     public static final String SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED = "red.editor.save.changedLinesOnlyEnabled";
     public static final String SAVE_ACTIONS_AUTO_DISCOVERING_ENABLED = "red.editor.save.autoDiscoveringEnabled";
     public static final String SAVE_ACTIONS_AUTO_DISCOVERING_SUMMARY_WINDOW_ENABLED = "red.editor.save.autoDiscoveringSummaryWindowEnabled";
+
+    public static final String CODE_TEMPLATES = "red.editor.codeTemplates";
 
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
     public static final String AUTODISCOVERY_GEVENT_SUPPORT = "red.libraries.autoDiscoveryGeventSupport";
@@ -130,10 +135,27 @@ public class RedPreferences {
     public static final String STRING_VARIABLES_SETS = "red.string.variables.sets";
     public static final String STRING_VARIABLES_ACTIVE_SET = "red.string.variables.activeSet";
 
+    private static final String CODE_TEMPLATES_REGISTRY_ID = "org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry";
+
     private final IPreferenceStore store;
 
     protected RedPreferences(final IPreferenceStore store) {
         this.store = store;
+    }
+
+    public ContributionTemplateStore getTemplateStore() {
+        final ContributionContextTypeRegistry registry = getTemplateContextTypeRegistry();
+        final ContributionTemplateStore templateStore = new ContributionTemplateStore(registry, store, CODE_TEMPLATES);
+        try {
+            templateStore.load();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+        return templateStore;
+    }
+
+    public ContributionContextTypeRegistry getTemplateContextTypeRegistry() {
+        return new ContributionContextTypeRegistry(CODE_TEMPLATES_REGISTRY_ID);
     }
 
     public String getActiveRuntime() {
@@ -224,6 +246,10 @@ public class RedPreferences {
 
     public CellWrappingStrategy getCellWrappingStrategy() {
         return CellWrappingStrategy.valueOf(store.getString(CELL_WRAPPING));
+    }
+
+    public boolean isAssistantAutoInsertEnabled() {
+        return store.getBoolean(ASSISTANT_AUTO_INSERT_ENABLED);
     }
 
     public boolean isAssistantAutoActivationEnabled() {

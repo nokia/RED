@@ -82,7 +82,7 @@ public class Stylers {
             }
         };
 
-        public static final Styler MARKED_PREFIX_STYLER = new Styler() {
+        public static final Styler MATCH_DECORATION_STYLER = new Styler() {
 
             @Override
             public void applyStyles(final TextStyle style) {

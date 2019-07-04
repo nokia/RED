@@ -506,6 +506,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/stackframe.png");
     }
 
+    public static ImageDescriptor getTemplateImage() {
+        return RedPlugin.getImageDescriptor("resources/template.png");
+    }
+
     public static ImageDescriptor getImageForResource(final IResource resource) {
         return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
     }

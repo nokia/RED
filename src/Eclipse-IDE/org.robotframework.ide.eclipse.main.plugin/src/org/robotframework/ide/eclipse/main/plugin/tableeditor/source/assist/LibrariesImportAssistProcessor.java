@@ -32,12 +32,12 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Libraries";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 

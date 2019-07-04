@@ -59,9 +59,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Cycl
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.GeneralSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInCodeAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInSettingsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewKeywordTemplateAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewSectionTemplateAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTaskTemplateAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTestTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
@@ -109,6 +114,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private EditStrategyPreferences editStrategyPreferences;
 
+    private ContentAssistant contentAssistant;
+
     private final RedTokensStore store;
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
@@ -124,6 +131,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     EditStrategyPreferences getEditStrategyPreferences() {
         return editStrategyPreferences;
+    }
+
+    ContentAssistant getContentAssistant() {
+        return contentAssistant;
     }
 
     void resetTokensStore() {
@@ -172,9 +183,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
-        final ContentAssistant contentAssistant = new ContentAssistant();
+        contentAssistant = new ContentAssistant();
         contentAssistant.enableColoredLabels(true);
-        contentAssistant.enableAutoInsert(false);
+        contentAssistant.enableAutoInsert(RedPlugin.getDefault().getPreferences().isAssistantAutoInsertEnabled());
         contentAssistant
                 .enableAutoActivation(RedPlugin.getDefault().getPreferences().isAssistantAutoActivationEnabled());
         contentAssistant
@@ -229,10 +240,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createSettingsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
         createVariablesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
         createKeywordsAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
-        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
-        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor,
-                SuiteSourcePartitionScanner.TASKS_SECTION);
+        createTestCasesAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
+        createTasksAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
         createDefaultAssist(infoControlSupport, contentAssistant, modelSupplier, assistantAccessor);
     }
 
@@ -244,6 +253,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new WithNameAssistProcessor(assistContext),
@@ -254,13 +266,15 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new SectionsAssistProcessor(assistContext),
                 new KeywordCallsInSettingsAssistProcessor(assistContext),
                 new ImportsInSettingsAssistProcessor(assistContext),
-                variablesAssistProcessor);
+                variablesAssistProcessor,
+                templatesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(settingNamesProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.SETTINGS_SECTION);
         contentAssistant.addCompletionListener(cycledProcessor);
@@ -273,16 +287,21 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 modelSupplier, contentAssistActivationTrigger);
 
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new VariablesDefinitionsAssistProcessor(assistContext),
                 new SectionsAssistProcessor(assistContext),
-                variablesAssistProcessor);
+                variablesAssistProcessor,
+                templatesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.VARIABLES_SECTION);
         contentAssistant.addCompletionListener(cycledProcessor);
@@ -290,12 +309,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createTestCasesAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
-            final AssistantCallbacks assistantAccessor, final String contentType) {
+            final AssistantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext),
+                new NewTestTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new SectionsAssistProcessor(assistContext),
@@ -303,15 +326,50 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CodeReservedWordsAssistProcessor(assistContext),
                 keywordCallsAssistProcessor,
                 new ImportsInCodeAssistProcessor(assistContext),
-                variablesAssistProcessor);
+                variablesAssistProcessor,
+                templatesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(keywordCallsAssistProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
 
-        contentAssistant.setContentAssistProcessor(cycledProcessor, contentType);
+        contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        contentAssistant.addCompletionListener(cycledProcessor);
+    }
+
+    private void createTasksAssist(final InformationControlSupport infoControlSupport,
+            final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+                modelSupplier, contentAssistActivationTrigger);
+
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
+        final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext),
+                new NewTaskTemplateAssistProcessor(assistContext));
+
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new SectionsAssistProcessor(assistContext),
+                new SettingsAssistProcessor(assistContext),
+                new CodeReservedWordsAssistProcessor(assistContext),
+                keywordCallsAssistProcessor,
+                new ImportsInCodeAssistProcessor(assistContext),
+                variablesAssistProcessor,
+                templatesAssistProcessor);
+
+        final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
+                assistantAccessor);
+        cycledProcessor.addProcessor(combinedProcessor);
+        cycledProcessor.addProcessor(keywordCallsAssistProcessor);
+        cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
+
+        contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.TASKS_SECTION);
         contentAssistant.addCompletionListener(cycledProcessor);
     }
 
@@ -322,6 +380,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 modelSupplier, contentAssistActivationTrigger);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext),
+                new NewKeywordTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new SectionsAssistProcessor(assistContext),
@@ -329,13 +391,15 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CodeReservedWordsAssistProcessor(assistContext),
                 keywordCallsAssistProcessor,
                 new ImportsInCodeAssistProcessor(assistContext),
-                variablesAssistProcessor);
+                variablesAssistProcessor,
+                templatesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(keywordCallsAssistProcessor);
         cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
         contentAssistant.addCompletionListener(cycledProcessor);
@@ -356,6 +420,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final KeywordCallsAssistProcessor keywordCallsProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesProcessor = new VariablesAssistProcessor(assistContext);
+        final CombinedAssistProcessor templatesAssistProcessor = new CombinedAssistProcessor("Templates",
+                new KeywordCallTemplateAssistProcessor(assistContext),
+                new NewSectionTemplateAssistProcessor(assistContext),
+                new NewKeywordTemplateAssistProcessor(assistContext),
+                new NewTestTemplateAssistProcessor(assistContext),
+                new NewTaskTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new VariablesDefinitionsAssistProcessor(assistContext),
@@ -371,7 +441,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 keywordCallsProcessor,
                 new ImportsInSettingsAssistProcessor(assistContext),
                 new ImportsInCodeAssistProcessor(assistContext),
-                variablesProcessor);
+                variablesProcessor,
+                templatesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -379,6 +450,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         cycledProcessor.addProcessor(generalSettingProcessor);
         cycledProcessor.addProcessor(keywordCallsProcessor);
         cycledProcessor.addProcessor(variablesProcessor);
+        cycledProcessor.addProcessor(templatesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);
         contentAssistant.addCompletionListener(cycledProcessor);

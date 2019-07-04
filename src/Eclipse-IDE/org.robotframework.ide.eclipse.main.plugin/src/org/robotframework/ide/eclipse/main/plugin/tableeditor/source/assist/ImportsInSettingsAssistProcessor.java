@@ -21,12 +21,12 @@ public class ImportsInSettingsAssistProcessor extends ImportsInCodeAssistProcess
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Imports";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 

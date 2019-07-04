@@ -30,12 +30,12 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Resource files";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 

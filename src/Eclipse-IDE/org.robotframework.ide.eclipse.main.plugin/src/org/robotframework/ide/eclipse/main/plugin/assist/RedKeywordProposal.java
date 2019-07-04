@@ -99,7 +99,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
                 final int length = Math.min(matchingRange.upperEndpoint() - matchingRange.lowerEndpoint(),
                         label.length() - matchingRange.lowerEndpoint());
                 label.setStyle(matchingRange.lowerEndpoint(), length,
-                        Stylers.mixingStyler(styleRange, Stylers.Common.MARKED_PREFIX_STYLER));
+                        Stylers.mixingStyler(styleRange, Stylers.Common.MATCH_DECORATION_STYLER));
             }
         }
         return label;

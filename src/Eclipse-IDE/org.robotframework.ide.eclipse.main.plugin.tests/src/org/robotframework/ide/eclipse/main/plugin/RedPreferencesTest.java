@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.Template;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.junit.Test;
@@ -31,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElement
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.OverriddenVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +54,27 @@ public class RedPreferencesTest {
 
         for (final Field field : preferenceNameFields) {
             assertThat((String) field.get(preferences)).startsWith("red.");
+        }
+    }
+
+    @Test
+    public void templatesAreRetrievedFromTemplateStore() throws Exception {
+        final RedPreferences preferences = new RedPreferences(mock(IPreferenceStore.class));
+        final TemplateStore store = preferences.getTemplateStore();
+
+        assertThat(store.getTemplates()).extracting(Template::getName)
+                .containsOnly("New test", "New task", "New keyword", "Settings section");
+    }
+
+    @Test
+    public void contextTypesAreRetrievedFromTemplateContextTypeRegistry() throws Exception {
+        final RedPreferences preferences = new RedPreferences(mock(IPreferenceStore.class));
+        final ContextTypeRegistry registry = preferences.getTemplateContextTypeRegistry();
+
+        for (final String id : newArrayList(RedTemplateContextType.KEYWORD_CALL_CONTEXT_TYPE,
+                RedTemplateContextType.NEW_SECTION_CONTEXT_TYPE, RedTemplateContextType.NEW_KEYWORD_CONTEXT_TYPE,
+                RedTemplateContextType.NEW_TEST_CONTEXT_TYPE, RedTemplateContextType.NEW_TASK_CONTEXT_TYPE)) {
+            assertThat(registry.getContextType(id)).isExactlyInstanceOf(RedTemplateContextType.class);
         }
     }
 

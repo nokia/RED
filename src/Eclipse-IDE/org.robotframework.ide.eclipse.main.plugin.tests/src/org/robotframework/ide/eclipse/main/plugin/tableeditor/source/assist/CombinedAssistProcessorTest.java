@@ -121,12 +121,12 @@ public class CombinedAssistProcessorTest {
         }
 
         @Override
-        protected List<String> getApplicableContentTypes() {
+        public List<String> getApplicableContentTypes() {
             return newArrayList();
         }
 
         @Override
-        protected String getProposalsTitle() {
+        public String getProposalsTitle() {
             return null;
         }
 

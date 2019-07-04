@@ -6682,6 +6682,12 @@
             name="Syntax Coloring">
       </page>
       <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.EditorTemplatePreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.templates"
+            name="Templates">
+      </page>
+      <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.LaunchingPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
@@ -7324,5 +7330,106 @@
                </command>
             </menu>
          </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.ui.editors.templates">
+         <contextTypeRegistry
+               id="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextTypeRegistry>
+         <contextType
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType"
+               id="org.robotframework.ide.eclipse.keywordCallContextType"
+               name="Keyword call"
+               registryId="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextType>
+         <contextType
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType"
+               id="org.robotframework.ide.eclipse.newSectionContextType"
+               name="New section"
+               registryId="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextType>
+         <contextType
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType"
+               id="org.robotframework.ide.eclipse.newKeywordContextType"
+               name="New keyword"
+               registryId="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextType>
+         <contextType
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType"
+               id="org.robotframework.ide.eclipse.newTestContextType"
+               name="New test"
+               registryId="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextType>
+         <contextType
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType"
+               id="org.robotframework.ide.eclipse.newTaskContextType"
+               name="New task"
+               registryId="org.robotframework.ide.eclipse.RedTemplateContextTypeRegistry">
+         </contextType>
+         <template
+               autoinsert="true"
+               contextTypeId="org.robotframework.ide.eclipse.newTestContextType"
+               description="New test case with settings"
+               id="org.robotframework.ide.eclipse.testTemplate"
+               name="New test">
+            <pattern>
+               Test
+    [Documentation]
+    [Tags]
+    [Timeout]
+    [Setup]
+    [Teardown]
+            </pattern>
+         </template>
+         <template
+               autoinsert="true"
+               contextTypeId="org.robotframework.ide.eclipse.newTaskContextType"
+               description="New RPA task with settings"
+               id="org.robotframework.ide.eclipse.taskTemplate"
+               name="New task">
+            <pattern>
+               Task
+    [Documentation]
+    [Tags]
+    [Timeout]
+    [Setup]
+    [Teardown]
+            </pattern>
+         </template>
+         <template
+               autoinsert="true"
+               contextTypeId="org.robotframework.ide.eclipse.newKeywordContextType"
+               description="New keyword with settings"
+               id="org.robotframework.ide.eclipse.keywordTemplate"
+               name="New keyword">
+            <pattern>
+               Keyword
+    [Documentation]
+    [Tags]
+    [Arguments]
+    [Timeout]
+    [Teardown]
+    [Return]
+            </pattern>
+         </template>
+         <template
+               autoinsert="true"
+               contextTypeId="org.robotframework.ide.eclipse.newSectionContextType"
+               description="New settings section with settings"
+               id="org.robotframework.ide.eclipse.settingsTemplate"
+               name="Settings section">
+            <pattern>
+               *** Settings ***
+Documentation
+Metadata
+Force Tags
+Default Tags
+Suite Setup
+Suite Teardown
+Test Setup
+Test Teardown
+Test Timeout
+            </pattern>
+         </template>
       </extension>
 </plugin>

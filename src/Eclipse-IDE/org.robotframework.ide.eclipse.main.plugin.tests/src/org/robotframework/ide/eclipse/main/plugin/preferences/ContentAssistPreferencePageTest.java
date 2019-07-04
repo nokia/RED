@@ -47,12 +47,13 @@ public class ContentAssistPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(6);
+        assertThat(editors).hasSize(7);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
-                names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED,
+                names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED,
+                        RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED,
                         RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED,
                         RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED));
         assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,

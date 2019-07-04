@@ -47,12 +47,12 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected String getProposalsTitle() {
+    public String getProposalsTitle() {
         return "Keywords";
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }

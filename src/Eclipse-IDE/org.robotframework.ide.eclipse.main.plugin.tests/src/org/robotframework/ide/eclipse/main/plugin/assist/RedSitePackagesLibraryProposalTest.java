@@ -92,7 +92,7 @@ public class RedSitePackagesLibraryProposalTest {
         final TextStyle decorationStyle = new TextStyle();
         Stylers.Common.ECLIPSE_DECORATION_STYLER.applyStyles(decorationStyle);
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         final StyleRange[] ranges = proposal.getStyledLabel().getStyleRanges();
         assertThat(ranges).hasSize(1);
@@ -123,7 +123,7 @@ public class RedSitePackagesLibraryProposalTest {
         final TextStyle decorationStyle = new TextStyle();
         Stylers.Common.ECLIPSE_DECORATION_STYLER.applyStyles(decorationStyle);
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         final StyleRange[] ranges = proposal.getStyledLabel().getStyleRanges();
         assertThat(ranges).hasSize(2);

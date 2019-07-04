@@ -105,7 +105,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
         if (!adaptedProposal.isDocumented()) {
             return null;
         }
-        
+
         final InformationControlSupport infoControlSupport = context.getInfoControlSupport();
         if (infoControlSupport.isBrowserBased()) {
             return adaptedProposal.getDocumentationInput().provideHtml(context.getEnvironment());
@@ -147,16 +147,16 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
         public Supplier<Collection<Runnable>> operationsAfterAccepting;
 
         public DocumentModification(final String contentSuffix, final Position toReplace) {
-            this(contentSuffix, toReplace, null, false, () -> new ArrayList<>());
+            this(contentSuffix, toReplace, null, false, ArrayList::new);
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace,
                 final boolean shouldActivate) {
-            this(contentSuffix, toReplace, null, shouldActivate, () -> new ArrayList<>());
+            this(contentSuffix, toReplace, null, shouldActivate, ArrayList::new);
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect) {
-            this(contentSuffix, toReplace, toSelect, false, () -> new ArrayList<>());
+            this(contentSuffix, toReplace, toSelect, false, ArrayList::new);
         }
 
         public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect,

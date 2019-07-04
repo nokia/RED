@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -42,7 +42,7 @@ public class DefaultContentAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         assertThat(processor.computeContextInformation(viewer, 10)).isEmpty();
 
-        verifyNoMoreInteractions(viewer);
+        verifyZeroInteractions(viewer);
     }
 
     private DefaultContentAssistProcessor createProcessor() {

@@ -32,7 +32,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private final AssistantCallbacks assistant;
 
-    private final List<RedContentAssistProcessor> processors;
+    private final List<IRedContentAssistProcessor> processors;
 
     private int currentPage;
 
@@ -54,17 +54,17 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         this.canReopenAssistantProgramatically = canReopenAssistantProgramatically;
     }
 
-    public void addProcessor(final RedContentAssistProcessor processor) {
+    public void addProcessor(final IRedContentAssistProcessor processor) {
         processors.add(processor);
     }
 
-    private RedContentAssistProcessor getCurrentProcessor() {
+    private IRedContentAssistProcessor getCurrentProcessor() {
         return processors.get(currentPage);
     }
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-        final RedContentAssistProcessor nextApplicableProcessor = getNextApplicableProcessor(viewer.getDocument(),
+        final IRedContentAssistProcessor nextApplicableProcessor = getNextApplicableProcessor(viewer.getDocument(),
                 offset);
         assistant.setStatus(nextApplicableProcessor == getCurrentProcessor() ? ""
                 : String.format("Press %s to show %s proposals", assistContext.getActivationTrigger().format(),
@@ -78,7 +78,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         return proposals;
     }
 
-    private RedContentAssistProcessor getNextApplicableProcessor(final IDocument document, final int offset) {
+    private IRedContentAssistProcessor getNextApplicableProcessor(final IDocument document, final int offset) {
         int i = 1;
         while (!processorFromIndexIsApplicable((currentPage + i) % processors.size(), document, offset)) {
             i++;
@@ -90,7 +90,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     }
 
     private boolean processorFromIndexIsApplicable(final int index, final IDocument document, final int offset) {
-        final RedContentAssistProcessor processor = processors.get(index);
+        final IRedContentAssistProcessor processor = processors.get(index);
         try {
             return processor.isInApplicableContentType(document, offset);
         } catch (final BadLocationException e) {

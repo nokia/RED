@@ -35,6 +35,7 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         final Composite parent = getFieldEditorParent();
 
         createLink(parent);
+        createAutoInsertEditor(parent);
         createAutoActivationEditors(parent);
         createKeywordPrefixAutoAdditionEditor(parent);
     }
@@ -58,6 +59,19 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
                 PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             }
         }));
+    }
+
+    private void createAutoInsertEditor(final Composite parent) {
+        final Group autoInsertGroup = new Group(parent, SWT.NONE);
+        autoInsertGroup.setText("Auto insert");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(autoInsertGroup);
+        GridLayoutFactory.fillDefaults().applyTo(autoInsertGroup);
+
+        final BooleanFieldEditor autoInsertEnabled = new BooleanFieldEditor(
+                RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED, "Insert single proposals automatically", autoInsertGroup);
+        addField(autoInsertEnabled);
+        final Button button = (Button) autoInsertEnabled.getDescriptionControl(autoInsertGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
     }
 
     private void createAutoActivationEditors(final Composite parent) {

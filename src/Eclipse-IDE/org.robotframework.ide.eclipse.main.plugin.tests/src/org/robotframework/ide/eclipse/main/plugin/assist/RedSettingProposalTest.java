@@ -75,7 +75,7 @@ public class RedSettingProposalTest {
 
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("Documentation");
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         final StyleRange[] ranges = proposal.getStyledLabel().getStyleRanges();
         assertThat(ranges).hasSize(2);

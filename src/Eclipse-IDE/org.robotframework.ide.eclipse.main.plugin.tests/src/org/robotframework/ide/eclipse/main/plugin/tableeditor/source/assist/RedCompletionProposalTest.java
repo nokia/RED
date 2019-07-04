@@ -159,7 +159,7 @@ public class RedCompletionProposalTest {
         assertThat(label.getString()).isEqualTo("label");
 
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         final StyleRange[] ranges = label.getStyleRanges();
         assertThat(ranges).hasSize(1);

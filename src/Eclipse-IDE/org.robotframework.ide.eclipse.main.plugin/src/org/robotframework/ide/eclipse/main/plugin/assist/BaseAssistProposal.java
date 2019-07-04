@@ -53,7 +53,7 @@ abstract class BaseAssistProposal implements AssistProposal {
         for (final Range<Integer> matchingRange : match) {
             final int length = Math.min(matchingRange.upperEndpoint() - matchingRange.lowerEndpoint(),
                     label.length() - matchingRange.lowerEndpoint());
-            label.setStyle(matchingRange.lowerEndpoint(), length, Stylers.Common.MARKED_PREFIX_STYLER);
+            label.setStyle(matchingRange.lowerEndpoint(), length, Stylers.Common.MATCH_DECORATION_STYLER);
         }
         return label;
     }

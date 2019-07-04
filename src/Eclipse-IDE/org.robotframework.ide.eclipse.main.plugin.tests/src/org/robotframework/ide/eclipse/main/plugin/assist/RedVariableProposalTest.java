@@ -100,7 +100,7 @@ public class RedVariableProposalTest {
         assertThat(label.getStyleRanges()).hasSize(1);
 
         final TextStyle matchStyle = new TextStyle();
-        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+        Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 
         assertThat(label.getStyleRanges()[0].background.getRGB()).isEqualTo(matchStyle.background.getRGB());
         assertThat(label.getStyleRanges()[0].foreground.getRGB()).isEqualTo(matchStyle.foreground.getRGB());

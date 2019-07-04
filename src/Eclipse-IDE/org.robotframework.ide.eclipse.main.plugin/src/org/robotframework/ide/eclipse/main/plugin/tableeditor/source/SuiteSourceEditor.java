@@ -307,6 +307,9 @@ public class SuiteSourceEditor extends TextEditor {
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
                 config.getEditStrategyPreferences().refresh();
+            } else if (RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED.equals(event.getKey())) {
+                final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+                config.getContentAssistant().enableAutoInsert(Boolean.parseBoolean((String) event.getNewValue()));
             }
         };
         final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID);

@@ -183,7 +183,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         if (decoratePrefix) {
             final String alreadyWrittenPrefix = toDisplay.substring(0, prefixLength);
             final String suffixWhichWillBeAdded = toDisplay.substring(prefixLength);
-            styledString.append(alreadyWrittenPrefix, Stylers.Common.MARKED_PREFIX_STYLER);
+            styledString.append(alreadyWrittenPrefix, Stylers.Common.MATCH_DECORATION_STYLER);
             styledString.append(suffixWhichWillBeAdded);
         } else {
             styledString.append(toDisplay);

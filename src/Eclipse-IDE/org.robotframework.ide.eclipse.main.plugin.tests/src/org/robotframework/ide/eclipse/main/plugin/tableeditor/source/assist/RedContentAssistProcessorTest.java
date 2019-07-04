@@ -185,12 +185,12 @@ public class RedContentAssistProcessorTest {
         return new RedContentAssistProcessor(context) {
 
             @Override
-            protected String getProposalsTitle() {
+            public String getProposalsTitle() {
                 return "Title";
             }
 
             @Override
-            protected List<String> getApplicableContentTypes() {
+            public List<String> getApplicableContentTypes() {
                 return applicableContentTypes;
             }
 

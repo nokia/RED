@@ -647,20 +647,6 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void onlyOneMarkerIsReported_whenFileIsImportedFromOutsideOfWorkspaceByPoKeMoNPath_onWindows() {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "ExTeRnAl_NeStEd_LiB.py");
-
-        final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
-        validateLibraryImport(absPath);
-
-        assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE,
-                        new ProblemPosition(2, Range.closed(26, 26 + absPath.length()))));
-    }
-
-    @Test
     public void markerIsReported_whenExternalFileDoesNotExist() {
         final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.py");
 
@@ -733,6 +719,29 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("lib.py", new HashMap<>(), refLibs);
         assertThat(reporter.getReportedProblems()).contains(new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
                 new ProblemPosition(2, Range.closed(26, 32))));
+
+        libFile.delete(true, null);
+    }
+
+    @Test
+    public void noMarkerIsReported_whenFileIsImportedByPoKeMoNPath_onWindows() throws Exception {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final String libFileName = "library.py";
+        final String libPath = projectProvider.getProject().getName() + "/" + libFileName;
+        final String libName = "library";
+
+        final IFile libFile = projectProvider.createFile(libFileName);
+
+        final LibraryConstructor constructor = new LibraryConstructor();
+
+        final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
+
+        validateLibraryImport("LiBrArY.py", new HashMap<>(), refLibs);
+        assertThat(reporter.getReportedProblems()).isEmpty();
 
         libFile.delete(true, null);
     }

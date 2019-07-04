@@ -7,12 +7,14 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 
 /**
@@ -20,20 +22,27 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  */
 public class CombinedAssistProcessor extends RedContentAssistProcessor {
 
-    private final List<RedContentAssistProcessor> processors;
+    private final List<IRedContentAssistProcessor> processors;
 
-    public CombinedAssistProcessor(final RedContentAssistProcessor... assistProcessors) {
+    private final String proposalsTitle;
+
+    public CombinedAssistProcessor(final IRedContentAssistProcessor... assistProcessors) {
+        this("Smart", assistProcessors);
+    }
+
+    public CombinedAssistProcessor(final String proposalsTitle, final IRedContentAssistProcessor... assistProcessors) {
         super(null);
+        this.proposalsTitle = proposalsTitle;
         this.processors = newArrayList(assistProcessors);
     }
 
     @Override
-    protected String getProposalsTitle() {
-        return "Smart";
+    public String getProposalsTitle() {
+        return proposalsTitle;
     }
 
     @Override
-    protected List<String> getApplicableContentTypes() {
+    public List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
                 SuiteSourcePartitionScanner.SETTINGS_SECTION, SuiteSourcePartitionScanner.VARIABLES_SECTION);
@@ -44,11 +53,11 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = newArrayList();
         boolean proposalsFound = false;
 
-        for (final RedContentAssistProcessor processor : processors) {
-            final List<? extends ICompletionProposal> newProposals = processor.computeProposals(viewer, offset);
+        for (final IContentAssistProcessor processor : processors) {
+            final ICompletionProposal[] newProposals = processor.computeCompletionProposals(viewer, offset);
             if (newProposals != null) {
                 proposalsFound = true;
-                proposals.addAll(newProposals);
+                proposals.addAll(Arrays.asList(newProposals));
             }
         }
         return !proposalsFound && proposals.isEmpty() ? null : proposals;

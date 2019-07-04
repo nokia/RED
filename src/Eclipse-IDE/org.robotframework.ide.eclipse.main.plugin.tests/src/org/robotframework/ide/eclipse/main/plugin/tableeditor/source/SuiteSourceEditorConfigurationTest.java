@@ -13,6 +13,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -140,5 +141,20 @@ public class SuiteSourceEditorConfigurationTest {
         final ISourceViewer sourceViewer = mock(ISourceViewer.class);
 
         assertThat(config.getHyperlinkDetectors(sourceViewer)).isEmpty();
+    }
+
+    @Test
+    public void contentAssistantIsObtainable_andSameAsCreatedBefore() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().build();
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final IContentAssistant contentAssist = config.getContentAssistant(null);
+
+        assertThat(contentAssist).isNotNull();
+        assertThat(config.getContentAssistant()).isSameAs(contentAssist);
     }
 }
