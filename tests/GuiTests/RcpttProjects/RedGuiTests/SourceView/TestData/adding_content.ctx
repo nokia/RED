@@ -5,8 +5,8 @@ Element-Name: adding_content
 Element-Type: context
 Element-Version: 2.0
 Id: _wdMmkIk5EeWHhtZu19MBKw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/12/18 11:53 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/5/19 5:35 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -162,7 +162,7 @@ proc "add-content-to-test" [val file_name]{
 	    key-type "M1+SPACE"
 	}
 	//check proposal 
-	check-content-assist-for-empty-file
+	check-content-assist-under-section -section tests 
 	get-editor $file_name| get-text-viewer |key-type Esc
 	//select keywords
 	

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _JPBOsIb7EeWrUbOa1Nzguw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/22/19 9:39 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/5/19 5:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,7 +28,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+SPACE"
     wait 300
 }
-check-content-assist-for-empty-file
+check-content-assist-under-section -section tests
 
 with [get-editor "TestFile.robot"] {
     get-text-viewer | key-type ESC
@@ -100,7 +100,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     wait 200
 }
 
-check-content-assist-for-empty-file
+check-content-assist-under-section -section keywords
 
 with [get-editor "TestFile.robot"] {
     get-text-viewer | key-type ESC
@@ -140,8 +140,8 @@ get-eclipse-window | key-type "M1+SPACE"
 get-eclipse-window | key-type "M1+SPACE"
 get-eclipse-window | key-type "M1+SPACE"
 get-window -from "CompletionProposalPopup.createProposalSelector()" 
-    | get-label "Press M1+Space to show Smart proposals" | get-property caption 
-    | equals "Press M1+Space to show Smart proposals" | verify-true
+    | get-label "Press M1+Space to show Templates proposals" | get-property caption 
+    | equals "Press M1+Space to show Templates proposals" | verify-true
 
 // use content assist to select user KW
 wait 300
