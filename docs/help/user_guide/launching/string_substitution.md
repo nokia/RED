@@ -31,7 +31,7 @@
 	</p>
 <h3>Creating custom variables</h3>
 <p>Custom string substitution variables can be created and configured at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.StringVariablePreferencePage)")'>
-    Window -&gt; Preferences -&gt; Run/Debug -&gt; String Substitution</a></code> preference page.
+    Window -> Preferences -> Run/Debug -> String Substitution</a></code> preference page.
     </p>
 <h3>Overriding custom variables in variables sets</h3>
 <p>Once variables are used in launch configurations it would be sometimes useful to be able to switch between
@@ -45,7 +45,7 @@
     </p>
 <h3>Defining different variables sets</h3>
 <p>The variables sets can be configured at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.activeVarsSets)")'>
-    Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching -&gt; Active String Substitution sets</a></code> preference page:
+    Window -> Preferences -> Robot Framework -> Launching -> Active String Substitution sets</a></code> preference page:
     </p>
 <img src="images/ui_active_variables.png"/>
 <p>Each set defined here provides possibility to differently override values of custom string variables and

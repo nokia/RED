@@ -46,7 +46,7 @@ This only require that the path to one of those executables (Unix-like / Windows
 <h3>Manual environment configuration</h3>
 <p>It is possible to add environments manually in 
 <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Installed frameworks</a></code>. Simply use 
+Window -> Preferences -> Robot Framework -> Installed frameworks</a></code>. Simply use 
 <span class="block">Add...</span> button to open dialog in which the directory can be chosen. It should be the 
 directory which contains one of the executable files listed above. 
 </p>

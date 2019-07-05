@@ -14,7 +14,7 @@
 
 Remote servers expose the keywords provided by the actual test libraries to the Remote library. The Remote library and remote servers communicate using a simple remote protocol on top of an XML-RPC channel.</p>
 <h3>Using Remote libraries in RED</h3>
-<p>In order to use Keywords from Remote Library together with validation and code assistance, information about Remote Library address needs to be included in <b><code>red.xml -&gt; Libraries -&gt; Libraries</code></b> part.</p>
+<p>In order to use Keywords from Remote Library together with validation and code assistance, information about Remote Library address needs to be included in <b><code>red.xml -> Libraries -> Libraries</code></b> part.</p>
 <br/><br/><img src="images/remote_library_settings.png"/> <br/><br/>
 <p>Note that IP, Port and name library served by remote library server may differ. Please follow usage details of your Remote Library.</p>
 <h4>Settings in TestSuite</h4>

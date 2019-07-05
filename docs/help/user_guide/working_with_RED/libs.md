@@ -46,7 +46,7 @@ be added to Referenced libraries in red.xml
 <br/><br/><img src="images/reference_libs.png"/><br/>
 <h3>Add library from Project Explorer</h3>
 External Python libraries can be directly included to red.xml file by right clicking on file and using option:<br/>
-<b><code>Robot Framework -&gt; Add Library to red.xml.</code></b>
+<b><code>Robot Framework -> Add Library to red.xml.</code></b>
 <h3>Add library from red.xml editor</h3>
 External can be also added directly from red.xml editor:<br/><br/>
 <img src="images/library_add.gif"/> <br/><br/>
@@ -59,7 +59,7 @@ Libdoc xml file can be included instead of external library file by using red.xm
 For more information about LibDoc please refer to <a class="external" href="http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc" target="_blank">http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc</a> <br/>
 <h3>Library autodiscovering and libdoc generation preferences</h3>
 <p>Autodiscovering and libdoc generation preferences can be configured at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Libraries</a></code></p>
+Window -> Preferences -> Robot Framework -> Libraries</a></code></p>
 <img src="images/libraries_preferences.png"/> <br/><br/>
 <dl class="warning">
 <dt>Warning</dt>

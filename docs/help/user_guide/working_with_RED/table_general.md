@@ -20,7 +20,7 @@ Type of new variable in Variable Editor can be controlled by small green arrow n
 Scalar type is displayed as default on add action element. Other types are: list and dictionary.<br/>
 <h3>Table preferences</h3>
 All table related preferences (cell text folding, number of columns, default behaviors) can be configured at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor</a></code> in <b>Tables</b> section.
+Window -> Preferences -> Robot Framework -> Editor</a></code> in <b>Tables</b> section.
 <br/><br/><img src="images/table_preferences.png"/> <br/><br/>
 <h3>Default number of columns in Test Cases/Keywords editors</h3>
 To make Table editors tidy, RED creates predefined numbers of columns.<br/>

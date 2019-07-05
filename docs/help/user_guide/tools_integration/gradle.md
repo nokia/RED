@@ -105,7 +105,7 @@
 <dd>Instead of specifying script at <b>Executor</b> tab manually it is possible to define
 	   default value of executor script path in Preferences
 	   (at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
-	   Window -&gt; Preferences -&gt; Robot Framework -&gt; Default Launch Configurations
+	   Window -> Preferences -> Robot Framework -> Default Launch Configurations
 	   </a></code> set <b>Executable file</b> to desired executable). Now every time new launch 
 	   configuration is created it will use given executable by default.
 	   </dd>

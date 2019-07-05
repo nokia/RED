@@ -9,8 +9,8 @@
 <p>Red.xml is file which stores Project related settings, some of those controls editing phase (validation, code assistance etc.), other can influence RobotFramework execution.</p>
 <p>It is always located in Project's root.</p>
 <h2>Creating/recreating red.xml</h2>
-<p>Red.xml is automatically created when Robot project is created by action from <b><code>File -&gt; New -&gt; Robot Project</code></b>.</p>
-<p>In case of importing robot files to generic Eclipse project, right click on Project in Project Explorer and select <b><code>Robot Framework -&gt; Add Robot nature</code></b> to create red.xml</p>
+<p>Red.xml is automatically created when Robot project is created by action from <b><code>File -> New -> Robot Project</code></b>.</p>
+<p>In case of importing robot files to generic Eclipse project, right click on Project in Project Explorer and select <b><code>Robot Framework -> Add Robot nature</code></b> to create red.xml</p>
 <img src="images/add_robot_nature.png"/> <br/><br/>
 <p>In any case, red.xml shall be visible in Project Explorer in root folder.</p>
 <h2>Red.xml parts</h2>

@@ -29,7 +29,7 @@ be specified in <a href="#prefs">preferences</a>.
 <p>Detected tasks are visible in RED in couple of places:</p>
 <ul>
 <li><b>Tasks</b> view - this view is similar to Problems view and displays all the tasks reported for files in whole
-  workspace (this view can be open from menu by choosing <b><code>Window -&gt; Show View -&gt; Other... -&gt; General -&gt; Tasks</code></b>),
+  workspace (this view can be open from menu by choosing <b><code>Window -> Show View -> Other... -> General -> Tasks</code></b>),
   </li>
 <li><b>Source</b> tab of editor - icon is visible in line where task is defined on left vertical ruler as well
   as small square on right overview vertical ruler,

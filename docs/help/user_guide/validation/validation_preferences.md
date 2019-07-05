@@ -7,7 +7,7 @@
 <h2>Validation - setting issues severity levels</h2>
 <h3>General information</h3>
 <p>Validation findings levels can be customized in Preferences (<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Errors/Warnings</a></code>).<br/>
+Window -> Preferences -> Robot Framework -> Errors/Warnings</a></code>).<br/>
 Each issue can be reported as error/warning/info/ignore. In case of setting ignore level, such validation issue type will not be visible in Problems view.
 </p>
 <dl class="note">

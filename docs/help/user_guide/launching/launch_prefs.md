@@ -8,7 +8,7 @@
 <h3>General launching preferences</h3>
 <p>General preferences used when launching Robot tests can be found at
 	<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch)')">
-	Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching</a></code>
+	Window -> Preferences -> Robot Framework -> Launching</a></code>
 	preference page. Following settings can be changed:
 	</p>
 <ul>
@@ -29,7 +29,7 @@
 <h3>Default launch configurations</h3>
 <p>All arguments which are set at 
 	<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
-	Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching -&gt; Default Launch Configurations</a></code>
+	Window -> Preferences -> Robot Framework -> Launching -> Default Launch Configurations</a></code>
 	preference page will be used by RED when new launch configuration is automatically created. This may happen
 	for example when launching suites from <b>Project Explorer</b> and there is no launch configuration matching
 	selected suites (read <a href="ui_elements.html#launching">launching</a> paragraph to see when RED automatically
@@ -43,7 +43,7 @@
 <p>
     Run and Debug actions, depending on preferences, can use previously used or created launch configuration or create a new one.
     Standard behavior can be changed at <code><a class="command" href='javascript:executeCommand("org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage)")'>
-    Window -&gt; Preferences -&gt; Run/Debug -&gt; Launching</a></code> under Launch Operation.
+    Window -> Preferences -> Run/Debug -> Launching</a></code> under Launch Operation.
     </p>
 </body>
 </html>

@@ -20,7 +20,7 @@
 </ul>
 <p>In order to setup debugging sessions proper launch configuration needs to be created. In order to do this 
 	one can simply run a wizard: <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.newWizard(newWizardId=org.robotframework.red.wizard.new.redPydevdLaunchConfig)')">
-    New  -&gt; Other -&gt; Robot Framework -&gt; RED with PyDev debugging session</a></code>. The launch configuration
+    New  -> Other -> Robot Framework -> RED with PyDev debugging session</a></code>. The launch configuration
     created by this wizard will be created for selected suites inside project (if there is a suite selected in Project
     Explorer view).
 	</p>
@@ -101,7 +101,7 @@
 </li>
 <li>the <b>Python debug server</b> needs to be started. This can be done manually:<br/>
 <img src="images/red_pydev_wizard_server.png"/><br/>
-        or automatically if proper PyDev preference is enabled (<code>Preferences -&gt; PyDev -&gt; Debug -&gt; Remote debugger server activation</code>).
+        or automatically if proper PyDev preference is enabled (<code>Preferences -> PyDev -> Debug -> Remote debugger server activation</code>).
         <p></p>
 </li>
 <li>the address and port passed by launch configuration for Python debugger need to be the same 

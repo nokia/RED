@@ -19,7 +19,7 @@ When given input is camel case string (for example: REA, CrBiFi, WaUCr) keywords
 <br/><br/><img src="images/content-assist-camel-case.png"/> <br/><br/><br/>
 <h3>Content assistance preferences </h3>
 Behavior of content assist can be changed at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor -&gt; Content Assist</a></code>.<br/>
+Window -> Preferences -> Robot Framework -> Editor -> Content Assist</a></code>.<br/>
 <br/><b>Auto activation</b><br/>
 When auto activation is enabled, triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br/>
 <br/><b>Keywords</b><br/>

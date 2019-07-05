@@ -13,7 +13,7 @@
 <h3>Robot launch configuration</h3>
 <p>Open 
 	<code><a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenRunConfigurations')">
-	Run -&gt; Run Configurations...</a></code> dialog and under <b>Robot</b> element create new configuration. The
+	Run -> Run Configurations...</a></code> dialog and under <b>Robot</b> element create new configuration. The
 	configuration itself is using couple of tabs:
 	</p>
 <ul>

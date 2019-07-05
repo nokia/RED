@@ -12,8 +12,8 @@ spell check. Validation mechanism walk down the project tree and read all test f
 </p>
 <h3>Validation execution</h3>
 <p>Validation mechanism is executed any time when edited file is changed with slight delay while <b>Build Automatic </b>
-option is selected from Project. Whole project validation can be manually started using option <b><code>Project -&gt; Clean</code></b>.<br>
-Resources can be also validated by selecting <b><code>Robot Framework -&gt; Revalidate</code></b> option in Project explorer.<br/>
+option is selected from Project. Whole project validation can be manually started using option <b><code>Project -> Clean</code></b>.<br>
+Resources can be also validated by selecting <b><code>Robot Framework -> Revalidate</code></b> option in Project explorer.<br/>
 </br></p>
 <p>The file which currently edited within Suite Editor is constantly validated in background giving quick feedback
 about potential problems.
@@ -21,7 +21,7 @@ about potential problems.
 <dl class="note">
 <dt>Note</dt>
 <dd>Although not recommended, validation can be turned off in Preferences (<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.validation)')">
-   Window -&gt; Preferences -&gt; Robot Framework -&gt; Errors/Warnings</a></code>).
+   Window -> Preferences -> Robot Framework -> Errors/Warnings</a></code>).
    </dd>
 </dl>
 <h3>Validation preferences</h3>

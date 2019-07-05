@@ -85,7 +85,7 @@
 			version you are using
 		</li>
 <li>go to <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Installed frameworks</a></code>
+Window -> Preferences -> Robot Framework -> Installed frameworks</a></code>
 </li>
 <li>click <i>Add...</i> button and select bin directory from 1.
 		</li>

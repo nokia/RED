@@ -33,7 +33,7 @@ We recommend to install Python packages using pip. <br/>
 <h3>Install RED into Eclipse</h3>
 <h4>Install from Eclipse Marketplace</h4>
 <ul>
-<li>Start Eclipse, open <b><code>Help -&gt; Eclipse Marketplace</code></b></li>
+<li>Start Eclipse, open <b><code>Help -> Eclipse Marketplace</code></b></li>
 <li>Search for "RED Robot Editor"</li>
 <li>Install preferred version accepting license</li>
 <li>Restart Eclipse to apply changes</li>
@@ -41,12 +41,12 @@ We recommend to install Python packages using pip. <br/>
 <h4>Install from zip file</h4>
 <ul>
 <li>Start Eclipse, accept default Workspace folder placement<br/></li>
-<li>Open <b><code>Help -&gt; Install New Software</code></b><br/></li>
-<li>Click <b><code>Add -&gt; Archive</code></b> and select RED zip feature (eg. org.robotframework.ide.eclipse.feature_1.0.0.201507130728.zip)<br/></li>
+<li>Open <b><code>Help -> Install New Software</code></b><br/></li>
+<li>Click <b><code>Add -> Archive</code></b> and select RED zip feature (eg. org.robotframework.ide.eclipse.feature_1.0.0.201507130728.zip)<br/></li>
 <li>Tick all boxes in Robot Framework IDE Category and apply Next<br/></li>
 <li>Accept all prompts and user licences, proceed with installation process<br/></li>
 <li>Restart Eclipse as prompted<br/></li>
-<li>Verify RED installation by opening <b><code>Help -&gt; About RED -&gt; Installation Details</code></b> to check if RED is visible on installed features list<br/></li>
+<li>Verify RED installation by opening <b><code>Help -> About RED -> Installation Details</code></b> to check if RED is visible on installed features list<br/></li>
 </ul>
 </body>
 </html>

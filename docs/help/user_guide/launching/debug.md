@@ -65,7 +65,7 @@
 <p>You may edit the launch configuration in order to limit test cases which should be executed in your debug
 	session. Open 
 	<code><a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenDebugConfigurations')">
-	Run -&gt; Debug Configurations...</a></code> dialog and choose which cases should be executed:
+	Run -> Debug Configurations...</a></code> dialog and choose which cases should be executed:
 	</p>
 <img src="images/debug_4.png"/>
 <br/>

@@ -69,7 +69,7 @@
 	the rest mean that there are <code>3</code> elements inside it. Lists are labeled in the same way. 
 	Additionally you may display <b>Actual Type</b> column which would also show types of 
 	objects for scalar variables and for objects inside list/dictionaries. To do it click on arrow icon in the top 
-	right corner of the Variables view, choose <b><code>Layout -&gt; Select Columns...</code></b> and select <b>Actual Type</b>
+	right corner of the Variables view, choose <b><code>Layout -> Select Columns...</code></b> and select <b>Actual Type</b>
 	column.
 	</p>
 <p>Variables are send from Robot to RED every time when RED is ordered to suspend the execution. Sometimes you may observe 
@@ -131,7 +131,7 @@ After suspension you may open source file related to any frame by double clickin
 #### Instruction pointers
 
 The editor opened for any frame displays __instruction pointer__ - by default it's a green background	displayed in line which relates to chosen stack frame. You may also notice that instruction pointer for	top frame is a bit darker than pointers for other frames. The way the instruction pointers are displayed can be configured	in preferences: <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations)')">
-	General -&gt; Editors &gt; Text Editors &gt; Annotations</a></code> (change annotations __Debug Call Stack__ for 	ordinary frame or __Debug Current Instruction Pointer__ for top frame)	
+	General -> Editors &gt; Text Editors &gt; Annotations</a></code> (change annotations __Debug Call Stack__ for 	ordinary frame or __Debug Current Instruction Pointer__ for top frame)	
 
 You may also encounter situation in which current frame is somehow erroneous. This situation is rather unusual	in local launches (although may happen) but it can be more common in remote debugging sessions. There may be many 	different causes for such debugging errors but in general it happens when remote code under execution differs	from the code found locally in RED workspace. For example picture below presents situation in which remotely	executing `` types.robot `` suite calls `` Log `` keyword, but in local code there is a call to 	`` Log many `` keyword. As you can see instruction pointer in this situation is RED and there is a problem	explanation when you hover the cursor over the problematic line.	
 

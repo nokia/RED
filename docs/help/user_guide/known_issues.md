@@ -34,7 +34,7 @@
 <p><img src="images/unicode.png"/></p>
 <p>This can be fixed by selecting proper file encoding in 
 		Preferences (at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.preferencePages.Workspace)')">
-		Window -&gt; Preferences -&gt; General -&gt; Workspace</a></code> change <b>Text file encoding</b> to UTF-8).</p>
+		Window -> Preferences -> General -> Workspace</a></code> change <b>Text file encoding</b> to UTF-8).</p>
 </li>
 <li>
 <h3>Unicode characters in paths with Python 2 on Windows platform</h3>
@@ -55,7 +55,7 @@
 <p>RED Product for Linux has configuration to use GTK2, Eclipse users should check and change - if necessary - to GTK2.
 		</p>
 <h4>Verifying current GTK version used</h4>
-<p>GTK version can be checked in Eclipse under <b><code>Help -&gt; Installation Details -&gt; Configuration</code></b>, 
+<p>GTK version can be checked in Eclipse under <b><code>Help -> Installation Details -> Configuration</code></b>, 
 		search for <code>org.eclipse.swt.internal.gtk.version</code> entry.
 		</p>
 <h4>Setting GTK2 system wide</h4>

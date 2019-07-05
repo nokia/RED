@@ -35,7 +35,7 @@
 <dl class="note">
 <dt>Note</dt>
 <dd>Key bindings can be configured in Preferences (<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.preferencePages.Keys)')">
-		Window -&gt; Preferences -&gt; General -&gt; Keys</a></code>).</dd>
+		Window -> Preferences -> General -> Keys</a></code>).</dd>
 </dl>
 <h3>Key shortcuts in editors</h3>
 <table>

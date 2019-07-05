@@ -6,7 +6,7 @@
 <a href="../../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../../help/user_guide/launching.html">Launching Tests</a> &gt; <a href="../../../../../help/user_guide/launching/debug.html">Debugging Robot</a> &gt; 
 	<h2>Debugger preferences</h2>
 <p>Following settings found at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.debugger)')">
-	Window -&gt; Preferences -&gt; Robot Framework -&gt; Launching -&gt; Debugger</a></code>
+	Window -> Preferences -> Robot Framework -> Launching -> Debugger</a></code>
 	preference page which can be adjusted in order to influence debugger behavior:
 	</p>
 <ul>

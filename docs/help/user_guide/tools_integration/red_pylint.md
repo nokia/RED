@@ -15,13 +15,13 @@
 <h3>PyDev installation</h3>
 <p>We recommend to install PyDev from Eclipse Marketplace:</p>
 <ul>
-<li>Open Eclipse Marketplace: <b><code>Help -&gt; Eclipse
+<li>Open Eclipse Marketplace: <b><code>Help -> Eclipse
 				Marketplace</code></b>,</li>
 <li>in Find field enter PyDev and proceed with installation
 			instructions,</li>
 <li>when prompted, restart Eclipse/RED Product,</li>
 <li>check PyDev preferences for python interpreters under <b><code>Windows
-				-&gt; Preferences -&gt; PyDev</code></b>.</li>
+				-> Preferences -> PyDev</code></b>.</li>
 </ul>
 <h3>Debugging tests with RED &amp; PyDev</h3>
 <p>It is possible to debug the tests together with python code using RED and PyDev. For detailed
@@ -42,10 +42,10 @@
 <li>enable PyLint,</li>
 <li>enable redirecting PyLint output to console,</li>
 <li>
-			provide proper PyLint executable paths in PyDev preferences: <b><code>Window -&gt; Preferences -&gt; PyDev -&gt; PyLint</code></b>,
+			provide proper PyLint executable paths in PyDev preferences: <b><code>Window -> Preferences -> PyDev -> PyLint</code></b>,
 		</li>
 <li>sometimes it is necessary to set folder with sources for
-			PyDev in Project properties: right click on <b><code>Project -&gt; PyDev -&gt; Set as Source Folder (add to PYTHONPATH)</code></b>,
+			PyDev in Project properties: right click on <b><code>Project -> PyDev -> Set as Source Folder (add to PYTHONPATH)</code></b>,
 		</li>
 <li>restart Eclipse/RED Product.</li>
 </ul>

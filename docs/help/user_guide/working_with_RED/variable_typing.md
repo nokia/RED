@@ -12,7 +12,7 @@ When selected text matches given pattern and one of variable identifiers is type
 <br/><br/><img src="images/variable_typing.gif"/> <br/><br/>
 <h3>Variable typing preferences</h3>
 All variable typing related preferences (bracket insertion, text wrapping, text wrapping pattern) can be configured at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor)')">
-Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor</a></code> in <b>Variables</b> section.
+Window -> Preferences -> Robot Framework -> Editor</a></code> in <b>Variables</b> section.
 <br/><br/><img src="images/variable_preferneces.png"/> <br/><br/>
 </body>
 </html>

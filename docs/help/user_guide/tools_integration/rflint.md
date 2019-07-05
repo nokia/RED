@@ -11,7 +11,7 @@
 	</p>
 <h3>Running RfLint</h3>
 <p>RfLint can be run on selected file or folder (or whole project) in <b>Project Explorer</b> view. In order
-	to start analysis open context menu for selected resource and choose <b><code>Robot Framework -&gt; Run RfLint analysis</code></b>.
+	to start analysis open context menu for selected resource and choose <b><code>Robot Framework -> Run RfLint analysis</code></b>.
 	</p>
 <img src="images/rflint_run.png"/>
 <p>The analysis should start and its progress is visible in <b>Progress</b> view. At any time you can abort running
@@ -24,7 +24,7 @@
 	in <b>Problems</b> view and are also visible in editors. 
 	</p>
 <img src="images/rflint_problems.png"/>
-<p>In order to remove problems simply choose <b><code>Robot Framework -&gt; Clean RfLint problems</code></b> from context menu
+<p>In order to remove problems simply choose <b><code>Robot Framework -> Clean RfLint problems</code></b> from context menu
 	of selected resource.
 	</p>
 <dl class="note">
@@ -35,7 +35,7 @@
 <h3>Configuration</h3>
 <p>It is possible to configure RfLint behavior in Preferences (
 		<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint)')">
-		Window -&gt; Preferences -&gt; Robot Framework -&gt; Errors/Warnings -&gt; RfLint validation</a></code>).
+		Window -> Preferences -> Robot Framework -> Errors/Warnings -> RfLint validation</a></code>).
 	</p>
 <img src="images/rflint_preferences.png"/>
 <p>The table shows all available rules grouped by the source files where they are defined. It is possible

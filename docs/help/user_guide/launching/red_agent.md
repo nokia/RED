@@ -21,7 +21,7 @@
 <h3>Obtaining agent script</h3>
 <p>You can always obtain agent script from RED within Preferences dialog
 	(at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
-	Window -&gt; Preferences -&gt; Robot Framework -&gt; Default Launch Configurations
+	Window -> Preferences -> Robot Framework -> Default Launch Configurations
 	</a></code>, use <b>Export Client Script</b> button). Additionally the file may be saved
 	straight from launch configuration dialog.
 	</p>

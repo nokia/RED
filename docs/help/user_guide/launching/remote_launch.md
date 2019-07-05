@@ -11,7 +11,7 @@
 <h2>Remote launch configuration</h2>
 <p>Open 
 	<code><a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenRunConfigurations')">
-	Run -&gt; Run Configurations...</a></code> dialog and under <b>Robot Remote</b> create new configuration. The
+	Run -> Run Configurations...</a></code> dialog and under <b>Robot Remote</b> create new configuration. The
 	configuration itself is rather simple and consists mainly of network-related settings: 
 	</p>
 <img src="images/remote_config.png"/>
