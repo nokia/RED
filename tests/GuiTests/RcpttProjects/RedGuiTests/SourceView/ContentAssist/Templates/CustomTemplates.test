@@ -1,0 +1,255 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CustomTemplates
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _iu5KAKGHEemGTZOc_dtNHw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/8/19 6:21 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Templates"
+    get-button "New..." | click
+}
+
+//check new templates elements
+with [get-window Preferences | get-window "New Template"] {
+    get-editbox -after [get-label "Name:"] | get-property text | equals "" | verify-true
+    with [get-combo -after [get-label "Context:"]] {
+        get-property "values[0]" | equals "Keyword call" | verify-true
+        get-property "values[1]" | equals "New keyword" | verify-true
+        get-property "values[2]" | equals "New section" | verify-true
+        get-property "values[3]" | equals "New task" | verify-true
+        get-property "values[4]" | equals "New test" | verify-true
+    }
+    // checkbox on
+    get-button "Automatically insert" | get-property selected | equals true | verify-true
+    
+    // no description
+    get-editbox -after [get-label "Description:"] | get-property text | equals "" | verify-true
+    
+    // preview
+    get-text-viewer | get-property text | equals "" | verify-true
+    get-button "Insert Variable..." | get-property enablement | equals true | verify-true
+}
+
+// add KW call with no description
+with [get-window Preferences] {
+    with [get-window "New Template"] {
+        get-editbox -after [get-label "Name:"] | set-text "compare values"
+        get-editbox -after [get-label "Description:"] | click-text
+        get-text-viewer | type-text "Catenate  3  4"
+        get-button OK | click
+    }
+    // add new TC
+    get-button "New..." | click
+    with [get-window "New Template"] {
+        get-editbox -after [get-label "Name:"] | set-text "my TC"
+        get-combo -after [get-label "Context:"] | select "New test"
+        get-editbox -after [get-label "Description:"] | set-text "Test with loop"
+        get-button "Automatically insert" | uncheck
+        with [get-text-viewer] {
+            set-caret-pos 4 15
+            type-text "loop\n"
+                + "    :FOR    $${s}  IN RANGE    100\n"
+			    + "\\    log  7\n"
+			    + "Catenate    11    $${x}" 
+        	set-caret-pos 3 16
+        	
+        }
+        // add coursor variable after Log KW
+        get-button "Insert Variable..." | click
+    	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select cursor | click -default
+    	get-button OK | click
+    }
+}
+
+// add new KW
+with [get-window Preferences] {
+    get-button "New..." | click
+    with [get-window "New Template"] {
+        get-editbox -after [get-label "Name:"] | set-text "simple KW"
+        get-combo -after [get-label "Context:"] | select "New keyword"
+        get-editbox -after [get-label "Description:"] | set-text "My KW"
+        with [get-text-viewer] {
+            type-text "my kw"
+            key-type Enter
+            type-text "    Log  7"
+            key-type Enter
+            type-text "[Return]  6"
+        }
+        get-button OK | click
+    }
+    
+    // add setting - no name
+    get-button "New..." | click
+    with [get-window "New Template"] {
+        get-editbox -after [get-label "Description:"] | set-text abc
+        get-combo -after [get-label "Context:"] | select "New section"
+        with [get-text-viewer] {
+            key-type "NUMPAD_MULTIPLY" "*" -times 3
+            type-text " Setting"
+            key-type "NUMPAD_MULTIPLY" "*" -times 3
+            key-type "NUMPAD_ENTER" "\\u000D"
+            type-text "Tags  7  8"
+        }
+    }
+}
+//check error
+get-window Preferences | get-window "New Template" | get-label "Template name cannot be empty." | get-property caption 
+    | equals "Template name cannot be empty." | verify-true
+    
+//add name    
+with [get-window Preferences] {
+    with [get-window "New Template"] {
+        get-editbox -after [get-label "Name:"] | set-text S1
+        get-button OK | click
+    }
+    get-button "Apply and Close" | click
+}
+
+
+//open file
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+// open CA after TC section
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+}
+//check if new Templates are in CA
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-item -path "Settings section - New settings section with settings" | get-property index | equals 6 | verify-true
+    get-item -path "S1 - abc" | get-property index | equals 7 | verify-true
+    get-item -path "New test - New test case with settings" | get-property index | equals 8 | verify-true
+    get-item -path "my TC - Test with loop" | get-property index | equals 9 | verify-true
+}
+
+// add cusom TC - check if caret is in declared position
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "my TC - Test with loop" 
+    | click -default
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Test Cases ***\n"
+        + "loop\n"
+        + "    :FOR    ${s}  IN RANGE    100\n"
+        + "    \\    log  7\n"
+        + "    Catenate    11    ${x}" | verify-true
+    get-property "caretPosition.line" | equals 4 | verify-true
+    get-property "caretPosition.column" | equals 16 | verify-true
+} 
+
+
+
+// add new line ad use Keyword call
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 27
+    key-type "NUMPAD_ENTER" "\\u000D"
+    set-caret-pos 6 5
+    type-text com
+    key-type "M1+SPACE"
+}
+
+//check that is no Description
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Comment - BuiltIn" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "compare values -" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "compare values - " | click 
+    -default
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "loop\n"
+    + "    :FOR    ${s}  IN RANGE    100\n"
+    + "    \\    log  7\n"
+    + "    Catenate    11    ${x}\n"
+    + "    Catenate  3  4" | verify-true
+    
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 19
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type "M1+SPACE"
+}   
+//add new section
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "S1 - abc" | click -default
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "loop\n"
+    + "    :FOR    ${s}  IN RANGE    100\n"
+    + "    \\    log  7\n"
+    + "    Catenate    11    ${x}\n"
+    + "    Catenate  3  4\n"
+    + "    \n"
+    + "*** Setting***\n"
+    + "Tags  7  8" | verify-true
+    
+// add Suite setup and check if Keyword call works in Settings    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 11
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "Suite Setup  comp"
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "compare values - " | click 
+    -default
+
+// KW is added to setting    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "loop\n"
+    + "    :FOR    ${s}  IN RANGE    100\n"
+    + "    \\    log  7\n"
+    + "    Catenate    11    ${x}\n"
+    + "    Catenate  3  4\n"
+    + "    \n"
+    + "*** Setting***\n"
+    + "Tags  7  8\n"
+    + "Suite Setup  Catenate  3  4" | verify-true
+    
+//add KW section    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 10 28
+        key-type Enter
+        type-text "*** Keywords ***\n"
+        key-type "M1+SPACE"
+    }
+}
+
+// KW template is in list
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-item -path "Settings section - New settings section with settings" | get-property index | equals 6 | verify-true
+    get-item -path "S1 - abc" | get-property index | equals 7 | verify-true
+    get-item -path "New keyword - New keyword with settings" | get-property index | equals 8 | verify-true
+    get-item -path "simple KW - My KW" | get-property index | equals 9 | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "simple KW - My KW" | click 
+    -default
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "loop\n"
+    + "    :FOR    ${s}  IN RANGE    100\n"
+    + "    \\    log  7\n"
+    + "    Catenate    11    ${x}\n"
+    + "    Catenate  3  4\n"
+    + "    \n"
+    + "*** Setting***\n"
+    + "Tags  7  8\n"
+    + "Suite Setup  Catenate  3  4\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    Log  7\n"
+    + "    [Return]  6" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

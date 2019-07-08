@@ -1,0 +1,366 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DefaultTemplates
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _DWEyMKF1EemGTZOc_dtNHw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/8/19 3:59 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor/Templates"
+get-window Preferences | maximize
+
+//check view
+with [get-window Preferences | get-table] {
+    //columns
+    get-property itemCount | equals 4 | verify-true
+    get-property "columns[0].caption" | equals Name | verify-true
+    get-property "columns[1].caption" | equals Context | verify-true
+    get-property "columns[2].caption" | equals Description | verify-true
+    get-property "columns[3].caption" | equals "Auto Insert" | verify-true
+    
+    //New keyword with settings
+    get-item -path "New keyword" | get-property "values['Description']" | equals "New keyword with settings" 
+        | verify-true
+    get-item -path "New keyword" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New keyword" | get-property "values['Name']" | equals "New keyword" | verify-true
+    get-item -path "New keyword" | get-property "values['Context']" | equals "New keyword" | verify-true
+    
+    //task
+    get-item -path "New task" | get-property "values['Description']" | equals "New task with settings" | verify-true
+    get-item -path "New task" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New task" | get-property "values['Name']" | equals "New task" | verify-true
+    get-item -path "New task" | get-property "values['Context']" | equals "New task" | verify-true
+    
+    //case
+    get-item -path "New test" | get-property "values['Description']" | equals "New test case with settings" 
+        | verify-true
+    get-item -path "New test" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New test" | get-property "values['Name']" | equals "New test" | verify-true
+    get-item -path "New test" | get-property "values['Context']" | equals "New test" | verify-true
+    
+    //settings
+    get-item -path "Settings section" | get-property "values['Description']" 
+        | equals "New settings section with settings" | verify-true
+    get-item -path "Settings section" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "Settings section" | get-property "values['Name']" | equals "Settings section" | verify-true
+    get-item -path "Settings section" | get-property "values['Context']" | equals "New section" | verify-true
+}
+//check preview
+get-window Preferences | get-table | select "New task"
+get-window Preferences | get-text-viewer | get-property text | equals "Task\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true
+    
+get-window Preferences | get-table | select "New keyword"
+get-window Preferences | get-text-viewer | get-property text | equals "Keyword\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Arguments]\n"
+    + "    [Timeout]\n"
+    + "    [Teardown]\n"
+    + "    [Return]" | verify-true
+    
+get-window Preferences | get-table | select "Settings section"
+get-window Preferences | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout" | verify-true
+    
+get-window Preferences | get-table | select "New test"
+get-window Preferences | get-editbox -after [get-label "Preview:"] | get-property text | equals "Test\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true
+    
+    
+    
+//open file and add settings
+get-window Preferences | get-button Cancel | click
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type Enter
+    key-type Up
+    key-type "M1+SPACE"
+}
+
+// add setting section
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Settings \\*\\*\\*" 
+    | click -default
+    
+// new template is shown    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+SPACE"
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item 
+    -path "Settings section - New settings section with settings" | get-property caption 
+    | equals "Settings section - New settings section with settings" | verify-true
+    
+// go to template section in CA    
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Comments \\*\\*\\*" 
+    | key-type "M1+SPACE" -times 3
+    
+// is only one    
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Settings section - New settings section with settings" 
+        | verify-true
+}
+// select Setting tempalte
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Settings section - New settings section with settings" | click -default
+    
+    
+    
+//check text    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout\n"
+    + "*** Test Cases ***" | verify-true
+    
+// go down below TC    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 12 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+}
+
+//check if New TEst is shown and add it
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 8 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "Settings section - New settings section with settings" 
+        | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "New test - New test case with settings" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "New test - New test case with settings" | click -default
+    
+//check text    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout\n"
+    + "*** Test Cases ***\n"
+    + "Test\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true
+    
+// go down and add KW section    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 18 15
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 200
+    key-type Down
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 200
+}
+
+//check if new KW is visible
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 8 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "Settings section - New settings section with settings" 
+        | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "New keyword - New keyword with settings" | verify-true
+}
+
+// add new KW
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "New keyword - New keyword with settings" | click -default
+    
+//check text    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout\n"
+    + "*** Test Cases ***\n"
+    + "Test\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "Keyword\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Arguments]\n"
+    + "    [Timeout]\n"
+    + "    [Teardown]\n"
+    + "    [Return]" | verify-true
+    
+// add Log to KW    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 27 13
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "log  8"
+	
+	//add new line and open CA
+    set-caret-pos 28 11
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+}
+
+//check if Templates are empty in TKW secion - KW
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Keywords proposals" | get-property caption 
+    | equals "Press M1+Space to show Keywords proposals" | verify-true
+    
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\[Documentation\\]" 
+    | key-type "M1+SPACE"
+// vars    
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Variables proposals" | get-property caption 
+    
+    | equals "Press M1+Space to show Variables proposals" | verify-true
+
+// tempaltes   
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
+    
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Templates proposals" | get-property caption 
+    | equals "Press M1+Space to show Templates proposals" | verify-true
+
+// no proposal    
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "no proposals" 
+    | key-type "TRAVERSE_ESCAPE"
+    
+// add KW to TC and open CA below    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 19 5
+    type-text "log  99"
+    key-type Enter
+    key-type "M1+SPACE"
+}
+//Kw
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Keywords proposals" | get-property caption 
+    | equals "Press M1+Space to show Keywords proposals" | verify-true
+    
+with [get-window -from "CompletionProposalPopup.createProposalSelector()"] {
+    get-table | select "\\[Documentation\\]" | key-type "M1+SPACE"
+}
+
+//vars
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Variables proposals" | get-property caption 
+    | equals "Press M1+Space to show Variables proposals" | verify-true
+    
+// tempates    
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
+get-window -from "CompletionProposalPopup.createProposalSelector()" 
+    | get-label "Press M1+Space to show Templates proposals" | get-property caption 
+    | equals "Press M1+Space to show Templates proposals" | verify-true
+
+// no propsal    
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
+ 
+ 
+// add task
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu 
+    -path "New/Robot Task Suite" | click
+with [get-window "New Robot Task Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text task
+    get-button Finish | click
+}
+with [get-editor "task.robot" | get-text-viewer] {
+    set-caret-pos 1 14
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+}
+
+//check CA for tasks
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 8 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "Settings section - New settings section with settings" 
+        | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "New task - New task with settings" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "New task - New task with settings" | click -default
+get-editor "task.robot" | get-text-viewer | get-property text | equals "*** Tasks ***\n"
+    + "Task\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true 
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

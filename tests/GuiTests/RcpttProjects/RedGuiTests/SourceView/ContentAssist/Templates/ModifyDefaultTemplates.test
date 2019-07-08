@@ -1,0 +1,347 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ModifyDefaultTemplates
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KSrzcKF_EemGTZOc_dtNHw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/8/19 4:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor/Templates"
+get-window Preferences | maximize
+
+//select new task and remove it
+with [get-window Preferences] {
+    get-table | select "New task"
+    get-button Remove | click
+    
+    //change name and description in KW
+    get-table | select "New keyword" | double-click
+    with [get-window "Edit Template"] {
+        get-editbox -after [get-label "Name:"] | set-text "My new keyword"
+        get-editbox -after [get-label "Description:"] | set-text "New descripotion"
+        get-button OK | click
+    }
+}
+
+//check warning
+get-window Preferences | get-window "Edit Template" 
+    | get-label "The name of the template has been changed. Click 'Yes' to create an additional template with the new name or 'No' to rename the existing one." 
+    | get-property caption 
+    | equals "The name of the template has been changed. Click 'Yes' to create an additional template with the new name or 'No' to rename the existing one." 
+    | verify-true
+    
+//selecy No
+get-window Preferences |  get-window "Edit Template" | get-button No | click
+
+// edit New test    
+with [get-window Preferences] {    
+    get-table | select "New test"
+    get-button "Edit..." | click
+    with [get-window "Edit Template"] {
+        with [get-text-viewer] {
+            //add Doc
+            set-caret-pos 2 20
+            type-text "  abc123"
+            set-caret-pos 5 12
+            //setup
+            type-text "  log  123"
+            // remove Teardown
+            set-caret-pos 6 14
+            select-range 6 15 6 1
+            key-type BackSpace -times 2
+        }
+        get-button OK | click
+    } 
+}
+
+//change Setting to test
+with [get-window Preferences] {
+    get-table | select "Settings section" | double-click
+    with [get-window "Edit Template"] {
+        get-combo -after [get-label "Context:"] | select "New test"
+        get-button OK | click
+    }
+}
+// applay and open again - now view must be restarted
+get-window Preferences |   get-button "Apply and Close" | click
+
+get-preferences-menu | click
+get-window Preferences | maximize
+with [get-window Preferences | get-table] {
+
+	// 3 elements
+	get-property itemCount | equals 3 | verify-true
+	
+    get-item -path "My new keyword" | get-property "values['Description']" | equals "New descripotion" | verify-true
+    get-item -path "My new keyword" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "My new keyword" | get-property "values['Name']" | equals "My new keyword" | verify-true
+    get-item -path "My new keyword" | get-property "values['Context']" | equals "New keyword" | verify-true
+    
+    
+    get-item -path "New test" | get-property "values['Description']" | equals "New test case with settings" 
+        | verify-true
+    get-item -path "New test" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New test" | get-property "values['Name']" | equals "New test" | verify-true
+    get-item -path "New test" | get-property "values['Context']" | equals "New test" | verify-true
+    
+    
+    get-item -path "Settings section" | get-property "values['Description']" 
+        | equals "New settings section with settings" | verify-true
+    get-item -path "Settings section" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "Settings section" | get-property "values['Name']" | equals "Settings section" | verify-true
+    get-item -path "Settings section" | get-property "values['Context']" | equals "New test" | verify-true
+    
+}
+
+// check preview - test
+get-window Preferences | get-table | select "New test"
+get-window Preferences | get-text-viewer | get-property text | equals "Test\n"
+    + "    [Documentation]  abc123\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]  log  123" | verify-true
+    
+// check preview - KW    
+get-window Preferences | get-table | select "My new keyword"
+get-window Preferences | get-text-viewer | get-property text | equals "Keyword\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Arguments]\n"
+    + "    [Timeout]\n"
+    + "    [Teardown]\n"
+    + "    [Return]" | verify-true
+    
+// check preview - settings    
+get-window Preferences | get-table | select "Settings section"
+get-window Preferences | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout" | verify-true
+    
+get-window Preferences | get-button "Apply and Close" | click
+
+
+//open file and add modified tempaltes
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+}
+
+//check if under TC are 2 tempaltes
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-item -path "New test - New test case with settings" | get-property caption 
+        | equals "New test - New test case with settings" | verify-true
+    get-item -path "Settings section - New settings section with settings" | get-property caption 
+        | equals "Settings section - New settings section with settings" | verify-true
+}
+
+//select modified test case template
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "New test - New test case with settings" | click -default
+    
+//check text    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    [Documentation]  abc123\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]  log  123" | verify-true
+    
+// add setting template    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 22
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Enter
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Settings section - New settings section with settings" | click -default
+    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    [Documentation]  abc123\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]  log  123\n"
+    + "    \n"
+    + "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout" | verify-true
+        
+    
+// ---------------------------------- insert mode --------------------------
+//select option to auto insert CA
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    with [get-group "Auto insert" | get-button "Insert single proposals automatically"] {
+        check
+    }
+    get-button "Apply and Close" | click
+}
+
+// add KW section
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 17 13
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Keywords \\*\\*\\*" 
+    | click -default
+    
+// type part of KW name and open CA     
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    type-text "new key"
+    key-type "M1+SPACE"
+}
+
+// content is auto - inserted
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "Test\n"
+    + "    [Documentation]  abc123\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]  log  123\n"
+    + "    \n"
+    + "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout\n\n"
+    + "*** Keywords ***\n"
+    + "new Keyword\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Arguments]\n"
+    + "    [Timeout]\n"
+    + "    [Teardown]\n"
+    + "    [Return]" | verify-true
+
+// uncheck "Automatically insert" 
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Templates"
+    get-table | select "My new keyword"
+    get-button "Edit..." | click
+    with [get-window "Edit Template"] {
+        get-button "Automatically insert" | uncheck
+        get-button OK | click
+    }
+    get-button "Apply and Close" | click
+}
+
+// add new KW, check that CA is shown
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 25 15
+    key-type Down
+    key-type Enter
+    key-type Left -times 4
+    type-text "my new"
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property "selection[0].path[0]" 
+    | equals "My new keyword - New descripotion" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
+    
+    
+// ----------------------------- restore defaults ------------------------------------------------------------
+
+get-preferences-menu | click
+get-window Preferences | get-button "Restore Defaults" | click
+
+//task is back
+with [get-window Preferences | get-table] {
+    get-property itemCount | equals 4 | verify-true
+    get-item -path "New keyword" | get-property "values['Description']" | equals "New keyword with settings" 
+        | verify-true
+    get-item -path "New keyword" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New keyword" | get-property "values['Name']" | equals "New keyword" | verify-true
+    get-item -path "New keyword" | get-property "values['Context']" | equals "New keyword" | verify-true
+    get-item -path "New task" | get-property "values['Description']" | equals "New task with settings" | verify-true
+    get-item -path "New task" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New task" | get-property "values['Name']" | equals "New task" | verify-true
+    get-item -path "New task" | get-property "values['Context']" | equals "New task" | verify-true
+    get-item -path "New test" | get-property "values['Description']" | equals "New test case with settings" 
+        | verify-true
+    get-item -path "New test" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "New test" | get-property "values['Name']" | equals "New test" | verify-true
+    get-item -path "New test" | get-property "values['Context']" | equals "New test" | verify-true
+    get-item -path "Settings section" | get-property "values['Description']" 
+        | equals "New settings section with settings" | verify-true
+    get-item -path "Settings section" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "Settings section" | get-property "values['Name']" | equals "Settings section" | verify-true
+    get-item -path "Settings section" | get-property "values['Context']" | equals "New section" | verify-true
+}
+
+// check preview
+get-window Preferences | get-table | select "New task"
+get-window Preferences | get-text-viewer | get-property text | equals "Task\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true
+    
+get-window Preferences | get-table | select "New keyword"
+get-window Preferences | get-text-viewer | get-property text | equals "Keyword\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Arguments]\n"
+    + "    [Timeout]\n"
+    + "    [Teardown]\n"
+    + "    [Return]" | verify-true
+    
+get-window Preferences | get-table | select "Settings section"
+get-window Preferences | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation\n"
+    + "Metadata\n"
+    + "Force Tags\n"
+    + "Default Tags\n"
+    + "Suite Setup\n"
+    + "Suite Teardown\n"
+    + "Test Setup\n"
+    + "Test Teardown\n"
+    + "Test Timeout" | verify-true
+    
+get-window Preferences | get-table | select "New test"
+get-window Preferences | get-editbox -after [get-label "Preview:"] | get-property text | equals "Test\n"
+    + "    [Documentation]\n"
+    + "    [Tags]\n"
+    + "    [Timeout]\n"
+    + "    [Setup]\n"
+    + "    [Teardown]" | verify-true
+get-window Preferences | get-button Cancel | click   
+        
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
