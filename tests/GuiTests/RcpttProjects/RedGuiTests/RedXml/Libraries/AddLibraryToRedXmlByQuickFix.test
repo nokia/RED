@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/5/19 4:10 PM
+Save-Time: 7/9/19 11:42 AM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -255,13 +255,20 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text "here_is_class."
     type-text Dog
     key-type "M1+s"
-    wait 500
+}
+
+try -times 4 -delay 500 -command{
+	get-view Problems | get-tree | get-item 
+        -path "Errors \\(1 item\\)/Unknown 'here_is_class.Dog' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property "image.path" | equals ".*quickfix_error_obj.png" | verify-true
+}
+
+with [get-editor "Script.robot" | get-text-viewer] {  
     set-caret-pos 7 19
     wait 100
     get-menu "Quick Fix" | click
     wait 500
-}
-
+}      
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
     
