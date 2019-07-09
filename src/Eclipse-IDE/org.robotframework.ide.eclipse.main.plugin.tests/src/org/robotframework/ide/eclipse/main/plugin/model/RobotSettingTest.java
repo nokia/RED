@@ -104,6 +104,26 @@ public class RobotSettingTest {
         assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
     }
 
+    @Test
+    public void pathToDirMatches_specificationWithInitLibraryPath() {
+        final String libPath = "path/to/lib/__init__.py";
+        IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        absolute = absolute.append("path/to/lib");
+        final IPath libIPath = new Path(libPath);
+
+        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+    }
+
+    @Test
+    public void pathToDirWithSeparatorAtTheEndMatches_specificationWithInitLibraryPath() {
+        final String libPath = "path/to/lib/__init__.py";
+        IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        absolute = absolute.append("path/to/lib/");
+        final IPath libIPath = new Path(libPath);
+
+        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+    }
+
     private static void assertNames(final List<RobotKeywordCall> settings) {
         assertThat(settings.get(0).getName()).isEqualTo("Metadata");
         assertThat(settings.get(1).getName()).isEqualTo("Library");

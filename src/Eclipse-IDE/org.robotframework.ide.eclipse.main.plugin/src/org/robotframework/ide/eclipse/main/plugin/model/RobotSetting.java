@@ -272,9 +272,11 @@ public class RobotSetting extends RobotKeywordCall {
             return absolutePath.toPortableString()
                     .equalsIgnoreCase(
                             RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath).toPortableString())
-                    || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.toPortableString()
+                    || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.removeTrailingSeparator()
+                            .toPortableString()
                             .equalsIgnoreCase(RedWorkspace.Paths
-                                    .toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1))
+                                    .toAbsoluteFromWorkspaceRelativeIfPossible(
+                                            refLibPath.removeLastSegments(1))
                                     .toPortableString());
         } else {
             return absolutePath.equals(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath))

@@ -96,7 +96,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                 if ("__init__.py".equals(entryPath.lastSegment())) {
                     libPath = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.removeLastSegments(1));
-                    if (candidate.toPortableString().equalsIgnoreCase(libPath.toPortableString())) {
+                    if (candidate.removeTrailingSeparator()
+                            .toPortableString()
+                            .equalsIgnoreCase(libPath.toPortableString())) {
                         return libs.get(descriptor);
                     }
                 }
