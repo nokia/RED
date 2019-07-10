@@ -15,12 +15,22 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.libraries";
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".libraries_preferences_page_context");
+    }
 
     @Override
     protected void createFieldEditors() {

@@ -45,8 +45,6 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.validation";
 
-    private static final String HELP_CONTEXT_ID = RedPlugin.PLUGIN_ID + ".validation_preferences_page_context";
-
     private static final String PROBLEM_PREFERENCES = "problemPreferences";
 
     private final Map<ProblemCategory, Severity> currentPreferences;
@@ -70,7 +68,9 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
     @Override
     public void createControl(final Composite parent) {
         super.createControl(parent);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(), HELP_CONTEXT_ID);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".validation_preferences_page_context");
     }
 
     @Override

@@ -20,12 +20,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
 
     private Consumer<Boolean> messageLogLimitEnablementUpdater;
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".launching_preferences_page_context");
+    }
 
     @Override
     protected void createFieldEditors() {

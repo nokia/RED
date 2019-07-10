@@ -10,6 +10,8 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 
@@ -19,6 +21,14 @@ public class DebuggerPreferencePage extends RedFieldEditorPreferencePage {
 
     public DebuggerPreferencePage() {
         setDescription("Configure debugger options");
+    }
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".debugger_preferences_page_context");
     }
 
     @Override

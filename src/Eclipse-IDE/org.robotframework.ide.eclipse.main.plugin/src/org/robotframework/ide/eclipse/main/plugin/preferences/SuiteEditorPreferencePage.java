@@ -22,7 +22,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -39,6 +41,14 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
     private Consumer<String> separatorEnablementUpdater;
 
     private BiConsumer<Boolean, Boolean> variablesEnablementUpdater;
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".editor_preferences_page_context");
+    }
 
     @Override
     protected void createFieldEditors() {

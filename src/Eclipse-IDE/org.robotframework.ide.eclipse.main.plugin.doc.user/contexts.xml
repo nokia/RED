@@ -1,6 +1,52 @@
 <contexts>
+	<context id="editor_preferences_page_context">
+		<description>This page allows you to manage general preferences for source and table editors.</description>
+		<topic href="help/user_guide/working_with_RED/table_general.html" label="Table Editors - general usage hints" ></topic>
+		<topic href="help/user_guide/working_with_RED/variable_typing.html" label="Variable typing in editors"></topic>
+	</context>
+	<context id="assist_preferences_page_context">
+		<description>This page allows you to manage code assistant preferences.</description>
+		<topic href="help/user_guide/working_with_RED/content_assist.html" label="Content assistance"></topic>
+	</context>
+	<context id="coloring_preferences_page_context">
+		<description>This page allows you to manage code syntax coloring.</description>
+		<topic href="help/user_guide/working_with_RED/dark_theme.html" label="Dark theme in RED"></topic>
+	</context>
+	<context id="templates_preferences_page_context">
+		<description>This page allows you to define and manage code templates.</description>
+		<topic href="help/user_guide/working_with_RED/code_templates.html" label="Code templates"></topic>
+	</context>
 	<context id="validation_preferences_page_context">
 		<description>This page allows you to configure severity levels for problems detected by RED.</description>
-		<topic href="help/user_guide/validation/validation_preferences.html" label="Validation - severity levels" ></topic>
+		<topic href="help/user_guide/validation/validation_preferences.html" label="Validation - severity levels"></topic>
+	</context>
+	<context id="rflint_preferences_page_context">
+		<description>This page allows you to configure rules for Robot Framework Lint analysis.</description>
+		<topic href="help/user_guide/tools_integration/rflint.html" label="Robot Framework Lint"></topic>
+	</context>
+	<context id="frameworks_preferences_page_context">
+		<description>This page allows you to detect and manage python installations.</description>
+		<topic href="help/first_steps/setting_up_environment.html" label="Setting up environment"></topic>
+	</context>
+	<context id="launching_preferences_page_context">
+		<description>This page allows you to manage test launching preferences.</description>
+		<topic href="help/user_guide/launching.html" label="Launching Tests"></topic>
+	</context>
+	<context id="parameterized_launching_preferences_page_context">
+		<description>This page allows you to define and manage string substitution variable sets for parameterized launches.</description>
+		<topic href="help/user_guide/launching/string_substitution.html" label="Parameterizing launches"></topic>
+	</context>
+	<context id="debugger_preferences_page_context">
+		<description>This page allows you to manage test debugging preferences.</description>
+		<topic href="help/user_guide/launching/debug.html" label="Debugging Robot"></topic>
+	</context>
+	<context id="libraries_preferences_page_context">
+		<description>This page allows you to manage properties related to Robot libraries.</description>
+		<topic href="help/user_guide/working_with_RED/libs.html" label="Recognizing external libraries in RED" ></topic>
+		<topic href="help/user_guide/working_with_RED/custom_paths_relatve.html" label="Custom python/class paths and path relativeness"></topic>
+	</context>
+	<context id="tasks_preferences_page_context">
+		<description>This page allows you to define and manage FIXME/TODO tags.</description>
+		<topic href="help/user_guide/validation/tasks.html" label="Tasks/TODO"></topic>
 	</context>
 </contexts> 

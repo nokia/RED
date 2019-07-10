@@ -26,7 +26,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -41,8 +41,11 @@ public class EditorTemplatePreferencePage extends TemplatePreferencePage {
     }
 
     @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".templates_preferences_page_context");
     }
 
     @Override
@@ -74,7 +77,7 @@ public class EditorTemplatePreferencePage extends TemplatePreferencePage {
         }
         return null;
     }
-    
+
     private static class EditRedTemplateDialog extends EditTemplateDialog {
 
         private final EditorTemplateVariableProcessor processor;

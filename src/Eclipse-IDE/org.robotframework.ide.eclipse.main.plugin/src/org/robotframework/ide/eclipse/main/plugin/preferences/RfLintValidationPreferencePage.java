@@ -99,7 +99,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     private Composite progressParent;
     private Composite topLevelParent;
     private Link description;
-    
+
     private final Map<RulesFile, List<RfLintRule>> rules = new LinkedHashMap<>();
 
     private CheckboxTreeViewer rulesViewer;
@@ -109,6 +109,14 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     public RfLintValidationPreferencePage() {
         super("RfLint validation settings");
+    }
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".rflint_preferences_page_context");
     }
 
     @Override
@@ -339,7 +347,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 .flatMap(List::stream)
                 .filter(RfLintRule::isConfigured)
                 .collect(toMap(RfLintRule::getRuleName, RfLintRule::getConfiguration));
-        
+
         initializeRules(currentAdditionalFiles, currentRulesConfigs);
     }
 
@@ -351,12 +359,12 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         additionalFiles.stream()
                 .map(path -> new RulesFile(path, false))
                 .forEach(rulesFile -> rules.put(rulesFile, new ArrayList<>()));
-        
+
         final Job rulesReadingJob = Job.createSystem("Reading RfLint rules", monitor -> {
             final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
             final Map<String, RfLintRule> envRules = RfLintRules.getInstance()
                     .loadRules(() -> env.getRfLintRules(additionalFiles));
-            
+
             final List<RfLintRule> missingRules = ruleConfigs.entrySet()
                     .stream()
                     .filter(entry -> !envRules.containsKey(entry.getKey()))
@@ -406,7 +414,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                     rulesViewer.getControl().setEnabled(true);
                     rulesViewer.setExpandedElements(expanded);
                 });
-            };
+            }
         });
         showProgress();
         rulesViewer.getControl().setEnabled(false);
@@ -530,7 +538,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
     }
 
     private static final class RulesFile {
-        
+
         private static final RulesFile MISSING_SOURCE = new RulesFile("Unknown source", false);
 
         private String path;
@@ -822,10 +830,10 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                     index = severities.indexOf(rule.getSeverity());
                 }
                 return index;
-        
+
             } else if (element instanceof RulesFile) {
                 return 0;
-        
+
             } else {
                 return null;
             }

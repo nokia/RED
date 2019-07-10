@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
@@ -89,6 +90,14 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     public InstalledRobotsPreferencesPage() {
         super("Installed Robot Frameworks");
+    }
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".frameworks_preferences_page_context");
     }
 
     @Override

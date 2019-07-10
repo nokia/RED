@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -94,6 +95,14 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
             }
         };
         getPreferenceStore().addPropertyChangeListener(preferenceListener);
+    }
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".coloring_preferences_page_context");
     }
 
     @Override

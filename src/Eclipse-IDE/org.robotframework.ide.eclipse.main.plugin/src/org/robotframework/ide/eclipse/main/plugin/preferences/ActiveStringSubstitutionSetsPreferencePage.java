@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -76,6 +77,14 @@ public class ActiveStringSubstitutionSetsPreferencePage extends RedPreferencePag
         this.variablesManager = new RedStringVariablesManager();
         this.variableSets = new ArrayList<>();
         this.activeVariablesSet = null;
+    }
+
+    @Override
+    public void createControl(final Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench()
+                .getHelpSystem()
+                .setHelp(getControl(), RedPlugin.PLUGIN_ID + ".parameterized_launching_preferences_page_context");
     }
 
     @Override
