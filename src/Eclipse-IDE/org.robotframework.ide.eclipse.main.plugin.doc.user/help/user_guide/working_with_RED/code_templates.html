@@ -1,0 +1,46 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<h2>Code templates</h2>
+
+<p>Templates can be used to define source code patterns that are often repeated. There are inserted by content assist <b>(CTRL+SPACE)</b>.</p>
+<p>There are some templates already defined in RED. User custom templates can be also defined in <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.templates)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor -&gt; Templates</a></code>.</p>
+
+<h3>Template context description</h3>
+<p>Contexts mean places in document where given template make sense and can be inserted.</p>
+<p>
+There are following contexts defined in RED:
+<ul>
+<li><b>Keyword call</b> - makes sense when cursor is placed in places where Robot keyword can be executed</li>
+<li><b>New keyword</b> - make sense only when the cursor is placed in the line beginning inside *** Keywords *** section</li>
+<li><b>New section</b> - make sense only when the cursor is placed in the line beginning inside any section</li>
+<li><b>New task</b> - make sense  only when the cursor is placed in the line beginning inside *** Tasks *** section</li>
+<li><b>New test</b> - make sense  only when the cursor is placed in the line beginning inside *** Test Cases *** section</li>
+</ul>
+</p>
+
+<h3>Automatic proposal insertion</h3>
+
+<p>When there is only one proposal matching user content and automatic insertion is enabled, code assistant will choose and insert it automatically.
+</p>
+
+<p>
+To enable such behavior new preference “Insert single proposals automatically” was added to <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor -&gt; Content Assist</a></code>.<br/>
+This preference has to be enabled first, then “Automatically insert” option from templates will work as described.
+</p>
+
+<h3>Variables in templates</h3>
+
+<p>Template patterns can contain custom user variables. When template is inserted user can define values for such variables.</p>
+<p>There are also several Eclipse predefined variables, which can be inserted with "Insert variables" button or by content assist in pattern editor. Such variables are resolved to concrete values when the template is inserted.</p>
+<p>Following example contains predefined Eclipse variable for dollar sign escape together with two user variables:<br/><br/>
+<code>$${${name}}=&nbsp;&nbsp;&nbsp;&nbsp;Set Variable&nbsp;&nbsp;&nbsp;&nbsp;${value}</code>
+</p>
+
+
+</body>
+</html>
