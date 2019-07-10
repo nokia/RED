@@ -5,19 +5,19 @@
 <body>
 <a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/working_with_RED.html">Working with RED</a> &gt; 
 <h2>Code templates</h2>
-<p>Templates can be used to define source code patterns that are often repeated. There are inserted by content assist <b>(CTRL+SPACE)</b>.</p>
+<p>Templates can be used to define source code patterns that are often repeated. They are inserted by content assist <b>(CTRL+SPACE)</b>.</p>
 <p>There are some templates already defined in RED. User custom templates can be also defined in <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.templates)')">
 Window -> Preferences -> Robot Framework -> Editor -> Templates</a></code>.</p>
 <h3>Template context description</h3>
-<p>Contexts mean places in document where given template make sense and can be inserted.</p>
+<p>Contexts mean places in document where given template makes sense and can be inserted.</p>
 <p>
 There are following contexts defined in RED:
 <ul>
 <li><b>Keyword call</b> - makes sense when cursor is placed in places where Robot keyword can be executed</li>
-<li><b>New keyword</b> - make sense only when the cursor is placed in the line beginning inside *** Keywords *** section</li>
-<li><b>New section</b> - make sense only when the cursor is placed in the line beginning inside any section</li>
-<li><b>New task</b> - make sense  only when the cursor is placed in the line beginning inside *** Tasks *** section</li>
-<li><b>New test</b> - make sense  only when the cursor is placed in the line beginning inside *** Test Cases *** section</li>
+<li><b>New keyword</b> - makes sense only when the cursor is placed in the line beginning inside *** Keywords *** section</li>
+<li><b>New section</b> - makes sense only when the cursor is placed in the line beginning inside any section</li>
+<li><b>New task</b> - makes sense  only when the cursor is placed in the line beginning inside *** Tasks *** section</li>
+<li><b>New test</b> - makes sense  only when the cursor is placed in the line beginning inside *** Test Cases *** section</li>
 </ul>
 </p>
 <h3>Automatic proposal insertion</h3>
