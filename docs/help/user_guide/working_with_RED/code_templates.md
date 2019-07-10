@@ -24,9 +24,9 @@ There are following contexts defined in RED:
 <p>When there is only one proposal matching user content and automatic insertion is enabled, code assistant will choose and insert it automatically.
 </p>
 <p>
-To enable such behavior new preference “Insert single proposals automatically” was added to <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
+To enable such behavior new preference "Insert single proposals automatically" was added to <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
 Window -> Preferences -> Robot Framework -> Editor -> Content Assist</a></code>.<br/>
-This preference has to be enabled first, then “Automatically insert” option from templates will work as described.
+This preference has to be enabled first, then "Automatically insert" option from templates will work as described.
 </p>
 <h3>Variables in templates</h3>
 <p>Template patterns can contain custom user variables. When template is inserted user can define values for such variables.</p>
