@@ -120,7 +120,7 @@ public class SuiteSourceAssistantContext {
             return isKeywordPrefixAutoAdditionEnabled;
         }
 
-        public char[] getAssistantAutoActivationChars() {
+        char[] getAssistantAutoActivationChars() {
             return autoActivationChars;
         }
     }

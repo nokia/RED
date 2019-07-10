@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
@@ -575,13 +574,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IContentFormatter getContentFormatter(final ISourceViewer sourceViewer) {
-        final RedPreferences prefs = RedPlugin.getDefault().getPreferences();
         final IRuntimeEnvironment env = editor.getFileModel().getRuntimeEnvironment();
 
         final MultiPassContentFormatter formatter = new MultiPassContentFormatter(
                 getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
-        formatter
-                .setMasterStrategy(new SuiteSourceFormattingStrategy(() -> SourceDocumentFormatter.create(prefs, env)));
+        formatter.setMasterStrategy(new SuiteSourceFormattingStrategy(
+                () -> SourceDocumentFormatter.create(RedPlugin.getDefault().getPreferences(), env)));
         return formatter;
     }
 }
