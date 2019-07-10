@@ -37,21 +37,23 @@
 </li>
 <li><a href="../../help/user_guide/working_with_RED/variable_typing.html">Variable typing in editors</a>
 </li>
+<li><a href="../../help/user_guide/working_with_RED/content_assist.html">Content assistance</a>
+</li>
+<li><a href="../../help/user_guide/working_with_RED/code_templates.html">Code templates</a>
+</li>
 <li><a href="../../help/user_guide/working_with_RED/libs.html">Recognizing external libraries in RED</a>
-</li>
-<li><a href="../../help/user_guide/working_with_RED/variable_mapping.html">Variable mapping - dealing with parameterized paths to libraries and resources</a>
-</li>
-<li><a href="../../help/user_guide/working_with_RED/variable_files.html">Variable Files - using files with variable accessible anywhere inside Project</a>
 </li>
 <li><a href="../../help/user_guide/working_with_RED/custom_paths_relatve.html">Custom python/class paths and path relativeness</a>
 </li>
-<li><a href="../../help/user_guide/working_with_RED/importing.html">Importing files and projects to workspace</a>
-</li>
 <li><a href="../../help/user_guide/working_with_RED/remote_library.html">Remote library</a>
 </li>
-<li><a href="../../help/user_guide/working_with_RED/red_xml.html">Red.xml description</a>
+<li><a href="../../help/user_guide/working_with_RED/variable_mapping.html">Variable mapping - dealing with parameterized paths to libraries and resources</a>
 </li>
-<li><a href="../../help/user_guide/working_with_RED/content_assist.html">Content assistance</a>
+<li><a href="../../help/user_guide/working_with_RED/variable_files.html">Variable files - using files with variable accessible anywhere inside Project</a>
+</li>
+<li><a href="../../help/user_guide/working_with_RED/importing.html">Importing files and projects to workspace</a>
+</li>
+<li><a href="../../help/user_guide/working_with_RED/red_xml.html">Red.xml description</a>
 </li>
 <li><a href="../../help/user_guide/working_with_RED/dark_theme.html">Dark theme in RED</a>
 </li>

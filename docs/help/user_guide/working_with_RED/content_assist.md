@@ -20,6 +20,8 @@ When given input is camel case string (for example: REA, CrBiFi, WaUCr) keywords
 <h3>Content assistance preferences </h3>
 Behavior of content assist can be changed at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
 Window -> Preferences -> Robot Framework -> Editor -> Content Assist</a></code>.<br/>
+<br/><b>Auto insert</b><br/>
+If single proposals insertion is enabled, code assistant will choose and insert automatically single proposals.<br/>
 <br/><b>Auto activation</b><br/>
 When auto activation is enabled, triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br/>
 <br/><b>Keywords</b><br/>

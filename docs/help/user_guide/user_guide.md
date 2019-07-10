@@ -17,14 +17,15 @@ Material is intended to provide detailed informations about RED for users alread
     
     *   [Table Editors - general usage hints](../../../help/user_guide/working_with_RED/table_general.md)
     *   [Variable typing in editors](../../../help/user_guide/working_with_RED/variable_typing.md)
-    *   [Recognizing external libraries in RED](../../../help/user_guide/working_with_RED/libs.md)
-    *   [Variable mapping - dealing with parameterized paths to libraries and resources](../../../help/user_guide/working_with_RED/variable_mapping.md)
-    *   [Variable Files - using files with variable accessible anywhere inside Project](../../../help/user_guide/working_with_RED/variable_files.md)
-    *   [Custom python/class paths and path relativeness](../../../help/user_guide/working_with_RED/custom_paths_relatve.md)
-    *   [Importing files and projects to workspace](../../../help/user_guide/working_with_RED/importing.md)
-    *   [Remote library](../../../help/user_guide/working_with_RED/remote_library.md)
-    *   [Red.xml description](../../../help/user_guide/working_with_RED/red_xml.md)
     *   [Content assistance](../../../help/user_guide/working_with_RED/content_assist.md)
+    *   [Code templates](../../../help/user_guide/working_with_RED/code_templates.md)
+    *   [Recognizing external libraries in RED](../../../help/user_guide/working_with_RED/libs.md)
+    *   [Custom python/class paths and path relativeness](../../../help/user_guide/working_with_RED/custom_paths_relatve.md)
+    *   [Remote library](../../../help/user_guide/working_with_RED/remote_library.md)
+    *   [Variable mapping - dealing with parameterized paths to libraries and resources](../../../help/user_guide/working_with_RED/variable_mapping.md)
+    *   [Variable files - using files with variable accessible anywhere inside Project](../../../help/user_guide/working_with_RED/variable_files.md)
+    *   [Importing files and projects to workspace](../../../help/user_guide/working_with_RED/importing.md)
+    *   [Red.xml description](../../../help/user_guide/working_with_RED/red_xml.md)
     *   [Dark theme in RED](../../../help/user_guide/working_with_RED/dark_theme.md)
     
     
