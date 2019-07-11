@@ -121,7 +121,7 @@ public abstract class RedTemplateAssistProcessor extends TemplateCompletionProce
             throws BadLocationException;
 
     @Override
-    public final boolean isInApplicableContentType(final IDocument document, final int offset)
+    public boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {
         return getApplicableContentTypes().contains(getVirtualContentType(document, offset));
     }

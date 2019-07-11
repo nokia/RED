@@ -41,6 +41,11 @@ public class NewSectionTemplateAssistProcessor extends RedTemplateAssistProcesso
     }
 
     @Override
+    public boolean isInApplicableContentType(IDocument document, int offset) throws BadLocationException {
+        return true;
+    }
+
+    @Override
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         final IRegion lineInfo = document.getLineInformationOfOffset(offset);
