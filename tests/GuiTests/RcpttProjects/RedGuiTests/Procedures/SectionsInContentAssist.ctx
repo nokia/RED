@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/5/19 5:31 PM
+Save-Time: 7/11/19 5:45 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -61,13 +61,14 @@ proc "check-content-assist-for-variables"{
 
 proc "check-content-assist-for-empty-file"{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
-	    get-property itemCount | equals 6 | verify-true
+	    get-property itemCount | equals 7 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "*** Comments ***" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "*** Keywords ***" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "*** Settings ***" | verify-true
 	    get-property "getItems().TableItem[3].getText()" | equals "*** Tasks ***" | verify-true
 	    get-property "getItems().TableItem[4].getText()" | equals "*** Test Cases ***" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "Settings section - New settings section with settings" | verify-true
 	}	    
 }
 
