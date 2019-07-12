@@ -64,57 +64,46 @@ public abstract class RedTemplateAssistProcessor extends TemplateCompletionProce
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, int offset) {
-        final IDocument document = viewer.getDocument();
-        final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-
         try {
+            final IDocument document = viewer.getDocument();
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+
             if (!shouldShowProposals(document, offset, lineContent)) {
                 return new ICompletionProposal[0];
             }
+
+            final String userContent = extractUserContent(document, offset);
+
+            final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
+            // adjust offset to end of normalized selection
+            if (selection.getOffset() == offset) {
+                offset = selection.getOffset() + selection.getLength();
+            }
+
+            final String prefix = extractPrefix(viewer, offset);
+            final Region region = new Region(offset - prefix.length(), prefix.length());
+            final TemplateContext context = createContext(viewer, region);
+            if (context == null) {
+                return new ICompletionProposal[0];
+            }
+
+            context.setVariable("selection", selection.getText()); // name of the //$NON-NLS-1$
+                                                                   // selection variables {line,
+                                                                   // word}_selection
+            final List<ICompletionProposal> proposals = new RedTemplateProposals(context, region)
+                    .getSectionsProposals(userContent);
+
+            return proposals.toArray(new ICompletionProposal[proposals.size()]);
+
         } catch (final BadLocationException e) {
             return new ICompletionProposal[0];
         }
+    }
 
-        final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
-        // adjust offset to end of normalized selection
-        if (selection.getOffset() == offset)
-            offset = selection.getOffset() + selection.getLength();
-
-        final String prefix = extractPrefix(viewer, offset);
-        final Region region = new Region(offset - prefix.length(), prefix.length());
-        final TemplateContext context = createContext(viewer, region);
-        if (context == null)
-            return new ICompletionProposal[0];
-
-        context.setVariable("selection", selection.getText()); // name of the //$NON-NLS-1$
-                                                               // selection variables {line,
-                                                               // word}_selection
-
-        final Template[] templates = getTemplates(context.getContextType().getId());
-
-        final List<ICompletionProposal> matches = new ArrayList<>();
-        for (final Template template : templates) {
-            try {
-                context.getContextType().validate(template.getPattern());
-            } catch (final TemplateException e) {
-                continue;
-            }
-            try {
-                final boolean isTsv = assist.isTsvFile();
-                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-                final String userContent = DocumentUtilities.getPrefix(document, cellRegion, offset);
-                final String proposalContent = template.getName();
-                final ProposalMatcher matcher = ProposalMatchers.substringMatcher();
-                final Optional<ProposalMatch> match = matcher.matches(userContent, proposalContent);
-                if (template.getContextTypeId().equals(context.getContextType().getId()) && match.isPresent()) {
-                    matches.add(new RedTemplateProposal(template, context, region, getImage(template), match.get()));
-                }
-            } catch (final BadLocationException e) {
-                continue;
-            }
-        }
-
-        return matches.toArray(new ICompletionProposal[matches.size()]);
+    private String extractUserContent(final IDocument document, final int offset) throws BadLocationException {
+        final boolean isTsv = assist.isTsvFile();
+        final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
+        return DocumentUtilities.getPrefix(document, cellRegion, offset);
     }
 
     protected abstract boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
@@ -135,5 +124,41 @@ public abstract class RedTemplateAssistProcessor extends TemplateCompletionProce
             return document.getContentType(offset - 1);
         }
         return contentType;
+    }
+
+    class RedTemplateProposals {
+
+        private final TemplateContext context;
+
+        private final Region region;
+
+        private final ProposalMatcher matcher;
+
+        RedTemplateProposals(final TemplateContext context, final Region region) {
+            this(context, region, ProposalMatchers.substringMatcher());
+        }
+
+        RedTemplateProposals(final TemplateContext context, final Region region, final ProposalMatcher matcher) {
+            this.context = context;
+            this.region = region;
+            this.matcher = matcher;
+        }
+
+        List<ICompletionProposal> getSectionsProposals(final String userContent) {
+            final List<ICompletionProposal> proposals = new ArrayList<>();
+            final Template[] templates = getTemplates(context.getContextType().getId());
+            for (final Template template : templates) {
+                try {
+                    context.getContextType().validate(template.getPattern());
+                } catch (final TemplateException e) {
+                    continue;
+                }
+                final Optional<ProposalMatch> match = matcher.matches(userContent, template.getName());
+                if (template.getContextTypeId().equals(context.getContextType().getId()) && match.isPresent()) {
+                    proposals.add(new RedTemplateProposal(template, context, region, getImage(template), match.get()));
+                }
+            }
+            return proposals;
+        }
     }
 }
