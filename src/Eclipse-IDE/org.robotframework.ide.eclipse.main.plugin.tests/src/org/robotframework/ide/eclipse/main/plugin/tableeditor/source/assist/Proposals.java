@@ -9,7 +9,9 @@ import java.util.Objects;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
@@ -53,6 +55,11 @@ class Proposals {
         final Document docCopy = new Document(document);
         proposal.apply(docCopy);
         return docCopy;
+    }
+
+    static IDocument applyToDocument(final ITextViewer viewer, final int offset, final TemplateProposal proposal) {
+        proposal.apply(viewer, (char) -1, -1, offset);
+        return new Document(viewer.getDocument());
     }
 
 }
