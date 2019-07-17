@@ -63,7 +63,7 @@ public class RedPreferencesTest {
         final TemplateStore store = preferences.getTemplateStore();
 
         assertThat(store.getTemplates()).extracting(Template::getName)
-                .containsOnly("New test", "New task", "New keyword", "Settings section");
+                .containsOnly("New test", "New task", "New keyword", "Settings section", "For loop");
     }
 
     @Test
