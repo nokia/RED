@@ -33,7 +33,7 @@ import org.robotframework.red.junit.ProjectProvider;
 public class NewKeywordTemplateAssistProcessorTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(CodeReservedWordsAssistProcessorTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(NewKeywordTemplateAssistProcessorTest.class);
 
     private static IFile suite;
 

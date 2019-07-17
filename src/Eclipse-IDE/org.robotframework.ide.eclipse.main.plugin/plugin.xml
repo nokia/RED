@@ -7431,5 +7431,17 @@ Test Teardown
 Test Timeout
             </pattern>
          </template>
+         <template
+               autoinsert="true"
+               contextTypeId="org.robotframework.ide.eclipse.keywordCallContextType"
+               description="New for loop scheme"
+               id="org.robotframework.ide.eclipse.keywordCallTemplate"
+               name="For loop">
+            <pattern>
+FOR    $${${element}}    IN    @{${elements_list}}
+        ${Keyword}    ${arg}
+    END
+            </pattern>
+         </template>
       </extension>
 </plugin>
