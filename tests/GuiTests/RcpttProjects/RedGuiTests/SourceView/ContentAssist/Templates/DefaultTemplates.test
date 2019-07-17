@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _DWEyMKF1EemGTZOc_dtNHw
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/17/19 2:24 PM
+Save-Time: 7/17/19 2:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -324,14 +324,54 @@ get-window -from "CompletionProposalPopup.createProposalSelector()"
     | get-label "Press M1+Space to show Templates proposals" | get-property caption 
     | equals "Press M1+Space to show Templates proposals" | verify-true
 
-// no propsal    
+// kw call  
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "For loop - New FOR loop scheme" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
- 
+
+// add KW call with loop
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "For loop - New FOR loop scheme" | click -default
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property text | equals "*** Settings ***\n"
+        + "*** Settings ***\n"
+        + "Documentation\n"
+        + "Metadata\n"
+        + "Force Tags\n"
+        + "Default Tags\n"
+        + "Suite Setup\n"
+        + "Suite Teardown\n"
+        + "Test Setup\n"
+        + "Test Teardown\n"
+        + "Test Timeout\n"
+        + "*** Test Cases ***\n"
+        + "Test\n"
+        + "    [Documentation]\n"
+        + "    [Tags]\n"
+        + "    [Timeout]\n"
+        + "    [Setup]\n"
+        + "    [Teardown]\n"
+        + "    log  99\n"
+        + "    FOR    ${element}    IN    @{elements_list}\n"
+        + "        Keyword    arg\n"
+        + "    END\n"
+        + "*** Keywords ***\n"
+        + "Keyword\n"
+        + "    [Documentation]\n"
+        + "    [Tags]\n"
+        + "    [Arguments]\n"
+        + "    [Timeout]\n"
+        + "    [Teardown]\n"
+        + "    [Return]\n"
+        + "    log  8" | verify-true
+        
+    //check that var is selected    
+    get-property "caretPosition.line" | equals 20 | verify-true
+    get-property "caretPosition.column" | equals 21 | verify-true
+    get-property "getSelectionText()" | equals element | verify-true
+}
  
 // add task
 get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu 
