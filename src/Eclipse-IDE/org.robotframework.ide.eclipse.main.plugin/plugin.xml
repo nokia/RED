@@ -7434,7 +7434,7 @@ Test Timeout
          <template
                autoinsert="true"
                contextTypeId="org.robotframework.ide.eclipse.keywordCallContextType"
-               description="New for loop scheme"
+               description="New FOR loop scheme"
                id="org.robotframework.ide.eclipse.keywordCallTemplate"
                name="For loop">
             <pattern>
