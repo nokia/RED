@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _DWEyMKF1EemGTZOc_dtNHw
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/8/19 3:59 PM
+Save-Time: 7/17/19 2:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,12 +20,19 @@ get-window Preferences | maximize
 //check view
 with [get-window Preferences | get-table] {
     //columns
-    get-property itemCount | equals 4 | verify-true
+    get-property itemCount | equals 5 | verify-true
     get-property "columns[0].caption" | equals Name | verify-true
     get-property "columns[1].caption" | equals Context | verify-true
     get-property "columns[2].caption" | equals Description | verify-true
     get-property "columns[3].caption" | equals "Auto Insert" | verify-true
     
+    //FOR loop
+    
+    get-item -path "For loop" | get-property "values['Description']" | equals "New FOR loop scheme" | verify-true
+    get-item -path "For loop" | get-property "values['Auto Insert']" | equals on | verify-true
+    get-item -path "For loop" | get-property "values['Name']" | equals "For loop" | verify-true
+    get-item -path "For loop" | get-property "values['Context']" | equals "Keyword call" | verify-true
+
     //New keyword with settings
     get-item -path "New keyword" | get-property "values['Description']" | equals "New keyword with settings" 
         | verify-true
@@ -285,9 +292,9 @@ get-window -from "CompletionProposalPopup.createProposalSelector()"
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "For loop - New FOR loop scheme" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "no proposals" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "For loop - New FOR loop scheme" 
     | key-type "TRAVERSE_ESCAPE"
     
 // add KW to TC and open CA below    
@@ -321,7 +328,7 @@ get-window -from "CompletionProposalPopup.createProposalSelector()"
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "M1+SPACE"
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "For loop - New FOR loop scheme" | verify-true
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
  
