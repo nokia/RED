@@ -1,3 +1,39 @@
+# RED - Robot Editor v0.8.13
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.13 **cannot** be upgraded from 0.8.0 and earlier versions. 
+For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Source formatter enhancements, possibility to format with robot.tidy
+- Code templates provided. Note: templates editor in Preferences does not refresh under Eclipse 2018-09
+- Improved integration with RfLint (better configuration, rules documentation handling)
+- Error field in execution view is shown when needed
+- Fixes for Robot & Python debugging session: gevent is supported
+- Pythonpaths from red.xml are used when importing variables files
+- Online documentation fixed
+
+## GitHub issues updates
+ - #181 Prefilled RFLint settings
+ - #247 'Format source' column positioning could be placed under user preference control
+ - #278 Investigate what to do with GTK2/3 issues
+ - #293 Simplify libdoc reload error stacktrace
+ - #303 Variable mappings for Remote Library imports
+ - #307 Make Error field in Execution view visible only when needed
+ - #308 Support libraries using gevent in debugger sessions and autodiscovery
+ - #311 Unable to import variables from python file
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.12
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
@@ -10,7 +46,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
-Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.11 **cannot** be upgraded from 0.8.0 and earlier versions. 
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.12 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates

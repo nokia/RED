@@ -1,3 +1,41 @@
+RED 0.8.13 - 2019/07/18
+
+Enhancement
+
+	[RED-928] - Support for libraries with the same name as python standard libraries
+	[RED-1193] - [GitHub #247] Enhance source formatting
+	[RED-1242] - [Discussion]: Snippet (like) functionality
+	[RED-1249] - Improve online documentation on GitHub
+	[RED-1252] - Editor problems with files opened from history view
+	[RED-1255] - Possibility to skip built-in RFLint rules
+	[RED-1256] - RFLint rule selection
+	[RED-1257] - Find a way to check the available RFLint rules documentation
+	[RED-1262] - [GitHub #293] Simplify libdoc reload error stacktrace
+	[RED-1271] - [GitHub #303] Variable mappings for Remote Library imports
+	[RED-1278] - [GitHub #308] support libraries using gevent in debugger sessions and autodiscovery
+	[RED-1280] - [GitHub #307] Make Error field in Execution view visible only when needed
+	[RED-1281] - [GitHub #311] Session server does not take python path when reading variables from vars files
+
+Bug
+
+	[RED-483] - Content Proposal window is closed when double clicking on proposal under GTK2
+	[RED-583] - Importing libraries in Setting table adds to red.xml but not to test file
+	[RED-1263] - Removing old libspecs
+	[RED-1270] - GitHub online help navigation links does not work as expected
+	[RED-1276] - Error for not recognized library with full path
+	[RED-1277] - Invalid pythonpath entries for libraries with name module.class
+
+Task
+
+	[RED-1246] - [GitHub #278] Investigate what to do with GTK2/3 issues
+	[RED-1265] - Cloud maintenance
+	[RED-1274] - Installing Robot 3.1.2
+
+Sub-task
+
+	[RED-1243] - Implement proof-of-concept for templates in source part of editor
+
+
 RED 0.8.12 - 2019/05/21
 
 Feature
