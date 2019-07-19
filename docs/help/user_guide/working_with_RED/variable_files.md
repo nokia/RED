@@ -27,13 +27,13 @@ Variables from such file will be visible as Global variables for all Robot files
 Below is a sample body of such Python variable file (examples can be also found in RobotFramework official manual and Python examples). 
 <br/><br/><img src="images/var_files_red_xml.gif"/> <br/><br/>
 <br/>
-<code><br/>
+<code>
 #!python <br/>
 <br/>
 #Sample variables and values<br/>
 Scalar = 'value'<br/>
 UserList = ['value1','value2']<br/>
-UserDict ={'key1':'value1', 'key2':'value2'}<br/>
+UserDict ={'key1':'value1', 'key2':'value2'}
 </code>
 <br/>
 <h2>Reloading variable file content</h2>
