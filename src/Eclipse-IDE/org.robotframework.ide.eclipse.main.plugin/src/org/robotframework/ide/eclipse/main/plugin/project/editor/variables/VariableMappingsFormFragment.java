@@ -218,6 +218,16 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         }
     }
 
+    @Inject
+    @Optional
+    private void whenMappingValueChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED) final RedProjectConfigEventData<List<VariableMapping>> eventData) {
+        if (eventData.isApplicable(editorInput.getRobotProject())) {
+            setDirty(true);
+            viewer.refresh();
+        }
+    }
+
     private class VariableMappingsContentProvider extends StructuredContentProvider {
 
         @Override
