@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../help/index.html">RED - Robot Editor User Guide</a> &gt; 
+<a href="RED/../../help/index.html">RED - Robot Editor User Guide</a> &gt; 
 	<h2>License</h2>
 <p>Copyright 2015, 2016, 2017, 2018, 2019 Nokia Solutions and Networks</p>
 <p>

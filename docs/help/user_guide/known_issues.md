@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../help/user_guide/user_guide.html">User guide</a> &gt; 
+<a href="RED/../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../help/user_guide/user_guide.html">User guide</a> &gt; 
 <h2>Known issues and problems</h2>
 <p>For all currently opened issues please visit our repository at 
 <a class="external" href="https://github.com/nokia/RED/" target="_blank">GitHub</a>

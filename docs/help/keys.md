@@ -29,7 +29,7 @@
     </style>
 </head>
 <body>
-<a href="../../help/index.html">RED - Robot Editor User Guide</a> &gt; 
+<a href="RED/../../help/index.html">RED - Robot Editor User Guide</a> &gt; 
 
 	<h2>Useful RED key shortcuts</h2>
 <dl class="note">

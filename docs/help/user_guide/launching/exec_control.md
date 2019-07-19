@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
 	<h2>Controlling execution</h2>
 <p>In both <b>RUN</b> and <b>DEBUG</b> modes no matter if locally or remotely launched tests it is possible to 
 	control basic aspects of execution: <code>suspend/resume</code>, <code>terminate</code>, <code>terminate 

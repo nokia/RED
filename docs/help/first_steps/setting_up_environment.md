@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../help/first_steps/first_steps.html">First steps with RED</a> &gt; 
+<a href="RED/../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../help/first_steps/first_steps.html">First steps with RED</a> &gt; 
 
 <h2>Establishing environment</h2>
 <p>As mentioned <a href="download_install.html">earlier</a> RED requires Python interpreter with Robot Framework 

@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/tools_integration.html">Integration with other tools</a> &gt; 
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/tools_integration.html">Integration with other tools</a> &gt; 
 	<h2>PyDev and PyLint</h2>
 <p>
 <a class="external" href="https://marketplace.eclipse.org/content/pydev-python-ide-eclipse" target="_blank">PyDev</a> and 

@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../../help/user_guide/launching.html">Launching Tests</a> &gt; <a href="../../../../../help/user_guide/launching/debug.html">Debugging Robot</a> &gt; 
+<a href="RED/../../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../../help/user_guide/launching.html">Launching Tests</a> &gt; <a href="RED/../../../../../help/user_guide/launching/debug.html">Debugging Robot</a> &gt; 
 	<h2>Debugging Robot &amp; Python with RED &amp; PyDev</h2>
 <p>It is possible to setup debugging sessions on both Robot and Python code levels using RED together with
 	PyDev in single RED/Eclipse instance.

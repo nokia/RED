@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../help/first_steps/first_steps.html">First steps with RED</a> &gt; 
+<a href="RED/../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../help/first_steps/first_steps.html">First steps with RED</a> &gt; 
   <h2>RED Preferences &amp; red.xml and other</h2>
   This page is intended to help users in following cases: <br/>
 <ul>

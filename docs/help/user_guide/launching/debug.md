@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/launching.html">Launching Tests</a> &gt; 
 	<h2>Debugging Robot</h2>
 <p>Debug functionality is unique way of checking what is happening during tests execution. It works similar 
 	as debug functionality in most of programming languages - it allows to track execution of a program	for 
@@ -71,15 +71,15 @@
 <br/>
 <h3>Contents</h3>
 <ul>
-<li><a href="../../../../help/user_guide/launching/debug/ui_elements.html">User interface</a>
+<li><a href="RED/../../../../help/user_guide/launching/debug/ui_elements.html">User interface</a>
 </li>
-<li><a href="../../../../help/user_guide/launching/debug/breakpoints.html">Breakpoints</a>
+<li><a href="RED/../../../../help/user_guide/launching/debug/breakpoints.html">Breakpoints</a>
 </li>
-<li><a href="../../../../help/user_guide/launching/debug/hitting_a_breakpoint.html">Hitting a breakpoint</a>
+<li><a href="RED/../../../../help/user_guide/launching/debug/hitting_a_breakpoint.html">Hitting a breakpoint</a>
 </li>
-<li><a href="../../../../help/user_guide/launching/debug/preferences.html">Debugger preferences</a>
+<li><a href="RED/../../../../help/user_guide/launching/debug/preferences.html">Debugger preferences</a>
 </li>
-<li><a href="../../../../help/user_guide/launching/debug/robot_python_debug.html">Debugging Robot &amp; Python with RED &amp; PyDev</a>
+<li><a href="RED/../../../../help/user_guide/launching/debug/robot_python_debug.html">Debugging Robot &amp; Python with RED &amp; PyDev</a>
 </li>
 </ul>
 </body>

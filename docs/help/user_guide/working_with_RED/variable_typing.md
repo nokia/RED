@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/working_with_RED.html">Working with RED</a> &gt; 
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/working_with_RED.html">Working with RED</a> &gt; 
 <h2>Variable typing in editors</h2>
 RED supports several variable typing enhancements. When this feature is enabled, variable brackets {} are automatically inserted after typing one of Robot variable identifiers ($, @, &amp;, %).<br/>
 Corresponding bracket is automatically deleted when brackets are empty and first bracket is deleted by typing Delete or Backspace.

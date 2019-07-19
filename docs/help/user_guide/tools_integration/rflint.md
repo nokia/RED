@@ -3,7 +3,7 @@
 <link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<a href="../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="../../../../help/user_guide/tools_integration.html">Integration with other tools</a> &gt; 
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/tools_integration.html">Integration with other tools</a> &gt; 
 	<h2>Robot Framework Lint analysis</h2>
 <p>Starting with RED 0.8.1 it is possible to run <a class="external" href="http://github.com/boakley/robotframework-lint/" target="_blank">Robot Framework Lint</a> 
 	analysis tool. Of course one have to have it installed in the python installation
