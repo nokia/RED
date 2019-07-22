@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,15 +33,53 @@ public class SpecialTokensRule implements ISyntaxColouringRule {
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
-        return token.getTypes()
-                .stream()
-                .filter(this::isSpecialTokenType)
-                .findFirst()
-                .map(t -> new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
+        if (isNoneAwareSetting(token)) {
+            return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
+
+        } else {
+            return token.getTypes()
+                    .stream()
+                    .filter(this::isSpecialTokenType)
+                    .findFirst()
+                    .map(t -> new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
+        }
+    }
+
+    public static boolean isNoneAwareSetting(final IRobotLineElement token) {
+        final IRobotTokenType type = token.getTypes().get(0);
+        return token.getText().equalsIgnoreCase("none") && EnumSet.of(
+                RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
+                RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
+                RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME,
+                RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE,
+                RobotTokenType.TEST_CASE_SETTING_TAGS,
+                
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME,
+                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
+                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME,
+                RobotTokenType.TASK_SETTING_TIMEOUT_VALUE,
+                RobotTokenType.TASK_SETTING_TAGS,
+                
+                RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
+                RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE,
+                RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
+                
+                RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME,
+                RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME,
+                RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME,
+                RobotTokenType.SETTING_TEST_TIMEOUT_VALUE,
+                RobotTokenType.SETTING_TASK_SETUP_KEYWORD_NAME,
+                RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_NAME,
+                RobotTokenType.SETTING_TASK_TEMPLATE_KEYWORD_NAME,
+                RobotTokenType.SETTING_TASK_TIMEOUT_VALUE,
+                RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_NAME,
+                RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME).contains(type);
     }
 
     private boolean isSpecialTokenType(final IRobotTokenType type) {
-        return type == RobotTokenType.SETTING_LIBRARY_ALIAS || type == RobotTokenType.FOR_TOKEN
-                || type == RobotTokenType.IN_TOKEN || type == RobotTokenType.FOR_END_TOKEN;
+        return EnumSet
+                .of(RobotTokenType.SETTING_LIBRARY_ALIAS, RobotTokenType.FOR_TOKEN, RobotTokenType.IN_TOKEN,
+                        RobotTokenType.FOR_END_TOKEN)
+                .contains(type);
     }
 }

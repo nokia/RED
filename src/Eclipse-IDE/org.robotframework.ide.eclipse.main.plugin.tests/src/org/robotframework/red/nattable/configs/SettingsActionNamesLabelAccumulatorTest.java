@@ -54,8 +54,9 @@ public class SettingsActionNamesLabelAccumulatorTest {
 
     @Test
     public void labelIsAdded_forSecondColumnOfKeywordBasedSetting() {
-        final RobotSetting setting = mock(RobotSetting.class);
-        when(setting.isAnySetupOrTeardown()).thenReturn(true);
+        final SuiteSetup linkedSetting = new SuiteSetup(RobotToken.create("Suite Setup"));
+        linkedSetting.setKeywordName("Keyword");
+        final RobotSetting setting = new RobotSetting(null, linkedSetting);
         final Entry<String, RobotSetting> entry = entry("Setting", setting);
 
         assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);

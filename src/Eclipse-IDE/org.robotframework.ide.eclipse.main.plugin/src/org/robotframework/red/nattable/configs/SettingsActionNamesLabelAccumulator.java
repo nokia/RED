@@ -38,14 +38,19 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
             return;
         }
 
-        if (setting.isTemplate() && columnPosition > 0) {
+        if (setting.isTemplate() && columnPosition > 0
+                && !setting.getArguments().stream().findFirst().orElse("").equalsIgnoreCase("none")) {
             configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
 
         } else if (setting.isAnySetupOrTeardown()) {
             // don't worry about variable here - this case would be served by
             // SettingsVariablesLabelAccumulator
             if (columnPosition == 1) {
-                configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+                final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
+
+                if (!linkedSetting.getKeywordName().getText().equalsIgnoreCase("none")) {
+                    configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+                }
 
             } else if (columnPosition > 1) {
                 final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();

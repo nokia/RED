@@ -36,7 +36,7 @@ public class SpecialItemsLabelAccumulatorTest {
     public void cleanData() {
         dataProvider = mock(IRowDataProvider.class);
         labels = new LabelStack();
-        labelAccumulator = new SpecialItemsLabelAccumulator(dataProvider);
+        labelAccumulator = new SpecialItemsLabelAccumulator(dataProvider::getRowObject);
     }
 
     @Test

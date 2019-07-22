@@ -150,6 +150,7 @@ import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.SettingsNestedExecsSpecialTokensLabelAccumulator;
+import org.robotframework.red.nattable.configs.SpecialItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
@@ -532,6 +533,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new SettingsActionNamesLabelAccumulator(dataProvider),
                 new SettingsNestedExecsSpecialTokensLabelAccumulator(dataProvider),
+                new SpecialItemsLabelAccumulator(row -> dataProvider.getRowObject(row).getValue()),
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());

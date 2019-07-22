@@ -180,6 +180,17 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return isLocalSetting() && (modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.TASK_TEMPLATE);
     }
 
+    public boolean isTimeoutSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_TIMEOUT || modelType == ModelType.TASK_TIMEOUT
+                || modelType == ModelType.USER_KEYWORD_TIMEOUT);
+    }
+
+    public boolean isSetupSetting() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return isLocalSetting() && (modelType == ModelType.TEST_CASE_SETUP || modelType == ModelType.TASK_SETUP);
+    }
+
     public boolean isTeardownSetting() {
         final ModelType modelType = getLinkedElement().getModelType();
         return isLocalSetting() && (modelType == ModelType.TEST_CASE_TEARDOWN || modelType == ModelType.TASK_TEARDOWN

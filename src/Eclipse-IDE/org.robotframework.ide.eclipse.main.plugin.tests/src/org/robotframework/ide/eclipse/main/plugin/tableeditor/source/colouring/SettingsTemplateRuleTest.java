@@ -5,17 +5,23 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
@@ -76,11 +82,39 @@ public class SettingsTemplateRuleTest {
         assertThat(thereWasName).isTrue();
     }
 
+    @Test
+    public void templateSettingsArgsAreNotRecognizeIfNoneIsUsedAsKeywordName() {
+        final List<PositionedTextToken> coloredTokens = createNoneAwareSettingsTokens().stream()
+                .map(this::evaluate)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+
+        assertThat(coloredTokens).isEmpty();
+    }
+
     private Optional<PositionedTextToken> evaluate(final RobotToken token) {
         return evaluate(token, 0);
     }
 
     private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
         return testedRule.evaluate(token, position, new ArrayList<>());
+    }
+    
+    static List<RobotToken> createNoneAwareSettingsTokens() {
+        return createTokens(TokensSource::createTokensOfNoneAwareSettings);
+    }
+
+    static List<RobotToken> createTokens() {
+        return createTokens(TokensSource::createTokensInLines);
+    }
+
+    static List<RobotToken> createTokens(final Supplier<List<RobotLine>> linesSupplier) {
+        final List<RobotLine> lines = linesSupplier.get();
+        final List<RobotToken> tokens = new ArrayList<>();
+        for (final RobotLine line : lines) {
+            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
+        }
+        return tokens;
     }
 }

@@ -60,7 +60,7 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
             final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
             unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
 
-        } else {
+        } else if (!keywordNameToken.getText().equalsIgnoreCase("none")) {
             new ExecutableNestedRowValidator(validationContext, additionalVariables, row, descriptor, reporter)
                     .validate(monitor);
         }

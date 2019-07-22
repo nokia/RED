@@ -172,6 +172,57 @@ public class TokensSource {
         return model.getLinkedElement().getFileContent();
     }
 
+    static List<RobotLine> createTokensOfNoneAwareSettings() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case 1")
+                .appendLine("  [Documentation]  NONE")
+                .appendLine("  [Tags]  NONE")
+                .appendLine("  [Setup]  NONE")
+                .appendLine("  [Teardown]  NONE")
+                .appendLine("  [Timeout]  NONE")
+                .appendLine("  [UnkownTcSetting]  NONE")
+                .appendLine("  [Template]  NONE")
+                .appendLine("*** Tasks ***")
+                .appendLine("task 1")
+                .appendLine("  [Documentation]  NONE")
+                .appendLine("  [Tags]  NONE")
+                .appendLine("  [Setup]  NONE")
+                .appendLine("  [Teardown]  NONE")
+                .appendLine("  [Timeout]  NONE")
+                .appendLine("  [UnkownTaSetting]  NONE")
+                .appendLine("  [Template]  NONE")
+                .appendLine("*** Keywords ***")
+                .appendLine("userkw 1")
+                .appendLine("  [Arguments]  NONE")
+                .appendLine("  [Documentation]  NONE")
+                .appendLine("  [Tags]  NONE")
+                .appendLine("  [Teardown]  NONE")
+                .appendLine("  [Timeout]  NONE")
+                .appendLine("  [UnkownKwSetting]  NONE")
+                .appendLine("  [Return]  NONE")
+                .appendLine("*** Settings ***")
+                .appendLine("Documentation  NONE")
+                .appendLine("Library  NONE")
+                .appendLine("Resource  NONE")
+                .appendLine("Variables  NONE")
+                .appendLine("Metadata  NONE")
+                .appendLine("Force Tags  NONE")
+                .appendLine("Default Tags  NONE")
+                .appendLine("Suite Setup  NONE")
+                .appendLine("Suite Teardown  NONE")
+                .appendLine("Test Setup  NONE")
+                .appendLine("Test Teardown  NONE")
+                .appendLine("Test Template  NONE")
+                .appendLine("Test Timeout  NONE")
+                .appendLine("Task Setup  NONE")
+                .appendLine("Task Teardown  NONE")
+                .appendLine("Task Template  NONE")
+                .appendLine("Task Timeout  NONE")
+                .appendLine("UnkownSetting  NONE")
+                .build();
+        return model.getLinkedElement().getFileContent();
+    }
+
     static List<RobotLine> lines(final RobotLine... lines) {
         return newArrayList(lines);
     }

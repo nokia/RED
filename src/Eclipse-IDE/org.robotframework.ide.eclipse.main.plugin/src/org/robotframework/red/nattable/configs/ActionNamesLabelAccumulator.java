@@ -79,11 +79,17 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                 }
             }
         } else if (call.isLocalSetting()) {
-            if (call.isTemplateSetting() && columnPosition > 0) {
+            if (call.isTemplateSetting() && columnPosition > 0
+                    && !call.getArguments().stream().findFirst().orElse("").equalsIgnoreCase("none")) {
+
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
             } else if (call.isExecutableSetting() && columnPosition == 1) {
-                configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
+
+                if (!kwBasedSetting.getKeywordName().getText().equalsIgnoreCase("none")) {
+                    configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                }
 
             } else if (call.isExecutableSetting() && columnPosition > 1) {
                 final ExecutableSetting kwBasedSetting = call.getExecutableSetting();

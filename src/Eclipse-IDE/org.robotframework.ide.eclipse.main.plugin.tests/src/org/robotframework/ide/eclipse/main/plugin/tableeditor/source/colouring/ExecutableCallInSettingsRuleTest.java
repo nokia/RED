@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -17,10 +18,28 @@ import org.eclipse.jface.text.rules.Token;
 import org.junit.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
 
 public class ExecutableCallInSettingsRuleTest {
+
+    @Test
+    public void executableSettingsCallsAreNotRecognized_whenTheyAreCalledNone() {
+        final List<RobotLine> lines = TokensSource.createTokensOfNoneAwareSettings();
+        final List<PositionedTextToken> coloredTokens = lines
+                .stream()
+                .map(RobotLine::getLineElements)
+                .flatMap(List::stream)
+                .filter(RobotToken.class::isInstance)
+                .map(RobotToken.class::cast)
+                .map(token -> evaluate(token, 0, lines))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+
+        assertThat(coloredTokens).isEmpty();
+    }
 
     @Test
     public void nestedKeywordsAreRecognized_inAllSettings() {

@@ -219,7 +219,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
                 new CasesElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
-                new SpecialItemsLabelAccumulator(dataProvider),
+                new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
