@@ -529,30 +529,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new ChangeToFixer("WITH NAME"));
         }
-    },
-    VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.VARIABLE_AS_KEYWORD_USAGE;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Variable '%s' is given as keyword name.";
-        }
-    },
-    PARAMETERIZED_KEYWORD_NAME_USAGE {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.PARAMETERIZED_KEYWORD_NAME_USAGE;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Keyword name '%s' contains variables. RED is unable to validate arguments given to this keyword";
-        }
     };
 
     @Override

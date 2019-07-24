@@ -23,6 +23,15 @@ public class EmbeddedKeywordNamesSupportTest {
         assertThat(EmbeddedKeywordNamesSupport.hasEmbeddedArguments("abc")).isFalse();
 
         assertThat(EmbeddedKeywordNamesSupport.hasEmbeddedArguments("abc${x}")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.hasEmbeddedArguments("abc${x:ca(t|r)}")).isTrue();
+    }
+
+    @Test
+    public void hasVariablesUsedTest() {
+        assertThat(EmbeddedKeywordNamesSupport.hasVariablesUsed("xyz")).isFalse();
+
+        assertThat(EmbeddedKeywordNamesSupport.hasVariablesUsed("${a}")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.hasVariablesUsed("x${y}z")).isTrue();
     }
 
     @Test
@@ -108,6 +117,14 @@ public class EmbeddedKeywordNamesSupportTest {
                 "today is 2016-12-20")).isTrue();
 
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("incorrect regex ${date:[}", "word")).isFalse();
+    }
+
+    @Test
+    public void nameMatchesTest_whenVariablesInOccurenceAreUsed() {
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${b}c", "a${b}c")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${b}c", "a${x}c")).isTrue();
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${x:\\d+}c", "A${B}C")).isTrue();
+
     }
 
     @Test

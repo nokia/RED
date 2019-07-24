@@ -6,6 +6,8 @@
 package org.rf.ide.core.testdata.model.table.keywords.names;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -18,6 +20,10 @@ import com.google.common.collect.TreeRangeSet;
  * @author Michal Anglart
  */
 public class EmbeddedKeywordNamesSupport {
+
+    public static boolean hasVariablesUsed(final String occurenceName) {
+        return !findEmbeddedArgumentsRanges(occurenceName).isEmpty();
+    }
 
     public static boolean hasEmbeddedArguments(final String definitionName) {
         return !findEmbeddedArgumentsRanges(definitionName).isEmpty();
@@ -71,15 +77,29 @@ public class EmbeddedKeywordNamesSupport {
             return false;
         }
 
-        final String regex = "(?iu)^" + substituteVariablesWithRegex(definitionName) + "$";
         try {
-            return Pattern.matches(regex, occurrenceName);
+            if (hasVariablesUsed(occurrenceName)) {
+                // There is a variable used in occurrence - we'll change all variables to ordinary
+                // dots and try if they matches regex with variables replaced by .+ regex
+                final String occurenceName = substituteVariablesWithRegex(occurrenceName, s -> s, (n, r) -> ".");
+                final String regex = "(?iu)^"
+                        + substituteVariablesWithRegex(definitionName, Pattern::quote, (n, r) -> ".+") + "$";
+                return Pattern.matches(regex, occurenceName);
+
+            } else {
+                final String regex = "(?iu)^" + substituteVariablesWithRegex(definitionName, Pattern::quote,
+                        EmbeddedKeywordNamesSupport::getEmbeddedArgumentRegex) + "$";
+                return Pattern.matches(regex, occurrenceName);
+            }
+
         } catch (final PatternSyntaxException e) {
             return false;
         }
     }
 
-    private static String substituteVariablesWithRegex(final String definitionName) {
+    private static String substituteVariablesWithRegex(final String definitionName,
+            final Function<String, String> outOfVariableTransformation,
+            final BiFunction<String, Range<Integer>, String> regexExtractor) {
         final StringBuilder wholeRegex = new StringBuilder();
 
         final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
@@ -89,13 +109,12 @@ public class EmbeddedKeywordNamesSupport {
         while (i < definitionName.length()) {
             if (varRanges.contains(i)) {
                 if (exactWordPatternRegex.length() > 0) {
-                    wholeRegex.append(Pattern.quote(exactWordPatternRegex.toString()));
+                    wholeRegex.append(outOfVariableTransformation.apply(exactWordPatternRegex.toString()));
                     exactWordPatternRegex = new StringBuilder();
                 }
 
                 final Range<Integer> varRange = varRanges.rangeContaining(i);
-                final String internalRegex = getEmbeddedArgumentRegex(definitionName, varRange);
-                wholeRegex.append(internalRegex);
+                wholeRegex.append(regexExtractor.apply(definitionName, varRange));
                 i = varRange.upperEndpoint() + 1;
             } else {
                 exactWordPatternRegex.append(definitionName.charAt(i));
@@ -103,7 +122,7 @@ public class EmbeddedKeywordNamesSupport {
             }
         }
         if (exactWordPatternRegex.length() > 0) {
-            wholeRegex.append(Pattern.quote(exactWordPatternRegex.toString()));
+            wholeRegex.append(outOfVariableTransformation.apply(exactWordPatternRegex.toString()));
         }
         return wholeRegex.toString();
     }

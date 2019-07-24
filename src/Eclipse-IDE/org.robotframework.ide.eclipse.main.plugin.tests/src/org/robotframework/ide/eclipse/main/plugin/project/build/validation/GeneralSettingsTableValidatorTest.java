@@ -179,13 +179,13 @@ public class GeneralSettingsTableValidatorTest {
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).containsOnly(
-                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                         new ProblemPosition(2, Range.closed(30, 36))),
-                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                         new ProblemPosition(3, Range.closed(49, 55))),
-                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                         new ProblemPosition(4, Range.closed(72, 78))),
-                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                         new ProblemPosition(5, Range.closed(94, 100))));
     }
 

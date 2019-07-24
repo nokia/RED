@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
 class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
 
@@ -53,8 +53,8 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
 
         if (variablesExtraction.getMappedElements().size() == 1 && variablesDeclarations.size() == 1) {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING)
-                    .formatMessageWith(variablesDeclarations.get(0).getVariableName().getText());
+                    .causedBy(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED)
+                    .formatMessageWith(variablesDeclarations.get(0).getVariableName().getText(), "");
             reporter.handleProblem(problem, validationContext.getFile(), keywordNameToken);
 
             final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);

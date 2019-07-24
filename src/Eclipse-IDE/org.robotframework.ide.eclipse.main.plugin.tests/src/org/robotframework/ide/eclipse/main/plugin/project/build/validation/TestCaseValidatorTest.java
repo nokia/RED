@@ -30,7 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
@@ -216,6 +215,22 @@ public class TestCaseValidatorTest {
     }
 
     @Test
+    public void keywordWithVariablesProblemInExecutableRowIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  kw ${x}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw ${a}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).contains(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
+                new ProblemPosition(3, Range.closed(26, 33))));
+    }
+
+    @Test
     public void variableSyntaxProblemIsReportedInExecutableRowWithSpecialKeyword() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
@@ -345,7 +360,7 @@ public class TestCaseValidatorTest {
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final Collection<Problem> problems = validate(context, fileModel);
 
-        assertThat(problems).containsOnly(new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                 new ProblemPosition(3, Range.closed(35, 41))));
     }
 
@@ -443,7 +458,7 @@ public class TestCaseValidatorTest {
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
 
         final Collection<Problem> problems = validate(context, fileModel);
-        assertThat(problems).containsOnly(new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                 new ProblemPosition(3, Range.closed(38, 44))));
     }
 

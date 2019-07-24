@@ -276,6 +276,18 @@ public enum KeywordsProblem implements IProblemCause {
                     + "Use '%s' in this suite file if the latter is desired";
         }
     },
+    KEYWORD_NAME_IS_PARAMETERIZED {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.PARAMETERIZED_KEYWORD_NAME_USAGE;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword name '%s' contains variables.%s";
+        }
+    },
     DEPRECATED_KEYWORD_SETTING_NAME {
 
         @Override

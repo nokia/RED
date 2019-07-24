@@ -31,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
@@ -310,6 +309,21 @@ public class KeywordValidatorTest {
     }
 
     @Test
+    public void keywordWithVariablesProblemInExecutableRowIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  kw ${x}")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw ${a}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).contains(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
+                new ProblemPosition(3, Range.closed(27, 34))));
+    }
+
+    @Test
     public void variableSyntaxProblemIsReportedInExecutableRowWithSpecialKeyword() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
@@ -416,7 +430,7 @@ public class KeywordValidatorTest {
         final FileValidationContext context = prepareContext(accessibleVariables);
         final Collection<Problem> problems = validate(context, fileModel);
 
-        assertThat(problems).containsOnly(new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                 new ProblemPosition(3, Range.closed(39, 45))));
     }
 
