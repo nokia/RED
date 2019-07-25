@@ -15,13 +15,14 @@ enabled RED will start reporting special kinds of markers similarly as Problems,
 For example in following code there are two tasks defined in comments:
 </p>
 
-<div class="code">
+<code>
 # TODO implement more test scenarios<br/>
 *** Test Cases ***<br/>
 case<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;Should Be Equal&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;# FIXME this assertion does not pass<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;...
-</div>
+</code>
+</br></br>
 <img src="images/editor_tasks.png"><br>
 
 <p>The detection is based on tags. When defined tag is found by RED inside the comment it will be reported as a
