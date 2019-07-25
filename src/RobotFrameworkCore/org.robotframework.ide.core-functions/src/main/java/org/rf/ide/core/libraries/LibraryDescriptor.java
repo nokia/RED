@@ -6,12 +6,14 @@
 package org.rf.ide.core.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 
@@ -23,16 +25,17 @@ import com.google.common.hash.Hashing;
 public final class LibraryDescriptor {
 
     public static LibraryDescriptor ofStandardLibrary(final String libraryName) {
-        return new LibraryDescriptor(libraryName, LibraryType.PYTHON, null, new ArrayList<>());
+        return new LibraryDescriptor(libraryName, LibraryType.PYTHON, null, new ArrayList<>(), false);
     }
 
     public static LibraryDescriptor ofStandardRemoteLibrary(final RemoteLocation remoteLocation) {
-        return new LibraryDescriptor("Remote", LibraryType.PYTHON, null, newArrayList(remoteLocation.getUri()));
+        return new LibraryDescriptor("Remote", LibraryType.PYTHON, null, newArrayList(remoteLocation.getUri()), true);
     }
 
-    public static LibraryDescriptor ofReferencedLibrary(final ReferencedLibrary refLibrary) {
+    public static LibraryDescriptor ofReferencedLibrary(final ReferencedLibrary refLibrary,
+            final ReferencedLibraryArgumentsVariant argumentsVariant) {
         return new LibraryDescriptor(refLibrary.getName(), refLibrary.provideType(), refLibrary.getPath(),
-                new ArrayList<>());
+                argumentsVariant.getArgsStream().collect(toList()), refLibrary.isDynamic());
     }
 
     private final String name;
@@ -43,12 +46,20 @@ public final class LibraryDescriptor {
 
     private final List<String> arguments;
 
+    private final boolean isDynamic;
+
     public LibraryDescriptor(final String name, final LibraryType type, final String path,
             final List<String> arguments) {
+        this(name, type, path, arguments, false);
+    }
+
+    public LibraryDescriptor(final String name, final LibraryType type, final String path, final List<String> arguments,
+            final boolean isDynamic) {
         this.name = name;
         this.type = type;
         this.path = path;
         this.arguments = arguments;
+        this.isDynamic = isDynamic;
     }
 
     public String getName() {
@@ -65,6 +76,10 @@ public final class LibraryDescriptor {
 
     public List<String> getArguments() {
         return arguments;
+    }
+
+    public boolean isDynamic() {
+        return isDynamic;
     }
 
     public boolean isStandardRemoteLibrary() {
@@ -109,13 +124,14 @@ public final class LibraryDescriptor {
         if (obj != null && obj.getClass() == LibraryDescriptor.class) {
             final LibraryDescriptor that = (LibraryDescriptor) obj;
             return Objects.equal(this.name, that.name) && Objects.equal(this.type, that.type)
-                    && Objects.equal(this.path, that.path) && Objects.equal(this.arguments, that.arguments);
+                    && Objects.equal(this.path, that.path) && Objects.equal(this.arguments, that.arguments)
+                    && this.isDynamic == that.isDynamic;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, type, path, arguments);
+        return Objects.hashCode(name, type, path, arguments, isDynamic);
     }
 }

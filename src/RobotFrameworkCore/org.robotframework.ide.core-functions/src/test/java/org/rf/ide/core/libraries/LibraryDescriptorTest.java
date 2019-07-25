@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 
@@ -23,6 +24,7 @@ public class LibraryDescriptorTest {
         assertThat(descriptor.getArguments()).isEmpty();
         assertThat(descriptor.getLibraryType()).isEqualTo(LibraryType.PYTHON);
         assertThat(descriptor.getPath()).isNull();
+        assertThat(descriptor.isDynamic()).isFalse();
 
         assertThat(descriptor.isStandardLibrary()).isTrue();
         assertThat(descriptor.isStandardRemoteLibrary()).isFalse();
@@ -45,6 +47,7 @@ public class LibraryDescriptorTest {
         assertThat(descriptor.getArguments()).containsExactly("http://uri");
         assertThat(descriptor.getLibraryType()).isEqualTo(LibraryType.PYTHON);
         assertThat(descriptor.getPath()).isNull();
+        assertThat(descriptor.isDynamic()).isTrue();
 
         assertThat(descriptor.isStandardLibrary()).isTrue();
         assertThat(descriptor.isStandardRemoteLibrary()).isTrue();
@@ -64,58 +67,95 @@ public class LibraryDescriptorTest {
     }
 
     @Test
-    public void testReferencedLibraryDescriptorProperties() {
-        final LibraryDescriptor descriptor = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"));
+    public void testReferencedLibraryDescriptorProperties_1() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py");
+        final ReferencedLibraryArgumentsVariant argsVariant = ReferencedLibraryArgumentsVariant.create();
+
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(lib, argsVariant);
 
         assertThat(descriptor.getName()).isEqualTo("lib");
         assertThat(descriptor.getArguments()).isEmpty();
         assertThat(descriptor.getLibraryType()).isEqualTo(LibraryType.PYTHON);
         assertThat(descriptor.getPath()).isEqualTo("path/to/library/lib.py");
         assertThat(descriptor.getKeywordsScope()).isEqualTo(KeywordScope.REF_LIBRARY);
+        assertThat(descriptor.isDynamic()).isFalse();
 
         assertThat(descriptor.isStandardLibrary()).isFalse();
         assertThat(descriptor.isStandardRemoteLibrary()).isFalse();
         assertThat(descriptor.isReferencedLibrary()).isTrue();
 
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))))
-                        .isTrue();
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"))))
-                        .isFalse();
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"))))
-                        .isFalse();
-        assertThat(descriptor.equals(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"))))
-                        .isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                lib, argsVariant))).isTrue();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"), argsVariant))).isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"), argsVariant))).isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"), argsVariant))).isFalse();
 
-        assertThat(descriptor.hashCode()).isEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))
-                .hashCode());
-        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"))
-                .hashCode());
-        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"))
-                .hashCode());
-        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"))
-                .hashCode());
+        assertThat(descriptor.hashCode()).isEqualTo(LibraryDescriptor.ofReferencedLibrary(
+                lib, argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"), argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"), argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(
+                LibraryDescriptor
+                        .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"),
+                                argsVariant)
+                        .hashCode());
+    }
+
+    @Test
+    public void testReferencedLibraryDescriptorProperties_2() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py");
+        lib.setDynamic(true);
+        final ReferencedLibraryArgumentsVariant argsVariant = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(lib, argsVariant);
+
+        assertThat(descriptor.getName()).isEqualTo("lib");
+        assertThat(descriptor.getArguments()).containsExactly("1", "2", "3");
+        assertThat(descriptor.getLibraryType()).isEqualTo(LibraryType.PYTHON);
+        assertThat(descriptor.getPath()).isEqualTo("path/to/library/lib.py");
+        assertThat(descriptor.getKeywordsScope()).isEqualTo(KeywordScope.REF_LIBRARY);
+        assertThat(descriptor.isDynamic()).isTrue();
+
+        assertThat(descriptor.isStandardLibrary()).isFalse();
+        assertThat(descriptor.isStandardRemoteLibrary()).isFalse();
+        assertThat(descriptor.isReferencedLibrary()).isTrue();
+
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(lib, argsVariant))).isTrue();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"), argsVariant))).isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"), argsVariant))).isFalse();
+        assertThat(descriptor.equals(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"), argsVariant))).isFalse();
+
+        assertThat(descriptor.hashCode()).isEqualTo(LibraryDescriptor.ofReferencedLibrary(lib, argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.JAVA, "lib", "path/to/library/lib.py"), argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "l", "path/to/library/lib.py"), argsVariant).hashCode());
+        assertThat(descriptor.hashCode()).isNotEqualTo(
+                LibraryDescriptor
+                        .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/other/lib.py"),
+                                argsVariant)
+                        .hashCode());
     }
 
     @Test
     public void pathIsProperlyProvided() {
+        final ReferencedLibraryArgumentsVariant argsVariant = ReferencedLibraryArgumentsVariant.create();
+
         assertThat(LibraryDescriptor.ofStandardLibrary("StdLib").getPath()).isNull();
-        assertThat(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).getPath())
-                .isNull();
-        assertThat(LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"))
-                .getPath()).isEqualTo("path/to/library/lib.py");
-        assertThat(LibraryDescriptor
-                .ofReferencedLibrary(
-                        ReferencedLibrary.create(LibraryType.PYTHON, "lib.a.b", "path/to/library/lib/a.py"))
+        assertThat(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create("http://uri")).getPath()).isNull();
+        assertThat(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"), argsVariant).getPath())
+                        .isEqualTo("path/to/library/lib.py");
+        assertThat(LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib.a.b", "path/to/library/lib/a.py"), argsVariant)
                 .getPath()).isEqualTo("path/to/library/lib/a.py");
     }
 
@@ -136,8 +176,10 @@ public class LibraryDescriptorTest {
 
     @Test
     public void filenameOfReferencedLibraryIsItsNameWithAbbreviatedHashedSuffix() {
-        final LibraryDescriptor descriptor = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"));
+        final ReferencedLibraryArgumentsVariant argsVariant = ReferencedLibraryArgumentsVariant.create();
+
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(
+                ReferencedLibrary.create(LibraryType.PYTHON, "lib", "path/to/library/lib.py"), argsVariant);
 
         assertThat(descriptor.generateLibspecFileName()).matches("^lib_[0-9a-fA-F]{7}$");
     }

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
@@ -16,7 +17,13 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
+    static String buildNameWithArgs(final String nameOrPath, final List<String> arguments) {
+        return arguments.isEmpty() ? nameOrPath : nameOrPath + "::" + String.join("::", arguments);
+    }
+
     private final String libName;
+
+    private final List<String> arguments;
 
     private final String libPath;
 
@@ -24,9 +31,10 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     private final LibdocFormat format;
 
-    PythonLibraryLibdocGenerator(final String libName, final String path, final IFile targetSpecFile,
-            final LibdocFormat format) {
+    PythonLibraryLibdocGenerator(final String libName, final List<String> arguments, final String path,
+            final IFile targetSpecFile, final LibdocFormat format) {
         this.libName = libName;
+        this.arguments = arguments;
         this.libPath = path;
         this.targetSpecFile = targetSpecFile;
         this.format = format;
@@ -38,12 +46,12 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
                 ? libPath
                 : extractLibParent();
         additionalPaths.addPythonPath(additionalPath);
-        final String libPathOrName = getLibPathOrName();
+        final String pathOrNameWithArgs = buildNameWithArgs(getLibPathOrName(), arguments);
         final File outputFile = targetSpecFile.getLocation().toFile();
         if (RedPlugin.getDefault().getPreferences().isPythonLibrariesLibdocGenerationInSeparateProcessEnabled()) {
-            environment.createLibdocInSeparateProcess(libPathOrName, outputFile, format, additionalPaths);
+            environment.createLibdocInSeparateProcess(pathOrNameWithArgs, outputFile, format, additionalPaths);
         } else {
-            environment.createLibdoc(libPathOrName, outputFile, format, additionalPaths);
+            environment.createLibdoc(pathOrNameWithArgs, outputFile, format, additionalPaths);
         }
     }
 
@@ -80,7 +88,8 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        return "generating libdoc for '" + libName + "' library located at '" + libPath + "'";
+        final String pathOrNameWithArgs = buildNameWithArgs(getLibPathOrName(), arguments);
+        return "generating libdoc for '" + pathOrNameWithArgs + "' library located at '" + libPath + "'";
     }
 
     @Override

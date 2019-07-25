@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -454,7 +453,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile) {
         final ValidationContext parentContext = new ValidationContext(
                 suiteFile.getRobotProject().getRobotProjectConfig(),
-                model, RobotVersion.from("0.0"), SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
+                model, RobotVersion.from("0.0"), SuiteExecutor.Python, ArrayListMultimap.create());
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 

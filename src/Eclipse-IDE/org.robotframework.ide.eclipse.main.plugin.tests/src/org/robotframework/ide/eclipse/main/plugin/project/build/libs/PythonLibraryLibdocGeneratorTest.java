@@ -9,6 +9,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.junit.After;
 import org.junit.Before;
@@ -77,8 +79,8 @@ public class PythonLibraryLibdocGeneratorTest {
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectProvider.getProject(),
                 robotProject.getRobotProjectConfig()).createAdditionalEnvironmentSearchPaths();
 
-        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
-                targetSpecFile, format);
+        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName,
+                new ArrayList<>(), libPath, targetSpecFile, format);
 
         final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
@@ -103,8 +105,8 @@ public class PythonLibraryLibdocGeneratorTest {
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectProvider.getProject(),
                 robotProject.getRobotProjectConfig()).createAdditionalEnvironmentSearchPaths();
 
-        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
-                targetSpecFile, format);
+        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName,
+                new ArrayList<>(), libPath, targetSpecFile, format);
 
         final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 
@@ -126,8 +128,8 @@ public class PythonLibraryLibdocGeneratorTest {
         final EnvironmentSearchPaths additionalPaths = new RedEclipseProjectConfig(projectProvider.getProject(),
                 robotProject.getRobotProjectConfig()).createAdditionalEnvironmentSearchPaths();
 
-        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName, libPath,
-                targetSpecFile, format);
+        final PythonLibraryLibdocGenerator pythonGenerator = new PythonLibraryLibdocGenerator(libName,
+                new ArrayList<>(), libPath, targetSpecFile, format);
 
         final IRuntimeEnvironment runtimeEnvironment = mock(IRuntimeEnvironment.class);
 

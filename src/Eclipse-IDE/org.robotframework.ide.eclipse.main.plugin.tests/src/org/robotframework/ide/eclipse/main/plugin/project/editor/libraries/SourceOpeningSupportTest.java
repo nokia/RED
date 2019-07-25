@@ -38,6 +38,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -86,7 +87,8 @@ public class SourceOpeningSupportTest {
         config.addReferencedLibrary(lib);
         projectProvider.configure(config);
 
-        final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
+        final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         libSpec = LibrarySpecification.create("testlib");
         libSpec.setDescriptor(libDesc);
 
@@ -116,8 +118,9 @@ public class SourceOpeningSupportTest {
     public void testIfLinkedLibraryIsOpened() throws Exception {
         final File nonWorkspaceLib = tempFolder.newFile("linkedLib.py");
         final LibrarySpecification linkedLibSpec = LibrarySpecification.create("linkedLib");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
-                .create(LibraryType.PYTHON, "linkedLib", nonWorkspaceLib.getAbsolutePath()));
+                .create(LibraryType.PYTHON, "linkedLib", nonWorkspaceLib.getAbsolutePath()), variant);
         linkedLibSpec.setDescriptor(libDesc);
 
         final IFile linkedFile = projectProvider.getFile("linkedLib.py");
@@ -136,8 +139,9 @@ public class SourceOpeningSupportTest {
     public void testIfNonWorkspaceLibraryIsOpened() throws Exception {
         final File nonWorkspaceLib = tempFolder.newFile("outsideLib.py");
         final LibrarySpecification nonWorkspaceLibSpec = LibrarySpecification.create("outsideLib");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
-                .create(LibraryType.PYTHON, "outsideLib", nonWorkspaceLib.getAbsolutePath()));
+                .create(LibraryType.PYTHON, "outsideLib", nonWorkspaceLib.getAbsolutePath()), variant);
         nonWorkspaceLibSpec.setDescriptor(libDesc);
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, nonWorkspaceLibSpec));
@@ -152,8 +156,9 @@ public class SourceOpeningSupportTest {
     @Test
     public void testIfUnknownLibraryIsNotOpened() throws Exception {
         final LibrarySpecification unknownLibSpec = LibrarySpecification.create("unknown");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "unknown", "path"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "unknown", "path"), variant);
         unknownLibSpec.setDescriptor(libDesc);
 
         SourceOpeningSupport.open(page, robotProject, unknownLibSpec, errorHandler);
@@ -165,8 +170,9 @@ public class SourceOpeningSupportTest {
     @Test
     public void testIfJavaLibraryIsNotOpened() throws Exception {
         final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"), variant);
         unsupportedLibSpec.setDescriptor(libDesc);
 
         SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, errorHandler);
@@ -178,8 +184,9 @@ public class SourceOpeningSupportTest {
     @Test
     public void testIfVirtualLibraryIsNotOpened() throws Exception {
         final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"), variant);
         unsupportedLibSpec.setDescriptor(libDesc);
 
         SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, errorHandler);
@@ -193,8 +200,9 @@ public class SourceOpeningSupportTest {
         final KeywordSpecification kwSpec = new KeywordSpecification();
 
         final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "unsupported", "path.jar"), variant);
         unsupportedLibSpec.setDescriptor(libDesc);
 
         SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, kwSpec, errorHandler);
@@ -208,8 +216,9 @@ public class SourceOpeningSupportTest {
         final KeywordSpecification kwSpec = new KeywordSpecification();
 
         final LibrarySpecification unsupportedLibSpec = LibrarySpecification.create("unsupported");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor
-                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"));
+                .ofReferencedLibrary(ReferencedLibrary.create(LibraryType.VIRTUAL, "unsupported", "path.xml"), variant);
         unsupportedLibSpec.setDescriptor(libDesc);
 
         SourceOpeningSupport.open(page, robotProject, unsupportedLibSpec, kwSpec, errorHandler);

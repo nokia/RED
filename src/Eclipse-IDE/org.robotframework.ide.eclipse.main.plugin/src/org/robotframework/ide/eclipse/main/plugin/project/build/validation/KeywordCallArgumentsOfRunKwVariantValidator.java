@@ -11,6 +11,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.ArgumentsProblemFoundException;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.RobotTokenAsArgExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.TaggedCallSiteArguments;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
@@ -29,7 +32,8 @@ class KeywordCallArgumentsOfRunKwVariantValidator extends KeywordCallArgumentsVa
         // with invalid descriptors
 
         final Map<String, Argument> argsByNames = groupDescriptorArgumentsByNames();
-        final TaggedCallSiteArguments taggedArguments = tagArguments(argsByNames);
+        final TaggedCallSiteArguments<RobotToken> taggedArguments = tagArguments(new RobotTokenAsArgExtractor(),
+                argsByNames);
 
         try {
             validateNumberOfArgs(taggedArguments);

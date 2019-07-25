@@ -41,6 +41,7 @@ import org.rf.ide.core.project.NullRobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -144,14 +145,18 @@ public class RobotProject extends RobotContainer {
 
         refLibsSpecs = new LinkedHashMap<>();
         for (final ReferencedLibrary library : getRobotProjectConfig().getReferencedLibraries()) {
-            final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
+            final List<ReferencedLibraryArgumentsVariant> variants = library.getArgsVariantsStream().collect(toList());
+            for (final ReferencedLibraryArgumentsVariant argsVariant : variants) {
+                final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library, argsVariant);
 
-            final LibrarySpecification spec = findLibSpec(descriptor);
-            refLibsSpecs.put(descriptor, spec);
+                final LibrarySpecification spec = findLibSpec(descriptor);
+                refLibsSpecs.put(descriptor, spec);
 
-            if (spec != null) {
-                librariesWatchHandler.registerLibrary(library, spec);
+                if (spec != null) {
+                    librariesWatchHandler.registerLibrary(library, spec);
+                }
             }
+
         }
         return refLibsSpecs;
     }

@@ -8,31 +8,27 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.InvalidArgumentsDescriptorException;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.ArgumentsProblemFoundException;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.BindedCallSiteArguments;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.RobotTokenAsArgExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.TaggedCallSiteArguments;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Streams;
 
@@ -64,19 +60,21 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) {
         try {
+            final RobotTokenAsArgExtractor extractor = new RobotTokenAsArgExtractor();
+
             validateDescriptor();
 
             final Map<String, Argument> argsByNames = groupDescriptorArgumentsByNames();
-            final TaggedCallSiteArguments taggedArguments = tagArguments(argsByNames);
+            final TaggedCallSiteArguments<RobotToken> taggedArguments = tagArguments(extractor, argsByNames);
 
             validatePositionalAndNamedOrder(taggedArguments);
 
-            final BindedCallSiteArguments bindedArguments = BindedCallSiteArguments.bindArguments(descriptor, arguments,
-                    argsByNames, taggedArguments);
+            final BindedCallSiteArguments<RobotToken> bindedArguments = BindedCallSiteArguments
+                    .bindArguments(extractor, descriptor, arguments, argsByNames, taggedArguments);
 
             validatePositionalDuplicatedByNamedArgument(taggedArguments, bindedArguments);
             validateNumberOfArgs(taggedArguments);
-            validateNamedDuplicatedByNames(taggedArguments);
+            validateNamedDuplicatedByNamed(taggedArguments);
 
             if (taggedArguments.containsCollectionArgument()) {
                 validateCollectionArguments(taggedArguments, bindedArguments);
@@ -108,12 +106,13 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 .collect(toMap(Argument::getName, arg -> arg));
     }
 
-    protected final TaggedCallSiteArguments tagArguments(final Map<String, Argument> argsByNames) {
-        return TaggedCallSiteArguments.tagArguments(arguments, argsByNames,
+    protected final TaggedCallSiteArguments<RobotToken> tagArguments(final RobotTokenAsArgExtractor extractor,
+            final Map<String, Argument> argsByNames) {
+        return TaggedCallSiteArguments.tagArguments(extractor, arguments, argsByNames,
                 descriptor.supportsKwargs() || descriptor.supportsKeywordOnlyArguments());
     }
 
-    private void validatePositionalAndNamedOrder(final TaggedCallSiteArguments taggedArguments) {
+    private void validatePositionalAndNamedOrder(final TaggedCallSiteArguments<RobotToken> taggedArguments) {
         boolean orderIsWrong = false;
         boolean foundNamed = false;
         for (final RobotToken arg : arguments) {
@@ -136,8 +135,8 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validatePositionalDuplicatedByNamedArgument(final TaggedCallSiteArguments taggedArguments,
-            final BindedCallSiteArguments bindedArguments) {
+    private void validatePositionalDuplicatedByNamedArgument(final TaggedCallSiteArguments<RobotToken> taggedArguments,
+            final BindedCallSiteArguments<RobotToken> bindedArguments) {
 
         boolean isPositionalDuplicatedByNamed = false;
 
@@ -163,7 +162,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateNamedDuplicatedByNames(final TaggedCallSiteArguments taggedArguments) {
+    private void validateNamedDuplicatedByNamed(final TaggedCallSiteArguments<RobotToken> taggedArguments) {
         for (final RobotToken callSiteArg : arguments) {
             if (taggedArguments.isNamedDuplicateArgument(callSiteArg)) {
                 reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT)
@@ -172,7 +171,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    protected final void validateNumberOfArgs(final TaggedCallSiteArguments taggedArguments) {
+    protected final void validateNumberOfArgs(final TaggedCallSiteArguments<RobotToken> taggedArguments) {
         final boolean supportsKeyword = descriptor.supportsKwargs() || descriptor.supportsKeywordOnlyArguments();
         final int actual = supportsKeyword
                 ? taggedArguments.getNumberOfNonKeywordArguments(arguments)
@@ -212,7 +211,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateAllRequiredAreProvided(final BindedCallSiteArguments bindedArguments) {
+    private void validateAllRequiredAreProvided(final BindedCallSiteArguments<RobotToken> bindedArguments) {
         final List<Argument> missingArguments = descriptor.stream()
                 .filter(arg -> arg.isRequired() || arg.isKeywordOnlyRequired())
                 .filter(arg -> bindedArguments.callSiteArgumentsOf(arg).isEmpty())
@@ -229,7 +228,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateNoKeywordUnexpectedIsProvided(final BindedCallSiteArguments bindedArguments) {
+    private void validateNoKeywordUnexpectedIsProvided(final BindedCallSiteArguments<RobotToken> bindedArguments) {
         if (!descriptor.supportsKwargs() && descriptor.supportsKeywordOnlyArguments()) {
             final List<RobotToken> tokensWithMissingBinding = arguments.stream()
                     .filter(token -> bindedArguments.definitionArgumentsOf(token).isEmpty())
@@ -243,8 +242,8 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateCollectionArguments(final TaggedCallSiteArguments taggedArguments,
-            final BindedCallSiteArguments bindedArguments) {
+    private void validateCollectionArguments(final TaggedCallSiteArguments<RobotToken> taggedArguments,
+            final BindedCallSiteArguments<RobotToken> bindedArguments) {
 
         boolean listValidated = false;
         boolean listProblemFound = false;
@@ -316,7 +315,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateAllKeywordOnlyRequiredAreProvided(final BindedCallSiteArguments bindedArguments) {
+    private void validateAllKeywordOnlyRequiredAreProvided(final BindedCallSiteArguments<RobotToken> bindedArguments) {
         final List<Argument> missingArguments = descriptor.stream()
                 .filter(Argument::isKeywordOnlyRequired)
                 .filter(arg -> bindedArguments.callSiteArgumentsOf(arg).isEmpty())
@@ -432,294 +431,5 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             return "";
         }
         return amount == 1 ? noun : noun + "s";
-    }
-
-    static class TaggedCallSiteArguments {
-
-        private static final Pattern LIST_PATTERN = Pattern.compile("^@\\{[\\w ]+\\}$");
-
-        private static final Pattern DICT_PATTERN = Pattern.compile("^&\\{[\\w ]+\\}$");
-
-        private final SymmetricRelation<RobotToken, ArgumentTag> bindings;
-
-        public TaggedCallSiteArguments(final SymmetricRelation<RobotToken, ArgumentTag> bindings) {
-            this.bindings = bindings;
-        }
-
-        public boolean isPositionalLookingLikeNamed(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.CONTAINS_EQUALS);
-        }
-
-        public boolean isNamedArgument(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.NAMED);
-        }
-
-        public boolean isNamedDuplicateArgument(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.NAMED_DUPLICATE);
-        }
-
-        public boolean isListArgument(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.LIST);
-        }
-
-        public boolean isDictionaryArgument(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.DICTIONARY);
-        }
-
-        public boolean isKeywordArgument(final RobotToken argument) {
-            return bindings.getLeftRelated(argument).contains(ArgumentTag.KEYWORD);
-        }
-
-        public boolean isKeywordNonDictionaryArgument(final RobotToken argument) {
-            final List<ArgumentTag> tags = bindings.getLeftRelated(argument);
-            return tags.contains(ArgumentTag.KEYWORD) && !tags.contains(ArgumentTag.DICTIONARY);
-        }
-
-        public boolean containsArgumentPassedPositionallyAndByName(final List<RobotToken> arguments) {
-            final Set<ArgumentTag> tags = arguments.stream()
-                    .map(bindings::getLeftRelated)
-                    .flatMap(List::stream)
-                    .collect(toSet());
-            return tags.contains(ArgumentTag.POSITIONAL) && tags.contains(ArgumentTag.NAMED);
-        }
-
-        public boolean containsCollectionArgument() {
-            return !bindings.getRightRelated(ArgumentTag.COLLECTION).isEmpty();
-        }
-
-        public boolean containsListArgument() {
-            return !bindings.getRightRelated(ArgumentTag.LIST).isEmpty();
-        }
-
-        public int getNumberOfNonCollectionArguments(final List<RobotToken> arguments) {
-            return (int) arguments.stream()
-                    .filter(arg -> !bindings.getLeftRelated(arg).contains(ArgumentTag.COLLECTION))
-                    .filter(arg -> !bindings.getLeftRelated(arg).contains(ArgumentTag.KEYWORD))
-                    .count();
-        }
-
-        public int getNumberOfArguments(final List<RobotToken> arguments) {
-            return (int) arguments.stream()
-                    .map(bindings::getLeftRelated)
-                    .filter(tags -> !tags.contains(ArgumentTag.LIST))
-                    .filter(tags -> !tags.contains(ArgumentTag.NAMED_DUPLICATE))
-                    .count();
-        }
-
-        public int getNumberOfNonKeywordArguments(final List<RobotToken> arguments) {
-            return (int) arguments.stream()
-                    .map(bindings::getLeftRelated)
-                    .filter(tags -> !tags.contains(ArgumentTag.KEYWORD))
-                    .filter(tags -> !tags.contains(ArgumentTag.LIST))
-                    .filter(tags -> !tags.contains(ArgumentTag.NAMED_DUPLICATE))
-                    .count();
-        }
-
-        public List<RobotToken> getPositionalArguments() {
-            return bindings.getRightRelated(ArgumentTag.POSITIONAL);
-        }
-
-        public List<RobotToken> getNamedArguments() {
-            return bindings.getRightRelated(ArgumentTag.NAMED);
-        }
-
-        static TaggedCallSiteArguments tagArguments(final List<RobotToken> callSiteArguments,
-                final Map<String, Argument> argsByNames, final boolean kwargsAreSupported) {
-
-            final SymmetricRelation<RobotToken, ArgumentTag> bindings = new SymmetricRelation<>();
-            final Map<String, RobotToken> previousWithSameName = new HashMap<>();
-            for (final RobotToken arg : callSiteArguments) {
-
-                if (isCleanList(arg)) {
-                    bindings.bind(arg, ArgumentTag.LIST);
-                    bindings.bind(arg, ArgumentTag.COLLECTION);
-                    bindings.bind(arg, ArgumentTag.POSITIONAL);
-
-                } else if (isCleanDictionary(arg)) {
-                    bindings.bind(arg, ArgumentTag.DICTIONARY);
-                    bindings.bind(arg, ArgumentTag.COLLECTION);
-                    bindings.bind(arg, ArgumentTag.NAMED);
-                    if (kwargsAreSupported) {
-                        bindings.bind(arg, ArgumentTag.KEYWORD);
-                    }
-
-                } else {
-                    final String argument = arg.getText();
-                    if (argument.contains("=")) {
-                        final String name = getName(argument);
-                        if (name.endsWith("\\")) {
-                            // '=' character is escaped
-                            bindings.bind(arg, ArgumentTag.POSITIONAL);
-
-                        } else if (argsByNames.keySet().contains(name)) {
-                            bindings.bind(arg, argsByNames.get(name).isKeywordOnly() ? ArgumentTag.KEYWORD : ArgumentTag.NAMED);
-
-                            if (previousWithSameName.get(name) != null) {
-                                bindings.bind(previousWithSameName.get(name), ArgumentTag.NAMED_DUPLICATE);
-                            }
-                            previousWithSameName.put(name, arg);
-
-                        } else if (kwargsAreSupported) {
-                            bindings.bind(arg, ArgumentTag.KEYWORD);
-
-                        } else {
-                            bindings.bind(arg, ArgumentTag.POSITIONAL);
-                            bindings.bind(arg, ArgumentTag.CONTAINS_EQUALS);
-                        }
-                    } else {
-                        bindings.bind(arg, ArgumentTag.POSITIONAL);
-                    }
-                }
-            }
-            return new TaggedCallSiteArguments(bindings);
-        }
-
-        private static boolean isCleanList(final RobotToken token) {
-            return token != null && token.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
-                    && LIST_PATTERN.matcher(token.getText()).matches();
-        }
-
-        private static boolean isCleanDictionary(final RobotToken token) {
-            return token != null && token.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
-                    && DICT_PATTERN.matcher(token.getText()).matches();
-        }
-    }
-
-    private static class BindedCallSiteArguments {
-
-        private final SymmetricRelation<Argument, RobotToken> bindings;
-
-        public BindedCallSiteArguments(final SymmetricRelation<Argument, RobotToken> bindings) {
-            this.bindings = bindings;
-        }
-
-        public List<RobotToken> callSiteArgumentsOf(final Argument definitionArgument) {
-            return bindings.getLeftRelated(definitionArgument);
-        }
-
-        public List<Argument> definitionArgumentsOf(final RobotToken token) {
-            return bindings.getRightRelated(token);
-        }
-
-        private static BindedCallSiteArguments bindArguments(final ArgumentsDescriptor descriptor,
-                final List<RobotToken> arguments, final Map<String, Argument> argsByNames,
-                final TaggedCallSiteArguments taggedArguments) {
-
-            final List<RobotToken> positional = taggedArguments.getPositionalArguments();
-            final List<RobotToken> named = taggedArguments.getNamedArguments();
-
-            final SymmetricRelation<Argument, RobotToken> mapping = new SymmetricRelation<>();
-            bindPositionalArguments(descriptor, mapping, positional, taggedArguments);
-            bindNamedArguments(mapping, named, argsByNames, taggedArguments);
-            bindKeywordArguments(descriptor, mapping, arguments, argsByNames, taggedArguments);
-            return new BindedCallSiteArguments(mapping);
-        }
-
-        private static void bindPositionalArguments(final ArgumentsDescriptor descriptor,
-                final SymmetricRelation<Argument, RobotToken> mapping, final List<RobotToken> positional,
-                final TaggedCallSiteArguments taggedArguments) {
-
-            final int sizeWithoutVarArgsAndKwargs = descriptor.size() - (descriptor.supportsVarargs() ? 1 : 0)
-                    - (descriptor.supportsKwargs() ? 1 : 0);
-
-            final int lastListIndex = indexOfLastList(positional, taggedArguments);
-
-            int i = 0;
-            int j = 0;
-            while (i < sizeWithoutVarArgsAndKwargs && j < lastListIndex) {
-                if (!taggedArguments.isListArgument(positional.get(j))) {
-                    mapping.bind(descriptor.get(i), positional.get(j));
-                    i++;
-                }
-                j++;
-            }
-            if (lastListIndex >= 0) {
-                j++;
-            }
-            for (; i < sizeWithoutVarArgsAndKwargs && j < positional.size(); i++, j++) {
-                mapping.bind(descriptor.get(i), positional.get(j));
-            }
-            if (descriptor.supportsVarargs()) {
-                for (; j < positional.size(); j++) {
-                    mapping.bind(descriptor.getVarargArgument().get(), positional.get(j));
-                }
-            }
-        }
-
-        private static int indexOfLastList(final List<RobotToken> positional,
-                final TaggedCallSiteArguments taggedArguments) {
-            final int lastListIndex = Iterables.indexOf(Lists.reverse(positional), taggedArguments::isListArgument);
-            if (lastListIndex == -1) {
-                return -1;
-            }
-            return positional.size() - 1 - lastListIndex;
-        }
-
-        private static void bindNamedArguments(final SymmetricRelation<Argument, RobotToken> mapping,
-                final List<RobotToken> named, final Map<String, Argument> argsByNames,
-                final TaggedCallSiteArguments taggedArguments) {
-
-            for (final RobotToken argToken : named) {
-                if (!taggedArguments.isDictionaryArgument(argToken) && taggedArguments.isNamedArgument(argToken)) {
-                    final Argument arg = argsByNames.get(getName(argToken.getText()));
-                    mapping.bind(arg, argToken);
-                }
-            }
-        }
-
-        private static void bindKeywordArguments(final ArgumentsDescriptor descriptor,
-                final SymmetricRelation<Argument, RobotToken> mapping, final List<RobotToken> arguments,
-                final Map<String, Argument> argsByNames, final TaggedCallSiteArguments taggedArguments) {
-            for (final RobotToken argToken : arguments) {
-                if (taggedArguments.isKeywordNonDictionaryArgument(argToken)) {
-                    final Argument arg = argsByNames.get(getName(argToken.getText()));
-                    if (arg != null && arg.isKeywordOnly()) {
-                        mapping.bind(arg, argToken);
-                    } else if (descriptor.supportsKwargs()) {
-                        mapping.bind(descriptor.getKwargArgument().get(), argToken);
-                    }
-                }
-            }
-        }
-    }
-
-    private static class SymmetricRelation<L, R> {
-
-        private final ArrayListMultimap<L, R> leftToRightMapping = ArrayListMultimap.create();
-
-        private final ArrayListMultimap<R, L> rightToLeftMapping = ArrayListMultimap.create();
-
-        public void bind(final L left, final R right) {
-            leftToRightMapping.put(left, right);
-            rightToLeftMapping.put(right, left);
-        }
-
-        public List<R> getLeftRelated(final L left) {
-            return leftToRightMapping.get(left);
-        }
-
-        public List<L> getRightRelated(final R right) {
-            return rightToLeftMapping.get(right);
-        }
-    }
-
-    private static enum ArgumentTag {
-        POSITIONAL,
-        NAMED,
-        NAMED_DUPLICATE,
-        KEYWORD,
-        CONTAINS_EQUALS,
-        LIST,
-        DICTIONARY,
-        COLLECTION
-    }
-
-    static class ArgumentsProblemFoundException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public ArgumentsProblemFoundException() {
-            super();
-        }
     }
 }

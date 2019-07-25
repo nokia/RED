@@ -107,7 +107,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (isPathImport(pathOrName)) {
             validatePathImport(pathOrName, pathOrNameToken, isParameterized, imported.getArguments());
         } else {
-            validateNameImport(pathOrName, pathOrNameToken, imported.getArguments());
+            validateNameImport(imported, pathOrName, pathOrNameToken, imported.getArguments());
         }
     }
 
@@ -212,7 +212,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     @SuppressWarnings("unused")
-    protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments) {
+    protected void validateNameImport(final AImported imported, final String name, final RobotToken nameToken,
+            final List<RobotToken> arguments) {
         // nothing to do; override if needed
     }
 

@@ -28,6 +28,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -103,10 +104,11 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 projectProvider.getProject().getName() + "/known2.py");
         final ReferencedLibrary refLib3 = ReferencedLibrary.create(LibraryType.PYTHON, "knownInResource",
                 projectProvider.getProject().getName() + "/knownInResource.py");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
 
-        final LibraryDescriptor desc1 = LibraryDescriptor.ofReferencedLibrary(refLib1);
-        final LibraryDescriptor desc2 = LibraryDescriptor.ofReferencedLibrary(refLib2);
-        final LibraryDescriptor desc3 = LibraryDescriptor.ofReferencedLibrary(refLib3);
+        final LibraryDescriptor desc1 = LibraryDescriptor.ofReferencedLibrary(refLib1, variant);
+        final LibraryDescriptor desc2 = LibraryDescriptor.ofReferencedLibrary(refLib2, variant);
+        final LibraryDescriptor desc3 = LibraryDescriptor.ofReferencedLibrary(refLib3, variant);
         final LibrarySpecification spec1 = LibrarySpecification.create(refLib1.getName());
         spec1.setDescriptor(desc1);
         final LibrarySpecification spec2 = LibrarySpecification.create(refLib2.getName());

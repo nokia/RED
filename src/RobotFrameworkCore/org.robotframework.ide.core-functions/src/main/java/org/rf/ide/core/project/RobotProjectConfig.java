@@ -6,6 +6,8 @@
 package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -424,6 +427,12 @@ public class RobotProjectConfig {
         @XmlAttribute
         private String path;
 
+        @XmlAttribute(name = "dynamic", required = false)
+        private boolean isDynamic = false;
+
+        @XmlElement(name = "argumentsVariant", type = ReferencedLibraryArgumentsVariant.class)
+        private List<ReferencedLibraryArgumentsVariant> argumentsVariants = new ArrayList<>();
+
         public void setType(final String type) {
             this.type = type;
         }
@@ -448,6 +457,41 @@ public class RobotProjectConfig {
             return path;
         }
 
+        public void setArgumentsVariants(final List<ReferencedLibraryArgumentsVariant> arguments) {
+            if (!isDynamic && arguments.size() > 1) {
+                throw new IllegalArgumentException();
+            }
+            this.argumentsVariants = arguments;
+        }
+
+        public List<ReferencedLibraryArgumentsVariant> getArgumentsVariants() {
+            return argumentsVariants;
+        }
+
+        public Stream<ReferencedLibraryArgumentsVariant> getArgsVariantsStream() {
+            if (argumentsVariants.isEmpty()) {
+                // when there are no variants then we artificialy return single empty variant
+                return Stream.of(ReferencedLibraryArgumentsVariant.create());
+            } else {
+                return argumentsVariants.stream();
+            }
+        }
+
+        public void addArgumentsVariant(final ReferencedLibraryArgumentsVariant variant) {
+            if (!isDynamic && argumentsVariants.size() >= 1) {
+                throw new IllegalArgumentException();
+            }
+            argumentsVariants.add(variant);
+        }
+
+        public void setDynamic(final boolean isDynamic) {
+            this.isDynamic = isDynamic;
+        }
+
+        public boolean isDynamic() {
+            return isDynamic;
+        }
+
         public String getParentPath() {
             if (LibraryType.PYTHON != provideType()) {
                 return path;
@@ -456,9 +500,9 @@ public class RobotProjectConfig {
             if (path.length() <= lastCharsToRemove) {
                 return "";
             }
-            String parentPath = path.substring(0, path.length() - lastCharsToRemove);
+            final String parentPath = path.substring(0, path.length() - lastCharsToRemove);
 
-            String[] nameParts = name.split("\\.");
+            final String[] nameParts = name.split("\\.");
             if (parentPath.endsWith(String.join("/", nameParts))) {
                 lastCharsToRemove = name.length() + 1; // +1 for separator
                 return parentPath.length() > lastCharsToRemove
@@ -466,7 +510,7 @@ public class RobotProjectConfig {
                         : "";
             }
             // possible module name inside file
-            String nameWithoutClass = String.join("/", Arrays.copyOf(nameParts, nameParts.length - 1));
+            final String nameWithoutClass = String.join("/", Arrays.copyOf(nameParts, nameParts.length - 1));
             if (parentPath.endsWith(nameWithoutClass)) {
                 lastCharsToRemove = nameWithoutClass.length() + 1; // +1 for separator
                 return parentPath.length() > lastCharsToRemove
@@ -488,19 +532,105 @@ public class RobotProjectConfig {
             } else if (obj.getClass() == getClass()) {
                 final ReferencedLibrary other = (ReferencedLibrary) obj;
                 return Objects.equals(type, other.type) && Objects.equals(name, other.name)
-                        && Objects.equals(path, other.path);
+                        && Objects.equals(path, other.path)
+                        && Objects.equals(argumentsVariants, other.argumentsVariants) && isDynamic == other.isDynamic;
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, name, path);
+            return Objects.hash(type, name, path, argumentsVariants, isDynamic);
         }
 
         @Override
         public String toString() {
             return "ReferencedLibrary [type=" + type + ", name=" + name + ", path=" + path + "]";
+        }
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class ReferencedLibraryArgumentsVariant {
+
+        public static ReferencedLibraryArgumentsVariant create(final String... arguments) {
+            return new ReferencedLibraryArgumentsVariant(
+                    Arrays.asList(arguments).stream().map(ReferencedLibraryArgument::new).collect(toList()));
+        }
+
+        @XmlElement(name = "argument", required = false)
+        private List<ReferencedLibraryArgument> arguments = new ArrayList<>();
+
+        public ReferencedLibraryArgumentsVariant() {
+            this(null);
+        }
+
+        public ReferencedLibraryArgumentsVariant(final List<ReferencedLibraryArgument> args) {
+            this.arguments = args;
+        }
+
+        public List<ReferencedLibraryArgument> getArguments() {
+            return arguments;
+        }
+
+        public Stream<String> getArgsStream() {
+            return arguments.stream().map(ReferencedLibraryArgument::getArgument);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof ReferencedLibraryArgumentsVariant) {
+                final ReferencedLibraryArgumentsVariant that = (ReferencedLibraryArgumentsVariant) obj;
+                return Objects.equals(this.arguments, that.arguments);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(arguments);
+        }
+
+        @Override
+        public String toString() {
+            return getArgsStream().collect(joining(", ", "[", "]"));
+        }
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class ReferencedLibraryArgument {
+
+        @XmlValue
+        private final String argument;
+
+        public ReferencedLibraryArgument() {
+            this(null);
+        }
+
+        public ReferencedLibraryArgument(final String arg) {
+            this.argument = arg;
+        }
+
+        public String getArgument() {
+            return argument;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof ReferencedLibraryArgument) {
+                final ReferencedLibraryArgument that = (ReferencedLibraryArgument) obj;
+                return Objects.equals(this.argument, that.argument);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(argument);
+        }
+
+        @Override
+        public String toString() {
+            return argument;
         }
     }
 
@@ -528,6 +658,31 @@ public class RobotProjectConfig {
             final RemoteLocation location = new RemoteLocation();
             location.setUriAddress(path);
             return location;
+        }
+
+        public static boolean areEqual(final String path1, final String path2) {
+            return stripLastSlashAndProtocolIfNecessary(path1).equals(stripLastSlashAndProtocolIfNecessary(path2));
+        }
+
+        public static String stripLastSlashAndProtocolIfNecessary(final String string) {
+            return stripLastSlashIfNecessary(stripProtocolIfNecessary(string));
+        }
+
+        private static String stripLastSlashIfNecessary(final String string) {
+            return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
+        }
+
+        public static String addProtocolIfNecessary(final String argument) {
+            return argument.contains("://") ? argument : "http://" + argument;
+        }
+
+        private static String stripProtocolIfNecessary(final String string) {
+            if (string.toLowerCase().startsWith("https://")) {
+                return string.substring(8, string.length());
+            } else if (string.toLowerCase().startsWith("http://")) {
+                return string.substring(7, string.length());
+            }
+            return string;
         }
 
         @XmlAttribute(required = true)

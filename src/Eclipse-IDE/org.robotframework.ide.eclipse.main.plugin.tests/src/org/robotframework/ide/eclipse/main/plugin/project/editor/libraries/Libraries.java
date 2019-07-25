@@ -5,14 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.rf.ide.core.libraries.KeywordSpecification;
+import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,6 +53,8 @@ public class Libraries {
         libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName("Remote");
+        final LibraryConstructor constructor = LibraryConstructor.create("", newArrayList("uri=default", "timeout=30"));
+        libSpec.setConstructor(constructor);
         for (final String kwName : kwNames) {
             final KeywordSpecification kwSpec = new KeywordSpecification();
             kwSpec.setName(kwName);
@@ -73,7 +79,8 @@ public class Libraries {
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final ReferencedLibrary library,
             final String... kwNames) {
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library, variant);
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setVersion("1.0");
         libSpec.setScope("global");

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +97,7 @@ class Contexts {
                 .collect(groupingBy(KeywordEntity::getKeywordName, toCollection(ArrayList::new)));
 
         final ValidationContext parentContext = new ValidationContext(null, new RobotModel(), version,
-                SuiteExecutor.Python, ArrayListMultimap.create(), new HashMap<>());
+                SuiteExecutor.Python, ArrayListMultimap.create());
         final IFile file = mock(IFile.class);
         when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
         return new FileValidationContext(parentContext, file, () -> accessibleKws, accessibleVariables);

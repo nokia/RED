@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table.setting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -79,6 +80,21 @@ public class LibraryImport extends AImported {
         return true;
     }
 
+    public Optional<RobotToken> getLibraryNameToken() {
+        return Optional.ofNullable(getPathOrName());
+    }
+
+    public Optional<RobotToken> getLibraryAliasToken() {
+        return alias.getElementTokens()
+                .stream()
+                .filter(t -> t.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE))
+                .findFirst();
+    }
+
+    public List<RobotToken> getLibraryArgumentTokens() {
+        return new ArrayList<>(arguments);
+    }
+
     @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
@@ -122,7 +138,7 @@ public class LibraryImport extends AImported {
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position - 2 <= arguments.size()) { // new argument

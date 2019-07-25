@@ -12,7 +12,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
-import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
@@ -74,16 +72,8 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         return context.getVersion();
     }
 
-    LibrarySpecification getLibrarySpecifications(final String libName, final String address) {
-        return context.getLibrarySpecification(libName, address);
-    }
-
-    LibrarySpecification getLibrarySpecifications(final String libName, final List<String> arguments) {
-        return context.getLibrarySpecification(libName, arguments);
-    }
-
-    Map<LibraryDescriptor, LibrarySpecification> getReferencedLibrarySpecifications() {
-        return context.getReferencedLibrarySpecifications();
+    public ListMultimap<String, LibrarySpecification> getSpecifications() {
+        return context.getSpecifications();
     }
 
     Set<String> getAccessibleVariables() {

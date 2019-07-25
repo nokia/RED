@@ -30,6 +30,7 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -373,8 +374,9 @@ public class LibrariesWatchHandlerTest {
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1), libSpec1);
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2), libSpec2);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1, variant), libSpec1);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2, variant), libSpec2);
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -401,9 +403,10 @@ public class LibrariesWatchHandlerTest {
         final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1), libSpec1);
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2), libSpec2);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary1, variant), libSpec1);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary2, variant), libSpec2);
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -429,8 +432,9 @@ public class LibrariesWatchHandlerTest {
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary, variant), libSpec);
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -452,8 +456,9 @@ public class LibrariesWatchHandlerTest {
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary), libSpec);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(referencedLibrary, variant), libSpec);
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project, refLibs);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);

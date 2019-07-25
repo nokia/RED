@@ -5,13 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -20,7 +17,6 @@ import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.KeywordSpecification;
-import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -41,12 +37,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.Files;
 
@@ -63,9 +57,7 @@ public class ValidationContext {
 
     private final RobotProjectConfig projectConfig;
 
-    private final Multimap<String, LibrarySpecification> accessibleLibraries;
-
-    private final Map<LibraryDescriptor, LibrarySpecification> referencedAccessibleLibraries;
+    private final ListMultimap<String, LibrarySpecification> accessibleLibraries;
 
     private BuildLogger logger;
 
@@ -78,22 +70,19 @@ public class ValidationContext {
         this.version = robotProject.getRobotParserComplianceVersion();
         this.executorInUse = robotProject.getRuntimeEnvironment().getInterpreter();
         this.accessibleLibraries = collectLibraries(robotProject);
-        this.referencedAccessibleLibraries = new HashMap<>(robotProject.getReferencedLibraries());
     }
 
     @VisibleForTesting
     public ValidationContext(final RobotProjectConfig config, final RobotModel model, final RobotVersion version,
-            final SuiteExecutor executor, final Multimap<String, LibrarySpecification> libs,
-            final Map<LibraryDescriptor, LibrarySpecification> refLibs) {
+            final SuiteExecutor executor, final ListMultimap<String, LibrarySpecification> libs) {
         this.projectConfig = config;
         this.model = model;
         this.version = version;
         this.executorInUse = executor;
         this.accessibleLibraries = libs;
-        this.referencedAccessibleLibraries = refLibs;
     }
 
-    private static Multimap<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
+    private static ListMultimap<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
         return Multimaps.index(robotProject.getLibrarySpecifications(), LibrarySpecification::getName);
     }
 
@@ -118,54 +107,8 @@ public class ValidationContext {
         return version;
     }
 
-    public LibrarySpecification getLibrarySpecification(final String libName, final String address) {
-        final Collection<LibrarySpecification> candidates = accessibleLibraries.get(libName);
-        if (address == null) {
-            return null;
-        }
-        for (final LibrarySpecification candidate : candidates) {
-            if (RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(address).equals(RemoteArgumentsResolver
-                    .stripLastSlashAndProtocolIfNecessary(candidate.getDescriptor().getArguments().get(0)))) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    public LibrarySpecification getLibrarySpecification(final String libName, final List<String> arguments) {
-        final Collection<LibrarySpecification> candidates = accessibleLibraries.get(libName);
-
-        if (candidates.isEmpty()) {
-            return null;
-        } else if (candidates.size() == 1) {
-            return Iterables.getOnlyElement(candidates);
-        } else {
-            // TODO : the specification should be chosen from possible candidates
-            for (final LibrarySpecification candidate : candidates) {
-                final List<String> candidateNormalizedArguments = candidate.getDescriptor()
-                        .getArguments()
-                        .stream()
-                        .map(this::normalizeArg)
-                        .collect(toList());
-                final List<String> normalizedArguments = arguments.stream().map(this::normalizeArg).collect(toList());
-                if (candidateNormalizedArguments.equals(normalizedArguments)) {
-                    return candidate;
-                }
-            }
-            return null;
-        }
-    }
-
-    private String normalizeArg(final String argument) {
-        return stripLastSlashIfNecessary(argument).toLowerCase();
-    }
-
-    private static String stripLastSlashIfNecessary(final String string) {
-        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
-    }
-
-    public Map<LibraryDescriptor, LibrarySpecification> getReferencedLibrarySpecifications() {
-        return referencedAccessibleLibraries;
+    public ListMultimap<String, LibrarySpecification> getSpecifications() {
+        return accessibleLibraries;
     }
 
     public boolean isValidatingChangedFiles() {

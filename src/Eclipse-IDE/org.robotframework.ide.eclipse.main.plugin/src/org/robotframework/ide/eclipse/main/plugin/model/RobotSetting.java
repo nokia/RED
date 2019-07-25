@@ -11,8 +11,8 @@ import java.net.URI;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -22,23 +22,21 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.testdata.importer.LibraryImportResolver;
+import org.rf.ide.core.testdata.importer.LibraryImportResolver.ImportedLibrary;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.IRegionCacheable;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.project.build.libs.RemoteArgumentsResolver;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 
@@ -143,14 +141,6 @@ public class RobotSetting extends RobotKeywordCall {
         return modelType == ModelType.LIBRARY_IMPORT_SETTING;
     }
 
-    private Optional<String> extractLibraryAlias() {
-        if (getLinkedElement() instanceof LibraryImport) {
-            final LibraryAlias libAlias = ((LibraryImport) getLinkedElement()).getAlias();
-            return libAlias.isPresent() ? Optional.of(libAlias.getLibraryAlias().getText()) : Optional.empty();
-        }
-        throw new IllegalArgumentException("Unable to extract library alias from non-Library setting");
-    }
-
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getRobotSettingImage();
@@ -200,74 +190,33 @@ public class RobotSetting extends RobotKeywordCall {
             throw new IllegalArgumentException("Cannot provide library from setting other then Library");
         }
 
-        final List<String> args = getArguments();
-        if (args.isEmpty()) {
-            return Optional.empty();
-        }
-
-        final String libNameOrPath = RobotExpressions.unescapeSpaces(args.get(0));
-        if (indexedLibraries.containsKey(libNameOrPath)
-                && !indexedLibraries.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
-            // by-name import of non-remote; only remote libraries are currently used
-            // multiple times
-            return Optional.of(new ImportedLibrary(indexedLibraries.get(libNameOrPath).get(0), extractLibraryAlias()));
-
-        } else if (indexedLibraries.containsKey(libNameOrPath)
-                && indexedLibraries.get(libNameOrPath).get(0).getDescriptor().isStandardRemoteLibrary()) {
-            // by-name import of remote library
-            // empty were filtered out, so here size() > 0
-            final List<RobotToken> arguments = args.subList(1, args.size())
-                    .stream()
-                    .map(arg -> RobotToken.create(arg))
-                    .collect(toList());
-            final Map<String, String> variablesMapping = getSuiteFile().getRobotProject().getRobotProjectHolder()
-                    .getVariableMappings();
-            final RemoteArgumentsResolver resolver = new RemoteArgumentsResolver(arguments, variablesMapping);
-            final Optional<String> uri = resolver.getUri();
-            try {
-                final RemoteLocation remoteLocation = RemoteLocation.create(uri.get());
-                final String remote = RemoteArgumentsResolver
-                        .stripLastSlashAndProtocolIfNecessary(remoteLocation.getUri());
-
-                for (final LibrarySpecification spec : indexedLibraries.get(libNameOrPath)) {
-                    if (remote
-                            .equals(RemoteArgumentsResolver.stripLastSlashAndProtocolIfNecessary(
-                                    spec.getDescriptor().getArguments().get(0)))) {
-                        return Optional.of(new ImportedLibrary(spec, extractLibraryAlias()));
-                    }
-                }
-            } catch (final Exception e) {
-                // nothing to do
-            }
-            return Optional.empty();
-        } else {
-            // maybe it's a by-path import
-            return findSpecForPath(libNameOrPath);
-        }
-    }
-
-    private Optional<ImportedLibrary> findSpecForPath(final String path) {
         final RobotSuiteFile suiteFile = getSuiteFile();
         final RobotProject project = suiteFile.getRobotProject();
+        final Map<String, String> variablesMapping = project.getRobotProjectHolder().getVariableMappings();
+
+        final LibraryImportResolver libResolver = new LibraryImportResolver(project.getRobotParserComplianceVersion(),
+                variablesMapping, createIsImportedByPathPredicate(), indexedLibraries);
+        return libResolver.getImportedLibrary((LibraryImport) getLinkedElement());
+    }
+
+    private BiFunction<LibrarySpecification, String, Boolean> createIsImportedByPathPredicate() {
+        return (spec, path) -> isImportedByPath(getSuiteFile(), spec, path);
+    }
+
+    public static boolean isImportedByPath(final RobotSuiteFile suiteFile, final LibrarySpecification specification,
+            final String pathUsedToImport) {
+        final RobotProject project = suiteFile.getRobotProject();
         final Optional<IPath> candidate = new RobotProjectPathsProvider(project)
-                .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(path))
+                .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(pathUsedToImport))
                 .map(URI::getPath)
                 .map(Path::new);
         if (!candidate.isPresent()) {
-            return Optional.empty();
+            return false;
         }
-
-        return project.getLibraryEntriesStream()
-                .filter(entry -> entry.getValue() != null)
-                .filter(entry -> entry.getKey().isReferencedLibrary())
-                .filter(entry -> specPathMatches(candidate.get(), new Path(entry.getKey().getPath())))
-                .map(Entry::getValue)
-                .map(spec -> new ImportedLibrary(spec, extractLibraryAlias()))
-                .findFirst();
+        return specPathsMatches(candidate.get(), new Path(specification.getDescriptor().getPath()));
     }
 
-    @VisibleForTesting
-    protected boolean specPathMatches(final IPath absolutePath, final IPath refLibPath) {
+    public static boolean specPathsMatches(final IPath absolutePath, final IPath refLibPath) {
         if (RedSystemProperties.isWindowsPlatform()) {
             return absolutePath.toPortableString()
                     .equalsIgnoreCase(
@@ -275,8 +224,7 @@ public class RobotSetting extends RobotKeywordCall {
                     || "__init__.py".equals(refLibPath.lastSegment()) && absolutePath.removeTrailingSeparator()
                             .toPortableString()
                             .equalsIgnoreCase(RedWorkspace.Paths
-                                    .toAbsoluteFromWorkspaceRelativeIfPossible(
-                                            refLibPath.removeLastSegments(1))
+                                    .toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath.removeLastSegments(1))
                                     .toPortableString());
         } else {
             return absolutePath.equals(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(refLibPath))
@@ -309,26 +257,6 @@ public class RobotSetting extends RobotKeywordCall {
         final RedWorkspace redWorkspace = new RedWorkspace(workspaceRoot);
         final IResource resource = redWorkspace.forUri(possiblePath.get());
         return Optional.ofNullable(resource);
-    }
-
-    public static class ImportedLibrary {
-
-        private final LibrarySpecification spec;
-
-        private final Optional<String> alias;
-
-        private ImportedLibrary(final LibrarySpecification spec, final Optional<String> alias) {
-            this.spec = spec;
-            this.alias = alias;
-        }
-
-        public LibrarySpecification getSpecification() {
-            return spec;
-        }
-
-        Optional<String> getAlias() {
-            return alias;
-        }
     }
 
     public enum SettingsGroup {

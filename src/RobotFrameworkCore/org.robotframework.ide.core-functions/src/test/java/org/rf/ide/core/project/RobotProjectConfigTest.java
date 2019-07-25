@@ -7,6 +7,7 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -526,6 +528,53 @@ public class RobotProjectConfigTest {
                 "path/to/return/outer/even/more/lib/__init__.py");
 
         assertThat(lib.getParentPath()).isEqualTo("path/to/return");
+    }
+
+    @Test
+    public void argumentsVariantForStaticLibraryCanBeAdded_whenLibraryHasNoVariant() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "/lib.py");
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+
+        assertThat(lib.getArgumentsVariants()).isEmpty();
+
+        lib.addArgumentsVariant(variant);
+
+        assertThat(lib.getArgumentsVariants()).containsExactly(variant);
+    }
+
+    @Test
+    public void argumentsVariantForStaticLibraryCannotBeAdded_whenThereIsOneAlready() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "/lib.py");
+
+        lib.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("1", "2", "3"));
+        
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> lib.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("a", "b", "c")));
+    }
+
+    @Test
+    public void argumentsVariantsForDynamicLibraryCanBeAdded() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "/lib.py");
+        lib.setDynamic(true);
+        final ReferencedLibraryArgumentsVariant variant1 = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+        final ReferencedLibraryArgumentsVariant variant2 = ReferencedLibraryArgumentsVariant.create("a", "b", "c");
+        final ReferencedLibraryArgumentsVariant variant3 = ReferencedLibraryArgumentsVariant.create("x", "y", "z");
+
+        assertThat(lib.getArgumentsVariants()).isEmpty();
+
+        lib.addArgumentsVariant(variant1);
+        lib.addArgumentsVariant(variant2);
+        lib.addArgumentsVariant(variant3);
+
+        assertThat(lib.getArgumentsVariants()).containsExactly(variant1, variant2, variant3);
+    }
+
+    @Test
+    public void argumentsVariantsStreamHasEmptyVariant_whenThereIsNoVariantAdded() {
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "/lib.py");
+
+        assertThat(lib.getArgumentsVariants()).isEmpty();
+        assertThat(lib.getArgsVariantsStream()).containsExactly(ReferencedLibraryArgumentsVariant.create());
     }
 
 }

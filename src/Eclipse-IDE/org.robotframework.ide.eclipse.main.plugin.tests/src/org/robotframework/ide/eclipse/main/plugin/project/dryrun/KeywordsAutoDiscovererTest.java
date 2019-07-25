@@ -25,6 +25,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
@@ -228,7 +229,8 @@ public class KeywordsAutoDiscovererTest {
         projectProvider.configure(config);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(libraries.entrySet().stream().collect(
-                toMap(entry -> LibraryDescriptor.ofReferencedLibrary(entry.getKey()), entry -> entry.getValue())));
+                        toMap(entry -> LibraryDescriptor.ofReferencedLibrary(entry.getKey(),
+                                ReferencedLibraryArgumentsVariant.create()), entry -> entry.getValue())));
     }
 
     private Consumer<RobotDryRunKeywordSource> equalSource(final String expectedFilePath, final int expectedLine,

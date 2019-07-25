@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
@@ -37,7 +38,7 @@ public class StandardLibraryLibdocGeneratorTest {
         additionalPaths.addClassPath("cp2");
 
         final StandardLibraryLibdocGenerator generator = new StandardLibraryLibdocGenerator("library",
-                file, LibdocFormat.XML);
+                new ArrayList<>(), file, LibdocFormat.XML);
         generator.generateLibdoc(env, additionalPaths);
 
         verify(env).createLibdoc(eq("library"), eq(new File("/some/path")), eq(LibdocFormat.XML),

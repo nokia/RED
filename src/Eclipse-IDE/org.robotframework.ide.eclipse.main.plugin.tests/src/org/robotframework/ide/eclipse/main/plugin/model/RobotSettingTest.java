@@ -79,7 +79,7 @@ public class RobotSettingTest {
         absolute = absolute.append(libPath);
         final IPath libIPath = new Path(libPath);
 
-        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+        assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isTrue();
     }
 
     @Test
@@ -89,7 +89,7 @@ public class RobotSettingTest {
         absolute = absolute.append("path/to/another_lib.py");
         final IPath libIPath = new Path(libPath);
 
-        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isFalse();
+        assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isFalse();
     }
 
     @Test
@@ -101,7 +101,7 @@ public class RobotSettingTest {
         absolute = absolute.append("path/to/lib.py");
         final IPath libIPath = new Path(libPath);
 
-        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+        assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isTrue();
     }
 
     @Test
@@ -111,7 +111,7 @@ public class RobotSettingTest {
         absolute = absolute.append("path/to/lib");
         final IPath libIPath = new Path(libPath);
 
-        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+        assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isTrue();
     }
 
     @Test
@@ -121,7 +121,7 @@ public class RobotSettingTest {
         absolute = absolute.append("path/to/lib/");
         final IPath libIPath = new Path(libPath);
 
-        assertThat(new RobotSetting(null, null).specPathMatches(absolute, libIPath)).isTrue();
+        assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isTrue();
     }
 
     private static void assertNames(final List<RobotKeywordCall> settings) {

@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -58,6 +60,7 @@ import org.robotframework.red.junit.ResourceCreator;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
@@ -148,7 +151,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithToManyNamedArguments() {
-        validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=60  timeout=30");
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = createLibSpecForLibrary("http://127.0.0.1:9000");
+
+        validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=60  timeout=30", stdLibs);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(62, 72))));
@@ -156,10 +161,15 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithToManyPositionalArguments() {
-        validateLibraryImport("Remote  http://127.0.0.1:9000/  60  30");
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = createLibSpecForLibrary("http://127.0.0.1:9000");
 
-        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(2, Range.closed(26, 32))));
+        validateLibraryImport("Remote  http://127.0.0.1:9000/  60  30", stdLibs);
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(26, 32))),
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
+                        new ProblemPosition(2, Range.closed(26, 32))));
     }
 
     @Test
@@ -315,7 +325,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidPositionalUri1() {
-        validateLibraryImport("Remote  urrri=http://127.0.0.1:9000/");
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = createLibSpecForLibrary("http://127.0.0.1:9000");
+
+        validateLibraryImport("Remote  urrri=http://127.0.0.1:9000/", stdLibs);
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT,
@@ -690,7 +702,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -712,7 +725,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         constructor.setArguments(newArrayList("x", "y", "*ls"));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -736,7 +750,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final LibraryConstructor constructor = new LibraryConstructor();
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -751,7 +766,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             throws Exception {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
-        validateLibraryImport("Remote", libs, new HashMap<>());
+        validateLibraryImport("Remote", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -761,7 +776,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             throws Exception {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
-        validateLibraryImport("Remote   timeout=30", libs, new HashMap<>());
+        validateLibraryImport("Remote   timeout=30", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -918,8 +933,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_1() {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
-        validateLibraryImport("Remote  timeout=2 days 3 hours 20 minutes 2 seconds 10 miliseconds", libs,
-                new HashMap<>());
+        validateLibraryImport("Remote  timeout=2 days 3 hours 20 minutes 2 seconds 10 miliseconds", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -928,7 +942,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_2() {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
-        validateLibraryImport("Remote  timeout=2d3h20m2s10ms", libs, new HashMap<>());
+        validateLibraryImport("Remote  timeout=2d3h20m2s10ms", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -937,7 +951,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_3() {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
-        validateLibraryImport("Remote  timeout=2:3:20:2:10", libs, new HashMap<>());
+        validateLibraryImport("Remote  timeout=2:3:20:2:10", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -951,7 +965,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -971,7 +986,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -992,7 +1008,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + "/__init__.py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1011,7 +1028,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final IFile libFile = projectProvider.createFile("lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1030,7 +1048,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectProvider.createFile("directory/lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1050,7 +1069,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectProvider.createFile("directory/lib/__init__.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1073,7 +1093,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1096,7 +1117,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final String absPath = libFile.getLocation().toString();
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1116,7 +1138,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1136,7 +1159,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1157,7 +1181,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
                 dir.getAbsolutePath());
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1180,7 +1205,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1204,7 +1230,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1228,7 +1255,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib",
                 dir.getAbsolutePath() + "/external_nested_lib.py");
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1254,7 +1282,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         robotProject.getRobotProjectConfig().setPythonPaths(paths);
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "external_nested_lib", libPath);
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib);
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
+                mock(ReferencedLibraryArgumentsVariant.class));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor);
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = ImmutableMap.of(descriptor, spec);
 
@@ -1289,6 +1318,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private void validateLibraryImport(final String toImport) {
         validateLibraryImport(toImport, new HashMap<>(), new HashMap<>());
+    }
+
+    private void validateLibraryImport(final String toImport,
+            final Map<LibraryDescriptor, LibrarySpecification> stdLibs) {
+        validateLibraryImport(toImport, stdLibs, new HashMap<>());
     }
 
     private void validateLibraryImport(final String toImport,
@@ -1338,12 +1372,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final Multimap<String, LibrarySpecification> refSpecsByName = Multimaps.index(refLibs.values(),
                 LibrarySpecification::getName);
 
-        final Multimap<String, LibrarySpecification> allLibsByNames = ArrayListMultimap.create();
+        final ListMultimap<String, LibrarySpecification> allLibsByNames = ArrayListMultimap.create();
         allLibsByNames.putAll(stdSpecsByName);
         allLibsByNames.putAll(refSpecsByName);
 
         final ValidationContext parentContext = new ValidationContext(config, model, RobotVersion.from("0.0"),
-                SuiteExecutor.Python, allLibsByNames, refLibs);
+                SuiteExecutor.Python, allLibsByNames);
         return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 

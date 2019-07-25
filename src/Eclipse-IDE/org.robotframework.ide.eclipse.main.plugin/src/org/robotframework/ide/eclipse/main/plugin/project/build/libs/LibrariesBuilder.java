@@ -6,9 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -32,6 +34,7 @@ import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
@@ -93,7 +96,10 @@ public class LibrariesBuilder {
             final String fileName = descriptor.generateLibspecFileName();
             final IFile htmlTargetFile = LibspecsFolder.get(project).getHtmlSpecFile(fileName);
 
-            final ILibdocGenerator generator = provideGenerator(descriptor, htmlTargetFile, LibdocFormat.HTML);
+            final Map<String, String> varsMapping = robotProject.getRobotProjectHolder().getVariableMappings();
+
+            final ILibdocGenerator generator = provideGenerator(descriptor, htmlTargetFile, varsMapping,
+                    LibdocFormat.HTML);
             generator.generateLibdoc(robotProject.getRuntimeEnvironment(),
                     new RedEclipseProjectConfig(project, robotProject.getRobotProjectConfig())
                             .createAdditionalEnvironmentSearchPaths());
@@ -112,7 +118,11 @@ public class LibrariesBuilder {
             final String fileName = spec.getDescriptor().generateLibspecFileName();
             final IFile xmlTargetFile = LibspecsFolder.get(project).getXmlSpecFile(fileName);
 
-            groupedGenerators.put(project, provideGenerator(spec.getDescriptor(), xmlTargetFile, LibdocFormat.XML));
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            final Map<String, String> varsMapping = robotProject.getRobotProjectHolder().getVariableMappings();
+
+            groupedGenerators.put(project,
+                    provideGenerator(spec.getDescriptor(), xmlTargetFile, varsMapping, LibdocFormat.XML));
         });
 
         monitor.setWorkRemaining(groupedGenerators.size());
@@ -156,11 +166,16 @@ public class LibrariesBuilder {
     }
 
     private ILibdocGenerator provideGenerator(final LibraryDescriptor libraryDescriptor, final IFile targetFile,
-            final LibdocFormat format) {
-        final String nameForLibdoc = createLibraryName(libraryDescriptor);
+            final Map<String, String> varsMapping, final LibdocFormat format) {
+
+        final List<String> resolvedArguments = libraryDescriptor.getArguments()
+                .stream()
+                .map(val -> RobotExpressions.resolve(varsMapping, val))
+                .collect(toList());
 
         if (libraryDescriptor.isStandardLibrary()) {
-            return new StandardLibraryLibdocGenerator(nameForLibdoc, targetFile, format);
+            return new StandardLibraryLibdocGenerator(libraryDescriptor.getName(), resolvedArguments, targetFile,
+                    format);
 
         } else {
             final String path = libraryDescriptor.getPath();
@@ -170,20 +185,15 @@ public class LibrariesBuilder {
                 return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), targetFile, format);
 
             } else if (type == LibraryType.PYTHON) {
-                return new PythonLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile, format);
+                return new PythonLibraryLibdocGenerator(libraryDescriptor.getName(), resolvedArguments,
+                        toAbsolute(path), targetFile, format);
 
             } else if (type == LibraryType.JAVA) {
-                return new JavaLibraryLibdocGenerator(nameForLibdoc, toAbsolute(path), targetFile, format);
+                return new JavaLibraryLibdocGenerator(libraryDescriptor.getName(), resolvedArguments, toAbsolute(path),
+                        targetFile, format);
             }
             throw new IllegalStateException("Unknown library type: " + type);
         }
-    }
-
-    private static String createLibraryName(final LibraryDescriptor libraryDescriptor) {
-        // libdoc tool requires arguments to be provided with name: Lib::arg1::arg2
-        final List<String> nameToGenerate = newArrayList(libraryDescriptor.getName());
-        nameToGenerate.addAll(libraryDescriptor.getArguments());
-        return String.join("::", nameToGenerate);
     }
 
     public void buildLibraries(final RobotProject robotProject, final IRuntimeEnvironment environment,
@@ -191,15 +201,17 @@ public class LibrariesBuilder {
         logger.log("BUILDING: generating library docs");
         monitor.subTask("generating libdocs");
 
+        final Map<String, String> varsMapping = robotProject.getRobotProjectHolder().getVariableMappings();
+
         final List<ILibdocGenerator> libdocGenerators = new ArrayList<>();
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         libdocGenerators.addAll(getStandardLibrariesToRecreate(environment, libspecsFolder));
-        libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder));
+        libdocGenerators.addAll(getStandardRemoteLibrariesToRecreate(configuration, libspecsFolder, varsMapping));
         libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
-        libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
+        libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder, varsMapping));
         if (environment.getInterpreter() == SuiteExecutor.Jython) {
-            libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+            libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder, varsMapping));
         }
 
         monitor.setWorkRemaining(libdocGenerators.size());
@@ -236,14 +248,15 @@ public class LibrariesBuilder {
             if (!fileExist(xmlSpecFile) || !hasSameVersion(xmlSpecFile, environment.getVersion())) {
                 // we always want to regenerate standard libraries when RF version have changed
                 // or libdoc does not exist
-                generators.add(new StandardLibraryLibdocGenerator(stdLib, xmlSpecFile, LibdocFormat.XML));
+                generators.add(
+                        new StandardLibraryLibdocGenerator(stdLib, new ArrayList<>(), xmlSpecFile, LibdocFormat.XML));
             }
         }
         return generators;
     }
 
     private List<ILibdocGenerator> getStandardRemoteLibrariesToRecreate(final RobotProjectConfig configuration,
-            final LibspecsFolder libspecsFolder) {
+            final LibspecsFolder libspecsFolder, final Map<String, String> varsMapping) {
 
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
@@ -252,8 +265,10 @@ public class LibrariesBuilder {
 
             // we always want to regenerate remote libraries, as something may have changed
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+            final List<String> resolvedArguments = newArrayList(
+                    RobotExpressions.resolve(varsMapping, location.getUri()));
             generators.add(
-                    new StandardLibraryLibdocGenerator("Remote::" + location.getUri(), xmlSpecFile, LibdocFormat.XML));
+                    new StandardLibraryLibdocGenerator("Remote", resolvedArguments, xmlSpecFile, LibdocFormat.XML));
         }
         return generators;
     }
@@ -266,57 +281,72 @@ public class LibrariesBuilder {
                 .stream()
                 .filter(lib -> lib.provideType() == LibraryType.VIRTUAL)
                 .forEach(lib -> {
-                    final Path libPath = new Path(lib.getPath());
+                    lib.getArgsVariantsStream().forEach(argsVariant -> {
+                        final Path libPath = new Path(lib.getPath());
 
-                    // we only copy workspace-external specs to libspecs folder; those in workspace
-                    // should
-                    // be read directly
-                    if (libPath.isAbsolute()) {
-                        final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+                        // we only copy workspace-external specs to libspecs folder; those in
+                        // workspace should be read directly
+                        if (libPath.isAbsolute()) {
+                            final String fileName = LibraryDescriptor.ofReferencedLibrary(lib, argsVariant)
+                                    .generateLibspecFileName();
 
-                        final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-                        if (!fileExist(xmlSpecFile)) {
-                            generators.add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile, LibdocFormat.XML));
+                            final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                            if (!fileExist(xmlSpecFile)) {
+                                generators
+                                        .add(new VirtualLibraryLibdocGenerator(libPath, xmlSpecFile, LibdocFormat.XML));
+                            }
                         }
-                    }
+                    });
                 });
         return generators;
     }
 
     private List<ILibdocGenerator> getReferencedPythonLibrariesToRecreate(final RobotProjectConfig configuration,
-            final LibspecsFolder libspecsFolder) {
+            final LibspecsFolder libspecsFolder, final Map<String, String> varsMapping) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
         configuration.getReferencedLibraries()
                 .stream()
                 .filter(lib -> lib.provideType() == LibraryType.PYTHON)
                 .forEach(lib -> {
-                    final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+                    lib.getArgsVariantsStream().forEach(argsVariant -> {
+                        final String fileName = LibraryDescriptor.ofReferencedLibrary(lib, argsVariant)
+                                .generateLibspecFileName();
 
-                    final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-                    if (!fileExist(xmlSpecFile)) {
-                        generators.add(new PythonLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()),
-                                xmlSpecFile, LibdocFormat.XML));
-                    }
+                        final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                        if (!fileExist(xmlSpecFile)) {
+                            final List<String> resolvedArguments = argsVariant.getArgsStream()
+                                    .map(val -> RobotExpressions.resolve(varsMapping, val))
+                                    .collect(toList());
+                            generators.add(new PythonLibraryLibdocGenerator(lib.getName(), resolvedArguments,
+                                    toAbsolute(lib.getPath()), xmlSpecFile, LibdocFormat.XML));
+                        }
+                    });
                 });
         return generators;
     }
 
     private List<ILibdocGenerator> getReferencedJavaLibrariesToRecreate(final RobotProjectConfig configuration,
-            final LibspecsFolder libspecsFolder) {
+            final LibspecsFolder libspecsFolder, final Map<String, String> varsMapping) {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
         configuration.getReferencedLibraries()
                 .stream()
                 .filter(lib -> lib.provideType() == LibraryType.JAVA)
                 .forEach(lib -> {
-                    final String fileName = LibraryDescriptor.ofReferencedLibrary(lib).generateLibspecFileName();
+                    lib.getArgsVariantsStream().forEach(argsVariant -> {
+                        final String fileName = LibraryDescriptor.ofReferencedLibrary(lib, argsVariant)
+                                .generateLibspecFileName();
 
-                    final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
-                    if (!fileExist(xmlSpecFile)) {
-                        generators.add(new JavaLibraryLibdocGenerator(lib.getName(), toAbsolute(lib.getPath()),
-                                xmlSpecFile, LibdocFormat.XML));
-                    }
+                        final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
+                        if (!fileExist(xmlSpecFile)) {
+                            final List<String> resolvedArguments = argsVariant.getArgsStream()
+                                    .map(val -> RobotExpressions.resolve(varsMapping, val))
+                                    .collect(toList());
+                            generators.add(new JavaLibraryLibdocGenerator(lib.getName(), resolvedArguments,
+                                    toAbsolute(lib.getPath()), xmlSpecFile, LibdocFormat.XML));
+                        }
+                    });
                 });
         return generators;
     }

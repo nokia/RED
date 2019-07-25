@@ -30,6 +30,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -211,9 +212,10 @@ public class RobotProjectConfigFileValidatorTest {
         final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib1), LibrarySpecification.create("ref"));
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib2), null);
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib1, variant), LibrarySpecification.create("ref"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib2, variant), null);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -240,8 +242,9 @@ public class RobotProjectConfigFileValidatorTest {
                 PROJECT_NAME + "/libs/notExisting.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -267,8 +270,9 @@ public class RobotProjectConfigFileValidatorTest {
                 projectProvider.getProject().getLocation() + "/libs/pyLib.py");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -294,8 +298,9 @@ public class RobotProjectConfigFileValidatorTest {
                 projectProvider.getProject().getLocation() + "/libs/notExisting.xml");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("pyLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -322,8 +327,9 @@ public class RobotProjectConfigFileValidatorTest {
                 PROJECT_NAME + "/libs/JavaLib.jar");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -349,8 +355,9 @@ public class RobotProjectConfigFileValidatorTest {
                 PROJECT_NAME + "/libs/JavaLib.zip");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -376,8 +383,9 @@ public class RobotProjectConfigFileValidatorTest {
                 PROJECT_NAME + "/libs/JavaLib.tar");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 
@@ -404,8 +412,9 @@ public class RobotProjectConfigFileValidatorTest {
                 PROJECT_NAME + "/libs/JavaLib.jar");
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib), LibrarySpecification.create("JavaLib"));
+        refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(refLibs);
 

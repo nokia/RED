@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -57,7 +58,8 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenLibraryIsReferencedOrNotReserved_reservedLibPredicateIsSatisfied() {
         final LibrarySpecification spec1 = new LibrarySpecification();
-        spec1.setDescriptor(LibraryDescriptor.ofReferencedLibrary(mock(ReferencedLibrary.class)));
+        spec1.setDescriptor(LibraryDescriptor.ofReferencedLibrary(mock(ReferencedLibrary.class),
+                ReferencedLibraryArgumentsVariant.create()));
         spec1.setName("foo");
 
         final LibrarySpecification spec2 = new LibrarySpecification();
