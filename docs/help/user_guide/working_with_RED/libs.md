@@ -92,6 +92,6 @@ Whenever RED encounters libdoc generation problem, it will be shown as popup win
 <img src="images/libdoc_error.png"/> <br/><br/>
 This indicates that some of the dependencies are missing on your local machine which may affect test suites execution.    
 To verify you can try to execute libdoc in console:<br/>
-<i>python -m robot.libdoc &lt;PATH_TO_LIBNAME&gt; list </i>
+<code>python -m robot.libdoc &lt;PATH_TO_LIBNAME&gt; list </code>
 </body>
 </html>

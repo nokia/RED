@@ -27,7 +27,7 @@ Window -> Preferences -> Robot Framework -> Editor -> Code Formatter</a></code>.
 <p>It is invoked by right click menu in Source editor or automatically as editor save action, which can be configured at
 <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.save)')">
 Window -> Preferences -> Robot Framework -> Editor -> Save Actions</a></code><br/></p>
-<br/><br/><img src="images/gen_5.png"/> <br/><br/>
+<br/><img src="images/gen_5.png"/> <br/><br/>
 <dl class="note">
 <dt>Note</dt>
 <dd>RED does not support source formatting in *.tsv files

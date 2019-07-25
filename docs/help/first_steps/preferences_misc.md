@@ -16,7 +16,7 @@
 <p>Preferences can be found in toolbar menu <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.main)')">
 Window -> Preferences -> Robot Framework</a></code>.</p>
 <p>One of the most important item in multiple python environment is setting active Python and RobotFramework instances to be used for running and debugging.</p>
-<p>If you need to use different Pythons &amp; Robots in various projects, this can be done editing red.xml in respective project</p><br/>
+<p>If you need to use different Pythons &amp; Robots in various projects, this can be done editing red.xml in respective project</p>
 <img src="images/red_preferences.gif"/>
 <h3> Preferences in red.xml </h3>
 <p>Red.xml file is place with Project respective preferences, it is not shared with other projects. It is always created during project creation process in RED.</p>
@@ -27,6 +27,6 @@ Window -> Preferences -> Robot Framework</a></code>.</p>
 <p>In current releases there is no transparent and discovery mechanism of including variables and libraries files automatically to red.xml file. 
   For now user action is required any time when new external library and variable file is included in settings of testcase file.<p>
 <p>Red.xml file opened with RED Project Editor should look like follows:</p>
-<br/><img src="images/red_xml.gif"/><br/>
+<img src="images/red_xml.gif"/><br/>
 </p></p></body>
 </html>

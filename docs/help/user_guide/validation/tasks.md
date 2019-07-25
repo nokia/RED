@@ -12,52 +12,37 @@ in future. RED offers possibility to detect such tasks and overview them in sing
 enabled RED will start reporting special kinds of markers similarly as Problems, but of different type (Task).
 For example in following code there are two tasks defined in comments:
 </p>
-<div class="code">
+<code>
 # TODO implement more test scenarios<br/>
 *** Test Cases ***<br/>
 case<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;Should Be Equal&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;# FIXME this assertion does not pass<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;...
-</div>
-<img src="images/editor_tasks.png"/><br/>
-<p>The detection is based on tags. When defined tag is found by RED inside the comment it will be reported as a
-<b>task</b>. By default there are two tags which RED recognizes: <b>TODO</b> and <b>FIXME</b>: the first
-one has normal priority while the latter is reported with high priority. The tags and their priorities can 
-be specified in <a href="#prefs">preferences</a>.
-</p>
-<img src="images/tasks.png"/><br/>
-<p>Detected tasks are visible in RED in couple of places:</p>
-<ul>
-<li><b>Tasks</b> view - this view is similar to Problems view and displays all the tasks reported for files in whole
-  workspace (this view can be open from menu by choosing <b><code>Window -> Show View -> Other... -> General -> Tasks</code></b>),
-  </li>
-<li><b>Source</b> tab of editor - icon is visible in line where task is defined on left vertical ruler as well
-  as small square on right overview vertical ruler,
-  </li>
-<li><b>Tables</b> tab of editor - icon is visible on element to which the task is attached on left ruler,
-  </li>
-<li><b>syntax coloring</b> of comment - the detected tag is colored differently than the rest of the comment both 
-  in source tab as well as tables
-  </li>
-</ul>
+</code>
+</body></html>
+
+![](images/editor_tasks.png)  
+
+The detection is based on tags. When defined tag is found by RED inside the comment it will be reported as a__task__. By default there are two tags which RED recognizes: __TODO__ and __FIXME__: the firstone has normal priority while the latter is reported with high priority. The tags and their priorities can be specified in [preferences](#prefs).
+
+![](images/tasks.png)  
+
+Detected tasks are visible in RED in couple of places:
+
+*   __Tasks__ view - this view is similar to Problems view and displays all the tasks reported for files in whole workspace (this view can be open from menu by choosing __`` Window -> Show View -> Other... -> General -> Tasks ``__), 
+*   __Source__ tab of editor - icon is visible in line where task is defined on left vertical ruler as well as small square on right overview vertical ruler, 
+*   __Tables__ tab of editor - icon is visible on element to which the task is attached on left ruler, 
+*   __syntax coloring__ of comment - the detected tag is colored differently than the rest of the comment both  in source tab as well as tables 
+
 <h3 id="prefs">Preferences</h3>
-<p>Following preferences can be changed regarding tasks detection:</p>
-<ul>
-<li><b>detection enablement</b> - whole mechanism can be enabled or disabled at
-    <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks)')">
-    Task Tags</a></i> page,
-    </li>
-<li><b>tags and their priorities</b> - different tags can be specified at same 
-    <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks)')">
-    Task Tags</a></i> page,
-    </li>
-<li><b>tags syntax coloring</b> - the color of syntax highlighting for task tags can be specified at
-    <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax)')">
-    Syntax Coloring</a></i> page,
-    </li>
-<li><b>marker annotations</b> color and appearance used by editor can be changed at
-    <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations)')">
-    Annotations</a></i> page. 
-</li></ul>
-</body>
-</html>
+
+Following preferences can be changed regarding tasks detection:
+
+*   __detection enablement__ - whole mechanism can be enabled or disabled at _<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks)')">
+    Task Tags</a>_ page, 
+*   __tags and their priorities__ - different tags can be specified at same  _<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.tasks)')">
+    Task Tags</a>_ page, 
+*   __tags syntax coloring__ - the color of syntax highlighting for task tags can be specified at _<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax)')">
+    Syntax Coloring</a>_ page, 
+*   __marker annotations__ color and appearance used by editor can be changed at _<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.editors.preferencePages.Annotations)')">
+    Annotations</a>_ page. 

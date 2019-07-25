@@ -13,15 +13,15 @@
 	with a call to user defined executable. For example RED would normally use following command
 	line call:
 	</p>
-<div class="code"><code>
+<code>
 	python.exe -m robot.run --suite mySuite &lt;path to project&gt;
-	</code></div>
+	</code>
 <p>but when script <code>my_script.bat</code> with arguments <code>arg1</code>, <code>arg2</code> is
 	used the command line call becomes:
 	</p>
-<div class="code"><code>
+<code>
 	my_script.bat arg1 arg2 python.exe -m robot.run --suite mySuite &lt;path to project&gt;
-	</code></div>
+	</code>
 <p>The script is now free to process the arguments which were passed - it may use them or not, or
 	select those which are interesting for the script but eventually it should start robot tests execution.
 	</p>
@@ -29,9 +29,9 @@
 <dt>Note</dt>
 <dd>By default, RED passes Robot executable command line to user script as is thus each space separated entry is own parameter.
        From above example, following Robot command line passed to script by RED:
-       	<div class="code"><code>
+       	<code>
             python.exe -m robot.run --suite mySuite &lt;path to project&gt;
-        </code></div>
+        </code>
         is passed to a user script as 6 arguments. This can be changed in <a href="launch_prefs.html">preferences</a>, so whole Robot executable command line is wrapped with quotation marks. This affects how script handles input parameters.
 	   </dd>
 </dl>
@@ -61,36 +61,32 @@
 <dd>User scripts examples can be found at <a class="external" href="https://github.com/nokia/RED/tree/master/src/RobotUserScripts" target="_blank">https://github.com/nokia/RED/tree/master/src/RobotUserScripts</a>.
 	   </dd>
 </dl>
-<p>Windows batch example:</p>
-<div <code="" class="code">
-    @ECHO OFF</div></body></html>
+</body></html>
 
-    echo running scripts with external batch file
-    echo script name: %0
-    echo script's arguments: %*
-    echo running arguments as they consist call to start python scripts:
-    %*
+__Windows batch example:__
 
-Python script example:
+<code>
+	@ECHO OFF<br/>
+	echo running scripts with external batch file<br/>
+	echo script name: %0<br/>
+	echo script's arguments: %*<br/>
+	echo running arguments as they consist call to start python scripts: %*
+	</code>
 
-<div class="code"><code>
+__Python script example:__
+
+<code>
 	import sys<br/>
 	from io import StringIO<br/>
 	from subprocess import Popen, PIPE<br/><br/>
-	
 	print('##########')<br/>
 	print('Running Robot tests via script!')<br/>
 	print('##########')<br/>
 	sys.stdout.flush()<br/><br/>
-	
 	execution = Popen(sys.argv[1:])<br/>
-	execution.communicate()<br/>
-</code></div>
+	execution.communicate()
+	</code>
 
 Save code from above into `` my_script.py `` file, then at __Executor__ tab	of desired launch configuration browse your computer for __python.exe__ and set it in	__executable file__ field and pass the location to `` my_script.py `` inside	__arguments field__.	
 
 When configuration defined as described will be launched you should be able to see the message	from script as well as the output from tests.	
-
-  
-
-  

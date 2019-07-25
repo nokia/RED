@@ -12,9 +12,9 @@ spell check. Validation mechanism walk down the project tree and read all test f
 </p>
 <h3>Validation execution</h3>
 <p>Validation mechanism is executed any time when edited file is changed with slight delay while <b>Build Automatic </b>
-option is selected from Project. Whole project validation can be manually started using option <b><code>Project -> Clean</code></b>.<br>
-Resources can be also validated by selecting <b><code>Robot Framework -> Revalidate</code></b> option in Project explorer.<br/>
-</br></p>
+option is selected from Project. Whole project validation can be manually started using option <b><code>Project -> Clean</code></b>.<br/>
+Resources can be also validated by selecting <b><code>Robot Framework -> Revalidate</code></b> option in Project explorer.
+</p>
 <p>The file which currently edited within Suite Editor is constantly validated in background giving quick feedback
 about potential problems.
 </p>

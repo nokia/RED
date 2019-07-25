@@ -12,7 +12,7 @@ mappings or include/exclude folders. Only opened projects are validated.</p>
 <p>Output of headless execution is report of validated projects and xml report in checkstyle format.
 </p>
 <p>Syntax:</p>
-<div class="code">
+<code>
 eclipse 
 -application org.robotframework.ide.eclipse.main.plugin.validation 
 -data $WORKSPACE_PATH 
@@ -22,10 +22,8 @@ eclipse
 -import $PROJECT_PATHS 
 -projects $PROJECT_NAMES 
 -report $RAPORT_FILE
-</div>
-<ul>
-<li><b>$PROJECT_PATHS</b> - list of paths to projects to be imported into workspace, separated by space</li>
-<li><b>$PROJECT_NAMES</b> - list of projects to be validated from workspace, separated by space</li>
-</ul>
-</body>
-</html>
+</code>
+</body></html>
+
+*   __$PROJECT\_PATHS__ - list of paths to projects to be imported into workspace, separated by space
+*   __$PROJECT\_NAMES__ - list of projects to be validated from workspace, separated by space

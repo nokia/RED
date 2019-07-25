@@ -30,8 +30,6 @@
 	to execute the <code>redpydevd</code> runner script and effectively the chosen Robot suites. 
 	</p>
 <img src="images/red_pydev_wizard_envs.png"/>
-<br/>
-<br/>
 <h4>Choosing redpydevd module</h4>
 <img src="images/red_pydev_wizard_runner.png"/>
 <p>Second page allows to choose which <code>redpydevd</code> script should be used. There are 3 possibilities:
