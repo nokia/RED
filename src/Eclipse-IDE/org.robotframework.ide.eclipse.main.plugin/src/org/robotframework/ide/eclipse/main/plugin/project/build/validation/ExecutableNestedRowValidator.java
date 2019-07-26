@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -81,14 +80,6 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                 unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
 
             } else {
-                if (keywordName != null
-                        && EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName.getKeywordName())
-                        && EmbeddedKeywordNamesSupport.hasVariablesUsed(keywordNameToken.getText())) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED)
-                            .formatMessageWith(keywordNameToken.getText(), "");
-                    reporter.handleProblem(problem, validationContext.getFile(), keywordNameToken);
-                }
-
                 final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
                         descriptor);
                 unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, variableUsedInCall);

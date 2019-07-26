@@ -215,22 +215,6 @@ public class TestCaseValidatorTest {
     }
 
     @Test
-    public void keywordWithVariablesProblemInExecutableRowIsReported() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
-                .appendLine("test")
-                .appendLine("  kw ${x}")
-                .build();
-
-        final List<KeywordEntity> accessibleKws = newArrayList(
-                newResourceKeyword("kw ${a}", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
-
-        final Collection<Problem> problems = validate(context, fileModel);
-        assertThat(problems).contains(new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
-                new ProblemPosition(3, Range.closed(26, 33))));
-    }
-
-    @Test
     public void variableSyntaxProblemIsReportedInExecutableRowWithSpecialKeyword() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
