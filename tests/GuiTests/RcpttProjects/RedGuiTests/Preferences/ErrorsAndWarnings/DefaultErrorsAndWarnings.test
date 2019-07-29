@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
-Runtime-Version: 2.4.0.201811080014
-Save-Time: 1/8/19 2:52 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 7/29/19 2:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -127,8 +127,8 @@ check-combobox-list-and-selection -section "Code style" -label "Keyword occurren
 check-combobox-list-and-selection -section "Code style" -label "Keyword name with dots"
 	-text "Occurs when keyword name contains dots. It may be confused with fully qualified name." 
 
-check-combobox-list-and-selection -section "Code style" -label "Variable given as keyword name"
-	 -text  "Occurs when variable is used as keyword call in test suite setup or teardown." 
+check-combobox-list-and-selection -section "Code style" -label "Variables are used in called keyword names"
+	 -text  "Occurs when variables are used in name of called keyword."
 
 check-combobox-list-and-selection -section "Code style" -label  "Collection size should be equal to keyword arguments number" 
 	  -text "Occurs when collection variable is used in keyword call and collection elements number is different than keyword arguments number."
