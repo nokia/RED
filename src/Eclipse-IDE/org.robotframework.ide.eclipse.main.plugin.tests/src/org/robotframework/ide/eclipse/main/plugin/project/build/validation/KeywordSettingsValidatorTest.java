@@ -258,6 +258,17 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
+    public void invalidSyntaxInKeywordTimeoutIsNotReported_whenEqualsNone() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("kw1")
+                .appendLine("  [Timeout]  none")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void undeclaredVariableInKeywordTimeoutIsReported() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw1")

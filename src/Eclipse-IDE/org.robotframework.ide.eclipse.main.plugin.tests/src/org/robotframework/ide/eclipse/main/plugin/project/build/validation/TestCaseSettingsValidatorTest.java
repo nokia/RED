@@ -254,6 +254,17 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
+    public void invalidSyntaxInTestCaseTimeoutIsNotReported_whenEqualsNone() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Timeout]  NoNe")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void emptyTemplateSettingIsReported() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")

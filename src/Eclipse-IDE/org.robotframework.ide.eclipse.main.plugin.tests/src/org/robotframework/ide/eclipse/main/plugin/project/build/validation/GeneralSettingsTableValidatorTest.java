@@ -312,6 +312,18 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
+    public void undefinedTimeFormatInTimeoutIsNotReported_whenEqualsNone() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Timeout  NONE")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void definedTimeFormatInTimeoutIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Test Timeout  3 seconds")

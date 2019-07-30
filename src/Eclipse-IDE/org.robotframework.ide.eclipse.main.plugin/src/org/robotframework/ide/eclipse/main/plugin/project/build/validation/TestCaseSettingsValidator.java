@@ -103,6 +103,7 @@ public class TestCaseSettingsValidator implements ModelUnitValidator {
             if (timeoutToken != null) {
                 final String timeout = timeoutToken.getText();
                 if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
+                        && !timeout.equalsIgnoreCase("none")
                         && !RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
                             .formatMessageWith(timeout);
