@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -32,35 +33,39 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 public class ExecutableCallRuleTest {
 
     private final ExecutableCallRule tcTestedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
-            new Token("gherkin_token"), new Token("quote_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
+
+    private final ExecutableCallRule taskTestedRule = ExecutableCallRule.forExecutableInTask(new Token("call_token"),
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
 
     private final ExecutableCallRule kwTestedRule = ExecutableCallRule.forExecutableInKeyword(new Token("call_token"),
-            new Token("gherkin_token"), new Token("quote_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
-        final RobotToken caseAction1 = RobotToken.create("", newArrayList(RobotTokenType.TEST_CASE_ACTION_NAME));
-        final RobotToken caseAction2 = RobotToken.create("", newArrayList(RobotTokenType.TEST_CASE_ACTION_ARGUMENT));
-        final RobotToken kwAction1 = RobotToken.create("", newArrayList(RobotTokenType.KEYWORD_ACTION_NAME));
-        final RobotToken kwAction2 = RobotToken.create("", newArrayList(RobotTokenType.KEYWORD_ACTION_ARGUMENT));
-
-        assertThat(tcTestedRule.isApplicable(caseAction1)).isTrue();
-        assertThat(tcTestedRule.isApplicable(caseAction2)).isTrue();
-        assertThat(tcTestedRule.isApplicable(kwAction1)).isFalse();
-        assertThat(tcTestedRule.isApplicable(kwAction2)).isFalse();
-
-        assertThat(kwTestedRule.isApplicable(caseAction1)).isFalse();
-        assertThat(kwTestedRule.isApplicable(caseAction2)).isFalse();
-        assertThat(kwTestedRule.isApplicable(kwAction1)).isTrue();
-        assertThat(kwTestedRule.isApplicable(kwAction2)).isTrue();
-
-        assertThat(tcTestedRule.isApplicable(new RobotToken())).isFalse();
-        assertThat(tcTestedRule.isApplicable(new Separator())).isFalse();
-        assertThat(tcTestedRule.isApplicable(mock(IRobotLineElement.class))).isFalse();
-
-        assertThat(kwTestedRule.isApplicable(new RobotToken())).isFalse();
-        assertThat(kwTestedRule.isApplicable(new Separator())).isFalse();
-        assertThat(kwTestedRule.isApplicable(mock(IRobotLineElement.class))).isFalse();
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+            assertThat(tcTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isTrue();
+            assertThat(taskTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+            assertThat(kwTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+        }
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
+            assertThat(tcTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+            assertThat(taskTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isTrue();
+            assertThat(kwTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+        }
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT)) {
+            assertThat(tcTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+            assertThat(taskTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isFalse();
+            assertThat(kwTestedRule.isApplicable(RobotToken.create("", newArrayList(actionType)))).isTrue();
+        }
+        for (final ExecutableCallRule rule : newHashSet(tcTestedRule, taskTestedRule, kwTestedRule)) {
+            assertThat(rule.isApplicable(new RobotToken())).isFalse();
+            assertThat(rule.isApplicable(new Separator())).isFalse();
+            assertThat(rule.isApplicable(mock(IRobotLineElement.class))).isFalse();
+        }
     }
 
     @Test
@@ -237,8 +242,9 @@ public class ExecutableCallRuleTest {
         varPositions.add(new Position(content.indexOf(var3), var3.length()));
 
         for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
             final List<RobotLine> lines = newArrayList(line(token));
@@ -271,8 +277,9 @@ public class ExecutableCallRuleTest {
         nonVarPositions.add(new Position(content.indexOf(text4), text4.length()));
 
         for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
             final List<RobotLine> lines = newArrayList(line(token));
@@ -295,8 +302,9 @@ public class ExecutableCallRuleTest {
         final String content = "abc\"x\"def\"xy\"ghi\"xyz\"jkl";
 
         for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
             final List<RobotLine> lines = newArrayList(line(token));
@@ -305,7 +313,7 @@ public class ExecutableCallRuleTest {
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i, lines);
                 assertThat(evaluatedToken).isPresent();
 
-                final int nextQuoteIndex = content.indexOf("\"", i + 1);
+                final int nextQuoteIndex = content.indexOf('"', i + 1);
                 if (content.charAt(i) == '"' && nextQuoteIndex >= 0) {
                     final int length = nextQuoteIndex - i + 1;
                     assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(i, length));
@@ -320,24 +328,71 @@ public class ExecutableCallRuleTest {
     }
 
     @Test
+    public void keywordLibraryPrefixTokenIsDetected() {
+        final String content = "SomeLibrary.With.Dots.KeywordCall With \"arg.1\" And ${v.A.r} Embedded";
+
+        final List<Position> libraryPositions = new ArrayList<>();
+        libraryPositions.add(new Position(0, 12));
+        libraryPositions.add(new Position(12, 5));
+        libraryPositions.add(new Position(17, 5));
+
+        final List<Position> keywordPositions = new ArrayList<>();
+        keywordPositions.add(new Position(22, 17));
+        keywordPositions.add(new Position(46, 5));
+        keywordPositions.add(new Position(59, 9));
+
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
+
+            final RobotToken token = createToken(actionType, content);
+            final List<RobotLine> lines = newArrayList(line(token));
+
+            for (int i = 0; i < content.length(); i++) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i, lines);
+                assertThat(evaluatedToken).isPresent();
+
+                for (final Position position : libraryPositions) {
+                    if (position.includes(i)) {
+                        assertThat(evaluatedToken.get().getPosition())
+                                .isEqualTo(new Position(i, position.getOffset() + position.getLength() - i));
+                        assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("lib_token");
+                    }
+                }
+
+                for (final Position position : keywordPositions) {
+                    if (position.includes(i)) {
+                        assertThat(evaluatedToken.get().getPosition())
+                                .isEqualTo(new Position(i, position.getOffset() + position.getLength() - i));
+                        assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("call_token");
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     public void allTokensAreDetected() {
-        final String content = "Given Embedded \"Name\" Kw @{variable}[0] With \"Argument\" With Quotes And ${var}";
+        final String content = "Given SomeLib.Embedded \"Name\" Kw @{variable}[0] With \"Argument\" With Quotes And ${var}";
 
         final NavigableMap<Integer, String> tokenPositions = new TreeMap<>();
         tokenPositions.put(0, "gherkin_token");
-        tokenPositions.put(6, "call_token");
-        tokenPositions.put(15, "quote_token");
-        tokenPositions.put(21, "call_token");
-        tokenPositions.put(25, "var_token");
-        tokenPositions.put(36, "var_token");
-        tokenPositions.put(39, "call_token");
-        tokenPositions.put(45, "quote_token");
-        tokenPositions.put(55, "call_token");
-        tokenPositions.put(72, "var_token");
+        tokenPositions.put(6, "lib_token");
+        tokenPositions.put(14, "call_token");
+        tokenPositions.put(23, "quote_token");
+        tokenPositions.put(29, "call_token");
+        tokenPositions.put(33, "var_token");
+        tokenPositions.put(44, "var_token");
+        tokenPositions.put(47, "call_token");
+        tokenPositions.put(53, "quote_token");
+        tokenPositions.put(63, "call_token");
+        tokenPositions.put(80, "var_token");
 
         for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT)) {
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
 
             final RobotToken token = createToken(actionType, content);
             final List<RobotLine> lines = newArrayList(line(token));
@@ -376,7 +431,7 @@ public class ExecutableCallRuleTest {
 
     private Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int position,
             final List<RobotLine> lines) {
-        return Stream.of(tcTestedRule, kwTestedRule)
+        return Stream.of(tcTestedRule, taskTestedRule, kwTestedRule)
                 .filter(rule -> rule.isApplicable(token))
                 .findFirst()
                 .flatMap(rule -> rule.evaluate(token, position, lines));

@@ -5,7 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import java.util.List;
 import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -47,7 +46,7 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
         final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                findVariables(variableStyler, label -> createVariableExtractor().extract(label).getMappedElements()));
+                findVariables(variableStyler, createVariableExtractor()));
         return style;
     }
 
@@ -56,10 +55,10 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findVariables(final Styler variableStyler,
-            final Function<String, List<IElementDeclaration>> variableExtractor) {
+            final VariableExtractor variableExtractor) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
-            for (final IElementDeclaration declaration : variableExtractor.apply(label)) {
+            for (final IElementDeclaration declaration : variableExtractor.extract(label).getMappedElements()) {
                 if (declaration.isComplex()) {
                     mapping.put(Range.closedOpen(declaration.getStart().getStart() - 1,
                             declaration.getEnd().getStart() + 1), variableStyler);

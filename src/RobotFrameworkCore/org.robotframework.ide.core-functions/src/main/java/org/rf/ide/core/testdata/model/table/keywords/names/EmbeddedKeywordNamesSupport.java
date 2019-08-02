@@ -21,8 +21,8 @@ import com.google.common.collect.TreeRangeSet;
  */
 public class EmbeddedKeywordNamesSupport {
 
-    public static boolean hasVariablesUsed(final String occurenceName) {
-        return !findEmbeddedArgumentsRanges(occurenceName).isEmpty();
+    public static boolean hasVariablesUsed(final String occurrenceName) {
+        return !findEmbeddedArgumentsRanges(occurrenceName).isEmpty();
     }
 
     public static boolean hasEmbeddedArguments(final String definitionName) {
@@ -81,10 +81,11 @@ public class EmbeddedKeywordNamesSupport {
             if (hasVariablesUsed(occurrenceName)) {
                 // There is a variable used in occurrence - we'll change all variables to ordinary
                 // dots and try if they matches regex with variables replaced by .+ regex
-                final String occurenceName = substituteVariablesWithRegex(occurrenceName, s -> s, (n, r) -> ".");
+                final String occurrenceNameWithoutVariables = substituteVariablesWithRegex(occurrenceName, s -> s,
+                        (n, r) -> ".");
                 final String regex = "(?iu)^"
                         + substituteVariablesWithRegex(definitionName, Pattern::quote, (n, r) -> ".+") + "$";
-                return Pattern.matches(regex, occurenceName);
+                return Pattern.matches(regex, occurrenceNameWithoutVariables);
 
             } else {
                 final String regex = "(?iu)^" + substituteVariablesWithRegex(definitionName, Pattern::quote,

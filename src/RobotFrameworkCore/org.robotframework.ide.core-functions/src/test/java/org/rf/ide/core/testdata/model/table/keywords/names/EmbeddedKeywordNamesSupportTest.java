@@ -120,7 +120,7 @@ public class EmbeddedKeywordNamesSupportTest {
     }
 
     @Test
-    public void nameMatchesTest_whenVariablesInOccurenceAreUsed() {
+    public void nameMatchesTest_whenVariablesInOccurrenceAreUsed() {
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${b}c", "a${b}c")).isTrue();
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${b}c", "a${x}c")).isTrue();
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${x:\\d+}c", "A${B}C")).isTrue();

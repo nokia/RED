@@ -16,13 +16,13 @@ public final class QualifiedKeywordName {
     private final String name;
 
     private final String source;
-    
+
     private final String embeddedName;
 
     private QualifiedKeywordName(final String name, final String source) {
         this(name, null, source);
     }
-    
+
     private QualifiedKeywordName(final String name, final String embeddedName, final String source) {
         this.name = name;
         this.source = source;
@@ -39,11 +39,6 @@ public final class QualifiedKeywordName {
         final String source = Joiner.on('.').join(splitted.subList(0, splitted.size() - 1)).trim();
         return new QualifiedKeywordName(unifyDefinition(name), name.toLowerCase(), source);
     }
-    
-    public static QualifiedKeywordName fromOccurrenceWithDots(final String givenWholeName) {
-        // ignore keyword source
-        return new QualifiedKeywordName(unifyDefinition(givenWholeName), givenWholeName.toLowerCase(), "");
-    }
 
     public static String unifyDefinition(final String keywordDefinition) {
         if (keywordDefinition != null) {
@@ -52,7 +47,7 @@ public final class QualifiedKeywordName {
         }
         return "";
     }
-    
+
     public static boolean isOccurrenceEqualToDefinition(final String keywordOccurrence, final String keywordDefinition) {
         if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names
             return true;
@@ -72,7 +67,7 @@ public final class QualifiedKeywordName {
     public String getKeywordName() {
         return name;
     }
-    
+
     public String getEmbeddedKeywordName() {
         return embeddedName;
     }

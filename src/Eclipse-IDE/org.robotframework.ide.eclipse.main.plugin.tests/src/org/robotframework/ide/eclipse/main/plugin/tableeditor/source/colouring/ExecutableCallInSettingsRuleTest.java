@@ -71,11 +71,13 @@ public class ExecutableCallInSettingsRuleTest {
             final List<RobotLine> lines) {
         return Stream.of(
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("quote_token"), new Token("var_token")),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
+                ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(new Token("call_token"),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("quote_token"), new Token("var_token")),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("quote_token"), new Token("var_token")))
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")))
                 .filter(rule -> rule.isApplicable(token))
                 .findFirst()
                 .flatMap(rule -> rule.evaluate(token, position, lines));

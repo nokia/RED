@@ -5,7 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import java.util.List;
 import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -48,10 +47,11 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
     Style createElementStyle() {
         final Style style = createStyle(SyntaxHighlightingCategory.KEYWORD_CALL);
         final Styler gherkinStyler = createStyler(SyntaxHighlightingCategory.GHERKIN);
-        final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
+        final Styler libraryStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final Styler quoteStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
-        style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES, findStyleRanges(gherkinStyler,
-                variableStyler, quoteStyler, label -> createVariableExtractor().extract(label).getMappedElements()));
+        final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
+        style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
+                findStyleRanges(gherkinStyler, libraryStyler, quoteStyler, variableStyler, createVariableExtractor()));
         return style;
     }
 
@@ -60,8 +60,8 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findStyleRanges(final Styler gherkinStyler,
-            final Styler variableStyler, final Styler quoteStyler,
-            final Function<String, List<IElementDeclaration>> variableExtractor) {
+            final Styler libraryStyler, final Styler quoteStyler, final Styler variableStyler,
+            final VariableExtractor variableExtractor) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
 
@@ -71,17 +71,32 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
                 mapping.put(gherkinRange, gherkinStyler);
             }
 
-            for (final IElementDeclaration declaration : variableExtractor.apply(label)) {
+            for (final IElementDeclaration declaration : variableExtractor.extract(label).getMappedElements()) {
                 if (declaration.isComplex()) {
                     mapping.put(Range.closedOpen(declaration.getStart().getStart() - 1,
                             declaration.getEnd().getStart() + 1), variableStyler);
                 } else {
                     final String textToEvaluate = declaration.getText();
-                    int offset = 0;
+                    int offset = gherkinRange.upperEndpoint();
+
+                    if (declaration.getStart().getStart() == 0) {
+                        int dotIndex = textToEvaluate.indexOf('.', offset);
+                        while (dotIndex > 0) {
+                            final int quoteOpeningIndex = textToEvaluate.indexOf('"', offset);
+                            if (quoteOpeningIndex == -1 || dotIndex < quoteOpeningIndex) {
+                                mapping.put(Range.closedOpen(offset, dotIndex + 1), libraryStyler);
+                                offset = dotIndex + 1;
+                                dotIndex = textToEvaluate.indexOf('.', offset);
+                                continue;
+                            }
+                            break;
+                        }
+                    }
+
                     while (offset < textToEvaluate.length()) {
-                        final int quoteOpenIndex = textToEvaluate.indexOf('\"', offset);
+                        final int quoteOpenIndex = textToEvaluate.indexOf('"', offset);
                         if (quoteOpenIndex != -1) {
-                            final int quoteCloseIndex = textToEvaluate.indexOf('\"', quoteOpenIndex + 1);
+                            final int quoteCloseIndex = textToEvaluate.indexOf('"', quoteOpenIndex + 1);
                             if (quoteOpenIndex < quoteCloseIndex) {
                                 mapping.put(Range.closedOpen(quoteOpenIndex + declaration.getStart().getStart(),
                                         quoteCloseIndex + declaration.getStart().getStart() + 1), quoteStyler);

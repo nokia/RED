@@ -262,6 +262,17 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Given keyword name '%s' contains dots. Use underscores instead of dots in keywords names.";
         }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            return newArrayList(new ChangeToFixer(name.replaceAll("\\.", "_")));
+        }
     },
     KEYWORD_MASKS_OTHER_KEYWORD {
 

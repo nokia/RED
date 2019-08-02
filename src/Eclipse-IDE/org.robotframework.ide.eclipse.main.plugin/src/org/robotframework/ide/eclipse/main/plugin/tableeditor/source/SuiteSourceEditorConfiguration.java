@@ -507,6 +507,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
         final IToken quote = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
+        final IToken library = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final IToken setting = coloringTokens.get(SyntaxHighlightingCategory.SETTING);
         final IToken gherkin = coloringTokens.get(SyntaxHighlightingCategory.GHERKIN);
         final IToken special = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
@@ -517,29 +518,31 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, quote, variable),
-                ExecutableCallRule.forExecutableInTestCase(call, gherkin, quote, variable),
+                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, library, quote,
+                        variable),
+                ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, quote, variable),
-                ExecutableCallRule.forExecutableInTask(call, gherkin, quote, variable),
+                ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, library, quote,
+                        variable),
+                ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, quote, variable),
-                ExecutableCallRule.forExecutableInKeyword(call, gherkin, quote, variable),
+                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, library, quote, variable),
+                ExecutableCallRule.forExecutableInKeyword(call, gherkin, library, quote, variable),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsTemplateRule(call),
-                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, quote,
-                        variable),
+                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, library,
+                        quote, variable),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 

@@ -11,24 +11,24 @@ import com.google.common.base.Objects;
 
 public final class RunningKeyword {
 
-    private final String libOrResouceName;
+    private final String libOrResourceName;
 
     private final String keywordName;
 
     private final KeywordCallType callType;
 
-    public RunningKeyword(final String libOrResouceName, final String keywordName, final KeywordCallType callType) {
-        this.libOrResouceName = libOrResouceName;
+    public RunningKeyword(final String libOrResourceName, final String keywordName, final KeywordCallType callType) {
+        this.libOrResourceName = libOrResourceName;
         this.keywordName = keywordName;
         this.callType = callType;
     }
 
     public RunningKeyword(final RunningKeyword keyword, final KeywordCallType callType) {
-        this(keyword.libOrResouceName, keyword.keywordName, callType);
+        this(keyword.libOrResourceName, keyword.keywordName, callType);
     }
 
     public RunningKeyword(final RunningKeyword keyword) {
-        this(keyword.libOrResouceName, keyword.keywordName, keyword.callType);
+        this(keyword.libOrResourceName, keyword.keywordName, keyword.callType);
     }
 
     public boolean isSetup() {
@@ -48,11 +48,11 @@ public final class RunningKeyword {
     }
 
     public String asCall() {
-        return QualifiedKeywordName.asCall(keywordName, libOrResouceName);
+        return QualifiedKeywordName.asCall(keywordName, libOrResourceName);
     }
 
     public String getSourceName() {
-        return libOrResouceName;
+        return libOrResourceName;
     }
 
     public String getName() {
@@ -67,7 +67,7 @@ public final class RunningKeyword {
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == RunningKeyword.class) {
             final RunningKeyword that = (RunningKeyword) obj;
-            return Objects.equal(this.libOrResouceName, that.libOrResouceName)
+            return Objects.equal(this.libOrResourceName, that.libOrResourceName)
                     && Objects.equal(this.keywordName, that.keywordName) && this.callType == that.callType;
         }
         return false;
@@ -75,11 +75,11 @@ public final class RunningKeyword {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(libOrResouceName, keywordName, callType);
+        return Objects.hashCode(libOrResourceName, keywordName, callType);
     }
 
     @Override
     public String toString() {
-        return callType.name() + ": " + libOrResouceName + "." + keywordName;
+        return callType.name() + ": " + libOrResourceName + "." + keywordName;
     }
 }

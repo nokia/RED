@@ -28,16 +28,16 @@ public class KeywordsProblemTest {
     public void forInExpressionWronglyTyped_hasResolutionAndProvidesFixer() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("IN RANGE");
-        
+
         final KeywordsProblem problem = KeywordsProblem.FOR_IN_EXPR_WRONGLY_TYPED;
-        
+
         assertThat(problem.hasResolution()).isTrue();
         final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
         assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'IN RANGE'");
     }
 
     @Test
-    public void keywordFromNestedLibrary_hasResoulutionAndProvidesFixer() {
+    public void keywordFromNestedLibrary_hasResolutionAndProvidesFixer() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("myLib");
 
@@ -46,6 +46,18 @@ public class KeywordsProblemTest {
         assertThat(problem.hasResolution()).isTrue();
         final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
         assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Import 'myLib' library");
+    }
+
+    @Test
+    public void keywordNameWithDots_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("Some.Keyword.Name");
+
+        final KeywordsProblem problem = KeywordsProblem.KEYWORD_NAME_WITH_DOTS;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'Some_Keyword_Name'");
     }
 
 }

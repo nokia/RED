@@ -27,22 +27,22 @@ import org.rf.ide.core.validation.SpecialKeywords;
 public class ExecutableCallRule extends VariableUsageRule {
 
     public static ExecutableCallRule forExecutableInTestCase(final IToken textToken, final IToken gherkinToken,
-            final IToken quoteToken, final IToken embeddedVariablesToken) {
-        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT),
                 elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
     }
 
-    public static ISyntaxColouringRule forExecutableInTask(final IToken textToken, final IToken gherkinToken,
-            final IToken quoteToken, final IToken embeddedVariablesToken) {
-        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
+    public static ExecutableCallRule forExecutableInTask(final IToken textToken, final IToken gherkinToken,
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT),
                 elem -> elem.getTypes().contains(RobotTokenType.TASK_NAME));
     }
 
     public static ExecutableCallRule forExecutableInKeyword(final IToken textToken, final IToken gherkinToken,
-            final IToken quoteToken, final IToken embeddedVariablesToken) {
-        return new ExecutableCallRule(textToken, gherkinToken, quoteToken, embeddedVariablesToken,
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+        return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT),
                 elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_NAME));
     }
@@ -51,15 +51,18 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     private final IToken gherkinToken;
 
+    private final IToken libraryToken;
+
     private final IToken quoteToken;
 
     private final Predicate<IRobotLineElement> shouldStopOnElement;
 
-    protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken quoteToken,
-            final IToken embeddedVariablesToken, final EnumSet<RobotTokenType> acceptableTypes,
+    protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken libraryToken,
+            final IToken quoteToken, final IToken embeddedVariablesToken, final EnumSet<RobotTokenType> acceptableTypes,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
         super(embeddedVariablesToken, textToken);
         this.gherkinToken = gherkinToken;
+        this.libraryToken = libraryToken;
         this.quoteToken = quoteToken;
         this.acceptableTypes = acceptableTypes;
         this.shouldStopOnElement = shouldStopOnElement;
@@ -78,6 +81,11 @@ public class ExecutableCallRule extends VariableUsageRule {
             final List<RobotLine> context) {
         if (shouldBeColored(token, context, shouldStopOnElement)) {
             Optional<PositionedTextToken> evaluated = evaluateGherkin(token, offsetInToken);
+            if (evaluated.isPresent()) {
+                return evaluated;
+            }
+
+            evaluated = evaluateLibrary(token, offsetInToken);
             if (evaluated.isPresent()) {
                 return evaluated;
             }
@@ -103,15 +111,31 @@ public class ExecutableCallRule extends VariableUsageRule {
         return Optional.empty();
     }
 
+    private Optional<PositionedTextToken> evaluateLibrary(final IRobotLineElement token,
+            final int offsetInToken) {
+        final int dotIndex = token.getText().indexOf('.', offsetInToken);
+        if (dotIndex > 0) {
+            final int quoteOpeningIndex = token.getText().indexOf('"', offsetInToken);
+            if (quoteOpeningIndex == -1 || dotIndex < quoteOpeningIndex) {
+                final int varOpeningBracketIndex = token.getText().indexOf('{', offsetInToken);
+                if (varOpeningBracketIndex == -1 || dotIndex < varOpeningBracketIndex) {
+                    return Optional.of(new PositionedTextToken(libraryToken, token.getStartOffset() + offsetInToken,
+                            dotIndex - offsetInToken + 1));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     private Optional<PositionedTextToken> evaluateQuotes(final int tokenStartOffset, final int offsetInToken,
             final String textToEvaluate, final int fromIndex) {
-        final int quoteOpenIndex = textToEvaluate.indexOf('\"', fromIndex);
+        final int quoteOpenIndex = textToEvaluate.indexOf('"', fromIndex);
         if (quoteOpenIndex != -1) {
             if (fromIndex < quoteOpenIndex) {
                 return Optional.of(new PositionedTextToken(nonVarToken, tokenStartOffset + offsetInToken,
                         quoteOpenIndex - fromIndex));
             }
-            final int quoteCloseIndex = textToEvaluate.indexOf('\"', quoteOpenIndex + 1);
+            final int quoteCloseIndex = textToEvaluate.indexOf('"', quoteOpenIndex + 1);
             if (quoteOpenIndex < quoteCloseIndex) {
                 return Optional.of(new PositionedTextToken(quoteToken,
                         tokenStartOffset + quoteOpenIndex + offsetInToken - fromIndex,
