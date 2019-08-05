@@ -29,7 +29,7 @@ colors are saved into <b>custom</b> profile.
 <h3>Changing to Dark theme</h3>
 <p>Dark theme can be changed in 
 <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.preferencePages.Views)')">
-Window -> Preferences -> Appearance</a></code>.
+Window -> Preferences -> General -> Appearance</a></code>.
 </p>
 <p><img src="images/apperence-dark.png"/>
 </p>
@@ -44,7 +44,7 @@ modified icons and other UI elements for dark profile.
 <p>Darkest Dark Theme can be installed from 
 <b><code>Help -> Eclipse Marketplace</code></b> and then be activated from 
 <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.eclipse.ui.preferencePages.Views)')">
-Window -> Preferences -> Appearance</a></code>
+Window -> Preferences -> General -> Appearance</a></code>
 </p>
 <p><img src="images/apperence-darkest-dark.png"/>
 </p>
