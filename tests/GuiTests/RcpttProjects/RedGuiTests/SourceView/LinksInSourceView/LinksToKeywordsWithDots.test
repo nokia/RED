@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _98rk8Le9EeaN18-GwBb_GA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/1/16 2:10 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/5/19 3:20 PM
 Testcase-Type: ecl
 Verifications: _YCCOILfHEeaN18-GwBb_GA
 
@@ -141,5 +141,18 @@ get-editor "LibA.py" | get-text-viewer | get-property text | equals "from robot.
     + "    @keyword(name='opa.opa_hop')\n"
     + "    def keyword(self):\n"
     + "        pass" | verify-true
+
+get-view Problems | get-tree | select "Warnings (8 items)" | expand-all
+get-view Problems | get-tree 
+    | select "Warnings \\(.* items\\)/Given keyword name 'res.data' contains dots. Use underscores instead of dots in keywords names." 
+    | double-click
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    hover-text 41 5
+    get-menu -path "Quick Fix" | click
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Change to 'res_data'" | verify-true
+}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
