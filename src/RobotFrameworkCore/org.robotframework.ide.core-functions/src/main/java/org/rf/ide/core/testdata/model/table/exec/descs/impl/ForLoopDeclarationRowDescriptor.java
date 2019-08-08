@@ -24,9 +24,9 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
-    private RobotAction forAction = new RobotAction(new RobotToken(), new ArrayList<IElementDeclaration>());
+    private RobotAction forAction = new RobotAction(new RobotToken(), new ArrayList<>());
 
-    private RobotAction inAction = new RobotAction(new RobotToken(), new ArrayList<IElementDeclaration>());
+    private RobotAction inAction = new RobotAction(new RobotToken(), new ArrayList<>());
 
     private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
 

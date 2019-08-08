@@ -517,7 +517,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new CaseNameRule(definition), new TestCaseSettingsRule(setting), new SettingsTemplateRule(call),
+                new CaseNameRule(definition), new TestCaseSettingsRule(setting),
+                new SettingsTemplateRule(call, variable),
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, library, quote,
                         variable),
                 ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable),
@@ -525,7 +526,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call),
+                new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call, variable),
                 ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, library, quote,
                         variable),
                 ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable),
@@ -540,7 +541,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new SettingRule(setting), new SettingsTemplateRule(call),
+                new SettingRule(setting), new SettingsTemplateRule(call, variable),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, library,
                         quote, variable),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),

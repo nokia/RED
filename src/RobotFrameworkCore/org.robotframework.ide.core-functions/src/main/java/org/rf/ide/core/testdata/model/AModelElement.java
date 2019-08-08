@@ -6,7 +6,6 @@
 package org.rf.ide.core.testdata.model;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,12 +51,8 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         if (isPresent()) {
             final List<RobotToken> elementTokens = getElementTokens();
 
-            final RobotToken lastToken = Collections.max(elementTokens, new Comparator<RobotToken>() {
-                @Override
-                public int compare(final RobotToken o1, final RobotToken o2) {
-                    return Integer.compare(o1.getEndOffset(), o2.getEndOffset());
-                }
-            });
+            final RobotToken lastToken = Collections.max(elementTokens,
+                    (o1, o2) -> Integer.compare(o1.getEndOffset(), o2.getEndOffset()));
             pos = new FilePosition(lastToken.getLineNumber(), lastToken.getEndColumn(), lastToken.getEndOffset());
         }
 

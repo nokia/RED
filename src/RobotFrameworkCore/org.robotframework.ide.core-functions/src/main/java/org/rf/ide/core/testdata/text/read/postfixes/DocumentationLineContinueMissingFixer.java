@@ -170,13 +170,6 @@ class DocumentationLineContinueMissingFixer implements IPostProcessFixer {
 
     private boolean isAnyOfType(final List<IRobotTokenType> elemTypes, final IRobotTokenType... acceptable) {
         final List<IRobotTokenType> accept = Arrays.asList(acceptable);
-
-        for (final IRobotTokenType e : elemTypes) {
-            if (accept.contains(e)) {
-                return true;
-            }
-        }
-
-        return false;
+        return elemTypes.stream().anyMatch(accept::contains);
     }
 }

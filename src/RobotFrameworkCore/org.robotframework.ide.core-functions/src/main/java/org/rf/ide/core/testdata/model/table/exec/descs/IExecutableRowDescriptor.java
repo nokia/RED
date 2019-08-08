@@ -36,7 +36,7 @@ public interface IExecutableRowDescriptor<T> {
     AModelElement<T> getRow();
 
     public enum RowType {
-        UNKONWN,
+        UNKNOWN,
         SETTING,
         COMMENTED_HASH,
         SIMPLE,

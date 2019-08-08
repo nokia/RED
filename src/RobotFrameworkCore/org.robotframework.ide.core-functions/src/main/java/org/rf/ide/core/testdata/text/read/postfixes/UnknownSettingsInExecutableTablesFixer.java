@@ -47,11 +47,8 @@ public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixer
     }
 
     private void fixInUserKeywordTable(final KeywordTable keywordTable) {
-        final List<UserKeyword> keywords = keywordTable.getKeywords();
-        for (final UserKeyword userKeyword : keywords) {
-            final List<RobotExecutableRow<UserKeyword>> execRows = userKeyword.getExecutionContext();
-            for (int i = 0; i < execRows.size(); i++) {
-                final RobotExecutableRow<UserKeyword> robotExecutableRow = execRows.get(i);
+        for (final UserKeyword userKeyword : keywordTable.getKeywords()) {
+            for (final RobotExecutableRow<UserKeyword> robotExecutableRow : userKeyword.getExecutionContext()) {
                 final String text = robotExecutableRow.getAction().getText().trim();
                 if (text.startsWith("[") && text.endsWith("]")) {
 
@@ -76,11 +73,8 @@ public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixer
     }
 
     private void fixInTestCaseTable(final TestCaseTable testCaseTable) {
-        final List<TestCase> testCases = testCaseTable.getTestCases();
-        for (final TestCase testCase : testCases) {
-            final List<RobotExecutableRow<TestCase>> execRows = testCase.getExecutionContext();
-            for (int i = 0; i < execRows.size(); i++) {
-                final RobotExecutableRow<TestCase> robotExecutableRow = execRows.get(i);
+        for (final TestCase testCase : testCaseTable.getTestCases()) {
+            for (final RobotExecutableRow<TestCase> robotExecutableRow : testCase.getExecutionContext()) {
                 final String text = robotExecutableRow.getAction().getText().trim();
                 if (text.startsWith("[") && text.endsWith("]")) {
 
@@ -105,11 +99,8 @@ public class UnknownSettingsInExecutableTablesFixer implements IPostProcessFixer
     }
 
     private void fixInTaskTable(final TaskTable taskTable) {
-        final List<Task> tasks = taskTable.getTasks();
-        for (final Task task : tasks) {
-            final List<RobotExecutableRow<Task>> execRows = task.getExecutionContext();
-            for (int i = 0; i < execRows.size(); i++) {
-                final RobotExecutableRow<Task> robotExecutableRow = execRows.get(i);
+        for (final Task task : taskTable.getTasks()) {
+            for (final RobotExecutableRow<Task> robotExecutableRow : task.getExecutionContext()) {
                 final String text = robotExecutableRow.getAction().getText().trim();
                 if (text.startsWith("[") && text.endsWith("]")) {
 

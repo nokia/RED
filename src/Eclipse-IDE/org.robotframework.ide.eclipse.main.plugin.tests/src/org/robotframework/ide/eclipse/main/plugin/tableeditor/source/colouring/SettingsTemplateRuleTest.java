@@ -23,12 +23,14 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
 public class SettingsTemplateRuleTest {
 
-    private final SettingsTemplateRule testedRule = new SettingsTemplateRule(new Token("token"));
+    private final SettingsTemplateRule testedRule = new SettingsTemplateRule(new Token("token"),
+            new Token("var_token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -83,6 +85,59 @@ public class SettingsTemplateRuleTest {
     }
 
     @Test
+    public void variableTokenIsDetected_whenPositionedInsideVariable() {
+        final String var1 = "${var1}";
+        final String var2 = "${var2}";
+        final String var3 = "${var3}";
+
+        final String content = "abc" + var1 + "def" + var2 + "ghi" + var3 + "jkl";
+
+        final List<Position> varPositions = new ArrayList<>();
+        varPositions.add(new Position(content.indexOf(var1), var1.length()));
+        varPositions.add(new Position(content.indexOf(var2), var2.length()));
+        varPositions.add(new Position(content.indexOf(var3), var3.length()));
+
+        final RobotToken token = createToken(content);
+
+        for (final Position position : varPositions) {
+            for (int offset = 0; offset < position.getLength(); offset++) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset);
+                assertThat(evaluatedToken).isPresent();
+                assertThat(evaluatedToken.get().getPosition())
+                        .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
+                assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
+            }
+        }
+    }
+
+    @Test
+    public void templateTokenIsDetected_whenPositionedOutsideVariables() {
+        final String text1 = "abc";
+        final String text2 = "def";
+        final String text3 = "ghi";
+        final String text4 = "jkl";
+        final String content = text1 + "${var1}" + text2 + "${var2}" + text3 + "${var3}" + text4;
+
+        final List<Position> nonVarPositions = new ArrayList<>();
+        nonVarPositions.add(new Position(content.indexOf(text1), text1.length()));
+        nonVarPositions.add(new Position(content.indexOf(text2), text2.length()));
+        nonVarPositions.add(new Position(content.indexOf(text3), text3.length()));
+        nonVarPositions.add(new Position(content.indexOf(text4), text4.length()));
+
+        final RobotToken token = createToken(content);
+
+        for (final Position position : nonVarPositions) {
+            for (int offset = 0; offset < position.getLength(); offset++) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position.getOffset() + offset);
+                assertThat(evaluatedToken).isPresent();
+                assertThat(evaluatedToken.get().getPosition())
+                        .isEqualTo(new Position(position.getOffset() + offset, position.getLength() - offset));
+                assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
+            }
+        }
+    }
+
+    @Test
     public void templateSettingsArgsAreNotRecognizeIfNoneIsUsedAsKeywordName() {
         final List<PositionedTextToken> coloredTokens = createNoneAwareSettingsTokens().stream()
                 .map(this::evaluate)
@@ -100,7 +155,7 @@ public class SettingsTemplateRuleTest {
     private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
         return testedRule.evaluate(token, position, new ArrayList<>());
     }
-    
+
     static List<RobotToken> createNoneAwareSettingsTokens() {
         return createTokens(TokensSource::createTokensOfNoneAwareSettings);
     }
@@ -117,4 +172,14 @@ public class SettingsTemplateRuleTest {
         }
         return tokens;
     }
+
+    private RobotToken createToken(final String kwName) {
+        final RobotToken token = RobotToken.create(kwName,
+                newArrayList(RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME, RobotTokenType.VARIABLE_USAGE));
+        token.setLineNumber(1);
+        token.setStartColumn(0);
+        token.setStartOffset(0);
+        return token;
+    }
+
 }

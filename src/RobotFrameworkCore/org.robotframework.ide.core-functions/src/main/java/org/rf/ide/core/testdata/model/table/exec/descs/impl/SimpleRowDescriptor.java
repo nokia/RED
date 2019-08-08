@@ -21,7 +21,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
-    private RobotAction action = new RobotAction(new RobotToken(), new ArrayList<IElementDeclaration>());
+    private RobotAction action = new RobotAction(new RobotToken(), new ArrayList<>());
 
     private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
 

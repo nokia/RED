@@ -28,7 +28,7 @@ public class SectionHeaderRule extends TokenTypeBasedRule {
     }
 
     @Override
-    public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInRobotToken,
+    public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
@@ -36,6 +36,6 @@ public class SectionHeaderRule extends TokenTypeBasedRule {
                 || tokenTypes.contains(RobotTokenType.COMMENT_CONTINUE)) {
             return Optional.empty();
         }
-        return super.evaluate(token, offsetInRobotToken, context);
+        return super.evaluate(token, offsetInToken, context);
     }
 }

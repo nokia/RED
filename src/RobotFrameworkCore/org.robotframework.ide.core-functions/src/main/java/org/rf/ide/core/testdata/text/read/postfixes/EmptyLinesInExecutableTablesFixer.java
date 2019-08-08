@@ -65,7 +65,7 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             final List<AModelElement<T>> elements = execHolder.getElements();
             final int holderStartLine = execHolder.getName().getLineNumber();
             final int holderEndLine = getHolderLastLine(execHolder, elements);
-            
+
             if (holderStartLine == -1 || holderEndLine == -1) {
                 continue;
             }
@@ -171,7 +171,7 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             for (final RobotExecutableRow<T> executableRow : executionRows) {
                 if (!RobotExecutableRow.isExecutable(fileFormat, executableRow.getElementTokens())) {
                     final RobotEmptyRow<T> row = rewriteToEmptyRow(executableRow);
-                    
+
                     holder.replaceElement(executableRow, row);
                 }
             }
@@ -182,11 +182,11 @@ public class EmptyLinesInExecutableTablesFixer implements IPostProcessFixer {
             final RobotExecutableRow<T> executableRow) {
 
         final RobotEmptyRow<T> emptyRow = new RobotEmptyRow<>();
-        final boolean isForWithEndConinuation = executableRow.getAction()
+        final boolean isForWithEndContinuation = executableRow.getAction()
                 .getTypes()
                 .contains(RobotTokenType.FOR_WITH_END_CONTINUATION);
         emptyRow.setEmpty(executableRow.getAction());
-        if (isForWithEndConinuation) {
+        if (isForWithEndContinuation) {
             emptyRow.getEmptyToken().getTypes().add(RobotTokenType.FOR_WITH_END_CONTINUATION);
         }
         for (final RobotToken commentToken : executableRow.getComment()) {

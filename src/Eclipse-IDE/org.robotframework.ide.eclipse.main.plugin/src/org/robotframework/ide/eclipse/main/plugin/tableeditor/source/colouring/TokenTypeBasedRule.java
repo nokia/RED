@@ -32,7 +32,7 @@ class TokenTypeBasedRule implements ISyntaxColouringRule {
     }
 
     @Override
-    public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInRobotToken,
+    public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<RobotLine> context) {
         final IRobotTokenType type = token.getTypes().get(0);
 
