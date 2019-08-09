@@ -7,6 +7,7 @@ package org.robotframework.red.nattable.edit;
 
 import java.util.Optional;
 
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
@@ -19,9 +20,13 @@ public class VariableNameRedCellEditorValidator extends DefaultRedCellEditorValu
 
     private final CommonVariableHelper commonVarHelper = new CommonVariableHelper();
 
+    public VariableNameRedCellEditorValidator(final IRowDataProvider<?> dataProvider) {
+        super(dataProvider);
+    }
+
     @Override
-    public void validate(final String value) {
-        super.validate(value);
+    public void validate(final String value, final int rowId) {
+        super.validate(value, rowId);
 
         final Optional<String> error = getProblemsWithVariableName(value);
 

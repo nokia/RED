@@ -8,6 +8,7 @@ package org.robotframework.red.nattable.edit;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
@@ -30,6 +31,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
@@ -75,12 +77,13 @@ public class RedTextCellEditor extends TextCellEditor {
         return MoveDirectionEnum.NONE;
     }
 
-    public RedTextCellEditor(final boolean wrapCellContent) {
-        this(0, 0, new DefaultRedCellEditorValueValidator(), null, wrapCellContent);
+    public RedTextCellEditor(final boolean wrapCellContent, final IRowDataProvider<?> dataProvider) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(dataProvider), null, wrapCellContent);
     }
 
-    public RedTextCellEditor(final RedContentProposalProvider proposalProvider, final boolean wrapCellContent) {
-        this(0, 0, new DefaultRedCellEditorValueValidator(), proposalProvider, wrapCellContent);
+    public RedTextCellEditor(final RedContentProposalProvider proposalProvider, final boolean wrapCellContent,
+            final IRowDataProvider<?> dataProvider) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(dataProvider), proposalProvider, wrapCellContent);
     }
 
     public RedTextCellEditor(final CellEditorValueValidator<String> validator, final boolean wrapCellContent) {
@@ -88,13 +91,19 @@ public class RedTextCellEditor extends TextCellEditor {
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
-            final boolean wrapCellContent) {
-        this(selectionStartShift, selectionEndShift, new DefaultRedCellEditorValueValidator(), null, wrapCellContent);
+            final boolean wrapCellContent, final IRowDataProvider<?> dataProvider) {
+        this(selectionStartShift, selectionEndShift, new DefaultRedCellEditorValueValidator(dataProvider), null,
+                wrapCellContent);
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
             final CellEditorValueValidator<String> validator, final boolean wrapCellContent) {
         this(selectionStartShift, selectionEndShift, validator, null, wrapCellContent);
+    }
+
+    public RedTextCellEditor(CombinedProposalsProvider proposalProvider, boolean wrapCellContent,
+            IRowDataProvider<?> dataProvider) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(dataProvider), proposalProvider, wrapCellContent);
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
@@ -125,7 +134,7 @@ public class RedTextCellEditor extends TextCellEditor {
 
         textControl.addKeyListener(new TextKeyListener(parent));
         textControl.addVerifyListener(new TextVerifyListener(textControl, RedPlugin.getDefault().getPreferences()));
-        validationJobScheduler.armRevalidationOn(textControl);
+        validationJobScheduler.armRevalidationOn(textControl, getRowIndex());
 
         return textControl;
     }

@@ -39,12 +39,12 @@ public class CellEditorValueValidationJobScheduler<V> {
         this.validator = validator;
     }
 
-    void rescheduleValidation(final V value, final Control control) {
+    void rescheduleValidation(final V value, final Control control, final int rowId) {
         isClosingLocked = true;
         if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
             validationJob.cancel();
         }
-        validationJob = new CellEditorValueValidationJob<>(validator, value);
+        validationJob = new CellEditorValueValidationJob<>(validator, value, rowId);
         validationJob.addJobChangeListener(new CellEditorValueValidationListener(control));
         validationJob.schedule(300);
     }
@@ -66,12 +66,12 @@ public class CellEditorValueValidationJobScheduler<V> {
     }
 
     @SuppressWarnings("unchecked")
-    public void armRevalidationOn(final Text textControl) {
+    public void armRevalidationOn(final Text textControl, final int rowId) {
         if (validator == null || textControl == null || textControl.isDisposed()) {
             return;
         }
         originalForeground = textControl.getForeground();
-        textControl.addModifyListener(e -> rescheduleValidation((V) textControl.getText(), textControl));
+        textControl.addModifyListener(e -> rescheduleValidation((V) textControl.getText(), textControl, rowId));
     }
 
     @VisibleForTesting

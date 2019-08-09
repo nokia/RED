@@ -263,7 +263,7 @@ class TasksFormFragment implements ISectionFormFragment {
             gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
-                CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent));
+                CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent, dataProvider));
         gridLayer.addConfiguration(new CodeElementsTableEditConfiguration(fileModel, dataProvider,
                 SettingTarget.TASK, wrapCellContent));
 

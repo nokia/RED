@@ -200,7 +200,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
         }
         gridLayer.addConfiguration(new VariablesTableAdderStatesConfiguration(dataProvider));
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent));
+        gridLayer.addConfiguration(
+                new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent, dataProvider));
         gridLayer.addConfiguration(
                 new VariableValuesEditConfiguration(theme, fileModel, dataProvider, commandsStack, wrapCellContent));
 

@@ -38,7 +38,7 @@ class MetadataSettingsEditConfiguration extends AbstractRegistryConfiguration {
                 new VariableProposalsProvider(suiteFile, dataProvider));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(proposalProvider, wrapCellContent), DisplayMode.NORMAL,
+                new RedTextCellEditor(proposalProvider, wrapCellContent, dataProvider), DisplayMode.NORMAL,
                 TableConfigurationLabels.ASSIST_REQUIRED);
     }
 }

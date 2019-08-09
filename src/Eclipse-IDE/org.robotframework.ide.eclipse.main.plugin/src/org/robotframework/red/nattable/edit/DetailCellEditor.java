@@ -8,6 +8,7 @@ package org.robotframework.red.nattable.edit;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
@@ -50,8 +51,8 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     private IContextActivation contextActivation;
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
-            final RedContentProposalProvider proposalProvider) {
-        this(editSupport, new DefaultRedCellEditorValueValidator(), proposalProvider);
+            final RedContentProposalProvider proposalProvider, final IRowDataProvider<?> dataProvider) {
+        this(editSupport, new DefaultRedCellEditorValueValidator(dataProvider), proposalProvider);
     }
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
@@ -143,7 +144,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
             }
         });
         composite.setVisible(true);
-        validationJobScheduler.armRevalidationOn(composite.getText());
+        validationJobScheduler.armRevalidationOn(composite.getText(), getRowIndex());
         return composite;
     }
 

@@ -9,6 +9,7 @@ import static org.robotframework.red.swt.Listeners.focusLostAdapter;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -37,10 +38,14 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
     private Text textEdit;
 
+    private IRowDataProvider<?> dataProvider;
+
     DictVariableDetailCellEditorEntry(final Composite parent, final int column, final int row,
-            final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor) {
+            final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor,
+            final IRowDataProvider<?> dataProvider) {
         super(parent, column, row, hoverColor, selectionColor);
         this.assistSupport = assistSupport;
+        this.dataProvider = dataProvider;
 
         addPaintListener(new DictElementPainter());
         GridLayoutFactory.fillDefaults().extendedMargins(0, HOVER_BLOCK_WIDTH, 0, 0).applyTo(this);
@@ -48,7 +53,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
     @Override
     protected CellEditorValueValidator<String> getValidator() {
-        return new DefaultRedCellEditorValueValidator();
+        return new DefaultRedCellEditorValueValidator(dataProvider);
     }
 
     @Override
@@ -76,7 +81,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
             e.gc.drawLine(e.width - 1, e.height - 1, 0, e.height - 1);
             e.gc.drawLine(0, e.height - 1, 0, 0);
         });
-        validationJobScheduler.armRevalidationOn(textEdit);
+        validationJobScheduler.armRevalidationOn(textEdit, row);
         final AssistantContext context = new NatTableAssistantContext(column, row);
         assistSupport.install(textEdit, context);
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).hint(SWT.DEFAULT, 20).applyTo(textEdit);

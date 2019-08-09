@@ -56,16 +56,16 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
             final RedContentProposalProvider proposalsProvider) {
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider,
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(dataProvider), proposalsProvider,
                         wrapCellContent),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider,
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(dataProvider), proposalsProvider,
                         wrapCellContent),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider,
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(dataProvider), proposalsProvider,
                         wrapCellContent),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.DICTIONARY));
@@ -75,21 +75,21 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
             final RedContentProposalProvider proposalsProvider) {
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(proposalsProvider, wrapCellContent), DisplayMode.NORMAL,
+                new RedTextCellEditor(proposalsProvider, wrapCellContent, dataProvider), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsProvider),
+                        proposalsProvider, dataProvider),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsProvider),
+                        proposalsProvider, dataProvider),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.INVALID));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new DictVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsProvider),
+                        proposalsProvider, dataProvider),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.DICTIONARY));
     }

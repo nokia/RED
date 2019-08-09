@@ -569,7 +569,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(null,
-                GeneralSettingsTableEditableRule.createEditableRule(fileModel), wrapCellContent));
+                GeneralSettingsTableEditableRule.createEditableRule(fileModel), wrapCellContent, dataProvider));
         gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
         table = java.util.Optional.of(theme.configureScrollBars(parent, bodyViewportLayer,

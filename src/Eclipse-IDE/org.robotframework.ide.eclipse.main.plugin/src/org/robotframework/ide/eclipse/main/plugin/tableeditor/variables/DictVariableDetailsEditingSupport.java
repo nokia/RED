@@ -71,7 +71,7 @@ public class DictVariableDetailsEditingSupport implements DetailCellEditorEditin
         final Color hoverColor = theme.getBodyHoveredCellBackground();
         final Color selectionColor = theme.getBodySelectedCellBackground();
         final DictVariableDetailCellEditorEntry entry = new DictVariableDetailCellEditorEntry(parent, column, row,
-                assistSupport, hoverColor, selectionColor);
+                assistSupport, hoverColor, selectionColor, dataProvider);
         entry.update(detail);
         return entry;
     }

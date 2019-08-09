@@ -29,17 +29,21 @@ class CellEditorValueValidationJob<V> extends Job {
 
     private final V valueToValidate;
 
-    CellEditorValueValidationJob(final CellEditorValueValidator<V> validator, final V valueToValidate) {
+    private final int rowId;
+
+    CellEditorValueValidationJob(final CellEditorValueValidator<V> validator, final V valueToValidate,
+            final int rowId) {
         super("Validating cell input");
         this.validator = validator;
         this.valueToValidate = valueToValidate;
+        this.rowId = rowId;
     }
 
     @Override
     protected IStatus run(final IProgressMonitor monitor) {
         try {
             setProperty(getLockPropertyName(), Boolean.TRUE);
-            validator.validate(valueToValidate);
+            validator.validate(valueToValidate, rowId);
             setProperty(getLockPropertyName(), Boolean.FALSE);
         } catch (final CellEditorValueValidationException e) {
             setProperty(getErrorMessagePropertyName(), e.getMessage());

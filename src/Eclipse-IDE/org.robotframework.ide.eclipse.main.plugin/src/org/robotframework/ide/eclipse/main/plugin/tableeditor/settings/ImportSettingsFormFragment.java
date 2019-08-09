@@ -252,7 +252,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         if (wrapCellContent) {
             gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
         }
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent));
+        gridLayer.addConfiguration(
+                new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent, dataProvider));
         gridLayer.addConfiguration(new ImportsSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,

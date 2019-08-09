@@ -6,9 +6,11 @@
 package org.robotframework.red.nattable.edit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorValueValidationException;
@@ -22,7 +24,7 @@ public class VariableNameRedCellEditorValidatorTest {
 
     @Before
     public void setUp() {
-        this.testable = new VariableNameRedCellEditorValidator();
+        this.testable = new VariableNameRedCellEditorValidator(mock(IRowDataProvider.class));
     }
 
     @Test
@@ -31,7 +33,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final String varName = "${var}";
 
         // when
-        testable.validate(varName);
+        testable.validate(varName, 0);
     }
 
     @Test(expected = CellEditorValueValidationException.class)
@@ -40,7 +42,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final String varName = "  d";
 
         // when
-        testable.validate(varName);
+        testable.validate(varName, 0);
     }
 
     @Test(expected = CellEditorValueValidationException.class)
@@ -49,7 +51,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final String varName = "";
 
         // when
-        testable.validate(varName);
+        testable.validate(varName, 0);
     }
 
     @Test

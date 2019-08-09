@@ -7,6 +7,7 @@ package org.robotframework.red.nattable.configs;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.validate.DefaultDataValidator;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditConfiguration;
@@ -32,16 +33,19 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
 
     private boolean wrapCellContent;
 
+    private IRowDataProvider<?> dataProvider;
+
     public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator,
-            final boolean wrapCellContent) {
-        this(creator, SuiteModelEditableRule.createEditableRule(fileModel), wrapCellContent);
+            final boolean wrapCellContent, final IRowDataProvider<?> dataProvider) {
+        this(creator, SuiteModelEditableRule.createEditableRule(fileModel), wrapCellContent, dataProvider);
     }
     
     public RedTableEditConfiguration(final NewElementsCreator<T> creator, final IEditableRule editableRule,
-            final boolean wrapCellContent) {
+            final boolean wrapCellContent, final IRowDataProvider<?> dataProvider) {
         this.editableRule = editableRule;
         this.creator = creator;
         this.wrapCellContent = wrapCellContent;
+        this.dataProvider = dataProvider;
     }
 
     @Override
@@ -54,7 +58,8 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
                 AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(wrapCellContent),
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new RedTextCellEditor(wrapCellContent, dataProvider),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());
         configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE,

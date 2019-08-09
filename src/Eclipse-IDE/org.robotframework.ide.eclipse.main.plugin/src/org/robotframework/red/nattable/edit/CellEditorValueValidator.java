@@ -10,7 +10,7 @@ package org.robotframework.red.nattable.edit;
  */
 public interface CellEditorValueValidator<V> {
 
-    void validate(V value);
+    void validate(V value, int rowId);
 
     public static class CellEditorValueValidationException extends RuntimeException {
 
