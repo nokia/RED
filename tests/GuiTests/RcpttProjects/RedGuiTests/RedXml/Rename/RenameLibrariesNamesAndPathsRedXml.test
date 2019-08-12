@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/16/19 4:44 PM
+Save-Time: 8/12/19 2:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,8 +44,8 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject/here_is_class.py\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject/here_is_class.py\" dynamic=\"false\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
@@ -69,15 +69,14 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/here_is_classNewName.py\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/here_is_classNewName.py\" dynamic=\"false\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
-    
     
 // close red.xml
 get-view "Project Explorer" | click
@@ -113,15 +112,14 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\" dynamic=\"false\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
-    
     
 // copy library to second project
 with [get-view "Project Explorer" | get-tree] {
@@ -166,8 +164,8 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\" dynamic=\"false\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
@@ -188,8 +186,8 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\"/>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder/here_is_classNewName.py\" dynamic=\"false\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject/only_function.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"

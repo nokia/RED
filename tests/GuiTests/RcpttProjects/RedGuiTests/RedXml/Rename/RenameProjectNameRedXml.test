@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Y5c34CjREeeF0_hmqEfhuQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 2:55 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/12/19 1:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,7 +34,7 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject/here_is_class.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject/here_is_class.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
@@ -67,13 +67,14 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "<projectConfiguration>\n"
     + "    <configVersion>2</configVersion>\n"
     + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName/here_is_class.py\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName/here_is_class.py\" dynamic=\"false\"/>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
+    
 // rename with open red.xml
 get-view "Project Explorer" | get-tree | select RobotProjectNewName | get-menu "Rename..." | click
 with [get-window "Rename Resource"] {
@@ -87,26 +88,27 @@ with [get-window "Rename Resource"] {
         get-property "getItems().TreeItem[1].getText()" 
             | equals "Rename 'RobotProjectNewName' to 'RobotProjectNewNameNew'" | verify-true
     }
-get-editor "red.xml" | get-text-viewer | get-property text 
-    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-    + "<projectConfiguration>\n"
-    + "    <configVersion>2</configVersion>\n"
-    + "    <relativeTo>WORKSPACE</relativeTo>\n"
-    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName/here_is_class.py\"/>\n"
-    + "    <pythonpath/>\n"
-    + "    <classpath/>\n"
-    + "    <excludedForValidation/>\n"
-    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
-    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
-    + "</projectConfiguration>" | verify-true
-    
+  
+	get-editor "red.xml" | get-text-viewer | get-property text 
+	    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+	    + "<projectConfiguration>\n"
+	    + "    <configVersion>2</configVersion>\n"
+	    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+	    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName/here_is_class.py\" dynamic=\"false\"/>\n"
+	    + "    <pythonpath/>\n"
+	    + "    <classpath/>\n"
+	    + "    <excludedForValidation/>\n"
+	    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+	    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+	    + "</projectConfiguration>" | verify-true
+	    
     
     get-text-viewer -after [get-label "Refactored Source"] -index 1 | get-property text 
         | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
         + "<projectConfiguration>\n"
         + "    <configVersion>2</configVersion>\n"
         + "    <relativeTo>WORKSPACE</relativeTo>\n"
-        + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewNameNew/here_is_class.py\"/>\n"
+        + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewNameNew/here_is_class.py\" dynamic=\"false\"/>\n"
         + "    <pythonpath/>\n"
         + "    <classpath/>\n"
         + "    <excludedForValidation/>\n"

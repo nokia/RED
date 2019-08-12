@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 1:57 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/12/19 2:40 PM
 Testcase-Type: ecl
 Verifications: _JUqVgK-LEeiBA8H4m2oMKw
 
@@ -63,30 +63,32 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
     
 
 // verify errors
-wait-for-errors -amount 10 -times 4 -delay 500
+wait-for-errors -amount 11 -times 4 -delay 500
 
 with [get-view Problems | get-tree] {
     get-item 
-        -path "Errors \\(10 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8272\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8272\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
     get-item 
-        -path "Errors \\(10 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8273\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8273\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
     get-item 
-        -path "Errors \\(10 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8274\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8274\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
     get-item 
-        -path "Errors \\(10 items\\)/'Remote' library under 'http:\\/\\/timeoutttt=30' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/timeoutttt=30' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
         
-    get-item -path "Errors \\(10 items\\)/Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
+    get-item -path "Errors \\(11 items\\)/Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
         | get-property enablement | equals false | verify-true
-    get-item -path "Errors \\(10 items\\)/Unknown keyword 'Remote.Other Func'" | get-property enablement | equals false 
+    get-item -path "Errors \\(11 items\\)/Unknown keyword 'Remote.Other Func'" | get-property enablement | equals false 
         | verify-true
-    get-item -path "Errors \\(10 items\\)/Unknown keyword 'Remote.Stop Remote Server'" | get-property enablement 
+    get-item -path "Errors \\(11 items\\)/Unknown keyword 'Remote.Stop Remote Server'" | get-property enablement 
         | equals false | verify-true
-    get-item -path "Errors \\(10 items\\)/Unreachable remote server http:\\/\\/127.0.0.1:8270\\/RPC2" 
+    get-item -path "Errors \\(11 items\\)/Unreachable remote server http:\\/\\/127.0.0.1:8270\\/RPC2" 
         | get-property enablement | equals false | verify-true
+     get-item 
+       -path "Errors \\(11 items\\)/Unknown 'Remote' library under 'http:\\/\\/127.0.0.1:8270\\/RPC2' location. Unable to connect" 
 }
 
     
@@ -109,9 +111,9 @@ try -command{
 	    key-type "M1+s"
 	}
 
-	wait-for-errors 14  10 2
-	get-view Problems | get-label "14 errors, 1 warning, 0 others" | get-property caption 
-	    | equals "14 errors, 1 warning, 0 others" | verify-true
+	wait-for-errors 15  10 2
+	get-view Problems | get-label "15 errors, 1 warning, 0 others" | get-property caption 
+	    | equals "15 errors, 1 warning, 0 others" | verify-true
 	    
 	//check what was added to red.xml    
 	get-editor "RobotProject/red.xml" | click
