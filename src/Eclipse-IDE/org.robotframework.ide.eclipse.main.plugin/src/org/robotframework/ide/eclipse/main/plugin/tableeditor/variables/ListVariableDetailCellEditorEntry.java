@@ -20,7 +20,6 @@ import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
@@ -40,22 +39,14 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
 
     private Text textEdit;
 
-    private IRowDataProvider<?> dataProvider;
-
     ListVariableDetailCellEditorEntry(final Composite parent, final int column, final int row,
             final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor,
             final IRowDataProvider<?> dataProvider) {
-        super(parent, column, row, hoverColor, selectionColor);
+        super(parent, column, row, new DefaultRedCellEditorValueValidator(dataProvider), hoverColor, selectionColor);
         this.assistSupport = assistSupport;
-        this.dataProvider = dataProvider;
 
         addPaintListener(new ListElementPainter());
         GridLayoutFactory.fillDefaults().extendedMargins(0, HOVER_BLOCK_WIDTH, 0, 0).applyTo(this);
-    }
-
-    @Override
-    protected CellEditorValueValidator<String> getValidator() {
-        return new DefaultRedCellEditorValueValidator(dataProvider);
     }
 
     @Override

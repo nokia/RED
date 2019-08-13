@@ -44,14 +44,15 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     protected CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    public DetailCellEditorEntry(final Composite parent, final int column, final int row, final Color hoverColor,
+    public DetailCellEditorEntry(final Composite parent, final int column, final int row,
+            final CellEditorValueValidator<String> validator, final Color hoverColor,
             final Color selectionColor) {
         super(parent, SWT.NO_BACKGROUND);
         this.column = column;
         this.row = row;
         this.hoverColor = hoverColor;
         this.selectionColor = selectionColor;
-        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(getValidator());
+        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
 
         addMouseTrackListener(new MouseTrackAdapter() {
             @Override
@@ -74,8 +75,6 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
             }
         });
     }
-
-    protected abstract CellEditorValueValidator<String> getValidator();
 
     public void setEditorListener(final Consumer<String> listener) {
         editorListener = listener;
