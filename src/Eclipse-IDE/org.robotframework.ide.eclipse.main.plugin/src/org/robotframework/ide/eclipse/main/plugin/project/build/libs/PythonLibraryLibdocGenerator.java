@@ -21,6 +21,10 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         return arguments.isEmpty() ? nameOrPath : nameOrPath + "::" + String.join("::", arguments);
     }
 
+    static String buildNameWithArgsDescription(final String nameOrPath, final List<String> arguments) {
+        return arguments.isEmpty() ? nameOrPath : nameOrPath + " [" + String.join(", ", arguments) + "]";
+    }
+
     private final String libName;
 
     private final List<String> arguments;
@@ -88,7 +92,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        final String pathOrNameWithArgs = buildNameWithArgs(getLibPathOrName(), arguments);
+        final String pathOrNameWithArgs = buildNameWithArgsDescription(getLibPathOrName(), arguments);
         return "generating libdoc for '" + pathOrNameWithArgs + "' library located at '" + libPath + "'";
     }
 

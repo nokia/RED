@@ -39,7 +39,7 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        final String nameWithArgs = PythonLibraryLibdocGenerator.buildNameWithArgs(libName, arguments);
+        final String nameWithArgs = PythonLibraryLibdocGenerator.buildNameWithArgsDescription(libName, arguments);
         return "generating libdoc for '" + nameWithArgs + "' library";
     }
 
