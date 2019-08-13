@@ -102,8 +102,8 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                 TestsExecutionTerminationSupport.installTerminationSupport(launchExecution.getServerJob(), debugTarget);
                 testsStarter.allowClientTestsStart();
 
-                launch.addDebugTarget(debugTarget);
                 debugTarget.setProcess(launchExecution.getRobotProcess());
+                launch.addDebugTarget(debugTarget);
             }
             if (launchExecution.getRobotProcess() != null) {
                 launchExecution.getRobotProcess().setUserProcessController(userController);
