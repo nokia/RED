@@ -480,8 +480,6 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <adapt
-                            type="org.eclipse.core.resources.IResource">
                          <or>
                             <instanceof
                                   value="org.eclipse.core.resources.IContainer">
@@ -510,7 +508,6 @@
                                </or>
                             </and>
                          </or>
-                      </adapt>
                    </iterate>
                 </with>
             </enablement>
@@ -557,8 +554,6 @@
                 <iterate
                       ifEmpty="false"
                       operator="and">
-                   <adapt
-                         type="org.eclipse.core.resources.IResource">
                       <or>
                          <instanceof
                                value="org.eclipse.core.resources.IContainer">
@@ -587,7 +582,6 @@
                             </or>
                          </and>
                       </or>
-                   </adapt>
                 </iterate>
              </with>
           </enablement>
@@ -629,8 +623,6 @@
           labelProvider="org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider"
           name="Robot Elements">
        <triggerPoints>
-          <adapt
-                type="org.eclipse.core.resources.IResource">
              <and>
                 <instanceof
                       value="org.eclipse.core.resources.IFile">
@@ -654,7 +646,6 @@
                    </test>
                 </or>
              </and>
-          </adapt>
        </triggerPoints>
        <possibleChildren>
           <instanceof
@@ -676,13 +667,11 @@
        <commonSorter
              class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotElementsSorter">
           <parentExpression>
+          <and>
+          		<instanceof
+                     value="org.eclipse.core.resources.IFile">
+               </instanceof>
              <or>
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
-                   <instanceof
-                         value="org.eclipse.core.resources.IFile">
-                   </instanceof>
-                </adapt>
                 <instanceof
                       value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection">
                 </instanceof>
@@ -696,6 +685,7 @@
                       value="org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement">
                 </instanceof>
              </or>
+         </and>
           </parentExpression>
        </commonSorter>
     </navigatorContent>
@@ -707,18 +697,16 @@
           name="Robot Libraries"
           priority="highest">
        <triggerPoints>
-          <adapt
-                type="org.eclipse.core.resources.IResource">
-             <and>
-                <instanceof
-                      value="org.eclipse.core.resources.IProject">
-                </instanceof>
-                <test
-                      property="org.eclipse.core.resources.projectNature"
-                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-                </test>
-             </and>
-          </adapt></triggerPoints>
+         <and>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+            <test
+                  property="org.eclipse.core.resources.projectNature"
+                  value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+            </test>
+         </and>
+       </triggerPoints>
        <possibleChildren>
           <instanceof
                 value="org.rf.ide.core.libraries.LibrarySpecification">
@@ -731,12 +719,9 @@
        <commonSorter
              class="org.robotframework.ide.eclipse.main.plugin.navigator.ProjectSorter">
           <parentExpression>
-             <adapt
-                   type="org.eclipse.core.resources.IResource">
-                <instanceof
-                      value="org.eclipse.core.resources.IProject">
-                </instanceof>
-             </adapt>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
           </parentExpression>
        </commonSorter>
     </navigatorContent>
@@ -803,8 +788,6 @@
                 variable="selection">
              <iterate
                    ifEmpty="false">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <or>
                       <and>
                          <instanceof
@@ -821,7 +804,6 @@
                          </instanceof>
                       </not>
                    </or>
-                </adapt>
              </iterate>
           </with>
        </enablement>
@@ -840,8 +822,6 @@
                 variable="selection">
              <iterate
                    ifEmpty="false">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <or>
                       <and>
                          <instanceof
@@ -858,7 +838,6 @@
                          </instanceof>
                       </not>
                    </or>
-                </adapt>
              </iterate>
           </with>
        </enablement>
@@ -877,8 +856,6 @@
                 variable="selection">
              <iterate
                    ifEmpty="false">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <or>
                       <and>
                          <instanceof
@@ -895,7 +872,6 @@
                          </instanceof>
                       </not>
                    </or>
-                </adapt>
              </iterate>
           </with>
        </enablement>
@@ -926,8 +902,6 @@
                 variable="selection">
              <iterate
                    ifEmpty="false">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <or>
                       <and>
                          <instanceof
@@ -944,7 +918,6 @@
                          </instanceof>
                       </not>
                    </or>
-                </adapt>
              </iterate>
           </with>
        </enablement>
@@ -1565,8 +1538,6 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-               <adapt
-                     type="org.eclipse.core.resources.IResource">
                    <and>
                       <instanceof
                             value="org.eclipse.core.resources.IProject">
@@ -1576,7 +1547,6 @@
                             value="open">
                       </test>
                    </and>
-               </adapt>
              </iterate>
           </with>
        </activeWhen>
@@ -1590,8 +1560,6 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <and>
                       <instanceof
                             value="org.eclipse.core.resources.IProject">
@@ -1601,7 +1569,6 @@
                             value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                       </test>
                    </and>
-                </adapt>
              </iterate>
           </with>
        </activeWhen>
@@ -1615,13 +1582,13 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
+	                <instanceof
+	                      value="org.eclipse.core.resources.IResource">
+	                </instanceof>
                    <test
                          property="org.eclipse.core.resources.projectNature"
                          value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                    </test>
-                </adapt>
              </iterate>
           </with>
        </activeWhen>
@@ -1631,9 +1598,10 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <and>
+                      <instanceof
+                            value="org.eclipse.core.resources.IResource">
+                	  </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isApplicable"
                             value="true">
@@ -1651,7 +1619,6 @@
                             value="false">
                       </test>
                    </and>
-                </adapt>
              </iterate>
           </with>
        </enabledWhen>
@@ -1665,13 +1632,13 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
+	                <instanceof
+	                      value="org.eclipse.core.resources.IResource">
+	                </instanceof>
                    <test
                          property="org.eclipse.core.resources.projectNature"
                          value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                    </test>
-                </adapt>
              </iterate>
           </with>
        </activeWhen>
@@ -1681,9 +1648,10 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
                    <and>
+                      <instanceof
+                            value="org.eclipse.core.resources.IResource">
+                      </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isApplicable"
                             value="true">
@@ -1701,7 +1669,6 @@
                             value="false">
                       </test>
                    </and>
-                </adapt>
              </iterate>
           </with>
        </enabledWhen>
@@ -1715,25 +1682,25 @@
 			 <iterate
 				   ifEmpty="false"
 				   operator="and">
-    			<adapt
-		          type="org.eclipse.core.resources.IResource">
+    				<instanceof
+		          		value="org.eclipse.core.resources.IResource">
+					</instanceof>
 			       <test
 		             property="org.eclipse.core.resources.projectNature"
         		     value="org.robotframework.ide.eclipse.main.plugin.robotNature">
 			       </test>
-			    </adapt>
+			    
 			 </iterate>
 		  </with>
 	   </activeWhen>
 	   <enabledWhen>
           <with variable="selection">
              <iterate ifEmpty="false" operator="and">
-                <adapt type="org.eclipse.core.resources.IFile">
                    <and>
+                   	  <instanceof value="org.eclipse.core.resources.IFile" />
                       <test property="org.robotframework.redxml.navigator.isApplicable" value="true"/>
                       <test property="org.eclipse.core.resources.name" value="*.py"/>
                    </and>
-                </adapt>
              </iterate>
           </with>
         </enabledWhen>
@@ -1747,13 +1714,12 @@
 			<iterate
                    ifEmpty="false"
                    operator="and">
-                <adapt
-                      type="org.eclipse.core.resources.IResource">
+                <instanceof
+                      value="org.eclipse.core.resources.IResource" />
                    <test
                          property="org.eclipse.core.resources.projectNature"
                          value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                    </test>
-                </adapt>
              </iterate>
 		  </with>
 	   </activeWhen>
@@ -1763,20 +1729,21 @@
 	          <iterate operator="and" ifEmpty="false">
                 <and>
                     <or>
-                        <adapt type="org.eclipse.core.resources.IFile">
+                    	<and>
+                        	<instanceof value="org.eclipse.core.resources.IFile" />
                             <or>
 	                            <test property="org.eclipse.core.resources.name" value="*.robot"/>
                                 <test property="org.eclipse.core.resources.name" value="*.resource"/>
                                 <test property="org.eclipse.core.resources.name" value="*.txt"/>
                                 <test property="org.eclipse.core.resources.name" value="*.tsv"/>
                             </or>
-                        </adapt>
-                        <adapt type="org.eclipse.core.resources.IFolder" />
-                        <adapt type="org.eclipse.core.resources.IProject" />
+                        </and>
+                        <instanceof value="org.eclipse.core.resources.IFolder" />
+                        <instanceof value="org.eclipse.core.resources.IProject" />
                     </or>
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
                        <and>
+	                       <instanceof
+	                          value="org.eclipse.core.resources.IResource" />
 	                      <test
 	                            property="org.robotframework.redxml.navigator.isApplicable"
 	                            value="true">
@@ -1794,7 +1761,6 @@
                                value="false">
                           </test>
                        </and>
-                    </adapt>
                 </and>
 	          </iterate>
 		  	</with>
@@ -1814,13 +1780,12 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
+                     	<instanceof
+                           value="org.eclipse.core.resources.IResource" />
                         <test
                               property="org.eclipse.core.resources.projectNature"
                               value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                         </test>
-                     </adapt>
                   </iterate>
                </with>
            </and>
@@ -1833,8 +1798,9 @@
 	                operator="or">
                 <and>
                     <or>
-                        <adapt
-	                          type="org.eclipse.core.resources.IFile">
+                    	<and>
+                        	<instanceof
+	                          value="org.eclipse.core.resources.IFile"/>
                             <or>
 	                            <test
                                      property="org.eclipse.core.resources.name"
@@ -1853,17 +1819,17 @@
                                      value="*.tsv">
                                 </test>
                             </or>
-                        </adapt>
-                        <adapt
-                              type="org.eclipse.core.resources.IFolder">
-                        </adapt>
-                        <adapt
-                              type="org.eclipse.core.resources.IProject">
-                        </adapt>
+                        </and>
+                        <instanceof
+                              value="org.eclipse.core.resources.IFolder">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
                     </or>
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
                        <and>
+                          <instanceof
+                               value="org.eclipse.core.resources.IResource" />
 	                      <test
 	                           property="org.robotframework.redxml.navigator.isHidden"
 	                           value="false">
@@ -1877,7 +1843,6 @@
                                value="false">
                           </test>
                        </and>
-                    </adapt>
                 </and>
 	          </iterate>
 	       </with>
@@ -1896,13 +1861,12 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
+                     <instanceof
+                           value="org.eclipse.core.resources.IResource" />
                         <test
                               property="org.eclipse.core.resources.projectNature"
                               value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                         </test>
-                     </adapt>
                   </iterate>
                </and>
             </with>
@@ -1915,8 +1879,9 @@
                      operator="or">
                   <and>
                     <or>
-                       <adapt
-                             type="org.eclipse.core.resources.IFile">
+                       <and>
+                       	  <instanceof
+                             value="org.eclipse.core.resources.IFile" />
                           <or>
                              <test
                                    property="org.eclipse.core.resources.name"
@@ -1935,31 +1900,30 @@
                                    value="*.tsv">
                              </test>
                           </or>
-                       </adapt>
-                       <adapt
-                             type="org.eclipse.core.resources.IFolder">
-                       </adapt>
-                       <adapt
-                             type="org.eclipse.core.resources.IProject">
-                       </adapt>
-                    </or>
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
-                       <and>
-	                      <test
-	                           property="org.robotframework.redxml.navigator.isHidden"
-	                           value="false">
-	                      </test>
-                          <test
-                               property="org.robotframework.redxml.navigator.isExcluded"
-                               value="false">
-                          </test>
-                          <test
-                               property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
-                               value="false">
-                          </test>
                        </and>
-                    </adapt>
+                       <instanceof
+                             value="org.eclipse.core.resources.IFolder">
+                       </instanceof>
+                       <instanceof
+                             value="org.eclipse.core.resources.IProject">
+                       </instanceof>
+                    </or>
+                   <and>
+                      <instanceof
+                           value="org.eclipse.core.resources.IResource" />
+                      <test
+                           property="org.robotframework.redxml.navigator.isHidden"
+                           value="false">
+                      </test>
+                      <test
+                           property="org.robotframework.redxml.navigator.isExcluded"
+                           value="false">
+                      </test>
+                      <test
+                           property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
+                           value="false">
+                      </test>
+                   </and>
                   </and>
                </iterate>
             </with>
@@ -1974,13 +1938,12 @@
               <iterate
                     ifEmpty="false"
                     operator="and">
-                 <adapt
-                       type="org.eclipse.core.resources.IResource">
+	                 <instanceof
+	                       value="org.eclipse.core.resources.IResource" />
                     <test
                           property="org.eclipse.core.resources.projectNature"
                           value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                     </test>
-                 </adapt>
               </iterate>
            </with>
         </activeWhen>
@@ -1991,8 +1954,9 @@
                     ifEmpty="false"
                     operator="or">
                  <or>
-                    <adapt
-                          type="org.eclipse.core.resources.IFile">
+                 	<and>
+                    	<instanceof
+                          value="org.eclipse.core.resources.IFile" />
                        <or>
                           <test
                                 property="org.eclipse.core.resources.name"
@@ -2011,13 +1975,13 @@
                                 value="*.tsv">
                           </test>
                        </or>
-                    </adapt>
-                    <adapt
-                          type="org.eclipse.core.resources.IFolder">
-                    </adapt>
-                    <adapt
-                          type="org.eclipse.core.resources.IProject">
-                    </adapt>
+                    </and>
+                    <instanceof
+                          value="org.eclipse.core.resources.IFolder">
+                    </instanceof>
+                    <instanceof
+                          value="org.eclipse.core.resources.IProject">
+                    </instanceof>
                  </or>
               </iterate>
            </with>
@@ -3477,6 +3441,12 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
+					<instanceof
+                          value="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+					</instanceof>
+                   <instanceof
+                          value="org.eclipse.core.resources.IResource">
+					</instanceof>
                 <and>
                	 <or>
                   	 <test
@@ -3515,6 +3485,12 @@
              <iterate
                    ifEmpty="false"
                    operator="and">
+               <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+				</instanceof>
+               <instanceof
+                      value="org.eclipse.core.resources.IResource">
+				</instanceof>
                 <and>
                 	<or>
                    		<test
@@ -3897,8 +3873,6 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <adapt
-                            type="org.eclipse.core.resources.IResource">
                          <and>
                             <instanceof
                                   value="org.eclipse.core.resources.IProject">
@@ -3910,7 +3884,6 @@
                                </test>
                             </not>
                          </and>
-                      </adapt>
                    </iterate>
                 </with>
              </visibleWhen>
@@ -3931,8 +3904,6 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <adapt
-                            type="org.eclipse.core.resources.IResource">
                          <and>
                             <instanceof
                                   value="org.eclipse.core.resources.IProject">
@@ -3942,7 +3913,6 @@
                                   value="org.robotframework.ide.eclipse.main.plugin.robotNature">
                             </test>
                          </and>
-                      </adapt>
                    </iterate>
                 </with>
              </visibleWhen>
@@ -4043,13 +4013,14 @@
                    </count>
                    <iterate
                       ifEmpty="false">
-                      <adapt
-                            type="org.eclipse.core.resources.IMarker">
-                         <test
-                               property="org.eclipse.ui.ide.marker.type"
-                               value="org.robotframework.ide.eclipse.main.plugin.rfLintProblem">
-                         </test>
-                      </adapt>
+                         <and>
+	                         <instanceof
+	                            value="org.eclipse.core.resources.IMarker" />
+	                         <test
+	                               property="org.eclipse.ui.ide.marker.type"
+	                               value="org.robotframework.ide.eclipse.main.plugin.rfLintProblem">
+	                         </test>
+                         </and>
                    </iterate>
                 </and>
              </with>
@@ -5927,6 +5898,8 @@
        <with
              variable="selection">
           <and>
+		  <instanceof value="org.eclipse.jface.viewers.IStructuredSelection">
+		  </instanceof>
              <test
                    property="org.robotframework.selection.allElementsHaveSameType"
                    value="true">
@@ -7157,6 +7130,7 @@
                      <count
                            value="1">
                      </count>
+					 <instanceof value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode" />
                      <iterate
                            ifEmpty="false"
                            operator="and">
@@ -7188,6 +7162,8 @@
                <with
                      variable="activePart">
                   <and>
+				     <instanceof
+			               value="org.eclipse.debug.core.ILaunchConfiguration" />
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7207,6 +7183,8 @@
                <with
                      variable="activePart">
                   <and>
+				  <instanceof
+			               value="org.eclipse.debug.core.ILaunchConfiguration" />
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7229,6 +7207,8 @@
             <enabledWhen>
                <with
                      variable="activePart">
+					 <instanceof
+			               value="org.eclipse.debug.core.ILaunchConfiguration" />
                   <test
                         property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                         value="true">
