@@ -7,11 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.io.File;
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -59,20 +60,18 @@ public class RerunFailedHandler extends DIParameterizedHandler<E4ShowFailedOnlyH
         @VisibleForTesting
         static ILaunchConfigurationWorkingCopy getConfig(final RobotTestsLaunch launch) throws CoreException {
             final ILaunchConfiguration launchConfig = launch.getLaunchConfiguration();
+
             if (launchConfig != null && launchConfig.exists()) {
-                // FIXME : do not use -R launching; instead collect failed tests from the
-                // tree and launch test basing on -s and -t switches
-                final Optional<String> outputFilePath = launch.getExecutionData(ExecutionStatusStore.class)
-                        .map(ExecutionStatusStore::getOutputFilePath)
-                        .map(File::new)
-                        .filter(File::exists)
-                        .map(File::getAbsolutePath);
-                if (outputFilePath.isPresent()) {
-                    final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
-                    RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy, outputFilePath.get());
+                final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
+                final IProject project = new RobotLaunchConfiguration(launchConfigCopy).getProject();
+                final ExecutionStatusStore statusStore = launch.getExecutionData(ExecutionStatusStore.class).get();
+                final Map<String, List<String>> failedSuitesPaths = statusStore.getFailedSuitePaths(project);
+
+                if (!failedSuitesPaths.isEmpty()) {
+                    RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy, failedSuitesPaths);
                     return launchConfigCopy;
                 } else {
-                    throw newCoreException("Output file does not exist");
+                    throw newCoreException("Failed tests do not exist");
                 }
             } else {
                 throw newCoreException("Launch configuration does not exist");

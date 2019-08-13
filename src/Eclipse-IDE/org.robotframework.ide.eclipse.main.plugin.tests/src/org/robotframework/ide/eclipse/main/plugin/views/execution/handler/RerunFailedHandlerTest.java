@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.spy;
@@ -12,22 +13,32 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
+import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.ResourceCreator;
 import org.robotframework.red.junit.RunConfigurationProvider;
 
 import com.google.common.collect.ImmutableMap;
-
 public class RerunFailedHandlerTest {
+
+    private static final String PROJECT_NAME = RerunFailedHandlerTest.class.getSimpleName();
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
     public RunConfigurationProvider robotRunConfigurationProvider = new RunConfigurationProvider(
@@ -35,6 +46,9 @@ public class RerunFailedHandlerTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public ResourceCreator resourceCreator = new ResourceCreator();
 
     @Test
     public void coreExceptionIsThrown_whenConfigurationIsNull() throws Exception {
@@ -62,71 +76,148 @@ public class RerunFailedHandlerTest {
     }
 
     @Test
-    public void coreExceptionIsThrown_whenConfigurationExistsButOutputFileIsNotSet() throws Exception {
+    public void coreExceptionIsThrown_whenConfigurationExistsButFailedTestsDoNotExist() throws Exception {
         final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
         when(configuration.exists()).thenReturn(true);
 
-        final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+
+        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
+        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
+        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        suite.addChildren(newArrayList(test));
+        root.addChildren(newArrayList(suite));
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
-                .withMessage("Output file does not exist")
+                .withMessage("Failed tests do not exist")
                 .withNoCause();
     }
 
     @Test
-    public void coreExceptionIsThrown_whenConfigurationExistsButOutputFileDoesNotExist() throws Exception {
+    public void configurationForFailedTestsRerunIsReturned_whenFailedTestsExist() throws Exception {
         final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
         when(configuration.exists()).thenReturn(true);
 
-        final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
-        setOutputFilePath(launch, new URI("file:///not_existing_output.xml"));
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+        projectProvider.createFile("suite.robot");
 
-        assertThatExceptionOfType(CoreException.class)
-                .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
-                .withMessage("Output file does not exist")
-                .withNoCause();
-    }
+        final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
 
-    @Test
-    public void configurationForFailedTestsRerunIsReturned_whenOutputFileExists() throws Exception {
-        final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
-        when(configuration.exists()).thenReturn(true);
-
-        final File output = tempFolder.newFile("existing_output.xml");
-        final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
-        setOutputFilePath(launch, output.toURI());
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
         assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Robot arguments", "-R " + output.getAbsolutePath())
-                .containsEntry("Test suites", new HashMap<>());
+                .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
     }
 
     @Test
-    public void configurationForFailedTestRerunIsReturned_whenOutputFileExistsAndCustomRobotArgumentsAreSet()
+    public void configurationForFailedTestsRerunIsReturned_whenFailedTestsExistAndSuiteIsNested() throws Exception {
+        final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
+        when(configuration.exists()).thenReturn(true);
+
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+        projectProvider.createDir("dir");
+        projectProvider.createDir("dir/dir");
+        projectProvider.createFile("dir/dir/suite.robot");
+
+        final ExecutionStatusStore store = createExecutionStatusStore("/dir/dir/suite.robot");
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
+
+        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+                .containsEntry("Test suites", ImmutableMap.of("dir/dir/suite.robot", "test"));
+    }
+
+    @Test
+    public void configurationForFailedTestsRerunIsReturned_whenFailedTestsExistAndSuiteIsLinked() throws Exception {
+        final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
+        when(configuration.exists()).thenReturn(true);
+
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+
+        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
+        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
+        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+
+        final ExecutionStatusStore store = createExecutionStatusStore("/linkedSuite.robot");
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
+
+        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+                .containsEntry("Test suites", ImmutableMap.of("linkedSuite.robot", "test"));
+    }
+
+    @Test
+    public void configurationForFailedTestsRerunIsReturned_whenFailedTestsExistAndSuiteIsLinkedAndNasted()
+            throws Exception {
+        final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
+        when(configuration.exists()).thenReturn(true);
+
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+
+        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
+        final IFile linkedSuite = projectProvider.getFile("dir/linkedSuite.robot");
+        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+
+        final ExecutionStatusStore store = createExecutionStatusStore("/dir/linkedSuite.robot");
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
+
+        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+                .containsEntry("Test suites", ImmutableMap.of("dir/linkedSuite.robot", "test"));
+    }
+
+    @Test
+    public void configurationForFailedTestRerunIsReturned_whenFailedTestsExistAndCustomRobotArgumentsAreSet()
             throws Exception {
         final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
         when(configuration.exists()).thenReturn(true);
         configuration.setAttribute("Robot arguments", "-a -b -c");
-        configuration.setAttribute("Test suites", ImmutableMap.of("Suite", "test_a::test_b::test_c"));
 
-        final File output = tempFolder.newFile("existing_output.xml");
-        final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
-        setOutputFilePath(launch, output.toURI());
+        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName(projectProvider.getProject().getName());
+        projectProvider.createFile("suite.robot");
 
+        final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
         assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Robot arguments", "-a -b -c -R " + output.getAbsolutePath())
-                .containsEntry("Test suites", new HashMap<>());
+                .containsEntry("Robot arguments", "-a -b -c")
+                .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
     }
 
     private ILaunchConfigurationWorkingCopy createConfigurationSpy() throws CoreException {
         return spy(robotRunConfigurationProvider.create("robot").getWorkingCopy());
     }
 
-    private void setOutputFilePath(final RobotTestsLaunch launch, final URI path) {
-        final ExecutionStatusTracker tracker = new ExecutionStatusTracker(launch);
-        tracker.eventsProcessingAboutToStart();
-        tracker.handleOutputFile(new OutputFileEvent(path));
-    }
+    private ExecutionStatusStore createExecutionStatusStore(final String suitePath) {
+        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
+        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
+        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        test.setStatus(Status.FAIL);
+        suite.setPath(
+                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + suitePath));
+        suite.addChildren(newArrayList(test));
+        root.addChildren(newArrayList(suite));
 
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+        return store;
+    }
 }

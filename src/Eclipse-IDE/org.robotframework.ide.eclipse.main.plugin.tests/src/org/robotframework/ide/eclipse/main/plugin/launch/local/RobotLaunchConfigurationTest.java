@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -335,29 +336,41 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void filePathIsAddedToRobotArguments_whenAskedForRerunWithoutExistingArguments() throws CoreException {
+    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithoutExistingArguments()
+            throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(projectProvider.getFile("Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
+        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
+        failedSuitePaths.put("Suite1", asList("test1", "test2"));
+        failedSuitePaths.put("Suite2", asList("test1", "test2"));
 
-        assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
-        assertThat(robotConfig.getSuitePaths()).isEmpty();
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), failedSuitePaths);
+
+        assertThat(robotConfig.getRobotArguments()).isEmpty();
+        assertThat(robotConfig.getSuitePaths()).hasSize(2);
+        assertThat(robotConfig.getSuitePaths()).containsEntry("Suite1", asList("test1", "test2"));
+        assertThat(robotConfig.getSuitePaths()).containsEntry("Suite2", asList("test1", "test2"));
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
     }
 
     @Test
-    public void filePathIsAddedToRobotArguments_whenAskedForRerunWithExistingArguments() throws CoreException {
+    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithExistingArguments()
+            throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(projectProvider.getFile("Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        robotConfig.setRobotArguments("-a -b -c");
-        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
+        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
+        failedSuitePaths.put("Suite", asList("test"));
 
-        assertThat(robotConfig.getRobotArguments()).isEqualTo("-a -b -c -R path");
-        assertThat(robotConfig.getSuitePaths()).isEmpty();
+        robotConfig.setRobotArguments("-a -b -c");
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), failedSuitePaths);
+
+        assertThat(robotConfig.getRobotArguments()).contains("-a -b -c");
+        assertThat(robotConfig.getSuitePaths()).hasSize(1);
+        assertThat(robotConfig.getSuitePaths()).containsEntry("Suite", asList("test"));
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
     }
 

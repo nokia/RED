@@ -62,7 +62,7 @@ public class ExecutionTreeNode {
         return name;
     }
 
-    void setPath(final URI path) {
+    public void setPath(final URI path) {
         this.path = path;
     }
 
@@ -74,7 +74,7 @@ public class ExecutionTreeNode {
         return kind;
     }
 
-    void setStatus(final Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 

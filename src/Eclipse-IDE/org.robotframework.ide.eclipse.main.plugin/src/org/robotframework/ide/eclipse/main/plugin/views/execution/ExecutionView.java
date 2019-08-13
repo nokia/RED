@@ -62,7 +62,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  */
 public class ExecutionView {
-    
+
     public static final String ID = "org.robotframework.ide.ExecutionView";
     private static final String MENU_ID = "org.robotframework.ide.ExecutionView.viewer";
 
@@ -78,7 +78,7 @@ public class ExecutionView {
     private CLabel testsCounterLabel;
     private CLabel passCounterLabel;
     private CLabel failCounterLabel;
-    
+
     private SimpleProgressBar progressBar;
 
     private TreeViewer executionViewer;
@@ -201,7 +201,7 @@ public class ExecutionView {
         menuService.populateContributionManager(mgr, "popup:" + MENU_ID);
         executionViewer.getTree().setMenu(mgr.createContextMenu(executionViewer.getTree()));
     }
-    
+
     private void setInput() {
         // synchronize on service, so that any thread which would like to start another launch
         // will have to wait
@@ -306,7 +306,7 @@ public class ExecutionView {
                 collectElementsToExpand(elementsToExpand, child);
             }
         }
-        
+
     }
 
     private List<ExecutionTreeNode> getPath(final ExecutionTreeNode node) {
@@ -331,7 +331,7 @@ public class ExecutionView {
         ShowFailedOnlyHandler.setCommandState(false);
 
         resetControls();
-        
+
         evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED);
     }
 
@@ -404,9 +404,10 @@ public class ExecutionView {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
             });
-            // execution ended, however the statys store can still be updated by server thread;
-            // we're scheduling a single task (last one as executor will be shutdown) which will
-            // wait for store to be closed and then will set the input for the view
+            // execution ended, however the status store can still be updated by server
+            // thread; we're scheduling a single task (last one as executor will be
+            // shutdown) which will wait for store to be closed and then will set the input
+            // for the view
             executor.schedule(() -> {
                 final ExecutionStatusStore messagesStore = launch.getExecutionData(ExecutionStatusStore.class,
                         ExecutionStatusStore::new);

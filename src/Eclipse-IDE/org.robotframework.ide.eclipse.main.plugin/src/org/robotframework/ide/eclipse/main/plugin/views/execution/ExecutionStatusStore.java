@@ -8,11 +8,19 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.ui.services.IDisposable;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -41,7 +49,7 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     @VisibleForTesting
-    void setExecutionTree(final ExecutionTreeNode root) {
+    public void setExecutionTree(final ExecutionTreeNode root) {
         this.root = root;
     }
 
@@ -181,5 +189,43 @@ public class ExecutionStatusStore implements IDisposable {
 
     void close() {
         isOpen = false;
+    }
+
+    public Map<String, List<String>> getFailedSuitePaths(final IProject project) {
+        final List<ExecutionTreeNode> nodes = this.getExecutionTree().getChildren();
+        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
+        for (final ExecutionTreeNode node : nodes) {
+            final List<String> failedTests = getFailedChildren(node);
+            if (!failedTests.isEmpty()) {
+                final IWorkspaceRoot root = project.getWorkspace().getRoot();
+                final RedWorkspace workspace = new RedWorkspace(root);
+                final IResource resource = workspace.forUri(node.getPath());
+                final String path = resource.getProjectRelativePath().toPortableString();
+                failedSuitePaths.put(path, failedTests);
+            }
+        }
+        return failedSuitePaths;
+    };
+
+    private List<String> getFailedChildren(final ExecutionTreeNode node) {
+        final List<String> failedTests = new ArrayList<>();
+        collectFailedTestsPaths(node, failedTests, "");
+        return failedTests;
+    }
+
+    private void collectFailedTestsPaths(final ExecutionTreeNode node, final List<String> failedTests,
+            final String currentPath) {
+        final ExecutionTreeNode current = node;
+        String newPath = currentPath.isEmpty() ? current.getName() : currentPath + "." + current.getName();
+        if (current.getKind() == ElementKind.SUITE) {
+            for (final ExecutionTreeNode c : current.getChildren()) {
+                collectFailedTestsPaths(c, failedTests, newPath);
+            }
+        } else {
+            if (current.getStatus().equals(Optional.of(Status.FAIL))) {
+                newPath = newPath.substring(newPath.indexOf(".") + 1);
+                failedTests.add(newPath);
+            }
+        }
     }
 }

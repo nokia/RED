@@ -136,7 +136,8 @@ class LocalProcessCommandLineBuilder {
             builder.withDataSources(
                     dataSources.stream().map(IResource::getLocation).map(IPath::toFile).collect(toList()));
             if (!suitePaths.isEmpty()) {
-                final String topLevelSuiteName = RobotPathsNaming.createTopLevelSuiteName(dataSources);
+                final String topLevelSuiteName = createTopLevelSuiteName(dataSources,
+                        parseArguments(robotConfig.getRobotArguments()));
                 final Function<IResource, List<String>> mapper = r -> {
                     if (r.isLinked(IResource.CHECK_ANCESTORS)) {
                         return newArrayList(removeFileExtensionIfNeeded(r, r.getLocation()).lastSegment());
@@ -234,4 +235,18 @@ class LocalProcessCommandLineBuilder {
                 .noneMatch(r -> !r.isVirtual() && r.getLocation().isPrefixOf(resource.getLocation()));
     }
 
+    static String createTopLevelSuiteName(final List<IResource> dataSources, final List<String> customRobotArguments) {
+        for (int i = customRobotArguments.size() - 1; i >= 0; i--) {
+            final String arg = customRobotArguments.get(i);
+            if (arg.equals("--name") || arg.equals("-N")) {
+                if (i < customRobotArguments.size() - 1) {
+                    final String nameValue = customRobotArguments.get(i + 1);
+                    if (!nameValue.isEmpty() && !nameValue.startsWith("-")) {
+                        return nameValue;
+                    }
+                }
+            }
+        }
+        return RobotPathsNaming.createTopLevelSuiteName(dataSources);
+    }
 }

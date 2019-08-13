@@ -8,17 +8,29 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.eclipse.core.runtime.CoreException;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
+import org.robotframework.red.junit.ProjectProvider;
 
 public class ExecutionStatusStoreTest {
+
+    private static final String PROJECT_NAME = ExecutionStatusStoreTest.class.getSimpleName();
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Test
     public void newlyCreatedStoreHaveZeroedCountersAndNoTree() {
@@ -227,7 +239,7 @@ public class ExecutionStatusStoreTest {
         store.setCurrent(current);
 
         store.testStarted();
-        
+
         assertThat(current.getStatus()).isEqualTo(Optional.of(Status.RUNNING));
         assertThat(store.getCurrentTest()).isEqualTo(1);
     }
@@ -317,7 +329,7 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(new ExecutionTreeNode(null, ElementKind.SUITE, "r"));
         store.setCurrent(new ExecutionTreeNode(null, ElementKind.SUITE, "s"));
-        
+
         assertThat(store.isDisposed()).isFalse();
 
         store.dispose();
@@ -325,5 +337,103 @@ public class ExecutionStatusStoreTest {
         assertThat(store.getExecutionTree()).isNull();
         assertThat(store.getCurrent()).isNull();
         assertThat(store.isDisposed()).isTrue();
+    }
+
+    @Test
+    public void whenManySuitesContainFailedTests_failedSuitePathsMapIsReturnedWithManySuites()
+            throws IOException, CoreException {
+        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
+        final ExecutionTreeNode suite1 = new ExecutionTreeNode(root, ElementKind.SUITE, "suite1");
+        final ExecutionTreeNode suite2 = new ExecutionTreeNode(root, ElementKind.SUITE, "suite2");
+        final ExecutionTreeNode suite3 = new ExecutionTreeNode(root, ElementKind.SUITE, "suite3");
+        final ExecutionTreeNode suite4 = new ExecutionTreeNode(root, ElementKind.SUITE, "suite4");
+        final ExecutionTreeNode test1_failed = new ExecutionTreeNode(suite1, ElementKind.TEST, "test1");
+        final ExecutionTreeNode test1_passed = new ExecutionTreeNode(suite1, ElementKind.TEST, "test2");
+        final ExecutionTreeNode test2_failed = new ExecutionTreeNode(suite2, ElementKind.TEST, "test1");
+        final ExecutionTreeNode test2_passed = new ExecutionTreeNode(suite2, ElementKind.TEST, "test2");
+        final ExecutionTreeNode test3_passed = new ExecutionTreeNode(suite3, ElementKind.TEST, "test1");
+        final ExecutionTreeNode test4_passed = new ExecutionTreeNode(suite4, ElementKind.TEST, "test1");
+        test1_failed.setStatus(Status.FAIL);
+        test2_failed.setStatus(Status.FAIL);
+        suite1.setPath(URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+        suite2.setPath(URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+        suite3.setPath(URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite3.robot"));
+        suite4.setPath(URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite4.robot"));
+        suite1.addChildren(newArrayList(test1_failed, test1_passed));
+        suite2.addChildren(newArrayList(test2_failed, test2_passed));
+        suite3.addChildren(newArrayList(test3_passed));
+        suite4.addChildren(newArrayList(test4_passed));
+        root.addChildren(newArrayList(suite1, suite2, suite3, suite4));
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        projectProvider.createFile("suite1.robot");
+        projectProvider.createFile("suite2.robot");
+        projectProvider.createFile("suite3.robot");
+        projectProvider.createFile("suite4.robot");
+
+        assertThat(store.getFailedSuitePaths(projectProvider.getProject()))
+                .containsEntry("suite1.robot", newArrayList("test1"))
+                .containsEntry("suite2.robot", newArrayList("test1"));
+    }
+
+    @Test
+    public void whenSingleSuiteContainsFailedTests_failedSuitePathsMapIsReturnedWithSingleSuite()
+            throws IOException, CoreException {
+        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
+        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
+        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        test.setStatus(Status.FAIL);
+        suite.setPath(
+                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+        suite.addChildren(newArrayList(test));
+        root.addChildren(newArrayList(suite));
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        projectProvider.createFile("suite.robot");
+
+        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).containsEntry("suite.robot",
+                newArrayList("test"));
+    }
+
+    @Test
+    public void whenSingleSuiteContainsFailedTestsAndSingleSuitePreferenceIsSet_failedSuitePathsMapIsReturnedWithSingleSuite()
+            throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final ExecutionTreeNode suite = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
+        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        test.setStatus(Status.FAIL);
+        test.setPath(
+                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+        suite.addChildren(newArrayList(test));
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(suite);
+
+        projectProvider.createFile("suite.robot");
+
+        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).containsEntry("suite.robot",
+                newArrayList("test"));
+    }
+
+    @Test
+    public void whenFailedTestsDoNotExist_emptyFailedSuitePathsMapIsReturned() {
+        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
+        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
+        root.addChildren(newArrayList(suite));
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).isEmpty();
     }
 }
