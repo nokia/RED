@@ -3474,10 +3474,16 @@
        <enabledWhen>
           <with
                 variable="selection">
+             <instanceof
+                   value="org.eclipse.jface.viewers.IStructuredSelection">
+             </instanceof>
              <iterate
                    ifEmpty="false"
                    operator="and">
                 <and>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+                   </instanceof>
                	 <or>
                   	 <test
                          property="org.robotframework.redxml.validation.isInternalFolder"
@@ -3512,10 +3518,16 @@
        <enabledWhen>
           <with
                 variable="selection">
+             <instanceof
+                   value="org.eclipse.jface.viewers.IStructuredSelection">
+             </instanceof>
              <iterate
                    ifEmpty="false"
                    operator="and">
                 <and>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
+                   </instanceof>
                 	<or>
                    		<test
                         	 property="org.robotframework.redxml.validation.isInternalFolder"
@@ -5431,7 +5443,7 @@
           id="org.robotframework.selectionsPropertyTester"
           namespace="org.robotframework.selection"
           properties="allElementsHaveSameType,selectedActualFile,keywordCallButNotDocumentation,isMetadataSelected"
-          type="org.eclipse.jface.viewers.IStructuredSelection">
+          type="org.eclipse.jface.viewers.ISelection">
     </propertyTester>
     <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
@@ -7154,12 +7166,18 @@
                <with
                      variable="selection">
                   <and>
+                     <instanceof
+                           value="org.eclipse.jface.viewers.IStructuredSelection">
+                     </instanceof>
                      <count
                            value="1">
                      </count>
                      <iterate
                            ifEmpty="false"
                            operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode">
+                        </instanceof>
                         <test
                               property="org.robotframework.red.view.execution.node.kind"
                               value="test">
@@ -7188,6 +7206,9 @@
                <with
                      variable="activePart">
                   <and>
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+                     </instanceof>
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7207,6 +7228,9 @@
                <with
                      variable="activePart">
                   <and>
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+                     </instanceof>
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7229,6 +7253,9 @@
             <enabledWhen>
                <with
                      variable="activePart">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+                  </instanceof>
                   <test
                         property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                         value="true">

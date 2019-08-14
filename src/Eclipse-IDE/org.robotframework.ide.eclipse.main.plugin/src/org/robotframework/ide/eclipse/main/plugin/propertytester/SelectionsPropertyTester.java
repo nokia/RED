@@ -12,6 +12,7 @@ import java.util.Set;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -40,11 +41,11 @@ public class SelectionsPropertyTester extends PropertyTester {
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
-        Preconditions.checkArgument(receiver instanceof IStructuredSelection,
+        Preconditions.checkArgument(receiver instanceof ISelection,
                 "Property tester is unable to test properties of " + receiver.getClass().getName()
-                        + ". It should be used with " + IStructuredSelection.class.getName());
+                        + ". It should be used with " + ISelection.class.getName());
 
-        if (expectedValue instanceof Boolean) {
+        if (expectedValue instanceof Boolean && receiver instanceof IStructuredSelection) {
             return testProperty((IStructuredSelection) receiver, property, ((Boolean) expectedValue).booleanValue());
         }
         return false;

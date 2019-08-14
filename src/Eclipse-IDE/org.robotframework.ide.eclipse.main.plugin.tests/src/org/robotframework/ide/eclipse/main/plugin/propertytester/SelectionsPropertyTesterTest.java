@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class SelectionsPropertyTesterTest {
     public void exceptionIsThrown_whenReceiverIsNotStructuredSelection() {
         assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
                 .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                        + IStructuredSelection.class.getName())
+                        + ISelection.class.getName())
                 .withNoCause();
     }
 
