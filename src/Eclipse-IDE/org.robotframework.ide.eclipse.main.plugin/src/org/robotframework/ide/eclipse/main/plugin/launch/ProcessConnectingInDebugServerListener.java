@@ -23,15 +23,18 @@ public class ProcessConnectingInDebugServerListener extends ProcessConnectingInR
     public void clientConnected(final int clientId) {
         super.clientConnected(clientId);
 
-        Optional<RobotDebugTarget> debugTarget = getDebugTarget();
-        while (!debugTarget.isPresent()) {
+        Optional<RobotDebugTarget> debugTarget;
+        do {
             debugTarget = getDebugTarget();
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                // retry
+            if (!debugTarget.isPresent()) {
+                try {
+                    Thread.sleep(100);
+                } catch (final InterruptedException e) {
+                    // retry
+                }
             }
-        }
+        } while (!debugTarget.isPresent());
+
         debugTarget.get().connected();
     }
 
