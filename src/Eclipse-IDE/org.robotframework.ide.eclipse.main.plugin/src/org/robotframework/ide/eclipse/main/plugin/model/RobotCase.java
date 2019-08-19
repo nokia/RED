@@ -65,7 +65,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     @Override
     public ImageDescriptor getImage() {
         final TestCase testCase = getLinkedElement();
-        return testCase != null && testCase.isDataDrivenTestCase() ? RedImages.getTemplatedTestCaseImage()
+        return testCase != null && testCase.getTemplateKeywordName().isPresent() ? RedImages.getTemplatedTestCaseImage()
                 : RedImages.getTestCaseImage();
     }
 
@@ -88,7 +88,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     @Override
     public Optional<String> getTemplateInUse() {
-        return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
+        return getLinkedElement().getTemplateKeywordName();
     }
 
     @SuppressWarnings("unchecked")

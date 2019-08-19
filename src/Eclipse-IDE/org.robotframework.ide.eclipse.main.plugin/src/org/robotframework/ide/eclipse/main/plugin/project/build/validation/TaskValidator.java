@@ -81,7 +81,7 @@ class TaskValidator implements ModelUnitValidator {
         final List<ExecutableValidator> execValidators = new ArrayList<>();
 
         final SilentReporter silentReporter = new SilentReporter();
-        
+
         // not validated; will just add variables if any
         getGeneralSettingsSuiteSetups().stream()
                 .findFirst()
@@ -103,8 +103,7 @@ class TaskValidator implements ModelUnitValidator {
         }
 
 
-        final String templateKeyword = task.getTemplateKeywordName();
-        if (templateKeyword == null) {
+        if (!task.getTemplateKeywordName().isPresent()) {
             task.getExecutionContext()
                     .stream()
                     .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))

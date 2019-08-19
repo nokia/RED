@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
+import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -25,7 +26,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.CompoundHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentationHyperlink;
@@ -60,22 +60,19 @@ abstract class HyperlinksToKeywordsDetector {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
         final AccessibleKeywordsEntities context = createEntities(suiteFile);
-        final ListMultimap<String, KeywordEntity> keywordProposal = context.findPossibleKeywords(keywordName, false);
-        final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName,
-                gherkinNameVariant -> context.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                        ? Optional.of(gherkinNameVariant)
-                        : Optional.empty());
+        final ListMultimap<String, KeywordEntity> foundKeywords = context.findPossibleKeywords(keywordName, false);
+        final Optional<String> nameToUse = context.findAccessibleGherkinNameVariant(foundKeywords, keywordName);
 
         if (!nameToUse.isPresent()) {
             return hyperlinks;
         }
-        final String name = nameToUse.get().isEmpty() ? keywordName : nameToUse.get().toString();
+        final String name = nameToUse.filter(not(String::isEmpty)).orElse(keywordName);
 
         final int lengthOfRemovedPrefix = keywordName.length() - name.length();
         final IRegion adjustedFromRegion = new Region(fromRegion.getOffset() + lengthOfRemovedPrefix,
                 fromRegion.getLength() - lengthOfRemovedPrefix);
 
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = context.getPossibleKeywords(keywordProposal, name);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = context.getPossibleKeywords(foundKeywords, name);
 
         final List<IHyperlink> definitionHyperlinks = new ArrayList<>();
         final List<IHyperlink> documentationHyperlinks = new ArrayList<>();

@@ -183,7 +183,7 @@ public class TaskTest {
                 .extracting(AModelElement::getDeclaration)
                 .extracting(RobotToken::getText)
                 .containsExactly("[set]", "[]");
-        
+
         assertThat(task.getUnknownSettings()).hasSize(2)
                 .extracting(AModelElement::getDeclaration)
                 .extracting(RobotToken::getText)
@@ -398,7 +398,7 @@ public class TaskTest {
         template.addToken("to");
         template.addToken("use");
 
-        assertThat(task.getTemplateKeywordName()).isEqualTo("keyword to use");
+        assertThat(task.getTemplateKeywordName()).hasValue("keyword to use");
     }
 
     @Test
@@ -417,7 +417,7 @@ public class TaskTest {
         final LocalSetting<Task> template = task.newTemplate(0);
         template.addToken("keyword");
 
-        assertThat(task.getTemplateKeywordName()).isEqualTo("keyword");
+        assertThat(task.getTemplateKeywordName()).hasValue("keyword");
     }
 
     @Test
@@ -433,7 +433,7 @@ public class TaskTest {
         final Task task = new Task(RobotToken.create("task"));
         task.setParent(table);
 
-        assertThat(task.getTemplateKeywordName()).isEqualTo("global kw");
+        assertThat(task.getTemplateKeywordName()).hasValue("global kw");
     }
 
     @Test
@@ -449,7 +449,7 @@ public class TaskTest {
         final LocalSetting<Task> template2 = task.newTemplate(1);
         template2.addToken("keyword2");
 
-        assertThat(task.getTemplateKeywordName()).isNull();
+        assertThat(task.getTemplateKeywordName()).isEmpty();
     }
 
     @Test
@@ -468,7 +468,7 @@ public class TaskTest {
         final LocalSetting<Task> template = task.newTemplate(0);
         template.addToken("NONE");
 
-        assertThat(task.getTemplateKeywordName()).isNull();
+        assertThat(task.getTemplateKeywordName()).isEmpty();
     }
 
     private static RobotExecutableRow<Task> row(final String... cells) {

@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.environment.RobotVersion;
@@ -29,8 +30,6 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Strings;
 
 public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Serializable {
 
@@ -344,22 +343,20 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         return tokens;
     }
 
-    public boolean isDataDrivenTestCase() {
-        return getTemplateKeywordName() != null;
-    }
-
-    public String getTemplateKeywordName() {
+    public Optional<String> getTemplateKeywordName() {
         final String keywordName = getLocalTestTemplateInUse();
 
         if (keywordName == null) {
             final SettingTable settingTable = getParent().getParent().getSettingTable();
-            return settingTable.isPresent() ? Strings.emptyToNull(settingTable.getTestTemplateInUse()) : null;
+            return settingTable.isPresent()
+                    ? Optional.ofNullable(settingTable.getTestTemplateInUse()).filter(name -> !name.isEmpty())
+                    : Optional.empty();
 
         } else if (keywordName.isEmpty() || keywordName.equalsIgnoreCase("none")) {
-            return null;
+            return Optional.empty();
 
         } else {
-            return keywordName;
+            return Optional.of(keywordName);
         }
     }
 
@@ -367,7 +364,8 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
         final List<LocalSetting<TestCase>> templates = getTemplates();
         if (templates.size() == 1) {
             final LocalSetting<TestCase> template = templates.get(0);
-            return template.getTokensWithoutDeclaration().stream()
+            return template.getTokensWithoutDeclaration()
+                    .stream()
                     .filter(t -> t != null)
                     .map(RobotToken::getText)
                     .collect(joining(" "));

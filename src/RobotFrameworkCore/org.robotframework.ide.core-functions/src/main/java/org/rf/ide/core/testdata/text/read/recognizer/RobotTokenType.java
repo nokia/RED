@@ -482,6 +482,9 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
+    /**
+     */
+    TEST_CASE_TEMPLATE_ARGUMENT(TableType.TEST_CASES),
 
 
     TASK_SETTING_UNKNOWN_DECLARATION(TableType.TASKS, true),
@@ -523,6 +526,7 @@ public enum RobotTokenType implements IRobotTokenType {
     TASK_NAME(TableType.TASKS),
     TASK_ACTION_NAME(TableType.TASKS),
     TASK_ACTION_ARGUMENT(TableType.TASKS),
+    TASK_TEMPLATE_ARGUMENT(TableType.TASKS),
 
 
     KEYWORD_SETTING_NAME_DUPLICATION(TableType.KEYWORDS, true),

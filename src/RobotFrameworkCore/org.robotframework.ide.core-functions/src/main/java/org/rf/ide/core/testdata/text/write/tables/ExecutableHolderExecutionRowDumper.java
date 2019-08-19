@@ -7,7 +7,6 @@ package org.rf.ide.core.testdata.text.write.tables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,26 +42,20 @@ class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
             final AModelElement<? extends IExecutableStepsHolder<?>> currentElement) {
-        final RobotExecutableRow<?> userKeyword = (RobotExecutableRow<?>) currentElement;
+        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) currentElement;
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
 
         final List<RobotTokenType> tokenTypes = TYPES.get(servedType);
 
-        sorter.addPresaveSequenceForType(tokenTypes.get(0), 1, getAction(userKeyword));
-        sorter.addPresaveSequenceForType(tokenTypes.get(1), 2, userKeyword.getArguments());
-        sorter.addPresaveSequenceForType(tokenTypes.get(2), 3,
-                elemUtility.filter(userKeyword.getComment(), tokenTypes.get(2)));
-        sorter.addPresaveSequenceForType(tokenTypes.get(3), 4,
-                elemUtility.filter(userKeyword.getComment(), tokenTypes.get(3)));
+        sorter.addPresaveSequenceForType(tokenTypes.get(0), 1, getAction(row));
+        sorter.addPresaveSequenceForType(tokenTypes.get(1), 2, row.getArguments());
+        sorter.addPresaveSequenceForType(tokenTypes.get(2), 3, elemUtility.filter(row.getComment(), tokenTypes.get(2)));
+        sorter.addPresaveSequenceForType(tokenTypes.get(3), 4, elemUtility.filter(row.getComment(), tokenTypes.get(3)));
 
         return sorter;
     }
 
-    private List<RobotToken> getAction(final RobotExecutableRow<?> userKeyword) {
-        final List<RobotToken> keys = new ArrayList<>();
-        if (userKeyword.getAction() != null) {
-            keys.add(userKeyword.getAction());
-        }
-        return keys;
+    private List<RobotToken> getAction(final RobotExecutableRow<?> row) {
+        return row.getAction() != null ? newArrayList(row.getAction()) : newArrayList();
     }
 }

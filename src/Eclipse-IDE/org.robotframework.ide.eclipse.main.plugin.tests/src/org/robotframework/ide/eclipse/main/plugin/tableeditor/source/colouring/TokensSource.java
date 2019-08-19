@@ -42,7 +42,6 @@ public class TokensSource {
                 .appendLine("  [Teardown]  tc_setting_call  a1  a2  #comment")
                 .appendLine("  [Timeout]  10  a  b  c  # comment")
                 .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
-                .appendLine("  [Template]  tc_setting_template  tc_setting_template_arg1  tc_setting_template_arg2  # comment")
                 .appendLine("  call  arg  ${x}  # comment   comment")
                 .appendLine("case 2")
                 .appendLine("  call  arg  ${x}  # comment   comment")
@@ -102,7 +101,6 @@ public class TokensSource {
                 .appendLine("Suite Teardown  general_setting_call  def  # comment")
                 .appendLine("Test Setup  general_setting_call  def  # comment")
                 .appendLine("Test Teardown  general_setting_call  def  # comment")
-                .appendLine("Test Template  general_setting_template  general_setting_template_arg  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")
                 .build();
@@ -120,7 +118,6 @@ public class TokensSource {
                         "  [Teardown]  Run Keywords  settings_nestedkw  arg  AND  settings_nestedkw  arg  AND  settings_nestedkw  arg  #comment")
                 .appendLine("  [Timeout]  10  a  b  c  # comment")
                 .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
-                .appendLine("  [Template]  tc_setting_template  b  c  # comment")
                 .appendLine(
                         "  Run Keyword If  cond  nestedkw  arg  ELSE IF  condition  nestedkw  arg  ELSE  nestedkw  arg")
                 .appendLine("  Run Keywords  nestedkw  arg  AND  nestedkw  arg  AND  nestedkw  arg")
@@ -165,7 +162,6 @@ public class TokensSource {
                         "Test Setup  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment  # comment")
                 .appendLine(
                         "Test Teardown  Run Keyword If  cond  settings_nestedkw  arg  ELSE IF  condition  settings_nestedkw  arg  ELSE  settings_nestedkw  arg  #comment  # comment")
-                .appendLine("Test Template  general_setting_template  def  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")
                 .build();
@@ -219,6 +215,28 @@ public class TokensSource {
                 .appendLine("Task Template  NONE")
                 .appendLine("Task Timeout  NONE")
                 .appendLine("UnkownSetting  NONE")
+                .build();
+        return model.getLinkedElement().getFileContent();
+    }
+
+    static List<RobotLine> createTokensOfTemplatedCases() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case 1")
+                .appendLine("  [Template]  tc_setting_template  tc_setting_template_arg1  tc_setting_template_arg2  # comment")
+                .appendLine("  arg1  arg2  # comment   comment")
+                .appendLine("  other1  other2")
+                .appendLine("  a1  a2  a3  a4  # comment")
+                .appendLine("case 2")
+                .appendLine("  arg1  arg2  # comment   comment")
+                .appendLine("  other1  other2")
+                .appendLine("  a1  a2  a3  a4  # comment")
+                .appendLine("case 3")
+                .appendLine("  FOR  ${item}  IN  @{ITEMS}")
+                .appendLine("    a  b  c")
+                .appendLine("    other")
+                .appendLine("  END")
+                .appendLine("*** Settings ***")
+                .appendLine("Test Template  general_setting_template  general_setting_template_arg  # comment")
                 .build();
         return model.getLinkedElement().getFileContent();
     }

@@ -81,7 +81,7 @@ class TestCaseValidator implements ModelUnitValidator {
         final List<ExecutableValidator> execValidators = new ArrayList<>();
 
         final SilentReporter silentReporter = new SilentReporter();
-        
+
         // not validated; will just add variables if any
         getGeneralSettingsSuiteSetups().stream()
                 .findFirst()
@@ -102,8 +102,7 @@ class TestCaseValidator implements ModelUnitValidator {
         }
 
 
-        final String templateKeyword = testCase.getTemplateKeywordName();
-        if (templateKeyword == null) {
+        if (!testCase.getTemplateKeywordName().isPresent()) {
             testCase.getExecutionContext().stream()
                     .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                     .forEach(execValidators::add);

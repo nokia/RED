@@ -411,6 +411,26 @@ public class ExecutableCallRuleTest {
         }
     }
 
+    @Test
+    public void executableCallIsNotRecognized_whenTestCaseHasTemplate() {
+        final List<IRobotLineElement> previousTokens = new ArrayList<>();
+
+        boolean thereWasTemplate = false;
+        final List<RobotLine> lines = TokensSource.createTokensOfTemplatedCases();
+        for (final RobotLine line : lines) {
+            for (final IRobotLineElement token : line.getLineElements()) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, lines);
+                if (token.getText().startsWith("general_setting_template")
+                        || token.getText().startsWith("tc_setting_template")) {
+                    thereWasTemplate = true;
+                }
+                assertThat(evaluatedToken).isNotPresent();
+                previousTokens.add(token);
+            }
+        }
+        assertThat(thereWasTemplate).isTrue();
+    }
+
     private RobotToken createToken(final RobotTokenType actionType, final String kwCall) {
         final RobotToken token = RobotToken.create(kwCall, newArrayList(actionType, RobotTokenType.VARIABLE_USAGE));
         token.setLineNumber(1);

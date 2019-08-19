@@ -10,8 +10,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.base.Predicates.not;
+
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -127,6 +130,27 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     public boolean isValidatingChangedFiles() {
         return context.isValidatingChangedFiles();
+    }
+
+    public ValidationKeywordEntity findAccessibleKeyword(final String keywordName) {
+        final ListMultimap<String, KeywordEntity> foundKeywords = findPossibleKeywords(keywordName);
+        final Optional<String> nameToUse = findAccessibleGherkinNameVariant(foundKeywords, keywordName);
+
+        if (nameToUse.isPresent()) {
+            final String name = nameToUse.filter(not(String::isEmpty)).orElse(keywordName);
+            final ListMultimap<KeywordScope, KeywordEntity> keywords = getPossibleKeywords(foundKeywords, name);
+
+            for (final KeywordScope scope : KeywordScope.defaultOrder()) {
+                final List<KeywordEntity> keywordEntities = keywords.get(scope);
+                if (keywordEntities.size() == 0) {
+                    continue;
+                } else if (keywordEntities.size() == 1) {
+                    return (ValidationKeywordEntity) keywordEntities.get(0);
+                }
+                break;
+            }
+        }
+        return null;
     }
 
     private static final class ValidationKeywordCollector implements AccessibleKeywordsCollector {

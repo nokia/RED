@@ -42,7 +42,7 @@ public class SettingsTemplateRuleTest {
     @Test
     public void generalSettingKeywordCallIsRecognized() {
         boolean thereWasName = false;
-        for (final RobotToken token : TokensSource.createTokens()) {
+        for (final RobotToken token : createTokens(TokensSource::createTokensOfTemplatedCases)) {
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
 
             if (token.getText().startsWith("general_setting_template")
@@ -64,7 +64,7 @@ public class SettingsTemplateRuleTest {
     @Test
     public void generalSettingKeywordCallIsRecognized_evenWhenPositionIsInsideToken() {
         boolean thereWasName = false;
-        for (final RobotToken token : TokensSource.createTokens()) {
+        for (final RobotToken token : createTokens(TokensSource::createTokensOfTemplatedCases)) {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
 

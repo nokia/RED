@@ -65,7 +65,7 @@ public class RobotTask extends RobotCodeHoldingElement<Task> {
     @Override
     public ImageDescriptor getImage() {
         final Task task = getLinkedElement();
-        return task != null && task.isDataDrivenTask() ? RedImages.getTemplatedRpaTaskImage()
+        return task != null && task.getTemplateKeywordName().isPresent() ? RedImages.getTemplatedRpaTaskImage()
                 : RedImages.getRpaTaskImage();
     }
 
@@ -88,7 +88,7 @@ public class RobotTask extends RobotCodeHoldingElement<Task> {
 
     @Override
     public Optional<String> getTemplateInUse() {
-        return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
+        return getLinkedElement().getTemplateKeywordName();
     }
 
     @SuppressWarnings("unchecked")

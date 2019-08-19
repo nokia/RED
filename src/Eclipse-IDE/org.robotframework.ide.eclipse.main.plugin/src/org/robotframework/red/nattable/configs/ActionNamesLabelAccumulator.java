@@ -58,13 +58,16 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
             // another case
             final RobotToken actual = tokens.get(columnPosition);
 
-            if (actual.getTypes().contains(RobotTokenType.FOR_TOKEN)
-                    || actual.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
+            if (actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                    || actual.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)
+                    || actual.getTypes().contains(RobotTokenType.FOR_TOKEN)
+                    || actual.getTypes().contains(RobotTokenType.FOR_END_TOKEN)
+                    || actual.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT)
+                    || actual.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT)) {
                 return;
             }
 
-            if (actual.getText().equals(action.getText()) && actual.getStartOffset() == action.getStartOffset()
-                    && !actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
+            if (actual.getText().equals(action.getText()) && actual.getStartOffset() == action.getStartOffset()) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
             } else {

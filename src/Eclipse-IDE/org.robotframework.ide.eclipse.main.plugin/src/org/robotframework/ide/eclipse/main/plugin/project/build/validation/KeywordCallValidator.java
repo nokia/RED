@@ -14,7 +14,6 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -61,12 +60,8 @@ class KeywordCallValidator implements ModelUnitValidator {
 
     void validateKeywordCall() {
         final String kwName = getActualKeywordName();
-        final ListMultimap<String, KeywordEntity> keywordProposal = validationContext.findPossibleKeywords(kwName);
-
-        final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(kwName,
-                gherkinNameVariant -> validationContext.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                        ? Optional.of(gherkinNameVariant)
-                        : Optional.empty());
+        final ListMultimap<String, KeywordEntity> foundKeywords = validationContext.findPossibleKeywords(kwName);
+        final Optional<String> nameToUse = validationContext.findAccessibleGherkinNameVariant(foundKeywords, kwName);
         final String name = nameToUse.filter(not(String::isEmpty)).orElse(kwName);
         final int offset = keywordNameToken.getStartOffset() + (kwName.length() - name.length());
         final ProblemPosition position = nameToUse.isPresent()
@@ -84,7 +79,7 @@ class KeywordCallValidator implements ModelUnitValidator {
                             AdditionalMarkerAttributes.ORIGINAL_NAME, getActualKeywordName()));
         } else {
             final ListMultimap<KeywordScope, KeywordEntity> keywords = validationContext
-                    .getPossibleKeywords(keywordProposal, name);
+                    .getPossibleKeywords(foundKeywords, name);
 
             for (final KeywordScope scope : KeywordScope.defaultOrder()) {
                 final List<KeywordEntity> keywordEntities = keywords.get(scope);

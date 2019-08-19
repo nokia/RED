@@ -59,10 +59,6 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
         return false;
     }
 
-    public RobotExecutableRow() {
-        this.action = new RobotToken();
-    }
-
     @Override
     public void setParent(final T parent) {
         super.setParent(parent);
@@ -108,10 +104,7 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
     }
 
     public void setArgument(final int index, final String argument) {
-        final RobotToken token = new RobotToken();
-        token.setText(argument);
-
-        setArgument(index, token);
+        setArgument(index, RobotToken.create(argument));
     }
 
     public void setArgument(final int index, final RobotToken argument) {
@@ -151,9 +144,7 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
 
     @Override
     public void setComment(final String comment) {
-        final RobotToken tok = new RobotToken();
-        tok.setText(comment);
-        setComment(tok);
+        setComment(RobotToken.create(comment));
     }
 
     @Override
@@ -380,13 +371,12 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
 
     private void fixMissingTypes() {
         if (getParent() != null) {
-            if (action != null && (getArguments().size() > 0 || action.isNotEmpty() || getComment().size() > 0)) {
+            if (action != null && (!getArguments().isEmpty() || action.isNotEmpty() || !getComment().isEmpty())) {
                 action.getTypes().remove(RobotTokenType.UNKNOWN);
                 fixForTheType(action, getActionType(), true);
             }
 
-            for (int i = 0; i < getArguments().size(); i++) {
-                final RobotToken token = getArguments().get(i);
+            for (final RobotToken token : getArguments()) {
                 token.getTypes().remove(RobotTokenType.UNKNOWN);
                 token.getTypes().remove(getActionType());
                 fixForTheType(token, getArgumentType(), true);

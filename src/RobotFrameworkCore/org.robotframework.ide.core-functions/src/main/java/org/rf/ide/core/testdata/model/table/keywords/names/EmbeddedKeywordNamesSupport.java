@@ -11,7 +11,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -151,8 +150,7 @@ public class EmbeddedKeywordNamesSupport {
         return escapedRegex.toString();
     }
 
-    @VisibleForTesting
-    static RangeSet<Integer> findEmbeddedArgumentsRanges(final String definitionName) {
+    public static RangeSet<Integer> findEmbeddedArgumentsRanges(final String definitionName) {
         final RangeSet<Integer> varRanges = TreeRangeSet.create();
 
         if (definitionName.isEmpty()) {

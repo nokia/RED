@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -28,106 +27,109 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
  */
 public class ActionNamesLabelAccumulatorTest {
 
-    private IRowDataProvider<Object> dataProvider;
-    private LabelStack labels;
-    private ActionNamesLabelAccumulator labelAccumulator;
-    private final RobotSuiteFile model = createModel();
-
-    @SuppressWarnings("unchecked")
-    @Before
-    public void cleanData() {
-        dataProvider = mock(IRowDataProvider.class);
-        labels = new LabelStack();
-        labelAccumulator = new ActionNamesLabelAccumulator(dataProvider);
-    }
-
     @Test
     public void labelIsNotAdded_forEmptyLine() {
         final RobotKeywordCall call = new RobotKeywordCall(null, new RobotEmptyRow<>());
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels()).isEmpty();
+        assertThat(labelsAt(call, 0)).isEmpty();
     }
 
     @Test
     public void labelIsAdded_forSimpleKeywordCall_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        final RobotKeywordCall call = createModel().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 0)).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
     }
 
     @Test
     public void labelIsAdded_forSettingKeywordCall_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(1);
-        when(dataProvider.getRowObject(1)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 1);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        final RobotKeywordCall call = createModel().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+        assertThat(labelsAt(call, 1, 1)).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
     }
 
     @Test
     public void labelIsNotAdded_forSetting_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(1);
-        when(dataProvider.getRowObject(1)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 1);
-        assertThat(labels.getLabels()).isEmpty();
+        final RobotKeywordCall call = createModel().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+        assertThat(labelsAt(call, 0, 1)).isEmpty();
     }
 
     @Test
     public void labelIsNotAdded_forSettingArgument_InTestCases() {
-        final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 2);
-        assertThat(labels.getLabels()).isEmpty();
+        final RobotKeywordCall call = createModel().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(2);
+        assertThat(labelsAt(call, 1, 2)).isEmpty();
     }
 
     @Test
     public void labelIsAdded_forSimpleKeywordCall_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(2);
-        when(dataProvider.getRowObject(2)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 2);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        final RobotKeywordCall call = createModel().findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(2);
+        assertThat(labelsAt(call, 0, 2)).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
     }
 
     @Test
     public void labelIsAdded_forSettingKeywordCall_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
-        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        final RobotKeywordCall call = createModel().findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 1)).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
     }
 
     @Test
     public void labelIsNotAdded_forSetting_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(0);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels()).isEmpty();
+        final RobotKeywordCall call = createModel().findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 0)).isEmpty();
     }
 
     @Test
     public void labelIsNotAdded_forSettingArgument_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(1);
-        when(dataProvider.getRowObject(1)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 1, 1);
-        assertThat(labels.getLabels()).isEmpty();
+        final RobotKeywordCall call = createModel().findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+        assertThat(labelsAt(call, 1, 1)).isEmpty();
     }
 
     @Test
     public void labelIsNotAdded_forSlashThenCommentCase_InKeywords() {
-        final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
-                .get(0).getChildren().get(3);
-        when(dataProvider.getRowObject(3)).thenReturn(call);
-        labelAccumulator.accumulateConfigLabels(labels, 0, 3);
-        assertThat(labels.getLabels()).isEmpty();
+        final RobotKeywordCall call = createModel().findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(3);
+        assertThat(labelsAt(call, 0, 3)).isEmpty();
     }
 
     @Test
@@ -177,14 +179,120 @@ public class ActionNamesLabelAccumulatorTest {
         assertThat(labelsAt(call, 11)).isEmpty();
     }
 
+    @Test
+    public void labelsAreProperlyAdded_forExecutableRowContainingForLoopContinuation() {
+        final RobotKeywordCall call = createModelWithForLoop().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(call, 2)).isEmpty();
+    }
+
+    @Test
+    public void labelsAreProperlyAdded_forExecutableRowContainingForLoopWithEndContinuation() {
+        final RobotKeywordCall call = createModelWithForLoopWithEnd().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(call, 2)).isEmpty();
+    }
+
+    @Test
+    public void labelIsNotAdded_forExecutableRowContainingForLoopStart() {
+        final RobotKeywordCall call = createModelWithForLoop().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).isEmpty();
+        assertThat(labelsAt(call, 2)).isEmpty();
+        assertThat(labelsAt(call, 3)).isEmpty();
+    }
+
+    @Test
+    public void labelIsNotAdded_forExecutableRowContainingForLoopEnd() {
+        final RobotKeywordCall call = createModelWithForLoopWithEnd().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(2);
+        assertThat(labelsAt(call, 0)).isEmpty();
+    }
+
+    @Test
+    public void labelIsAdded_forTestSetupContainingTemplateKeywordCall() {
+        final RobotKeywordCall call = createModelWithTemplate().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelIsNotAdded_forTestTemplateArguments() {
+        final RobotKeywordCall call = createModelWithTemplate().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).isEmpty();
+    }
+
+    @Test
+    public void labelIsNotAdded_forTestSetupContainingTemplateDisable() {
+        final RobotKeywordCall call = createModelWithDisabledTemplate().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        assertThat(labelsAt(call, 0)).isEmpty();
+        assertThat(labelsAt(call, 1)).isEmpty();
+    }
+
+    @Test
+    public void labelsAreProperlyAdded_forExecutableRowInCaseWithDisabledTemplate() {
+        final RobotKeywordCall call = createModelWithDisabledTemplate().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+
+        assertThat(labelsAt(call, 0)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(call, 1)).isEmpty();
+    }
+
     private static List<String> labelsAt(final RobotKeywordCall call, final int column) {
+        return labelsAt(call, column, 0);
+    }
+
+    private static List<String> labelsAt(final RobotKeywordCall call, final int column, final int row) {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getRowObject(0)).thenReturn(call);
+        when(dataProvider.getRowObject(row)).thenReturn(call);
 
         final LabelStack labels = new LabelStack();
         final ActionNamesLabelAccumulator labelAccumulator = new ActionNamesLabelAccumulator(dataProvider);
-        labelAccumulator.accumulateConfigLabels(labels, column, 0);
+        labelAccumulator.accumulateConfigLabels(labels, column, row);
         return labels.getLabels();
     }
 
@@ -212,6 +320,45 @@ public class ActionNamesLabelAccumulatorTest {
                         "  [Setup]  Run Keyword If  condition1  kw1  arg1  ELSE IF  condition2  kw2  arg2  arg3  ELSE  kw3  arg4")
                 .appendLine(
                         "  Run Keyword If  condition1  kw1  arg1  ELSE IF  condition2  kw2  arg2  arg3  ELSE  kw3  arg4")
+                .build();
+    }
+
+    private static RobotSuiteFile createModelWithForLoop() {
+        return new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  FOR  ${index}  IN RANGE  3")
+                .appendLine("    \\  Log  ${index}")
+                .build();
+    }
+
+    private static RobotSuiteFile createModelWithForLoopWithEnd() {
+        return new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  FOR  ${index}  IN RANGE  3")
+                .appendLine("    Log  ${index}")
+                .appendLine("  END")
+                .build();
+    }
+
+    private static RobotSuiteFile createModelWithTemplate() {
+        return new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Template]  Some Kw")
+                .appendLine("    Log  1")
+                .build();
+    }
+
+    private static RobotSuiteFile createModelWithDisabledTemplate() {
+        return new RobotSuiteFileCreator()
+                .appendLine("*** Settings ***")
+                .appendLine("Test Template  Some Kw")
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Template]  NONE")
+                .appendLine("    Log  1")
                 .build();
     }
 }

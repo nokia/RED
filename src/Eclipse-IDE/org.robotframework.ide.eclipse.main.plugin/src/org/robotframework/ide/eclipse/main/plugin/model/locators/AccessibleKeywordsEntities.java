@@ -10,10 +10,12 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -53,6 +55,14 @@ public class AccessibleKeywordsEntities {
             final String keywordName) {
         return (foundKeywords.containsKey(keywordName) || foundKeywords.containsKey(keywordName.toLowerCase())
                 || foundKeywords.containsKey(QualifiedKeywordName.unifyDefinition(keywordName)));
+    }
+
+    public Optional<String> findAccessibleGherkinNameVariant(final ListMultimap<String, KeywordEntity> foundKeywords,
+            final String keywordName) {
+        return GherkinStyleSupport.firstNameTransformationResult(keywordName,
+                gherkinNameVariant -> isKeywordAccessible(foundKeywords, gherkinNameVariant)
+                        ? Optional.of(gherkinNameVariant)
+                        : Optional.empty());
     }
 
     public ListMultimap<String, KeywordEntity> findPossibleKeywords(final String keywordName,
