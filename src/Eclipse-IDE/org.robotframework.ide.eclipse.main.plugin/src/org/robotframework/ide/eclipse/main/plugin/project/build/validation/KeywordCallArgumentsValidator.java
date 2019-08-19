@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.Binde
 import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.RobotTokenAsArgExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.TaggedCallSiteArguments;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
@@ -88,13 +89,22 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         }
     }
 
+    protected String getKeywordName() {
+        return definingToken.getText();
+    }
+
+    protected ProblemPosition getKeywordProblemPosition() {
+        return new ProblemPosition(definingToken.getLineNumber(), Range.closed(definingToken.getStartOffset(),
+                definingToken.getStartOffset() + definingToken.getText().length()));
+    }
+
     private void validateDescriptor() {
         try {
             descriptor.validate(validationContext.getVersion());
         } catch (final InvalidArgumentsDescriptorException e) {
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_ARGUMENTS_DESCRIPTOR)
-                    .formatMessageWith(definingToken.getText(), e.getMessage());
-            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
+                    .formatMessageWith(getKeywordName(), e.getMessage());
+            reporter.handleProblem(problem, validationContext.getFile(), getKeywordProblemPosition());
 
             throw new ArgumentsProblemFoundException();
         }
@@ -185,9 +195,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             // cannot say if that's ok or not
             final String element = supportsKeyword ? "non-named argument" : "argument";
             reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
-                    .formatMessageWith(definingToken.getText(), getRangesInfo(possibleRange, element), actual,
+                    .formatMessageWith(getKeywordName(), getRangesInfo(possibleRange, element), actual,
                             toBeInProperForm(actual)),
-                    validationContext.getFile(), definingToken);
+                    validationContext.getFile(), getKeywordProblemPosition());
 
             throw new ArgumentsProblemFoundException();
 
@@ -202,9 +212,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
                 final String element = supportsKeyword ? "non-named argument" : "argument";
                 reporter.handleProblem(RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
-                        .formatMessageWith(definingToken.getText(), getRangesInfo(possibleRange, element),
+                        .formatMessageWith(getKeywordName(), getRangesInfo(possibleRange, element),
                                 getRangesInfo(actualRange, ""), toBeInProperForm(actual)),
-                        validationContext.getFile(), definingToken);
+                        validationContext.getFile(), getKeywordProblemPosition());
 
                 throw new ArgumentsProblemFoundException();
             }
@@ -222,9 +232,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             final String args = missingArguments.stream().map(Argument::getName).collect(joining(", ", "(", ")"));
 
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG)
-                    .formatMessageWith(definingToken.getText(),
+                    .formatMessageWith(getKeywordName(),
                             args + argType + toPluralIfNeeded(" argument", missingArguments.size()));
-            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
+            reporter.handleProblem(problem, validationContext.getFile(), getKeywordProblemPosition());
         }
     }
 
@@ -324,9 +334,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             final String args = missingArguments.stream().map(Argument::getName).collect(joining(", ", "(", ")"));
 
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG)
-                    .formatMessageWith(definingToken.getText(),
+                    .formatMessageWith(getKeywordName(),
                             args + " keyword-only" + toPluralIfNeeded(" argument", missingArguments.size()));
-            reporter.handleProblem(problem, validationContext.getFile(), definingToken);
+            reporter.handleProblem(problem, validationContext.getFile(), getKeywordProblemPosition());
         }
     }
 

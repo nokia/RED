@@ -246,7 +246,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void undeclaredKeywordInTemplateIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
-                .appendLine("Test Template  kw1  ${var}")
+                .appendLine("Test Template  kw1  arg")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -280,6 +280,18 @@ public class GeneralSettingsTableValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot"), "arg"));
         final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void undeclaredKeywordInParameterizedTemplateIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Template  kw1 ${a} in ${b} embedded")
+                .build();
+
+        final FileValidationContext context = prepareContext();
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).isEmpty();
@@ -1382,7 +1394,7 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     static Tuple problem(final Object... properties) {
-        // adding synonym for better readablity
+        // adding synonym for better readability
         return tuple(properties);
     }
 

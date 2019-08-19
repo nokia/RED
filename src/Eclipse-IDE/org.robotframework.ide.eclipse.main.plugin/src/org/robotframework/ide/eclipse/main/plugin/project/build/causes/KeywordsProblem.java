@@ -429,6 +429,13 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "For loop contains no keywords";
         }
+    },
+    UNKNOWN_TEMPLATE_KEYWORD {
+
+        @Override
+        public String getProblemDescription() {
+            return "Unknown template keyword '%s'";
+        }
     };
 
     @Override

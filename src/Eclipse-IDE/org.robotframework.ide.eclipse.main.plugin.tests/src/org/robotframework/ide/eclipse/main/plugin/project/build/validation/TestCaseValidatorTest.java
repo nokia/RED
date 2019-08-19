@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -1337,6 +1338,200 @@ public class TestCaseValidatorTest {
         });
     }
 
+    @Test
+    public void nothingIsReported_whenGlobalTemplateIsUsed_andArgumentsAreDefined() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Template  kw")
+                .appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  a  b")
+                .appendLine("  c  d")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenLocalTemplateIsUsed_andArgumentsAreDefined() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw")
+                .appendLine("  a  b")
+                .appendLine("  c  d")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void unknownKeywordIsReported_whenUnknownNotParameterizedTemplateIsUsed() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  unknown kw")
+                .appendLine("  a  b")
+                .appendLine("  c  d")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+
+        assertThat(problemsOf(context, fileModel)).containsOnly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(48, 58))));
+    }
+
+    @Test
+    public void invalidNumberOfParametersIsReported_whenTemplateIsUsed_andArgumentsNumberIsInvalid() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw")
+                .appendLine("  a  b")
+                .appendLine("  x  y  z")
+                .appendLine("  q")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2"));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).containsOnly(
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(5, Range.closed(60, 67))),
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
+                        new ProblemPosition(6, Range.closed(70, 71))));
+    }
+
+    @Test
+    public void nothingIsReported_whenTemplateIsUsed_andArgumentsAreDefinedWithAccessibleVariables() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw")
+                .appendLine("  a  ${var}")
+                .appendLine("  ${var}  d")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2"));
+        final Set<String> accessibleVariables = newHashSet("${var}");
+        final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void undeclaredVariableInExecutableRowIsReported_whenTemplateIsUsed_andArgumentsAreDefinedWithUnknownVariables() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw")
+                .appendLine("  a  ${var}")
+                .appendLine("  ${unknown}  d")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2"));
+        final Set<String> accessibleVariables = newHashSet("${var}");
+        final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
+
+        assertThat(problemsOf(context, fileModel)).containsOnly(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(5, Range.closed(65, 75))));
+    }
+
+    @Test
+    public void nothingIsReported_whenTemplateIsUsedInForLoop() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw")
+                .appendLine("  FOR  ${index}  IN RANGE  10")
+                .appendLine("    a  b  ${index}")
+                .appendLine("    c  d  ${index}")
+                .appendLine("  END")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2", "arg3"));
+        final FileValidationContext context = prepareContext(accessibleKws, RobotVersion.from("3.1"));
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenTemplateWithParametersIsUsed() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw ${a} embedded ${b}")
+                .appendLine("  x  y")
+                .appendLine("  abc  def")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw ${a} embedded ${b}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenTemplateWithParametersIsUsed_andAdditionalParametersAreDefined() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  ${name} kw ${a} embedded ${b}")
+                .appendLine("  some  x  y")
+                .appendLine("  other  abc  def")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("some kw ${a} embedded ${b}", new Path("/res.robot")),
+                newResourceKeyword("other kw ${a} embedded ${b}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).isEmpty();
+    }
+
+    @Test
+    public void invalidNumberOfParameterizedTemplateParametersIsReported_whenTemplateWithParametersIsUsed_andArgumentsNumberIsInvalid() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  kw ${a} embedded ${b}")
+                .appendLine("  a  b")
+                .appendLine("  x  y  z")
+                .appendLine("  q")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw ${a} embedded ${b}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).containsOnly(
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS,
+                        new ProblemPosition(5, Range.closed(79, 86))),
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS,
+                        new ProblemPosition(6, Range.closed(89, 90))));
+    }
+
+    @Test
+    public void unknownTemplateKeywordIsReported_whenTemplateWithParametersIsUsed_andKeywordCannotBeFound() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("templated case")
+                .appendLine("  [Template]  ${name} kw ${a} embedded ${b}")
+                .appendLine("  some  a  b")
+                .appendLine("  different  y  z")
+                .appendLine("  a  b  c")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("some kw ${a} embedded ${b}", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        assertThat(problemsOf(context, fileModel)).containsOnly(
+                new Problem(KeywordsProblem.UNKNOWN_TEMPLATE_KEYWORD, new ProblemPosition(5, Range.closed(93, 108))),
+                new Problem(KeywordsProblem.UNKNOWN_TEMPLATE_KEYWORD, new ProblemPosition(6, Range.closed(111, 118))));
+    }
+
     private static Collection<Problem> problemsOf(final FileValidationContext context, final RobotSuiteFile fileModel) {
         try {
             return validate(context, fileModel);
@@ -1358,7 +1553,7 @@ public class TestCaseValidatorTest {
     }
 
     static Tuple problem(final Object... properties) {
-        // adding synonym for better readablity
+        // adding synonym for better readability
         return tuple(properties);
     }
 

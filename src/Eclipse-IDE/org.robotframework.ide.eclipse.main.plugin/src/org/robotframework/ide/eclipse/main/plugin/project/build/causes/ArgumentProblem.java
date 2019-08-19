@@ -44,7 +44,7 @@ public enum ArgumentProblem implements IProblemCause {
         }
     },
     OVERRIDDEN_NAMED_ARGUMENT {
-        
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.OVERRIDDEN_ARGUMENTS;
@@ -98,6 +98,13 @@ public enum ArgumentProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Invalid variable syntax '%s'";
+        }
+    },
+    INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Parameterized template keyword '%s' expects exactly %s parameters, got %s";
         }
     };
 

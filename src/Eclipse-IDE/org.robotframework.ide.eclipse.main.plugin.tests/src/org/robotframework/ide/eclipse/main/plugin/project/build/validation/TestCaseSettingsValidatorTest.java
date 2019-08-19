@@ -293,6 +293,19 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
+    public void nothingIsReported_whenTemplateIsParameterized() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [Template]    Some ${var} Template ${other} Kw")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void duplicatedTemplatesAreReportedInRf3() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")

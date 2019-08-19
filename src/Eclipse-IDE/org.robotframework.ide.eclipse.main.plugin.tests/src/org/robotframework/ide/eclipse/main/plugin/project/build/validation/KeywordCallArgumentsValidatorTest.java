@@ -54,7 +54,7 @@ public class KeywordCallArgumentsValidatorTest {
     private static final ArgumentProblem COLLECTION_WARNING = ArgumentProblem.COLLECTION_ARGUMENT_SHOULD_PROVIDE_ARGS;
 
     public static class InvalidDescriptorsTest {
-        
+
         private final List<RobotKeywordCall> calls = newArrayList(call("1"), call("1", "2"), call("a=1", "b=2"),
                 call("a=1", "1"), call("1", "b=2"), call("@{l}", "2"), call("2", "@{l}"), call("b=2", "a=1", "c=3"),
                 call("1", "&{d}", "c=3"));
@@ -137,7 +137,7 @@ public class KeywordCallArgumentsValidatorTest {
                     createDescriptor("*a", "b=2"), createDescriptor("*a", "b", "c=3"),
                     createDescriptor("*a", "b=2", "c"), createDescriptor("*c", "a", "b=1", "**d"),
                     createDescriptor("a", "*c", "b=1", "**d"), createDescriptor("a", "b=2", "*c", "d=4", "e", "**f"));
-            
+
             SoftAssertions.assertSoftly(softly -> {
                 for (final ArgumentsDescriptor descriptor : descriptors) {
                     for (final RobotKeywordCall call : calls) {
@@ -148,7 +148,7 @@ public class KeywordCallArgumentsValidatorTest {
                 }
             });
         }
-        
+
         @Test
         public void noInvalidDescriptorIsReported_whenKeywordOnlyArgumentsAreUsedInRf31() {
             final List<ArgumentsDescriptor> descriptors = Lists.newArrayList(
@@ -2600,13 +2600,13 @@ public class KeywordCallArgumentsValidatorTest {
             });
         }
     }
-    
+
     public static class KeywordOnlyArgumentsInRf31Test {
 
         private final ArgumentsDescriptor desc_kw_only = createDescriptor("a", "b=2", "*", "d=4", "e");
         private final ArgumentsDescriptor desc_kw_only_kwargs = createDescriptor("a", "b=2", "*", "d=4", "e", "**kwargs");
         private final ArgumentsDescriptor desc_varargs_kw_only_kwargs = createDescriptor("a", "b=2", "*varargs", "d=4", "e", "**kwargs");
-        
+
         @Test
         public void noProblemsReported_whenArgumentsAreUsedProperly() {
             SoftAssertions.assertSoftly(softly -> {
@@ -2705,7 +2705,7 @@ public class KeywordCallArgumentsValidatorTest {
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
             });
         }
-        
+
         @Test
         public void unexpectedArgumentsPassedByNamesAreReported_whenThereAreNoKwargsInDescriptor() {
             SoftAssertions.assertSoftly(softly -> {
@@ -2761,7 +2761,7 @@ public class KeywordCallArgumentsValidatorTest {
     }
 
     static Tuple problem(final Object... properties) {
-        // adding synonym for better readablity
+        // adding synonym for better readability
         return tuple(properties);
     }
 

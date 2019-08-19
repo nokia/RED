@@ -654,7 +654,7 @@ public class KeywordValidatorTest {
         final Collection<Problem> problems = validate(context, fileModel);
         assertThat(problems).isEmpty();
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly() {
         final List<KeywordEntity> accessibleKws = newArrayList(
@@ -675,7 +675,7 @@ public class KeywordValidatorTest {
             softly.assertThat(problemsOf(context, theCall("Run Keyword If", "cond", "Log", "1", "ELSE IF", "cond", "Log", "2", "ELSE", "Log", "3"))).isEmpty();
         });
     }
-    
+
     @Test
     public void noProblemsInNestedKeywordsAreReported_whenUsedProperly_inKeywordTeardown() {
         final List<KeywordEntity> accessibleKws = newArrayList(
@@ -1178,7 +1178,7 @@ public class KeywordValidatorTest {
     }
 
     static Tuple problem(final Object... properties) {
-        // adding synonym for better readablity
+        // adding synonym for better readability
         return tuple(properties);
     }
 

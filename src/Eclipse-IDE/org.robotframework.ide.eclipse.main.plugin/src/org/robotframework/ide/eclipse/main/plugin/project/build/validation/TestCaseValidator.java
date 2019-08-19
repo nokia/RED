@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -22,8 +24,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.RangeSet;
 
 
 class TestCaseValidator implements ModelUnitValidator {
@@ -101,13 +105,28 @@ class TestCaseValidator implements ModelUnitValidator {
                     .ifPresent(execValidators::add);
         }
 
-
-        if (!testCase.getTemplateKeywordName().isPresent()) {
-            testCase.getExecutionContext().stream()
+        final Optional<String> templateKeywordName = testCase.getTemplateKeywordName();
+        if (templateKeywordName.isPresent()) {
+            final ValidationKeywordEntity foundKeyword = validationContext
+                    .findAccessibleKeyword(templateKeywordName.get());
+            final RangeSet<Integer> templateParameters = EmbeddedKeywordNamesSupport
+                    .findEmbeddedArgumentsRanges(templateKeywordName.get());
+            if (foundKeyword != null || !templateParameters.isEmpty()) {
+                testCase.getExecutionContext()
+                        .stream()
+                        .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row,
+                                templateKeywordName.get(), foundKeyword, templateParameters, reporter))
+                        .forEach(execValidators::add);
+            }
+        } else {
+            testCase.getExecutionContext()
+                    .stream()
                     .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row, reporter))
                     .forEach(execValidators::add);
         }
-        testCase.getTeardowns().stream()
+
+        testCase.getTeardowns()
+                .stream()
                 .map(teardown -> ExecutableValidator.of(validationContext, additionalVariables, teardown, reporter))
                 .forEach(execValidators::add);
         execValidators.forEach(ExecutableValidator::validate);

@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,8 +19,13 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
+
+import com.google.common.collect.RangeSet;
 
 interface ExecutableValidator extends ModelUnitValidator {
 
@@ -58,5 +65,25 @@ interface ExecutableValidator extends ModelUnitValidator {
             }
         }
         throw new IllegalStateException();
+    }
+
+    static ExecutableValidator of(final FileValidationContext validationContext, final Set<String> additionalVariables,
+            final RobotExecutableRow<?> row, final String templateKeywordName,
+            final ValidationKeywordEntity foundTemplateKeyword, final RangeSet<Integer> templateParameters,
+            final ValidationReportingStrategy reporter) {
+        final List<RobotToken> templateArguments = row.getElementTokens()
+                .stream()
+                .filter(token -> token.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT)
+                        || token.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT))
+                .collect(Collectors.toList());
+        if (templateArguments.isEmpty()) {
+            return ExecutableValidator.of(validationContext, additionalVariables, row, reporter);
+        } else if (templateParameters.isEmpty()) {
+            return new TemplateDataRowValidator(validationContext, additionalVariables, foundTemplateKeyword,
+                    templateArguments, reporter);
+        } else {
+            return new ParameterizedTemplateDataRowValidator(validationContext, additionalVariables,
+                    templateKeywordName, foundTemplateKeyword, templateParameters, templateArguments, reporter);
+        }
     }
 }

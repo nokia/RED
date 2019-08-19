@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.ArrayList;
 
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 
@@ -29,5 +30,13 @@ class KeywordCallInTemplateValidator extends KeywordCallValidator {
     @Override
     protected void validateArguments() {
         // templates have no arguments which needs validation; only keyword requires validating
+    }
+
+    @Override
+    void validateKeywordCall() {
+        // only not parameterized keyword calls can be validated in template setting
+        if (!EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
+            super.validateKeywordCall();
+        }
     }
 }

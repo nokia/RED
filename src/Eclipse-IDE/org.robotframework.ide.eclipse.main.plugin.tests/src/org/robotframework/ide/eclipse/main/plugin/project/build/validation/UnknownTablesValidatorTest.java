@@ -99,7 +99,7 @@ public class UnknownTablesValidatorTest {
     }
 
     private static Tuple problem(final Object... properties) {
-        // adding synonym for better readablity
+        // adding synonym for better readability
         return tuple(properties);
     }
 
