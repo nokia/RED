@@ -21,7 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 
-class ParameterizedTemplateKeywordCallArgumentsValidator implements ModelUnitValidator {
+class TemplateKeywordCallEmbeddedArgumentsValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
@@ -31,7 +31,7 @@ class ParameterizedTemplateKeywordCallArgumentsValidator implements ModelUnitVal
 
     private final ValidationKeywordEntity foundKeyword;
 
-    private final RangeSet<Integer> templateParameters;
+    private final RangeSet<Integer> embeddedArguments;
 
     private final int lineNumber;
 
@@ -41,15 +41,15 @@ class ParameterizedTemplateKeywordCallArgumentsValidator implements ModelUnitVal
 
     private final List<RobotToken> arguments;
 
-    ParameterizedTemplateKeywordCallArgumentsValidator(final FileValidationContext validationContext,
+    TemplateKeywordCallEmbeddedArgumentsValidator(final FileValidationContext validationContext,
             final ValidationReportingStrategy reporter, final String keywordName,
-            final ValidationKeywordEntity foundKeyword, final RangeSet<Integer> templateParameters,
+            final ValidationKeywordEntity foundKeyword, final RangeSet<Integer> embeddedArguments,
             final List<RobotToken> arguments) {
         this.validationContext = validationContext;
         this.reporter = reporter;
         this.keywordName = keywordName;
         this.foundKeyword = foundKeyword;
-        this.templateParameters = templateParameters;
+        this.embeddedArguments = embeddedArguments;
         this.lineNumber = arguments.stream().findFirst().map(RobotToken::getLineNumber).orElse(-1);
         this.startOffset = arguments.stream().findFirst().map(RobotToken::getStartOffset).orElse(-1);
         this.endOffset = arguments.stream().reduce((a, b) -> b).map(RobotToken::getEndOffset).orElse(-1);
@@ -58,11 +58,11 @@ class ParameterizedTemplateKeywordCallArgumentsValidator implements ModelUnitVal
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        final int expectedArguments = templateParameters.asRanges().size();
+        final int expectedArguments = embeddedArguments.asRanges().size();
         final int actualArguments = arguments.size();
         if (expectedArguments != actualArguments) {
             reporter.handleProblem(
-                    RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS)
+                    RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_TEMPLATE_EMBEDDED_ARGUMENTS)
                             .formatMessageWith(keywordName, expectedArguments, actualArguments),
                     validationContext.getFile(), getArgumentsProblemPosition());
         } else if (foundKeyword == null) {
@@ -78,7 +78,7 @@ class ParameterizedTemplateKeywordCallArgumentsValidator implements ModelUnitVal
 
     private String resolveParameters() {
         final StringBuilder builder = new StringBuilder(keywordName);
-        final Iterator<Range<Integer>> rangesIterator = templateParameters.asRanges().iterator();
+        final Iterator<Range<Integer>> rangesIterator = embeddedArguments.asRanges().iterator();
         final Iterator<RobotToken> argsIterator = arguments.iterator();
         int offset = 0;
         while (rangesIterator.hasNext() && argsIterator.hasNext()) {

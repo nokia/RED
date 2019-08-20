@@ -100,11 +100,11 @@ public enum ArgumentProblem implements IProblemCause {
             return "Invalid variable syntax '%s'";
         }
     },
-    INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS {
+    INVALID_NUMBER_OF_TEMPLATE_EMBEDDED_ARGUMENTS {
 
         @Override
         public String getProblemDescription() {
-            return "Parameterized template keyword '%s' expects exactly %s parameters, got %s";
+            return "Template keyword '%s' expects exactly %s embedded arguments, got %s";
         }
     };
 

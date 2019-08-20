@@ -293,7 +293,7 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenTemplateIsParameterized() throws CoreException {
+    public void nothingIsReported_whenTemplateHasEmbeddedArguments() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Template]    Some ${var} Template ${other} Kw")

@@ -109,13 +109,13 @@ class TestCaseValidator implements ModelUnitValidator {
         if (templateKeywordName.isPresent()) {
             final ValidationKeywordEntity foundKeyword = validationContext
                     .findAccessibleKeyword(templateKeywordName.get());
-            final RangeSet<Integer> templateParameters = EmbeddedKeywordNamesSupport
+            final RangeSet<Integer> embeddedArguments = EmbeddedKeywordNamesSupport
                     .findEmbeddedArgumentsRanges(templateKeywordName.get());
-            if (foundKeyword != null || !templateParameters.isEmpty()) {
+            if (foundKeyword != null || !embeddedArguments.isEmpty()) {
                 testCase.getExecutionContext()
                         .stream()
                         .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row,
-                                templateKeywordName.get(), foundKeyword, templateParameters, reporter))
+                                templateKeywordName.get(), foundKeyword, embeddedArguments, reporter))
                         .forEach(execValidators::add);
             }
         } else {

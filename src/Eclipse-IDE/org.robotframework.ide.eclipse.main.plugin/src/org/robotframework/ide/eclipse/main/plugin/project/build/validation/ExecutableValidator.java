@@ -69,7 +69,7 @@ interface ExecutableValidator extends ModelUnitValidator {
 
     static ExecutableValidator of(final FileValidationContext validationContext, final Set<String> additionalVariables,
             final RobotExecutableRow<?> row, final String templateKeywordName,
-            final ValidationKeywordEntity foundTemplateKeyword, final RangeSet<Integer> templateParameters,
+            final ValidationKeywordEntity foundTemplateKeyword, final RangeSet<Integer> embeddedArguments,
             final ValidationReportingStrategy reporter) {
         final List<RobotToken> templateArguments = row.getElementTokens()
                 .stream()
@@ -78,12 +78,12 @@ interface ExecutableValidator extends ModelUnitValidator {
                 .collect(Collectors.toList());
         if (templateArguments.isEmpty()) {
             return ExecutableValidator.of(validationContext, additionalVariables, row, reporter);
-        } else if (templateParameters.isEmpty()) {
+        } else if (embeddedArguments.isEmpty()) {
             return new TemplateDataRowValidator(validationContext, additionalVariables, foundTemplateKeyword,
                     templateArguments, reporter);
         } else {
-            return new ParameterizedTemplateDataRowValidator(validationContext, additionalVariables,
-                    templateKeywordName, foundTemplateKeyword, templateParameters, templateArguments, reporter);
+            return new TemplateDataRowWithEmbeddedArgumentsValidator(validationContext, additionalVariables,
+                    templateKeywordName, foundTemplateKeyword, embeddedArguments, templateArguments, reporter);
         }
     }
 }

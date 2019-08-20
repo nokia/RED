@@ -34,7 +34,7 @@ class KeywordCallInTemplateValidator extends KeywordCallValidator {
 
     @Override
     void validateKeywordCall() {
-        // only not parameterized keyword calls can be validated in template setting
+        // only keyword calls without embedded arguments can be validated in template setting
         if (!EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
             super.validateKeywordCall();
         }

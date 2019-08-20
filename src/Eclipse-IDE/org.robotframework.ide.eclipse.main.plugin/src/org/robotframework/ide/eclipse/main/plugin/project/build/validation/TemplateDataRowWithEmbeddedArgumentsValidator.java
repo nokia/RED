@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 
 import com.google.common.collect.RangeSet;
 
-class ParameterizedTemplateDataRowValidator implements ExecutableValidator {
+class TemplateDataRowWithEmbeddedArgumentsValidator implements ExecutableValidator {
 
     private final FileValidationContext validationContext;
 
@@ -27,29 +27,29 @@ class ParameterizedTemplateDataRowValidator implements ExecutableValidator {
 
     private final ValidationKeywordEntity foundKeyword;
 
-    private final RangeSet<Integer> templateParameters;
+    private final RangeSet<Integer> embeddedArguments;
 
     private final List<RobotToken> arguments;
 
     private final ValidationReportingStrategy reporter;
 
-    public ParameterizedTemplateDataRowValidator(final FileValidationContext validationContext,
+    public TemplateDataRowWithEmbeddedArgumentsValidator(final FileValidationContext validationContext,
             final Set<String> additionalVariables, final String keywordName, final ValidationKeywordEntity foundKeyword,
-            final RangeSet<Integer> templateParameters, final List<RobotToken> arguments,
+            final RangeSet<Integer> embeddedArguments, final List<RobotToken> arguments,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.additionalVariables = additionalVariables;
         this.keywordName = keywordName;
         this.foundKeyword = foundKeyword;
-        this.templateParameters = templateParameters;
+        this.embeddedArguments = embeddedArguments;
         this.arguments = arguments;
         this.reporter = reporter;
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        final ParameterizedTemplateKeywordCallArgumentsValidator argsValidator = new ParameterizedTemplateKeywordCallArgumentsValidator(
-                validationContext, reporter, keywordName, foundKeyword, templateParameters, arguments);
+        final TemplateKeywordCallEmbeddedArgumentsValidator argsValidator = new TemplateKeywordCallEmbeddedArgumentsValidator(
+                validationContext, reporter, keywordName, foundKeyword, embeddedArguments, arguments);
         argsValidator.validate(monitor);
 
         final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext,

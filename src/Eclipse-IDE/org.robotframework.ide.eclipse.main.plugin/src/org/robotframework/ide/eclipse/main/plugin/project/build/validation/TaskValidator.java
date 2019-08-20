@@ -110,13 +110,15 @@ class TaskValidator implements ModelUnitValidator {
         if (templateKeywordName.isPresent()) {
             final ValidationKeywordEntity foundKeyword = validationContext
                     .findAccessibleKeyword(templateKeywordName.get());
-            final RangeSet<Integer> templateParameters = EmbeddedKeywordNamesSupport
+            final RangeSet<Integer> embeddedArguments = EmbeddedKeywordNamesSupport
                     .findEmbeddedArgumentsRanges(templateKeywordName.get());
-            task.getExecutionContext()
-                    .stream()
-                    .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row,
-                            templateKeywordName.get(), foundKeyword, templateParameters, reporter))
-                    .forEach(execValidators::add);
+            if (foundKeyword != null || !embeddedArguments.isEmpty()) {
+                task.getExecutionContext()
+                        .stream()
+                        .map(row -> ExecutableValidator.of(validationContext, additionalVariables, row,
+                                templateKeywordName.get(), foundKeyword, embeddedArguments, reporter))
+                        .forEach(execValidators::add);
+            }
         } else {
             task.getExecutionContext()
                     .stream()

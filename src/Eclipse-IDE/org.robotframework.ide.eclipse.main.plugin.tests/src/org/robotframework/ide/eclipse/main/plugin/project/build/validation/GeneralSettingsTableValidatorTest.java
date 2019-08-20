@@ -286,7 +286,7 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
-    public void undeclaredKeywordInParameterizedTemplateIsNotReported() throws CoreException {
+    public void undeclaredKeywordInTemplateWithEmbeddedArgumentsIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Test Template  kw1 ${a} in ${b} embedded")
                 .build();

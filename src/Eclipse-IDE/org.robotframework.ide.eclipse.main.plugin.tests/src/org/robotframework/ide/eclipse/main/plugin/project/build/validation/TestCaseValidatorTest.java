@@ -1372,7 +1372,7 @@ public class TestCaseValidatorTest {
     }
 
     @Test
-    public void unknownKeywordIsReported_whenUnknownNotParameterizedTemplateIsUsed() {
+    public void unknownKeywordIsReported_whenUnknownTemplateWithoutEmbeddedArgumentsIsUsed() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  unknown kw")
@@ -1460,7 +1460,7 @@ public class TestCaseValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenTemplateWithParametersIsUsed() {
+    public void nothingIsReported_whenTemplateWithEmbeddedArgumentsIsUsed() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  kw ${a} embedded ${b}")
@@ -1476,7 +1476,7 @@ public class TestCaseValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenTemplateWithParametersIsUsed_andAdditionalParametersAreDefined() {
+    public void nothingIsReported_whenTemplateWithEmbeddedArgumentsIsUsed_andAdditionalArgumentsAreDefined() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  ${name} kw ${a} embedded ${b}")
@@ -1493,7 +1493,7 @@ public class TestCaseValidatorTest {
     }
 
     @Test
-    public void invalidNumberOfParameterizedTemplateParametersIsReported_whenTemplateWithParametersIsUsed_andArgumentsNumberIsInvalid() {
+    public void invalidNumberOfArgumentsIsReported_whenTemplateWithEmbeddedArgumentsIsUsed_andArgumentsNumberIsInvalid() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  kw ${a} embedded ${b}")
@@ -1507,14 +1507,14 @@ public class TestCaseValidatorTest {
         final FileValidationContext context = prepareContext(accessibleKws);
 
         assertThat(problemsOf(context, fileModel)).containsOnly(
-                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS,
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_TEMPLATE_EMBEDDED_ARGUMENTS,
                         new ProblemPosition(5, Range.closed(79, 86))),
-                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERIZED_TEMPLATE_PARAMETERS,
+                new Problem(ArgumentProblem.INVALID_NUMBER_OF_TEMPLATE_EMBEDDED_ARGUMENTS,
                         new ProblemPosition(6, Range.closed(89, 90))));
     }
 
     @Test
-    public void unknownTemplateKeywordIsReported_whenTemplateWithParametersIsUsed_andKeywordCannotBeFound() {
+    public void unknownTemplateKeywordIsReported_whenTemplateWithEmbeddedArgumentsIsUsed_andKeywordCannotBeFound() {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  ${name} kw ${a} embedded ${b}")
