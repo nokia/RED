@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/17/19 3:17 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/20/19 5:06 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -26,21 +26,21 @@ wait-for-loading-red-xml -editor_name  "RobotProject/red.xml"
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 set-dialog-result File "platform:/resource/RobotProject/libs/liby.py" "platform:/resource/RobotProject/libs/sum.py"
 
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 //add libspec
 set-dialog-result File "platform:/resource/RobotProject/generated_libspec/liby.xml"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 //add multiply.py lib
 set-dialog-result File "platform:/resource/RobotProject/multiply.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 get-editor "RobotProject/red.xml" | maximize
 //add empty libspec
 exec-with-options {
 	set-dialog-result File "platform:/resource/RobotProject/empty  libspeck/empty.xml"
-	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 	wait 500
     get-window "Problem Occurred" 
         | get-label "RED was unable to find classes/modules inside '.*empty.xml' module" 
@@ -52,7 +52,7 @@ exec-with-options {
 
 //add file with few classes
 set-dialog-result File "platform:/resource/RobotProject/additional libs/lib1.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 wait 500
 get-window "Select library class" | get-table | select "lib1.Selenium"
 with [get-window "Select library class" | get-table] {
@@ -72,7 +72,7 @@ with [get-window "Select library class"] {
 //add xml file which is not libspec
 exec-with-options {
 	set-dialog-result File "platform:/resource/RobotProject/report_xml/output.xml"
-	get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
     get-window "Problem Occurred" 
         | get-label "RED was unable to find classes/modules inside '.*output.xml' module" 
         | get-property caption 
@@ -82,7 +82,7 @@ exec-with-options {
 } -allowStatusDialog
 
 
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 
 //check how looks tree
 get-editor "RobotProject/red.xml" | restore
@@ -140,14 +140,14 @@ with [get-view "Project Explorer" | get-tree] {
         | get-property "styles[0].foregroundColor" | equals "#957D47" | verify-true
 }
 //remove few files
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-tree] {
     select "lib1.Selenium - RobotProject\\/additional libs\\/lib1.py" | key-type Del
     key-type "M1+s"
 }
 
 //add duplicate lib
 set-dialog-result File "platform:/resource/RobotProject/libs/sum.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 //chec if it is not dirty
 get-tab-folder -index 3 | get-property activePage | equals "RobotProject/red.xml" | verify-true
@@ -156,11 +156,11 @@ get-editor "RobotProject/red.xml" | maximize
 //add file with class name as file
 get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
 set-dialog-result File "platform:/resource/RobotProject/classes/DefaultLib.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 //add file with different class name
 set-dialog-result File "platform:/resource/RobotProject/classes/FileNOTAsClassName.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 get-window "Select library class" | get-table | select FileNOTAsClassName
 with [get-window "Select library class" | get-table] {
     get-property itemCount | equals 2 | verify-true
@@ -174,8 +174,8 @@ with [get-window "Select library class"] {
 
 //add empty file
 set-dialog-result File "platform:/resource/RobotProject/empty.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 get-editor "RobotProject/red.xml" | restore
 
 //check project expolorer
