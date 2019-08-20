@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _a_1L4AfGEearkLC-7wHL-g
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/13/19 3:14 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/20/19 4:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -49,8 +49,8 @@ get-editor "RobotProject/red.xml" | get-section Paths | get-table
 
 //add res1.py to reference lib
 set-dialog-result File "platform:/resource/RobotProject/libs/for_resource/res1.py"
-get-editor "RobotProject/red.xml"| get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml"| get-section Libraries | get-tree | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 
 wait 1000
 with [get-editor "RobotProject/red.xml"] {
@@ -160,7 +160,7 @@ get-editor "RobotProject/red.xml" | get-section Paths | get-combo
     -after [get-label "Relative paths defined below are relative to:"] | select PROJECT
     
 //save file (workaround - cannot save when dropdown was used ??)
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table 
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree
     | select "res1 - RobotProject\\/libs\\/for_resource\\/res1.py" | key-type "M1+s"   
 wait 2000
 //check if it was changed    
@@ -233,7 +233,7 @@ try -times 5 -delay 1000 -command{
 
 with [get-editor "RobotProject/red.xml"] {
     get-section Paths | get-combo -after [get-label "Relative paths defined below are relative to:"] | select WORKSPACE
-    get-section "Libraries" | get-table | select "res1 - RobotProject\\/libs\\/for_resource\\/res1.py"
+    get-section "Libraries" | get-tree | select "res1 - RobotProject\\/libs\\/for_resource\\/res1.py"
         | key-type "M1+s"
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
