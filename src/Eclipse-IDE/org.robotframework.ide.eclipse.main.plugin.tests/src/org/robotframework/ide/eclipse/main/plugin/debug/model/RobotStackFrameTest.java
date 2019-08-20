@@ -366,7 +366,7 @@ public class RobotStackFrameTest {
     }
 
     @Test
-    public void frameIsStepping_whenConstrolerIsStepping() {
+    public void frameIsStepping_whenControllerIsStepping() {
         final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
         stacktrace.push(frame);
@@ -381,7 +381,7 @@ public class RobotStackFrameTest {
     }
 
     @Test
-    public void frameIsNotStepping_whenConstrolerIsNotStepping() {
+    public void frameIsNotStepping_whenControllerIsNotStepping() {
         final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
         stacktrace.push(frame);
@@ -413,9 +413,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepIntoSendsTheCodeToControllerWhichFiresResumeEventsWhenSendToAgent() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final IRobotProcess process = mock(IRobotProcess.class);
 
@@ -444,9 +442,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepIntoSendsTheCodeToControllerWhichFiresSteppingEndsEventsWhenSuspendedAgain() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final RobotThread thread = mock(RobotThread.class);
 
@@ -483,9 +479,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepOverSendsTheCodeToControllerWhichFiresResumeEventsWhenSendToAgent() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final IRobotProcess process = mock(IRobotProcess.class);
 
@@ -514,9 +508,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepOverSendsTheCodeToControllerWhichFiresSteppingEndsEventsWhenSuspendedAgain() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final RobotThread thread = mock(RobotThread.class);
 
@@ -553,9 +545,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepReturnSendsTheCodeToControllerWhichFiresResumeEventsWhenSendToAgent() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final IRobotProcess process = mock(IRobotProcess.class);
 
@@ -584,9 +574,7 @@ public class RobotStackFrameTest {
 
     @Test
     public void stepReturnSendsTheCodeToControllerWhichFiresSteppingEndsEventsWhenSuspendedAgain() {
-        final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
-        stacktrace.push(frame);
 
         final RobotThread thread = mock(RobotThread.class);
 
@@ -643,7 +631,7 @@ public class RobotStackFrameTest {
         variables.put(new Variable("${true}", VariableScope.GLOBAL), new VariableTypedValue("bool", true));
 
         final StackFrameVariables vars = StackFrameVariables.newNonLocalVariables(variables);
-        
+
         final Stacktrace stacktrace = new Stacktrace();
         final StackFrame frame = mock(StackFrame.class);
         when(frame.getVariables()).thenReturn(vars);
@@ -652,7 +640,7 @@ public class RobotStackFrameTest {
         final RobotThread thread = new RobotThread(mock(RobotDebugTarget.class), stacktrace,
                 mock(UserProcessDebugController.class));
         final RobotStackFrame stackFrame = new RobotStackFrame(thread, frame, mock(UserProcessDebugController.class));
-        
+
         final RobotDebugVariable[] robotVariables = stackFrame.getVariables();
         assertThat(robotVariables).hasSize(3);
 

@@ -179,12 +179,8 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenLibspecForStandardRemoteLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
         final String path = "http://127.0.0.1:" + findFreePort() + "/";
 
-        final LibrarySpecification libSpec = new LibrarySpecification();
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(path));
-        libSpec.setDescriptor(descriptor);
-        libSpec.setName("Remote");
         final Map<LibraryDescriptor, LibrarySpecification> stdLibs = new HashMap<>();
-        stdLibs.put(descriptor, null);
+        stdLibs.put(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(path)), null);
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(stdLibs);

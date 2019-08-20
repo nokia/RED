@@ -70,8 +70,6 @@ public class ExecutableCallRuleTest {
 
     @Test
     public void executableCallIsRecognized() {
-        final List<IRobotLineElement> previousTokens = new ArrayList<>();
-
         boolean thereWasName = false;
         final List<RobotLine> lines = TokensSource.createTokensInLines();
         for (final RobotLine line : lines) {
@@ -89,7 +87,6 @@ public class ExecutableCallRuleTest {
                 } else if (!token.getText().contains("var_asgn") && !token.getText().contains("gherkin_call")) {
                     assertThat(evaluatedToken).isNotPresent();
                 }
-                previousTokens.add(token);
             }
         }
         assertThat(thereWasName).isTrue();
@@ -123,8 +120,6 @@ public class ExecutableCallRuleTest {
 
     @Test
     public void gherkinPrefixIsRecognized() {
-        final List<IRobotLineElement> previousTokens = new ArrayList<>();
-
         boolean thereWasName = false;
         final List<RobotLine> lines = TokensSource.createTokensInLines();
         for (final RobotLine line : lines) {
@@ -142,7 +137,6 @@ public class ExecutableCallRuleTest {
                         && !token.getText().equals(":FOR")) {
                     assertThat(evaluatedToken).isNotPresent();
                 }
-                previousTokens.add(token);
             }
         }
         assertThat(thereWasName).isTrue();
@@ -413,8 +407,6 @@ public class ExecutableCallRuleTest {
 
     @Test
     public void executableCallIsNotRecognized_whenTestCaseHasTemplate() {
-        final List<IRobotLineElement> previousTokens = new ArrayList<>();
-
         boolean thereWasTemplate = false;
         final List<RobotLine> lines = TokensSource.createTokensOfTemplatedCases();
         for (final RobotLine line : lines) {
@@ -425,7 +417,6 @@ public class ExecutableCallRuleTest {
                     thereWasTemplate = true;
                 }
                 assertThat(evaluatedToken).isNotPresent();
-                previousTokens.add(token);
             }
         }
         assertThat(thereWasTemplate).isTrue();
