@@ -708,6 +708,90 @@ public class TestCaseTableModelUpdaterTest {
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
+    @Test
+    public void executableRowWithTemplateCreationTest() {
+        final TestCase testCase = createCase();
+        final LocalSetting<TestCase> template = testCase.newTemplate(0);
+        template.addToken("Some Kw");
+
+        assertThat(testCase.getExecutionContext()).isEmpty();
+
+        final AModelElement<?> row = updater.createExecutableRow(testCase, 1,
+                newArrayList("a1", "a2", "a3", "a4", "#comment"));
+
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<TestCase> addedRow = testCase.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(row);
+        assertThat(addedRow.getParent()).isSameAs(testCase);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT))
+                .extracting(RobotToken::getText)
+                .containsExactly("a1", "a2", "a3", "a4");
+
+    }
+
+    @Test
+    public void testInsertingExecutableRowFromTestWithoutTemplateToTestWithTemplate() {
+        final TestCase testCase = createCase();
+        final LocalSetting<TestCase> template = testCase.newTemplate(0);
+        template.addToken("Some Kw");
+
+        assertThat(testCase.getExecutionContext()).isEmpty();
+
+        final RobotExecutableRow<TestCase> rowToInsert = new RobotExecutableRow<>();
+        rowToInsert.setAction(RobotToken.create("Kw Call", RobotTokenType.TEST_CASE_ACTION_NAME));
+        rowToInsert.setArgument(0, RobotToken.create("a1"));
+        rowToInsert.setArgument(1, RobotToken.create("a2"));
+        rowToInsert.setArgument(2, RobotToken.create("a3"));
+        final AModelElement<?> insertedRow = updater.insert(testCase, 1, rowToInsert);
+
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<TestCase> addedRow = testCase.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(insertedRow);
+        assertThat(addedRow.getParent()).isSameAs(testCase);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT))
+                .extracting(RobotToken::getText)
+                .containsExactly("Kw Call", "a1", "a2", "a3");
+
+    }
+
+    @Test
+    public void testInsertingExecutableRowFromTestWithTemplateToTestWithoutTemplate() {
+        final TestCase testCase = createCase();
+
+        assertThat(testCase.getExecutionContext()).isEmpty();
+
+        final RobotExecutableRow<TestCase> rowToInsert = new RobotExecutableRow<>();
+        rowToInsert.setAction(RobotToken.create("Kw Call", RobotTokenType.TEST_CASE_ACTION_NAME,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(0, RobotToken.create("a1", RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(1, RobotToken.create("a2", RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(2, RobotToken.create("a3", RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT));
+        final AModelElement<?> insertedRow = updater.insert(testCase, 0, rowToInsert);
+
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<TestCase> addedRow = testCase.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(insertedRow);
+        assertThat(addedRow.getParent()).isSameAs(testCase);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT))
+                .isEmpty();
+
+    }
+
     private static TestCase createCase() {
         final RobotFileOutput parentFileOutput = new RobotFileOutput(RobotVersion.from("3.0.0"));
         final RobotFile parent = new RobotFile(parentFileOutput);

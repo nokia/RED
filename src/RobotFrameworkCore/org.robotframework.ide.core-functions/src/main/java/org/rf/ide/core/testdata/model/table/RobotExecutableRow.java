@@ -66,7 +66,6 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
     }
 
     public RobotToken getAction() {
-        fixMissingTypes();
         return action;
     }
 
@@ -214,7 +213,6 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
 
     @Override
     public List<RobotToken> getElementTokens() {
-        fixMissingTypes();
         final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
         if (comments.isEmpty()) {
@@ -272,9 +270,11 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
             arguments.add(0, action);
             action = RobotToken.create("");
             fixMissingTypes();
+            fixTemplateArgumentsTypes();
 
         } else if (0 <= argsIndex && argsIndex <= arguments.size()) {
             arguments.add(argsIndex, RobotToken.create("", getArgumentType()));
+            fixTemplateArgumentsTypes();
 
         } else if (1 <= commentsIndex && commentsIndex <= comments.size()) {
             comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
@@ -380,6 +380,33 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
                 token.getTypes().remove(RobotTokenType.UNKNOWN);
                 token.getTypes().remove(getActionType());
                 fixForTheType(token, getArgumentType(), true);
+            }
+        }
+    }
+
+    private void fixTemplateArgumentsTypes() {
+        if (getParent() != null) {
+            if (getParent().getClass() == TestCase.class) {
+                fixTemplateArgumentsTypes(((TestCase) getParent()).getTemplateKeywordName().isPresent(),
+                        RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+            } else if (getParent().getClass() == Task.class) {
+                fixTemplateArgumentsTypes(((Task) getParent()).getTemplateKeywordName().isPresent(),
+                        RobotTokenType.TASK_TEMPLATE_ARGUMENT);
+            }
+        }
+    }
+
+    public void fixTemplateArgumentsTypes(final boolean isTemplateUsed, final RobotTokenType templateArgumentType) {
+        if (!action.getTypes().contains(RobotTokenType.FOR_TOKEN)
+                && !action.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
+            for (final RobotToken token : getElementTokens()) {
+                token.getTypes().remove(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+                token.getTypes().remove(RobotTokenType.TASK_TEMPLATE_ARGUMENT);
+                if (isTemplateUsed && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                        && !token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)
+                        && !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                    token.getTypes().add(templateArgumentType);
+                }
             }
         }
     }

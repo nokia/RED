@@ -46,6 +46,7 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
     public AModelElement<Task> createExecutableRow(final Task task, final int index, final List<String> cells) {
         final RobotExecutableRow<?> row = TestCaseTableModelUpdater.createExecutableRow(cells);
         task.addElement(index, row);
+        fixTemplateArguments(task, row);
         return (RobotExecutableRow<Task>) row;
     }
 
@@ -95,7 +96,9 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + task.getName().getText() + " task. Operation handler is missing");
         }
-        return operationHandler.insert(task, index, modelElement);
+        final AModelElement<?> inserted = operationHandler.insert(task, index, modelElement);
+        fixTemplateArguments(task, inserted);
+        return inserted;
     }
 
     private BiFunction<Integer, String, LocalSetting<Task>> getSettingCreateOperation(final Task task,
@@ -120,5 +123,13 @@ public class TaskTableModelUpdater implements IExecutablesTableModelUpdater<Task
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<Task> getOperationHandler(final IRobotTokenType type) {
         return ELEMENT_OPERATIONS.stream().filter(op -> op.isApplicable(type)).findFirst().orElse(null);
+    }
+
+    private void fixTemplateArguments(final Task task, final AModelElement<?> modelElement) {
+        if (modelElement instanceof RobotExecutableRow<?>) {
+            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
+            row.fixTemplateArgumentsTypes(task.getTemplateKeywordName().isPresent(),
+                    RobotTokenType.TASK_TEMPLATE_ARGUMENT);
+        }
     }
 }

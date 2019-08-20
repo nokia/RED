@@ -829,6 +829,90 @@ public class TaskTableModelUpdaterTest {
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
     }
 
+    @Test
+    public void executableRowWithTemplateCreationTest() {
+        final Task task = createTask();
+        final LocalSetting<Task> template = task.newTemplate(0);
+        template.addToken("Some Kw");
+
+        assertThat(task.getExecutionContext()).isEmpty();
+
+        final AModelElement<?> row = updater.createExecutableRow(task, 1,
+                newArrayList("a1", "a2", "a3", "a4", "#comment"));
+
+        assertThat(task.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<Task> addedRow = task.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(row);
+        assertThat(addedRow.getParent()).isSameAs(task);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT))
+                .extracting(RobotToken::getText)
+                .containsExactly("a1", "a2", "a3", "a4");
+
+    }
+
+    @Test
+    public void testInsertingExecutableRowFromTaskWithoutTemplateToTaskWithTemplate() {
+        final Task task = createTask();
+        final LocalSetting<Task> template = task.newTemplate(0);
+        template.addToken("Some Kw");
+
+        assertThat(task.getExecutionContext()).isEmpty();
+
+        final RobotExecutableRow<Task> rowToInsert = new RobotExecutableRow<>();
+        rowToInsert.setAction(RobotToken.create("Kw Call", RobotTokenType.TASK_ACTION_NAME));
+        rowToInsert.setArgument(0, RobotToken.create("a1"));
+        rowToInsert.setArgument(1, RobotToken.create("a2"));
+        rowToInsert.setArgument(2, RobotToken.create("a3"));
+        final AModelElement<?> insertedRow = updater.insert(task, 1, rowToInsert);
+
+        assertThat(task.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<Task> addedRow = task.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(insertedRow);
+        assertThat(addedRow.getParent()).isSameAs(task);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT))
+                .extracting(RobotToken::getText)
+                .containsExactly("Kw Call", "a1", "a2", "a3");
+
+    }
+
+    @Test
+    public void testInsertingExecutableRowFromTestWithTemplateToTestWithoutTemplate() {
+        final Task task = createTask();
+
+        assertThat(task.getExecutionContext()).isEmpty();
+
+        final RobotExecutableRow<TestCase> rowToInsert = new RobotExecutableRow<>();
+        rowToInsert.setAction(
+                RobotToken.create("Kw Call", RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(0,
+                RobotToken.create("a1", RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.TASK_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(1,
+                RobotToken.create("a2", RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.TASK_TEMPLATE_ARGUMENT));
+        rowToInsert.setArgument(2,
+                RobotToken.create("a3", RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.TASK_TEMPLATE_ARGUMENT));
+        final AModelElement<?> insertedRow = updater.insert(task, 0, rowToInsert);
+
+        assertThat(task.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<Task> addedRow = task.getExecutionContext().get(0);
+
+        assertThat(addedRow).isSameAs(insertedRow);
+        assertThat(addedRow.getParent()).isSameAs(task);
+        assertThat(addedRow.getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
+
+        assertThat(addedRow.getElementTokens())
+                .filteredOn(token -> token.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT))
+                .isEmpty();
+
+    }
+
     private static Task createTask() {
         final RobotFileOutput parentFileOutput = new RobotFileOutput(RobotVersion.from("3.1.0"));
         final RobotFile parent = new RobotFile(parentFileOutput);

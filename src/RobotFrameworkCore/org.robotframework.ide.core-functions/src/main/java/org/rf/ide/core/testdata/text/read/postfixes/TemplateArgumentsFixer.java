@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.testdata.text.read.postfixes;
 
-import java.util.List;
-
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -15,7 +13,6 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.postfixes.PostProcessingFixActions.IPostProcessFixer;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 class TemplateArgumentsFixer implements IPostProcessFixer {
@@ -27,8 +24,9 @@ class TemplateArgumentsFixer implements IPostProcessFixer {
         final TestCaseTable testCaseTable = model.getTestCaseTable();
         if (testCaseTable.isPresent()) {
             for (final TestCase testCase : testCaseTable.getTestCases()) {
-                if (testCase.getTemplateKeywordName().isPresent()) {
-                    updateRows(testCase.getExecutionContext(), RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+                final boolean isTemplateUsed = testCase.getTemplateKeywordName().isPresent();
+                for (final RobotExecutableRow<?> row : testCase.getExecutionContext()) {
+                    row.fixTemplateArgumentsTypes(isTemplateUsed, RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
                 }
             }
         }
@@ -36,34 +34,11 @@ class TemplateArgumentsFixer implements IPostProcessFixer {
         final TaskTable tasksTable = model.getTasksTable();
         if (tasksTable.isPresent()) {
             for (final Task task : tasksTable.getTasks()) {
-                if (task.getTemplateKeywordName().isPresent()) {
-                    updateRows(task.getExecutionContext(), RobotTokenType.TASK_TEMPLATE_ARGUMENT);
+                final boolean isTemplateUsed = task.getTemplateKeywordName().isPresent();
+                for (final RobotExecutableRow<?> row : task.getExecutionContext()) {
+                    row.fixTemplateArgumentsTypes(isTemplateUsed, RobotTokenType.TASK_TEMPLATE_ARGUMENT);
                 }
             }
         }
-    }
-
-    private static <T> void updateRows(final List<RobotExecutableRow<T>> rows,
-            final RobotTokenType templateArgumentType) {
-        for (final RobotExecutableRow<?> executableRow : rows) {
-            if (!isForDeclarationRow(executableRow)) {
-                for (final RobotToken robotToken : executableRow.getElementTokens()) {
-                    if (isTemplateArgument(robotToken)) {
-                        robotToken.getTypes().add(templateArgumentType);
-                    }
-                }
-            }
-        }
-    }
-
-    private static <T> boolean isForDeclarationRow(final RobotExecutableRow<T> row) {
-        return row.getAction().getTypes().contains(RobotTokenType.FOR_TOKEN)
-                || row.getAction().getTypes().contains(RobotTokenType.FOR_END_TOKEN);
-    }
-
-    private static boolean isTemplateArgument(final RobotToken robotToken) {
-        return !robotToken.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                && !robotToken.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)
-                && !robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
     }
 }

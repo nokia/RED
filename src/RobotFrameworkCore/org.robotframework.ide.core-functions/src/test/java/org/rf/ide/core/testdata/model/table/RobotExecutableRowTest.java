@@ -13,6 +13,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -187,7 +190,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenCreationDoesNothing_whenInsertingOutOfTheRow() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.createToken(-1);
@@ -203,7 +206,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenCreationInsertsEmptyToken_whenInsertingAtActionName() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.createToken(0);
@@ -217,7 +220,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenCreationInsertsEmptyToken_whenInsertingAtArgumentOrFirstComment() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row3 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
@@ -245,7 +248,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenCreationInsertsEmptyComment_whenInsertingAtNonFirstComment() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.createToken(4);
@@ -258,7 +261,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenDeletionIsNotPossible_whenTryingToRemoveActionButThereAreNoArguments() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args(), comment());
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args(), comment("c1", "c2"));
 
@@ -268,14 +271,14 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenDeletionDoesNothing_whenIndexIsOutOfTheRow() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.deleteToken(-1);
         row.deleteToken(5);
         row.deleteToken(6);
         row.deleteToken(10);
-        
+
         assertThat(cellsOf(row)).containsExactly("action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
@@ -284,7 +287,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenDeletionMovesArgumentAsAction_whenActionIsRemoved() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.deleteToken(0);
@@ -297,7 +300,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenDeletionRemovesArgument_whenArgumentIsRemoved() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
@@ -317,7 +320,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenDeletionRemovesComment_andMovesOtherToArgumentsProperly() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"),
                 comment("c1", "c2", "# c3", "c4"));
@@ -339,7 +342,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateIsNotPossible_whenTryingToChangeActionIntoComment() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, "# action"));
@@ -347,7 +350,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateDoesNothing_whenNegativeIndexIsGiven() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.updateToken(-1, "a");
@@ -362,7 +365,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateChangesAction_whenUpdatingAtFirstElement() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
         row.updateToken(0, "other action");
@@ -375,7 +378,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateChangesArgument_whenUpdatingAfterAction() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
@@ -395,7 +398,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateChangesArgumentIntoComment_whenUpdatingAfterActionWithCommentedValue() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
@@ -415,7 +418,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateChangesComment_whenUpdatingAfterArguments() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
@@ -435,7 +438,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateChangesCommentIntoArgument_whenUpdatingAfterArgumentsWithUncommentedValue() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment("c1", "# c2", "c3"));
 
@@ -456,7 +459,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateFillsMissingArguments_whenUpdatingRowWithoutCommentsAfterEndOfTokens() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1", "2"), comment());
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1", "2"), comment());
         final RobotExecutableRow<TestCase> row3 = createRow(test, "action", args("1", "2"), comment());
@@ -484,7 +487,7 @@ public class RobotExecutableRowTest {
 
     @Test
     public void tokenUpdateFillsMissingComments_whenUpdatingRowAfterEndOfComments() {
-        final TestCase test = new TestCase(RobotToken.create("test"));
+        final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args("1"), comment("c1"));
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args("1"), comment("c1"));
         final RobotExecutableRow<TestCase> row3 = createRow(test, "action", args("1"), comment("c1"));
@@ -509,6 +512,88 @@ public class RobotExecutableRowTest {
                 RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
     }
 
+    @Test
+    public void test_ifCellWillBeAdded_atActionPosition_whenTemplateIsDefined() {
+        // prepare
+        final RobotToken action = RobotToken.create("act");
+        final RobotToken arg1 = RobotToken.create("a1");
+        final RobotToken arg2 = RobotToken.create("a2");
+        final RobotToken comment = RobotToken.create("cmnt");
+
+        final TestCase test = createTest();
+        final LocalSetting<TestCase> template = test.newTemplate(0);
+        template.addToken("Some Kw");
+        final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
+        row.setParent(test);
+        row.setAction(action);
+        row.addArgument(arg1);
+        row.addArgument(arg2);
+        row.addCommentPart(comment);
+
+        // execute
+        row.createToken(0);
+        row.updateToken(0, "action");
+
+        // verify
+        final List<RobotToken> elementTokens = row.getElementTokens();
+        assertThat(elementTokens).hasSize(5);
+        assertThat(elementTokens.get(0).getText()).isEqualTo("action");
+        assertThat(elementTokens.get(0).getTypes()).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(1).getText()).isEqualTo("act");
+        assertThat(elementTokens.get(1).getTypes()).containsExactly(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(2)).isSameAs(arg1);
+        assertThat(elementTokens.get(2).getTypes()).containsExactly(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(3)).isSameAs(arg2);
+        assertThat(elementTokens.get(3).getTypes()).containsExactly(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(4)).isSameAs(comment);
+        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.START_HASH_COMMENT);
+    }
+
+    @Test
+    public void test_ifCellWillBeAdded_atArgumentPosition_whenTemplateIsDefined() {
+        // prepare
+        final RobotToken action = RobotToken.create("act");
+        final RobotToken arg1 = RobotToken.create("a1");
+        final RobotToken arg2 = RobotToken.create("a2");
+        final RobotToken comment = RobotToken.create("cmnt");
+
+        final TestCase test = createTest();
+        final LocalSetting<TestCase> template = test.newTemplate(0);
+        template.addToken("Some Kw");
+        final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
+        row.setParent(test);
+        row.setAction(action);
+        row.addArgument(arg1);
+        row.addArgument(arg2);
+        row.addCommentPart(comment);
+
+        // execute
+        row.createToken(2);
+        row.updateToken(2, "argument");
+
+        // verify
+        final List<RobotToken> elementTokens = row.getElementTokens();
+        assertThat(elementTokens).hasSize(5);
+        assertThat(elementTokens.get(0)).isSameAs(action);
+        assertThat(elementTokens.get(0).getTypes()).contains(RobotTokenType.TEST_CASE_ACTION_NAME,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(1)).isSameAs(arg1);
+        assertThat(elementTokens.get(1).getTypes()).contains(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(2).getText()).isEqualTo("argument");
+        assertThat(elementTokens.get(2).getTypes()).contains(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(3)).isSameAs(arg2);
+        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        assertThat(elementTokens.get(4)).isSameAs(comment);
+        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.START_HASH_COMMENT);
+    }
+
     private static List<String> args(final String... arguments) {
         return newArrayList(arguments);
     }
@@ -519,6 +604,15 @@ public class RobotExecutableRowTest {
             cmts.set(0, "# " + cmts.get(0));
         }
         return cmts;
+    }
+
+    private static TestCase createTest() {
+        final RobotFileOutput parentFileOutput = new RobotFileOutput(RobotVersion.from("3.1.0"));
+        final RobotFile parent = new RobotFile(parentFileOutput);
+        final TestCaseTable table = new TestCaseTable(parent);
+        final TestCase test = new TestCase(RobotToken.create("test"));
+        test.setParent(table);
+        return test;
     }
 
     private static RobotExecutableRow<TestCase> createRow(final TestCase test, final String action,

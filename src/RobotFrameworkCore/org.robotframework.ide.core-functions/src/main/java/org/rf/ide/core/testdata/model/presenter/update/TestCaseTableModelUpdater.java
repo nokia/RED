@@ -48,6 +48,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             final List<String> cells) {
         final RobotExecutableRow<?> row = createExecutableRow(cells);
         testCase.addElement(index, row);
+        fixTemplateArguments(testCase, row);
         return (RobotExecutableRow<TestCase>) row;
     }
 
@@ -56,7 +57,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException("Unable to create empty call");
         }
         final int cmtIndex = indexOfCommentStart(cells);
-        
+
         final RobotExecutableRow<?> row = new RobotExecutableRow<>();
         row.setAction(RobotToken.create(cells.get(0)));
         for (int i = 1; i < cells.size(); i++) {
@@ -144,7 +145,9 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + testCase.getName().getText() + " test case. Operation handler is missing");
         }
-        return operationHandler.insert(testCase, index, modelElement);
+        final AModelElement<?> inserted = operationHandler.insert(testCase, index, modelElement);
+        fixTemplateArguments(testCase, inserted);
+        return inserted;
     }
 
     private BiFunction<Integer, String, LocalSetting<TestCase>> getSettingCreateOperation(final TestCase testCase,
@@ -179,5 +182,13 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             }
         }
         return null;
+    }
+
+    private void fixTemplateArguments(final TestCase testCase, final AModelElement<?> modelElement) {
+        if (modelElement instanceof RobotExecutableRow<?>) {
+            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
+            row.fixTemplateArgumentsTypes(testCase.getTemplateKeywordName().isPresent(),
+                    RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
+        }
     }
 }
