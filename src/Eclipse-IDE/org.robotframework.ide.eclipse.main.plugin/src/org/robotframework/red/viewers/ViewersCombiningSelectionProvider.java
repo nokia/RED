@@ -8,29 +8,29 @@ package org.robotframework.red.viewers;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 
 public class ViewersCombiningSelectionProvider implements ISelectionProvider {
 
-    private final List<TableViewer> viewers;
+    private final List<ColumnViewer> viewers;
 
-    private TableViewer activeViewer;
+    private ColumnViewer activeViewer;
 
-    public ViewersCombiningSelectionProvider(final TableViewer... viewers) {
+    public ViewersCombiningSelectionProvider(final ColumnViewer... viewers) {
         this.viewers = Arrays.asList(viewers);
 
-        for (final TableViewer viewer : viewers) {
+        for (final ColumnViewer viewer : viewers) {
             addFocusListener(viewer);
         }
     }
 
-    private void addFocusListener(final TableViewer viewer) {
+    private void addFocusListener(final ColumnViewer viewer) {
         viewer.getControl().addFocusListener(new FocusAdapter() {
 
             @Override
@@ -42,7 +42,7 @@ public class ViewersCombiningSelectionProvider implements ISelectionProvider {
 
     @Override
     public void addSelectionChangedListener(final ISelectionChangedListener listener) {
-        for (final TableViewer viewer : viewers) {
+        for (final ColumnViewer viewer : viewers) {
             viewer.addSelectionChangedListener(listener);
         }
     }
@@ -57,7 +57,7 @@ public class ViewersCombiningSelectionProvider implements ISelectionProvider {
 
     @Override
     public void removeSelectionChangedListener(final ISelectionChangedListener listener) {
-        for (final TableViewer viewer : viewers) {
+        for (final ColumnViewer viewer : viewers) {
             viewer.removeSelectionChangedListener(listener);
         }
     }

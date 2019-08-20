@@ -44,8 +44,7 @@ public class LibrariesProjectConfigurationEditorPart
         @Override
         protected ISelectionProvider getSelectionProvider() {
             return new ViewersCombiningSelectionProvider(librariesFragment.getReferencedLibrariesViewer(),
-                    librariesFragment.getRemoteLocationsViewer(), pathsFragment.getPythonPathViewer(),
-                    pathsFragment.getClassPathViewer());
+                    pathsFragment.getPythonPathViewer(), pathsFragment.getClassPathViewer());
         }
     }
 }

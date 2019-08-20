@@ -24,6 +24,16 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class CellsActivationStrategy {
 
+    public static void addActivationStrategy(final ColumnViewer viewer, final RowTabbingStrategy rowTabbing) {
+        if (viewer instanceof TableViewer) {
+            addActivationStrategy((TableViewer) viewer, rowTabbing);
+        } else if (viewer instanceof TreeViewer) {
+            addActivationStrategy((TreeViewer) viewer, rowTabbing);
+        } else {
+            throw new IllegalArgumentException("Unrecognized viewer type");
+        }
+    }
+
     public static void addActivationStrategy(final TableViewer viewer, final RowTabbingStrategy rowTabbing) {
         final FocusCellHighlighter highlighter = new FocusCellHighlighter(viewer) {
             // nothing to implement

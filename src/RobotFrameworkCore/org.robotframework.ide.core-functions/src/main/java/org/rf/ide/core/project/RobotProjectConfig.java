@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,8 +149,7 @@ public class RobotProjectConfig {
 
     public boolean addRemoteLocation(final RemoteLocation remoteLocation) {
         if (!remoteLocations.contains(remoteLocation)) {
-            remoteLocations.add(remoteLocation);
-            return true;
+            return remoteLocations.add(remoteLocation);
         }
         return false;
     }
@@ -431,7 +431,7 @@ public class RobotProjectConfig {
         private boolean isDynamic = false;
 
         @XmlElement(name = "argumentsVariant", type = ReferencedLibraryArgumentsVariant.class)
-        private List<ReferencedLibraryArgumentsVariant> argumentsVariants = new ArrayList<>();
+        private final List<ReferencedLibraryArgumentsVariant> argumentsVariants = new ArrayList<>();
 
         public void setType(final String type) {
             this.type = type;
@@ -457,13 +457,6 @@ public class RobotProjectConfig {
             return path;
         }
 
-        public void setArgumentsVariants(final List<ReferencedLibraryArgumentsVariant> arguments) {
-            if (!isDynamic && arguments.size() > 1) {
-                throw new IllegalArgumentException();
-            }
-            this.argumentsVariants = arguments;
-        }
-
         public List<ReferencedLibraryArgumentsVariant> getArgumentsVariants() {
             return argumentsVariants;
         }
@@ -477,14 +470,26 @@ public class RobotProjectConfig {
             }
         }
 
-        public void addArgumentsVariant(final ReferencedLibraryArgumentsVariant variant) {
-            if (!isDynamic && argumentsVariants.size() >= 1) {
-                throw new IllegalArgumentException();
+        public boolean addArgumentsVariant(final ReferencedLibraryArgumentsVariant variant) {
+            if (argumentsVariants.contains(variant)) {
+                return false;
             }
-            argumentsVariants.add(variant);
+            if (!isDynamic && !argumentsVariants.isEmpty()) {
+                this.isDynamic = true;
+            }
+            return argumentsVariants.add(variant);
+        }
+
+        public boolean removeArgumentsVariants(final Collection<ReferencedLibraryArgumentsVariant> variants) {
+            return this.argumentsVariants.removeAll(variants);
         }
 
         public void setDynamic(final boolean isDynamic) {
+            if (!isDynamic) {
+                while (argumentsVariants.size() > 1) {
+                    argumentsVariants.remove(argumentsVariants.size() - 1);
+                }
+            }
             this.isDynamic = isDynamic;
         }
 
@@ -572,8 +577,12 @@ public class RobotProjectConfig {
             return arguments;
         }
 
+        public void setArguments(final List<String> arguments) {
+            this.arguments = arguments.stream().map(ReferencedLibraryArgument::new).collect(toList());
+        }
+
         public Stream<String> getArgsStream() {
-            return arguments.stream().map(ReferencedLibraryArgument::getArgument);
+            return arguments == null ? Stream.empty() : arguments.stream().map(ReferencedLibraryArgument::getArgument);
         }
 
         @Override

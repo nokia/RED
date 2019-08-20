@@ -148,7 +148,7 @@ class ExternalLibrariesImportCollector {
             } else if (name.equals("Remote")) {
                 locateRemoteLibrary(name, arguments);
             } else if (!name.isEmpty() && !standardLibraryNames.contains(name)) {
-                locateReferencedLibrary(name, arguments);
+                locateReferencedLibrary(name);
             }
         }
 
@@ -193,7 +193,7 @@ class ExternalLibrariesImportCollector {
             }
         }
 
-        private void locateReferencedLibrary(final String name, final List<RobotToken> arguments) {
+        private void locateReferencedLibrary(final String name) {
             if (unknownLibraryNames.containsKey(name)) {
                 unknownLibraryNames.put(name, currentSuite);
             } else if (knownLibraryNames.containsKey(name)) {

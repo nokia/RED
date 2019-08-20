@@ -35,7 +35,7 @@ public class RemoteLocationDialogTest {
                 finished.set(true);
             });
             SwtThread.asyncExec(() -> {
-                dialog.get().getUriText().setText("http://1.2.3.4");
+                dialog.get().getText().setText("http://1.2.3.4");
                 dialog.get().getOkButton().notifyListeners(SWT.Selection, new Event());
             });
         });
@@ -49,7 +49,7 @@ public class RemoteLocationDialogTest {
             }
         }
 
-        assertThat(dialog.get().getRemoteLocation().getUri()).isEqualTo("http://1.2.3.4:8270/RPC2");
+        assertThat(dialog.get().getCreatedElement().getUri()).isEqualTo("http://1.2.3.4:8270/RPC2");
     }
 
     @Test

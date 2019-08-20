@@ -21,11 +21,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant.RedXmlRemoteArgumentsVariant;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary.RedXmlRemoteLib;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
@@ -46,38 +50,48 @@ public class ReferencedLibrariesLabelProviderTest {
     @Test
     public void whenPythonReferencedLibraryWithoutProblemsIsGiven_pythonLibImageIsReturnedAsItsImage() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
-        assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getPythonLibraryImage()));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getPythonLibraryImage()));
     }
 
     @Test
     public void whenJavaReferencedLibraryWithoutProblemsIsGiven_javaLibImageIsReturnedAsItsImage() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib", "/some/path.jar");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
-        assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getJavaLibraryImage()));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getJavaLibraryImage()));
     }
 
     @Test
     public void whenVirtualReferencedLibraryWithoutProblemsIsGiven_virtualLibImageIsReturnedAsItsImage() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.VIRTUAL, "XmlLib", "/some/path.xml");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
-        assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getVirtualLibraryImage()));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getVirtualLibraryImage()));
     }
 
     @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorLibImageIsReturnedAsItsImage() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
-        assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryErrorImage()));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryErrorImage()));
     }
 
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningLibImageIsReturnedAsItsImage() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
-        assertThat(provider.getImage(library)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryWarnImage()));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getRobotLibraryWarnImage()));
     }
 
     @Test
@@ -89,21 +103,44 @@ public class ReferencedLibrariesLabelProviderTest {
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonDecoratedLibNameIsReturnedAsLabel() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
-        final StyledString styledLabel = provider.getStyledText(library);
+        final StyledString styledLabel = provider.getStyledText(lib);
         assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 5, null, null, SWT.NORMAL),
                 new StyleRange(5, 22, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
     }
 
     @Test
+    public void whenReferencedDynamicLibraryWithoutProblemsIsGiven_nonDecoratedLibNameIsReturnedAsLabel() {
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        library.setDynamic(true);
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
+        when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
+
+        final StyledString styledLabel = provider.getStyledText(lib);
+        assertThat(styledLabel.getString()).isEqualTo(" D  PyLib - /some/path/PyLib.py");
+
+        final StyleRange range1 = new StyleRange(0, 3, null, ColorsManager.getColor(190, 210, 255), SWT.NORMAL);
+        range1.borderStyle = SWT.BORDER_SOLID;
+        assertThat(styledLabel.getStyleRanges()).containsExactly(
+                range1,
+                new StyleRange(4, 5, null, null, SWT.NORMAL),
+                new StyleRange(9, 22, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+    }
+
+    @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorDecoratedLibNameIsReturnedAsLabel() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
-        final StyledString styledLabel = provider.getStyledText(library);
+        final StyledString styledLabel = provider.getStyledText(lib);
         assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(
                 new StyleRange(0, 5, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL),
@@ -113,10 +150,12 @@ public class ReferencedLibrariesLabelProviderTest {
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningDecoratedLibNameIsReturnedAsLabel() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
 
-        final StyledString styledLabel = provider.getStyledText(library);
+        final StyledString styledLabel = provider.getStyledText(lib);
         assertThat(styledLabel.getString()).isEqualTo("PyLib - /some/path/PyLib.py");
         assertThat(styledLabel.getStyleRanges()).containsExactly(
                 new StyleRange(0, 5, ColorsManager.getColor(255, 165, 0), null, SWT.NORMAL),
@@ -143,46 +182,175 @@ public class ReferencedLibrariesLabelProviderTest {
     @Test
     public void whenReferencedLibraryWithProblemsIsGiven_tooltipTextWithAllProblemDescriptionsIsReturned() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details"),
                         new RedXmlProblem(Severity.ERROR, "other error details"),
                         new RedXmlProblem(Severity.WARNING, "warning details")));
 
-        assertThat(provider.getToolTipText(library))
+        assertThat(provider.getToolTipText(lib))
                 .isEqualTo(String.join("\n", newArrayList("error details", "other error details", "warning details")));
     }
 
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonTooltipTextIsReturned() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
-        assertThat(provider.getToolTipText(library)).isNull();
+        assertThat(provider.getToolTipText(lib)).isNull();
     }
 
     @Test
     public void whenReferencedLibraryWithErrorIsGiven_errorTooltipImageIsReturned() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
 
-        assertThat(provider.getToolTipImage(library)).isSameAs(ImagesManager.getImage(RedImages.getErrorImage()));
+        assertThat(provider.getToolTipImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getErrorImage()));
     }
 
     @Test
     public void whenReferencedLibraryWithWarningIsGiven_warningTooltipImageIsReturned() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library))
                 .thenReturn(newArrayList(new RedXmlProblem(Severity.WARNING, "warning details")));
 
-        assertThat(provider.getToolTipImage(library)).isSameAs(ImagesManager.getImage(RedImages.getWarningImage()));
+        assertThat(provider.getToolTipImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getWarningImage()));
     }
 
     @Test
     public void whenReferencedLibraryWithoutProblemsIsGiven_nonTooltipImageIsReturned() {
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "/some/path/PyLib.py");
+        final RedXmlLibrary lib = new RedXmlLibrary(library);
+
         when(editorInput.getProblemsFor(library)).thenReturn(new ArrayList<>());
 
-        assertThat(provider.getToolTipImage(library)).isNull();
+        assertThat(provider.getToolTipImage(lib)).isNull();
+    }
+
+    @Test
+    public void whenRemoteLibraryIsGiven_imageAndLabelIsProvided() {
+        final RedXmlRemoteLib lib = new RedXmlRemoteLib();
+
+        final StyledString styledLabel = provider.getStyledText(lib);
+        assertThat(styledLabel.getString()).isEqualTo(" D  Remote - Standard library");
+        final StyleRange range1 = new StyleRange(0, 3, null, ColorsManager.getColor(190, 210, 255), SWT.NORMAL);
+        range1.borderStyle = SWT.BORDER_SOLID;
+        assertThat(styledLabel.getStyleRanges()).containsExactly(range1, new StyleRange(3, 7, null, null, SWT.NORMAL),
+                new StyleRange(10, 19, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(provider.getImage(lib)).isSameAs(ImagesManager.getImage(RedImages.getLibraryImage()));
+        assertThat(provider.getToolTipText(lib)).isNull();
+        assertThat(provider.getToolTipImage(lib)).isNull();
+    }
+
+    @Test
+    public void whenArgumentsForLibraryAreGiven_imageAndLabelIsProvided() {
+        final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+        final RedXmlArgumentsVariant args = new RedXmlArgumentsVariant(null, variant);
+
+        final StyledString styledLabel = provider.getStyledText(args);
+        assertThat(styledLabel.getString()).isEqualTo("[1, 2, 3]");
+        assertThat(styledLabel.getStyleRanges())
+                .containsExactly(new StyleRange(0, 9, RedTheme.Colors.getEclipseDecorationColor(), null, SWT.NORMAL));
+        assertThat(provider.getImage(args)).isNull();
+        assertThat(provider.getToolTipText(args)).isNull();
+        assertThat(provider.getToolTipImage(args)).isNull();
+    }
+
+    @Test
+    public void whenRemoteLocationWithoutProblemsIsGiven_remoteConnectedIsReturnedAsItsImage() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location)).thenReturn(new ArrayList<>());
+        assertThat(provider.getImage(args)).isSameAs(ImagesManager.getImage(RedImages.getRemoteConnectedImage()));
+    }
+
+    @Test
+    public void whenRemoteLocationWithProblemsIsGiven_remoteDisconnectedIsReturnedAsItsImage() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location))
+                .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
+        assertThat(provider.getImage(args))
+                .isSameAs(ImagesManager.getImage(RedImages.getRemoteDisconnectedImage()));
+    }
+
+    @Test
+    public void whenRemoteLocationWithoutProblemsIsGiven_nonDecoratedLocationIsReturnedAsLabel() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location)).thenReturn(new ArrayList<>());
+
+        final StyledString styledLabel = provider.getStyledText(args);
+        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/");
+        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 22, null, null, SWT.NORMAL));
+    }
+
+    @Test
+    public void whenRemoteLocationWithProblemsIsGiven_errorDecoratedLocationIsReturnedAsLabel() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location))
+                .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
+
+        final StyledString styledLabel = provider.getStyledText(args);
+        assertThat(styledLabel.getString()).isEqualTo("http://127.0.0.1:8270/");
+        assertThat(styledLabel.getStyleRanges())
+                .containsExactly(new StyleRange(0, 22, ColorsManager.getColor(255, 0, 0), null, SWT.NORMAL));
+    }
+
+    @Test
+    public void whenRemoteLocationWithProblemsIsGiven_tooltipTextWithAllProblemDescriptionsIsReturned() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location))
+                .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details"),
+                        new RedXmlProblem(Severity.ERROR, "other error details")));
+
+        assertThat(provider.getToolTipText(args))
+                .isEqualTo(String.join("\n", newArrayList("error details", "other error details")));
+    }
+
+    @Test
+    public void whenRemoteLocationWithoutProblemsIsGiven_nonTooltipTextIsReturned() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location)).thenReturn(new ArrayList<>());
+
+        assertThat(provider.getToolTipText(args)).isNull();
+    }
+
+    @Test
+    public void whenRemoteLocationWithProblemsIsGiven_errorTooltipImageIsReturned() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location))
+                .thenReturn(newArrayList(new RedXmlProblem(Severity.ERROR, "error details")));
+
+        assertThat(provider.getToolTipImage(args)).isSameAs(ImagesManager.getImage(RedImages.getErrorImage()));
+    }
+
+    @Test
+    public void whenRemoteLocationWithoutProblemsIsGiven_nonTooltipImageIsReturned() {
+        final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/");
+        final RedXmlRemoteArgumentsVariant args = new RedXmlRemoteArgumentsVariant(null, location);
+
+        when(editorInput.getProblemsFor(location)).thenReturn(new ArrayList<>());
+
+        assertThat(provider.getToolTipImage(args)).isNull();
     }
 }

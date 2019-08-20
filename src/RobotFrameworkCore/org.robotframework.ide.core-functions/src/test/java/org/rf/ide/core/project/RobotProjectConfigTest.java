@@ -7,7 +7,6 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 
@@ -543,13 +542,21 @@ public class RobotProjectConfigTest {
     }
 
     @Test
-    public void argumentsVariantForStaticLibraryCannotBeAdded_whenThereIsOneAlready() {
+    public void argumentsVariantForStaticLibraryCanBeAdded_butTheLibraryModeSwitches() {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "/lib.py");
+        final ReferencedLibraryArgumentsVariant variant1 = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+        final ReferencedLibraryArgumentsVariant variant2 = ReferencedLibraryArgumentsVariant.create("a", "b", "c");
+        final ReferencedLibraryArgumentsVariant variant3 = ReferencedLibraryArgumentsVariant.create("x", "y", "z");
 
-        lib.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("1", "2", "3"));
-        
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> lib.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("a", "b", "c")));
+        assertThat(lib.isDynamic()).isFalse();
+        lib.addArgumentsVariant(variant1);
+        assertThat(lib.isDynamic()).isFalse();
+        lib.addArgumentsVariant(variant2);
+        assertThat(lib.isDynamic()).isTrue();
+        lib.addArgumentsVariant(variant3);
+        assertThat(lib.isDynamic()).isTrue();
+
+        assertThat(lib.getArgumentsVariants()).containsExactly(variant1, variant2, variant3);
     }
 
     @Test
@@ -562,9 +569,13 @@ public class RobotProjectConfigTest {
 
         assertThat(lib.getArgumentsVariants()).isEmpty();
 
+        assertThat(lib.isDynamic()).isTrue();
         lib.addArgumentsVariant(variant1);
+        assertThat(lib.isDynamic()).isTrue();
         lib.addArgumentsVariant(variant2);
+        assertThat(lib.isDynamic()).isTrue();
         lib.addArgumentsVariant(variant3);
+        assertThat(lib.isDynamic()).isTrue();
 
         assertThat(lib.getArgumentsVariants()).containsExactly(variant1, variant2, variant3);
     }

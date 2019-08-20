@@ -18,15 +18,18 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.red.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -36,8 +39,15 @@ import com.google.common.annotations.VisibleForTesting;
  */
 class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
-    ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final Supplier<ReferencedLibrary> elementsCreator) {
+    private final RedProjectEditorInput editorInput;
+
+    private final IEventBroker eventBroker;
+
+    ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final Supplier<ReferencedLibrary> elementsCreator,
+            final RedProjectEditorInput editorInput, final IEventBroker eventBroker) {
         super(viewer, 0, elementsCreator);
+        this.editorInput = editorInput;
+        this.eventBroker = eventBroker;
     }
 
     @Override
@@ -47,19 +57,43 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected CellEditor getCellEditor(final Object element) {
-        // overridden for testing purpose
-        return super.getCellEditor(element);
+        if (element instanceof RedXmlArgumentsVariant) {
+            final Composite parent = (Composite) getViewer().getControl();
+            return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
+                    RedPlugin.DETAILS_EDITING_CONTEXT_ID);
+        } else {
+            return super.getCellEditor(element);
+        }
     }
 
     @Override
     protected Object getValue(final Object element) {
-        return null;
+        if (element instanceof RedXmlArgumentsVariant) {
+            return ((RedXmlArgumentsVariant) element).getArguments();
+        } else {
+            return null;
+        }
     }
 
     @Override
     protected void setValue(final Object element, final Object value) {
-        // overridden for testing purpose
-        super.setValue(element, value);
+        if (element instanceof RedXmlArgumentsVariant) {
+            try {
+                final RedXmlArgumentsVariant args = (RedXmlArgumentsVariant) element;
+                final String oldValue = (String) getValue(element);
+                final String newValue = (String) value;
+
+                if (!newValue.equals(oldValue)) {
+                    args.setArguments(newValue);
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), args));
+                }
+            } catch (final IllegalArgumentException e) {
+                // uri syntax was wrong...
+            }
+        } else {
+            super.setValue(element, value);
+        }
     }
 
     static class ReferencedLibraryCreator implements Supplier<ReferencedLibrary> {

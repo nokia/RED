@@ -6,6 +6,8 @@
 package org.robotframework.red.jface.viewers;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -13,7 +15,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -132,6 +133,16 @@ public class ViewerColumnsFactory {
 
     public ViewerColumnsFactory equipWithThreeWaySorting(final ViewerComparator ascendingComparator) {
         return equipWithThreeWaySorting(ascendingComparator, new ReversingViewerComparator(ascendingComparator));
+    }
+
+    public void createFor(final ColumnViewer viewer) {
+        if (viewer instanceof TableViewer) {
+            createFor((TableViewer) viewer);
+        } else if (viewer instanceof TreeViewer) {
+            createFor((TreeViewer) viewer);
+        } else {
+            throw new IllegalArgumentException("Unrecognized viewer type");
+        }
     }
 
     public void createFor(final TableViewer viewer) {
