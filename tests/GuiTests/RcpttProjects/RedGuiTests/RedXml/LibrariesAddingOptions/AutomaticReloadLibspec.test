@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/4/19 11:33 AM
+Save-Time: 8/21/19 4:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -26,8 +26,8 @@ get-editor "NewProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | cl
 
 //add file with functions
 set-dialog-result File "platform:/resource/NewProject/only_function.py"
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | get-item "...add new library file" | double-click
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | key-type "M1+s"
 
 
 //wait for Referenced libs - by default collapsed
@@ -102,7 +102,7 @@ with [get-view "Project Explorer" | get-tree] {
 //add file with class
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/here_is_class.py"
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "NewProject/red.xml" |  get-section "Libraries" | get-tree | get-item "...add new library file" | double-click
 
 // verify Select library class items list
 get-window "Select library class" | get-table | select "here_is_class"
@@ -116,7 +116,7 @@ with [get-window "Select library class" | get-control Any -index 1] {
 }
 
 get-window "Select library class" | get-table | select "here_is_class.Dog" | click -default
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | key-type "M1+s"
 
 //remove class Cat
 get-view "Project Explorer" | get-tree | select "NewProject/here_is_class.py" | get-menu "Open With/Text Editor" 
@@ -180,8 +180,8 @@ try -times 3 -delay 500 -command{
 // add file with import    
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/imports/test.py"
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | select "here_is_class.Dog - NewProject\\/here_is_class.py"
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | get-item "...add new library file" | double-click
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | select "here_is_class.Dog - NewProject\\/here_is_class.py"
     | key-type "M1+s"
     
 //check PE
@@ -218,8 +218,8 @@ with [get-view "Project Explorer" | get-tree] {
 // add file with class
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/imports/MainClass.py"
-get-editor "NewProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "NewProject/red.xml" | get-section Libraries | get-table |  key-type "M1+s"
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree | get-item "...add new library file" | double-click
+get-editor "NewProject/red.xml" | get-section "Libraries" | get-tree |  key-type "M1+s"
 
 //chage method in class that is imported
 get-view "Project Explorer" | get-tree | select "NewProject/imports/class_to_import.py" 
