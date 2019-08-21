@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tMPTMN5NEeeM0Z7Do3ZSmA
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/29/19 2:34 PM
+Save-Time: 8/21/19 10:44 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,18 +37,16 @@ try -command{
 	get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 	get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item Libraries | click
 	
-	get-editor "RobotProject/red.xml" | get-section Libraries | get-table 
-	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	    -index 1 | get-item  "...add new remote location" | double-click
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-tree 
+		| select " D  Remote - Standard library" | get-menu -path "Add arguments" | click
 	    
 	with [get-window "Add Remote location"] {
 	    get-editbox -after [get-label URI] | set-text "http://127.0.0.1:9000/"
 	    get-button OK | click
 	}
 	// add second location to red.xml
-	get-editor "RobotProject/red.xml" | get-section Libraries | get-table 
-	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	    -index 1 | get-item  "...add new remote location" | double-click
+	get-editor "RobotProject/red.xml" | get-section Libraries | get-tree 
+		| select " D  Remote - Standard library" | get-menu -path "Add arguments" | click
 	    
 	with [get-window "Add Remote location"] {
 	    get-editbox -after [get-label URI] | set-text "http://127.0.0.1:10000/"

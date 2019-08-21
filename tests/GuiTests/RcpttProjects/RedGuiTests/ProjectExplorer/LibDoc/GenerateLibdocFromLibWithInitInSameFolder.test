@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: https://jira3.int.net.nokia.com/projects/RED/issues/RED-1060
 Id: _aCLYsB0wEeirJIfaEnmyJw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 11:10 AM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 11:34 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -32,7 +32,7 @@ get-editor "Lib/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 
 set-dialog-result File "platform:/resource/Lib/libraries/moduleLib/newlib.py"
 exec-with-options {
-    get-editor "Lib/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+    get-editor "Lib/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
     
     //I cannot get by RCPPT to table - verification made by children
 	 with [get-window "Select library class" | get-control Any -index 1] {
@@ -47,13 +47,13 @@ exec-with-options {
 
 
 set-dialog-result File "platform:/resource/Lib/libraries/moduleLib/__init__.py"
-get-editor "Lib/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "Lib/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 with [get-window "Select library class"] {
     get-table | select "moduleLib.api"
     get-button OK | click
 }
 
-get-editor "Lib/red.xml" | get-section "Libraries" | get-table | key-type "M1+s"
+get-editor "Lib/red.xml" | get-section "Libraries" | get-tree | key-type "M1+s"
 
 //check libspecs
 get-view "Project Explorer" | get-tree | get-item -path "Lib/Robot Referenced libraries" | get-property childCount 

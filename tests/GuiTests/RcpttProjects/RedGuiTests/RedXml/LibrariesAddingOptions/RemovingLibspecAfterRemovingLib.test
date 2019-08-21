@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ytq_YILREemG5cruxlOj_w
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/30/19 2:32 PM
+Save-Time: 8/21/19 12:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,7 +24,7 @@ wait-for-loading-red-xml -editor_name  "SecondProject/red.xml"
 //removed 2 libs thet were in xml
 with [get-editor "SecondProject/red.xml"] {
     get-tab-folder | get-tab-item Libraries | click
-    with [get-section Libraries | get-table] {
+    with [get-section Libraries | get-tree] {
         get-cell 0 0 | click
         key-type Del
         get-cell 0 0 | click
@@ -53,12 +53,12 @@ with [get-editor "MyClass.py" | get-text-viewer] {
 
 //add lib
 set-dialog-result File "platform:/resource/SecondProject/libs/file.py"
-get-editor "SecondProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "SecondProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 
 //add class
 set-dialog-result File "platform:/resource/SecondProject/MyClass.py"
-get-editor "SecondProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-get-editor "SecondProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "SecondProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+get-editor "SecondProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 
 
 //check if new libdocs were genereted

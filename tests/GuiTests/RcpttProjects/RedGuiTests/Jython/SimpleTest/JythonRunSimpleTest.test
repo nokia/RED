@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/20/19 1:43 PM
+Save-Time: 8/21/19 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,10 +55,10 @@ try -command{
 	
 	
 	set-dialog-result File "platform:/resource/jython_simple_project/RED_TEST_JavaLib.jar"
-	get-editor "jython_simple_project/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+	get-editor "jython_simple_project/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 	
 	get-window "Select library class" | get-table | select MathOperator | click -default
-	get-editor "jython_simple_project/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	get-editor "jython_simple_project/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 	get-editor "jython_simple_project/red.xml" | close
 	
 	// check problems - now libspecs should be generated, no erros visible

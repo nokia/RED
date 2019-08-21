@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _V4L9gIlCEemC5c0GiYm_Dw
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/19/19 11:08 AM
+Save-Time: 8/21/19 11:09 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -112,21 +112,18 @@ try -command{
 	    click
 	    get-tab-folder | get-tab-item Libraries | click
 	}
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	    -index 1] {
-	    get-property "getItems().length" | equals 4 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:9000/" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "http://www.nonexist.com/web/" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "...add new remote location" | verify-true
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree] {
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().length" | equals 3 | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "http://127.0.0.1:10000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "http://127.0.0.1:9000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "http://www.nonexist.com/web/" | verify-true
 	}
 
-	with [get-editor "RemoteProject/red.xml"] {
-	    click
-	    get-section Libraries | get-table 
-	        -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	        -index 1 | select "http:\\/\\/www.nonexist.com\\/web\\/" | key-type Del
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree] {
+	    select " D  Remote - Standard library/http:\\/\\/www.nonexist.com\\/web\\/" | get-menu -path Delete | click
 	}
 	get-editor "test.robot" | click
 	

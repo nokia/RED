@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _O7bj0CuAEei6wOJtueYdHQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/8/19 12:23 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 2:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,19 +58,18 @@ try -command{
 	    select "RemoteProject/red.xml" | double-click
 	}
 	get-editor "RemoteProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	    -index 1] {
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8000/" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:9000/" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "...add new remote location" | verify-true
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree] {
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().length" | equals 3 | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "http://127.0.0.1:10000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "http://127.0.0.1:8000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "http://127.0.0.1:9000/" | verify-true
 	}
 	// clear red.xml
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-	    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-	    -index 1] {
-	    select "http:\\/\\/127.0.0.1:9000\\/" "http:\\/\\/127.0.0.1:8000\\/" "http:\\/\\/127.0.0.1:10000\\/"
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree] {
+	    select " D  Remote - Standard library/http:\\/\\/127.0.0.1:9000\\/" " D  Remote - Standard library/http:\\/\\/127.0.0.1:8000\\/" " D  Remote - Standard library/http:\\/\\/127.0.0.1:10000\\/"
 	    key-type Del
 	    key-type "M1+s"
 	}
@@ -78,6 +77,7 @@ try -command{
 	get-editor "TestFile.robot" | click
 	get-view "Project Explorer" | get-tree | select RemoteProject | get-menu 
 	    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+	    
 	// verify importers
 	//get-window "Discovering libraries summary" | get-tree | get-item -path "Remote http:\\/\\/127.0.0.1:10000\\/" | click
 	with [get-window "Discovering libraries summary" | get-tree] {
@@ -121,20 +121,20 @@ try -command{
 	// verifi red.xml
 	with [get-editor "RemoteProject/red.xml"] {
 	    click
-	    get-section "Libraries" | get-table | key-type "M1+s"
+	    get-section "Libraries" | get-tree | key-type "M1+s"
 	}
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1] {
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8000/" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:9000/" | verify-true
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree] {
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().length" | equals 3 | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "http://127.0.0.1:10000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "http://127.0.0.1:8000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "http://127.0.0.1:9000/" | verify-true
 	}
 	// clear red.xml
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1] {
-	    select "http:\\/\\/127.0.0.1:9000\\/" "http:\\/\\/127.0.0.1:8000\\/" "http:\\/\\/127.0.0.1:10000\\/"
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree]{
+	    select " D  Remote - Standard library/http:\\/\\/127.0.0.1:9000\\/" " D  Remote - Standard library/http:\\/\\/127.0.0.1:8000\\/" " D  Remote - Standard library/http:\\/\\/127.0.0.1:10000\\/"
 	    key-type Del
 	    key-type "M1+s"
 	}
@@ -177,20 +177,16 @@ try -command{
 	// verify red.xml
 	with [get-editor "RemoteProject/red.xml"] {
 	    click
-	    get-section "Libraries" | get-table | key-type "M1+s"
+	    get-section "Libraries" | get-tree | key-type "M1+s"
 	}
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1] {
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/" | verify-true
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree ]{
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
+	    get-item -path " D  Remote - Standard library" | get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/" | verify-true
 	}
 
 	//remove all from red.xml
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1] {
-	    select "http:\\/\\/127.0.0.1:8270\\/RPC2\\/" "http:\\/\\/127.0.0.1:10000\\/"
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree ]{
+	    select " D  Remote - Standard library/http:\\/\\/127.0.0.1:8270\\/RPC2\\/" " D  Remote - Standard library/http:\\/\\/127.0.0.1:10000\\/"
 	    key-type Del
 	}
 	get-button "Save (M1+S)" | click
@@ -201,11 +197,9 @@ try -command{
 	    get-text-viewer | key-type "M1+s"
 	}
 	get-editor "RemoteProject/red.xml" | click
-	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-table 
-    -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
-    -index 1] {
-	    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/" | verify-true
+	with [get-editor "RemoteProject/red.xml" | get-section Libraries | get-tree ] {
+	     get-item -path " D  Remote - Standard library" | get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:10000/" | verify-true
+	     get-item -path " D  Remote - Standard library" | get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2/" | verify-true
 	}
 
 	

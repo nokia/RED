@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/2/19 6:00 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 10:46 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -281,7 +281,7 @@ if [$is_eclipse_oxygen | equals True]{
 	get-editor "ProjectWithResource/red.xml" | get-section "Libraries" | get-editbox | key-type "M1+s"
 }	
 if [$is_eclipse_photon | equals True]{
-	get-editor "ProjectWithResource/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	get-editor "ProjectWithResource/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 }-else{	
 	get-editor "ProjectWithResource/red.xml" | get-section "Libraries" | get-editbox | key-type "M1+s"
 }	

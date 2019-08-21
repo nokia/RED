@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _rKHzEC1_EeanG46zhUFEYg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/27/19 2:19 PM
+Save-Time: 8/21/19 2:33 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -59,8 +59,8 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Linux"]{
 	get-view "Project Explorer" | get-tree | select "a/red.xml" | double-click
 	get-editor "a/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 	set-dialog-result File "platform:/resource/a/b.py"
-	get-editor "a/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-	get-editor "a/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	get-editor "a/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+	get-editor "a/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 	
 	get-view "Project Explorer" | get-tree | get-item -path "a/Robot Referenced libraries/b a\\/b.py \\(1\\)/Test" 
 	    | get-property caption | equals Test | verify-true
@@ -101,8 +101,8 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Linux"]{
 	//add to red.xml
 	get-view "Project Explorer" | get-tree | select "a/red.xml" | double-click
 	set-dialog-result File "platform:/resource/a/b.py"
-	get-editor "a/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
-	get-editor "a/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+	get-editor "a/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+	get-editor "a/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 	
 	//check if new libspec was generated
 	wait 3000

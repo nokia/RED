@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _WZVa8LkvEeWzhqlyblQz1g
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 3:46 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -36,13 +36,13 @@ get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select 
 wait-for-loading-red-xml -editor_name "RobotProject/red.xml" 
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
 set-dialog-result File "platform:/resource/RobotProject/additional libs/lib1.py"
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | get-item "...add new library file" | double-click
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | get-item "...add new library file" | double-click
 with [get-window "Select library class"] {
     get-table | select "lib1.Fruits"
     get-button OK | click
 }
 
-get-editor "RobotProject/red.xml" | get-section Libraries | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
 
 // check if libdoc is generated
 with [get-view "Project Explorer" | get-tree] {

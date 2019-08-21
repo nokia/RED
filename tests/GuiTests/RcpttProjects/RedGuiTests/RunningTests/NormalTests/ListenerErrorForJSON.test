@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kSFxAG96Eeas5uogJbgGYA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 4:28 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 2:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ get-view Console | get-text-viewer | get-property text
 //remove lib from red.xml to remove generated libdock    
 get-view "Project Explorer" | get-tree | select "ListerError/red.xml" | double-click
 get-editor "ListerError/red.xml" | get-tab-folder | get-tab-item "Libraries" | click
-with [get-editor "ListerError/red.xml" | get-section "Libraries" | get-table] {
+with [get-editor "ListerError/red.xml" | get-section "Libraries" | get-tree] {
     select "KeywordLibrary - ListerError\\/KeywordLibrary.py" | key-type Del
     key-type "M1+s"
 }    

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _rbkCsNBKEeeh-ab4fgUj0A
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/9/19 3:53 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/21/19 11:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,7 +28,7 @@ get-window "Discovering libraries summary" | get-button OK | click
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Libraries" | click
-    with [get-section "Libraries" | get-table] {
+    with [get-section "Libraries" | get-tree] {
         select "divide - RobotProject\\/libs\\/t\\/divide.py" 
         	"multiply - RobotProject\\/multiply.py" 
 	        "lib_with_args - RobotProject\\/libs\\/lib_with_args.py"
@@ -60,7 +60,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
 get-window "Discovering libraries summary" | get-button OK | click
 
 //remove all fromred.xml
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-tree] {
     select "res1 - RobotProject\\/libs\\/for_resource\\/res1.py" "multiply - RobotProject\\/multiply.py" "many_classes - RobotProject\\/libs\\/subfolder\\/many_classes.py" "lib_with_args - RobotProject\\/libs\\/lib_with_args.py" "divide - RobotProject\\/libs\\/t\\/divide.py" "add - RobotProject\\/libs\\/add.py"
     key-type Del
     key-type "M1+s"
@@ -75,7 +75,7 @@ get-window "Discovering libraries summary" | get-tree | get-property itemCount |
 get-window "Discovering libraries summary" | get-button OK | click
 
 //remove all
-with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-table] {
+with [get-editor "RobotProject/red.xml" | get-section "Libraries" | get-tree] {
     select "res1 - RobotProject\\/libs\\/for_resource\\/res1.py"
         "multiply - RobotProject\\/multiply.py" 
         "many_classes - RobotProject\\/libs\\/subfolder\\/many_classes.py"
