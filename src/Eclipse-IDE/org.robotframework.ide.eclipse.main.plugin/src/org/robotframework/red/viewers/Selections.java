@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,5 +59,12 @@ public class Selections {
     public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,
             final Class<T> elementsClass) {
         return getElements(selection, elementsClass).stream().findFirst();
+    }
+
+    public static Optional<Object> getOptionalFirstElement(final IStructuredSelection selection,
+            final Predicate<Object> predicate) {
+        @SuppressWarnings("unchecked")
+        final List<Object> elements = selection.toList();
+        return elements.stream().filter(predicate).findFirst();
     }
 }

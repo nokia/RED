@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
-import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.viewers.ISelection;
@@ -17,7 +17,8 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider.RemoteLibraryViewItem;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,10 +41,12 @@ public class SwitchLibraryMenuItem extends CompoundContributionItem {
         if (selection instanceof IStructuredSelection) {
             final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 
-            final Optional<RedXmlLibrary> lib = Selections.getOptionalFirstElement(structuredSelection,
-                    RedXmlLibrary.class);
-            return new IContributionItem[] {
-                    createMenuItem(activeWindow, lib.map(RedXmlLibrary::isDynamic).orElse(false)) };
+            final Predicate<Object> isLib = elem -> elem instanceof RemoteLibraryViewItem || elem instanceof ReferencedLibrary;
+            final boolean isDynamic = Selections.getOptionalFirstElement(structuredSelection, isLib)
+                    .map(o -> o instanceof RemoteLibraryViewItem ? true : ((ReferencedLibrary) o).isDynamic())
+                    .orElse(false);
+            
+            return new IContributionItem[] { createMenuItem(activeWindow, isDynamic) };
         }
         return new IContributionItem[] { createMenuItem(activeWindow, false) };
     }

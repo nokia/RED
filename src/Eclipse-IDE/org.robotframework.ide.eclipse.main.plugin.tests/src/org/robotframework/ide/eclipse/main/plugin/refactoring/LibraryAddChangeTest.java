@@ -66,7 +66,7 @@ public class LibraryAddChangeTest {
         assertThat(config.getReferencedLibraries()).hasSize(1);
         assertThat(config.getReferencedLibraries().get(0))
                 .has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b")));
-        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);

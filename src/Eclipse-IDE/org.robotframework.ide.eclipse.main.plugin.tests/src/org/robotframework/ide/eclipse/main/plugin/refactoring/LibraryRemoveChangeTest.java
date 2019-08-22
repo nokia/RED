@@ -66,7 +66,7 @@ public class LibraryRemoveChangeTest {
 
         assertThat(undoOperation).isInstanceOf(LibraryAddChange.class);
         assertThat(config.getReferencedLibraries()).isEmpty();
-        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);

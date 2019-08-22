@@ -3371,23 +3371,30 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <and>
-                         <instanceof
-                               value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary">
-                         </instanceof>
-                         <not>
-                            <instanceof
-                                  value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary$RedXmlRemoteLib">
-                            </instanceof>
-                         </not>
-                      </and>
+                      <or>
+                          <instanceof
+                                value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider$RemoteLibraryViewItem">
+                          </instanceof>
+                          <instanceof
+                                value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                          </instanceof>
+                          <instanceof
+                                value="org.robotframework.red.viewers.ElementAddingToken">
+                          </instanceof>
+                      </or>
                    </iterate>
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <instanceof
-                            value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant">
-                      </instanceof></iterate>
+                      <or>
+                          <instanceof
+                                value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
+                          </instanceof>
+                          <instanceof
+                                value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibraryArgumentsVariant">
+                          </instanceof>
+                      </or>
+                   </iterate>
                 </or>
              </and>
           </with>
@@ -3411,9 +3418,15 @@
                 <iterate
                       ifEmpty="false"
                       operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary">
-                   </instanceof></iterate>
+                   <or>
+                       <instanceof
+                             value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                       </instanceof>
+                       <instanceof
+                             value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider$RemoteLibraryViewItem">
+                       </instanceof>
+                   </or>
+                </iterate>
              </and>
           </with></enabledWhen>
     </handler>
@@ -3435,16 +3448,9 @@
                 <iterate
                       ifEmpty="false"
                       operator="and">
-                   <and>
-                      <instanceof
-                            value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary">
-                      </instanceof>
-                      <not>
-                         <instanceof
-                               value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary$RedXmlRemoteLib">
-                         </instanceof>
-                      </not>
-                   </and>
+                   <instanceof
+                         value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                   </instanceof>
                 </iterate>
              </and>
           </with></enabledWhen>
@@ -4157,9 +4163,14 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <instanceof
-                            value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary">
-                      </instanceof>
+                      <or>
+                          <instanceof
+                                value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                          </instanceof>
+                          <instanceof
+                                value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider$RemoteLibraryViewItem">
+                          </instanceof>
+                      </or>
                    </iterate>
                 </and>
              </with>
@@ -4188,9 +4199,14 @@
                    <iterate
                          ifEmpty="false"
                          operator="and">
-                      <instanceof
-                            value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary">
-                      </instanceof>
+                       <or>
+                           <instanceof
+                                 value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
+                           </instanceof>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider$RemoteLibraryViewItem">
+                           </instanceof>
+                       </or>
                    </iterate>
                 </and>
              </with>

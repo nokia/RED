@@ -14,8 +14,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant.RedXmlRemoteArgumentsVariant;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary.RedXmlRemoteLib;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider.RemoteLibraryViewItem;
 import org.robotframework.red.viewers.ElementAddingToken;
 
 public class ReferencedLibrariesContentProviderTest {
@@ -29,7 +28,7 @@ public class ReferencedLibrariesContentProviderTest {
         final Object[] elements = provider.getElements(cfg);
 
         assertThat(elements).hasSize(2);
-        assertThat(elements[0]).isEqualTo(new RedXmlRemoteLib());
+        assertThat(elements[0]).isEqualTo(new RemoteLibraryViewItem(cfg));
         assertThat(elements[1]).isInstanceOf(ElementAddingToken.class);
 
         assertThat(provider.hasChildren(elements[0])).isTrue();
@@ -49,12 +48,11 @@ public class ReferencedLibrariesContentProviderTest {
         final Object[] elements = provider.getElements(cfg);
 
         assertThat(elements).hasSize(2);
-        assertThat(elements[0]).isEqualTo(new RedXmlRemoteLib());
+        assertThat(elements[0]).isEqualTo(new RemoteLibraryViewItem(cfg));
         assertThat(elements[1]).isInstanceOf(ElementAddingToken.class);
 
         assertThat(provider.hasChildren(elements[0])).isTrue();
         assertThat(provider.getChildren(elements[0]))
-                .extracting(r -> ((RedXmlRemoteArgumentsVariant) r).getRemoteLocation())
                 .containsExactly(RemoteLocation.create("http://127.0.0.1:8271/"),
                         RemoteLocation.create("http://127.0.0.2:8272/"));
         assertThat(provider.hasChildren(elements[1])).isFalse();
@@ -66,8 +64,10 @@ public class ReferencedLibrariesContentProviderTest {
     public void whenContentProviderIsAskedForElementsOfConfigWithLibraries_itReturnsThemAsChildren() {
         final RobotProjectConfig cfg = new RobotProjectConfig();
         final ReferencedLibrary lib1 = ReferencedLibrary.create(LibraryType.PYTHON, "PyLib", "path1");
-        lib1.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("1", "2", "3"));
-        lib1.addArgumentsVariant(ReferencedLibraryArgumentsVariant.create("x", "y"));
+        final ReferencedLibraryArgumentsVariant variant1 = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
+        final ReferencedLibraryArgumentsVariant variant2 = ReferencedLibraryArgumentsVariant.create("x", "y");
+        lib1.addArgumentsVariant(variant1);
+        lib1.addArgumentsVariant(variant2);
         cfg.addReferencedLibrary(lib1);
         cfg.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPyLib", "path2"));
         cfg.addReferencedLibrary(ReferencedLibrary.create(LibraryType.JAVA, "JavaLib", "path3"));
@@ -78,24 +78,17 @@ public class ReferencedLibrariesContentProviderTest {
         final Object[] elements = provider.getElements(cfg);
 
         assertThat(elements).hasSize(6);
-        assertThat(elements[0]).isEqualTo(new RedXmlRemoteLib());
-        assertThat(((RedXmlLibrary) elements[1]).getLibrary())
-                .isEqualTo(lib1);
-        assertThat(((RedXmlLibrary) elements[2]).getLibrary())
-                .isEqualTo(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPyLib", "path2"));
-        assertThat(((RedXmlLibrary) elements[3]).getLibrary())
-                .isEqualTo(ReferencedLibrary.create(LibraryType.JAVA, "JavaLib", "path3"));
-        assertThat(((RedXmlLibrary) elements[4]).getLibrary())
-                .isEqualTo(ReferencedLibrary.create(LibraryType.VIRTUAL, "XmlLib", "path4"));
+        assertThat(elements[0]).isEqualTo(new RemoteLibraryViewItem(cfg));
+        assertThat(elements[1]).isEqualTo(lib1);
+        assertThat(elements[2]).isEqualTo(ReferencedLibrary.create(LibraryType.PYTHON, "OtherPyLib", "path2"));
+        assertThat(elements[3]).isEqualTo(ReferencedLibrary.create(LibraryType.JAVA, "JavaLib", "path3"));
+        assertThat(elements[4]).isEqualTo(ReferencedLibrary.create(LibraryType.VIRTUAL, "XmlLib", "path4"));
         assertThat(elements[5]).isInstanceOf(ElementAddingToken.class);
 
         assertThat(provider.hasChildren(elements[0])).isTrue();
         assertThat(provider.getChildren(elements[0])).isEmpty();
         assertThat(provider.hasChildren(elements[1])).isTrue();
-        assertThat(provider.getChildren(elements[1]))
-                .extracting(r -> ((RedXmlArgumentsVariant) r).getVariant())
-                .containsExactly(ReferencedLibraryArgumentsVariant.create("1", "2", "3"),
-                        ReferencedLibraryArgumentsVariant.create("x", "y"));
+        assertThat(provider.getChildren(elements[1])).containsExactly(variant1, variant2);
         assertThat(provider.hasChildren(elements[2])).isTrue();
         assertThat(provider.getChildren(elements[2])).isEmpty();
         assertThat(provider.hasChildren(elements[3])).isTrue();

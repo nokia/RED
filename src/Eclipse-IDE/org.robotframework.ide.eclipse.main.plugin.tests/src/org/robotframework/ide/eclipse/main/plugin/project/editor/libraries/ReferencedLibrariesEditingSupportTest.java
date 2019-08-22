@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,7 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant.RedXmlRemoteArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesEditingSupport.ReferencedLibraryCreator;
 import org.robotframework.red.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
@@ -75,7 +75,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(viewer, null,
                 mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final CellEditor cellEditor = support.getCellEditor(new RedXmlLibrary(new ReferencedLibrary()));
+        final CellEditor cellEditor = support.getCellEditor(new ReferencedLibrary());
         assertThat(cellEditor).isNull();
     }
 
@@ -88,7 +88,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(viewer, null,
                 mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final CellEditor cellEditor = support.getCellEditor(new RedXmlRemoteArgumentsVariant(null, new RemoteLocation()));
+        final CellEditor cellEditor = support.getCellEditor(new RemoteLocation());
         assertThat(cellEditor).isInstanceOf(ActivationCharPreservingTextCellEditor.class);
     }
 
@@ -101,8 +101,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(viewer, null,
                 mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final CellEditor cellEditor = support
-                .getCellEditor(new RedXmlArgumentsVariant(null, ReferencedLibraryArgumentsVariant.create("1")));
+        final CellEditor cellEditor = support.getCellEditor(ReferencedLibraryArgumentsVariant.create("1"));
         assertThat(cellEditor).isInstanceOf(ActivationCharPreservingTextCellEditor.class);
     }
 
@@ -124,7 +123,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), null, mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final Object value = support.getValue(new RedXmlLibrary(new ReferencedLibrary()));
+        final Object value = support.getValue(new ReferencedLibrary());
         assertThat(value).isNull();
     }
 
@@ -142,7 +141,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), null, mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final Object value = support.getValue(new RedXmlRemoteArgumentsVariant(null, RemoteLocation.create("http://some.uri.com")));
+        final Object value = support.getValue(RemoteLocation.create("http://some.uri.com"));
         assertThat(value).isEqualTo("http://some.uri.com");
     }
 
@@ -151,8 +150,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), null, mock(RedProjectEditorInput.class), mock(IEventBroker.class));
 
-        final Object value = support
-                .getValue(new RedXmlArgumentsVariant(null, ReferencedLibraryArgumentsVariant.create("1", "2", "3")));
+        final Object value = support.getValue(ReferencedLibraryArgumentsVariant.create("1", "2", "3"));
         assertThat(value).isEqualTo("1::2::3");
     }
 
@@ -163,7 +161,7 @@ public class ReferencedLibrariesEditingSupportTest {
 
         final ReferencedLibrary library = new ReferencedLibrary();
 
-        support.setValue(new RedXmlLibrary(library), "value");
+        support.setValue(library, "value");
 
         assertThat(library).isEqualTo(new ReferencedLibrary());
     }
@@ -176,7 +174,7 @@ public class ReferencedLibrariesEditingSupportTest {
                 mock(ColumnViewer.class), null, mock(RedProjectEditorInput.class), eventBroker);
 
         final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
-        support.setValue(new RedXmlRemoteArgumentsVariant(null, location), "invalid uri");
+        support.setValue(location, "invalid uri");
 
         assertThat(location.getUri()).isEqualTo("http://some.uri.com");
         verifyZeroInteractions(eventBroker);
@@ -194,12 +192,11 @@ public class ReferencedLibrariesEditingSupportTest {
 
         final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
 
-        final RedXmlRemoteArgumentsVariant variant = new RedXmlRemoteArgumentsVariant(null, location);
-        support.setValue(variant, "http://some.other.uri.com");
+        support.setValue(location, "http://some.other.uri.com");
 
         assertThat(location.getUri()).isEqualTo("http://some.other.uri.com");
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
-                argThat(hasCorrectEventData(file, variant)));
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_CHANGED),
+                argThat(hasCorrectEventData(file, newArrayList(location))));
     }
 
     @Test
@@ -210,7 +207,7 @@ public class ReferencedLibrariesEditingSupportTest {
                 mock(ColumnViewer.class), null, mock(RedProjectEditorInput.class), eventBroker);
 
         final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
-        support.setValue(new RedXmlRemoteArgumentsVariant(null, location), "http://some.uri.com");
+        support.setValue(location, "http://some.uri.com");
 
         assertThat(location.getUri()).isEqualTo("http://some.uri.com");
         verifyZeroInteractions(eventBroker);
@@ -228,12 +225,11 @@ public class ReferencedLibrariesEditingSupportTest {
 
         final ReferencedLibraryArgumentsVariant args = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
 
-        final RedXmlArgumentsVariant variant = new RedXmlArgumentsVariant(null, args);
-        support.setValue(variant, "a::b::c");
+        support.setValue(args, "a::b::c");
 
         assertThat(args.getArgsStream()).containsExactly("a", "b", "c");
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
-                argThat(hasCorrectEventData(file, variant)));
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_CHANGED),
+                argThat(hasCorrectEventData(file, newArrayList(args))));
     }
 
     @Test
@@ -245,8 +241,7 @@ public class ReferencedLibrariesEditingSupportTest {
 
         final ReferencedLibraryArgumentsVariant args = ReferencedLibraryArgumentsVariant.create("1", "2", "3");
 
-        final RedXmlArgumentsVariant variant = new RedXmlArgumentsVariant(null, args);
-        support.setValue(variant, "1::2::3");
+        support.setValue(args, "1::2::3");
 
         assertThat(args.getArgsStream()).containsExactly("1", "2", "3");
         verifyZeroInteractions(eventBroker);

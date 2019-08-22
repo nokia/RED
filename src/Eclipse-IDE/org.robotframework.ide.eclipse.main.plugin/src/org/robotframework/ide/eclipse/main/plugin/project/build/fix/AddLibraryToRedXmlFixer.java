@@ -135,7 +135,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (!addedLibraries.isEmpty()) {
                 final RedProjectConfigEventData<Collection<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
                         externalFile, addedLibraries);
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED, eventData);
             }
         }
 

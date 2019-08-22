@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,10 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedLibraryHandler.E4DeleteReferencedLibraryHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant.RedXmlRemoteArgumentsVariant;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary.RedXmlRemoteLib;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider.RemoteLibraryViewItem;
 
 public class DeleteReferencedLibraryHandlerTest {
 
@@ -58,21 +56,25 @@ public class DeleteReferencedLibraryHandlerTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
-        final List<RedXmlLibrary> selection = newArrayList(new RedXmlLibrary(library2), new RedXmlLibrary(library4));
+        final List<ReferencedLibrary> selection = newArrayList(library2, library4);
         final IStructuredSelection selectedLibs = new StructuredSelection(selection);
 
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLibs, input, eventBroker);
 
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED), argThat(
-                hasCorrectEventData(file, newArrayList(new RedXmlLibrary(library2), new RedXmlLibrary(library4)))));
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
+                argThat(hasCorrectEventData(file, newArrayList(library2, library4))));
         verify(project).unregisterWatchingOnReferencedLibraries(newArrayList(library2, library4));
         assertThat(config.getReferencedLibraries()).containsExactly(library1, library3);
     }
 
     @Test
-    public void whenRemoteLibIsSelected_nothingHappens() {
+    public void whenRemoteLibIsSelected_allRemoteLocationsAreRemoved() {
         final RobotProjectConfig config = new RobotProjectConfig();
+        final RemoteLocation remote1 = RemoteLocation.create("http://127.0.0.1:8270/");
+        config.addRemoteLocation(remote1);
+        final RemoteLocation remote2 = RemoteLocation.create("http://127.0.0.2:8270/");
+        config.addRemoteLocation(remote2);
 
         final IFile file = mock(IFile.class);
         final RobotProject project = mock(RobotProject.class);
@@ -80,13 +82,16 @@ public class DeleteReferencedLibraryHandlerTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
-        final IStructuredSelection selectedLibs = new StructuredSelection(newArrayList(new RedXmlRemoteLib()));
+        final IStructuredSelection selectedLibs = new StructuredSelection(
+                newArrayList(new RemoteLibraryViewItem(config)));
 
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLibs, input, eventBroker);
 
-        verifyZeroInteractions(eventBroker);
         verifyZeroInteractions(project);
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED),
+                argThat(hasCorrectEventData(file, newArrayList(remote1, remote2))));
+        assertThat(config.getRemoteLocations()).isEmpty();
     }
 
     @Test
@@ -105,7 +110,7 @@ public class DeleteReferencedLibraryHandlerTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
-        final List<RedXmlLibrary> selection = newArrayList(new RedXmlLibrary(library3), new RedXmlLibrary(library4));
+        final List<ReferencedLibrary> selection = newArrayList(library3, library4);
         final IStructuredSelection selectedLocations = new StructuredSelection(selection);
 
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
@@ -135,20 +140,20 @@ public class DeleteReferencedLibraryHandlerTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
-        final List<RedXmlArgumentsVariant> selection = newArrayList(
-                new RedXmlRemoteArgumentsVariant(new RedXmlRemoteLib(), remote1),
-                new RedXmlArgumentsVariant(new RedXmlLibrary(library), variant2));
+        final List<Object> selection = newArrayList(remote1, variant2);
         final IStructuredSelection selectedLocations = new StructuredSelection(selection);
 
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLocations, input, eventBroker);
 
         verifyZeroInteractions(project);
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED), argThat(
-                hasCorrectEventData(file, newArrayList(new RedXmlRemoteLib(), new RedXmlLibrary(library)))));
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED),
+                argThat(hasCorrectEventData(file, newArrayList(variant2, remote1))));
         assertThat(config.getReferencedLibraries()).containsExactly(library);
-        assertThat(config.getReferencedLibraries().get(0).getArgumentsVariants())
-                .containsExactly(ReferencedLibraryArgumentsVariant.create("1", "2"));
+        assertThat(config.getReferencedLibraries()
+                .get(0)
+                .getArgsVariantsStream()
+                .map(v -> v.getArgsStream().collect(toList()))).containsExactly(newArrayList("1", "2"));
         assertThat(config.getRemoteLocations()).containsExactly(RemoteLocation.create("http://127.0.0.2:8270/"));
     }
 

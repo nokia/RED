@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.text.templates.ContextTypeRegistry;
 import org.junit.Test;
 import org.rf.ide.core.rflint.RfLintRuleConfiguration;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
@@ -66,6 +66,7 @@ public class RedPreferencesTest {
                 .containsOnly("New test", "New task", "New keyword", "Settings section", "For loop");
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void contextTypesAreRetrievedFromTemplateContextTypeRegistry() throws Exception {
         final RedPreferences preferences = new RedPreferences(mock(IPreferenceStore.class));

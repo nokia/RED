@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -15,7 +17,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -47,6 +48,8 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         private final RobotSuiteFile suiteFile;
 
+        private RemoteLocation addedLocation;
+
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
                 final String shortDescription) {
             super(marker, externalFile, shortDescription, null);
@@ -55,8 +58,8 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config) {
-            final RemoteLocation remoteLibrary = RemoteLocation.create(path);
-            config.addRemoteLocation(remoteLibrary);
+            addedLocation = RemoteLocation.create(path);
+            config.addRemoteLocation(addedLocation);
             return !config.getRemoteLocations().isEmpty();
         }
 
@@ -67,11 +70,9 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
         @Override
         protected void fireEvents() {
-            final RobotProject robotProject = suiteFile.getRobotProject();
-            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
             final RedProjectConfigEventData<Collection<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
-                    externalFile, config.getRemoteLocations());
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                    externalFile, newArrayList(addedLocation));
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_ADDED, eventData);
         }
 
         @Override

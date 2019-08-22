@@ -6,8 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -25,6 +27,8 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibrarySpecificationReader;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
@@ -57,7 +61,7 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected CellEditor getCellEditor(final Object element) {
-        if (element instanceof RedXmlArgumentsVariant) {
+        if (element instanceof RemoteLocation || element instanceof ReferencedLibraryArgumentsVariant) {
             final Composite parent = (Composite) getViewer().getControl();
             return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
                     RedPlugin.DETAILS_EDITING_CONTEXT_ID);
@@ -68,8 +72,10 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected Object getValue(final Object element) {
-        if (element instanceof RedXmlArgumentsVariant) {
-            return ((RedXmlArgumentsVariant) element).getArguments();
+        if (element instanceof RemoteLocation) {
+            return ((RemoteLocation) element).getUri();
+        } else if (element instanceof ReferencedLibraryArgumentsVariant) {
+            return ((ReferencedLibraryArgumentsVariant) element).getArgsStream().collect(joining("::"));
         } else {
             return null;
         }
@@ -77,16 +83,19 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
     @Override
     protected void setValue(final Object element, final Object value) {
-        if (element instanceof RedXmlArgumentsVariant) {
+        if (element instanceof RemoteLocation || element instanceof ReferencedLibraryArgumentsVariant) {
             try {
-                final RedXmlArgumentsVariant args = (RedXmlArgumentsVariant) element;
                 final String oldValue = (String) getValue(element);
                 final String newValue = (String) value;
 
                 if (!newValue.equals(oldValue)) {
-                    args.setArguments(newValue);
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                            new RedProjectConfigEventData<>(editorInput.getFile(), args));
+                    if (element instanceof RemoteLocation) {
+                        ((RemoteLocation) element).setUri(newValue);
+                    } else if (element instanceof ReferencedLibraryArgumentsVariant) {
+                        ((ReferencedLibraryArgumentsVariant) element).setArguments(Arrays.asList(newValue.split("::")));
+                    }
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_CHANGED,
+                            new RedProjectConfigEventData<>(editorInput.getFile(), newArrayList(element)));
                 }
             } catch (final IllegalArgumentException e) {
                 // uri syntax was wrong...
@@ -127,7 +136,7 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
                 }
             }
             if (wasAdded) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED,
                         new RedProjectConfigEventData<>(editorInput.getFile(), referencedLibraries));
             }
 

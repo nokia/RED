@@ -27,7 +27,9 @@ public class LibrariesConfigUpdater {
 
     private final boolean isConfigClosed;
 
-    private final List<Object> addedLibraries;
+    private final List<RemoteLocation> addedRemoteLocations;
+
+    private final List<ReferencedLibrary> addedLibraries;
 
     public static LibrariesConfigUpdater createFor(final RobotProject project) {
         final Optional<RobotProjectConfig> openedConfig = project.getOpenedProjectConfig();
@@ -40,6 +42,7 @@ public class LibrariesConfigUpdater {
         this.robotProject = project;
         this.config = config;
         this.isConfigClosed = isConfigClosed;
+        this.addedRemoteLocations = new ArrayList<>();
         this.addedLibraries = new ArrayList<>();
     }
 
@@ -57,12 +60,12 @@ public class LibrariesConfigUpdater {
 
     public void addRemoteLocation(final RemoteLocation remoteLocation) {
         if (config.addRemoteLocation(remoteLocation)) {
-            addedLibraries.add(remoteLocation);
+            addedRemoteLocations.add(remoteLocation);
         }
     }
 
     public void finalizeLibrariesAdding(final IEventBroker eventBroker) {
-        if (!addedLibraries.isEmpty()) {
+        if (!addedLibraries.isEmpty() || !addedRemoteLocations.isEmpty()) {
             if (isConfigClosed) {
                 robotProject.clearConfiguration();
                 robotProject.clearKwSources();
@@ -70,13 +73,21 @@ public class LibrariesConfigUpdater {
             }
             fireEvents(eventBroker);
             addedLibraries.clear();
+            addedRemoteLocations.clear();
         }
     }
 
     private void fireEvents(final IEventBroker eventBroker) {
-        final RedProjectConfigEventData<List<Object>> eventData = new RedProjectConfigEventData<>(
-                robotProject.getConfigurationFile(), addedLibraries);
-        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-    }
+        if (!addedLibraries.isEmpty()) {
+            final RedProjectConfigEventData<List<ReferencedLibrary>> eventData1 = new RedProjectConfigEventData<>(
+                    robotProject.getConfigurationFile(), addedLibraries);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED, eventData1);
+        }
 
+        if (!addedRemoteLocations.isEmpty()) {
+            final RedProjectConfigEventData<List<RemoteLocation>> eventData2 = new RedProjectConfigEventData<>(
+                    robotProject.getConfigurationFile(), addedRemoteLocations);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_ADDED, eventData2);
+        }
+    }
 }

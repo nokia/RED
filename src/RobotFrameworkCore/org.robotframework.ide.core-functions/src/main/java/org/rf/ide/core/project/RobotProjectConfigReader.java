@@ -29,6 +29,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.xml.sax.SAXParseException;
@@ -58,7 +60,9 @@ public class RobotProjectConfigReader {
     private final RobotProjectConfig readConfiguration(final Reader reader) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(RobotProjectConfig.class);
-            return (RobotProjectConfig) jaxbContext.createUnmarshaller().unmarshal(reader);
+            final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller.setListener(new SimpleListener());
+            return (RobotProjectConfig) unmarshaller.unmarshal(reader);
 
         } catch (final JAXBException e) {
             if (e.getLinkedException() != null) {
@@ -79,11 +83,12 @@ public class RobotProjectConfigReader {
             final TreeSet<FileRegion> elementRegions = extractElementRegions(content, xmlFactory);
 
             final XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(new StringReader(content));
-            final LocationListener listener = new LocationListener(xmlReader, elementRegions);
+            final LocationListener locationListener = new LocationListener(xmlReader, elementRegions);
+            final CompoundListener listener = new CompoundListener(new SimpleListener(), locationListener);
             unmarshaller.setListener(listener);
 
             final RobotProjectConfig config = (RobotProjectConfig) unmarshaller.unmarshal(xmlReader);
-            return new RobotProjectConfigWithLines(config, elementRegions, listener.locations);
+            return new RobotProjectConfigWithLines(config, elementRegions, locationListener.locations);
 
         } catch (final JAXBException e) {
             if (e.getLinkedException() != null) {
@@ -176,6 +181,39 @@ public class RobotProjectConfigReader {
                 }
             }
             return null;
+        }
+    }
+
+    private static class CompoundListener extends Listener {
+
+        private final Listener[] listeners;
+
+        public CompoundListener(final Listener... listeners) {
+            this.listeners = listeners;
+        }
+
+        @Override
+        public void beforeUnmarshal(final Object target, final Object parent) {
+            for (final Listener listener : listeners) {
+                listener.beforeUnmarshal(target, parent);
+            }
+        }
+
+        @Override
+        public void afterUnmarshal(final Object target, final Object parent) {
+            for (final Listener listener : listeners) {
+                listener.afterUnmarshal(target, parent);
+            }
+        }
+    }
+
+    private static class SimpleListener extends Listener {
+
+        @Override
+        public void afterUnmarshal(final Object target, final Object parent) {
+            if (target instanceof ReferencedLibraryArgumentsVariant && parent instanceof ReferencedLibrary) {
+                ((ReferencedLibraryArgumentsVariant) target).setParent((ReferencedLibrary) parent);
+            }
         }
     }
 

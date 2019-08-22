@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -69,12 +70,9 @@ class LibraryRemoveChange extends Change {
     public Change perform(final IProgressMonitor pm) throws CoreException {
         config.getReferencedLibraries().remove(libraryToRemove);
 
-        final List<ReferencedLibrary> changedPaths = new ArrayList<>();
-        changedPaths.add(libraryToRemove);
         final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(redXmlFile,
-                changedPaths);
-
-        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+                newArrayList(libraryToRemove));
+        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED, eventData);
 
         return new LibraryAddChange(redXmlFile, config, libraryToRemove);
     }

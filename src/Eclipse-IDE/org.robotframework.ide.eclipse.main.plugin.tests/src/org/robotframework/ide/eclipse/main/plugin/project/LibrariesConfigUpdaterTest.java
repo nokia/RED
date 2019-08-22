@@ -69,8 +69,7 @@ public class LibrariesConfigUpdaterTest {
         updater.finalizeLibrariesAdding(eventBroker);
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(libs);
-        verify(eventBroker, times(1)).send(
-                eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
     }
 
@@ -85,8 +84,7 @@ public class LibrariesConfigUpdaterTest {
         updater.finalizeLibrariesAdding(eventBroker);
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
-        verify(eventBroker, times(1)).send(
-                eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
     }
 
@@ -104,8 +102,7 @@ public class LibrariesConfigUpdaterTest {
         final List<ReferencedLibrary> allLibs = new ArrayList<>(libs1);
         allLibs.addAll(libs2);
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(allLibs);
-        verify(eventBroker, times(1)).send(
-                eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
     }
 
@@ -120,8 +117,7 @@ public class LibrariesConfigUpdaterTest {
         updater.finalizeLibrariesAdding(eventBroker);
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEqualTo(libs);
-        verify(eventBroker, times(1)).send(
-                eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED),
+        verify(eventBroker, times(1)).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED),
                 any(RedProjectConfigEventData.class));
     }
 

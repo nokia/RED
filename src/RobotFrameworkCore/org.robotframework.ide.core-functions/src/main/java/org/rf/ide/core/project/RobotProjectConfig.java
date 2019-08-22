@@ -477,6 +477,7 @@ public class RobotProjectConfig {
             if (!isDynamic && !argumentsVariants.isEmpty()) {
                 this.isDynamic = true;
             }
+            variant.setParent(this);
             return argumentsVariants.add(variant);
         }
 
@@ -534,6 +535,8 @@ public class RobotProjectConfig {
         public boolean equals(final Object obj) {
             if (obj == null) {
                 return false;
+            } else if (obj == this) {
+                return true;
             } else if (obj.getClass() == getClass()) {
                 final ReferencedLibrary other = (ReferencedLibrary) obj;
                 return Objects.equals(type, other.type) && Objects.equals(name, other.name)
@@ -558,19 +561,37 @@ public class RobotProjectConfig {
     public static class ReferencedLibraryArgumentsVariant {
 
         public static ReferencedLibraryArgumentsVariant create(final String... arguments) {
-            return new ReferencedLibraryArgumentsVariant(
+            return create(null, arguments);
+        }
+
+        public static ReferencedLibraryArgumentsVariant create(final ReferencedLibrary parent,
+                final String... arguments) {
+            return new ReferencedLibraryArgumentsVariant(parent,
                     Arrays.asList(arguments).stream().map(ReferencedLibraryArgument::new).collect(toList()));
         }
+
+        @XmlTransient
+        private ReferencedLibrary parent;
 
         @XmlElement(name = "argument", required = false)
         private List<ReferencedLibraryArgument> arguments = new ArrayList<>();
 
         public ReferencedLibraryArgumentsVariant() {
-            this(null);
+            this(null, new ArrayList<>());
         }
 
-        public ReferencedLibraryArgumentsVariant(final List<ReferencedLibraryArgument> args) {
+        private ReferencedLibraryArgumentsVariant(final ReferencedLibrary parent,
+                final List<ReferencedLibraryArgument> args) {
+            this.parent = parent;
             this.arguments = args;
+        }
+
+        public void setParent(final ReferencedLibrary parent) {
+            this.parent = parent;
+        }
+
+        public ReferencedLibrary getParent() {
+            return parent;
         }
 
         public List<ReferencedLibraryArgument> getArguments() {
@@ -587,9 +608,13 @@ public class RobotProjectConfig {
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj instanceof ReferencedLibraryArgumentsVariant) {
+            if (obj == null) {
+                return false;
+            } else if (obj == this) {
+                return true;
+            } else if (obj.getClass() == getClass()) {
                 final ReferencedLibraryArgumentsVariant that = (ReferencedLibraryArgumentsVariant) obj;
-                return Objects.equals(this.arguments, that.arguments);
+                return Objects.equals(this.arguments, that.arguments) && this.parent == that.parent;
             }
             return false;
         }
@@ -625,7 +650,11 @@ public class RobotProjectConfig {
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj instanceof ReferencedLibraryArgument) {
+            if (obj == null) {
+                return false;
+            } else if (obj == this) {
+                return true;
+            } else if (obj.getClass() == getClass()) {
                 final ReferencedLibraryArgument that = (ReferencedLibraryArgument) obj;
                 return Objects.equals(this.argument, that.argument);
             }

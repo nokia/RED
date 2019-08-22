@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +20,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedLibraryHandler.E4DeleteReferencedLibraryHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlArgumentsVariant.RedXmlRemoteArgumentsVariant;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider.RemoteLibraryViewItem;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 /**
  * @author Michal Anglart
@@ -47,48 +43,46 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
         public void deleteReferencedLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
-            final List<RedXmlLibrary> libs = Selections.getElements(selection, RedXmlLibrary.class);
-            final List<RedXmlArgumentsVariant> variants = Selections.getElements(selection,
-                    RedXmlArgumentsVariant.class);
+            final List<RemoteLocation> remotesFromLib = Selections
+                    .getOptionalFirstElement(selection, RemoteLibraryViewItem.class)
+                    .map(RemoteLibraryViewItem::getLocations)
+                    .orElse(new ArrayList<RemoteLocation>());
+            final List<ReferencedLibrary> libs = Selections.getElements(selection, ReferencedLibrary.class);
+            final List<ReferencedLibraryArgumentsVariant> variants = Selections.getElements(selection,
+                    ReferencedLibraryArgumentsVariant.class);
+            final List<RemoteLocation> remotes = Selections.getElements(selection, RemoteLocation.class);
 
-            if (!libs.isEmpty()) {
-                final List<ReferencedLibrary> refLibs = libs.stream()
-                        .map(RedXmlLibrary::getLibrary)
-                        .filter(l -> l != null)
-                        .collect(toList());
-                final boolean removedRefLibs = input.getProjectConfiguration().removeReferencedLibraries(refLibs);
+            if (!libs.isEmpty() || !remotesFromLib.isEmpty()) {
+                final boolean removedRefLibs = input.getProjectConfiguration().removeReferencedLibraries(libs);
+                final boolean removedRemotes = input.getProjectConfiguration().removeRemoteLocations(remotesFromLib);
+
                 if (removedRefLibs) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED,
                             new RedProjectConfigEventData<>(input.getFile(), libs));
-                    input.getRobotProject().unregisterWatchingOnReferencedLibraries(refLibs);
+                    input.getRobotProject().unregisterWatchingOnReferencedLibraries(libs);
+                }
+                if (removedRemotes) {
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED,
+                            new RedProjectConfigEventData<>(input.getFile(), remotesFromLib));
                 }
 
-            } else if (!variants.isEmpty()) {
-                final List<RedXmlLibrary> libraries = new ArrayList<>();
-                final List<RemoteLocation> locations = new ArrayList<>();
-                final Multimap<ReferencedLibrary, ReferencedLibraryArgumentsVariant> groupedVariants = ArrayListMultimap
-                        .create();
+            } else if (!variants.isEmpty() || !remotes.isEmpty()) {
+                final List<Object> removedElems = new ArrayList<>();
+                removedElems.addAll(variants);
+                removedElems.addAll(remotes);
 
-                for (final RedXmlArgumentsVariant variant : variants) {
-                    final RedXmlLibrary lib = variant.getParent();
-                    libraries.add(lib);
+                final boolean removedRemotes = input.getProjectConfiguration().removeRemoteLocations(remotes);
 
-                    if (variant instanceof RedXmlRemoteArgumentsVariant) {
-                        locations.add(((RedXmlRemoteArgumentsVariant) variant).getRemoteLocation());
-                    } else {
-                        groupedVariants.put(lib.getLibrary(), variant.getVariant());
-                    }
-                }
-
+                final Multimap<ReferencedLibrary, ReferencedLibraryArgumentsVariant> groupedVariants = Multimaps
+                        .index(variants, ReferencedLibraryArgumentsVariant::getParent);
                 boolean removedVariants = false;
                 for (final ReferencedLibrary refLib : groupedVariants.keySet()) {
                     removedVariants |= refLib.removeArgumentsVariants(groupedVariants.get(refLib));
                 }
-                final boolean removedRemotes = input.getProjectConfiguration().removeRemoteLocations(locations);
 
                 if (removedRemotes || removedVariants) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
-                            new RedProjectConfigEventData<>(input.getFile(), libraries));
+                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED,
+                            new RedProjectConfigEventData<>(input.getFile(), removedElems));
                 }
             }
         }

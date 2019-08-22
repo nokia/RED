@@ -21,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventD
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.SwitchLibraryModeHandler.E4SwitchLibraryModeHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.RedXmlLibrary;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -40,19 +39,18 @@ public class SwitchLibraryModeHandler extends DIParameterizedHandler<E4SwitchLib
         public void switchMode(final Shell shell, @Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
-            final List<RedXmlLibrary> libs = Selections.getElements(selection, RedXmlLibrary.class);
+            final List<ReferencedLibrary> libs = Selections.getElements(selection, ReferencedLibrary.class);
             final boolean targetMode = !libs.stream()
                     .findFirst()
-                    .map(RedXmlLibrary::isDynamic)
+                    .map(ReferencedLibrary::isDynamic)
                     .orElseThrow(IllegalStateException::new);
 
             if (!targetMode) {
                 // when switching to static we do not want to have static libs with more than 1
                 // arguments list
                 final String libsWithTooMany = libs.stream()
-                        .filter(RedXmlLibrary::isDynamic)
-                        .filter(l -> l.getVariants().size() > 1)
-                        .map(RedXmlLibrary::getLibrary)
+                        .filter(ReferencedLibrary::isDynamic)
+                        .filter(l -> l.getArgumentsVariants().size() > 1)
                         .map(ReferencedLibrary::getName)
                         .collect(joining("\n  -"));
                 if (!libsWithTooMany.isEmpty()) {
@@ -72,11 +70,11 @@ public class SwitchLibraryModeHandler extends DIParameterizedHandler<E4SwitchLib
                 }
             }
 
-            for (final RedXmlLibrary lib : libs) {
+            for (final ReferencedLibrary lib : libs) {
                 lib.setDynamic(targetMode);
             }
             if (!libs.isEmpty()) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED,
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_MODE_CHANGED,
                         new RedProjectConfigEventData<>(input.getFile(), libs));
             }
         }

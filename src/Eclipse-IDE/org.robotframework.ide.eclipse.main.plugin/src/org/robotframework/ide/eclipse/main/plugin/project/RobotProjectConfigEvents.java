@@ -21,7 +21,12 @@ public class RobotProjectConfigEvents {
     public static final String ROBOT_CONFIG_VAR_FILE_PATH_CHANGED = "robot/redxml/detail/varfile/changed/path";
     public static final String ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED = "robot/redxml/structural/varfile/changed";
 
-    public static final String ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED = "robot/redxml/structural/libs/changed";
+    public static final String ROBOT_CONFIG_LIBRARY_ADDED_REMOVED = "robot/redxml/structural/libs/added_removed";
+    public static final String ROBOT_CONFIG_LIBRARY_MODE_CHANGED = "robot/redxml/detail/libs/changed";
+
+    public static final String ROBOT_CONFIG_LIBRARIES_ARGUMENTS_ADDED = "robot/redxml/structural/libs/args/added";
+    public static final String ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED = "robot/redxml/structural/libs/args/removed";
+    public static final String ROBOT_CONFIG_LIBRARIES_ARGUMENTS_CHANGED = "robot/redxml/detail/libs/args/changed";
 
     public static final String ROBOT_CONFIG_PYTHONPATH_CHANGED = "robot/redxml/detail/pythonpath/changed";
     public static final String ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED = "robot/redxml/structural/pythonpath/changed";
