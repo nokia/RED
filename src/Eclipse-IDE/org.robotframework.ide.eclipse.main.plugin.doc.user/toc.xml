@@ -23,6 +23,18 @@
     </topic>
     <topic href="help/user_guide/general.html" label="General usage hints">
     </topic>
+    <topic href="help/user_guide/project_config.html" label="Project configuration">
+       <topic href="help/user_guide/project_config/red_xml_overview.html" label="Overview of red.xml">
+       </topic>
+       <topic href="help/user_guide/project_config/libraries.html" label="Recognizing external libraries in RED">
+       </topic>
+       <topic href="help/user_guide/project_config/custom_paths.html" label="Custom PYTHONPATH/CLASSPATH and path relativeness">
+       </topic>
+       <topic href="help/user_guide/project_config/variable_mapping.html" label="Variable mappings">
+       </topic>
+       <topic href="help/user_guide/project_config/variable_files.html" label="Global variables files">
+       </topic>
+    </topic>
     <topic href="help/user_guide/working_with_RED.html" label="Working with RED">
         <topic href="help/user_guide/working_with_RED/table_general.html" label="Table Editors - general usage hints">
         </topic>
@@ -32,20 +44,8 @@
         </topic>   
         <topic href="help/user_guide/working_with_RED/code_templates.html" label="Code templates">
         </topic>
-        <topic href="help/user_guide/working_with_RED/libs.html" label="Recognizing external libraries in RED">
-        </topic>
-        <topic href="help/user_guide/working_with_RED/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
-        </topic>
-        <topic href="help/user_guide/working_with_RED/remote_library.html" label="Remote library">
-        </topic>
-        <topic href="help/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parameterized paths to libraries and resources">
-        </topic>
-        <topic href="help/user_guide/working_with_RED/variable_files.html" label="Variable files - using files with variable accessible anywhere inside Project">
-        </topic>
         <topic href="help/user_guide/working_with_RED/importing.html" label="Importing files and projects to workspace">
         </topic>
-        <topic href="help/user_guide/working_with_RED/red_xml.html" label="Red.xml description">
-        </topic> 
         <topic href="help/user_guide/working_with_RED/dark_theme.html" label="Dark theme in RED">
         </topic>    
     </topic>

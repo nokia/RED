@@ -1,0 +1,205 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+<h2>Recognizing external libraries in RED</h2>
+
+	<p>In order to provide validation and keyword assistance of external libraries (any library not bundled with 
+	RobotFramework but installed by pip or included in your test material) they <b>need</b> to be 
+	included in <b>red.xml</b> file in the Referenced libraries part. Additionally one may define arguments if
+	they are required by the library.
+	</p>
+    
+	
+<h3>Including libraries into red.xml</h3>
+	
+	<p>There are few ways to include library into red.xml.</p>
+
+<h4>Library autodiscovery</h4>
+
+	<p>Main way to include libraries keywords in RED is done by autodiscovery mechanism. Mechanism works on two 
+	levels - during test edition and executed in Project Explorer on group of files and folders.
+	</p>
+	
+	<p>Every time when user edits test suite which has error markers on library declaration autodiscovery is executed 
+	when file is saved.
+	</p>
+	
+	<p>When there is a need to run autodiscovery manually on list of files, folders or whole project it can be 
+	achieved by using context menu in Project Explorer from Robot Framework option.</p>  
+	<img src="images/autodiscovery_menu.png"> <br/><br/>
+	
+	<dl class="note">
+	   <dt>Note</dt>
+	   <dd>Library autodiscovering is not run on excluded project parts (see more under topic 
+	   <a href="../validation/scope.html">Limiting validation scope</a>).
+	   </dd>
+	</dl>
+
+<h4>Quick Fix - shortcut CTRL+1</h4>
+
+	<p>Lets focus on following example:</p>
+	<img src="images/unknown_libs.png">
+	
+	<p>In the sample above there are two libraries imported. <code>CalculatorLibrary.py</code> is a custom user local 
+	library placed in the same folder as suite file while <code>Selenium2Library</code> was installed by
+	<code>pip</code>.
+	</p>
+	
+    <p>Both libraries are not recognized by RED and validation places error markers on libraries name/path.    
+	Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
+	</p>
+	
+	<p>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1 shortcut:
+	</p>
+	
+	<img src="images/autodiscovery_quick_fix.png">
+	
+	<p>After selecting <b>Discover</b> option RED will search either <code>PYTHONPATH</code> or library file path.
+	If successful the library will be added to Referenced libraries section in red.xml
+	</p> 
+	<img src="images/reference_libs.png">
+
+
+
+<h4>Add library from Project Explorer</h4>
+
+	<p>External Python libraries can be directly included to red.xml file by right clicking on file and using option:
+	<code>Robot Framework -&gt; Add Library to red.xml.</code>
+	</p>
+
+
+<h4>Add library from red.xml editor</h4>
+	<p>External library can be also added directly from red.xml editor:
+	</p>
+	<img src="images/library_add.gif">
+
+
+<h4>Using libdoc file when external library is not present locally</h4>
+
+	<p>In some scenarios, testware edit happens on different host than test runtime thus it is undesirable/unnecessary to 
+	install/import all libraries as on remote host. RobotFramework provides possibility to generate an xml file with list 
+	of keywords, this also provides agile test development where libraries are developed in parallel to test cases.
+	Libdoc xml file can be included instead of external library file by using red.xml editor.
+	</p>
+	
+	<p>For more information about LibDoc please refer to <a target="_blank" class="external" href="http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc">
+	http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc</a>
+	</p>
+
+    
+<h3>Dynamic vs static library and library arguments</h3>
+
+    <p>From RED point of view there are two types of libraries: <b>static</b> and <b>dynamic</b>. The first one is a
+    library for which the specification does not depend upon parameters provided when importing it, while the latter
+    depends upon them. For example standard <code>Remote</code> library is a <b>dynamic</b> library because depending
+    what <code>uri</code> value will be provided when importing it the specification may be different (because 
+    <code>Remote</code> may provided different keywords depending to which machine it will connect). All the other
+    standard libraries included into Robot are <b>static</b> libraries - for example no matter what parameters 
+    will be provided when importing <code>Telnet</code> libraries the keywords will always be the same.   
+    </p>
+    
+    <p>By default library entry in <b>red.xml</b> is marked as static. It is possible to change it manually in the
+    editor. For library marked as static RED will:
+    </p>
+    <ul>
+        <li>will only allow to add maximum one possible arguments list in <b>red.xml</b> (because no more is needed as 
+        specification is always the same independently on argument values),</li>
+        <li>when the library is imported in some suite RED will not consider what are the values of arguments passed,</li>
+    </ul>
+    
+    <p>for library marked as dynamic RED will:
+    </p>
+    <ul>
+        <li>will allow to define multiple arguments list in <b>red.xml</b> and will generate specification file for each
+        provided arguments list,
+        </li>    
+        <li>when the library is imported in some suite RED will look for specification by comparing used arguments with
+        those defined in red.xml.
+        </li>
+    </ul>
+    
+    <p>The diagram below presents the example for better overview:
+    </p>
+    
+    <img src="images/libs_static_dynamic_diagram.png"/>
+    
+    <p>The library <code>dynamic</code> uses Robot <a href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#different-test-library-apis" class="external" target="_blank">
+    dynamic API</a> and provides different number of keywords printing different things depending on the value of 
+    <code>a</code> argument in <code>__init__</code> constructor. The <code>static</code> library however is a simple
+    library which may accept single argument and provides always a single argument independently on value passed when
+    importing. Both libraries are added to <b>red.xml</b> - the first is marked as dynamic while the latter is not.
+    RED makes it possible to define two different values lists for constructor of <code>dynamic</code> library and
+    generates two specifications with both lists which is visible in <b>Robot Referenced libraries</b> folder in 
+    Project explorer.
+    </p>
+    
+    <p>Finally when importing <code>static</code> library RED does not analyze arguments provided so it successfully
+    recognizes this import. However when importing <code>dynamic</code> library it will not recognize the import called
+    with <b>4</b> because it is only aware of specifications generated with <b>[3]</b> and <b>[5]</b>.
+    </p>
+    
+<h4>Standard Remote library</h4>
+
+<p>Standard <code>Remote</code> library is a <b>dynamic</b> library for which one need to define possible arguments. 
+This is done similarly as for external libraries by providing different (possibly multiple) locations which will be used
+when generating library specification and recognizing imports in tests suites.
+</p>
+
+<img src="images/remote_locations.png"/>
+
+<h3>Library autodiscovering and libdoc generation preferences</h3>
+
+    <p>Autodiscovering and libdoc generation preferences can be configured at <code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Libraries</a></code></p>
+
+	<img src="images/libraries_preferences.png">
+
+    <dl class="warning">
+       <dt>Warning</dt>
+       <dd>If the libraries you are going to debug use <code>Gevent</code> library then please select <b>Support Gevent 
+       during autodiscovery</b> checkbox. This will make it possible for autodiscovery mechanism to support such libraries. 
+       Without this you may experience hanging both when looking for libraries as well as when keyword source
+       is being searched.
+       </dd>
+    </dl>
+    
+    <dl class="note">
+       <dt>Note</dt>
+       <dd>In some cases problems occur during libdoc generation via session server. It leads to a situation when the 
+       server hangs due to 
+       <a target="_blank" class="external" href="https://wiki.python.org/moin/GlobalInterpreterLock">Global Interpreter Lock</a>
+       between the server code and the library code.<br> 
+       To avoid this problem since version 0.8.11 libdocs are generated in a separate process by default. Note that this solution
+       may affect the time of libdoc generation, i.e. slowing down the libraries import, especially with jython interpreter.
+       If you are not using problematic libraries you can disable the preference to make libdoc generation faster.
+       </dd>
+    </dl>
+
+<h3>Reloading libraries after change</h3>
+
+	<p>Whenever external library is changed (for instance new keyword is added) libdoc needs to be regenerated to 
+	provide changes on content assist and validation in RED. Since version 0.6.3 RED can automatically detect 
+	library change and regenerate libdoc (it can be switch off/on in 
+	<a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.libraries)')">
+	preferences</a>). This can be also done manually by right clicking on library in Project Explorer and selecting
+	<i>Reload action</i>.
+	</p>
+	
+	<p>Manual library reloading can be also useful for finding libdoc generation errors. Whenever RED encounters 
+	libdoc generation problem, it will be shown as popup window from Python execution:</p>
+	
+	<img src="images/libdoc_error.png">
+	
+	<p>This indicates that some of the dependencies are missing on your local machine which may affect test 
+	suites execution. To verify you can try to execute libdoc in console:
+	</p>
+	
+	<pre>
+    	<code>python -m robot.libdoc &lt;PATH_TO_LIBNAME&gt; list</code>
+	</pre>
+
+</body>
+</html>

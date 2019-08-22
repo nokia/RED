@@ -42,8 +42,8 @@
 	</context>
 	<context id="libraries_preferences_page_context">
 		<description>This page allows you to manage properties related to Robot libraries.</description>
-		<topic href="help/user_guide/working_with_RED/libs.html" label="Recognizing external libraries in RED" ></topic>
-		<topic href="help/user_guide/working_with_RED/custom_paths_relatve.html" label="Custom python/class paths and path relativeness"></topic>
+		<topic href="help/user_guide/project_config/libraries.html" label="Recognizing external libraries in RED" ></topic>
+		<topic href="help/user_guide/project_config/custom_paths.html" label="Custom python/class paths and path relativeness"></topic>
 	</context>
 	<context id="tasks_preferences_page_context">
 		<description>This page allows you to define and manage FIXME/TODO tags.</description>
