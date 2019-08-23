@@ -13,6 +13,7 @@ import org.eclipse.swt.graphics.Point;
  */
 class StyledTextCaretPositionProvider {
 
+    @SuppressWarnings("deprecation")
     static int getOffset(final StyledText text, final Point point) {
         final int charCount = text.getCharCount();
         if (charCount > 0 && text.getTextBounds(0, charCount - 1).contains(point)) {

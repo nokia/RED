@@ -16,7 +16,6 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
@@ -41,12 +40,13 @@ public abstract class RedTemplateAssistProcessor extends TemplateCompletionProce
         this.assist = assist;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected TemplateContextType getContextType(final ITextViewer viewer, final IRegion region) {
-        final ContextTypeRegistry contextTypeRegistry = RedPlugin.getDefault()
+        return RedPlugin.getDefault()
                 .getPreferences()
-                .getTemplateContextTypeRegistry();
-        return contextTypeRegistry.getContextType(getContextTypeId());
+                .getTemplateContextTypeRegistry()
+                .getContextType(getContextTypeId());
     }
 
     protected abstract String getContextTypeId();

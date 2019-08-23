@@ -30,8 +30,9 @@ public enum RfLintViolationSeverity {
                 return "w";
             case IGNORE:
                 return "i";
+            default:
+                throw new IllegalStateException();
         }
-        throw new IllegalStateException();
     }
 
 }

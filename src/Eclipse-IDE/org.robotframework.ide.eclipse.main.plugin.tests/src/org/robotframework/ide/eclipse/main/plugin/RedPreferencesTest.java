@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.SWT;
@@ -70,12 +69,12 @@ public class RedPreferencesTest {
     @Test
     public void contextTypesAreRetrievedFromTemplateContextTypeRegistry() throws Exception {
         final RedPreferences preferences = new RedPreferences(mock(IPreferenceStore.class));
-        final ContextTypeRegistry registry = preferences.getTemplateContextTypeRegistry();
 
         for (final String id : newArrayList(RedTemplateContextType.KEYWORD_CALL_CONTEXT_TYPE,
                 RedTemplateContextType.NEW_SECTION_CONTEXT_TYPE, RedTemplateContextType.NEW_KEYWORD_CONTEXT_TYPE,
                 RedTemplateContextType.NEW_TEST_CONTEXT_TYPE, RedTemplateContextType.NEW_TASK_CONTEXT_TYPE)) {
-            assertThat(registry.getContextType(id)).isExactlyInstanceOf(RedTemplateContextType.class);
+            assertThat(preferences.getTemplateContextTypeRegistry().getContextType(id))
+                    .isExactlyInstanceOf(RedTemplateContextType.class);
         }
     }
 

@@ -16,8 +16,6 @@ import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
@@ -40,20 +38,15 @@ public class AddRemoteLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution 
 
     @Override
     protected ICompletionProposal asContentProposal(final IMarker marker, final IFile externalFile) {
-        final RobotSuiteFile file = RedPlugin.getModelManager().createSuiteFile((IFile) marker.getResource());
-        return new AddLibraryProposal(marker, file, externalFile, getLabel());
+        return new AddLibraryProposal(marker, externalFile, getLabel());
     }
 
     private class AddLibraryProposal extends RedConfigFileCompletionProposal {
 
-        private final RobotSuiteFile suiteFile;
-
         private RemoteLocation addedLocation;
 
-        public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
-                final String shortDescription) {
+        public AddLibraryProposal(final IMarker marker, final IFile externalFile, final String shortDescription) {
             super(marker, externalFile, shortDescription, null);
-            this.suiteFile = suiteFile;
         }
 
         @Override
