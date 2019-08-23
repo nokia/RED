@@ -73,21 +73,22 @@
     will be provided when importing <code>Telnet</code> libraries the keywords will always be the same.   
     </p>
 <p>By default library entry in <b>red.xml</b> is marked as static. It is possible to change it manually in the
-    editor. For library marked as static RED will:
+    editor.</p>
+<p>For library marked as static RED will:
     </p>
 <ul>
-<li>will only allow to add maximum one possible arguments list in <b>red.xml</b> (because no more is needed as 
+<li>only allow to add maximum one possible arguments list in <b>red.xml</b> (because no more is needed as 
         specification is always the same independently on argument values),</li>
-<li>when the library is imported in some suite RED will not consider what are the values of arguments passed,</li>
+<li>not consider what are the values of arguments passed, when the library is imported in some suite.</li>
 </ul>
-<p>for library marked as dynamic RED will:
+<p>For library marked as dynamic RED will:
     </p>
 <ul>
-<li>will allow to define multiple arguments list in <b>red.xml</b> and will generate specification file for each
+<li>allow to define multiple arguments list in <b>red.xml</b> and will generate specification file for each
         provided arguments list,
         </li>
-<li>when the library is imported in some suite RED will look for specification by comparing used arguments with
-        those defined in red.xml.
+<li>look for specification by comparing used arguments with those defined in red.xml, when the library
+        is imported in some suite.
         </li>
 </ul>
 <p>The diagram below presents the example for better overview:
@@ -96,7 +97,7 @@
 <p>The library <code>dynamic</code> uses Robot <a class="external" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#different-test-library-apis" target="_blank">
     dynamic API</a> and provides different number of keywords printing different things depending on the value of 
     <code>a</code> argument in <code>__init__</code> constructor. The <code>static</code> library however is a simple
-    library which may accept single argument and provides always a single argument independently on value passed when
+    library which may accept single argument and provides always a single keyword independently on value passed when
     importing. Both libraries are added to <b>red.xml</b> - the first is marked as dynamic while the latter is not.
     RED makes it possible to define two different values lists for constructor of <code>dynamic</code> library and
     generates two specifications with both lists which is visible in <b>Robot Referenced libraries</b> folder in 
