@@ -1,0 +1,285 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Ug_E0MWtEemCIMV4ZbEbkw
+Element-Name: AddingRemovingDynamicLibs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _6di-0MWxEemCIMV4ZbEbkw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/23/19 5:22 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "MyProject/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "MyProject/red.xml" 
+get-editor "MyProject/red.xml" | get-tab-folder | get-tab-item Libraries | click
+
+
+// add dynamic lib
+set-dialog-result File "platform:/resource/MyProject/libs/Dyn2Lib.py"
+get-editor "MyProject/red.xml"  | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    double-click
+    key-type "M1+s"
+}
+
+//check that libspec was not genarated
+get-view "Project Explorer" | get-tree | get-item 
+    -path "MyProject/Robot Referenced libraries/Dyn2Lib MyProject\\/libs\\/Dyn2Lib.py \\(non-accessible\\)" 
+    | get-property index | equals 0 | verify-true
+    
+//reload libspec to see error    
+get-view "Project Explorer" | get-tree 
+    | select "MyProject/Robot Referenced libraries/Dyn2Lib MyProject\\/libs\\/Dyn2Lib.py (non-accessible)"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+        -after [get-label "See 'Details' for more information."] | get-property text 
+        | contains "Exception: Test Library 'Dyn2Lib' expected 1 argument, got 0" | verify-true
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+// add one arg
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | get-menu -path "Add arguments" | click
+}
+get-window "Add arguments" 
+    | get-label "Specify arguments for library constructor which will be used to generate library specifications. Multiple arguments should be separated by :: separator." 
+    | get-property caption 
+    | equals "Specify arguments for library constructor which will be used to generate library specifications. Multiple arguments should be separated by :: separator." 
+    | verify-true
+get-window "Add arguments" | get-editbox -after [get-label Arguments] | key-type "NUMPAD_3" 3    
+get-window "Add arguments" | get-button OK | click
+
+// add second arg
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | get-menu -path "Add arguments" | click
+}
+
+//check info tah this lib should be dynamic
+with [get-window "Static library detected"] {
+    get-label "The library 'Dyn2Lib' is static and has arguments already defined. Only dynamic libraries can have multiple arguments lists defined. Do you want to make this library dynamic?" 
+        | get-property caption 
+        | equals "The library 'Dyn2Lib' is static and has arguments already defined. Only dynamic libraries can have multiple arguments lists defined. Do you want to make this library dynamic?" 
+        | verify-true
+    get-button "Mark as dynamic" | get-property caption | equals "Mark as dynamic" | verify-true
+}
+get-window "Static library detected" | get-button "Mark as dynamic" | click
+
+// add inocrrect arg
+with [get-window "Add arguments"] {
+    get-editbox -after [get-label Arguments] | type-text j
+    get-button OK | click
+}
+get-eclipse-window | key-type "M1+s"
+
+//check libspec
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().length" | equals 3 | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Keyword 0" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Keyword 1" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[2].getText()" | equals "Keyword 2" | verify-true
+    
+    // this one is not working
+    get-item 
+        -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[j\\] MyProject\\/libs\\/Dyn2Lib.py \\(non-accessible\\)" 
+        | get-property index | equals 1 | verify-true
+}
+
+// reload to see error
+get-view "Project Explorer" | get-tree 
+    | select "MyProject/Robot Referenced libraries/Dyn2Lib [j] MyProject\\/libs\\/Dyn2Lib.py (non-accessible)"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+        -after [get-label "See 'Details' for more information."] | get-property text 
+        | contains "Exception: Getting keyword names from library 'Dyn2Lib' failed: Calling dynamic method 'get_keyword_names' failed: "
+        + "ValueError: invalid literal for int() with base 10: 'j'\n" | verify-true
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+// rmeove wrong arg
+
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    get-item -path " D  Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | expand
+    select " D  Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py/[j]" | get-menu -path Delete | click
+    key-type "M1+s"
+}
+
+// one libspec left
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "MyProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property index | equals 0 | verify-true
+}
+
+// add 2 args in one line
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select " D  Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | get-menu -path "Add arguments" | click
+}
+
+// add with separtor
+with [get-window "Add arguments"] {
+    with [get-editbox -after [get-label Arguments]] {
+        key-type "NUMPAD_5" 5
+        type-text "::"
+        key-type "NUMPAD_7" 7
+    }
+    get-button OK | click
+}
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
+
+//check if error is for libspec
+get-view "Project Explorer" | get-tree | get-item 
+    -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5, 7\\] MyProject\\/libs\\/Dyn2Lib.py \\(non-accessible\\)" 
+    | get-property index | equals 1 | verify-true
+    
+// reload to see error    
+get-view "Project Explorer" | get-tree 
+    | select "MyProject/Robot Referenced libraries/Dyn2Lib [5, 7] MyProject\\/libs\\/Dyn2Lib.py (non-accessible)"
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
+        -after [get-label "See 'Details' for more information."] | get-property text 
+        | contains "Exception: Test Library 'Dyn2Lib' expected 1 argument, got 2.\n"| verify-true
+    get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+// add correct arg
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select " D  Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py/[5, 7]"
+    get-cell 3 0 | mouse up -count 1
+}
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select " D  Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py/\\[5, 7\\]" | activate-cell-edit -type MouseDoubleClickSelection
+    get-cell 3 0 | mouse up -count 2
+}
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | get-editbox | get-property text | equals "5::7" 
+    | verify-true
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree | get-editbox] {
+    set-text 5
+    key-type Enter
+}
+get-button "Save (M1+S)" | click
+
+
+//check if libspecs were generated
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property childCount | equals 3 | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Keyword 0" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Keyword 1" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[3\\] MyProject\\/libs\\/Dyn2Lib.py \\(3\\)" 
+        | get-property "getItems().TreeItem[2].getText()" | equals "Keyword 2" | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItemCount()" | equals 5 | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Keyword 0" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Keyword 1" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItems().TreeItem[2].getText()" | equals "Keyword 2" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItems().TreeItem[3].getText()" | equals "Keyword 3" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/Dyn2Lib \\[5\\] MyProject\\/libs\\/Dyn2Lib.py \\(5\\)" 
+        | get-property "getItems().TreeItem[4].getText()" | equals "Keyword 4" | verify-true
+}
+
+
+
+
+// add new lib
+set-dialog-result File "platform:/resource/MyProject/libs/DynLib.py"
+get-editor "MyProject/red.xml"  | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+
+//check if was added at the end
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | get-item 
+    -path "DynLib - MyProject\\/libs\\/DynLib.py" | get-property index | equals 2 | verify-true
+    
+// remove it    
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "DynLib - MyProject\\/libs\\/DynLib.py" | get-menu -path Delete | click
+}
+
+// check if was removed
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    get-property itemCount | equals 3 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "D  Remote - Standard library" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "D  Dyn2Lib - MyProject/libs/Dyn2Lib.py" | verify-true
+    get-property "getItems().TreeItem[2].getText()" | equals "...add new library file" | verify-true
+}
+
+// add the same lib again
+set-dialog-result File "platform:/resource/MyProject/libs/DynLib.py"
+get-editor "MyProject/red.xml"  | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+
+// add args
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "DynLib - MyProject\\/libs\\/DynLib.py" | get-menu -path "Add arguments" | click
+}
+
+// add many args in one line
+with [get-window "Add arguments"] {
+    get-editbox -after [get-label Arguments] | type-text "3::5::text"
+    get-button OK | click
+}
+
+// check if arg were added
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | get-item 
+    -path "DynLib - MyProject\\/libs\\/DynLib.py/\\[3, 5, text\\]" | get-property index | equals 0 | verify-true
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
+
+// libspec not generated
+get-view "Project Explorer" | get-tree 
+    | select "MyProject/Robot Referenced libraries/DynLib [3, 5, text] MyProject\\/libs\\/DynLib.py (non-accessible)"
+    
+//remove all args and add new    
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    get-item -path "DynLib - MyProject\\/libs\\/DynLib.py" | expand
+    select "DynLib - MyProject\\/libs\\/DynLib.py/[3, 5, text]" | get-menu -path Delete | click
+    select "DynLib - MyProject\\/libs\\/DynLib.py" | get-menu -path "Add arguments" | click
+}
+with [get-window "Add arguments"] {
+    get-editbox -after [get-label Arguments] | key-type "NUMPAD_8" 8
+    get-button OK | click
+}
+get-editor "MyProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
+
+//libspec generated
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "MyProject/Robot Referenced libraries/DynLib \\[8\\] MyProject\\/libs\\/DynLib.py \\(2\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Kw 1" | verify-true
+    get-item -path "MyProject/Robot Referenced libraries/DynLib \\[8\\] MyProject\\/libs\\/DynLib.py \\(2\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Kw 2" | verify-true
+}
+
+
+// add remote
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select " D  Remote - Standard library" | get-menu -path "Add arguments" | click
+}
+get-window "Add Remote location" | get-button OK | click
+
+//select all
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    get-cell 0 0 | click
+    key-type "M1+a"
+    key-type Del
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
