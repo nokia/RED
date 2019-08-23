@@ -13,19 +13,23 @@ Material is intended to provide detailed informations about RED for users alread
 
 *   [Quick start with RED - Robot Editor](RED/../../../help/user_guide/quick_start.md)
 *   [General usage hints](RED/../../../help/user_guide/general.md)
+*   [Project configuration](RED/../../../help/user_guide/project_config.md)
+    
+    *   [Overview of red.xml](RED/../../../help/user_guide/project_config/red_xml_overview.md)
+    *   [Recognizing external libraries in RED](RED/../../../help/user_guide/project_config/libraries.md)
+    *   [Custom PYTHONPATH/CLASSPATH and path relativeness](RED/../../../help/user_guide/project_config/custom_paths.md)
+    *   [Variable mappings](RED/../../../help/user_guide/project_config/variable_mapping.md)
+    *   [Global variables files](RED/../../../help/user_guide/project_config/variable_files.md)
+    
+    
+    
 *   [Working with RED](RED/../../../help/user_guide/working_with_RED.md)
     
     *   [Table Editors - general usage hints](RED/../../../help/user_guide/working_with_RED/table_general.md)
     *   [Variable typing in editors](RED/../../../help/user_guide/working_with_RED/variable_typing.md)
     *   [Content assistance](RED/../../../help/user_guide/working_with_RED/content_assist.md)
     *   [Code templates](RED/../../../help/user_guide/working_with_RED/code_templates.md)
-    *   [Recognizing external libraries in RED](RED/../../../help/user_guide/working_with_RED/libs.md)
-    *   [Custom python/class paths and path relativeness](RED/../../../help/user_guide/working_with_RED/custom_paths_relatve.md)
-    *   [Remote library](RED/../../../help/user_guide/working_with_RED/remote_library.md)
-    *   [Variable mapping - dealing with parameterized paths to libraries and resources](RED/../../../help/user_guide/working_with_RED/variable_mapping.md)
-    *   [Variable files - using files with variable accessible anywhere inside Project](RED/../../../help/user_guide/working_with_RED/variable_files.md)
     *   [Importing files and projects to workspace](RED/../../../help/user_guide/working_with_RED/importing.md)
-    *   [Red.xml description](RED/../../../help/user_guide/working_with_RED/red_xml.md)
     *   [Dark theme in RED](RED/../../../help/user_guide/working_with_RED/dark_theme.md)
     
     

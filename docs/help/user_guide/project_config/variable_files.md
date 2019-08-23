@@ -1,0 +1,58 @@
+<html>
+<head>
+<link href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/help/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<a href="RED/../../../../help/index.html">RED - Robot Editor User Guide</a> &gt; <a href="RED/../../../../help/user_guide/user_guide.html">User guide</a> &gt; <a href="RED/../../../../help/user_guide/project_config.html">Project configuration</a> &gt; 
+
+<h2>Global variable files</h2>
+<p>Robot Framework allows to use Python variable files in test suites in two distinctive ways. <b>Direct usage</b>
+	is done by importing the file in <b>Settings</b> section of a suite file as follows:
+	</p>
+<pre>
+    <code>
+    <span class="syntax_section">*** Settings ***</span>
+    <span class="syntax_setting">Variables</span>    &lt;path_to_python_var_file.py&gt;</code>
+    </pre>
+<p>which allows to make the variables from given file accessible across tests suite.</p>
+<p><b>Global usage</b> is a way to use common variable file across any tests suite. In RED this can be achieved 
+	by including variables files in <b>red.xml</b> file under Variable Files tab. Once this is done RED will recognize
+	those variables in any suite which would use them. From Robot perspective this is equivalent to providing the file
+	with <code>-V</code> switch in command line.
+	</p>
+<h3>Python variable files to deal with missing variables</h3>
+<p>In some test environments Robot-specific environments variables are used in test cases or injected as arguments
+	to Robot test runner. RED is not aware of such usage thus those variables will be marked as unknown and error marker
+	will be placed. In order to include variable name validation without changing test suites, user can create local
+	Python file with list of variable names inside. Such file can be included in <b>red.xml</b> file under Variable
+	files section thus making RED aware of previously unknown variables. Variables from such file will be visible 
+	as Global variables for all Robot files inside Project.
+	</p>
+<dl class="note">
+<dt>Note</dt>
+<dd>Variables provided via <b>red.xml</b> are used by RED only for validation purpose and are not added to Robot 
+	    run command line when executing tests. During test execution variables have to be provided differently.</dd>
+</dl>
+<img src="images/var_files_red_xml.gif"/>
+<br/>
+<p>Below is a sample body of such Python variable file (examples can be also found in RobotFramework official manual 
+	and Python examples).</p>
+<pre>
+	<code>
+	#!python
+
+	#Sample variables and values
+	Scalar = 'value'
+	UserList = ['value1','value2']
+	UserDict = {'key1': 'value1', 'key2': 'value2'}
+	</code>
+    </pre>
+<h3>Reloading variable file content</h3>
+<p>Once the variables file imported into <b>red.xml</b> is changed RED will automatically invoke refresh of variable
+    files being changed so that the modifications are immediately visible. Alternatively this can be done manually 
+    by opening context menu on project and selecting <code>Robot Framework -> Reset Robot Environment</code>
+</p>
+<br/>
+<img src="images/reset_robot_env.gif"/>
+</body>
+</html>

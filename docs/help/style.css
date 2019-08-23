@@ -11,6 +11,34 @@ p {
 span.block {
 	font-family: "Courier New";
 }
+span.syntax_comment {
+    color: rgb(192, 192, 192);
+}
+span.syntax_bdd {
+    color: rgb(128, 128, 64);
+    font-weight: bold;
+}
+span.syntax_calls {
+    color: rgb(0, 128, 192);
+    font-weight: bold;
+}
+span.syntax_def {
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
+span.syntax_section {
+    color: rgb(255, 0, 0);
+}
+span.syntax_setting {
+	color: rgb(149, 0, 85);
+}
+span.syntax_special {
+    color: rgb(128, 128, 64);
+    font-weight: bold;
+}
+span.syntax_var {
+    color: rgb(0, 128, 0);
+}
 
 div.code {
 	font-family: monospace;

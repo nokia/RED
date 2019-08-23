@@ -31,6 +31,19 @@
 </li>
 <li><a href="RED/../../help/user_guide/general.html">General usage hints</a>
 </li>
+<li><a href="RED/../../help/user_guide/project_config.html">Project configuration</a>
+<ul>
+<li><a href="RED/../../help/user_guide/project_config/red_xml_overview.html">Overview of red.xml</a>
+</li>
+<li><a href="RED/../../help/user_guide/project_config/libraries.html">Recognizing external libraries in RED</a>
+</li>
+<li><a href="RED/../../help/user_guide/project_config/custom_paths.html">Custom PYTHONPATH/CLASSPATH and path relativeness</a>
+</li>
+<li><a href="RED/../../help/user_guide/project_config/variable_mapping.html">Variable mappings</a>
+</li>
+<li><a href="RED/../../help/user_guide/project_config/variable_files.html">Global variables files</a>
+</li>
+</ul></li>
 <li><a href="RED/../../help/user_guide/working_with_RED.html">Working with RED</a>
 <ul>
 <li><a href="RED/../../help/user_guide/working_with_RED/table_general.html">Table Editors - general usage hints</a>
@@ -41,19 +54,7 @@
 </li>
 <li><a href="RED/../../help/user_guide/working_with_RED/code_templates.html">Code templates</a>
 </li>
-<li><a href="RED/../../help/user_guide/working_with_RED/libs.html">Recognizing external libraries in RED</a>
-</li>
-<li><a href="RED/../../help/user_guide/working_with_RED/custom_paths_relatve.html">Custom python/class paths and path relativeness</a>
-</li>
-<li><a href="RED/../../help/user_guide/working_with_RED/remote_library.html">Remote library</a>
-</li>
-<li><a href="RED/../../help/user_guide/working_with_RED/variable_mapping.html">Variable mapping - dealing with parameterized paths to libraries and resources</a>
-</li>
-<li><a href="RED/../../help/user_guide/working_with_RED/variable_files.html">Variable files - using files with variable accessible anywhere inside Project</a>
-</li>
 <li><a href="RED/../../help/user_guide/working_with_RED/importing.html">Importing files and projects to workspace</a>
-</li>
-<li><a href="RED/../../help/user_guide/working_with_RED/red_xml.html">Red.xml description</a>
 </li>
 <li><a href="RED/../../help/user_guide/working_with_RED/dark_theme.html">Dark theme in RED</a>
 </li>
