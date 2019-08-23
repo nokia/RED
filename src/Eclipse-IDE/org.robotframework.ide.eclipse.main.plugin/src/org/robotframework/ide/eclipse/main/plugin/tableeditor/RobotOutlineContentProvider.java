@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -129,6 +130,12 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
                 final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
                 if (linkedElement instanceof RobotExecutableRow<?>) {
                     final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+                    if (row.getElementTokens()
+                            .stream()
+                            .anyMatch(token -> token.getTypes().contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT)
+                                    || token.getTypes().contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT))) {
+                        return false;
+                    }
                     final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
                     final RowType rowType = descriptor.getRowType();
                     return rowType != RowType.FOR_CONTINUE && rowType != RowType.FOR_END;
