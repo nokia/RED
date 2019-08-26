@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _c2s9wAaSEeiksYLFL8zyCg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/20/19 4:43 PM
+Save-Time: 8/26/19 4:18 PM
 Testcase-Type: ecl
 Verifications: _boFGIAagEeiksYLFL8zyCg
 
@@ -204,5 +204,6 @@ get-button "Save All (M1+M2+S)" | click
 get-view "Project Explorer" | get-tree | select "FirstProject/TestFile.robot [excluded]" | select FirstProject 
     | get-menu -path "Robot Framework/Run RfLint analysis" | click
     
-    
+wait-for-errors -amount 8 -times 5 -delay 500    
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
