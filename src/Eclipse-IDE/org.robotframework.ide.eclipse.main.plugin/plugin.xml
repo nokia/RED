@@ -3338,6 +3338,9 @@
           <with
                 variable="selection">
              <and>
+                <count
+                      value="+">
+                </count>
                 <iterate
                       ifEmpty="false"
                       operator="or">
@@ -3345,9 +3348,6 @@
                          value="org.rf.ide.core.project.RobotProjectConfig$ReferencedVariableFile">
                    </instanceof>
                 </iterate>
-                <count
-                      value="+">
-                </count>
              </and>
           </with>
        </enabledWhen>
@@ -3367,35 +3367,19 @@
                 <count
                       value="+">
                 </count>
-                <or>
-                   <iterate
-                         ifEmpty="false"
-                         operator="and">
-                      <or>
-                          <instanceof
-                                value="org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesContentProvider$RemoteLibraryViewItem">
-                          </instanceof>
-                          <instanceof
-                                value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
-                          </instanceof>
-                          <instanceof
-                                value="org.robotframework.red.viewers.ElementAddingToken">
-                          </instanceof>
-                      </or>
-                   </iterate>
-                   <iterate
-                         ifEmpty="false"
-                         operator="and">
-                      <or>
-                          <instanceof
-                                value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
-                          </instanceof>
-                          <instanceof
-                                value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibraryArgumentsVariant">
-                          </instanceof>
-                      </or>
-                   </iterate>
-                </or>
+                <not>
+                    <and>
+                        <count value="1">
+                        </count>
+                        <iterate
+                              ifEmpty="false"
+                              operator="and">
+                            <instanceof
+                                  value="org.robotframework.red.viewers.ElementAddingToken">
+                            </instanceof>
+                        </iterate>
+                    </and>
+                </not>
              </and>
           </with>
        </enabledWhen>

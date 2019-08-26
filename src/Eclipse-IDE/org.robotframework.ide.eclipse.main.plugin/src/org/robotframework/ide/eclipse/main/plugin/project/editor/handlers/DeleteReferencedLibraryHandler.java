@@ -5,8 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.handlers;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Named;
 
@@ -43,47 +45,47 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
         public void deleteReferencedLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
-            final List<RemoteLocation> remotesFromLib = Selections
+            final List<RemoteLocation> remotesToRemove = Selections
                     .getOptionalFirstElement(selection, RemoteLibraryViewItem.class)
                     .map(RemoteLibraryViewItem::getLocations)
-                    .orElse(new ArrayList<RemoteLocation>());
-            final List<ReferencedLibrary> libs = Selections.getElements(selection, ReferencedLibrary.class);
-            final List<ReferencedLibraryArgumentsVariant> variants = Selections.getElements(selection,
-                    ReferencedLibraryArgumentsVariant.class);
-            final List<RemoteLocation> remotes = Selections.getElements(selection, RemoteLocation.class);
+                    .orElseGet(() -> Selections.getElements(selection, RemoteLocation.class));
+            final List<ReferencedLibrary> libsToRemove = Selections.getElements(selection, ReferencedLibrary.class);
+            final List<ReferencedLibraryArgumentsVariant> variantsToRemove = Selections
+                    .getElementsStream(selection, ReferencedLibraryArgumentsVariant.class)
+                    .filter(variant -> !libsToRemove.contains(variant.getParent()))
+                    .collect(toList());
 
-            if (!libs.isEmpty() || !remotesFromLib.isEmpty()) {
-                final boolean removedRefLibs = input.getProjectConfiguration().removeReferencedLibraries(libs);
-                final boolean removedRemotes = input.getProjectConfiguration().removeRemoteLocations(remotesFromLib);
+            boolean removedLibs = false;
+            boolean removedVariants = false;
+            boolean removedRemotes = false;
 
-                if (removedRefLibs) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED,
-                            new RedProjectConfigEventData<>(input.getFile(), libs));
-                    input.getRobotProject().unregisterWatchingOnReferencedLibraries(libs);
-                }
-                if (removedRemotes) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED,
-                            new RedProjectConfigEventData<>(input.getFile(), remotesFromLib));
-                }
-
-            } else if (!variants.isEmpty() || !remotes.isEmpty()) {
-                final List<Object> removedElems = new ArrayList<>();
-                removedElems.addAll(variants);
-                removedElems.addAll(remotes);
-
-                final boolean removedRemotes = input.getProjectConfiguration().removeRemoteLocations(remotes);
-
+            if (!libsToRemove.isEmpty()) {
+                removedLibs = input.getProjectConfiguration().removeReferencedLibraries(libsToRemove);
+            }
+            if (!variantsToRemove.isEmpty()) {
                 final Multimap<ReferencedLibrary, ReferencedLibraryArgumentsVariant> groupedVariants = Multimaps
-                        .index(variants, ReferencedLibraryArgumentsVariant::getParent);
-                boolean removedVariants = false;
+                        .index(variantsToRemove, ReferencedLibraryArgumentsVariant::getParent);
                 for (final ReferencedLibrary refLib : groupedVariants.keySet()) {
                     removedVariants |= refLib.removeArgumentsVariants(groupedVariants.get(refLib));
                 }
+            }
+            if (!remotesToRemove.isEmpty()) {
+                removedRemotes = input.getProjectConfiguration().removeRemoteLocations(remotesToRemove);
+            }
 
-                if (removedRemotes || removedVariants) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED,
-                            new RedProjectConfigEventData<>(input.getFile(), removedElems));
-                }
+
+            if (removedLibs) {
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARY_ADDED_REMOVED,
+                        new RedProjectConfigEventData<>(input.getFile(), libsToRemove));
+                input.getRobotProject().unregisterWatchingOnReferencedLibraries(libsToRemove);
+            }
+            if (removedVariants || removedRemotes) {
+                final List<Object> allRemoved = Stream.of(variantsToRemove, remotesToRemove)
+                        .flatMap(List::stream)
+                        .collect(toList());
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED,
+                        new RedProjectConfigEventData<>(input.getFile(),
+                                allRemoved));
             }
         }
     }
