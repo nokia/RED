@@ -242,7 +242,8 @@ public class KeywordProposalsInSettingsProviderTest {
     }
 
     @Test
-    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArguments() throws Exception {
+    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndSettingIsNotTemplate()
+            throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("kw_based_settings_with_keywords_with_args.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
@@ -261,7 +262,11 @@ public class KeywordProposalsInSettingsProviderTest {
             assertThat(proposals[0].getOperationsToPerformAfterAccepting()).isEmpty();
             assertThat(proposals[1].getLabel())
                     .isEqualTo("kw_with_args - kw_based_settings_with_keywords_with_args.robot");
-            assertThat(proposals[1].getOperationsToPerformAfterAccepting()).hasSize(1);
+            if (settings.get(row).getLinkedElement().getDeclaration().getText().equals("Test Template")) {
+                assertThat(proposals[1].getOperationsToPerformAfterAccepting()).isEmpty();
+            } else {
+                assertThat(proposals[1].getOperationsToPerformAfterAccepting()).hasSize(1);
+            }
         }
     }
 

@@ -66,10 +66,12 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
             final NatTableAssistantContext tableContext) {
         final List<Runnable> operations = new ArrayList<>();
 
-        final SelectedKeywordTableUpdater updater = new SelectedKeywordTableUpdater(tableContext, dataProvider);
-        if (updater.shouldInsertWithArgs(proposedKeyword,
-                values -> tableContext.getColumn() + values.size() < dataProvider.getColumnCount())) {
-            operations.add(() -> updater.insertCallWithArgs(proposedKeyword));
+        if (!isTemplateSetting(dataProvider, tableContext.getRow())) {
+            final SelectedKeywordTableUpdater updater = new SelectedKeywordTableUpdater(tableContext, dataProvider);
+            if (updater.shouldInsertWithArgs(proposedKeyword,
+                    values -> tableContext.getColumn() + values.size() < dataProvider.getColumnCount())) {
+                operations.add(() -> updater.insertCallWithArgs(proposedKeyword));
+            }
         }
 
         if (!proposedKeyword.isAccessible()) {
@@ -87,7 +89,17 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         return EnumSet
                 .of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION,
                         RobotTokenType.SETTING_TEST_SETUP_DECLARATION, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION,
-                        RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
+                        RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION, RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
+                        RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)
                 .contains(actualType);
+    }
+
+    private static boolean isTemplateSetting(final IRowDataProvider<?> dataProvider, final int row) {
+        final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
+        final String settingName = (String) entry.getKey();
+        final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
+
+        return actualType == RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
+                || actualType == RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION;
     }
 }

@@ -60,8 +60,7 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
             final int cellIndex = context.getColumn();
             final List<RobotToken> tokens = ((RobotKeywordCall) tableElement).getLinkedElement().getElementTokens();
 
-            final Optional<RobotToken> firstTokenInLine = tokens.isEmpty() ? Optional.empty()
-                    : Optional.of(tokens.get(0));
+            final Optional<RobotToken> firstTokenInLine = tokens.stream().findFirst();
             return AssistProposalPredicates.forLoopReservedWordsPredicate(cellIndex + 1, firstTokenInLine);
         } else {
             return AssistProposalPredicates.alwaysFalse();

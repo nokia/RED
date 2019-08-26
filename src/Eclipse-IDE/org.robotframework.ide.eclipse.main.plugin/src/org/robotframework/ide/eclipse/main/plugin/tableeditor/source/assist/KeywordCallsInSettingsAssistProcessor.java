@@ -7,12 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 
@@ -38,6 +36,12 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
                 && isKeywordBasedSetting(lineContent);
     }
 
+    @Override
+    protected boolean isTemplateSetting(final String lineContent) {
+        return startsWithOptionalSpace(lineContent, "test template")
+                || startsWithOptionalSpace(lineContent, "task template");
+    }
+
     static boolean isKeywordBasedSetting(final String lineContent) {
         return startsWithOptionalSpace(lineContent, "test template")
                 || startsWithOptionalSpace(lineContent, "task template")
@@ -52,15 +56,5 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
     private static boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
         return string.toLowerCase().startsWith(potentialPrefix.toLowerCase())
                 || string.toLowerCase().startsWith(" " + potentialPrefix.toLowerCase());
-    }
-
-    @Override
-    protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
-        if (startsWithOptionalSpace(lineContent, "test template")
-                || startsWithOptionalSpace(lineContent, "task template")) {
-            return new ArrayList<>();
-        } else {
-            return super.getArguments(proposal, lineContent);
-        }
     }
 }

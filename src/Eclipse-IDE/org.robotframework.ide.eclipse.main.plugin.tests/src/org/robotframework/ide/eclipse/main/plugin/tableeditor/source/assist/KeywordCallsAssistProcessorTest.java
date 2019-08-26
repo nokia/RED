@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -15,37 +15,33 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.viewers.StyledString;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.libraries.ArgumentsDescriptor;
-import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
@@ -257,8 +253,8 @@ public class KeywordCallsAssistProcessorTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
-        final KeywordEntity entity = new MockProposal("keyword ${e1} with ${e2} args");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
+        final RedKeywordProposal proposal = createKeywordProposal("keyword ${e1} with ${e2} args");
+        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
         assertThat(regions).containsOnly(new Region(108, 5), new Region(119, 5));
     }
@@ -268,8 +264,8 @@ public class KeywordCallsAssistProcessorTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
-        final KeywordEntity entity = new MockProposal("keyword");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
+        final RedKeywordProposal proposal = createKeywordProposal("keyword");
+        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
         assertThat(regions).isEmpty();
     }
@@ -279,8 +275,8 @@ public class KeywordCallsAssistProcessorTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
-        final KeywordEntity entity = new MockProposal("keyword", "arg1");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
+        final RedKeywordProposal proposal = createKeywordProposal("keyword", "arg1");
+        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
         assertThat(regions).containsOnly(new Region(109, 4));
     }
@@ -290,8 +286,8 @@ public class KeywordCallsAssistProcessorTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
-        final KeywordEntity entity = new MockProposal("keyword", "arg1", "arg2");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
+        final RedKeywordProposal proposal = createKeywordProposal("keyword", "arg1", "arg2");
+        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
         assertThat(regions).containsOnly(new Region(109, 4), new Region(115, 4));
     }
@@ -323,54 +319,64 @@ public class KeywordCallsAssistProcessorTest {
                 .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(1));
     }
 
-    private static class MockProposal extends KeywordEntity implements AssistProposal {
+    @Test
+    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndSettingIsNotTemplate()
+            throws Exception {
+        final IFile suite = projectProvider.createFile("keywords_with_args_in_setting_suite.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  [Setup]  ",
+                "  [Teardown]  ",
+                "  [Template]  ",
+                "  [Tags]  ",
+                "  [Timeout]  ",
+                "  [Documentation]  ",
+                "*** Keywords ***",
+                "kw_no_args",
+                "kw_with_args",
+                "  [Arguments]  ${arg1}  ${arg2}");
 
-        private final List<String> arguments;
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
 
-        protected MockProposal(final String keywordName, final String... arguments) {
-            super(KeywordScope.LOCAL, "source", keywordName, Optional.of("source"), false,
-                    ArgumentsDescriptor.createDescriptor(), null);
-            this.arguments = newArrayList(arguments);
-        }
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(anyInt())).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        @Override
-        public String getContent() {
-            return getNameFromDefinition();
-        }
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(
+                createAssistant(model));
 
-        @Override
-        public List<String> getArguments() {
-            return arguments;
-        }
+        final List<RobotKeywordCall> settings = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+        for (int i = 0; i < settings.size(); i++) {
+            final int firstSettingLine = 2;
+            final IRegion lineRegion = document.getLineInformation(i + firstSettingLine);
+            final int offset = lineRegion.getOffset() + lineRegion.getLength();
 
-        @Override
-        public ImageDescriptor getImage() {
-            return null;
-        }
+            final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        @Override
-        public String getLabel() {
-            return getNameFromDefinition();
-        }
-
-        @Override
-        public StyledString getStyledLabel() {
-            return new StyledString(getNameFromDefinition());
-        }
-
-        @Override
-        public boolean isDocumented() {
-            return false;
-        }
-
-        @Override
-        public String getDescription() {
-            return "";
-        }
-
-        @Override
-        public DocumentationViewInput getDocumentationInput() {
-            return null;
+            if (settings.get(i).getLinkedElement().getDeclaration().getText().equals("[Template]")) {
+                assertThat(proposals).hasSize(2)
+                        .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())))
+                        .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(0));
+            } else {
+                assertThat(proposals).hasSize(2)
+                        .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())))
+                        .haveExactly(1, proposalWithOperationsToPerformAfterAccepting(0))
+                        .haveExactly(1, proposalWithOperationsToPerformAfterAccepting(1));
+            }
         }
     }
+
+    private RedKeywordProposal createKeywordProposal(final String name, final String... arguments) {
+        final RedKeywordProposal proposal = mock(RedKeywordProposal.class);
+        when(proposal.getNameFromDefinition()).thenReturn(name);
+        when(proposal.getContent()).thenReturn(name);
+        when(proposal.getArguments()).thenReturn(Arrays.asList(arguments));
+        return proposal;
+    }
+
 }

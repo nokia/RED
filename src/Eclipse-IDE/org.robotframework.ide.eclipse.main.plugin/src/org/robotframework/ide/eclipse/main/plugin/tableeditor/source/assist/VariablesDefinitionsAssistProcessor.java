@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -21,7 +20,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposals;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
@@ -51,18 +49,7 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     @Override
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
-        final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-        if (isInApplicableContentType(document, offset)) {
-            // we only want to show those proposals in first cell of the line
-            if (offset != lineInfo.getOffset()) {
-                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, assist.isTsvFile(),
-                        offset);
-                return cellRegion.isPresent() && lineInfo.getOffset() == cellRegion.get().getOffset();
-            } else {
-                return true;
-            }
-        }
-        return false;
+        return isInApplicableContentType(document, offset) && isInFirstCellOfTheLine(document, offset);
     }
 
     @Override

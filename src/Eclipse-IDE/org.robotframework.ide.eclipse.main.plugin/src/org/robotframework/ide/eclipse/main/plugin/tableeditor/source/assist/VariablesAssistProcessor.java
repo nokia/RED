@@ -52,7 +52,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         return isInApplicableContentType(document, offset)
-                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) >= 1;
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
     }
 
     @Override

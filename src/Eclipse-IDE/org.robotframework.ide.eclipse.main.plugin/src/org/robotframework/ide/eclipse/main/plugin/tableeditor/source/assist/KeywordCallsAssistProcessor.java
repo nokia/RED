@@ -24,10 +24,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -75,15 +73,16 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+        final boolean shouldInsertArguments = atTheEndOfLine && !isTemplateSetting(lineContent);
         for (final RedKeywordProposal kwProposal : kwProposals) {
-            final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<>();
+            final List<String> args = shouldInsertArguments ? kwProposal.getArguments() : new ArrayList<>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + String.join(separator, args));
 
             final Position toReplace = new Position(offset - userContent.length(), cellLength);
 
             final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, () -> {
-                final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
-                        ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset(), lineContent)
+                final Collection<IRegion> regionsToLinkedEdit = shouldInsertArguments
+                        ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset())
                         : new ArrayList<>();
                 return createOperationsToPerformAfterAccepting(regionsToLinkedEdit, kwProposal);
             });
@@ -94,22 +93,23 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return proposals;
     }
 
-    protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
-        return proposal.getArguments();
+    protected boolean isTemplateSetting(final String lineContent) {
+        return startsWithSetting(lineContent, "template");
+    }
+
+    private static boolean startsWithSetting(final String lineContent, final String setting) {
+        final String trimmed = lineContent.trim().toLowerCase();
+        return trimmed.matches("^\\[[ ]?" + setting + "[ ]?\\].*");
     }
 
     @VisibleForTesting
-    Collection<IRegion> calculateRegionsForLinkedMode(final KeywordEntity entity, final int startOffset,
-            final String lineContent) {
-        final AssistProposal proposal = (AssistProposal) entity;
-        final String keywordName = entity.getNameFromDefinition();
-
-        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
+    Collection<IRegion> calculateRegionsForLinkedMode(final RedKeywordProposal proposal, final int startOffset) {
+        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(proposal.getNameFromDefinition())) {
             return calculateRegionsForLinkedModeOfEmbeddedKeyword(startOffset, proposal.getContent());
         } else {
             final int separatorLength = assist.getSeparatorToFollow().length();
             return calculateRegionsForLinkedModeOfRegularKeyword(startOffset, proposal.getContent(),
-                    getArguments(proposal, lineContent), separatorLength);
+                    proposal.getArguments(), separatorLength);
         }
     }
 

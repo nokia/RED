@@ -83,4 +83,14 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
         }
         return contentType;
     }
+
+    protected boolean isInFirstCellOfTheLine(final IDocument document, final int offset) throws BadLocationException {
+        final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+        if (offset != lineInfo.getOffset()) {
+            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, assist.isTsvFile(),
+                    offset);
+            return cellRegion.isPresent() && lineInfo.getOffset() == cellRegion.get().getOffset();
+        }
+        return true;
+    }
 }

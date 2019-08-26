@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.NonContextualKeywordProposalsProvider;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
@@ -213,7 +213,7 @@ public class BreakpointDetailPane implements IDetailPane3 {
     private void activateContentAssistant() {
         final RobotSuiteFile currentModel = RedPlugin.getModelManager()
                 .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
-        final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel, null);
+        final NonContextualKeywordProposalsProvider keywordsProvider = new NonContextualKeywordProposalsProvider(() -> currentModel);
         proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
     }
 

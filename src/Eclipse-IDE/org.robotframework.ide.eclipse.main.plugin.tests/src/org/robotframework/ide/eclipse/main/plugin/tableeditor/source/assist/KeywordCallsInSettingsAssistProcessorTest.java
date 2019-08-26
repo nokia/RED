@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.junit.AfterClass;
@@ -29,8 +31,10 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -485,5 +489,51 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                 .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getKeywordImage())))
                 .haveExactly(3, proposalWithOperationsToPerformAfterAccepting(0))
                 .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(1));
+    }
+
+    @Test
+    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndSettingIsNotTemplate()
+            throws Exception {
+        final IFile suite = projectProvider.createFile("kw_based_settings_with_keywords_with_args.robot",
+                "*** Settings ***",
+                "Suite Setup  ",
+                "Suite Teardown  ",
+                "Test Setup  ",
+                "Test Teardown  ",
+                "Test Template  ",
+                "*** Keywords ***",
+                "kw_no_args",
+                "kw_with_args",
+                "  [Arguments]  ${arg1}  ${arg2}");
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(anyInt())).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+                createAssistant(model));
+
+        final List<RobotKeywordCall> settings = model.findSection(RobotSettingsSection.class).get().getChildren();
+        for (int i = 0; i < settings.size(); i++) {
+            final int firstSettingLine = 1;
+            final IRegion lineRegion = document.getLineInformation(i + firstSettingLine);
+            final int offset = lineRegion.getOffset() + lineRegion.getLength();
+
+            final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+
+            if (settings.get(i).getLinkedElement().getDeclaration().getText().equals("Test Template")) {
+                assertThat(proposals).hasSize(2)
+                        .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())))
+                        .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(0));
+            } else {
+                assertThat(proposals).hasSize(2)
+                        .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())))
+                        .haveExactly(1, proposalWithOperationsToPerformAfterAccepting(0))
+                        .haveExactly(1, proposalWithOperationsToPerformAfterAccepting(1));
+            }
+        }
     }
 }
