@@ -92,7 +92,7 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
 
     @Override
     public String getMessage() {
-        final String pathOrNameWithArgs = buildNameWithArgsDescription(getLibPathOrName(), arguments);
+        final String pathOrNameWithArgs = buildNameWithArgsDescription(libName, arguments);
         return "generating libdoc for '" + pathOrNameWithArgs + "' library located at '" + libPath + "'";
     }
 
