@@ -22,8 +22,11 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
@@ -106,6 +109,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     Collection<IRegion> calculateRegionsForLinkedMode(final RedKeywordProposal proposal, final int startOffset) {
         if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(proposal.getNameFromDefinition())) {
             return calculateRegionsForLinkedModeOfEmbeddedKeyword(startOffset, proposal.getContent());
+
         } else {
             final int separatorLength = assist.getSeparatorToFollow().length();
             return calculateRegionsForLinkedModeOfRegularKeyword(startOffset, proposal.getContent(),
@@ -113,7 +117,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private Collection<IRegion> calculateRegionsForLinkedModeOfEmbeddedKeyword(final int startOffset,
+    private static Collection<IRegion> calculateRegionsForLinkedModeOfEmbeddedKeyword(final int startOffset,
             final String wholeContent) {
         final Collection<IRegion> regions = new ArrayList<>();
         final Matcher matcher = Pattern.compile("\\$\\{[^\\}]+\\}").matcher(wholeContent);
@@ -123,7 +127,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return regions;
     }
 
-    private Collection<IRegion> calculateRegionsForLinkedModeOfRegularKeyword(final int startOffset,
+    private static Collection<IRegion> calculateRegionsForLinkedModeOfRegularKeyword(final int startOffset,
             final String wholeContent, final List<String> arguments, final int separatorLength) {
         final Collection<IRegion> regions = new ArrayList<>();
         int offset = startOffset + wholeContent.length();
@@ -141,8 +145,17 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             final RedKeywordProposal proposal) {
         final Collection<Runnable> operations = new ArrayList<>();
         if (!regionsToLinkedEdit.isEmpty()) {
-            operations.add(() -> SwtThread.asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer,
-                    regionsToLinkedEdit, RedPlugin.getDefault().getPreferences().getAssistantLinkedArgumentsMode())));
+            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+            final LinkedModeStrategy mode = preferences.getAssistantLinkedArgumentsMode();
+            final String separator = assist.getSeparatorToFollow();
+
+            final ArgumentsDescriptor argsDescriptor = proposal.getArgumentsDescriptor();
+            final boolean hasUpperBound = !argsDescriptor.getVarargArgument().isPresent()
+                    && !argsDescriptor.getKwargArgument().isPresent();
+            final int numberOfDefaultArgs = argsDescriptor.getDefaultArguments().size();
+            operations.add(
+                    () -> SwtThread.asyncExec(() -> RedEditorLinkedModeUI.enableLinkedModeWithEmptyCellReplacing(viewer,
+                            mode, separator, regionsToLinkedEdit, numberOfDefaultArgs, hasUpperBound)));
         }
 
         if (!proposal.isAccessible()) {

@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -375,6 +376,7 @@ public class KeywordCallsAssistProcessorTest {
         final RedKeywordProposal proposal = mock(RedKeywordProposal.class);
         when(proposal.getNameFromDefinition()).thenReturn(name);
         when(proposal.getContent()).thenReturn(name);
+        when(proposal.getArgumentsDescriptor()).thenReturn(ArgumentsDescriptor.createDescriptor(arguments));
         when(proposal.getArguments()).thenReturn(Arrays.asList(arguments));
         return proposal;
     }
