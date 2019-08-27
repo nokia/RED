@@ -127,12 +127,20 @@ public class LibrariesBuilder {
 
         monitor.setWorkRemaining(groupedGenerators.size());
         for (final IProject project : groupedGenerators.keySet()) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             final IRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
 
             MultiStatus multiStatus = null;
             for (final ILibdocGenerator generator : groupedGenerators.get(project)) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
                 monitor.subTask(generator.getMessage());
+
                 try {
                     if (project.exists()) {
                         generator.generateLibdoc(runtimeEnvironment,

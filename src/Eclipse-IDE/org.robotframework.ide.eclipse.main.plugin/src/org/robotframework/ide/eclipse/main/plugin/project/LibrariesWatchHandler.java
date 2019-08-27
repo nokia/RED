@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,11 +25,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -143,11 +140,13 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         unregisterFile(fileName);
     }
 
-    protected void registerPath(final Path dir, final String fileName) {
+    @VisibleForTesting
+    void registerPath(final Path dir, final String fileName) {
         RedFileWatcher.getInstance().registerPath(dir, fileName, this);
     }
 
-    protected void unregisterFile(final String fileName) {
+    @VisibleForTesting
+    void unregisterFile(final String fileName) {
         RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
 
@@ -165,6 +164,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
+    @VisibleForTesting
     boolean isLibSpecDirty(final LibrarySpecification spec) {
         return dirtySpecs.contains(spec);
     }
@@ -223,17 +223,26 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         if (rebuildTasksQueue.isEmpty()) {
             rebuildTasksQueue.add(newRebuildTask);
-            final Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
-            try {
-                new ProgressMonitorDialog(shell).run(true, true, monitor -> handleRebuildTask(monitor, newRebuildTask));
-            } catch (InvocationTargetException | InterruptedException e) {
-                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                        "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
-                        e.getCause()), StatusManager.SHOW);
-            }
+            scheduleRebuildJob(newRebuildTask);
         } else {
             rebuildTasksQueue.add(newRebuildTask);
         }
+    }
+
+    @VisibleForTesting
+    Job scheduleRebuildJob(final RebuildTask newRebuildTask) {
+        final Job job = new Job("Library specification generation") {
+
+            @Override
+            public IStatus run(final IProgressMonitor monitor) {
+                handleRebuildTask(monitor, newRebuildTask);
+                return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
+            }
+
+        };
+        job.setUser(false);
+        job.schedule();
+        return job;
     }
 
     private void handleRebuildTask(final IProgressMonitor monitor, final RebuildTask rebuildTask) {
@@ -254,7 +263,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
-    protected void invokeLibrariesBuilder(final IProgressMonitor monitor,
+    @VisibleForTesting
+    void invokeLibrariesBuilder(final IProgressMonitor monitor,
             final Multimap<IProject, LibrarySpecification> groupedSpecifications) {
         try {
             new LibrariesBuilder(new BuildLogger()).rebuildLibraries(groupedSpecifications,
@@ -334,7 +344,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         return rebuildTasksQueue.size();
     }
 
-    private static class RebuildTask {
+    @VisibleForTesting
+    static class RebuildTask {
 
         private final IProject project;
 

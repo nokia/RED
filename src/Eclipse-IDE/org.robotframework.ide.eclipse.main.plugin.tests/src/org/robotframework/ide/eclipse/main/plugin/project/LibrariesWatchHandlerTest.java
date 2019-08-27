@@ -12,13 +12,17 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -295,9 +299,11 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
+        assertThat(librariesWatchHandler.getRebuildTasksQueueSizeAfterEachBuilderInvoke()).containsExactly(1);
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
@@ -316,6 +322,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
@@ -326,6 +333,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(1);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec);
@@ -356,6 +364,7 @@ public class LibrariesWatchHandlerTest {
             librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         }
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().size()).isEqualTo(2);
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().get(project)).containsOnly(libSpec1, libSpec2);
@@ -385,6 +394,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
@@ -417,6 +427,7 @@ public class LibrariesWatchHandlerTest {
             librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         }
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec1)).isTrue();
@@ -443,6 +454,7 @@ public class LibrariesWatchHandlerTest {
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
@@ -466,6 +478,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isTrue();
@@ -491,6 +504,7 @@ public class LibrariesWatchHandlerTest {
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
+        librariesWatchHandler.waitForRebuildJobs();
 
         assertThat(librariesWatchHandler.getSpecificationsToRebuild().asMap()).isEmpty();
         assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
@@ -536,13 +550,15 @@ public class LibrariesWatchHandlerTest {
 
         private final Map<String, String> registeredPaths = new HashMap<>();
 
-        private final List<String> unregisteredFiles = newArrayList();
+        private final List<String> unregisteredFiles = new ArrayList<>();
 
         private final Multimap<IProject, LibrarySpecification> specificationsToRebuild = LinkedHashMultimap.create();
 
-        private final List<Integer> rebuildTasksQueueSizeAfterEachBuilderInvoke = newArrayList();
+        private final List<Integer> rebuildTasksQueueSizeAfterEachBuilderInvoke = new ArrayList<>();
 
         private int rebuildTasksQueueSizeBeforeBuilderInvoke = 0;
+
+        private final Set<Job> rebuildJobs = new HashSet<>();
 
         public DummyLibrariesWatchHandler(final RobotProject robotProject) {
             super(robotProject);
@@ -589,6 +605,12 @@ public class LibrariesWatchHandlerTest {
             }
         }
 
+        public void waitForRebuildJobs() {
+            while (rebuildJobs.stream().anyMatch(job -> job.getResult() == null)) {
+                // wait for all rebuild jobs finish
+            }
+        }
+
         private void sleep(final long millis) {
             try {
                 Thread.sleep(millis);
@@ -603,6 +625,13 @@ public class LibrariesWatchHandlerTest {
 
         public List<Integer> getRebuildTasksQueueSizeAfterEachBuilderInvoke() {
             return rebuildTasksQueueSizeAfterEachBuilderInvoke;
+        }
+
+        @Override
+        Job scheduleRebuildJob(final RebuildTask newRebuildTask) {
+            final Job job = super.scheduleRebuildJob(newRebuildTask);
+            rebuildJobs.add(job);
+            return job;
         }
 
     }
