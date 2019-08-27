@@ -1,0 +1,154 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Ug_E0MWtEemCIMV4ZbEbkw
+Element-Name: DynamicLibraryInTest
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _gs24cMilEem4rLX8K5H9uw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/27/19 2:03 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "MyProject/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "MyProject/red.xml"
+get-editor "MyProject/red.xml" | get-tab-folder | get-tab-item Libraries | click 
+
+// add two libs
+set-dialog-result File "platform:/resource/MyProject/libs/Dyn2Lib.py" "platform:/resource/MyProject/libs/DynLib.py"
+get-editor "MyProject/red.xml"  | get-section Libraries | get-tree | get-item "...add new library file" | double-click
+get-button "Save (M1+S)" | click
+
+// wait for errors
+wait-for-errors -amount 2 -times 5 -delay 500
+get-view Problems | click
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(2 items\\)/'Dyn2Lib' library specification file was not generated. Try to reload it manually in Project Explorer" 
+    | get-property caption 
+    | equals "'Dyn2Lib' library specification file was not generated. Try to reload it manually in Project Explorer" 
+    | verify-true
+    
+// add arguments to Dyn2Lib
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | get-menu -path "Add arguments" | click
+}
+
+//value 3
+with [get-window "Add arguments"] {
+    get-editbox -after [get-label Arguments] | type-text 3
+    get-button OK | click
+}
+
+// value 5
+with [get-editor "MyProject/red.xml" | get-section Libraries | get-tree] {
+    select "Dyn2Lib - MyProject\\/libs\\/Dyn2Lib.py" | get-menu -path "Add arguments" | click
+}
+get-window "Static library detected" | get-button "Mark as dynamic" | click
+with [get-window "Add arguments"] {
+    get-editbox -after [get-label Arguments] | type-text 5
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+get-view "Project Explorer" | get-tree | select "MyProject/test/test.robot" | double-click
+
+
+
+
+// check if libs ar in content assist
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 1
+    type-text libr
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals Collections | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals DateTime | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals Dialogs | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Dyn2Lib 3" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "Dyn2Lib 5" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals DynLib | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals OperatingSystem | verify-true
+}
+
+//se;ect with arg: 3
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Dyn2Lib 3" | click -default
+get-button "Save (M1+S)" | click
+
+
+//check tah is no new errors
+get-view Problems | get-tree | get-item -path "Errors \\(1 item\\)/Unknown keyword 'kw 2'" | get-property index 
+    | equals 0 | verify-true
+    
+// add second arg    
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 24
+    type-text "  8"
+    key-type "M1+s"
+}
+
+// library is now not recognzed
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(2 items\\)/Unknown 'Dyn2Lib' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+    | get-property caption 
+    | equals "Unknown 'Dyn2Lib' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+    | verify-true
+    
+// rmeove arg and add lib that can have argument that nothing changes    
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 27
+    key-type BackSpace -times 2
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Lib
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+}
+
+// add arg
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select DynLib | click -default
+with [get-editor "test.robot" | get-text-viewer] {
+    key-type "NUMPAD_3" 3 -times 2
+    key-type "M1+s"
+}
+
+// no errors
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+
+// add arg in red.xml
+with [get-editor "MyProject/red.xml"] {
+    click
+    with [get-section Libraries | get-tree] {
+        select "DynLib - MyProject\\/libs\\/DynLib.py" | get-menu -path "Add arguments" | click
+    }
+}
+
+// add arg in red.xml
+with [get-window "Add arguments"] {
+    with [get-editbox -after [get-label Arguments]] {
+        key-type "NUMPAD_8" 8
+        key-type "NUMPAD_7" 7
+    }
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+// no errors
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+
+// add second arg - now is erroe
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 3 24
+    type-text "  text"
+    key-type "M1+s"
+}
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(1 item\\)/Keyword 'DynLib' expects from 0 to 1 argument but 2 are provided" | get-property index 
+    | equals 0 | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
