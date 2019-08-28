@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 4:06 PM
+Save-Time: 8/28/19 11:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -263,9 +263,9 @@ get-editor "MainClass.py" | get-text-viewer | set-caret-pos 12 7
 
 exec-with-options {
     get-editor "MainClass.py" | get-text-viewer | key-type "M1+s"
-    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Progress Information" | get-window "Problem Occurred" | get-editbox 
-        -after [get-label "See 'Details' for more information."] | get-property text 
+     get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text
         | equals "Library specification generation problem\n\n"
         + "Problem occurred during generating libdoc for 'MainClass' library located at '.*NewProject[\\\\/]imports[\\\\/]MainClass.py'.\n"
         + "Following exception has been thrown:\n"
@@ -276,7 +276,7 @@ exec-with-options {
         + "            PYTHONPATH:\n"
         + "              (.*\n)*"
         + "            Try --help for usage information." | verify-true
-	 get-window "Progress Information" | get-window "Problem Occurred" | get-button OK | click
+	 get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
