@@ -5,12 +5,16 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 /**
  * @author Michal Anglart
@@ -28,41 +32,50 @@ public class DefaultRedCellEditorValueValidator implements CellEditorValueValida
         if (value == null) {
             return;
         }
-        Object robotObject = dataProvider.getRowObject(rowId);
-        if (robotObject instanceof Entry) {
-            robotObject = ((Entry<?, ?>) robotObject).getValue();
-        }
-        if (robotObject instanceof RobotKeywordCall) {
-            RobotKeywordCall call = (RobotKeywordCall) robotObject;
-            int offset = call.getPosition().getOffset();
-            if (offset > -1) {
-                List<String> separator = call.getSuiteFile()
-                        .getLinkedElement()
-                        .getRobotLineBy(offset)
-                        .get()
-                        .getSeparatorForLine()
-                        .get()
-                        .getRepresentation();
-                for (String representation : separator) {
-                    if (value.contains(representation)) {
-                        throw new CellEditorValueValidationException("Single entry cannot contain cells separator");
-                    }
-                }
-            }
-        } else {
-            String userSeparator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(false);
-            if (userSeparator.contains("|")) {
-                userSeparator = "( |\t)\\|( |\t)";
-            } else {
-                userSeparator = "(  |\t)";
-            }
-            if (value.matches(".*" + userSeparator + ".*")) {
-                throw new CellEditorValueValidationException("Single entry cannot contain cells separator");
-            }
+
+        final SeparatorType separator = findSeparatorType(rowId);
+        final String regex = separator == SeparatorType.PIPE ? ".*( |\t)\\|( |\t).*" : ".*(  |\t).*";
+        if (value.matches(regex)) {
+            throw new CellEditorValueValidationException("Single entry cannot contain cells separator");
         }
 
         if (value.startsWith(" ") || (value.endsWith(" ") && !value.endsWith("\\ "))) {
-            throw new CellEditorValueValidationException("Space should be escaped.");
+            throw new CellEditorValueValidationException("Space should be escaped");
         }
     }
+
+    private SeparatorType findSeparatorType(final int rowId) {
+        final Object robotObject = retrieveModelObject(rowId);
+        if (robotObject instanceof RobotFileInternalElement) {
+            final RobotFileInternalElement element = (RobotFileInternalElement) robotObject;
+            return findSeparatorType(element.getSuiteFile(), (AModelElement<?>) element.getLinkedElement());
+        } else {
+            return findSeparatorType();
+        }
+    }
+
+    private Object retrieveModelObject(final int rowId) {
+        Object modelObject = dataProvider.getRowObject(rowId);
+        if (modelObject instanceof Entry) {
+            modelObject = ((Entry<?, ?>) modelObject).getValue();
+        }
+        return modelObject;
+    }
+
+    private SeparatorType findSeparatorType(final RobotSuiteFile suiteFile, final AModelElement<?> element) {
+        final FilePosition position = element.getBeginPosition();
+        if (position.isSet()) {
+            return suiteFile.getLinkedElement()
+                    .getRobotLineBy(position.getOffset())
+                    .flatMap(RobotLine::getSeparatorForLine)
+                    .orElseGet(this::findSeparatorType);
+        }
+        return findSeparatorType();
+    }
+
+    private SeparatorType findSeparatorType() {
+        final String separator = RedPlugin.getDefault().getPreferences().getSeparatorToUse(false);
+        return separator.contains("|") ? SeparatorType.PIPE : SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
+    }
+
 }

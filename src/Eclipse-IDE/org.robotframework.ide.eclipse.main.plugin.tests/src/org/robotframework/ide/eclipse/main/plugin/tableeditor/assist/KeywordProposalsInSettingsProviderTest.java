@@ -10,7 +10,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -326,10 +326,8 @@ public class KeywordProposalsInSettingsProviderTest {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         for (int i = 0; i < settings.size(); i++) {
-            final Map<String, Object> map = new HashMap<>();
-            map.put(settings.get(i).getName(), settings.get(i));
-            final Entry<String, Object> entry = map.entrySet().iterator().next();
-
+            final RobotKeywordCall call = settings.get(i);
+            final Entry<String, Object> entry = new SimpleEntry<String, Object>(call.getName(), call);
             when(dataProvider.getRowObject(i)).thenReturn(entry);
         }
         return dataProvider;
