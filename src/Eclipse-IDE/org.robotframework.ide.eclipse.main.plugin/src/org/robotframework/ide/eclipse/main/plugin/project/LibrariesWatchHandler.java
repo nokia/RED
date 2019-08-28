@@ -25,7 +25,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
@@ -189,32 +192,28 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 return;
             }
 
-            SwtThread.asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    final List<LibrarySpecification> libSpecsToRebuild = collectModifiedLibSpecs(modifiedFileName);
-                    if (RedPlugin.getDefault().getPreferences().isLibdocAutoReloadEnabled()) {
-                        rebuildLibSpecs(project, libSpecsToRebuild);
-                    } else {
-                        markLibSpecsAsModified(libSpecsToRebuild);
-                    }
+            SwtThread.asyncExec(() -> {
+                final List<LibrarySpecification> libSpecsToRebuild = collectModifiedLibSpecs(modifiedFileName);
+                if (RedPlugin.getDefault().getPreferences().isLibdocAutoReloadEnabled()) {
+                    rebuildLibSpecs(project, libSpecsToRebuild);
+                } else {
+                    markLibSpecsAsModified(libSpecsToRebuild);
                     fireSpecificationChangeEvent(project);
-                }
-
-                private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
-                    final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
-                    synchronized (registeredLibrarySpecifications) {
-                        registeredLibrarySpecifications.forEach((registeredSpec, registeredName) -> {
-                            if (registeredName.equals(modifiedFileName)) {
-                                specsToRebuild.add(registeredSpec);
-                            }
-                        });
-                    }
-                    return specsToRebuild;
                 }
             });
         }
+    }
+
+    private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
+        final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
+        synchronized (registeredLibrarySpecifications) {
+            registeredLibrarySpecifications.forEach((registeredSpec, registeredName) -> {
+                if (registeredName.equals(modifiedFileName)) {
+                    specsToRebuild.add(registeredSpec);
+                }
+            });
+        }
+        return specsToRebuild;
     }
 
     private void rebuildLibSpecs(final IProject project, final List<LibrarySpecification> specs) {
@@ -223,14 +222,20 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         if (rebuildTasksQueue.isEmpty()) {
             rebuildTasksQueue.add(newRebuildTask);
-            scheduleRebuildJob(newRebuildTask);
+            scheduleRebuildJob(newRebuildTask, new JobChangeAdapter() {
+
+                @Override
+                public void done(final IJobChangeEvent event) {
+                    fireSpecificationChangeEvent(project);
+                }
+            });
         } else {
             rebuildTasksQueue.add(newRebuildTask);
         }
     }
 
     @VisibleForTesting
-    Job scheduleRebuildJob(final RebuildTask newRebuildTask) {
+    Job scheduleRebuildJob(final RebuildTask newRebuildTask, final IJobChangeListener listener) {
         final Job job = new Job("Library specification generation") {
 
             @Override
@@ -241,6 +246,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         };
         job.setUser(false);
+        job.addJobChangeListener(listener);
         job.schedule();
         return job;
     }

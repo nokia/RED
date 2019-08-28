@@ -22,6 +22,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.junit.BeforeClass;
@@ -628,8 +629,8 @@ public class LibrariesWatchHandlerTest {
         }
 
         @Override
-        Job scheduleRebuildJob(final RebuildTask newRebuildTask) {
-            final Job job = super.scheduleRebuildJob(newRebuildTask);
+        Job scheduleRebuildJob(final RebuildTask newRebuildTask, final IJobChangeListener listener) {
+            final Job job = super.scheduleRebuildJob(newRebuildTask, listener);
             rebuildJobs.add(job);
             return job;
         }

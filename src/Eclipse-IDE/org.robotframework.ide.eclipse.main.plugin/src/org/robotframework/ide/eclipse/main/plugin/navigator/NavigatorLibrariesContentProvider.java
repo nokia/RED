@@ -76,12 +76,9 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
             }
 
             private void refreshViewer() {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (viewer != null && !viewer.getControl().isDisposed()) {
-                            viewer.refresh();
-                        }
+                Display.getDefault().asyncExec(() -> {
+                    if (viewer != null && !viewer.getControl().isDisposed()) {
+                        viewer.refresh();
                     }
                 });
             }
