@@ -1,0 +1,185 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Bre-YMjiEem4rLX8K5H9uw
+Element-Name: AddingTemplates
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nyd9cMmbEem4rLX8K5H9uw
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/29/19 11:10 AM
+Testcase-Type: ecl
+Verifications: _zVmTUMmkEem4rLX8K5H9uw,_tx_g0MmkEem4rLX8K5H9uw,_4zxMMMmkEem4rLX8K5H9uw,_AzGaQMmlEem4rLX8K5H9uw,_odceAMmkEem4rLX8K5H9uw,_G_fEAMmlEem4rLX8K5H9uw,_ueRikMmlEem4rLX8K5H9uw,_dllnkMo8Eem4rLX8K5H9uw
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select "a1/template_test.robot" | double-click
+    select "a1/template_name_in_one_line.robot" | double-click
+    select "a1/many_cases.robot" | double-click
+    select "a1/loop_in_template.robot" | double-click
+}
+
+// add kw to template and check if CA didn't added arguments
+with [get-editor "loop_in_template.robot" | get-text-viewer] {
+    set-caret-pos 6 18
+    type-text SBE
+    key-type "M1+SPACE"
+    wait 300
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Should Be Equal - BuiltIn" 
+    | click -default
+    
+get-editor "loop_in_template.robot" | get-text-viewer | get-property text | equals "*** Test Cases **\n"
+    + "Normal test case\n"
+    + "    Example keyword    first argument    second argument\n\n"
+    + "Templated test case\n"
+    + "    [Template]   Should Be Equal\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "Template and for\n"
+    + "    [Template]    Example keyword\n"
+    + "    FOR    ${item}    IN    @{ITEMS}\n"
+    + "        ${item}    2nd arg\n"
+    + "    END\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a}  ${b}\n"
+    + "    Log many  ${a}  ${b}\n\n\n"
+    + "*** Variables ***\n"
+    + "@{ITEMS}    33  34   6" | verify-true
+    
+    
+// add arg in next line    
+with [get-editor "loop_in_template.robot" | get-text-viewer] {
+    set-caret-pos 6 34
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "1  2"
+}
+
+//check that color is black
+with [get-editor "loop_in_template.robot" | get-text-viewer] {
+    get-property "styles[11].text" | equals 1 | verify-true
+    get-property "styles[11].fontStyle" | equals normal | verify-true
+    get-property "styles[12].text" | equals 2 | verify-true
+    get-property "styles[12].fontStyle" | equals normal | verify-true
+}
+
+//add task
+get-view "Project Explorer" | get-tree | select a1 | select a1 | get-menu -path "New/Robot Task Suite" | click
+with [get-window "New Robot Task Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text task
+    get-button Finish | click
+}
+
+// add setting section
+with [get-editor "task.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\*\\*\\* Settings \\*\\*\\*" 
+    | click -default
+with [get-editor "task.robot" | get-text-viewer] {
+    type-text Ta
+    key-type "M1+SPACE"
+}
+
+// add Task Template with KW
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Task Template" | click 
+    -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Convert To String - BuiltIn" 
+    | click -default
+    
+// add task     
+with [get-editor "task.robot" | get-text-viewer] {
+    set-caret-pos 3 14
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "task 1"
+}
+wait 1000
+//check if is bols and black
+with [get-editor "task.robot" | get-text-viewer] {
+    get-property "styles[8].text" | equals "task 1" | verify-true
+    get-property "styles[8].fontStyle" | equals bold | verify-true
+    get-property "styles[8].underline" | equals error | verify-true
+    get-property "styles[8].foregroundColor" | equals "#000000" | verify-true
+}
+
+
+// add args
+with [get-editor "task.robot" | get-text-viewer] {
+    set-caret-pos 4 7
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "1  4"
+}
+wait 1000
+with [get-editor "task.robot" | get-text-viewer] {
+    get-property "styles[10].text" | equals 1 | verify-true
+    get-property "styles[10].fontStyle" | equals normal | verify-true
+    get-property "styles[11].text" | equals 4 | verify-true
+    get-property "styles[11].fontStyle" | equals normal | verify-true
+}
+
+// save and remove one to remove error
+get-button "Save All (M1+M2+S)" | click
+with [get-editor "task.robot" | get-text-viewer] {
+    set-caret-pos 5 9
+    key-type BackSpace -times 3
+    key-type "M1+s"
+}
+
+
+
+
+
+
+get-view "Project Explorer" | get-tree | select "a1/template_name_in_one_line.robot" | select "a1/template_test.robot" 
+    | double-click
+get-editor "template_test.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "template_test.robot/Test Cases/Other formatting"
+with [get-editor "template_test.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 5
+        key-type Enter
+        key-type Down
+        key-type Enter
+        type-text 1
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+    get-editbox -after [get-label "Test Cases"] -index 1 | set-text 2
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "template_test.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Template         Login with invalid credentials should fail\n\n"
+    + "*** Variables ***\n"
+    + "${VALID USERNAME}   2\n"
+    + "${VALID PASSWORD}  33\n\n\n"
+    + "*** Test Cases ***    USERNAME             PASSWORD\n"
+    + "Invalid Username      invalid              ${VALID PASSWORD}\n"
+    + "Invalid Password      ${VALID USERNAME}    invalid\n\n"
+    + "Other formatting\n"
+    + "    first round 1     first round 2\n"
+    + "    second round 1    second round 2\n"
+    + "    \n"
+    + "case\n"
+    + "    1    2\n"
+    + "*** Keywords ***\n"
+    + "Login with invalid credentials should fail\n"
+    + "    [Arguments]    ${username}    ${password}\n"
+    + "    log    ${username}\n"
+    + "    log   ${password}" | verify-true
+get-editor "template_test.robot" | get-text-viewer | key-type "M1+s"
+
+
+get-editor "template_test.robot" | click
+get-view Outline | get-button "Expand All" | click
+get-editor "template_name_in_one_line.robot" | click
+get-view Outline | get-button "Expand All" | click
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
