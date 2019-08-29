@@ -21,10 +21,10 @@ public abstract class AModelTypeComparator<T extends AModelElement<?>> implement
     }
 
     @Override
-    public int compare(T modelElement1, T modelElement2) {
+    public int compare(final T modelElement1, final T modelElement2) {
         int result = ECompareResult.EQUAL_TO.getValue();
-        FilePosition filePos1 = modelElement1.getBeginPosition();
-        FilePosition filePos2 = modelElement2.getBeginPosition();
+        final FilePosition filePos1 = modelElement1.getBeginPosition();
+        final FilePosition filePos2 = modelElement2.getBeginPosition();
 
         if (filePos1.isNotSet() && filePos2.isNotSet()) {
             result = Integer.compare(position.get(modelElement1.getModelType()),

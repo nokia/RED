@@ -14,9 +14,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsSuiteTestTemplateTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterizedTest {
 
-    public CreationOfSettingsSuiteTestTemplateTest(final String extension, final FileFormat format) {
+    public CreationOfSettingsTestTemplateTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 

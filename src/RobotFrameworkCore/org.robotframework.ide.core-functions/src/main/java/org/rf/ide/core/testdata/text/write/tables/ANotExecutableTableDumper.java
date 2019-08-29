@@ -51,7 +51,7 @@ public abstract class ANotExecutableTableDumper<T extends ARobotSectionTable> im
                 final ISectionElementDumper<T> elemDumper = dumpers.stream()
                         .filter(dumper -> dumper.isServedType(currentElement))
                         .findFirst()
-                        .orElse(null);
+                        .orElseThrow(IllegalStateException::new);
                 elemDumper.dump(model, filteredSections, sectionWithHeaderPos, th, sorted, currentElement, lines);
 
                 final AModelElement<T> nextElementToBeDumped = currentIndex < lastIndexToDump

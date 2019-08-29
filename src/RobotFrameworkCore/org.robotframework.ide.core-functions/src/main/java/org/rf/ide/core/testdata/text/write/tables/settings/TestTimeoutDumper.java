@@ -18,9 +18,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDumper;
 
-public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper<SettingTable> {
+public class TestTimeoutDumper extends ANotExecutableTableElementDumper<SettingTable> {
 
-    public SuiteTestTimeoutDumper(final DumperHelper helper) {
+    public TestTimeoutDumper(final DumperHelper helper) {
         super(helper, ModelType.SUITE_TEST_TIMEOUT);
     }
 

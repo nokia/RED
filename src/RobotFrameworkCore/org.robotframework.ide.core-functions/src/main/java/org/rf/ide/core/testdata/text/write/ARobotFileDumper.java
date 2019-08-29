@@ -165,6 +165,10 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         list.addAll(settingTable.getTestTeardowns());
         list.addAll(settingTable.getTestTemplates());
         list.addAll(settingTable.getTestTimeouts());
+        list.addAll(settingTable.getTaskSetups());
+        list.addAll(settingTable.getTaskTeardowns());
+        list.addAll(settingTable.getTaskTemplates());
+        list.addAll(settingTable.getTaskTimeouts());
         list.addAll(settingTable.getUnknownSettings());
 
         list.addAll(settingTable.getMetadatas());

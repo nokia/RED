@@ -21,11 +21,15 @@ public class SettingTableElementsComparator extends AModelTypeComparator<AModelE
         POSITION.put(ModelType.SUITE_SETUP, ++startPosition);
         POSITION.put(ModelType.SUITE_TEARDOWN, ++startPosition);
         POSITION.put(ModelType.SUITE_TEST_SETUP, ++startPosition);
+        POSITION.put(ModelType.SUITE_TASK_SETUP, ++startPosition);
         POSITION.put(ModelType.SUITE_TEST_TEARDOWN, ++startPosition);
+        POSITION.put(ModelType.SUITE_TASK_TEARDOWN, ++startPosition);
         POSITION.put(ModelType.FORCE_TAGS_SETTING, ++startPosition);
         POSITION.put(ModelType.DEFAULT_TAGS_SETTING, ++startPosition);
         POSITION.put(ModelType.SUITE_TEST_TEMPLATE, ++startPosition);
+        POSITION.put(ModelType.SUITE_TASK_TEMPLATE, ++startPosition);
         POSITION.put(ModelType.SUITE_TEST_TIMEOUT, ++startPosition);
+        POSITION.put(ModelType.SUITE_TASK_TIMEOUT, ++startPosition);
         POSITION.put(ModelType.METADATA_SETTING, ++startPosition);
         POSITION.put(ModelType.LIBRARY_IMPORT_SETTING, ++startPosition);
         POSITION.put(ModelType.RESOURCE_IMPORT_SETTING, ++startPosition);
