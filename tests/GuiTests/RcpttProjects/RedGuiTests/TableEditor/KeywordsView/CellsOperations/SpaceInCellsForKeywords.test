@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oVPCsGCaEeaRBaqqj0N1Gg
-Runtime-Version: 2.4.1.201903190000
-Save-Time: 5/10/19 12:08 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 8/29/19 11:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,12 +18,12 @@ proc "check-marker-on-cell" [val is_content_assist true] [val check_color true]{
 	if [$is_content_assist | eq True]{
 		with [get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1] {
 	    	get-property "decorators[0].description" | equals "Press M1+Space for content assist" | verify-true
-	    	get-property "decorators[1].description" | equals "Space should be escaped." | verify-true
+	    	get-property "decorators[1].description" | equals "Space should be escaped" | verify-true
 		}
 	}-else{
 	
 		with [get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1] {
-	    	get-property "decorators[0].description" | equals "Space should be escaped." | verify-true
+	    	get-property "decorators[0].description" | equals "Space should be escaped" | verify-true
 		}
 	}	
 	if [$check_color | eq true]{
