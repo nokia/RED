@@ -13,17 +13,16 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
-import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
 public class RfLintValidationPreferencePageTest {
@@ -31,15 +30,8 @@ public class RfLintValidationPreferencePageTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @AfterClass
-    public static void afterSuite() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.RFLINT_RULES_FILES, "");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
-        store.putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "");
-    }
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void initDoesNothing() {
@@ -71,8 +63,7 @@ public class RfLintValidationPreferencePageTest {
 
     @Test
     public void additionalArgumentsFieldDisplaysCustomArguments() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
 
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
         page.createControl(shellProvider.getShell());
@@ -82,12 +73,11 @@ public class RfLintValidationPreferencePageTest {
 
     @Test
     public void valuesAndPreferencesAreCorrectlyUpdated() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.RFLINT_RULES_FILES, "/path/to/fst.py;/path/to/snd.py");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "Rule1;Rule2");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "WARNING;ERROR");
-        store.putValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, ";100");
-        store.putValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_FILES, "/path/to/fst.py;/path/to/snd.py");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "Rule1;Rule2");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "WARNING;ERROR");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, ";100");
+        preferenceUpdater.setValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
 
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
         page.createControl(shellProvider.getShell());

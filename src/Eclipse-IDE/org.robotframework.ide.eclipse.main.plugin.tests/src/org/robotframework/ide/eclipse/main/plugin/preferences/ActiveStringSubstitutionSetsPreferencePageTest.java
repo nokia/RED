@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
@@ -30,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +48,9 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+
     @BeforeClass
     public static void beforeSuite() throws CoreException {
         VARIABLE_MANAGER.addVariables(CUSTOM_VARIABLES);
@@ -56,10 +59,6 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     @AfterClass
     public static void afterSuite() {
         VARIABLE_MANAGER.removeVariables(CUSTOM_VARIABLES);
-
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "");
-        store.putValue(RedPreferences.STRING_VARIABLES_SETS, "");
     }
 
     @Test
@@ -92,9 +91,8 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
         input.get("set 2").add(newArrayList("a", "4"));
         input.get("set 2").add(newArrayList("c", "6"));
 
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
-        store.putValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
+        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
+        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
 
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
         page.createControl(shellProvider.getShell());
@@ -136,9 +134,8 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
         input.get("set 2").add(newArrayList("a", "4"));
         input.get("set 2").add(newArrayList("c", "6"));
 
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
-        store.putValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
+        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
+        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
 
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
         page.createControl(shellProvider.getShell());

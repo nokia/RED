@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Button;
@@ -26,12 +25,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
-import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,12 +40,8 @@ public class DefaultLaunchConfigurationPreferencePageTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @AfterClass
-    public static void afterSuite() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES,
-                store.getDefaultString(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES));
-    }
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void initDoesNothing() {
@@ -101,8 +95,8 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         input.put("VAR_2", "1234");
         input.put("EMPTY_VAR", "");
 
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES, new ObjectMapper().writeValueAsString(input));
+        preferenceUpdater.setValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES,
+                new ObjectMapper().writeValueAsString(input));
 
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());

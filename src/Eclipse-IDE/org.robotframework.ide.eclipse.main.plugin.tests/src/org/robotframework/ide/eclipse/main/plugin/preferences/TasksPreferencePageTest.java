@@ -9,15 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
 
@@ -26,14 +24,8 @@ public class TasksPreferencePageTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @AfterClass
-    public static void afterSuite() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.TASKS_DETECTION_ENABLED,
-                store.getDefaultString(RedPreferences.TASKS_DETECTION_ENABLED));
-        store.putValue(RedPreferences.TASKS_TAGS, store.getDefaultString(RedPreferences.TASKS_TAGS));
-        store.putValue(RedPreferences.TASKS_PRIORITIES, store.getDefaultString(RedPreferences.TASKS_PRIORITIES));
-    }
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
     public void thereIsAnEnablementButtonAndATableForTagsPlacedAtThePage() {
@@ -50,8 +42,7 @@ public class TasksPreferencePageTest {
 
     @Test
     public void buttonHasSelection_whenTasksDetectionIsEnabled() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.TASKS_DETECTION_ENABLED, Boolean.TRUE.toString());
+        preferenceUpdater.setValue(RedPreferences.TASKS_DETECTION_ENABLED, Boolean.TRUE.toString());
 
         final TasksPreferencePage page = new TasksPreferencePage();
         page.createControl(shellProvider.getShell());
@@ -62,9 +53,8 @@ public class TasksPreferencePageTest {
 
     @Test
     public void tableDisplaysAllTheTasksTags() {
-        final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        store.putValue(RedPreferences.TASKS_TAGS, "X;Y;Z");
-        store.putValue(RedPreferences.TASKS_PRIORITIES, "LOW;NORMAL;HIGH");
+        preferenceUpdater.setValue(RedPreferences.TASKS_TAGS, "X;Y;Z");
+        preferenceUpdater.setValue(RedPreferences.TASKS_PRIORITIES, "LOW;NORMAL;HIGH");
 
         final TasksPreferencePage page = new TasksPreferencePage();
         page.createControl(shellProvider.getShell());
