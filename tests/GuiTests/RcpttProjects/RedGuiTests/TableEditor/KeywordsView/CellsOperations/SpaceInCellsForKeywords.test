@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oVPCsGCaEeaRBaqqj0N1Gg
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/29/19 11:24 AM
+Save-Time: 8/29/19 4:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -170,7 +170,7 @@ check-keyword-row -file "TestFile.robot" -row 2 -kw "log many" -c1 "12" -c2 "\\"
 check-keyword-row -file "TestFile.robot" -row 3 -kw "Convert To Binary" -c1 "ok3 spaces" -extended_col true
 check-keyword-row -file "TestFile.robot" -row 4 -kw "..." -extended_col true
 check-keyword-row -file "TestFile.robot" -row 5 -kw "...add new keyword" -extended_col true
-get-editor "TestFile.robot" | minimize
+get-editor "TestFile.robot" | restore
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***    \n"
@@ -179,4 +179,27 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Arguments]    ${arg1}\n"
     + "    log many  12    \\    \\    \\    #com2\n"
     + "    Convert To Binary    ok3 spaces" | verify-true
+    
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+    with [get-tab-folder] {
+        get-tab-item Keywords | click
+    }
+}
+
+// add new arg "a | b"
+get-view Outline | get-tree | select "TestFile.robot/Keywords/correct name/Convert To Binary"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 2
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "a | b"
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+}    
+
+check-keyword-row -file "TestFile.robot" -row 3 -kw "Convert To Binary" -c1 "ok3 spaces" -c2 "a | b"
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
