@@ -2566,6 +2566,9 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <or>
                 <reference
                       definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
@@ -2715,6 +2718,9 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <or>
                 <reference
                       definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
@@ -2850,6 +2856,9 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <or>
                 <reference
                       definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
@@ -2917,6 +2926,9 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
+           <instanceof
+                 value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+           </instanceof>
            <or>
              <reference
                    definitionId="org.robotframework.canPasteToGeneralSettingsSectionEditorTable">
@@ -3103,6 +3115,9 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <and>
                 <reference
                       definitionId="org.robotframework.canPasteToVariablesSectionEditorTable">
@@ -5607,6 +5622,9 @@
           </with>
           <with
               variable="activeEditor">
+              <instanceof
+                    value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+              </instanceof>
               <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5677,6 +5695,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5734,6 +5755,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5791,6 +5815,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5848,6 +5875,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5905,6 +5935,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5940,6 +5973,9 @@
           </with>
           <with
                 variable="activeEditor">
+             <instanceof
+                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+             </instanceof>
              <test
                    property="org.robotframework.editorModelIsEditable"
                    value="true">
@@ -5964,6 +6000,9 @@
           id="org.robotframework.canDeleteSectionUsingToolbar">
        <with
              variable="activeEditor">
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+          </instanceof>
           <and>
              <test
                    property="org.robotframework.editorModelIsEditable"
@@ -6056,6 +6095,9 @@
           id="org.robotframework.canPasteToCasesSectionEditorTable">
        <with
              variable="activeEditor">
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+          </instanceof>
           <or>
              <test
                    property="org.robotframework.thereAreCasesElementsInClipboard"
@@ -6090,6 +6132,9 @@
           id="org.robotframework.canPasteToTasksSectionEditorTable">
        <with
              variable="activeEditor">
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+          </instanceof>
           <or>
              <test
                    property="org.robotframework.thereAreTasksElementsInClipboard"
@@ -6124,6 +6169,9 @@
           id="org.robotframework.canPasteToKeywordSectionEditorTable">
        <with
          variable="activeEditor">
+         <instanceof
+               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+         </instanceof>
          <or>
             <test
                   property="org.robotframework.thereAreKeywordDefinitionElementsInClipboard"
@@ -6159,6 +6207,9 @@
        <and>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+	         </instanceof>
              <or>
                 <test
                       property="org.robotframework.thereAreGeneralSettingsInClipboard"
@@ -6193,6 +6244,9 @@
        <and>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+	         </instanceof>
              <or>
                 <test
                       property="org.robotframework.thereAreMetadataSettingsInClipboard"
@@ -6227,6 +6281,9 @@
        <and>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+	         </instanceof>
              <or>
                 <test
                       property="org.robotframework.thereAreImportSettingsInClipboard"
@@ -6260,6 +6317,9 @@
           id="org.robotframework.canPasteToVariablesSectionEditorTable">
        <with
              variable="activeEditor">
+         <instanceof
+               value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+         </instanceof>
          <or>
             <test
                   property="org.robotframework.thereAreVariablesInClipboard"
@@ -6282,6 +6342,9 @@
           id="org.robotframework.table.onlyFullRowsAreSelected">
        <with
              variable="activeEditor">
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+          </instanceof>
           <test
                 property="org.robotframework.table.cell.onlyFullRowsAreSelected"
                 value="true">
@@ -6292,6 +6355,9 @@
           id="org.robotframework.table.noFullRowIsSelected">
        <with
              variable="activeEditor">
+          <instanceof
+                value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+          </instanceof>
           <test
                 property="org.robotframework.table.cell.noFullRowIsSelected"
                 value="true">
@@ -6324,6 +6390,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6357,6 +6426,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6388,6 +6460,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6419,6 +6494,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6450,6 +6528,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6481,6 +6562,9 @@
           </with>
           <with
                 variable="activeEditor">
+	         <instanceof
+	               value="org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor">
+	         </instanceof>
              <test
                    property="org.robotframework.redXmlIsEditable"
                    value="true">
@@ -6493,6 +6577,9 @@
         <and>
             <with
                 variable="activeEditor">
+		        <instanceof
+		              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+		        </instanceof>
                 <test
                     property="org.robotframework.table.cell.numberOfSelectedCellEquals"
                     value="1">
@@ -6525,6 +6612,9 @@
                     </with>
                     <with
                         variable="activeEditor">
+				        <instanceof
+				              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+				        </instanceof>
                         <or>
                             <test
                                 property="org.robotframework.table.cell.isAnyCellSelectedInColumn"
