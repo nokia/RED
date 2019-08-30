@@ -144,6 +144,7 @@ public class RfLintIntegrationServer {
                     break;
                 case "analysis_finished":
                     handleAnalysisFinished(eventsListeners, eventMap);
+                    break;
                 default:
                     break;
             }

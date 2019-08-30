@@ -141,18 +141,16 @@ class SuiteSourceEditorFoldingSupport {
 
     private Collection<Position> toSectionPosition(final Map<Position, Set<Position>> positionsGroupedByHeaders) {
         final Set<Position> positions = new HashSet<>();
-        for (final Position key : positionsGroupedByHeaders.keySet()) {
-            if (positionsGroupedByHeaders.get(key).isEmpty()) {
+        positionsGroupedByHeaders.forEach((key, value) -> {
+            if (value.isEmpty()) {
                 positions.add(key);
             } else {
-                final Position maxPosition = Collections.max(positionsGroupedByHeaders.get(key), positionsComparator());
-
+                final Position maxPosition = Collections.max(value, positionsComparator());
                 final int offset = key.getOffset();
                 final int length = maxPosition.getOffset() + maxPosition.getLength() - offset;
                 positions.add(new Position(offset, length));
             }
-
-        }
+        });
         return positions;
     }
 

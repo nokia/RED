@@ -114,7 +114,7 @@ public class DictionaryVariableValueMapper implements IParsingMapper {
         return new KeyValuePair(key, value);
     }
 
-    protected class KeyValuePair {
+    protected static class KeyValuePair {
 
         private final RobotToken key;
 

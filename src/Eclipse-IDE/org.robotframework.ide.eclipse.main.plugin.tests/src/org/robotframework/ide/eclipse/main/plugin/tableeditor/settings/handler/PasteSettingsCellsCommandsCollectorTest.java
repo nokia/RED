@@ -316,7 +316,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         return commandsCollector;
     }
 
-    class DummyPasteSettingsCellsCommandsCollector extends PasteSettingsCellsCommandsCollector {
+    static class DummyPasteSettingsCellsCommandsCollector extends PasteSettingsCellsCommandsCollector {
 
         private RobotSetting[] settingsFromClipboard;
 
@@ -365,7 +365,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
     }
 
-    class PasteCommandsInput {
+    static class PasteCommandsInput {
 
         private final RobotElement selectedElement;
 

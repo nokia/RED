@@ -35,7 +35,7 @@ public class RemoveAllTerminatedRedSessionsActionTest {
         final IConsole[] consoles = new IConsole[] { mock(IConsole.class), mock(IConsole.class) };
         final IConsoleManager consoleManager = mock(IConsoleManager.class);
         when(consoleManager.getConsoles()).thenReturn(consoles);
-        
+
         final RemoveAllTerminatedRedSessionsAction action = new RemoveAllTerminatedRedSessionsAction(consoleManager);
         action.run();
 
@@ -46,8 +46,11 @@ public class RemoveAllTerminatedRedSessionsActionTest {
 
     @Test
     public void nothingIsRemovedWhenActionIsRunButAllSessionConsolesAreAlive() {
-        final IConsole[] consoles = new IConsole[] { mock(IConsole.class), aliveSessionConsole(),
-                mock(IConsole.class), aliveSessionConsole() };
+        final IConsole alive1 = sessionConsole(true);
+        final IConsole alive2 = sessionConsole(true);
+        final IConsole other1 = mock(IConsole.class);
+        final IConsole other2 = mock(IConsole.class);
+        final IConsole[] consoles = new IConsole[] { other1, alive1, other2, alive2 };
         final IConsoleManager consoleManager = mock(IConsoleManager.class);
         when(consoleManager.getConsoles()).thenReturn(consoles);
 
@@ -61,10 +64,13 @@ public class RemoveAllTerminatedRedSessionsActionTest {
 
     @Test
     public void allTerminatedSessionConsolesAreRemovedWhenActionIsRun() {
-        final IConsole terminated1 = terminatedSessionConsole();
-        final IConsole terminated2 = terminatedSessionConsole();
-        final IConsole[] consoles = new IConsole[] { mock(IConsole.class), terminated1,
-                aliveSessionConsole(), mock(IConsole.class), aliveSessionConsole(), terminated2 };
+        final IConsole terminated1 = sessionConsole(false);
+        final IConsole terminated2 = sessionConsole(false);
+        final IConsole alive1 = sessionConsole(true);
+        final IConsole alive2 = sessionConsole(true);
+        final IConsole other1 = mock(IConsole.class);
+        final IConsole other2 = mock(IConsole.class);
+        final IConsole[] consoles = new IConsole[] { other1, terminated1, alive1, other2, alive2, terminated2 };
         final IConsoleManager consoleManager = mock(IConsoleManager.class);
         when(consoleManager.getConsoles()).thenReturn(consoles);
 
@@ -76,16 +82,9 @@ public class RemoveAllTerminatedRedSessionsActionTest {
         verifyNoMoreInteractions(consoleManager);
     }
 
-    private static IConsole aliveSessionConsole() {
+    private static IConsole sessionConsole(final boolean isAlive) {
         final Process process = mock(Process.class);
-        when(process.isAlive()).thenReturn(true);
-
-        return new RedSessionConsole("c" + new Random().nextInt(), process);
-    }
-
-    private static IConsole terminatedSessionConsole() {
-        final Process process = mock(Process.class);
-        when(process.isAlive()).thenReturn(false);
+        when(process.isAlive()).thenReturn(isAlive);
 
         return new RedSessionConsole("c" + new Random().nextInt(), process);
     }

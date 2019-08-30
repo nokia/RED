@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
 
 /**
  * @author Michal Anglart
@@ -57,7 +56,7 @@ class LaunchConfigurationTabValidator {
             }
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
-            if (Sets.difference(suitesToRun.keySet(), robotConfig.getUnselectedSuitePaths()).isEmpty()) {
+            if (suitesToRun.isEmpty()) {
                 warnings.add("There are no suites specified. All suites in '" + robotConfig.getProjectName()
                         + "' will be executed.");
             }

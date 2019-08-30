@@ -62,10 +62,12 @@ public final class RedSystemHelper {
             final Process process = builder.redirectErrorStream(true).start();
 
             final InputStream inputStream = process.getInputStream();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lineHandler.accept(line);
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lineHandler.accept(line);
+                }
             }
             return process.waitFor();
         } catch (final InterruptedException e) {

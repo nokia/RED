@@ -176,7 +176,7 @@ public class KeywordSearcher {
         String getKeywordName();
     }
 
-    private class FromLongestLengthComparator implements Comparator<String> {
+    private static class FromLongestLengthComparator implements Comparator<String> {
 
         @Override
         public int compare(final String o1, final String o2) {

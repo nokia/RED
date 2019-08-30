@@ -84,7 +84,7 @@ public class AddNewElementDialogTest {
         }
     }
 
-    private class AddNewElementDialogMock extends AddNewElementDialog<String> {
+    private static class AddNewElementDialogMock extends AddNewElementDialog<String> {
 
         public AddNewElementDialogMock(final Shell shell) {
             super(shell);
@@ -111,7 +111,7 @@ public class AddNewElementDialogTest {
         }
 
         @Override
-        protected void validate(final String text, final AddNewElementDialog<String>.LocalValidationCallback callback) {
+        protected void validate(final String text, final LocalValidationCallback callback) {
             callback.passed();
         }
 
