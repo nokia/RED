@@ -61,10 +61,10 @@ def create_libdoc(libname, format):
         if encoded_libdoc:
             return encoded_libdoc
         else:
-            if '.PY' in libname or '.Py' in libname or '.pY' in libname:
-                raise Exception((result + "\nInvalid library extension"))
-            else:
+            if '.' not in libname or libname.endswith('.py'):
                 raise Exception(result)
+            else:
+                raise Exception((result + "\nInvalid library extension"))
     finally:
         os.remove(temp_lib_file_path)
 
@@ -104,23 +104,17 @@ def create_html_doc(doc, format):
     return formatter(doc)
 
 
-def __decode_unicode_if_needed(arg):
-    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
-        return arg.decode('utf-8')
-    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
-        return [__decode_unicode_if_needed(elem) for elem in arg]
-    else:
-        return arg
-
-
 if __name__ == '__main__':
     import robot_session_server
     import sys
 
-    libname = __decode_unicode_if_needed(sys.argv[1])
-    format = sys.argv[2]
-    python_paths = __decode_unicode_if_needed(sys.argv[3].split(";"))
-    class_paths = __decode_unicode_if_needed(sys.argv[4].split(";")) if len(sys.argv) == 5 else []
+    decoded_args = robot_session_server.__decode_unicode_if_needed(sys.argv)
+
+    libname = decoded_args[1]
+    format = decoded_args[2]
+    python_paths = decoded_args[3].split(";")
+    class_paths = decoded_args[4].split(";") if len(decoded_args) == 5 else []
 
     robot_session_server.__extend_paths(python_paths, class_paths)
+
     print("Libdoc >" + create_libdoc(libname, format))

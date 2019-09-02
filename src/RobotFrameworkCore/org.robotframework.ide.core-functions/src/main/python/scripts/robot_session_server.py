@@ -239,22 +239,23 @@ def start_library_auto_discovering(port, data_source_path, project_location_path
                                    excluded_paths, python_paths, class_paths):
     import subprocess
     import os
-    
+
     global INTERPRETER_PATH
-    
+
     command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_library_autodiscover.py'))
     command.append(str(port))
-    command.append(__encode_unicode_if_needed(data_source_path))
-    command.append(__encode_unicode_if_needed(project_location_path))
+    command.append(data_source_path)
+    command.append(project_location_path)
     command.append(str(support_gevent))
     command.append(str(recursiveInVirtualenv))
     if excluded_paths:
         command.append('-exclude')
-        command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
-    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))
+        command.append(';'.join(excluded_paths))
+    command.append(';'.join(python_paths + class_paths))
 
-    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
+    encoded_command = __encode_unicode_if_needed(command)
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(encoded_command, stdin=subprocess.PIPE))
 
 
 @logresult
@@ -265,15 +266,16 @@ def start_keyword_auto_discovering(port, data_source_path, support_gevent, pytho
     import os
 
     global INTERPRETER_PATH
-    
+
     command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_keyword_autodiscover.py'))
     command.append(str(port))
-    command.append(__encode_unicode_if_needed(data_source_path))
+    command.append(data_source_path)
     command.append(str(support_gevent))
-    command.append(';'.join(__encode_unicode_if_needed(python_paths + class_paths)))
+    command.append(';'.join(python_paths + class_paths))
 
-    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
+    encoded_command = __encode_unicode_if_needed(command)
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(encoded_command, stdin=subprocess.PIPE))
 
 
 @logresult
@@ -294,7 +296,7 @@ def get_rf_lint_rules(rulesfiles):
         import rflint_integration
     except Exception as e:
         raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
-    
+
     return rflint_integration.get_rules(rulesfiles)
 
 @logresult
@@ -302,7 +304,7 @@ def get_rf_lint_rules(rulesfiles):
 @logargs
 def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, additional_arguments):
     global INTERPRETER_PATH
-    
+
     import subprocess
     import os
     try:
@@ -310,20 +312,21 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
         import rflint_integration
     except Exception as e:
         raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
-    
+
     command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
     command.append(host)
     command.append(str(port))
-    command.append(__encode_unicode_if_needed(project_location_path))
+    command.append(project_location_path)
     if excluded_paths:
         command.append('-exclude')
-        command.append(';'.join(__encode_unicode_if_needed(excluded_paths)))
-    command.extend(__encode_unicode_if_needed(additional_arguments))
+        command.append(';'.join(excluded_paths))
+    command.extend(additional_arguments)
     command.append('-r')
-    command.append(__encode_unicode_if_needed(filepath))
+    command.append(filepath)
 
-    subprocess.Popen(command, stdin=subprocess.PIPE)
+    encoded_command = __encode_unicode_if_needed(command)
+    subprocess.Popen(encoded_command, stdin=subprocess.PIPE)
 
 
 @logresult
@@ -366,23 +369,24 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
         import Queue as queue
     except:
         import queue
-    
+
     global INTERPRETER_PATH
-    
+
     command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_libraries.py'))
-    command.append(__encode_unicode_if_needed(libname))
+    command.append(libname)
     command.append(format)
-    command.append(';'.join(__encode_unicode_if_needed(python_paths)))
+    command.append(';'.join(python_paths))
     if class_paths:
-        command.append(';'.join(__encode_unicode_if_needed(class_paths)))
+        command.append(';'.join(class_paths))
 
     def get_output(process, q_stdout, q_stderr):
         out, err = process.communicate()
         q_stdout.put(out)
         q_stderr.put(err)
 
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    encoded_command = __encode_unicode_if_needed(command)
+    process = subprocess.Popen(encoded_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     q_stdout = queue.Queue()
     q_stderr = queue.Queue()
     thread = threading.Thread(target=get_output, args=(process, q_stdout, q_stderr))
@@ -419,13 +423,22 @@ def __get_robot_version():
     return 'Robot Framework ' + version.get_full_version()
 
 
-def __encode_unicode_if_needed(s):
-    if sys.version_info < (3, 0, 0) and isinstance(s, unicode):
-        return s.encode('utf-8')
-    elif sys.version_info < (3, 0, 0) and isinstance(s, list):
-        return [__encode_unicode_if_needed(elem) for elem in s]
+def __encode_unicode_if_needed(arg):
+    if sys.version_info < (3, 0, 0) and isinstance(arg, unicode):
+        return arg.encode(sys.getfilesystemencoding())
+    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
+        return [__encode_unicode_if_needed(elem) for elem in arg]
     else:
-        return s
+        return arg
+
+
+def __decode_unicode_if_needed(arg):
+    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
+        return arg.decode(sys.getfilesystemencoding())
+    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
+        return [__decode_unicode_if_needed(elem) for elem in arg]
+    else:
+        return arg
 
 
 def __extend_paths(python_paths, class_paths):
@@ -459,7 +472,7 @@ def __shutdown_server_when_parent_process_becomes_unavailable(server):
 def __get_script_path():
     is_py2 = sys.version_info < (3, 0, 0)
     is_tty = sys.stdout.isatty()
-    
+
     decoded = __file__.decode(sys.getfilesystemencoding()) if is_py2 else __file__
     encoded = decoded.encode(sys.stdout.encoding if is_tty else 'utf-8')
     return encoded if is_py2 else str(encoded, 'utf-8')

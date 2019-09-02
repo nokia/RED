@@ -184,22 +184,20 @@ def run_analysis(host, port, project_location, excluded_paths, args):
         client.close_connection()
         return 1
 
-def __decode_unicode_if_needed(arg):
-    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
-        return arg.decode('utf-8')
-    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
-        return [__decode_unicode_if_needed(elem) for elem in arg]
-    else:
-        return arg
 
 if __name__ == "__main__":
-    host = sys.argv[1]
-    port = int(sys.argv[2])
-    project_location = __decode_unicode_if_needed(sys.argv[3])
-    if sys.argv[4] == '-exclude':
-        excluded_paths = __decode_unicode_if_needed(sys.argv[5].split(';'))
-        args = __decode_unicode_if_needed(sys.argv[6:])
+    import robot_session_server
+
+    decoded_args = robot_session_server.__decode_unicode_if_needed(sys.argv)
+
+    host = decoded_args[1]
+    port = int(decoded_args[2])
+    project_location = decoded_args[3]
+    if decoded_args[4] == '-exclude':
+        excluded_paths = decoded_args[5].split(';')
+        args = decoded_args[6:]
     else:
         excluded_paths = []
-        args = __decode_unicode_if_needed(sys.argv[4:])
+        args = decoded_args[4:]
+
     run_analysis(host, port, project_location, excluded_paths, args)

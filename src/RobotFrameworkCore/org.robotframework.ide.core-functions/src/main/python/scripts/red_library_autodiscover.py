@@ -63,43 +63,33 @@ def __is_excluded_path(root, path, to_exclude):
     return path.startswith('.') or os.path.join(root, path) in to_exclude
 
 
-def __decode_unicode_if_needed(arg):
-    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
-        return arg.decode('utf-8')
-    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
-        return [__decode_unicode_if_needed(elem) for elem in arg]
-    else:
-        return arg
-
-
 def _is_virtualenv():
     return hasattr(sys, 'real_prefix')
 
 
 if __name__ == '__main__':
-    port = sys.argv[1]
-    data_source_path = __decode_unicode_if_needed(sys.argv[2])
-    project_location_path = __decode_unicode_if_needed(sys.argv[3])
-    support_gevent = sys.argv[4].lower() == 'true'
-    recursive = recursive = not _is_virtualenv() or sys.argv[5].lower() == 'true'
+    import robot_session_server
+
+    decoded_args = robot_session_server.__decode_unicode_if_needed(sys.argv)
+
+    port = decoded_args[1]
+    data_source_path = decoded_args[2]
+    project_location_path = decoded_args[3]
+    support_gevent = decoded_args[4].lower() == 'true'
+    recursive = recursive = not _is_virtualenv() or decoded_args[5].lower() == 'true'
     excluded_paths = []
     additional_paths = []
 
-    if len(sys.argv) > 6:
-        if sys.argv[6] == '-exclude':
-            excluded_paths = __decode_unicode_if_needed(sys.argv[7].split(';'))
-            if len(sys.argv) > 8:
-                additional_paths = __decode_unicode_if_needed(sys.argv[8].split(';'))
+    if len(decoded_args) > 6:
+        if decoded_args[6] == '-exclude':
+            excluded_paths = decoded_args[7].split(';')
+            if len(decoded_args) > 8:
+                additional_paths = decoded_args[8].split(';')
         else:
-            additional_paths = __decode_unicode_if_needed(sys.argv[6].split(';'))
+            additional_paths = decoded_args[6].split(';')
 
     python_paths, class_paths = _collect_source_paths(project_location_path, recursive, excluded_paths)
 
-    sys.path.extend([project_location_path] + additional_paths + python_paths + class_paths)
-    if 'Jython' in platform.python_implementation():
-        for class_path in class_paths:
-            from classpath_updater import ClassPathUpdater
-            cp_updater = ClassPathUpdater()
-            cp_updater.add_file(class_path)
+    robot_session_server.__extend_paths([project_location_path] + additional_paths + python_paths, class_paths)
 
     start_auto_discovering(port, data_source_path, support_gevent)

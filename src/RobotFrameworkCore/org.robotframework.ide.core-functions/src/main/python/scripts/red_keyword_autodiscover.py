@@ -21,23 +21,17 @@ def start_auto_discovering(port, data_source_path, support_gevent):
         console='NONE')
 
 
-def __decode_unicode_if_needed(arg):
-    if sys.version_info < (3, 0, 0) and isinstance(arg, str):
-        return arg.decode('utf-8')
-    elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
-        return [__decode_unicode_if_needed(elem) for elem in arg]
-    else:
-        return arg
-
-
 if __name__ == '__main__':
+    import robot_session_server
     import sys
 
-    port = sys.argv[1]
-    data_source_path = sys.argv[2]
-    support_gevent = sys.argv[3].lower() == 'true'
-    additional_paths = sys.argv[4].split(';') if len(sys.argv) > 4 else []
+    decoded_args = robot_session_server.__decode_unicode_if_needed(sys.argv)
 
-    sys.path.extend(__decode_unicode_if_needed(additional_paths))
+    port = decoded_args[1]
+    data_source_path = decoded_args[2]
+    support_gevent = decoded_args[3].lower() == 'true'
+    additional_paths = decoded_args[4].split(';') if len(decoded_args) > 4 else []
 
-    start_auto_discovering(port, __decode_unicode_if_needed(data_source_path), support_gevent)
+    robot_session_server.__extend_paths(additional_paths, [])
+
+    start_auto_discovering(port, data_source_path, support_gevent)
