@@ -6,9 +6,7 @@
 package org.rf.ide.core.execution.dryrun;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,8 +25,6 @@ public class RobotDryRunLibraryImport {
 
     private final Set<URI> importers;
 
-    private final List<String> args;
-
     private DryRunLibraryImportStatus status;
 
     private String additionalInfo;
@@ -38,18 +34,17 @@ public class RobotDryRunLibraryImport {
     }
 
     public static RobotDryRunLibraryImport createUnknown(final String name, final String additionalInfo) {
-        return new RobotDryRunLibraryImport(name, null, DryRunLibraryType.UNKNOWN, new HashSet<>(), new ArrayList<>(),
+        return new RobotDryRunLibraryImport(name, null, DryRunLibraryType.UNKNOWN, new HashSet<>(),
                 DryRunLibraryImportStatus.NOT_ADDED, additionalInfo);
     }
 
     public static RobotDryRunLibraryImport createKnown(final String name, final URI originalPath) {
-        return createKnown(name, originalPath, new HashSet<>(), new ArrayList<>());
+        return createKnown(name, originalPath, new HashSet<>());
     }
 
-    public static RobotDryRunLibraryImport createKnown(final String name, final URI source, final Set<URI> importers,
-            final List<String> args) {
+    public static RobotDryRunLibraryImport createKnown(final String name, final URI source, final Set<URI> importers) {
         final DryRunLibraryType type = resolveType(name, source);
-        return new RobotDryRunLibraryImport(name, source, type, importers, args, DryRunLibraryImportStatus.ADDED, "");
+        return new RobotDryRunLibraryImport(name, source, type, importers, DryRunLibraryImportStatus.ADDED, "");
     }
 
     private static DryRunLibraryType resolveType(final String name, final URI source) {
@@ -68,13 +63,11 @@ public class RobotDryRunLibraryImport {
 
     @VisibleForTesting
     RobotDryRunLibraryImport(final String name, final URI source, final DryRunLibraryType type,
-            final Set<URI> importers, final List<String> args, final DryRunLibraryImportStatus status,
-            final String additionalInfo) {
+            final Set<URI> importers, final DryRunLibraryImportStatus status, final String additionalInfo) {
         this.name = name;
         this.source = source;
         this.type = type;
         this.importers = importers;
-        this.args = args;
         this.status = status;
         this.additionalInfo = additionalInfo;
     }
@@ -116,10 +109,6 @@ public class RobotDryRunLibraryImport {
         this.importers.addAll(importers);
     }
 
-    public List<String> getArgs() {
-        return args;
-    }
-
     @Override
     public boolean equals(final Object obj) {
         if (obj == null) {
@@ -140,7 +129,7 @@ public class RobotDryRunLibraryImport {
     @Override
     public String toString() {
         return "RobotDryRunLibraryImport [name=" + name + ", source=" + source + ", type=" + type + ", importers="
-                + importers + ", args=" + args + ", status=" + status + ", additionalInfo=" + additionalInfo + "]";
+                + importers + ", status=" + status + ", additionalInfo=" + additionalInfo + "]";
     }
 
     public static enum DryRunLibraryImportStatus {

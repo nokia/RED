@@ -46,8 +46,7 @@ public class RobotDryRunLibraryImportCollector {
         if (event.getImporter().isPresent() && !erroneousLibraryNames.contains(event.getName())
                 && !standardLibraryNames.contains(event.getName())) {
             final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(event.getName(),
-                    event.getSource().orElse(null), event.getImporter().map(Sets::newHashSet).orElse(newHashSet()),
-                    event.getArguments());
+                    event.getSource().orElse(null), event.getImporter().map(Sets::newHashSet).orElse(newHashSet()));
             importedLibraries.add(libImport);
         }
     }

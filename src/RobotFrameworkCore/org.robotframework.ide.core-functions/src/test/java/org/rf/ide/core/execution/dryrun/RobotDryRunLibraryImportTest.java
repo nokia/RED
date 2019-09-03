@@ -9,7 +9,6 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,7 +54,7 @@ public class RobotDryRunLibraryImportTest {
     public void testCreatingKnown() throws Exception {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(libName, source);
         final RobotDryRunLibraryImport expectedLibImport = new RobotDryRunLibraryImport(libName, source, expectedType,
-                new HashSet<>(), new ArrayList<>(), DryRunLibraryImportStatus.ADDED, "");
+                new HashSet<>(), DryRunLibraryImportStatus.ADDED, "");
         assertThat(libImport).has(sameFieldsAs(expectedLibImport));
     }
 
@@ -63,7 +62,7 @@ public class RobotDryRunLibraryImportTest {
     public void testCreatingUnknown() throws Exception {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(libName);
         final RobotDryRunLibraryImport expectedLibImport = new RobotDryRunLibraryImport(libName, null,
-                DryRunLibraryType.UNKNOWN, new HashSet<>(), new ArrayList<>(), DryRunLibraryImportStatus.NOT_ADDED, "");
+                DryRunLibraryType.UNKNOWN, new HashSet<>(), DryRunLibraryImportStatus.NOT_ADDED, "");
         assertThat(libImport).has(sameFieldsAs(expectedLibImport));
     }
 
@@ -74,7 +73,7 @@ public class RobotDryRunLibraryImportTest {
         libImport.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
         libImport.setAdditionalInfo("abc");
         final RobotDryRunLibraryImport expectedLibImport = new RobotDryRunLibraryImport(libName, source, expectedType,
-                newHashSet(new URI("file:///suite.robot"), new URI("file:///res.robot")), new ArrayList<>(),
+                newHashSet(new URI("file:///suite.robot"), new URI("file:///res.robot")),
                 DryRunLibraryImportStatus.ALREADY_EXISTING, "abc");
         assertThat(libImport).has(sameFieldsAs(expectedLibImport));
     }
@@ -88,7 +87,6 @@ public class RobotDryRunLibraryImportTest {
                         && Objects.equals(library.getSource(), toMatch.getSource())
                         && Objects.equals(library.getType(), toMatch.getType())
                         && Objects.equals(library.getImporters(), toMatch.getImporters())
-                        && Objects.equals(library.getArgs(), toMatch.getArgs())
                         && Objects.equals(library.getStatus(), toMatch.getStatus())
                         && Objects.equals(library.getAdditionalInfo(), toMatch.getAdditionalInfo());
             }

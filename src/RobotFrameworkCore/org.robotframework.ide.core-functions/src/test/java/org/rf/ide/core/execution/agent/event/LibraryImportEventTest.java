@@ -48,28 +48,13 @@ public class LibraryImportEventTest {
         LibraryImportEvent.from(eventMap);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void exceptionIsThrownForWronglyConstructedJsonDictionary_6() {
-        final Map<String, Object> eventMap = ImmutableMap.of("library_import",
-                newArrayList("_", ImmutableMap.of("originalname", "lib")));
-        LibraryImportEvent.from(eventMap);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void exceptionIsThrownForWronglyConstructedJsonDictionary_7() {
-        final Map<String, Object> eventMap = ImmutableMap.of("library_import",
-                newArrayList("_", ImmutableMap.of("args", newArrayList("1"))));
-        LibraryImportEvent.from(eventMap);
-    }
-
     @Test
     public void eventIsProperlyConstructed_1() {
         final Map<String, Object> eventMap = ImmutableMap.of("library_import",
                 newArrayList("_", ImmutableMap.of("source", "/lib.py", "importer", "/suite.robot", "originalname",
-                        "lib", "args", newArrayList("1", "2"))));
+                        "lib")));
         final LibraryImportEvent event = LibraryImportEvent.from(eventMap);
 
-        assertThat(event.getArguments()).containsExactly("1", "2");
         assertThat(event.getName()).isEqualTo("lib");
         assertThat(event.getSource()).contains(URI.create("file:///lib.py"));
         assertThat(event.getImporter()).contains(URI.create("file:///suite.robot"));
@@ -81,11 +66,9 @@ public class LibraryImportEventTest {
         attributes.put("source", null);
         attributes.put("importer", null);
         attributes.put("originalname", "lib");
-        attributes.put("args", newArrayList("1", "2"));
         final Map<String, Object> eventMap = ImmutableMap.of("library_import", newArrayList("_", attributes));
         final LibraryImportEvent event = LibraryImportEvent.from(eventMap);
 
-        assertThat(event.getArguments()).containsExactly("1", "2");
         assertThat(event.getName()).isEqualTo("lib");
         assertThat(event.getSource()).isEmpty();
         assertThat(event.getImporter()).isEmpty();
@@ -93,69 +76,49 @@ public class LibraryImportEventTest {
 
     @Test
     public void equalsTests() {
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
                         .isEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib", null, null, newArrayList("1")))
-                .isEqualTo(new LibraryImportEvent("lib", null, null, newArrayList("1")));
+                        URI.create("file:///lib.py")));
+        assertThat(new LibraryImportEvent("lib", null, null)).isEqualTo(new LibraryImportEvent("lib", null, null));
 
 
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib1", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib1", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res1.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res1.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib1.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent(
-                "lib", URI.create("file:///res.robot"), URI.create("file:///lib1.py"), newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("2")));
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("2")))
-                        .isNotEqualTo(new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                                URI.create("file:///lib.py"), newArrayList("1")));
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib1", URI.create("file:///res.robot"), URI.create("file:///lib.py")));
+        assertThat(new LibraryImportEvent("lib1", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")));
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib", URI.create("file:///res1.robot"), URI.create("file:///lib.py")));
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res1.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")));
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib1.py")));
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib1.py")))
+                .isNotEqualTo(
+                        new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")));
 
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1"))).isNotEqualTo(new Object());
-        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py"),
-                newArrayList("1"))).isNotEqualTo(null);
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(new Object());
+        assertThat(new LibraryImportEvent("lib", URI.create("file:///res.robot"), URI.create("file:///lib.py")))
+                .isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
         final LibraryImportEvent event1 = new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                URI.create("file:///lib.py"), newArrayList("1"));
+                URI.create("file:///lib.py"));
         final LibraryImportEvent event2 = new LibraryImportEvent("lib", URI.create("file:///res.robot"),
-                URI.create("file:///lib.py"), newArrayList("1"));
-        final LibraryImportEvent event3 = new LibraryImportEvent("lib", null, URI.create("file:///lib.py"),
-                newArrayList("1"));
-        final LibraryImportEvent event4 = new LibraryImportEvent("lib", null, URI.create("file:///lib.py"),
-                newArrayList("1"));
-        final LibraryImportEvent event5 = new LibraryImportEvent("lib", URI.create("file:///res.robot"), null,
-                newArrayList("1"));
-        final LibraryImportEvent event6 = new LibraryImportEvent("lib", URI.create("file:///res.robot"), null,
-                newArrayList("1"));
-        final LibraryImportEvent event7 = new LibraryImportEvent("lib", null, null, newArrayList("1"));
-        final LibraryImportEvent event8 = new LibraryImportEvent("lib", null, null, newArrayList("1"));
+                URI.create("file:///lib.py"));
+        final LibraryImportEvent event3 = new LibraryImportEvent("lib", null, URI.create("file:///lib.py"));
+        final LibraryImportEvent event4 = new LibraryImportEvent("lib", null, URI.create("file:///lib.py"));
+        final LibraryImportEvent event5 = new LibraryImportEvent("lib", URI.create("file:///res.robot"), null);
+        final LibraryImportEvent event6 = new LibraryImportEvent("lib", URI.create("file:///res.robot"), null);
+        final LibraryImportEvent event7 = new LibraryImportEvent("lib", null, null);
+        final LibraryImportEvent event8 = new LibraryImportEvent("lib", null, null);
 
         assertThat(event1.hashCode()).isEqualTo(event2.hashCode());
         assertThat(event3.hashCode()).isEqualTo(event4.hashCode());

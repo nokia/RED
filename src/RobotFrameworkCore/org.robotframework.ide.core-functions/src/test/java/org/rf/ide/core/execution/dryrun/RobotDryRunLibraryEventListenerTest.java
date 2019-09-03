@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.junit.Test;
@@ -22,8 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
-import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryEventListener;
-import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImportCollector;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RobotDryRunLibraryEventListenerTest {
@@ -40,7 +37,7 @@ public class RobotDryRunLibraryEventListenerTest {
                 libNameHandler);
 
         final LibraryImportEvent event = new LibraryImportEvent("String", new URI("file:///suite.robot"),
-                new URI("file:///String.py"), Arrays.asList("a1", "a2"));
+                new URI("file:///String.py"));
 
         listener.handleLibraryImport(event);
 
@@ -86,14 +83,14 @@ public class RobotDryRunLibraryEventListenerTest {
                 libNameHandler);
 
         final LibraryImportEvent event1 = new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
-                new URI("file:///lib2.py"), Arrays.asList("a", "b"));
+                new URI("file:///lib2.py"));
         final MessageEvent event2 = new MessageEvent("import_error_1", LogLevel.NONE, null);
         final MessageEvent event3 = new MessageEvent("import_error_2", LogLevel.NONE, null);
         final LibraryImportEvent event4 = new LibraryImportEvent("lib3", new URI("file:///suite1.robot"),
-                new URI("file:///lib3.py"), Arrays.asList("c", "d"));
+                new URI("file:///lib3.py"));
         final MessageEvent event5 = new MessageEvent("import_error_3", LogLevel.NONE, null);
         final LibraryImportEvent event6 = new LibraryImportEvent("lib1", new URI("file:///other.robot"),
-                new URI("file:///lib1.py"), Arrays.asList("x"));
+                new URI("file:///lib1.py"));
 
         listener.handleLibraryImport(event1);
         listener.handleMessage(event2);

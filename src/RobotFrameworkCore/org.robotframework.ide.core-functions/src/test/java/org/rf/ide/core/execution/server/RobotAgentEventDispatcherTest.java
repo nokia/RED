@@ -591,8 +591,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleLibraryImport(new LibraryImportEvent("lib1", new URI("file:///importerPath"),
-                new URI("file:///sourcePath"), newArrayList("arg1", "arg2")));
+        verify(listener).handleLibraryImport(
+                new LibraryImportEvent("lib1", new URI("file:///importerPath"), new URI("file:///sourcePath")));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
@@ -611,8 +611,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///importerPath"),
-                new URI("file:///sourcePath"), newArrayList("arg1", "arg2")));
+        verify(listener).handleLibraryImport(
+                new LibraryImportEvent("lib2", new URI("file:///importerPath"), new URI("file:///sourcePath")));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

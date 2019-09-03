@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.junit.Test;
@@ -22,8 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
-import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordEventListener;
-import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSourceCollector;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RobotDryRunKeywordEventListenerTest {
@@ -40,7 +37,7 @@ public class RobotDryRunKeywordEventListenerTest {
                 libNameHandler);
 
         final LibraryImportEvent event = new LibraryImportEvent("String", new URI("file:///suite.robot"),
-                new URI("file:///String.py"), Arrays.asList("a1", "a2"));
+                new URI("file:///String.py"));
 
         listener.handleLibraryImport(event);
 
@@ -86,11 +83,11 @@ public class RobotDryRunKeywordEventListenerTest {
 
         final MessageEvent event1 = new MessageEvent("kw_1", LogLevel.NONE, null);
         final LibraryImportEvent event2 = new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
-                new URI("file:///lib2.py"), Arrays.asList("a", "b"));
+                new URI("file:///lib2.py"));
         final MessageEvent event3 = new MessageEvent("kw_2", LogLevel.NONE, null);
         final MessageEvent event4 = new MessageEvent("kw_3", LogLevel.NONE, null);
         final LibraryImportEvent event5 = new LibraryImportEvent("lib1", new URI("file:///suite1.robot"),
-                new URI("file:///lib1.py"), Arrays.asList("x"));
+                new URI("file:///lib1.py"));
 
         listener.handleMessage(event1);
         listener.handleLibraryImport(event2);
