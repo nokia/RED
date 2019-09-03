@@ -61,10 +61,7 @@ def create_libdoc(libname, format):
         if encoded_libdoc:
             return encoded_libdoc
         else:
-            if '.' not in libname or libname.endswith('.py'):
-                raise Exception(result)
-            else:
-                raise Exception((result + "\nInvalid library extension"))
+            raise Exception(result)
     finally:
         os.remove(temp_lib_file_path)
 
