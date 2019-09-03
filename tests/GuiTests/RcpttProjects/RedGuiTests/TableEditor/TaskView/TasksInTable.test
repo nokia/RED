@@ -6,10 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _yUzRgCkuEemgl9-Lt8nhYA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 5/14/19 4:00 PM
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 9/2/19 2:17 PM
 Testcase-Type: ecl
-Verifications: _J6DFsClJEemgl9-Lt8nhYA,_DEcqYClKEemgl9-Lt8nhYA
+Verifications: _J6DFsClJEemgl9-Lt8nhYA,_DEcqYClKEemgl9-Lt8nhYA,_c678cM17EemGNoL7xvShiw
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -149,6 +149,53 @@ with [get-editor "test_first.robot" | get-tab-folder] {
     get-property tabCount | equals 5 | verify-true
 }
 
+// open file with all settings
+get-view "Project Explorer" | get-tree | select "MyProject/all_settings.robot" | double-click
+get-editor "all_settings.robot" | get-tab-folder | get-tab-item Tasks | click
+get-view Outline | get-tree | select "all_settings.robot/Tasks/task 1/log" | click
+wait 200
 
+//add new arg for Log KW
+with [get-editor "all_settings.robot"] {
+    with [get-canvas -after [get-label Tasks] -index 1] {
+        key-type Right -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Tasks] -index 1] {
+        type-text 7
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check that task setting were not removed - bug RED-1298
+get-editor "all_settings.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Default Tags\n"
+    + "Documentation\n"
+    + "Force Tags\n"
+    + "Library    Collections    \n"
+    + "Resource    files/res.robot\n"
+    + "Suite Setup    Should Be Equal As Integers           \n"
+    + "Suite Teardown    Append To List    list_    \n"
+    + "Task Teardown    Convert To Binary   \n"
+    + "Task Timeout    text\n"
+    + "Variables   files/a1.py\n"
+    + "Task Setup    ${no_var}\n\n"
+    + "Metadata\n"
+    + "           \n"
+    + "*** Tasks ***\n"
+    + "task 1\n"
+    + "    [Documentation]    Doc\n"
+    + "    [Setup]    Convert To Binary       \n"
+    + "    [Tags]    abc1\n"
+    + "    [Teardown]    Convert To Integer    78    \n"
+    + "    [Timeout]    45s\n"
+    + "    log  3    7\n\n\n"
+    + "task as tempalte\n"
+    + "    [Template]    Convert To String\n"
+    + "    a\n"
+    + "    c  7" | verify-true
+    
 get-editor "task.robot" | click
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
