@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/13/19 3:58 PM
+Save-Time: 9/3/19 4:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -191,11 +191,12 @@ proc "wait-for-discover-window" [val times 4]{
 }
 
 proc "get-arg-file-path"{
-	get-view Console | get-text-viewer | get-object |invoke getLine 0 | let [val lol -input]{
-		$lol | invoke substring [$lol | invoke lastIndexOf "--argumentfile" | int | plus 15 ]
-		      [$lol | invoke lastIndexOf ".arg" | int | plus 4] 
+	get-view Console | get-text-viewer | get-property text  -raw | let [val arg_path -input]{
+		$arg_path | invoke substring [$arg_path | invoke lastIndexOf "--argumentfile" | int | plus 15 ]
+		      [$arg_path | invoke lastIndexOf ".arg" | int | plus 4] 
 	}
 }
+
 // release files handle when files are locked under Windows. Proc used in Jython tests
 proc "release-files-handle"{
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
