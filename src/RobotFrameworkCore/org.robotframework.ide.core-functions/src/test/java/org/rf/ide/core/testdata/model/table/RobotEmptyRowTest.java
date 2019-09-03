@@ -352,8 +352,8 @@ public class RobotEmptyRowTest {
         row3.deleteToken(1);
         row4.deleteToken(1);
 
-        assertThat(cellsOf(row1)).isEmpty();
-        assertThat(typesOf(row1)).isEmpty();
+        assertThat(cellsOf(row1)).containsExactly("");
+        assertThat(typesOf(row1)).containsExactly(RobotTokenType.UNKNOWN);
 
         assertThat(cellsOf(row2)).containsExactly("# c2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.START_HASH_COMMENT);
@@ -390,6 +390,33 @@ public class RobotEmptyRowTest {
         assertThat(cellsOf(row4)).containsExactly("\\", "# c1", "c3");
         assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
                 RobotTokenType.COMMENT_CONTINUE);
+    }
+
+    @Test
+    public void elementTokensAreCorrectlyReturned() throws Exception {
+        final TestCase test = new TestCase(RobotToken.create("test"));
+        final RobotEmptyRow<TestCase> empty = createEmptyRow(test, "", comment());
+        final RobotEmptyRow<TestCase> backslash = createEmptyRow(test, "\\", comment());
+        final RobotEmptyRow<TestCase> comment = createCommentRow(test, comment("c1", "c2"));
+        final RobotEmptyRow<TestCase> unknown = createCommentRow(test, comment());
+        final RobotEmptyRow<TestCase> backslashWithComment = createEmptyRow(test, "\\", comment("c1", "c2"));
+
+        assertThat(cellsOf(empty)).containsExactly("");
+        assertThat(typesOf(empty)).containsExactly(RobotTokenType.EMPTY_CELL);
+
+        assertThat(cellsOf(backslash)).containsExactly("\\");
+        assertThat(typesOf(backslash)).containsExactly(RobotTokenType.EMPTY_CELL);
+
+        assertThat(cellsOf(comment)).containsExactly("# c1", "c2");
+        assertThat(typesOf(comment)).containsExactly(RobotTokenType.START_HASH_COMMENT,
+                RobotTokenType.COMMENT_CONTINUE);
+
+        assertThat(cellsOf(unknown)).containsExactly("");
+        assertThat(typesOf(unknown)).containsExactly(RobotTokenType.UNKNOWN);
+
+        assertThat(cellsOf(backslashWithComment)).containsExactly("\\", "# c1", "c2");
+        assertThat(typesOf(backslashWithComment)).containsExactly(RobotTokenType.EMPTY_CELL,
+                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
     }
 
     private static List<String> comment(final String... comments) {

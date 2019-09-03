@@ -47,11 +47,6 @@ public class RobotEmptyRow<T> extends CommonStep<T> implements ICommentHolder, S
         return emptyToken.getFilePosition().isNotSet() && emptyToken.getText().isEmpty() && !emptyToken.isDirty();
     }
 
-    public boolean isEmptyLine() {
-        return comments.isEmpty() && emptyToken.getFilePosition().isNotSet() && emptyToken.getText().isEmpty()
-                && !emptyToken.isDirty();
-    }
-
     @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
@@ -101,7 +96,7 @@ public class RobotEmptyRow<T> extends CommonStep<T> implements ICommentHolder, S
     @Override
     public List<RobotToken> getElementTokens() {
         final List<RobotToken> tokens = new ArrayList<>();
-        if (!isCommentOnly()) {
+        if (!isCommentOnly() || comments.isEmpty()) {
             tokens.add(emptyToken);
         }
         tokens.addAll(comments);
