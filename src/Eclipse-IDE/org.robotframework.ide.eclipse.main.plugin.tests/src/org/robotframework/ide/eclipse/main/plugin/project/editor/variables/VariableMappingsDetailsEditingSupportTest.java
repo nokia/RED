@@ -58,7 +58,7 @@ public class VariableMappingsDetailsEditingSupportTest {
 
         assertThat(mapping.getName()).isEqualTo("${new}");
         assertThat(mapping.getValue()).isEqualTo("abc");
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_NAME_CHANGED),
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_CHANGED),
                 argThat(hasCorrectEventData(file, mapping)));
     }
 
@@ -93,7 +93,7 @@ public class VariableMappingsDetailsEditingSupportTest {
 
         assertThat(mapping.getName()).isEqualTo("${var}");
         assertThat(mapping.getValue()).isEqualTo("xyz");
-        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED),
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_CHANGED),
                 argThat(hasCorrectEventData(file, mapping)));
     }
 

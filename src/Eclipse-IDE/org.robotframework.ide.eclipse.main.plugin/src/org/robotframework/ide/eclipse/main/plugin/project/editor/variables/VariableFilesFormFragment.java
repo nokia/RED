@@ -107,7 +107,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
-        viewer.setUseHashlookup(true);
+        viewer.setUseHashlookup(false);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(false);
@@ -187,10 +187,10 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenVarFileDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED) final RedProjectConfigEventData<ReferencedVariableFile> eventData) {
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_CHANGED) final RedProjectConfigEventData<ReferencedVariableFile> eventData) {
         if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
-            viewer.refresh();
+            viewer.update(eventData.getChangedElement(), null);
         }
     }
 

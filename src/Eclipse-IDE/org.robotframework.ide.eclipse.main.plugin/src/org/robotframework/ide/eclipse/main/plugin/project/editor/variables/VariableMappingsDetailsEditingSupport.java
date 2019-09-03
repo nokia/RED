@@ -71,7 +71,8 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
 
             if (!newValue.equals(oldValue)) {
                 setMappingValue(mapping, newValue);
-                eventBroker.send(getEventTopic(), new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_CHANGED,
+                        new RedProjectConfigEventData<>(editorInput.getFile(), mapping));
             }
         } else {
             super.setValue(element, value);
@@ -79,8 +80,6 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     }
 
     protected abstract void setMappingValue(VariableMapping mapping, String value);
-
-    protected abstract String getEventTopic();
 
     static class VariableMappingNameEditingSupport extends VariableMappingsDetailsEditingSupport {
 
@@ -97,11 +96,6 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
         @Override
         protected void setMappingValue(final VariableMapping mapping, final String value) {
             mapping.setName(value);
-        }
-
-        @Override
-        protected String getEventTopic() {
-            return RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_NAME_CHANGED;
         }
     }
 
@@ -120,11 +114,6 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
         @Override
         protected void setMappingValue(final VariableMapping mapping, final String value) {
             mapping.setValue(value);
-        }
-
-        @Override
-        protected String getEventTopic() {
-            return RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED;
         }
     }
 

@@ -106,7 +106,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
 
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).applyTo(viewer.getTable());
-        viewer.setUseHashlookup(true);
+        viewer.setUseHashlookup(false);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
@@ -199,11 +199,11 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenMappingDetailChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_DETAIL_CHANGED) final RedProjectConfigEventData<VariableMapping> eventData) {
+    private void whenMappingNameChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_CHANGED) final RedProjectConfigEventData<VariableMapping> eventData) {
         if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
-            viewer.refresh();
+            viewer.update(eventData.getChangedElement(), null);
         }
     }
 
@@ -213,16 +213,6 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<VariableMapping>> eventData) {
         if (eventData.isApplicable(editorInput.getRobotProject())) {
             setInput();
-            setDirty(true);
-            viewer.refresh();
-        }
-    }
-
-    @Inject
-    @Optional
-    private void whenMappingValueChanged(
-            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_VALUE_CHANGED) final RedProjectConfigEventData<List<VariableMapping>> eventData) {
-        if (eventData.isApplicable(editorInput.getRobotProject())) {
             setDirty(true);
             viewer.refresh();
         }
