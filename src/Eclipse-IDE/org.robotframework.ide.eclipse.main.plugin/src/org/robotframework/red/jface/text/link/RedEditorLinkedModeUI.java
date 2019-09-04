@@ -180,7 +180,7 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
         @Override
         public ExitFlags doExit(final LinkedModeModel model, final VerifyEvent event, final int offset,
                 final int length) {
-            final boolean shouldOpenNewLinkedMode = replaceEmptyRegion(model, event.character, offset);
+            final boolean shouldOpenNewLinkedMode = replaceEmptyRegion(model, event.character, event.stateMask, offset);
             if (shouldOpenNewLinkedMode) {
                 final List<IRegion> newRegions = model.getTabStopSequence()
                         .stream()
@@ -205,7 +205,7 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
 
             } else if (strategy == LinkedModeStrategy.EXIT_ON_LAST) {
                 final char character = event.character;
-                if (character == SWT.CR || character == SWT.LF || character == SWT.TAB) {
+                if (character == SWT.CR || character == SWT.LF || (character == SWT.TAB && event.stateMask == 0)) {
                     final List<LinkedPosition> positions = model.getTabStopSequence();
 
                     final boolean isLastPosition = positions.stream()
@@ -224,26 +224,25 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
         }
 
         private boolean replaceEmptyRegion(final LinkedModeModel model, final char character,
-                final int offset) {
-            if (character == SWT.CR || character == SWT.LF || character == SWT.TAB) {
+                final int stateMask, final int offset) {
+            if (character == SWT.CR || character == SWT.LF || character == SWT.ESC || character == SWT.TAB) {
                 final List<LinkedPosition> positions = model.getTabStopSequence();
 
-                final Optional<LinkedPosition> currentPostion = positions.stream()
+                final Optional<LinkedPosition> currentPosition = positions.stream()
                         .filter(pos -> pos.includes(offset))
                         .findFirst();
-                final boolean isAtZeroLengthPosition = currentPostion.map(LinkedPosition::getLength).orElse(-1) == 0;
-                final boolean isLastPosition = currentPostion.orElse(null) == positions.get(positions.size() - 1);
+                final boolean isAtZeroLengthPosition = currentPosition.map(LinkedPosition::getLength).orElse(-1) == 0;
+                final boolean isLastPosition = currentPosition.orElse(null) == positions.get(positions.size() - 1);
 
-                boolean emptyReplaced = false;
-                if (isAtZeroLengthPosition && (!isLastPosition || hasUpperBound || numberOfEmptyRegionsToAdd > 0)) {
+                if (character != SWT.ESC && isAtZeroLengthPosition
+                        && (!isLastPosition || hasUpperBound || numberOfEmptyRegionsToAdd > 0)) {
                     insert(viewer.getDocument(), emptyCellReplacement, offset);
-                    emptyReplaced = true;
                 }
 
-                if (isLastPosition && numberOfEmptyRegionsToAdd > 0
+                if (character == SWT.TAB && stateMask == 0 && isLastPosition && numberOfEmptyRegionsToAdd > 0
                         && !(numberOfEmptyRegionsToAdd == 1 && hasUpperBound)) {
                     insert(viewer.getDocument(), separator,
-                            offset + (emptyReplaced ? emptyCellReplacement.length() : 0));
+                            currentPosition.map(p -> p.offset + p.length).orElse(offset));
                     return true;
                 }
             }
@@ -258,12 +257,5 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
                 final int length) {
             return event.character == SWT.ESC ? new ExitFlags(ILinkedModeListener.UPDATE_CARET, false) : null;
         }
-    }
-
-    private enum ReplacingResult {
-        NOTHING,
-        REPLACED_EMPTY,
-        SEPARATOR_ADDED,
-        REPLACED_EMPTY_SEPARATOR_ADDED
     }
 }
