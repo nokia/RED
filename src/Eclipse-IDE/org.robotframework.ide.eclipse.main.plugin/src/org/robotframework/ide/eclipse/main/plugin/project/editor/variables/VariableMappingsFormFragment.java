@@ -193,6 +193,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final RedProjectConfigEventData<Environments> eventData) {
         if (eventData.isApplicable(editorInput.getRobotProject())) {
+            setInput();
             viewer.getTable().setEnabled(editorInput.isEditable());
         }
     }
