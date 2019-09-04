@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TkwYoPCWEeePD6aU90_GvA
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/11/19 5:51 PM
+Save-Time: 9/3/19 5:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -166,6 +166,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
 }
 // verify problem for last import
 get-view Problems | click
+wait-for-errors -amount 7 -times 5 -delay 500
 get-view Problems | get-tree | get-item 
     -path "Errors \\(7 items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators. Try to use Quick Fix \\(Ctrl\\+1\\)" 
     | get-property caption 
