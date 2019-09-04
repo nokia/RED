@@ -49,7 +49,7 @@ public class LibraryImportEventTest {
     }
 
     @Test
-    public void eventIsProperlyConstructed_1() {
+    public void eventIsProperlyConstructed() {
         final Map<String, Object> eventMap = ImmutableMap.of("library_import",
                 newArrayList("_", ImmutableMap.of("source", "/lib.py", "importer", "/suite.robot", "originalname",
                         "lib")));
@@ -61,11 +61,12 @@ public class LibraryImportEventTest {
     }
 
     @Test
-    public void eventIsProperlyConstructed_2() {
+    public void eventIsProperlyConstructed_evenWhenThereAreArgumentsOfDifferentTypesProvided() {
         final Map<String, Object> attributes = new HashMap<>();
         attributes.put("source", null);
         attributes.put("importer", null);
         attributes.put("originalname", "lib");
+        attributes.put("args", newArrayList("1", Integer.valueOf(2), new Object()));
         final Map<String, Object> eventMap = ImmutableMap.of("library_import", newArrayList("_", attributes));
         final LibraryImportEvent event = LibraryImportEvent.from(eventMap);
 
