@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _V4L9gIlCEemC5c0GiYm_Dw
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 11:09 AM
+Save-Time: 9/5/19 1:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -129,37 +129,35 @@ try -command{
 	
 	// uncommen after RED-1273 
 	
-//	//change var value - change port
-//	get-editor "RemoteProject/red.xml" | get-tab-folder | get-tab-item Variables | click
-//	with [get-editor "RemoteProject/red.xml" | get-section "Variable mappings" | get-table] {
-//	    get-cell 1 1 | click
-//	    get-cell 1 1 | mouse down -count 2
-//	    double-click
-//	    select "${two}" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
-//	    with [get-editbox] {
-//	        set-text 56789
-//	        key-type "NUMPAD_ENTER" "\\u000D"
-//	    }
-//	    apply-cell-edit -deactivate
-//	}
-//	get-button "Save (M1+S)" | click
-//	get-editor "test.robot" | click
-//	get-menu -path "Project/Clean..." | click
-//	get-window Clean | get-button Clean | click
-//	
-//	//check if new value is used to error
-//	get-editor "test.robot" | get-text-viewer | set-caret-pos 10 4
-//	get-view Problems | get-tree | get-item 
-//	    -path "Errors \\(2 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:56789' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
-//	    | get-property caption 
-//	    | equals "'Remote' library under 'http://127.0.0.1:56789' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
-//	    | verify-true
-//	with [get-editor "test.robot" | get-text-viewer] {
-//	    hover-text 3 25
-//	    hover-text 5 24
-//	}
-
-
+	//change var value - change port
+	get-editor "RemoteProject/red.xml" | get-tab-folder | get-tab-item Variables | click
+	with [get-editor "RemoteProject/red.xml" | get-section "Variable mappings" | get-table] {
+	    get-cell 1 1 | click
+	    get-cell 1 1 | mouse down -count 2
+	    double-click
+	    select "${two}" | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+	    with [get-editbox] {
+	        set-text 56789
+	        key-type "NUMPAD_ENTER" "\\u000D"
+	    }
+	    apply-cell-edit -deactivate
+	}
+	get-button "Save (M1+S)" | click
+	get-editor "test.robot" | click
+	get-menu -path "Project/Clean..." | click
+	get-window Clean | get-button Clean | click
+	
+	//check if new value is used to error
+	get-editor "test.robot" | get-text-viewer | set-caret-pos 10 4
+	get-view Problems | get-tree | get-item 
+	    -path "Errors \\(2 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:56789' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+	    | get-property caption 
+	    | equals "'Remote' library under 'http://127.0.0.1:56789' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+	    | verify-true
+	with [get-editor "test.robot" | get-text-viewer] {
+	    hover-text 3 25
+	    hover-text 5 24
+	}
 		
 }-finally{
 	stop-python-remote-server  "127.0.0.1:9000"
