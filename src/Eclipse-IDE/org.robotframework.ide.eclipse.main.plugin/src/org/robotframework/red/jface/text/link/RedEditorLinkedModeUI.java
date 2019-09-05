@@ -5,10 +5,13 @@
  */
 package org.robotframework.red.jface.text.link;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,41 +48,45 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
             final LinkedModeStrategy strategy, final String separator, final Collection<IRegion> regionsToLinkedEdit,
             final int startingPos, final int numberOfEmptyRegionsToAdd, final boolean hasUpperBound) {
 
+        final EmptyRegionsReplacingPolicy emptyRegionsReplacingPolicy = new EmptyRegionsReplacingPolicy(viewer,
+                strategy, separator, numberOfEmptyRegionsToAdd, hasUpperBound);
 
-        final LinkedModeUI linkedModeUi = createLinkedMode(viewer, regionsToLinkedEdit, startingPos);
-        if (strategy == LinkedModeStrategy.EXIT_ON_LAST) {
-            linkedModeUi.setCyclingMode(CYCLE_NEVER);
-            linkedModeUi.setExitPolicy(new CompundExitPolicy(new EmptyRegionsReplacingPolicy(viewer, strategy,
-                    separator, numberOfEmptyRegionsToAdd, hasUpperBound), new JumpToExitPositionOnEscPolicy()));
-            try {
-                final IRegion lastRegion = Iterables.getLast(regionsToLinkedEdit);
-                linkedModeUi.setExitPosition(viewer, lastRegion.getOffset() + lastRegion.getLength(), 0,
-                        Integer.MAX_VALUE);
-            } catch (final BadLocationException e) {
-                // shouldn't happen
-            }
-        } else if (strategy == LinkedModeStrategy.CYCLE) {
-            linkedModeUi.setCyclingMode(CYCLE_ALWAYS);
-            linkedModeUi.setExitPolicy(new EmptyRegionsReplacingPolicy(viewer, strategy, separator,
-                    numberOfEmptyRegionsToAdd, hasUpperBound));
-        } else {
-            throw new IllegalStateException("Unrecognized mode: " + strategy.toString());
-        }
-        linkedModeUi.enter();
+        final EnumMap<LinkedModeStrategy, List<IExitPolicy>> exitPolicies = new EnumMap<>(LinkedModeStrategy.class);
+        exitPolicies.put(LinkedModeStrategy.EXIT_ON_LAST,
+                newArrayList(emptyRegionsReplacingPolicy, new JumpToExitPositionOnEscPolicy()));
+        exitPolicies.put(LinkedModeStrategy.CYCLE, newArrayList(emptyRegionsReplacingPolicy));
+
+        enableLinkedMode(viewer, strategy, regionsToLinkedEdit, startingPos, exitPolicies);
     }
 
     public static void enableLinkedMode(final ITextViewer viewer, final Collection<IRegion> regionsToLinkedEdit,
             final LinkedModeStrategy strategy) {
         
-        final LinkedModeUI linkedModeUi = createLinkedMode(viewer, regionsToLinkedEdit, 0);
+        final EnumMap<LinkedModeStrategy, List<IExitPolicy>> exitPolicies = new EnumMap<>(LinkedModeStrategy.class);
+        exitPolicies.put(LinkedModeStrategy.EXIT_ON_LAST, newArrayList(new JumpToExitPositionOnEscPolicy()));
+        exitPolicies.put(LinkedModeStrategy.CYCLE, newArrayList());
+
+        enableLinkedMode(viewer, strategy, regionsToLinkedEdit, 0, exitPolicies);
+    }
+
+    private static void enableLinkedMode(final ITextViewer viewer, final LinkedModeStrategy strategy,
+            final Collection<IRegion> regionsToLinkedEdit, final int startingPos,
+            final EnumMap<LinkedModeStrategy, List<IExitPolicy>> exitPolicies) {
+
+        if (strategy != LinkedModeStrategy.EXIT_ON_LAST && strategy != LinkedModeStrategy.CYCLE) {
+            throw new IllegalStateException("Unrecognized mode: " + strategy.toString());
+        }
+
+        final RedEditorLinkedModeUI linkedModeUi = createLinkedMode(viewer, regionsToLinkedEdit);
+
+        linkedModeUi.setCyclingMode(strategy == LinkedModeStrategy.EXIT_ON_LAST ? CYCLE_NEVER : CYCLE_ALWAYS);
+        final List<IExitPolicy> policies = exitPolicies.get(strategy);
+        if (policies.size() == 1) {
+            linkedModeUi.setExitPolicy(policies.get(0));
+        } else if (policies.size() > 1) {
+            linkedModeUi.setExitPolicy(new CompundExitPolicy(policies));
+        }
         if (strategy == LinkedModeStrategy.EXIT_ON_LAST) {
-            linkedModeUi.setCyclingMode(CYCLE_NEVER);
-            linkedModeUi.setExitPolicy((model, event, offset, length) -> {
-                if (event.character == SWT.ESC) {
-                    return new ExitFlags(ILinkedModeListener.UPDATE_CARET, false);
-                }
-                return null;
-            });
             try {
                 final IRegion lastRegion = Iterables.getLast(regionsToLinkedEdit);
                 linkedModeUi.setExitPosition(viewer, lastRegion.getOffset() + lastRegion.getLength(), 0,
@@ -87,14 +94,8 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
             } catch (final BadLocationException e) {
                 // shouldn't happen
             }
-        } else if (strategy == LinkedModeStrategy.CYCLE) {
-            linkedModeUi.setCyclingMode(CYCLE_ALWAYS);
-            linkedModeUi.setExitPolicy((model, event, offset, length) -> null);
-        } else {
-            throw new IllegalStateException("Unrecognized mode: " + strategy.toString());
         }
-
-        linkedModeUi.enter();
+        linkedModeUi.enter(startingPos);
     }
 
     private static boolean insert(final IDocument document, final String text, final int offset) {
@@ -107,18 +108,14 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
         return false;
     }
 
-    private static LinkedModeUI createLinkedMode(final ITextViewer viewer,
-            final Collection<IRegion> regionsToLinkedEdit, final int startingPos) {
+    private static RedEditorLinkedModeUI createLinkedMode(final ITextViewer viewer,
+            final Collection<IRegion> regionsToLinkedEdit) {
         try {
             final LinkedModeModel model = new LinkedModeModel();
-            int i = 0;
             for (final IRegion region : regionsToLinkedEdit) {
                 final LinkedPositionGroup group = new LinkedPositionGroup();
-                final int rank = (i + regionsToLinkedEdit.size() - startingPos) % regionsToLinkedEdit.size();
-                group.addPosition(
-                        new LinkedPosition(viewer.getDocument(), region.getOffset(), region.getLength(), rank));
+                group.addPosition(new LinkedPosition(viewer.getDocument(), region.getOffset(), region.getLength()));
                 model.addGroup(group);
-                i++;
             }
             model.forceInstall();
             return new RedEditorLinkedModeUI(model, viewer);
@@ -132,12 +129,31 @@ public class RedEditorLinkedModeUI extends LinkedModeUI {
         super(model, viewers);
     }
 
+    public void enter(final int startPosition) {
+        enter();
+
+        if (startPosition > 0) {
+            // this is needed to start linked mode at given position; marking LinkedPosition with
+            // sequence number does not resolve this problem properly
+            try {
+                final Method nextMethod = LinkedModeUI.class.getDeclaredMethod("next");
+                for (int i = 0; i < startPosition; i++) {
+                    nextMethod.setAccessible(true);
+                    nextMethod.invoke(this);
+                }
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                // it will just start from first position
+            }
+        }
+    }
+
     private static class CompundExitPolicy implements IExitPolicy {
 
         private final List<IExitPolicy> policies;
 
-        public CompundExitPolicy(final IExitPolicy... policies) {
-            this.policies = Arrays.asList(policies);
+        public CompundExitPolicy(final List<IExitPolicy> policies) {
+            this.policies = policies;
         }
 
         @Override
