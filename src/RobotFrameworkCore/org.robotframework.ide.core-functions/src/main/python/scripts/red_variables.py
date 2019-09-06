@@ -78,22 +78,20 @@ def _wrap_variable_if_needed(varname):
     else:
         return '${' + varname + '}'
 
+
 def get_variables(path, arguments):
     import inspect
-    from robot.utils.dotdict import DotDict
 
     vars_from_file = _get_variables_from_file(path, arguments)
 
     filtered_vars = {}
     for k, v in vars_from_file.items():
         try:
-            if isinstance(v, DotDict):
-                filtered_vars[k] = _extract_dot_dict(v)
-            elif not inspect.ismodule(v) and not inspect.isfunction(v):
-                filtered_vars[k] = _escape_unicode(v)
-            # we filter out modules and functions so that they will not be avaliable
+            # we filter out modules and functions so that they will not be available
             # in assistant as well as not visible for validator
-        except Exception as e:
+            if not inspect.ismodule(v) and not inspect.isfunction(v):
+                filtered_vars[k] = _escape_unicode(v)
+        except:
             filtered_vars[k] = 'None'
     return filtered_vars
 
@@ -103,54 +101,42 @@ def _get_variables_from_file(path, arguments):
 
     variables = robot.variables.Variables()
     variables.set_from_file(path, arguments)
-    
+
     return variables.store.data
-
-def __get_robot_version():
-    import robot.version as ver
-    return tuple(map(int, ver.get_version(True).split('.')))
-
-def _extract_dot_dict(dict):
-    return dict((_escape_unicode(k), _escape_unicode(v)) for k, v in dict.items())
 
 
 def _escape_unicode(data):
-    from copy import copy
-    # basestring and long is not defined in python3
     import sys
-    py_version = sys.version_info
-    if py_version < (3,0,0) and isinstance(data, unicode):
+    from robot.utils.dotdict import DotDict
+
+    if sys.version_info < (3, 0, 0) and isinstance(data, unicode):
         import unicodedata
-        return unicodedata.normalize('NFKD', data).encode('ascii','ignore') # for XML-RPC problems with unicode characters
-    elif py_version >= (3,0,0) and isinstance(data, str):
+        return unicodedata.normalize('NFKD', data).encode('ascii', 'ignore')  # for XML-RPC problems with unicode characters
+    elif sys.version_info >= (3, 0, 0) and isinstance(data, str):
         escaped_data = data.encode('unicode_escape')
         if isinstance(escaped_data, bytes):
             escaped_data = escaped_data.decode()
         return escaped_data
-    elif py_version < (3,0,0) and isinstance(data, basestring):
+    elif sys.version_info < (3, 0, 0) and isinstance(data, basestring):
         return data.encode('unicode_escape')
-    elif py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
+    elif sys.version_info < (3, 0, 0) and isinstance(data, long):  # for OverflowError in XML-RPC
         return str(data)
-    elif isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
+    elif isinstance(data, int) and (data < -(2 ** 31) or data > (2 ** 31) - 1):
         return str(data)
+    elif isinstance(data, DotDict):
+        return dict((_escape_unicode(k), _escape_unicode(v)) for k, v in data.items())
     elif isinstance(data, dict):
         data_result = {}
         for key, val in data.items():
-            if isinstance(key, tuple):
+            if isinstance(key, tuple):  # for XML-RPC problems with TypeError (dictionary key must be string)
                 return 'None'
             data_result[_escape_unicode(str(key))] = _escape_unicode(val)
         return data_result
     elif isinstance(data, list):
-        data_result = copy(data)
-        for index, item in enumerate(data_result):
-            data_result[index] = _escape_unicode(item)
-        return data_result
-    elif isinstance(data, tuple):   
-        tuple_data = ()
-        for item in data:
-            tuple_data = tuple_data + tuple(_escape_unicode(item)) 
-        return tuple_data
+        return list(_escape_unicode(item) for item in data)
+    elif isinstance(data, tuple):
+        return tuple(_escape_unicode(item) for item in data)
     elif data is None:
-      return _escape_unicode('None')
+        return _escape_unicode('None')
     else:
-      return _escape_unicode(str(data))
+        return _escape_unicode(str(data))

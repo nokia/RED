@@ -425,7 +425,7 @@ def __get_robot_version():
 
 def __encode_unicode_if_needed(arg):
     if sys.version_info < (3, 0, 0) and isinstance(arg, unicode):
-        return arg.encode(sys.getfilesystemencoding())
+        return arg.encode('utf-8', 'replace')
     elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
         return [__encode_unicode_if_needed(elem) for elem in arg]
     else:
@@ -434,7 +434,7 @@ def __encode_unicode_if_needed(arg):
 
 def __decode_unicode_if_needed(arg):
     if sys.version_info < (3, 0, 0) and isinstance(arg, str):
-        return arg.decode(sys.getfilesystemencoding())
+        return arg.decode('utf-8', 'replace')
     elif sys.version_info < (3, 0, 0) and isinstance(arg, list):
         return [__decode_unicode_if_needed(elem) for elem in arg]
     else:
