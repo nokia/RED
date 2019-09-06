@@ -1,0 +1,429 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistForOptionalArgs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _6IGcMM_WEemJbfV-mMqNBA
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 9/6/19 11:23 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//set KW
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "Test\n\n\n"
+    + "*** Keywords ***\n"
+    + "one arg\n"
+    + "    [Arguments]    ${a}\n"
+    + "    Log  7\n"
+    + "    \n"
+    + "two args\n"
+    + "    [Arguments]    ${a}  ${b}\n"
+    + "    Log  7\n"
+    + "    \n"
+    + "three args\n"
+    + "    [Arguments]    ${a}  ${b}  ${c}=1  \n"
+    + "    log  7\n"
+    + "    \n\n"
+    + "four args\n"
+    + "    [Arguments]    ${a}  ${b}  ${c}=1  ${d}=2\n"
+    + "    Log  7\n"
+    + "    \n"
+    + "only optionals\n"
+    + "    [Arguments]    @{x}  &{y}\n"
+    + "    log  8" 
+    
+// kw with 2 mandatory args - 2 tabs - edit mode is turn off    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 1
+    key-type Tab
+    type-text two
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Tab 
+    wait 200
+    key-type Tab
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 3 | verify-true
+    get-property "caretPosition.column" | equals 23 | verify-true
+}
+
+//3 KW - adding optional arg and tab - edit mode turn off after optional
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text thre
+    key-type "M1+SPACE"
+    key-type Enter
+    
+    key-type Tab 
+    wait 200
+    key-type Tab
+    wait 200
+    type-text "new arg"
+    key-type Tab
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 4 | verify-true
+    get-property "caretPosition.column" | equals 36 | verify-true
+}
+
+// 3 KW - press enter - edit mode turn off
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text three
+    key-type "M1+SPACE"
+    key-type Enter
+    wait 200
+    key-type Enter
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 5 | verify-true
+    get-property "caretPosition.column" | equals 29 | verify-true
+}
+
+// 3 KW - change default args and one optional, shift tab - back one arg left
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text thre
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text a1
+    key-type Tab
+    type-text a2
+    key-type Tab
+    type-text a3
+    key-type "M2+TAB"
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 6 | verify-true
+    get-property "caretPosition.column" | equals 27 | verify-true
+    get-property "getSelectionText()" | equals a2 | verify-true
+}
+
+// press Esc to turn off edit mode
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    get-text-viewer | key-type ESC
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 6 | verify-true
+    get-property "caretPosition.column" | equals 33 | verify-true
+}
+
+// 3 KW - remove one arg, go to optional and press enter - "\" is added
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 6 33
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text thre
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Del
+    key-type Tab
+    wait 200
+    key-type Tab
+    key-type Enter
+}
+
+
+// 4 ARG - remove second mandatory, add all empty optionals
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 30
+    key-type Enter
+    type-text fou
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Tab
+    key-type BackSpace
+    key-type Tab
+    wait 200
+    key-type Tab
+    wait 200
+    key-type Tab
+}
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 8 | verify-true
+    get-property "caretPosition.column" | equals 34 | verify-true
+}
+
+
+
+// 4 args - change value, add variable, add 2 optionals and press enter - edt mode turn off
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text fou
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text g2
+    key-type Tab
+    type-text "${a}"
+    key-type Tab
+    type-text g3
+    key-type Tab
+    type-text g4
+    key-type Enter
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 9 | verify-true
+    get-property "caretPosition.column" | equals 40 | verify-true
+}
+
+// 4 args - add one optional and press shift+tab back to mandatory and press Tab
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 40
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text fou
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Tab -times 2
+    type-text c
+    key-type "M2+TAB"
+}
+
+// selection is on "b"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 10 | verify-true
+    get-property "caretPosition.column" | equals 24 | verify-true
+    get-property "getSelectionText()" | equals b | verify-true
+}
+
+// press tab - selection is on c
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    type-text "not b"
+    key-type Tab
+}
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 10 | verify-true
+    get-property "caretPosition.column" | equals 33 | verify-true
+    get-property "getSelectionText()" | equals c | verify-true
+}
+
+//change c value
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    type-text "not c"
+    key-type Tab
+    key-type Enter
+}
+
+
+// 4 arg - shift+tab for last arg
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text fou
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Tab -times 2
+    type-text c
+    key-type Tab
+    type-text d
+    key-type "M2+TAB"
+}
+
+// caret after "c"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 11 | verify-true
+    get-property "caretPosition.column" | equals 29 | verify-true
+}
+
+//move back - focus on "b"
+get-editor "TestFile.robot" | get-text-viewer | key-type "M2+TAB"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 11 | verify-true
+    get-property "caretPosition.column" | equals 24 | verify-true
+}
+
+// move forward - focus on "c"
+get-editor "TestFile.robot" | get-text-viewer | key-type Tab
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 11 | verify-true
+    get-property "caretPosition.column" | equals 29 | verify-true
+}
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | set-caret-pos 11 29
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        key-type End
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+}
+
+
+
+//  5 args and cycling
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-group Keywords | get-combo -after [get-label "After pressing Tab in arguments edition mode"] 
+        | select "cycle between arguments"
+    get-button "Apply and Close" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Enter
+    set-caret-pos 12 5
+    type-text Sh
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    key-type Tab
+    wait 200
+    key-type Tab
+    wait 200
+    key-type Tab
+    wait 200
+    key-type Tab
+    wait 200
+    key-type Tab
+    wait 200
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 12 | verify-true
+    get-property "caretPosition.column" | equals 41 | verify-true
+    get-property "getSelectionText()" | equals first | verify-true
+}
+
+// go tab twice - first \
+get-editor "TestFile.robot" | get-text-viewer | key-type Tab -times 2
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 12 | verify-true
+    get-property "caretPosition.column" | equals 56 | verify-true
+}
+
+// shift+tab twice
+get-editor "TestFile.robot" | get-text-viewer | key-type "M2+TAB"
+wait 200
+get-editor "TestFile.robot" | get-text-viewer | key-type "M2+TAB"
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals first | verify-true
+}
+
+// move to last \
+get-editor "TestFile.robot" | get-text-viewer | key-type "M2+TAB"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 12 | verify-true
+    get-property "caretPosition.column" | equals 66 | verify-true
+    get-property "getSelectionText()" | equals "\\" | verify-true
+}
+
+
+// one optional arg and cycle - selection is in one plece
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        key-type Right
+        set-caret-pos 12 66
+        key-type "NUMPAD_ENTER" "\\u000D"
+        
+        // add log many
+        type-text "log ma"
+        key-type "M1+SPACE"
+        key-type Enter
+        type-text text
+        key-type Tab
+        wait 200
+        key-type Tab
+    }
+}
+// selection is in one place - only caret position can be checked
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 13 | verify-true
+    get-property "caretPosition.column" | equals 21 | verify-true
+}
+with [get-editor "TestFile.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        set-caret-pos 13 21
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+}
+
+// select exit on last arg option
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Keywords | get-combo -after [get-label "After pressing Tab in arguments edition mode"] 
+        | select "exit on last argument"
+    get-button "Apply and Close" | click
+}
+
+//  add log many again - now edit mode is turn off for shift+tab
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 14 5
+    type-text "log ma"
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text text2
+    key-type "M2+TAB"
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 14 | verify-true
+    get-property "caretPosition.column" | equals 22 | verify-true
+    get-property "getSelectionText()" | equals "" | verify-true
+}
+
+// only optionals -  only one rectangle 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 14 22
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text onl
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text x1
+    key-type Tab
+}
+
+//check text
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 15 | verify-true
+    get-property "caretPosition.column" | equals 25 | verify-true
+}   
+ 
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+	+ "Test\n"
+	+ "    two args    a    b\n"
+	+ "    three args    a    b    new arg\n"
+	+ "    three args    a    b    \n"
+	+ "    three args    a1    a2    a3\n"
+	+ "    three args    \\    b    \\\n"
+	+ "    four args    a    \\    \\    \\\n"
+	+ "    four args    g2    ${a}    g3    g4\n"
+	+ "    four args    a    not b    not c    \\\n"
+	+ "    four args    a    b    c    d\n"
+	+ "    Should Be Equal As Integers    first    second    \\    \\    \\\n"
+	+ "    Log Many    text\n"
+	+ "    Log Many    text2\n"
+	+ "    only optionals    x1\n\n\n"
+	+ "*** Keywords ***\n"
+	+ "one arg\n"
+	+ "    [Arguments]    ${a}\n"
+	+ "    Log  7\n"
+	+ "    \n"
+	+ "two args\n"
+	+ "    [Arguments]    ${a}  ${b}\n"
+	+ "    Log  7\n"
+	+ "    \n"
+	+ "three args\n"
+	+ "    [Arguments]    ${a}  ${b}  ${c}=1  \n"
+	+ "    log  7\n"
+	+ "    \n\n"
+	+ "four args\n"
+	+ "    [Arguments]    ${a}  ${b}  ${c}=1  ${d}=2\n"
+	+ "    Log  7\n"
+	+ "    \n"
+	+ "only optionals\n"
+	+ "    [Arguments]    @{x}  &{y}\n"
+	+ "    log  8" | verify-true
+	
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
