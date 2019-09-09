@@ -39,44 +39,51 @@ public class CellEditorValueValidationJobScheduler<V> {
         this.validator = validator;
     }
 
-    void rescheduleValidation(final V value, final Control control, final int rowId) {
+    @SuppressWarnings("unchecked")
+    private void rescheduleValidation(final Text control, final int rowId) {
         isClosingLocked = true;
         if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
             validationJob.cancel();
         }
-        validationJob = new CellEditorValueValidationJob<>(validator, value, rowId);
+        validationJob = new CellEditorValueValidationJob<>(validator, (V) control.getText(), rowId);
         validationJob.addJobChangeListener(new CellEditorValueValidationListener(control));
         validationJob.schedule(300);
     }
 
     boolean canCloseCellEditor() {
-        waitForJobToFinish();
+        if (validationJob != null && validationJob.getState() == Job.SLEEPING && validationJob.isCellValid()) {
+            validationJob.cancel();
+            isClosingLocked = false;
+        } else if (validationJob != null) {
+            waitForJobToFinish();
+        }
         return !isClosingLocked;
     }
 
     private void waitForJobToFinish() {
-        final Job job = validationJob;
-        if (job != null) {
-            try {
-                job.join();
-            } catch (final InterruptedException e) {
-                throw new IllegalStateException("Cell editor validation job has been interrupted!", e);
-            }
+        try {
+            validationJob.join();
+        } catch (final InterruptedException e) {
+            throw new IllegalStateException("Cell editor validation job has been interrupted!", e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void armRevalidationOn(final Text textControl, final int rowId) {
-        if (validator == null || textControl == null || textControl.isDisposed()) {
+    public void armRevalidationOn(final Text control, final int rowId) {
+        if (validator == null || control == null || control.isDisposed()) {
             return;
         }
-        originalForeground = textControl.getForeground();
-        textControl.addModifyListener(e -> rescheduleValidation((V) textControl.getText(), textControl, rowId));
+        originalForeground = control.getForeground();
+        control.addModifyListener(e -> rescheduleValidation(control, rowId));
     }
 
     @VisibleForTesting
     public CellEditorValueValidator<V> getValidator() {
-        return this.validator;
+        return validator;
+    }
+
+    @VisibleForTesting
+    public CellEditorValueValidationJob<V> getValidationJob() {
+        return validationJob;
     }
 
     @VisibleForTesting
@@ -128,6 +135,6 @@ public class CellEditorValueValidationJobScheduler<V> {
 
     @VisibleForTesting
     ControlDecoration getDecoration() {
-        return this.decoration;
+        return decoration;
     }
 }

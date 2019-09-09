@@ -15,7 +15,7 @@ import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorV
 /**
  * @author Michal Anglart
  */
-class CellEditorValueValidationJob<V> extends Job {
+public class CellEditorValueValidationJob<V> extends Job {
 
     static QualifiedName getLockPropertyName() {
         return new QualifiedName("cell.editor", "lock");
@@ -50,4 +50,14 @@ class CellEditorValueValidationJob<V> extends Job {
         }
         return Status.OK_STATUS;
     }
+
+    boolean isCellValid() {
+        try {
+            validator.validate(valueToValidate, rowId);
+            return true;
+        } catch (final CellEditorValueValidationException e) {
+            return false;
+        }
+    }
+
 }

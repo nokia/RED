@@ -6,7 +6,6 @@
 package org.robotframework.red.nattable.edit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,13 +24,15 @@ import org.eclipse.swt.widgets.Control;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.robotframework.red.junit.ShellProvider;
 
 /**
  * @author wypych
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CellEditorValueValidationListenerTest {
 
     @Rule
@@ -43,6 +44,17 @@ public class CellEditorValueValidationListenerTest {
     private CellEditorValueValidationJobScheduler<Object> validationJobScheduler;
 
     private CellEditorValueValidationJobScheduler<Object>.CellEditorValueValidationListener cellValidationListener;
+
+    @Before
+    public void setUp() {
+        final Composite composite = mock(Composite.class);
+        when(composite.toDisplay(anyInt(), anyInt())).thenReturn(new Point(0, 0));
+        when(control.getShell()).thenReturn(shell.getShell());
+        when(control.getParent()).thenReturn(composite);
+        when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));
+        validationJobScheduler = new CellEditorValueValidationJobScheduler<>(null);
+        cellValidationListener = validationJobScheduler.new CellEditorValueValidationListener(control);
+    }
 
     @Test
     public void givenIJobChangeEventWithStatusSuccess_andJob_withLockAndErrorMsgBothProperties_whenCallMethodNotifyAboutJobChangeState_thenShouldBeNormalExecution()
@@ -63,11 +75,10 @@ public class CellEditorValueValidationListenerTest {
         cellValidationListener.done(jobChangeEvent);
 
         // then
-        final boolean canCloseCellEditor = validationJobScheduler.canCloseCellEditor();
-        assertThat(canCloseCellEditor).isFalse();
-        final ControlDecoration decoration = validationJobScheduler.getDecoration();
-        assertThat(decoration).isNotNull();
-        assertThat(decoration.getDescriptionText()).isEqualTo(errorMessage);
+        assertThat(validationJobScheduler.canCloseCellEditor()).isFalse();
+        assertThat(validationJobScheduler.getDecoration()).isNotNull()
+                .extracting(ControlDecoration::getDescriptionText)
+                .isEqualTo(errorMessage);
     }
 
     @Test
@@ -87,21 +98,6 @@ public class CellEditorValueValidationListenerTest {
         // then
         assertThat(validationJobScheduler.canCloseCellEditor()).isTrue();
         assertThat(validationJobScheduler.getDecoration()).isNull();
-    }
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        final Composite composite = mock(Composite.class);
-        when(composite.toDisplay(any(Point.class))).thenReturn(new Point(0, 0));
-        when(composite.toDisplay(anyInt(), anyInt())).thenReturn(new Point(0, 0));
-        when(control.getShell()).thenReturn(shell.getShell());
-        when(control.getParent()).thenReturn(composite);
-        when(composite.toDisplay(any(Point.class))).thenReturn(new Point(0, 0));
-        when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));
-        when(control.toControl(any(Point.class))).thenReturn(new Point(0, 0));
-        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(null);
-        this.cellValidationListener = validationJobScheduler.new CellEditorValueValidationListener(control);
     }
 
     private static class MockJob extends Job {
