@@ -89,7 +89,8 @@ class CommonContextsTransitions {
                     previousContext);
 
         } else if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-            return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), previousContext, breakpointSupplier);
+            return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(),
+                    previousContext, breakpointSupplier);
 
         } else {
             final String msg = ErrorMessages
@@ -126,8 +127,8 @@ class CommonContextsTransitions {
                             previousContext);
 
                 } else if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-                    return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), previousContext,
-                            breakpointSupplier);
+                    return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(),
+                            previousContext, breakpointSupplier);
 
                 } else {
                     final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, true);

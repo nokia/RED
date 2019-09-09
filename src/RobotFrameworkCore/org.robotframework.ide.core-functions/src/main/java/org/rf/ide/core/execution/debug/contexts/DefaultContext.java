@@ -8,9 +8,10 @@ package org.rf.ide.core.execution.debug.contexts;
 import java.net.URI;
 import java.util.Optional;
 
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 
 abstract class DefaultContext implements StackFrameContext {
@@ -41,7 +42,12 @@ abstract class DefaultContext implements StackFrameContext {
     }
 
     @Override
-    public Optional<RobotLineBreakpoint> getLineBreakpoint() {
+    public Optional<RobotBreakpoint> getLineBreakpoint() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<RobotBreakpoint> getKeywordFailBreakpoint(final QualifiedKeywordName currentlyFailedKeyword) {
         return Optional.empty();
     }
 }

@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -14,13 +13,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
 import org.junit.AfterClass;
@@ -29,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -76,7 +74,7 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<Tree> trees = getTrees();
+        final List<Tree> trees = Controls.getControls(shellProvider.getShell(), Tree.class);
         assertThat(trees).hasSize(1);
     }
 
@@ -173,13 +171,6 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     }
 
     private Tree getSetsTree() {
-        return getTrees().get(0);
-    }
-
-    private List<Tree> getTrees() {
-        return Stream.of(((Composite) shellProvider.getShell().getChildren()[0]).getChildren())
-                .filter(c -> c instanceof Tree)
-                .map(c -> Tree.class.cast(c))
-                .collect(toList());
+        return (Tree) Controls.findControlSatisfying(shellProvider.getShell(), c -> c instanceof Tree).get();
     }
 }

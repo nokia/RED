@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.jface.wizards.JobWizardPage.MonitoredJobFunction;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.swt.SwtThread;
 
@@ -29,7 +29,7 @@ public class JobWizardPageTest {
         final Shell shell = shellProvider.getShell();
         createPage(shell);
 
-        final ProgressBar progressBar = findControl(ProgressBar.class, shell);
+        final ProgressBar progressBar = Controls.getControls(shell, ProgressBar.class).get(0);
         assertThat(progressBar.isVisible()).isFalse();
     }
 
@@ -42,7 +42,7 @@ public class JobWizardPageTest {
 
         final MonitoredJobFunction<Void> fun = (monitor) -> {
             SwtThread.syncExec(() -> {
-                final ProgressBar progressBar = findControl(ProgressBar.class, shell);
+                final ProgressBar progressBar = Controls.getControls(shell, ProgressBar.class).get(0);
                 isVisible.set(progressBar.isVisible());
 
             });
@@ -50,22 +50,6 @@ public class JobWizardPageTest {
         };
         page.scheduleOperation(Void.class, fun, r -> {}).join();
         assertThat(isVisible.get()).isTrue();
-    }
-
-    private static <T extends Control> T findControl(final Class<T> controlClass, final Control root) {
-        if (controlClass.isInstance(root)) {
-            return controlClass.cast(root);
-
-        } else if (root instanceof Composite) {
-            final Composite comp = (Composite) root;
-            for (final Control child : comp.getChildren()) {
-                final T found = findControl(controlClass, child);
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
     }
 
     private static JobWizardPage createPage(final Composite parent) {

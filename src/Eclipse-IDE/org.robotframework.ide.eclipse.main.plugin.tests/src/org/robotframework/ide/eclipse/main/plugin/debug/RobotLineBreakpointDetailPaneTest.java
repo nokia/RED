@@ -1,121 +1,44 @@
 /*
-* Copyright 2017 Nokia Solutions and Networks
-* Licensed under the Apache License, Version 2.0,
-* see license.txt file for details.
-*/
+ * Copyright 2019 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IPropertyListener;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.red.junit.Controls;
 
-public class BreakpointDetailPaneTest {
+public class RobotLineBreakpointDetailPaneTest {
 
     @Test
     public void panePropertiesTest() {
-        final BreakpointDetailPane pane = new BreakpointDetailPane();
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane();
 
-        assertThat(pane.getID()).isEqualTo(BreakpointDetailPane.ID);
-        assertThat(pane.getName()).isEqualTo(BreakpointDetailPane.NAME);
-        assertThat(pane.getDescription()).isEqualTo(BreakpointDetailPane.DESCRIPTION);
+        assertThat(pane.getID()).isEqualTo(RobotLineBreakpointDetailPane.ID);
+        assertThat(pane.getName()).isEqualTo(RobotLineBreakpointDetailPane.NAME);
+        assertThat(pane.getDescription()).isEqualTo(RobotLineBreakpointDetailPane.DESCRIPTION);
         assertThat(pane.isDirty()).isFalse();
-    }
-
-    @Test
-    public void propertyListenersAreNotified_whenPaneChangesDirtyFlag() {
-        final BreakpointDetailPane pane = new BreakpointDetailPane();
-
-        final IPropertyListener listener1 = mock(IPropertyListener.class);
-        final IPropertyListener listener2 = mock(IPropertyListener.class);
-
-        pane.addPropertyListener(listener1);
-        pane.setDirty(true);
-
-        assertThat(pane.isDirty()).isTrue();
-
-        pane.addPropertyListener(listener2);
-        pane.setDirty(false);
-        assertThat(pane.isDirty()).isFalse();
-
-        pane.removePropertyListener(listener1);
-        pane.setDirty(true);
-        assertThat(pane.isDirty()).isTrue();
-
-        // dirty flag is cleared when initialized
-        pane.init(mock(IWorkbenchPartSite.class));
-        assertThat(pane.isDirty()).isFalse();
-        pane.setDirty(true);
-
-        verify(listener1, times(2)).propertyChanged(pane, ISaveablePart.PROP_DIRTY);
-        verify(listener2, times(2)).propertyChanged(pane, ISaveablePart.PROP_DIRTY);
-        verifyNoMoreInteractions(listener1, listener2);
-    }
-
-    @Test
-    public void dirtyFlagIsClearedAndListenersAreRemoved_whenPaneIsInitialized() {
-        final BreakpointDetailPane pane = new BreakpointDetailPane();
-        pane.setDirty(true);
-
-        final IPropertyListener listener = mock(IPropertyListener.class);
-        pane.addPropertyListener(listener);
-        pane.init(mock(IWorkbenchPartSite.class));
-
-        assertThat(pane.isDirty()).isFalse();
-        pane.setDirty(true);
-
-        verifyZeroInteractions(listener);
-    }
-
-    @Test
-    public void listenersAreRemoved_whenPaneIsDisposed() {
-        final BreakpointDetailPane pane = new BreakpointDetailPane();
-
-        final IPropertyListener listener = mock(IPropertyListener.class);
-        pane.addPropertyListener(listener);
-        pane.dispose();
-        pane.setDirty(true);
-
-        verifyZeroInteractions(listener);
-    }
-
-    @Test
-    public void saveOnCloseIsNotNeededAndSaveAsIsNotAllowed() {
-        final BreakpointDetailPane pane = spy(new BreakpointDetailPane());
-
-        assertThat(pane.isSaveOnCloseNeeded()).isFalse();
-        assertThat(pane.isSaveAsAllowed()).isFalse();
-        pane.doSaveAs();
-
-        verify(pane).isSaveOnCloseNeeded();
-        verify(pane).isSaveAsAllowed();
-        verify(pane).doSaveAs();
-        verifyNoMoreInteractions(pane);
     }
 
     @Test
@@ -124,20 +47,20 @@ public class BreakpointDetailPaneTest {
         shell.open();
 
         final IDialogSettings paneSection = mock(IDialogSettings.class);
-        when(paneSection.getArray(BreakpointDetailPane.OLD_CONDITIONS_ID))
+        when(paneSection.getArray(RobotLineBreakpointDetailPane.OLD_CONDITIONS_ID))
                 .thenReturn(new String[] { "old_condition", "old_condition  arg1  arg2" });
 
         final IDialogSettings dialogSettings = mock(IDialogSettings.class);
-        when(dialogSettings.getSection(BreakpointDetailPane.ID)).thenReturn(paneSection);
+        when(dialogSettings.getSection(RobotLineBreakpointDetailPane.ID)).thenReturn(paneSection);
 
-        final BreakpointDetailPane pane = new BreakpointDetailPane(dialogSettings);
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(dialogSettings);
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
         assertThat(pane.setFocus()).isFalse();
 
-        final List<Control> controls = getControls(shell);
+        final List<Control> controls = Controls.getControls(shell);
         assertThat(controls).hasSize(4);
 
         assertThat(controls.get(0)).isInstanceOf(Button.class);
@@ -168,13 +91,14 @@ public class BreakpointDetailPaneTest {
         final Shell shell = new Shell(Display.getDefault());
         shell.open();
 
-        final BreakpointDetailPane pane = new BreakpointDetailPane(mock(IDialogSettings.class));
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(mock(IDialogSettings.class));
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
 
         assertThat(pane.isDirty()).isFalse();
         assertThat(hitCountText.isEnabled()).isFalse();
@@ -202,13 +126,14 @@ public class BreakpointDetailPaneTest {
         final Shell shell = new Shell(Display.getDefault());
         shell.open();
 
-        final BreakpointDetailPane pane = new BreakpointDetailPane(mock(IDialogSettings.class));
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(mock(IDialogSettings.class));
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
 
         assertThat(pane.isDirty()).isFalse();
 
@@ -229,13 +154,14 @@ public class BreakpointDetailPaneTest {
         final Shell shell = new Shell(Display.getDefault());
         shell.open();
 
-        final BreakpointDetailPane pane = new BreakpointDetailPane(mock(IDialogSettings.class));
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(mock(IDialogSettings.class));
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         assertThat(pane.isDirty()).isFalse();
         assertThat(conditionCombo.isEnabled()).isFalse();
@@ -263,13 +189,14 @@ public class BreakpointDetailPaneTest {
         final Shell shell = new Shell(Display.getDefault());
         shell.open();
 
-        final BreakpointDetailPane pane = new BreakpointDetailPane(mock(IDialogSettings.class));
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(mock(IDialogSettings.class));
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         assertThat(pane.isDirty()).isFalse();
 
@@ -291,19 +218,20 @@ public class BreakpointDetailPaneTest {
         shell.open();
 
         final IDialogSettings conditionsSection = mock(IDialogSettings.class);
-        when(conditionsSection.getArray(BreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
+        when(conditionsSection.getArray(RobotLineBreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
 
         final IDialogSettings settings = conditionsSection;
-        when(settings.getSection(BreakpointDetailPane.ID)).thenReturn(conditionsSection);
-        final BreakpointDetailPane pane = new BreakpointDetailPane(settings);
+        when(settings.getSection(RobotLineBreakpointDetailPane.ID)).thenReturn(conditionsSection);
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(settings);
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         hitCountButton.setSelection(true);
         hitCountButton.notifyListeners(SWT.Selection, new Event());
@@ -315,7 +243,7 @@ public class BreakpointDetailPaneTest {
         conditionCombo.setText("condition");
         conditionCombo.notifyListeners(SWT.Modify, new Event());
 
-        pane.display(null);
+        pane.display((IStructuredSelection) null);
 
         assertThat(hitCountButton.getSelection()).isFalse();
         assertThat(conditionButton.getSelection()).isFalse();
@@ -332,19 +260,20 @@ public class BreakpointDetailPaneTest {
         shell.open();
 
         final IDialogSettings conditionsSection = mock(IDialogSettings.class);
-        when(conditionsSection.getArray(BreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
+        when(conditionsSection.getArray(RobotLineBreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
 
         final IDialogSettings settings = conditionsSection;
-        when(settings.getSection(BreakpointDetailPane.ID)).thenReturn(conditionsSection);
-        final BreakpointDetailPane pane = new BreakpointDetailPane(settings);
+        when(settings.getSection(RobotLineBreakpointDetailPane.ID)).thenReturn(conditionsSection);
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(settings);
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         hitCountButton.setSelection(true);
         hitCountButton.notifyListeners(SWT.Selection, new Event());
@@ -374,19 +303,20 @@ public class BreakpointDetailPaneTest {
         shell.open();
 
         final IDialogSettings conditionsSection = mock(IDialogSettings.class);
-        when(conditionsSection.getArray(BreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
+        when(conditionsSection.getArray(RobotLineBreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
 
         final IDialogSettings settings = conditionsSection;
-        when(settings.getSection(BreakpointDetailPane.ID)).thenReturn(conditionsSection);
-        final BreakpointDetailPane pane = new BreakpointDetailPane(settings);
+        when(settings.getSection(RobotLineBreakpointDetailPane.ID)).thenReturn(conditionsSection);
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(settings);
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         hitCountButton.setSelection(true);
         hitCountButton.notifyListeners(SWT.Selection, new Event());
@@ -402,7 +332,7 @@ public class BreakpointDetailPaneTest {
         when(breakpoint.isHitCountEnabled()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(true);
         when(breakpoint.getHitCount()).thenReturn(1729);
-        when(breakpoint.getCondition()).thenReturn("bp condition");
+        when(breakpoint.getConditionExpression()).thenReturn("bp condition");
         when(breakpoint.getMarker()).thenReturn(mock(IMarker.class));
         pane.display(new StructuredSelection(new Object[] { breakpoint }));
 
@@ -421,19 +351,20 @@ public class BreakpointDetailPaneTest {
         shell.open();
 
         final IDialogSettings conditionsSection = mock(IDialogSettings.class);
-        when(conditionsSection.getArray(BreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
+        when(conditionsSection.getArray(RobotLineBreakpointDetailPane.OLD_CONDITIONS_ID)).thenReturn(new String[0]);
 
         final IDialogSettings settings = conditionsSection;
-        when(settings.getSection(BreakpointDetailPane.ID)).thenReturn(conditionsSection);
-        final BreakpointDetailPane pane = new BreakpointDetailPane(settings);
+        when(settings.getSection(RobotLineBreakpointDetailPane.ID)).thenReturn(conditionsSection);
+        final RobotLineBreakpointDetailPane pane = new RobotLineBreakpointDetailPane(settings);
 
         pane.init(mock(IWorkbenchPartSite.class));
         pane.createControl(shell);
 
-        final Button hitCountButton = (Button) getControls(shell).get(0);
-        final Text hitCountText = (Text) getControls(shell).get(1);
-        final Button conditionButton = (Button) getControls(shell).get(2);
-        final Combo conditionCombo = (Combo) getControls(shell).get(3);
+        final List<Control> controls = Controls.getControls(shell);
+        final Button hitCountButton = (Button) controls.get(0);
+        final Text hitCountText = (Text) controls.get(1);
+        final Button conditionButton = (Button) controls.get(2);
+        final Combo conditionCombo = (Combo) controls.get(3);
 
         final IMarker marker = mock(IMarker.class);
         when(marker.exists()).thenReturn(true);
@@ -441,7 +372,7 @@ public class BreakpointDetailPaneTest {
         when(breakpoint.isHitCountEnabled()).thenReturn(false);
         when(breakpoint.isConditionEnabled()).thenReturn(false);
         when(breakpoint.getHitCount()).thenReturn(0);
-        when(breakpoint.getCondition()).thenReturn("");
+        when(breakpoint.getConditionExpression()).thenReturn("");
         when(breakpoint.getMarker()).thenReturn(marker);
         pane.display(new StructuredSelection(new Object[] { breakpoint }));
 
@@ -465,25 +396,5 @@ public class BreakpointDetailPaneTest {
 
         shell.close();
         shell.dispose();
-    }
-
-    private static List<Control> getControls(final Control control) {
-        final List<Control> controls = new ArrayList<>();
-        getControls(controls, control);
-        return controls;
-    }
-
-    private static void getControls(final List<Control> controls, final Control control) {
-        if (control instanceof Composite) {
-            if (control.getClass() != Composite.class && control.getClass() != Shell.class) {
-                controls.add(control);
-            }
-            final Composite composite = (Composite) control;
-            for (final Control child : composite.getChildren()) {
-                getControls(controls, child);
-            }
-        } else {
-            controls.add(control);
-        }
     }
 }

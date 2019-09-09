@@ -17,8 +17,8 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -26,6 +26,7 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 public class ExecutableCallContextTest {
@@ -76,14 +77,30 @@ public class ExecutableCallContextTest {
     @Test
     public void lineBreakpointIsProvidedThroughSupplier() {
         final RobotBreakpointSupplier breakpointSupplier = mock(RobotBreakpointSupplier.class);
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
-        when(breakpointSupplier.breakpointFor(URI.create("file:///file.robot"), 42))
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpointSupplier.lineBreakpointFor(URI.create("file:///file.robot"), 42))
                 .thenReturn(Optional.of(breakpoint));
 
         final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), newArrayList(), 0,
                 URI.create("file:///file.robot"), 42, breakpointSupplier);
 
         assertThat(context.getLineBreakpoint()).contains(breakpoint);
+    }
+
+    @Test
+    public void keywordFailBreakpointIsProvidedThroughSupplier() {
+        final ExecutableWithDescriptor exec = mock(ExecutableWithDescriptor.class);
+        when(exec.getCalledKeywordName()).thenReturn("name");
+        final List<ExecutableWithDescriptor> elements = newArrayList(exec);
+
+        final RobotBreakpointSupplier breakpointSupplier = mock(RobotBreakpointSupplier.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpointSupplier.keywordFailBreakpointFor("name")).thenReturn(Optional.of(breakpoint));
+
+        final ExecutableCallContext context = new ExecutableCallContext(newArrayList(), elements, 0,
+                URI.create("file:///file.robot"), 42, breakpointSupplier);
+
+        assertThat(context.getKeywordFailBreakpoint(QualifiedKeywordName.create("name", "lib"))).contains(breakpoint);
     }
 
     @Test

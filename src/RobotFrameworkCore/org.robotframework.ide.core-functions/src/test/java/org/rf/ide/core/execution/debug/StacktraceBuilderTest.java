@@ -46,7 +46,7 @@ public class StacktraceBuilderTest {
     @Test
     public void properKeywordTypesFixerIsCreated_dependingOnRobotVersion() {
         final ElementsLocator locator = mock(ElementsLocator.class);
-        final StacktraceBuilder builder = new StacktraceBuilder(new Stacktrace(), locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(new Stacktrace(), locator, new RobotBreakpointSupplier());
 
         builder.handleVersions(new VersionsEvent(null, "", "", "2.5", 1, Optional.of(42L)));
         assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
@@ -72,7 +72,7 @@ public class StacktraceBuilderTest {
         when(locator.findContextForSuite("Suite", URI.create("file:///suite.robot"), false, null)).thenReturn(context);
         final Stacktrace stack = new Stacktrace();
         
-        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
 
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res1.robot"), URI.create("file:///suite.robot")));
@@ -105,7 +105,7 @@ public class StacktraceBuilderTest {
         when(locator.findContextForSuite("Inner", URI.create("file:///inner.robot"), false, null)).thenReturn(context);
         final Stacktrace stack = new Stacktrace();
 
-        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
 
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res1.robot"), URI.create("file:///suite")));
@@ -144,7 +144,7 @@ public class StacktraceBuilderTest {
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, mock(StackFrameContext.class)));
 
-        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
         builder.handleTestStarted(new TestStartedEvent("test", "Suite.Test", null));
 
         assertThat(stack.size()).isEqualTo(2);
@@ -161,7 +161,7 @@ public class StacktraceBuilderTest {
 
     @Test
     public void currentFrameSwitchesContext_whenKeywordIsAboutToStart() {
-        final RobotBreakpointSupplier breakpointsSupplier = breakpointsSupplier();
+        final RobotBreakpointSupplier breakpointsSupplier = new RobotBreakpointSupplier();
         
         final CaseContext newContext = mock(CaseContext.class);
         final StackFrameContext oldContext = mock(StackFrameContext.class);
@@ -184,7 +184,7 @@ public class StacktraceBuilderTest {
         assertThat(frame.isTestContext()).isTrue();
         assertThat(frame.getLevel()).isEqualTo(1);
 
-        builder.handleKeywordEnded(new KeywordEndedEvent("kw", "keyword"));
+        builder.handleKeywordEnded(new KeywordEndedEvent("lib", "kw", "keyword", Status.PASS));
         assertThat(stack.size()).isEqualTo(1);
         assertThat(frame.getContext()).isSameAs(oldContext);
         assertThat(frame.isTestContext()).isTrue();
@@ -202,7 +202,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 2, mock(StackFrameContext.class)));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 3, mock(StackFrameContext.class)));
 
-        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
         builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L))); // has to be called to
                                                                            // initialize types fixer
         builder.handleKeywordStarted(new KeywordStartedEvent("kw", "keyword", "lib"));
@@ -214,7 +214,7 @@ public class StacktraceBuilderTest {
         assertThat(frame.getContext()).isSameAs(context);
         assertThat(frame.getLevel()).isEqualTo(4);
 
-        builder.handleKeywordAboutToEnd(new KeywordEndedEvent("kw", "keyword"));
+        builder.handleKeywordAboutToEnd(new KeywordEndedEvent("lib", "kw", "keyword", Status.PASS));
         assertThat(stack.size()).isEqualTo(2);
     }
 
@@ -230,7 +230,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 2, mock(StackFrameContext.class)));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 3, mock(StackFrameContext.class)));
 
-        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, breakpointsSupplier());
+        final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
         builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L))); // has to be called to initialize types fixer
         builder.handleKeywordStarted(new KeywordStartedEvent("kw", "keyword", "lib"));
 
@@ -241,7 +241,7 @@ public class StacktraceBuilderTest {
         assertThat(frame.getContext()).isSameAs(context);
         assertThat(frame.getLevel()).isEqualTo(3);
 
-        builder.handleKeywordAboutToEnd(new KeywordEndedEvent("kw", "keyword"));
+        builder.handleKeywordAboutToEnd(new KeywordEndedEvent("lib", "kw", "keyword", Status.PASS));
         assertThat(stack.size()).isEqualTo(2);
     }
 
@@ -256,7 +256,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2, mock(StackFrameContext.class)));
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, mock(ElementsLocator.class),
-                breakpointsSupplier());
+                new RobotBreakpointSupplier());
 
         assertThat(stack.stream()).allSatisfy(f -> assertThat(f.getLoadedResources().isEmpty()));
 
@@ -273,7 +273,7 @@ public class StacktraceBuilderTest {
         final Stacktrace stack = spy(new Stacktrace());
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, mock(ElementsLocator.class),
-                breakpointsSupplier());
+                new RobotBreakpointSupplier());
 
         final List<Map<Variable, VariableTypedValue>> variables = newArrayList(newHashMap());
         builder.handleVariables(new VariablesEvent(variables, ""));
@@ -288,14 +288,10 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Test", FrameCategory.TEST, 1, mock(StackFrameContext.class)));
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, mock(ElementsLocator.class),
-                breakpointsSupplier());
+                new RobotBreakpointSupplier());
 
         assertThat(stack.size()).isEqualTo(2);
         builder.handleClosed();
         assertThat(stack.size()).isEqualTo(0);
-    }
-
-    private static RobotBreakpointSupplier breakpointsSupplier() {
-        return (loc, line) -> Optional.empty();
     }
 }

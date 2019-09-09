@@ -385,13 +385,14 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("kwname", "kw", "type", "Setup");
+        final Map<String, Object> attributes = ImmutableMap.of("kwname", "kw", "libname", "lib", "type", "Setup",
+                "status", "PASS");
         final String json = toJson(ImmutableMap.of("pre_end_keyword", newArrayList("_", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleKeywordAboutToEnd(new KeywordEndedEvent("kw", "Setup"));
+        verify(listener).handleKeywordAboutToEnd(new KeywordEndedEvent("lib", "kw", "Setup", Status.PASS));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
@@ -403,13 +404,14 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("kwname", "kw", "type", "Setup");
+        final Map<String, Object> attributes = ImmutableMap.of("kwname", "kw", "libname", "lib", "type", "Setup",
+                "status", "PASS");
         final String json = toJson(ImmutableMap.of("end_keyword", newArrayList("_", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleKeywordEnded(new KeywordEndedEvent("kw", "Setup"));
+        verify(listener).handleKeywordEnded(new KeywordEndedEvent("lib", "kw", "Setup", Status.PASS));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

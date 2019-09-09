@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInput.SourceOfStackFrameInLibrary;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceNotFoundEditorInput.SourceOfStackFrameNotFound;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotThread;
@@ -319,6 +320,14 @@ public class RobotModelPresentationTest {
     }
 
     @Test
+    public void failBreakpointImageIsReturned_whenElementIsAFailKeywordBreakpoint() {
+        final Image expected = ImagesManager.getImage(RedImages.getKeywordFailBreakpointImage());
+
+        final RobotKeywordFailBreakpoint breakpoint = mock(RobotKeywordFailBreakpoint.class);
+        assertThat(presentation.getImage(breakpoint)).isEqualTo(expected);
+    }
+
+    @Test
     public void threadNameIsProvided_whenThreadIsGiven() throws CoreException {
         final IThread thread = mock(IThread.class);
         when(thread.getName()).thenReturn("robot thread");
@@ -348,6 +357,14 @@ public class RobotModelPresentationTest {
         when(breakpoint.getLabel()).thenReturn("breakpoint [line: 3]");
 
         assertThat(presentation.getText(breakpoint)).isEqualTo("breakpoint [line: 3]");
+    }
+
+    @Test
+    public void kwFailBreakpointLabelIsProvided_whenKwFailBreakpointIsGiven() throws CoreException {
+        final RobotKeywordFailBreakpoint breakpoint = mock(RobotKeywordFailBreakpoint.class);
+        when(breakpoint.getLabel()).thenReturn("Keyword 'foo' fails");
+
+        assertThat(presentation.getText(breakpoint)).isEqualTo("Keyword 'foo' fails");
     }
 
     @Test

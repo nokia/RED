@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 public interface StackFrameContext {
 
@@ -65,6 +66,12 @@ public interface StackFrameContext {
      * 
      * @return
      */
-    Optional<RobotLineBreakpoint> getLineBreakpoint();
+    Optional<RobotBreakpoint> getLineBreakpoint();
 
+    /**
+     * Gets keyword failed breakpoint associated with current context
+     * 
+     * @return
+     */
+    Optional<RobotBreakpoint> getKeywordFailBreakpoint(QualifiedKeywordName currentlyFailedKeyword);
 }

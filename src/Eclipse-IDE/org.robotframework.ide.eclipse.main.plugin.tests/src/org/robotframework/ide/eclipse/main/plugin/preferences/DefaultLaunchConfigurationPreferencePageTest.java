@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -118,9 +119,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
     private Group getGroup(final DefaultLaunchConfigurationPreferencePage page, final int index) {
         final Composite pageControl = (Composite) page.getControl();
         final Composite fieldEditorParent = (Composite) pageControl.getChildren()[1];
-        return Stream.of(fieldEditorParent.getChildren())
-                .filter(Group.class::isInstance)
-                .map(Group.class::cast)
-                .toArray(Group[]::new)[index];
+
+        return Controls.getControls(fieldEditorParent, Group.class).get(index);
     }
 }

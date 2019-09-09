@@ -16,8 +16,8 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -28,7 +28,7 @@ public class SetupTeardownContextTest {
     @Test
     public void setupTeardownContextIsNotErroneousWhenNoErrorMessageIsProvided() {
         final SetupTeardownContext context1 = new SetupTeardownContext(null, mock(StackFrameContext.class));
-        final SetupTeardownContext context2 = new SetupTeardownContext(URI.create("file:///file.robot"), 42,
+        final SetupTeardownContext context2 = new SetupTeardownContext(URI.create("file:///file.robot"), "kw", 42,
                 mock(StackFrameContext.class), mock(RobotBreakpointSupplier.class));
         final SetupTeardownContext context3 = new SetupTeardownContext(URI.create("file:///file.robot"), 42, null,
                 mock(StackFrameContext.class));
@@ -69,7 +69,7 @@ public class SetupTeardownContextTest {
     @Test
     public void suiteTeardownContextHasNoSourceAssociatedIfNotProvided() {
         final SetupTeardownContext context1 = new SetupTeardownContext(null, mock(StackFrameContext.class));
-        final SetupTeardownContext context2 = new SetupTeardownContext(null, -1, mock(StackFrameContext.class),
+        final SetupTeardownContext context2 = new SetupTeardownContext(null, "kw", -1, mock(StackFrameContext.class),
                 mock(RobotBreakpointSupplier.class));
         final SetupTeardownContext context3 = new SetupTeardownContext(null, -1, null, mock(StackFrameContext.class));
         final SetupTeardownContext context4 = new SetupTeardownContext(null, -1, null, mock(StackFrameContext.class),
@@ -94,7 +94,7 @@ public class SetupTeardownContextTest {
 
     @Test
     public void suiteTeardownContextHasSourceAssociatedWhenProvided() {
-        final SetupTeardownContext context1 = new SetupTeardownContext(URI.create("file:///file.robot"), 42,
+        final SetupTeardownContext context1 = new SetupTeardownContext(URI.create("file:///file.robot"), "kw", 42,
                 mock(StackFrameContext.class), mock(RobotBreakpointSupplier.class));
         final SetupTeardownContext context2 = new SetupTeardownContext(URI.create("file:///file.robot"), 42, null,
                 mock(StackFrameContext.class));
@@ -122,7 +122,7 @@ public class SetupTeardownContextTest {
         final StackFrameContext previousContext4 = mock(StackFrameContext.class);
 
         final SetupTeardownContext context1 = new SetupTeardownContext(null, previousContext1);
-        final SetupTeardownContext context2 = new SetupTeardownContext(URI.create("file:///file.robot"), 42,
+        final SetupTeardownContext context2 = new SetupTeardownContext(URI.create("file:///file.robot"), "kw", 42,
                 previousContext2, mock(RobotBreakpointSupplier.class));
         final SetupTeardownContext context3 = new SetupTeardownContext(URI.create("file:///file.robot"), 42, null,
                 previousContext3);
@@ -138,11 +138,11 @@ public class SetupTeardownContextTest {
     @Test
     public void lineBreakpointIsProvidedThroughSupplier_1() {
         final RobotBreakpointSupplier breakpointSupplier = mock(RobotBreakpointSupplier.class);
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
-        when(breakpointSupplier.breakpointFor(URI.create("file:///file.robot"), 42))
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpointSupplier.lineBreakpointFor(URI.create("file:///file.robot"), 42))
                 .thenReturn(Optional.of(breakpoint));
 
-        final SetupTeardownContext context = new SetupTeardownContext(URI.create("file:///file.robot"), 42,
+        final SetupTeardownContext context = new SetupTeardownContext(URI.create("file:///file.robot"), "kw",  42,
                 mock(StackFrameContext.class), breakpointSupplier);
 
         assertThat(context.getLineBreakpoint()).contains(breakpoint);
@@ -151,8 +151,8 @@ public class SetupTeardownContextTest {
     @Test
     public void lineBreakpointIsProvidedThroughSupplier_2() {
         final RobotBreakpointSupplier breakpointSupplier = mock(RobotBreakpointSupplier.class);
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
-        when(breakpointSupplier.breakpointFor(URI.create("file:///file.robot"), 42))
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpointSupplier.lineBreakpointFor(URI.create("file:///file.robot"), 42))
                 .thenReturn(Optional.of(breakpoint));
 
         final SetupTeardownContext context = new SetupTeardownContext(URI.create("file:///file.robot"), 42, null,

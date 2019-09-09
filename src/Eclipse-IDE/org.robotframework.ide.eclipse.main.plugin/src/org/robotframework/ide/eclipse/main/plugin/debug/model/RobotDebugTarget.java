@@ -17,7 +17,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IThread;
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.execution.debug.StackFrameVariable;
 import org.rf.ide.core.execution.debug.Stacktrace;
@@ -233,7 +233,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     class ExecutionPauseReasonsListener implements PauseReasonListener {
 
         @Override
-        public void pausedOnBreakpoint(final RobotLineBreakpoint breakpoint) {
+        public void pausedOnBreakpoint(final RobotBreakpoint breakpoint) {
             suspended(DebugEvent.BREAKPOINT);
             breakpointHit((IBreakpoint) breakpoint);
         }

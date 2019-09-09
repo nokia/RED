@@ -6,7 +6,6 @@
 package org.rf.ide.core.execution.debug;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +19,7 @@ import org.rf.ide.core.execution.server.response.ChangeVariable;
 import org.rf.ide.core.execution.server.response.EvaluateCondition;
 import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -73,7 +73,7 @@ public class UserProcessDebugController extends UserProcessController {
     @Override
     public void executionPaused() {
         if (susupensionData.reason == SuspendReason.BREAKPOINT) {
-            final RobotLineBreakpoint breakpoint = (RobotLineBreakpoint) susupensionData.data[0];
+            final RobotBreakpoint breakpoint = (RobotBreakpoint) susupensionData.data[0];
             pauseListeners.stream().forEach(listener -> listener.pausedOnBreakpoint(breakpoint));
 
         } else if (susupensionData.reason == SuspendReason.USER_REQUEST) {
@@ -95,11 +95,13 @@ public class UserProcessDebugController extends UserProcessController {
     }
 
     @Override
-    public Optional<ServerResponse> takeCurrentResponse(final PausingPoint pausingPoint) {
+    public Optional<ServerResponse> takeCurrentResponse(final PausingPoint pausingPoint,
+            final QualifiedKeywordName currentlyFailedKeyword) {
         this.lastPausingPoint = pausingPoint;
-        return super.takeCurrentResponse(pausingPoint).map(Optional::of)
+        return super.takeCurrentResponse(pausingPoint, currentlyFailedKeyword).map(Optional::of)
                 .orElseGet(() -> pauseOnErrorResponse(pausingPoint)).map(Optional::of)
-                .orElseGet(() -> breakpointHitResponse(pausingPoint)).map(Optional::of)
+                .orElseGet(() -> breakpointHitResponse(pausingPoint, currentlyFailedKeyword))
+                .map(Optional::of)
                 .orElseGet(() -> userSteppingResponse(pausingPoint));
     }
 
@@ -129,31 +131,32 @@ public class UserProcessDebugController extends UserProcessController {
         return Optional.empty();
     }
 
-    private Optional<ServerResponse> breakpointHitResponse(final PausingPoint pausingPoint) {
+    private Optional<ServerResponse> breakpointHitResponse(final PausingPoint pausingPoint,
+            final QualifiedKeywordName currentlyFailedKeyword) {
+
+        Optional<RobotBreakpoint> breakpoint;
         if (pausingPoint == PausingPoint.PRE_START_KEYWORD) {
+            breakpoint = frames().findFirst().flatMap(frame -> frame.getLineBreakpoint());
 
-            final Optional<RobotLineBreakpoint> breakpoint = frames()
-                    .findFirst()
-                    .flatMap(StackFrame::getBreakpoint);
+        } else if (pausingPoint == PausingPoint.PRE_END_KEYWORD && currentlyFailedKeyword != null) {
+            breakpoint = frames().findFirst().flatMap(frame -> frame.getKeywordFailBreakpoint(currentlyFailedKeyword));
 
-            if (breakpoint.isPresent()) {
-                final RobotLineBreakpoint robotLineBreakpoint = breakpoint.get();
+        } else {
+            breakpoint = Optional.empty();
+        }
 
-                if (robotLineBreakpoint.evaluateHitCount()) {
-                    susupensionData = new SuspensionData(SuspendReason.BREAKPOINT, robotLineBreakpoint);
+        if (breakpoint.isPresent()) {
+            final RobotBreakpoint robotBreakpoint = breakpoint.get();
 
-                    if (robotLineBreakpoint.isConditionEnabled()) {
-                        return Optional.of(new EvaluateCondition(
-                                Arrays.asList(robotLineBreakpoint.getCondition().split("(\\s{2,}|\t)"))));
-                    } else {
-                        return Optional.of(new PauseExecution());
-                    }
+            if (robotBreakpoint.evaluateHitCount()) {
+                susupensionData = new SuspensionData(SuspendReason.BREAKPOINT, robotBreakpoint);
+
+                if (robotBreakpoint.isConditionEnabled()) {
+                    return Optional.of(new EvaluateCondition(robotBreakpoint.getCondition()));
+                } else {
+                    return Optional.of(new PauseExecution());
                 }
             }
-
-        } else if (pausingPoint == PausingPoint.PRE_END_KEYWORD) {
-            // TODO : implement when on-keyword-fail breakpoint will be provided
-
         }
         return Optional.empty();
     }
@@ -277,7 +280,7 @@ public class UserProcessDebugController extends UserProcessController {
 
     public static interface PauseReasonListener {
 
-        public void pausedOnBreakpoint(RobotLineBreakpoint breakpoint);
+        public void pausedOnBreakpoint(RobotBreakpoint breakpoint);
 
         public void pausedByUser();
 

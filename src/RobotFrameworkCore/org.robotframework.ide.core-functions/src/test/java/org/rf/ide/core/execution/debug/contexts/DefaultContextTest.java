@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 public class DefaultContextTest {
 
@@ -29,6 +30,7 @@ public class DefaultContextTest {
     @Test
     public void defaultContextHasNoAssociatedBreakpoint() {
         assertThat(defaultContext().getLineBreakpoint()).isEmpty();
+        assertThat(defaultContext().getKeywordFailBreakpoint(QualifiedKeywordName.create("kw", "lib"))).isEmpty();
     }
 
     @Test

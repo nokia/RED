@@ -28,6 +28,7 @@ import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 public class StackFrameTest {
@@ -384,12 +385,29 @@ public class StackFrameTest {
         final StackFrameContext contextWithoutBp = mock(StackFrameContext.class);
         when(contextWithoutBp.getLineBreakpoint()).thenReturn(Optional.empty());
 
-        final RobotLineBreakpoint bp = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint bp = mock(RobotBreakpoint.class);
         final StackFrameContext contextWithBp = mock(StackFrameContext.class);
         when(contextWithBp.getLineBreakpoint()).thenReturn(Optional.of(bp));
 
-        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithoutBp).getBreakpoint()).isEmpty();
-        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithBp).getBreakpoint()).contains(bp);
+        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithoutBp).getLineBreakpoint()).isEmpty();
+        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithBp).getLineBreakpoint()).contains(bp);
+    }
+
+    @Test
+    public void associatedKwFailBreakpointIsTakenDirectlyFromContext() {
+        final QualifiedKeywordName qName = QualifiedKeywordName.create("kw", "lib");
+
+        final StackFrameContext contextWithoutBp = mock(StackFrameContext.class);
+        when(contextWithoutBp.getKeywordFailBreakpoint(qName)).thenReturn(Optional.empty());
+
+        final RobotBreakpoint bp = mock(RobotBreakpoint.class);
+        final StackFrameContext contextWithBp = mock(StackFrameContext.class);
+        when(contextWithBp.getKeywordFailBreakpoint(qName)).thenReturn(Optional.of(bp));
+
+        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithoutBp).getKeywordFailBreakpoint(qName))
+                .isEmpty();
+        assertThat(new StackFrame("frame", FrameCategory.KEYWORD, 42, contextWithBp).getKeywordFailBreakpoint(qName))
+                .contains(bp);
     }
 
     @Test
@@ -402,7 +420,7 @@ public class StackFrameTest {
         assertThat(frame.getContext()).isSameAs(context);
 
         frame.moveToKeyword(new RunningKeyword("lib", "kw", KeywordCallType.NORMAL_CALL),
-                (location, line) -> Optional.empty());
+                new RobotBreakpointSupplier());
 
         assertThat(frame.getContext()).isSameAs(nextContext);
     }

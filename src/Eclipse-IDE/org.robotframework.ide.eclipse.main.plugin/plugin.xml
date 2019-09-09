@@ -6704,6 +6704,11 @@
             class="org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint"
             id="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint">
       </breakpoint>
+      <breakpoint
+            class="org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint"
+            id="org.robotframework.ide.eclipse.main.plugin.robot.keywordFailBreakpoint"
+            markerType="org.robotframework.ide.eclipse.main.plugin.robot.keywordFailBreakpoint.marker">
+      </breakpoint>
    </extension>
    <extension
      id="org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker"
@@ -6714,6 +6719,16 @@
 	  <persistent
 	        value="true">
 	  </persistent>
+   </extension>
+   <extension
+         id="org.robotframework.ide.eclipse.main.plugin.robot.keywordFailBreakpoint.marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.debug.core.breakpointMarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
@@ -7474,12 +7489,20 @@
                   id="org.robotframework.red.view.debug.variables.sort.state">
             </state>
          </command>
-      </extension>
+         <command
+               id="org.robotframework.red.view.debug.breakpoints.addKwFailBreakpoint"
+               name="Add Robot Keyword Fail Breakpoint">
+         </command>
+      </extension>      
       <extension
             point="org.eclipse.ui.handlers">
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler"
                commandId="org.robotframework.red.view.debug.variables.sort">
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.debug.AddKeywordFailBreakpointHandler"
+               commandId="org.robotframework.red.view.debug.breakpoints.addKwFailBreakpoint">
          </handler>
       </extension>
       <extension
@@ -7496,6 +7519,20 @@
                      style="toggle">
                </command>
             </menu>
+         </menuContribution>
+      </extension>
+      <extension
+            name="Breakpoints view menus"
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.robotframework.red.view.debug.breakpoints.addKwFailBreakpoint"
+                  icon="resources/keyword_fail_breakpoint_add.png"
+                  label="Add Robot Keyword Fail Breakpoint"
+                  style="push">
+            </command>
          </menuContribution>
       </extension>
       <extension

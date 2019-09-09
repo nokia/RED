@@ -35,6 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInp
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceNotFoundEditorInput.SourceOfStackFrameNotFound;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -94,8 +95,10 @@ public class RobotModelPresentation extends LabelProvider
             }
             return decorator == null ? varImage
                     : ImagesManager.getImage(new DecorationOverlayIcon(varImage, decorator, IDecoration.TOP_RIGHT));
-        }
 
+        } else if (element instanceof RobotKeywordFailBreakpoint) {
+            return ImagesManager.getImage(RedImages.getKeywordFailBreakpointImage());
+        }
         return null;
     }
 
@@ -124,6 +127,8 @@ public class RobotModelPresentation extends LabelProvider
                 return ((RobotStackFrame) element).getLabel();
             } else if (element instanceof RobotLineBreakpoint) {
                 return ((RobotLineBreakpoint) element).getLabel();
+            } else if (element instanceof RobotKeywordFailBreakpoint) {
+                return ((RobotKeywordFailBreakpoint) element).getLabel();
             }
         } catch (final CoreException e) {
             e.printStackTrace();

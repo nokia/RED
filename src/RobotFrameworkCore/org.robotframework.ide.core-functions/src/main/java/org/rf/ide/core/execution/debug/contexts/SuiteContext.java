@@ -132,7 +132,8 @@ public class SuiteContext extends DefaultContext {
             }
 
             if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-                return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), this, breakpointSupplier);
+                return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(), this,
+                        breakpointSupplier);
             } else {
                 final String msg = ErrorMessages.errorOfSuitePrePostKwNotFoundBecauseOfDifferentCall(keyword.isSetup());
                 final String errorMsg = String.format(msg, keyword.asCall(), keywordToken.getText());

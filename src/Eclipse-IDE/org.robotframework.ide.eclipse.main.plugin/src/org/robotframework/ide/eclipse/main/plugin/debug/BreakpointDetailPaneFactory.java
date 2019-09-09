@@ -13,6 +13,7 @@ import java.util.Set;
 import org.eclipse.debug.ui.IDetailPane;
 import org.eclipse.debug.ui.IDetailPaneFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 
 /**
@@ -23,8 +24,13 @@ public class BreakpointDetailPaneFactory implements IDetailPaneFactory {
 
     @Override
     public Set<String> getDetailPaneTypes(final IStructuredSelection selection) {
-        if (selection != null && selection.size() == 1 && selection.getFirstElement() instanceof RobotLineBreakpoint) {
-            return newHashSet(BreakpointDetailPane.ID);
+        if (selection != null && selection.size() == 1) {
+            if (selection.getFirstElement() instanceof RobotLineBreakpoint) {
+                return newHashSet(RobotLineBreakpointDetailPane.ID);
+
+            } else if (selection.getFirstElement() instanceof RobotKeywordFailBreakpoint) {
+                return newHashSet(RobotKeywordFailBreakpointDetailPane.ID);
+            }
         }
         return new HashSet<>();
     }
@@ -35,25 +41,33 @@ public class BreakpointDetailPaneFactory implements IDetailPaneFactory {
     }
 
     @Override
-    public IDetailPane createDetailPane(final String paneID) {
-        if (BreakpointDetailPane.ID.equals(paneID)) {
-            return new BreakpointDetailPane();
+    public IDetailPane createDetailPane(final String paneId) {
+        if (RobotLineBreakpointDetailPane.ID.equals(paneId)) {
+            return new RobotLineBreakpointDetailPane();
+
+        } else if (RobotKeywordFailBreakpointDetailPane.ID.equals(paneId)) {
+            return new RobotKeywordFailBreakpointDetailPane();
         }
         return null;
     }
 
     @Override
-    public String getDetailPaneName(final String paneID) {
-        if (BreakpointDetailPane.ID.equals(paneID)) {
-            return BreakpointDetailPane.NAME;
+    public String getDetailPaneName(final String paneId) {
+        if (RobotLineBreakpointDetailPane.ID.equals(paneId)) {
+            return RobotLineBreakpointDetailPane.NAME;
+        } else if (RobotKeywordFailBreakpointDetailPane.ID.equals(paneId)) {
+            return RobotKeywordFailBreakpointDetailPane.NAME;
         }
         return null;
     }
 
     @Override
-    public String getDetailPaneDescription(final String paneID) {
-        if (BreakpointDetailPane.ID.equals(paneID)) {
-            return BreakpointDetailPane.DESCRIPTION;
+    public String getDetailPaneDescription(final String paneId) {
+        if (RobotLineBreakpointDetailPane.ID.equals(paneId)) {
+            return RobotLineBreakpointDetailPane.DESCRIPTION;
+
+        } else if (RobotKeywordFailBreakpointDetailPane.ID.equals(paneId)) {
+            return RobotKeywordFailBreakpointDetailPane.DESCRIPTION;
         }
         return null;
     }

@@ -13,12 +13,10 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.function.Predicate;
 
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
@@ -31,6 +29,7 @@ import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.swt.SimpleProgressBar;
 
@@ -116,41 +115,32 @@ public class ExecutionViewTest {
     }
 
     private static CLabel getTotalTestsLabel(final Composite parent) {
-        return (CLabel) findControlSatisfying(parent,
-                ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Tests"));
+        return (CLabel) Controls
+                .findControlSatisfying(parent,
+                        ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Tests"))
+                .get();
     }
 
     private static CLabel getPassedTestsLabel(final Composite parent) {
-        return (CLabel) findControlSatisfying(parent,
-                ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Passed"));
+        return (CLabel) Controls
+                .findControlSatisfying(parent,
+                        ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Passed"))
+                .get();
     }
 
     private static CLabel getFailedTestsLabel(final Composite parent) {
-        return (CLabel) findControlSatisfying(parent,
-                ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Failed"));
+        return (CLabel) Controls
+                .findControlSatisfying(parent,
+                        ctrl -> ctrl instanceof CLabel && ((CLabel) ctrl).getText().startsWith("Failed"))
+                .get();
     }
 
     private static SimpleProgressBar getProgressBar(final Composite parent) {
-        return (SimpleProgressBar) findControlSatisfying(parent, ctrl -> ctrl instanceof SimpleProgressBar);
+        return (SimpleProgressBar) Controls.findControlSatisfying(parent, ctrl -> ctrl instanceof SimpleProgressBar)
+                .get();
     }
 
     private static StyledText getErrorMessageText(final Composite parent) {
-        return (StyledText) findControlSatisfying(parent, ctrl -> ctrl instanceof StyledText);
+        return (StyledText) Controls.findControlSatisfying(parent, ctrl -> ctrl instanceof StyledText).get();
     }
-
-    private static Control findControlSatisfying(final Composite parent, final Predicate<Control> predicate) {
-        for (final Control control :  parent.getChildren()) {
-            if (predicate.test(control)) {
-                return control;
-            }
-            if (control instanceof Composite) {
-                final Control c = findControlSatisfying((Composite) control, predicate);
-                if (c != null) {
-                    return c;
-                }
-            }
-        }
-        return null;
-    }
-
 }

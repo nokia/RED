@@ -8,16 +8,19 @@ package org.rf.ide.core.execution.debug.contexts;
 import java.net.URI;
 import java.util.Optional;
 
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 class SetupTeardownContext extends DefaultContext {
 
     private final URI locationUri;
+
+    private final String keywordName;
 
     private final int line;
 
@@ -27,23 +30,31 @@ class SetupTeardownContext extends DefaultContext {
 
     private final String errorMessage;
 
-    SetupTeardownContext(final URI locationUri, final int line, final StackFrameContext previousContext,
+    SetupTeardownContext(final URI locationUri, final String keywordName, final int line,
+            final StackFrameContext previousContext,
             final RobotBreakpointSupplier breakpointSupplier) {
-        this(locationUri, line, null, previousContext, breakpointSupplier);
+        this(locationUri, keywordName, line, null, previousContext, breakpointSupplier);
     }
 
     SetupTeardownContext(final String errorMessage, final StackFrameContext previousContext) {
-        this(null, -1, errorMessage, previousContext, (uri, l) -> Optional.empty());
+        this(null, null, -1, errorMessage, previousContext, new RobotBreakpointSupplier());
     }
 
     SetupTeardownContext(final URI locationUri, final int line, final String errorMessage,
             final StackFrameContext previousContext) {
-        this(locationUri, line, errorMessage, previousContext, (uri, l) -> Optional.empty());
+        this(locationUri, null, line, errorMessage, previousContext, new RobotBreakpointSupplier());
     }
 
     SetupTeardownContext(final URI locationUri, final int line, final String errorMessage,
             final StackFrameContext previousContext, final RobotBreakpointSupplier breakpointSupplier) {
+        this(locationUri, null, line, errorMessage, previousContext, breakpointSupplier);
+    }
+
+    private SetupTeardownContext(final URI locationUri, final String keywordName, final int line,
+            final String errorMessage, final StackFrameContext previousContext,
+            final RobotBreakpointSupplier breakpointSupplier) {
         this.locationUri = locationUri;
+        this.keywordName = keywordName;
         this.line = line;
         this.errorMessage = errorMessage;
         this.previousContext = previousContext;
@@ -82,7 +93,12 @@ class SetupTeardownContext extends DefaultContext {
     }
 
     @Override
-    public Optional<RobotLineBreakpoint> getLineBreakpoint() {
-        return breakpointSupplier.breakpointFor(locationUri, line);
+    public Optional<RobotBreakpoint> getLineBreakpoint() {
+        return breakpointSupplier.lineBreakpointFor(locationUri, line);
+    }
+
+    @Override
+    public Optional<RobotBreakpoint> getKeywordFailBreakpoint(final QualifiedKeywordName currentlyFailedKeyword) {
+        return ExecutableCallContext.getKeywordFailBreakpoint(breakpointSupplier, keywordName, currentlyFailedKeyword);
     }
 }

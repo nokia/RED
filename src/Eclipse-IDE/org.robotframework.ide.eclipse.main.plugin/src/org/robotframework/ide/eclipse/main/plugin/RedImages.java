@@ -506,6 +506,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/stackframe.png");
     }
 
+    public static ImageDescriptor getKeywordFailBreakpointImage() {
+        return RedPlugin.getImageDescriptor("resources/keyword_fail_breakpoint.png");
+    }
+
     public static ImageDescriptor getTemplateImage() {
         return RedPlugin.getImageDescriptor("resources/template.png");
     }

@@ -10,11 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
@@ -22,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -123,7 +121,7 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Tree> getTrees() {
-        return getAllControls(shellProvider.getShell()).stream()
+        return Controls.getControlsStream(shellProvider.getShell())
                 .filter(c -> c instanceof Tree)
                 .map(c -> Tree.class.cast(c))
                 .collect(toList());
@@ -134,25 +132,9 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Text> getTextFields() {
-        return getAllControls(shellProvider.getShell()).stream()
+        return Controls.getControlsStream(shellProvider.getShell())
                 .filter(c -> c instanceof Text)
                 .map(c -> Text.class.cast(c))
                 .collect(toList());
-    }
-
-    private List<Control> getAllControls(final Control control) {
-        final List<Control> result = new ArrayList<>();
-        getAllControls(control, result);
-        return result;
-    }
-
-    private void getAllControls(final Control control, final List<Control> result) {
-        result.add(control);
-        if (control instanceof Composite) {
-            final Composite comp = (Composite) control;
-            for (final Control child : comp.getChildren()) {
-                getAllControls(child, result);
-            }
-        }
     }
 }

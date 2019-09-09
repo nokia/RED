@@ -8,9 +8,15 @@ package org.rf.ide.core.execution.debug;
 import java.net.URI;
 import java.util.Optional;
 
-@FunctionalInterface
-public interface RobotBreakpointSupplier {
+public class RobotBreakpointSupplier {
 
-    public Optional<RobotLineBreakpoint> breakpointFor(URI location, int line);
+    @SuppressWarnings("unused")
+    public Optional<RobotBreakpoint> lineBreakpointFor(final URI location, final int line) {
+        return Optional.empty();
+    }
 
+    @SuppressWarnings("unused")
+    public Optional<RobotBreakpoint> keywordFailBreakpointFor(final String keywordName) {
+        return Optional.empty();
+    }
 }

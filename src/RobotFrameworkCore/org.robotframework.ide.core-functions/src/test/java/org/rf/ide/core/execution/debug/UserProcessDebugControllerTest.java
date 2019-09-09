@@ -124,7 +124,7 @@ public class UserProcessDebugControllerTest {
         final PauseReasonListener listener1 = mock(PauseReasonListener.class);
         final PauseReasonListener listener2 = mock(PauseReasonListener.class);
 
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.whenSuspended(listener1);
         controller.whenSuspended(listener2);
@@ -226,7 +226,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isEmpty();
     }
 
@@ -240,7 +240,7 @@ public class UserProcessDebugControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(DisconnectExecution.class);
@@ -257,7 +257,7 @@ public class UserProcessDebugControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(TerminateExecution.class);
@@ -274,7 +274,7 @@ public class UserProcessDebugControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.USER_REQUEST);
         assertThat(controller.getSuspensionData().data).isEmpty();
@@ -293,7 +293,7 @@ public class UserProcessDebugControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ResumeExecution.class);
@@ -313,7 +313,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> true, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
 
         assertThat(response).isNotEmpty().containsInstanceOf(PauseExecution.class);
         assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(StackFrame::isMarkedError);
@@ -334,7 +334,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> true, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
 
         assertThat(response).isEmpty();
         assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(not(StackFrame::isMarkedError));
@@ -351,7 +351,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).isEmpty();
         assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(StackFrame::isMarkedError);
@@ -369,7 +369,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> true, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).isEmpty();
         assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(StackFrame::isMarkedError);
@@ -378,7 +378,7 @@ public class UserProcessDebugControllerTest {
 
     @Test
     public void pauseResponseIsReturned_whenThereIsABreakpointWithoutConditionWithHitCountFulfilled() {
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(false);
 
@@ -390,7 +390,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
 
         assertThat(response).isNotEmpty().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.BREAKPOINT);
@@ -399,10 +399,10 @@ public class UserProcessDebugControllerTest {
 
     @Test
     public void evaluateConditionResponseIsReturned_whenThereIsABreakpointWithConditionWithHitCountFulfilled() {
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(true);
-        when(breakpoint.getCondition()).thenReturn("Assert Equals    1    2");
+        when(breakpoint.getCondition()).thenReturn(newArrayList("Assert Equals", "1", "2"));
 
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
@@ -412,7 +412,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
 
         assertThat(response).isNotEmpty().containsInstanceOf(EvaluateCondition.class);
         assertThat(response.get().toMessage()).isEqualTo("{\"evaluate_condition\":[\"Assert Equals\",\"1\",\"2\"]}");
@@ -422,7 +422,7 @@ public class UserProcessDebugControllerTest {
 
     @Test
     public void noResponseIsReturned_whenThereIsABreakpointButHitCountIsNotFulfilled() {
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(false);
 
         final Stacktrace stack = new Stacktrace();
@@ -433,7 +433,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
 
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData()).isNull();
@@ -449,7 +449,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
 
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData()).isNull();
@@ -460,7 +460,7 @@ public class UserProcessDebugControllerTest {
             final PausingPoint point) {
         assumeTrue(point != PausingPoint.PRE_START_KEYWORD);
 
-        final RobotLineBreakpoint breakpoint = mock(RobotLineBreakpoint.class);
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(false);
 
@@ -472,7 +472,7 @@ public class UserProcessDebugControllerTest {
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(point);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(point, null);
 
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData()).isNull();
@@ -493,7 +493,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -515,7 +515,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -535,7 +535,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.END_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.END_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -558,7 +558,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -578,7 +578,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -599,7 +599,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.INTO, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
@@ -620,7 +620,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -640,7 +640,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -662,7 +662,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -684,7 +684,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -708,7 +708,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -731,7 +731,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -753,7 +753,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -776,7 +776,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -798,7 +798,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.OVER, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
@@ -821,7 +821,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -844,7 +844,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -868,7 +868,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -892,7 +892,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -915,7 +915,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -938,7 +938,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -961,7 +961,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isPresent().containsInstanceOf(PauseExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -984,7 +984,7 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.setSuspensionData(new SuspensionData(SuspendReason.STEPPING, SteppingMode.RETURN, whenSent));
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(pausingPoint, null);
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
@@ -1002,7 +1002,7 @@ public class UserProcessDebugControllerTest {
         controller.stepInto(callbackWhenSent, callbackForStepEnd);
 
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).containsInstanceOf(ResumeExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.STEPPING);
@@ -1029,7 +1029,7 @@ public class UserProcessDebugControllerTest {
         assertThat(stack.stream().filter(StackFrame::isMarkedStepping)).hasSize(1)
                 .containsExactly(stack.getFirstFrameSatisfying(f -> f.hasCategory(FrameCategory.TEST)).get());
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).containsInstanceOf(ResumeExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.STEPPING);
@@ -1059,7 +1059,7 @@ public class UserProcessDebugControllerTest {
         assertThat(stack.stream().filter(StackFrame::isMarkedStepping)).hasSize(1)
                 .containsExactly(stack.peekCurrentFrame().get());
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).containsInstanceOf(ResumeExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.STEPPING);
@@ -1085,7 +1085,7 @@ public class UserProcessDebugControllerTest {
         assertThat(stack.stream().filter(StackFrame::isMarkedStepping)).hasSize(1)
                 .containsExactly(stack.peekCurrentFrame().get());
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(response).containsInstanceOf(ResumeExecution.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.STEPPING);
@@ -1108,7 +1108,7 @@ public class UserProcessDebugControllerTest {
         controller.changeVariable(stack.peekCurrentFrame().get(), variable, newArrayList("1", "2"));
 
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ChangeVariable.class);
@@ -1131,7 +1131,7 @@ public class UserProcessDebugControllerTest {
                 newArrayList("1", "2"));
 
         assertThat(controller.manualUserResponse).hasSize(1);
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ChangeVariable.class);
@@ -1162,7 +1162,7 @@ public class UserProcessDebugControllerTest {
         return mock(StackFrameContext.class);
     }
 
-    private static StackFrameContext breakpointContext(final RobotLineBreakpoint breakpoint) {
+    private static StackFrameContext breakpointContext(final RobotBreakpoint breakpoint) {
         final StackFrameContext context = mock(StackFrameContext.class);
         when(context.getLineBreakpoint()).thenReturn(Optional.of(breakpoint));
         return context;

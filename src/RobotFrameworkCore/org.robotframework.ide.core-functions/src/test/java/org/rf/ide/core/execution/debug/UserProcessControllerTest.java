@@ -53,7 +53,7 @@ public class UserProcessControllerTest {
     public void thereIsNoResponse_forNewlyCreatedController() {
         final UserProcessController controller = new UserProcessController();
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
         assertThat(response).isEmpty();
     }
 
@@ -66,7 +66,7 @@ public class UserProcessControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(DisconnectExecution.class);
@@ -82,7 +82,7 @@ public class UserProcessControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(TerminateExecution.class);
@@ -98,7 +98,7 @@ public class UserProcessControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(PauseExecution.class);
@@ -114,7 +114,7 @@ public class UserProcessControllerTest {
 
         assertThat(controller.manualUserResponse).hasSize(1);
 
-        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
 
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ResumeExecution.class);

@@ -54,7 +54,7 @@ public class RobotLineBreakpointTest {
         assertThat(breakpoint.isHitCountEnabled()).isFalse();
         assertThat(breakpoint.getHitCount()).isEqualTo(1);
         assertThat(breakpoint.isConditionEnabled()).isFalse();
-        assertThat(breakpoint.getCondition()).isEmpty();
+        assertThat(breakpoint.getConditionExpression()).isEmpty();
     }
 
     @Test
@@ -143,8 +143,8 @@ public class RobotLineBreakpointTest {
         final IMarker markerWithCondition = mock(IMarker.class);
         when(markerWithCondition.getAttribute(RobotLineBreakpoint.CONDITION_ATTRIBUTE, "")).thenReturn("condition");
 
-        assertThat(new RobotLineBreakpoint(null).getCondition()).isEqualTo("");
-        assertThat(new RobotLineBreakpoint(markerWithCondition).getCondition()).isEqualTo("condition");
+        assertThat(new RobotLineBreakpoint(null).getConditionExpression()).isEqualTo("");
+        assertThat(new RobotLineBreakpoint(markerWithCondition).getConditionExpression()).isEqualTo("condition");
     }
 
     @Test
@@ -152,13 +152,13 @@ public class RobotLineBreakpointTest {
         final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
 
         breakpoint.setCondition("cond");
-        assertThat(breakpoint.getCondition()).isEqualTo("cond");
+        assertThat(breakpoint.getConditionExpression()).isEqualTo("cond");
 
         breakpoint.setCondition("other cond");
-        assertThat(breakpoint.getCondition()).isEqualTo("other cond");
+        assertThat(breakpoint.getConditionExpression()).isEqualTo("other cond");
 
         breakpoint.setCondition("other cond");
-        assertThat(breakpoint.getCondition()).isEqualTo("other cond");
+        assertThat(breakpoint.getConditionExpression()).isEqualTo("other cond");
     }
 
     @Test

@@ -18,6 +18,7 @@ import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ResumeExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
 import org.rf.ide.core.execution.server.response.TerminateExecution;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 public class UserProcessController {
 
@@ -32,7 +33,9 @@ public class UserProcessController {
         // nothing to do, override if needed
     }
 
-    public Optional<ServerResponse> takeCurrentResponse(@SuppressWarnings("unused") final PausingPoint pausingPoint) {
+    @SuppressWarnings("unused")
+    public Optional<ServerResponse> takeCurrentResponse(final PausingPoint pausingPoint,
+            final QualifiedKeywordName currentlyFailedKeyword) {
         final Optional<ResponseWithCallback> currentResponse = takeQueuedResponse();
 
         currentResponse.ifPresent(response -> response.callback.run());

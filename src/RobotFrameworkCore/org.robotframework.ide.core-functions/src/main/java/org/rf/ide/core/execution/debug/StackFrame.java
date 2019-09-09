@@ -22,6 +22,7 @@ import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.base.Preconditions;
 
@@ -187,8 +188,12 @@ public class StackFrame {
         markers.remove(marker);
     }
 
-    Optional<RobotLineBreakpoint> getBreakpoint() {
+    Optional<RobotBreakpoint> getLineBreakpoint() {
         return context.getLineBreakpoint();
+    }
+
+    Optional<RobotBreakpoint> getKeywordFailBreakpoint(final QualifiedKeywordName currentlyFailedKeyword) {
+        return context.getKeywordFailBreakpoint(currentlyFailedKeyword);
     }
 
     void moveToKeyword(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {

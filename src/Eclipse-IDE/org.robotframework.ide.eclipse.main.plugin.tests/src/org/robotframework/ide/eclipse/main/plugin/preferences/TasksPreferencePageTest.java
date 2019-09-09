@@ -7,14 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.stream.Stream;
-
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -70,18 +68,10 @@ public class TasksPreferencePageTest {
     }
 
     private Button getEnablementButton() {
-        return Stream.of(((Composite) shellProvider.getShell().getChildren()[0]).getChildren())
-                .filter(Button.class::isInstance)
-                .map(Button.class::cast)
-                .findFirst()
-                .orElse(null);
+        return Controls.getControls(shellProvider.getShell(), Button.class).get(0);
     }
 
     private Table getTable() {
-        return Stream.of(((Composite) shellProvider.getShell().getChildren()[0]).getChildren())
-                .filter(Table.class::isInstance)
-                .map(Table.class::cast)
-                .findFirst()
-                .orElse(null);
+        return Controls.getControls(shellProvider.getShell(), Table.class).get(0);
     }
 }

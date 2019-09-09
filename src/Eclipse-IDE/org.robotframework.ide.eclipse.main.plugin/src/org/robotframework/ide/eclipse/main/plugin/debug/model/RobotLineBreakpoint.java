@@ -11,6 +11,8 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.LineBreakpoint;
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotBreakpointDetailPane.BreakpointAttributeException;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -18,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author mmarzec
  *
  */
-public class RobotLineBreakpoint extends LineBreakpoint implements org.rf.ide.core.execution.debug.RobotLineBreakpoint {
+public class RobotLineBreakpoint extends LineBreakpoint implements RobotBreakpoint {
     
     @VisibleForTesting static final String MARKER_ID = "org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker";
 
@@ -97,30 +99,42 @@ public class RobotLineBreakpoint extends LineBreakpoint implements org.rf.ide.co
         this.isDisabledDueToHitCounter = disabled;
     }
 
+    @Override
     public boolean isHitCountEnabled() {
         final IMarker marker = getMarker();
         return marker == null ? false : marker.getAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, false);
     }
 
-    public void setHitCountEnabled(final boolean enabled) throws CoreException {
-        if (enabled != isHitCountEnabled()) {
-            setAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, enabled);
+    @Override
+    public void setHitCountEnabled(final boolean enabled) {
+        try {
+            if (enabled != isHitCountEnabled()) {
+                setAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, enabled);
+            }
+        } catch (final CoreException e) {
+            throw new BreakpointAttributeException(e);
         }
     }
 
+    @Override
     public int getHitCount() {
         final IMarker marker = getMarker();
         return marker == null ? 1 : marker.getAttribute(HIT_COUNT_ATTRIBUTE, 1);
     }
 
-    public void setHitCount(final int hitCount) throws CoreException {
-        if (hitCount != getHitCount()) {
-            setAttribute(HIT_COUNT_ATTRIBUTE, hitCount);
-            if (isDisabledDueToHitCounter) {
-                setEnabled(true);
+    @Override
+    public void setHitCount(final int hitCount) {
+        try {
+            if (hitCount != getHitCount()) {
+                setAttribute(HIT_COUNT_ATTRIBUTE, hitCount);
+                if (isDisabledDueToHitCounter) {
+                    setEnabled(true);
+                }
+                currentHitCounter = 0;
+                isDisabledDueToHitCounter = false;
             }
-            currentHitCounter = 0;
-            isDisabledDueToHitCounter = false;
+        } catch (final CoreException e) {
+            throw new BreakpointAttributeException(e);
         }
     }
 
@@ -169,13 +183,13 @@ public class RobotLineBreakpoint extends LineBreakpoint implements org.rf.ide.co
     }
 
     @Override
-    public String getCondition() {
+    public String getConditionExpression() {
         final IMarker marker = getMarker();
         return marker == null ? "" : marker.getAttribute(CONDITION_ATTRIBUTE, "");
     }
 
     public void setCondition(final String condition) throws CoreException {
-        if (!condition.equals(getCondition())) {
+        if (!condition.equals(getConditionExpression())) {
             setAttribute(CONDITION_ATTRIBUTE, condition);
         }
     }

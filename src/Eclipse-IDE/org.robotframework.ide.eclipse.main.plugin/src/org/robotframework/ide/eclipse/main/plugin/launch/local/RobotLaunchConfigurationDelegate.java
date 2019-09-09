@@ -94,8 +94,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                         stacktrace, (UserProcessDebugController) userController);
 
                 final StacktraceBuilder stacktraceBuilder = new StacktraceBuilder(stacktrace,
-                        new EclipseElementsLocator(robotConfig.getProject()),
-                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri));
+                        new EclipseElementsLocator(robotConfig.getProject()), new RobotBreakpoints());
 
                 final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
                         new ProcessConnectingInDebugServerListener(launch), new BreakpointsEnabler());

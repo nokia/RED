@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 
 import org.junit.Test;
+import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -130,40 +132,59 @@ public class KeywordEndedEventTest {
     @Test
     public void eventForPreEndedIsProperlyConstructed() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_end_keyword",
-                newArrayList("foo", ImmutableMap.of("kwname", "kwName", "type", "kwType")));
+                newArrayList("foo",
+                        ImmutableMap.of("kwname", "kwName", "libname", "lib", "type", "kwType", "status", "PASS")));
         final KeywordEndedEvent event = KeywordEndedEvent.fromPre(eventMap);
-        
+
+        assertThat(event.getLibraryName()).isEqualTo("lib");
         assertThat(event.getName()).isEqualTo("kwName");
+        assertThat(event.getQualifiedName()).isEqualTo(QualifiedKeywordName.create("kwName", "lib"));
         assertThat(event.getKeywordType()).isEqualTo("kwType");
+        assertThat(event.getStatus()).isEqualTo(Status.PASS);
     }
 
     @Test
     public void eventForEndedIsProperlyConstructed() {
         final Map<String, Object> eventMap = ImmutableMap.of("end_keyword",
-                newArrayList("foo", ImmutableMap.of("kwname", "kwName", "type", "kwType")));
+                newArrayList("foo",
+                        ImmutableMap.of("kwname", "kwName", "libname", "lib", "type", "kwType", "status", "FAIL")));
         final KeywordEndedEvent event = KeywordEndedEvent.from(eventMap);
 
+        assertThat(event.getLibraryName()).isEqualTo("lib");
         assertThat(event.getName()).isEqualTo("kwName");
+        assertThat(event.getQualifiedName()).isEqualTo(QualifiedKeywordName.create("kwName", "lib"));
         assertThat(event.getKeywordType()).isEqualTo("kwType");
+        assertThat(event.getStatus()).isEqualTo(Status.FAIL);
     }
 
     @Test
     public void equalsTests() {
-        assertThat(new KeywordEndedEvent("kw", "type")).isEqualTo(new KeywordEndedEvent("kw", "type"));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.PASS));
 
-        assertThat(new KeywordEndedEvent("kw", "type")).isNotEqualTo(new KeywordEndedEvent("kw1", "type"));
-        assertThat(new KeywordEndedEvent("kw1", "type")).isNotEqualTo(new KeywordEndedEvent("kw", "type"));
-        assertThat(new KeywordEndedEvent("kw", "type")).isNotEqualTo(new KeywordEndedEvent("kw", "type1"));
-        assertThat(new KeywordEndedEvent("kw", "type1")).isNotEqualTo(new KeywordEndedEvent("kw", "type"));
-        assertThat(new KeywordEndedEvent("kw", "type")).isNotEqualTo(new KeywordEndedEvent("kw1", "type1"));
-        assertThat(new KeywordEndedEvent("kw1", "type1")).isNotEqualTo(new KeywordEndedEvent("kw", "type"));
-        assertThat(new KeywordEndedEvent("kw", "type")).isNotEqualTo(new Object());
-        assertThat(new KeywordEndedEvent("kw", "type")).isNotEqualTo(null);
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw1", "type", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw1", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw", "type1", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type1", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw1", "type1", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw1", "type1", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.FAIL));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS))
+                .isNotEqualTo(new KeywordEndedEvent("lib1", "kw", "type", Status.PASS));
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS)).isNotEqualTo(new Object());
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS)).isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
-        assertThat(new KeywordEndedEvent("kw", "type").hashCode())
-                .isEqualTo(new KeywordEndedEvent("kw", "type").hashCode());
+        assertThat(new KeywordEndedEvent("lib", "kw", "type", Status.PASS).hashCode())
+                .isEqualTo(new KeywordEndedEvent("lib", "kw", "type", Status.PASS).hashCode());
     }
 }

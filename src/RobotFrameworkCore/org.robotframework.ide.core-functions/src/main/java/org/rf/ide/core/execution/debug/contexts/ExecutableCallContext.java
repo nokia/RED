@@ -9,8 +9,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
-import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.ExecutableSetting;
@@ -20,6 +20,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 public class ExecutableCallContext extends DefaultContext {
@@ -124,7 +125,21 @@ public class ExecutableCallContext extends DefaultContext {
     }
 
     @Override
-    public Optional<RobotLineBreakpoint> getLineBreakpoint() {
-        return breakpointSupplier.breakpointFor(locationUri, line);
+    public Optional<RobotBreakpoint> getLineBreakpoint() {
+        return breakpointSupplier.lineBreakpointFor(locationUri, line);
+    }
+
+    @Override
+    public Optional<RobotBreakpoint> getKeywordFailBreakpoint(final QualifiedKeywordName currentlyFailedKeyword) {
+        return getKeywordFailBreakpoint(breakpointSupplier, currentElement().getCalledKeywordName(),
+                currentlyFailedKeyword);
+    }
+
+    static Optional<RobotBreakpoint> getKeywordFailBreakpoint(final RobotBreakpointSupplier breakpointSupplier,
+            final String runningKeywordName, final QualifiedKeywordName currentlyFailedKeyword) {
+        if (QualifiedKeywordName.fromOccurrence(runningKeywordName).matchesIgnoringCase(currentlyFailedKeyword)) {
+            return breakpointSupplier.keywordFailBreakpointFor(currentlyFailedKeyword.getKeywordName());
+        }
+        return Optional.empty();
     }
 }

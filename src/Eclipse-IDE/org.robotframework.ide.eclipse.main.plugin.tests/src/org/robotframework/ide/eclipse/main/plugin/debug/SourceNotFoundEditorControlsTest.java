@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.custom.CLabel;
@@ -17,12 +16,12 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.debug.RedDebuggerAssistantEditorWrapper.RedDebuggerAssistantEditorInput;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.ShellProvider;
 
 public class SourceNotFoundEditorControlsTest {
@@ -38,7 +37,7 @@ public class SourceNotFoundEditorControlsTest {
         final SourceNotFoundEditorControls controls = new SourceNotFoundEditorControls();
         controls.construct(shell);
 
-        final List<Control> controlsInside = getControls(shell);
+        final List<Control> controlsInside = Controls.getControls(shell);
 
         assertThat(controls.getParent()).isSameAs(shell);
         assertThat(controlsInside).hasSize(2);
@@ -60,7 +59,7 @@ public class SourceNotFoundEditorControlsTest {
         controls.construct(shell);
         controls.setInput(input);
 
-        final List<Control> controlsInside = getControls(shell);
+        final List<Control> controlsInside = Controls.getControls(shell);
         final CLabel titleLabel = (CLabel) controlsInside.get(0);
         final StyledText infoText = (StyledText) controlsInside.get(1);
 
@@ -78,28 +77,8 @@ public class SourceNotFoundEditorControlsTest {
         controls.construct(shell);
         controls.dispose();
 
-        for (final Control control : getControls(shell)) {
+        for (final Control control : Controls.getControls(shell)) {
             assertThat(control.isDisposed()).isTrue();
-        }
-    }
-
-    private static List<Control> getControls(final Control control) {
-        final List<Control> controls = new ArrayList<>();
-        getControls(controls, control);
-        return controls;
-    }
-
-    private static void getControls(final List<Control> controls, final Control control) {
-        if (control instanceof Composite) {
-            if (control.getClass() != Composite.class && control.getClass() != Shell.class) {
-                controls.add(control);
-            }
-            final Composite composite = (Composite) control;
-            for (final Control child : composite.getChildren()) {
-                getControls(controls, child);
-            }
-        } else {
-            controls.add(control);
         }
     }
 }
