@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _acbKcATKEeeYtJSRkZkJgQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/27/19 4:26 PM
+Save-Time: 9/9/19 6:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -123,7 +123,7 @@ with [get-view "Execution View"] {
 }
 wait-for-console -times 4 -delay 500
 get-view Console | get-text-viewer | get-property text 
-    | equals ".* -c abc -n def -R .*MediumRobotTest[\\\\/]output.xml .*MediumRobotTest\n"
+    | equals "Command: .* -m robot.run --listener .* -s \"MediumRobotTest.Test With Fail\" -t \"MediumRobotTest.Test With Fail.test b\" -c abc -n def .*MediumRobotTest\n"
     + "Suite Executor: Robot Framework.*\n"
     + "==============================================================================\n"
     + "MediumRobotTest                                                               \n"
@@ -149,7 +149,7 @@ get-view Console | get-text-viewer | get-property text
 get-menu -path "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | matches "-c \"abc\" -n \"def\" -R .*MediumRobotTest[\\\\/]output.xml" | verify-true
+    | equals "-c \"abc\" -n \"def\"" | verify-true
 get-window "Run Configurations" | get-button Close | click
 
 //-------------------------------- robot arg are in run config and rerun ----------------------------------
@@ -192,7 +192,7 @@ get-view "Execution View" | get-button "Rerun Failed Tests" | click
 wait-for-console -times 4 -delay 500  
 
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -e abc123 -R .*MediumRobotTest[\\\\/]output.xml .*MediumRobotTest\n"
+    | equals "Command: .* -m robot.run --listener .* -s \"MediumRobotTest.Test With Fail\" -t \"MediumRobotTest.Test With Fail.test b\" -e abc123 .*[\\\\/]MediumRobotTest\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "MediumRobotTest                                                               \n"
@@ -219,7 +219,7 @@ get-menu -path "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_with_fail.robot"
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-e abc123 -R .*output.xml" | verify-true
+    | equals "-e abc123" | verify-true
 get-window "Run Configurations" | get-button Close | click
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
