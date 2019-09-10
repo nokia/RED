@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Nokia Solutions and Networks
 Require-Bundle: org.apache.commons.logging,
  javax.annotation,
+ javax.inject,
  org.eclipse.e4.core.services,
  org.eclipse.e4.core.di,
  org.eclipse.e4.ui.di,

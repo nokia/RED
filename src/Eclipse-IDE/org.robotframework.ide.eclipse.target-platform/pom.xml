@@ -85,6 +85,18 @@
 				<target-file-name>2019-06.target</target-file-name>
 			</properties>
 		</profile>
+		<profile>
+			<id>2019-09-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>2019-09</value>
+				</property>
+			</activation>
+			<properties>
+				<target-file-name>2019-09.target</target-file-name>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>
