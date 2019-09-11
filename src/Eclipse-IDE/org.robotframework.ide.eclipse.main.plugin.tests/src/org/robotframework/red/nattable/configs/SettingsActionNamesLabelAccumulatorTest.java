@@ -63,6 +63,15 @@ public class SettingsActionNamesLabelAccumulatorTest {
     }
 
     @Test
+    public void labelIsNotAdded_forSecondColumnOfEmptyKeywordBasedSetting() {
+        final SuiteSetup linkedSetting = new SuiteSetup(RobotToken.create("Suite Setup"));
+        final RobotSetting setting = new RobotSetting(null, linkedSetting);
+        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+
+        assertThat(labelsAt(entry, 1)).isEmpty();
+    }
+
+    @Test
     public void labelIsNotAdded_forColumnsGreaterThanSecondInKwBasedSettingWithOrdinaryKeyword() {
         final SuiteSetup setup = new SuiteSetup(RobotToken.create("[Setup]"));
         setup.setKeywordName("keyword");

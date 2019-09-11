@@ -48,14 +48,18 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
             if (columnPosition == 1) {
                 final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
 
-                if (!linkedSetting.getKeywordName().getText().equalsIgnoreCase("none")) {
+                final RobotToken keywordName = linkedSetting.getKeywordName();
+                if (keywordName != null && !keywordName.getText().equalsIgnoreCase("none")) {
                     configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
                 }
 
             } else if (columnPosition > 1) {
                 final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
                 final List<RobotToken> allTokens = new ArrayList<>();
-                allTokens.add(linkedSetting.getKeywordName());
+                final RobotToken keywordName = linkedSetting.getKeywordName();
+                if (keywordName != null) {
+                    allTokens.add(keywordName);
+                }
                 allTokens.addAll(linkedSetting.getArguments());
 
                 if (columnPosition - 1 < allTokens.size()) {
