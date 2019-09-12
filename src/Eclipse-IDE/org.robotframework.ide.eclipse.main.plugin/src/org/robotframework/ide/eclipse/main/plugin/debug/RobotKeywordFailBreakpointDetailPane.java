@@ -6,10 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -17,8 +15,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint.InvalidBreakpointPatternException;
-import org.robotframework.red.graphics.ColorsManager;
 
 class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
 
@@ -27,8 +23,8 @@ class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
     static final String DESCRIPTION = "Displays details of Robot keyword fail breakpoints";
 
     private Text patternTxt;
-
-    private ControlDecoration decoration;
+    private ControlDecoration patternDecoration;
+    private Label patternLabel;
 
     @Override
     protected Class<? extends IBreakpoint> getBreakpointClass() {
@@ -52,17 +48,16 @@ class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
 
     @Override
     protected void createSpecificControls(final Composite parent) {
-        final Label patternLabel = new Label(parent, SWT.NONE);
+        patternLabel = new Label(parent, SWT.NONE);
         patternLabel.setText("Keyword pattern:");
+        patternLabel.setEnabled(false);
 
         patternTxt = new Text(parent, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).indent(15, 0).applyTo(patternTxt);
         patternTxt.setEnabled(false);
         patternTxt.addModifyListener(event -> {
-            if (!isInitializingValues()) {
-                if (validate()) {
-                    setDirty(true);
-                }
+            if (!isInitializingValues() && validate()) {
+                setDirty(true);
             }
         });
     }
@@ -73,6 +68,7 @@ class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
 
         super.display(kwFailBreakpoint);
 
+        patternLabel.setEnabled(true);
         patternTxt.setEnabled(true);
         patternTxt.setText(kwFailBreakpoint.getNamePattern());
         patternTxt.setSelection(patternTxt.getText().length());
@@ -84,6 +80,7 @@ class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
     protected void displayEmpty() {
         super.displayEmpty();
 
+        patternLabel.setEnabled(false);
         patternTxt.setEnabled(false);
         patternTxt.setText("");
 
@@ -91,40 +88,14 @@ class RobotKeywordFailBreakpointDetailPane extends RobotBreakpointDetailPane {
     }
 
     @Override
-    public void doSave(final IProgressMonitor monitor) {
-        if (decoration == null) {
-            // is valid
-            super.doSave(monitor);
-        }
+    protected boolean isValid() {
+        return super.isValid() && patternDecoration == null;
     }
 
     private boolean validate() {
-        if (decoration != null) {
-            decoration.hide();
-            decoration.dispose();
-        }
-        decoration = null;
-
-        try {
-            RobotKeywordFailBreakpoint.validate(patternTxt.getText(), (IBreakpoint) getCurrentBreakpoint());
-
-            patternTxt.setBackground(null);
-            return true;
-
-        } catch (final InvalidBreakpointPatternException e) {
-            decoration = new ControlDecoration(patternTxt, SWT.LEFT | SWT.TOP);
-            decoration.setDescriptionText(e.getMessage());
-            decoration.setImage(FieldDecorationRegistry.getDefault()
-                    .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-                    .getImage());
-            patternTxt.setBackground(ColorsManager.getColor(255, 0, 0));
-            patternTxt.addDisposeListener(event -> {
-                if (decoration != null) {
-                    decoration.dispose();
-                }
-            });
-            return false;
-        }
+        patternDecoration = validateWithDecorations(patternTxt, patternDecoration,
+                txt -> RobotKeywordFailBreakpoint.validate(txt.getText(), (IBreakpoint) getCurrentBreakpoint()));
+        return patternDecoration == null;
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.eclipse.debug.core.model.Breakpoint;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotBreakpointDetailPane.BreakpointAttributeException;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotBreakpointDetailPane.BreakpointValidationException;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -34,7 +35,9 @@ public class RobotKeywordFailBreakpoint extends Breakpoint implements RobotBreak
 
     public static void validate(final String pattern, final IBreakpoint currentBreakpoint) {
         if (pattern.isEmpty()) {
-            throw new InvalidBreakpointPatternException("Keyword name cannot be empty");
+            throw new BreakpointValidationException("Keyword name cannot be empty");
+        } else if (pattern.contains("  ") || pattern.contains("\t")) {
+            throw new BreakpointValidationException("Keyword name cannot contain multiple spaces or tab character");
         }
         final IBreakpointManager bpManager = DebugPlugin.getDefault().getBreakpointManager();
         for (final IBreakpoint breakpoint : bpManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID)) {
@@ -42,7 +45,7 @@ public class RobotKeywordFailBreakpoint extends Breakpoint implements RobotBreak
                 final RobotKeywordFailBreakpoint bp = (RobotKeywordFailBreakpoint) breakpoint;
 
                 if (bp != currentBreakpoint && pattern.equals(bp.getNamePattern())) {
-                    throw new InvalidBreakpointPatternException(
+                    throw new BreakpointValidationException(
                             "There is already breakpoint defined for '" + pattern + "' name");
                 }
             }
@@ -211,8 +214,13 @@ public class RobotKeywordFailBreakpoint extends Breakpoint implements RobotBreak
 
     }
 
-    public String getLabel() {
-        return "Keyword '" + getNamePattern() + "' fails";
+    public String getLabel() throws CoreException {
+        String label = "Keyword '" + getNamePattern() + "' fails";
+
+        if (isHitCountEnabled()) {
+            label += " [hit count: " + getHitCount() + "]";
+        }
+        return label;
     }
 
     public static class InvalidBreakpointPatternException extends RuntimeException {

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,6 +16,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.IDetailPane3;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,8 +30,8 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.swt.Listeners;
-import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -43,6 +47,7 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
 
     private Button hitCountBtn;
     private Text hitCountTxt;
+    private ControlDecoration hitCountDecoration;
 
     private RobotBreakpoint currentBreakpoint;
 
@@ -100,7 +105,7 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
                 .minSize(80, 20)
                 .applyTo(hitCountTxt);
         hitCountTxt.addModifyListener(event -> {
-            if (!isInitializingValues) {
+            if (!isInitializingValues && validate()) {
                 setDirty(true);
             }
         });
@@ -142,6 +147,8 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
         hitCountTxt.setEnabled(hitCountEnabled);
         hitCountTxt.setText(Integer.toString(currentBreakpoint.getHitCount()));
         hitCountTxt.setSelection(hitCountTxt.getText().length());
+
+        validate();
     }
 
     protected void displayEmpty() {
@@ -149,6 +156,24 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
         hitCountBtn.setSelection(false);
         hitCountTxt.setEnabled(false);
         hitCountTxt.setText("");
+
+        validate();
+    }
+
+    private boolean validate() {
+        hitCountDecoration = validateWithDecorations(hitCountTxt, hitCountDecoration,
+                txt -> {
+                    final Integer count = Ints.tryParse(txt.getText());
+                    if (count == null || count < 1) {
+                        throw new BreakpointValidationException(
+                                "Hit count has to be a number greater than zero and less than 2^31");
+                    }
+                });
+        return hitCountDecoration == null;
+    }
+
+    protected boolean isValid() {
+        return hitCountDecoration == null;
     }
 
     @Override
@@ -176,6 +201,34 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
         listenersList.remove(listener);
     }
 
+    protected final <T extends Control> ControlDecoration validateWithDecorations(final T control,
+            final ControlDecoration currentDecoration, final Consumer<T> validator) {
+        if (currentDecoration != null) {
+            currentDecoration.hide();
+            currentDecoration.dispose();
+        }
+
+        try {
+            // only validate if there is a breakpoint displayed now
+            if (currentBreakpoint != null) {
+                validator.accept(control);
+            }
+
+            control.setBackground(null);
+            return null;
+
+        } catch (final BreakpointValidationException e) {
+            final ControlDecoration decoration = new ControlDecoration(control, SWT.LEFT | SWT.TOP);
+            decoration.setDescriptionText(e.getMessage());
+            decoration.setImage(FieldDecorationRegistry.getDefault()
+                    .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+                    .getImage());
+            control.setBackground(ColorsManager.getColor(255, 0, 0));
+            control.addDisposeListener(event -> decoration.dispose());
+            return decoration;
+        }
+    }
+
     @VisibleForTesting
     void setDirty(final boolean dirty) {
         this.isDirty = dirty;
@@ -186,6 +239,10 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
+        if (!isValid()) {
+            return;
+        }
+
         if (markerExists()) {
             try {
                 currentBreakpoint.setHitCountEnabled(hitCountBtn.getSelection());
@@ -213,15 +270,21 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
         if (parsed != null && parsed >= 1) {
             return parsed;
         } else {
-            SwtThread.asyncExec(() -> ErrorDialog.openError(hitCountTxt.getShell(), "Invalid value",
-                    "Value '" + hitCountText + "' is invalid: '1' will be used instead.", new Status(IStatus.ERROR,
-                            RedPlugin.PLUGIN_ID, "Hit count has to be a number greater than zero and less than 2^31")));
             hitCountTxt.setText("1");
             return 1;
         }
     }
 
     protected abstract void doSaveSpecificAttributes(RobotBreakpoint currentBreakpoint) throws CoreException;
+
+    public static class BreakpointValidationException extends RuntimeException {
+
+        private static final long serialVersionUID = 6544605591939988210L;
+        
+        public BreakpointValidationException(final String message) {
+            super(message);
+        }
+    }
 
     public static class BreakpointAttributeException extends RuntimeException {
 

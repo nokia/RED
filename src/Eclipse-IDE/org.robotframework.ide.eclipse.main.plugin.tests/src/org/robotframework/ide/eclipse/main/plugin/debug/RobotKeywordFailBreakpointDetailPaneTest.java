@@ -65,7 +65,7 @@ public class RobotKeywordFailBreakpointDetailPaneTest {
         assertThat(((Text) controls.get(1)).getText()).isEmpty();
 
         assertThat(controls.get(2)).isInstanceOf(Label.class);
-        assertThat(((Label) controls.get(2)).isEnabled()).isTrue();
+        assertThat(((Label) controls.get(2)).isEnabled()).isFalse();
         assertThat(((Label) controls.get(2)).getText()).isEqualTo("Keyword pattern:");
 
         assertThat(controls.get(3)).isInstanceOf(Text.class);
