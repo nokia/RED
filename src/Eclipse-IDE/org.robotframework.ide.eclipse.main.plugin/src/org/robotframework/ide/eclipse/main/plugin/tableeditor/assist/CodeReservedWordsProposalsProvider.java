@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
@@ -15,6 +14,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
+import org.robotframework.ide.eclipse.main.plugin.assist.DisableSettingReservedWordProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.ForLoopReservedWordsProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.GherkinReservedWordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -23,13 +23,15 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-public class CodeReservedElementsProposalsProvider implements RedContentProposalProvider {
+import com.google.common.collect.Streams;
+
+public class CodeReservedWordsProposalsProvider implements RedContentProposalProvider {
 
     private final IRuntimeEnvironment environment;
 
     private final IRowDataProvider<?> dataProvider;
 
-    public CodeReservedElementsProposalsProvider(final IRuntimeEnvironment environment,
+    public CodeReservedWordsProposalsProvider(final IRuntimeEnvironment environment,
             final IRowDataProvider<?> dataProvider) {
         this.environment = environment;
         this.dataProvider = dataProvider;
@@ -46,8 +48,10 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
                 createForLoopsPredicate(assistContext)).getReservedWordProposals(prefix);
         final List<? extends AssistProposal> gherkinProposals = new GherkinReservedWordProposals(
                 createGherkinPredicate(assistContext)).getReservedWordProposals(prefix);
+        final List<? extends AssistProposal> disableSettingProposals = new DisableSettingReservedWordProposals(
+                createDisableSettingPredicate(assistContext)).getReservedWordProposals(prefix);
 
-        return Stream.concat(loopsProposals.stream(), gherkinProposals.stream())
+        return Streams.concat(loopsProposals.stream(), gherkinProposals.stream(), disableSettingProposals.stream())
                 .map(proposal -> GherkinReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
                         ? new AssistProposalAdapter(environment, proposal, " ")
                         : new AssistProposalAdapter(environment, proposal, p -> true))
@@ -57,11 +61,10 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
     private AssistProposalPredicate<String> createForLoopsPredicate(final NatTableAssistantContext context) {
         final Object tableElement = dataProvider.getRowObject(context.getRow());
         if (tableElement instanceof RobotKeywordCall) {
-            final int cellIndex = context.getColumn();
             final List<RobotToken> tokens = ((RobotKeywordCall) tableElement).getLinkedElement().getElementTokens();
-
             final Optional<RobotToken> firstTokenInLine = tokens.stream().findFirst();
-            return AssistProposalPredicates.forLoopReservedWordsPredicate(cellIndex + 1, firstTokenInLine);
+
+            return AssistProposalPredicates.forLoopReservedWordsPredicate(context.getColumn() + 1, firstTokenInLine);
         } else {
             return AssistProposalPredicates.alwaysFalse();
         }
@@ -72,5 +75,18 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         return tableElement instanceof RobotKeywordCall
                 ? AssistProposalPredicates.gherkinReservedWordsPredicate(context.getColumn() + 1)
                 : AssistProposalPredicates.alwaysFalse();
+    }
+
+    private AssistProposalPredicate<String> createDisableSettingPredicate(final NatTableAssistantContext context) {
+        final Object tableElement = dataProvider.getRowObject(context.getRow());
+        if (tableElement instanceof RobotKeywordCall) {
+            final List<RobotToken> tokens = ((RobotKeywordCall) tableElement).getLinkedElement().getElementTokens();
+            final Optional<RobotToken> firstTokenInLine = tokens.stream().findFirst();
+
+            return AssistProposalPredicates.disableSettingReservedWordPredicate(context.getColumn() + 1,
+                    firstTokenInLine);
+        } else {
+            return AssistProposalPredicates.alwaysFalse();
+        }
     }
 }

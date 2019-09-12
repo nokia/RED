@@ -5,19 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.services.event.RedEventBroker;
 
-class SelectedKeywordTableUpdater {
+class MultipleCellTableUpdater {
 
     private final NatTableAssistantContext tableContext;
 
@@ -25,25 +22,27 @@ class SelectedKeywordTableUpdater {
 
     private final IEventBroker eventBroker;
 
-    SelectedKeywordTableUpdater(final NatTableAssistantContext tableContext, final IRowDataProvider<?> dataProvider) {
+    MultipleCellTableUpdater(final NatTableAssistantContext tableContext, final IRowDataProvider<?> dataProvider) {
         this(tableContext, dataProvider, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
-    SelectedKeywordTableUpdater(final NatTableAssistantContext tableContext, final IRowDataProvider<?> dataProvider,
+    MultipleCellTableUpdater(final NatTableAssistantContext tableContext, final IRowDataProvider<?> dataProvider,
             final IEventBroker eventBroker) {
         this.tableContext = tableContext;
         this.dataProvider = dataProvider;
         this.eventBroker = eventBroker;
     }
 
-    boolean shouldInsertWithArgs(final RedKeywordProposal proposedKeyword,
-            final Predicate<List<String>> additionalInsertPredicate) {
-        final List<String> values = getValuesToInsert(proposedKeyword);
-        return values.size() > 1 && !hasValuesInSucceedingColumns() && additionalInsertPredicate.test(values);
+    boolean shouldInsertMultipleCells(final List<String> values) {
+        return values.size() > 1 && !hasValuesInSucceedingColumns();
     }
 
-    void insertCallWithArgs(final RedKeywordProposal proposedKeyword) {
-        final List<String> values = getValuesToInsert(proposedKeyword);
+    boolean shouldInsertMultipleCellsWithoutColumnExceeding(final List<String> values) {
+        return values.size() > 1 && !hasValuesInSucceedingColumns()
+                && tableContext.getColumn() + values.size() < dataProvider.getColumnCount();
+    }
+
+    void insertMultipleCells(final List<String> values) {
         for (int i = 0; i < values.size(); i++) {
             dataProvider.setDataValue(tableContext.getColumn() + i, tableContext.getRow(), values.get(i));
         }
@@ -51,13 +50,6 @@ class SelectedKeywordTableUpdater {
             RedEventBroker.using(eventBroker).send(RobotModelEvents.COLUMN_COUNT_EXCEEDED,
                     dataProvider.getRowObject(tableContext.getRow()));
         }
-    }
-
-    private List<String> getValuesToInsert(final RedKeywordProposal proposedKeyword) {
-        final List<String> values = new ArrayList<>(proposedKeyword.getArguments());
-        values.add(0, proposedKeyword.getContent());
-        values.remove("");
-        return values;
     }
 
     private boolean hasValuesInSucceedingColumns() {

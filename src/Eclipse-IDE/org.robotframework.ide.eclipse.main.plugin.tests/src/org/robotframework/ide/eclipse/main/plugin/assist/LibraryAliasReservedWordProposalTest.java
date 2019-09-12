@@ -14,46 +14,33 @@ import org.robotframework.red.jface.viewers.Stylers;
 
 import com.google.common.collect.Range;
 
-public class RedWithNameProposalTest {
+public class LibraryAliasReservedWordProposalTest {
 
     @Test
-    public void testProposalWithEmptyContentAndEmptyMatch() {
-        final RedWithNameProposal proposal = new RedWithNameProposal("", ProposalMatch.EMPTY);
+    public void testProposalWithEmptyMatch() {
+        final LibraryAliasReservedWordProposal proposal = new LibraryAliasReservedWordProposal(ProposalMatch.EMPTY);
 
-        assertThat(proposal.getContent()).isEmpty();
+        assertThat(proposal.getContent()).isEqualTo("WITH NAME");
         assertThat(proposal.getArguments()).containsExactly("alias");
         assertThat(proposal.getImage()).isNull();
-        assertThat(proposal.getLabel()).isEmpty();
-        assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
-        assertThat(proposal.isDocumented()).isFalse();
-        assertThat(proposal.getDescription()).isEmpty();
-    }
-
-    @Test
-    public void testProposalWithNonEmptyContentAndEmptyMatch() {
-        final RedWithNameProposal proposal = new RedWithNameProposal("content", ProposalMatch.EMPTY);
-
-        assertThat(proposal.getContent()).isEqualTo("content");
-        assertThat(proposal.getArguments()).containsExactly("alias");
-        assertThat(proposal.getImage()).isNull();
-        assertThat(proposal.getLabel()).isEqualTo("content");
-        assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
+        assertThat(proposal.getLabel()).isEqualTo("WITH NAME");
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("WITH NAME");
         assertThat(proposal.getStyledLabel().getStyleRanges()).isEmpty();
         assertThat(proposal.isDocumented()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
     }
 
     @Test
-    public void testProposalWithNonEmptyContentAndNonEmptyMatch() {
-        final RedWithNameProposal proposal = new RedWithNameProposal("content",
+    public void testProposalWithNonEmptyMatch() {
+        final LibraryAliasReservedWordProposal proposal = new LibraryAliasReservedWordProposal(
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 7)));
 
-        assertThat(proposal.getContent()).isEqualTo("content");
+        assertThat(proposal.getContent()).isEqualTo("WITH NAME");
         assertThat(proposal.getArguments()).containsExactly("alias");
         assertThat(proposal.getImage()).isNull();
-        assertThat(proposal.getLabel()).isEqualTo("content");
+        assertThat(proposal.getLabel()).isEqualTo("WITH NAME");
 
-        assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("WITH NAME");
         final TextStyle matchStyle = new TextStyle();
         Stylers.Common.MATCH_DECORATION_STYLER.applyStyles(matchStyle);
 

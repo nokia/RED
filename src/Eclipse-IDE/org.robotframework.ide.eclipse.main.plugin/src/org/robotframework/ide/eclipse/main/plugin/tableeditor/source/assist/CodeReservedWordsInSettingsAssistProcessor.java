@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -20,20 +20,16 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
 import org.robotframework.ide.eclipse.main.plugin.assist.DisableSettingReservedWordProposals;
-import org.robotframework.ide.eclipse.main.plugin.assist.ForLoopReservedWordsProposals;
-import org.robotframework.ide.eclipse.main.plugin.assist.GherkinReservedWordProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.LibraryAliasReservedWordProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 import com.google.common.collect.Streams;
 
-/**
- * @author Michal Anglart
- */
-public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor {
+public class CodeReservedWordsInSettingsAssistProcessor extends RedContentAssistProcessor {
 
-    public CodeReservedWordsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public CodeReservedWordsInSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
         super(assist);
     }
 
@@ -44,8 +40,7 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
 
     @Override
     public List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
-                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Override
@@ -63,57 +58,59 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         final RobotLine lineModel = assist.getModel().getLinkedElement().getFileContent().get(line);
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         final int cellIndex = DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile());
+        final boolean isInLastCell = atTheEndOfLine ? true
+                : DocumentUtilities.isInLastCellOfLine(document, offset, assist.isTsvFile());
 
-        final List<? extends AssistProposal> loopsProposals = createForLoopsProposals(userContent, lineModel,
+        final List<? extends AssistProposal> libraryAliasProposals = createLibraryAliasProposals(userContent, lineModel,
                 cellIndex);
-        final List<? extends AssistProposal> gherkinProposals = createGherkinProposals(userContent, cellIndex);
         final List<? extends AssistProposal> disableSettingProposals = createDisableSettingProposals(userContent,
                 lineModel, cellIndex);
 
         final List<ICompletionProposal> proposals = newArrayList();
-        Streams.concat(loopsProposals.stream(), gherkinProposals.stream(), disableSettingProposals.stream())
-                .forEach(proposal -> {
-                    final String contentSuffix = getContentSuffix(proposal, atTheEndOfLine);
+        Streams.concat(libraryAliasProposals.stream(), disableSettingProposals.stream()).forEach(proposal -> {
+            final String contentSuffix = getContentSuffix(proposal, isInLastCell);
 
-                    final DocumentModification modification = new DocumentModification(contentSuffix,
-                            new Position(offset - userContent.length(), cellLength));
+            final int startOffset = offset - userContent.length();
+            final Position toReplace = new Position(startOffset, cellLength);
+            final Position toSelect = getSelection(proposal, startOffset, isInLastCell);
 
-                    proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
-                });
+            final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, toSelect);
+
+            proposals.add(new RedCompletionProposalAdapter(assist, proposal, modification));
+        });
         return proposals;
     }
 
-    private List<? extends AssistProposal> createForLoopsProposals(final String userContent, final RobotLine lineModel,
-            final int cellIndex) {
+    private List<? extends AssistProposal> createLibraryAliasProposals(final String userContent,
+            final RobotLine lineModel, final int cellIndex) {
         final Optional<RobotToken> firstTokenInLine = lineModel.tokensStream().findFirst();
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
-                .forLoopReservedWordsPredicate(cellIndex, firstTokenInLine);
-        return new ForLoopReservedWordsProposals(predicate).getReservedWordProposals(userContent);
-    }
-
-    private List<? extends AssistProposal> createGherkinProposals(final String userContent, final int cellIndex) {
-        final AssistProposalPredicate<String> predicate = AssistProposalPredicates
-                .gherkinReservedWordsPredicate(cellIndex);
-        return new GherkinReservedWordProposals(predicate).getReservedWordProposals(userContent);
+                .libraryAliasReservedWordPredicate(cellIndex, firstTokenInLine);
+        return new LibraryAliasReservedWordProposals(predicate).getReservedWordProposals(userContent);
     }
 
     private List<? extends AssistProposal> createDisableSettingProposals(final String userContent,
             final RobotLine lineModel, final int cellIndex) {
         final Optional<RobotToken> firstTokenInLine = lineModel.tokensStream().findFirst();
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
-                .disableSettingReservedWordPredicate(cellIndex, firstTokenInLine);
+                .disableSettingInSettingsReservedWordPredicate(cellIndex, firstTokenInLine);
         return new DisableSettingReservedWordProposals(predicate).getReservedWordProposals(userContent);
     }
 
-    private String getContentSuffix(final AssistProposal proposal, final boolean atTheEndOfLine) {
-        if (!atTheEndOfLine) {
-            return "";
-        } else if (GherkinReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())) {
-            return " ";
-        } else if (DisableSettingReservedWordProposals.NONE.equals(proposal.getLabel())) {
-            return "";
+    private String getContentSuffix(final AssistProposal proposal, final boolean isInLastCell) {
+        if (isInLastCell && LibraryAliasReservedWordProposals.WITH_NAME.equals(proposal.getLabel())) {
+            return assist.getSeparatorToFollow() + String.join(assist.getSeparatorToFollow(), proposal.getArguments());
         } else {
-            return assist.getSeparatorToFollow();
+            return "";
+        }
+    }
+
+    private Position getSelection(final AssistProposal proposal, final int startOffset, final boolean isInLastCell) {
+        if (isInLastCell && LibraryAliasReservedWordProposals.WITH_NAME.equals(proposal.getLabel())) {
+            return new Position(startOffset + proposal.getContent().length() + assist.getSeparatorToFollow().length(),
+                    proposal.getArguments().get(0).length());
+        } else {
+            return new Position(startOffset + proposal.getContent().length(), 0);
         }
     }
 }

@@ -26,10 +26,10 @@ import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 
-public class CodeElementsTableEditConfigurationTest {
+public class CodeReservedWordsTableEditConfigurationTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(CodeElementsTableEditConfigurationTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(CodeReservedWordsTableEditConfigurationTest.class);
 
     private static RobotModel robotModel;
 
@@ -47,7 +47,7 @@ public class CodeElementsTableEditConfigurationTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final CodeElementsTableEditConfiguration configuration = new CodeElementsTableEditConfiguration(model,
+        final CodeReservedWordsTableEditConfiguration configuration = new CodeReservedWordsTableEditConfiguration(model,
                 mock(IRowDataProvider.class), SettingTarget.TEST_CASE, true);
         configuration.configureRegistry(configRegistry);
 

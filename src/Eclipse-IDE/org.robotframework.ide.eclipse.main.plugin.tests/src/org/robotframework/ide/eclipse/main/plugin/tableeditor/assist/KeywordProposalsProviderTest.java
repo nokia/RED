@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -217,6 +219,15 @@ public class KeywordProposalsProviderTest {
         assertThat(proposals[1].getModificationStrategy()).isInstanceOfSatisfying(
                 SubstituteTextModificationStrategy.class,
                 strategy -> assertThat(strategy.shouldCommitAfterInsert()).isFalse());
+    }
+
+    @Test
+    public void emptyArgumentsAreFilteredOut() throws Exception {
+        final RedKeywordProposal proposedKeyword = mock(RedKeywordProposal.class);
+        when(proposedKeyword.getContent()).thenReturn("name");
+        when(proposedKeyword.getArguments()).thenReturn(Arrays.asList("a1", "a2", ""));
+
+        assertThat(KeywordProposalsProvider.getValuesToInsert(proposedKeyword)).containsExactly("name", "a1", "a2");
     }
 
     private static IRowDataProvider<Object> prepareDataProvider() {

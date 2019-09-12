@@ -9,12 +9,12 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-class RedWithNameProposal extends BaseAssistProposal {
+class LibraryAliasReservedWordProposal extends BaseAssistProposal {
 
     private final static List<String> ARGUMENTS = ImmutableList.of("alias");
 
-    RedWithNameProposal(final String word, final ProposalMatch match) {
-        super(word, match);
+    LibraryAliasReservedWordProposal(final ProposalMatch match) {
+        super(LibraryAliasReservedWordProposals.WITH_NAME, match);
     }
 
     @Override

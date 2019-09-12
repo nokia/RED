@@ -52,6 +52,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteAutoEditStrategy.EditStrategyPreferences;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
@@ -73,7 +74,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Suit
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.WithNameAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule.ITodoTaskToken;
@@ -257,7 +257,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new NewSectionTemplateAssistProcessor(assistContext));
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
-                new WithNameAssistProcessor(assistContext),
+                new CodeReservedWordsInSettingsAssistProcessor(assistContext),
                 new LibrariesImportAssistProcessor(assistContext),
                 new VariablesImportAssistProcessor(assistContext),
                 new ResourcesImportAssistProcessor(assistContext),
@@ -428,7 +428,6 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new VariablesDefinitionsAssistProcessor(assistContext),
-                new WithNameAssistProcessor(assistContext),
                 new LibrariesImportAssistProcessor(assistContext),
                 new VariablesImportAssistProcessor(assistContext),
                 new ResourcesImportAssistProcessor(assistContext),
@@ -436,6 +435,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new SectionsAssistProcessor(assistContext),
                 new SettingsAssistProcessor(assistContext),
                 new CodeReservedWordsAssistProcessor(assistContext),
+                new CodeReservedWordsInSettingsAssistProcessor(assistContext),
                 new KeywordCallsInSettingsAssistProcessor(assistContext),
                 keywordCallsProcessor,
                 new ImportsInSettingsAssistProcessor(assistContext),

@@ -14,7 +14,7 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CodeReservedElementsProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CodeReservedWordsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsInCodeProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.SettingProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.VariableProposalsProvider;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
-public class CodeElementsTableEditConfiguration extends AbstractRegistryConfiguration {
+public class CodeReservedWordsTableEditConfiguration extends AbstractRegistryConfiguration {
 
     private final RobotSuiteFile suiteFile;
 
@@ -32,7 +32,7 @@ public class CodeElementsTableEditConfiguration extends AbstractRegistryConfigur
 
     private final boolean wrapCellContent;
 
-    public CodeElementsTableEditConfiguration(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider,
+    public CodeReservedWordsTableEditConfiguration(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider,
             final SettingTarget settingsProposalsTarget,
             final boolean wrapCellContent) {
         this.suiteFile = suiteFile;
@@ -46,7 +46,7 @@ public class CodeElementsTableEditConfiguration extends AbstractRegistryConfigur
         final IRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(env, settingsProposalsTarget),
-                new CodeReservedElementsProposalsProvider(env, dataProvider),
+                new CodeReservedWordsProposalsProvider(env, dataProvider),
                 new KeywordProposalsProvider(suiteFile, dataProvider),
                 new ImportsInCodeProposalsProvider(suiteFile),
                 new VariableProposalsProvider(suiteFile, dataProvider));

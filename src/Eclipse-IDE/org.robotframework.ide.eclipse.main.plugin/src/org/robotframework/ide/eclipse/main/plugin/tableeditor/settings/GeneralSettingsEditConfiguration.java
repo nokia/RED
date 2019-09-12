@@ -12,6 +12,7 @@ import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CodeReservedWordsInSettingsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsInSettingsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsInSettingsProvider;
@@ -37,6 +38,7 @@ class GeneralSettingsEditConfiguration extends AbstractRegistryConfiguration {
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
+                new CodeReservedWordsInSettingsProposalsProvider(suiteFile.getRuntimeEnvironment(), dataProvider),
                 new KeywordProposalsInSettingsProvider(suiteFile, dataProvider),
                 new ImportsInSettingsProposalsProvider(suiteFile, dataProvider),
                 new VariableProposalsProvider(suiteFile, dataProvider));

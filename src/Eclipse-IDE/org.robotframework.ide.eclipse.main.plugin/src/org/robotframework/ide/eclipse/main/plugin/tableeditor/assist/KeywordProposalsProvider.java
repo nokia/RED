@@ -58,9 +58,10 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<Runnable> operations = new ArrayList<>();
 
         if (!isTemplateSetting(dataProvider, tableContext.getRow())) {
-            final SelectedKeywordTableUpdater updater = new SelectedKeywordTableUpdater(tableContext, dataProvider);
-            if (updater.shouldInsertWithArgs(proposedKeyword, values -> true)) {
-                operations.add(() -> updater.insertCallWithArgs(proposedKeyword));
+            final MultipleCellTableUpdater updater = new MultipleCellTableUpdater(tableContext, dataProvider);
+            final List<String> valuesToInsert = getValuesToInsert(proposedKeyword);
+            if (updater.shouldInsertMultipleCells(valuesToInsert)) {
+                operations.add(() -> updater.insertMultipleCells(valuesToInsert));
             }
         }
 
@@ -79,6 +80,13 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
             return modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.TASK_TEMPLATE;
         }
         return false;
+    }
+
+    static List<String> getValuesToInsert(final RedKeywordProposal proposedKeyword) {
+        final List<String> values = new ArrayList<>(proposedKeyword.getArguments());
+        values.add(0, proposedKeyword.getContent());
+        values.remove("");
+        return values;
     }
 
 }

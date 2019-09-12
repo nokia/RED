@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Range;
 
 public class AssistProposalPredicatesTest {
 
@@ -195,11 +199,11 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenThereIsTokenGivenWithFORButCellIsAtMostSecond_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.forLoopReservedWordsPredicate(0,
-                Optional.of(RobotToken.create(":FOR")));
+                Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.forLoopReservedWordsPredicate(1,
-                Optional.of(RobotToken.create(":FOR")));
+                Optional.of(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN)));
         final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.forLoopReservedWordsPredicate(2,
-                Optional.of(RobotToken.create(": FOR")));
+                Optional.of(RobotToken.create(": FOR", RobotTokenType.FOR_TOKEN)));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
             assertThat(predicate.test(null)).isFalse();
@@ -224,6 +228,195 @@ public class AssistProposalPredicatesTest {
         }
     }
 
+    @Test
+    public void whenGivenWordDoesNotMatchReservedWord_theLibraryAliasPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .libraryAliasReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsNoTokenGiven_theLibraryAliasPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .libraryAliasReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test("WITH NAME")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithoutLibDeclaration_theLibraryAliasPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .libraryAliasReservedWordPredicate(cellIndex, Optional.of(RobotToken.create("Library")));
+            assertThat(predicate.test("WITH NAME")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithLibDeclarationAndGivenWordDoesNotMatch_theLibraryAliasPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final Optional<RobotToken> firstTokenInLine = Optional
+                    .of(RobotToken.create("Library", RobotTokenType.SETTING_LIBRARY_DECLARATION));
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .libraryAliasReservedWordPredicate(cellIndex, firstTokenInLine);
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithLibDeclaration_theLibraryAliasPredicateIsSatisfiedOnlyForCertainCells() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final Optional<RobotToken> firstTokenInLine = Optional
+                    .of(RobotToken.create("Library", RobotTokenType.SETTING_LIBRARY_DECLARATION));
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .libraryAliasReservedWordPredicate(cellIndex, firstTokenInLine);
+            if (cellIndex < 2) {
+                assertThat(predicate.test("WITH NAME")).isFalse();
+            } else {
+                assertThat(predicate.test("WITH NAME")).isTrue();
+            }
+        }
+    }
+
+    @Test
+    public void whenGivenWordDoesNotMatchReservedWord_theDisabledSettingPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsNoTokenGiven_theDisabledSettingPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test("NONE")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithoutKeywordBasedSetting_theDisabledSettingPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingReservedWordPredicate(cellIndex, Optional.of(RobotToken.create("[Setting]")));
+            assertThat(predicate.test("NONE")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithKeywordBasedSettingAndGivenWordDoesNotMatch_theDisabledSettingPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            for (final RobotTokenType type : EnumSet.of(RobotTokenType.TEST_CASE_SETTING_SETUP,
+                    RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+                    RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_TEARDOWN,
+                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.KEYWORD_SETTING_TEARDOWN)) {
+                final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("[Setting]", type));
+                final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                        .disableSettingReservedWordPredicate(cellIndex, firstTokenInLine);
+                assertThat(predicate.test(null)).isFalse();
+                assertThat(predicate.test("")).isFalse();
+                assertThat(predicate.test("word")).isFalse();
+            }
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithKeywordBasedSetting_theDisabledSettingPredicateIsSatisfiedOnlyForCertainCells() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            for (final RobotTokenType type : EnumSet.of(RobotTokenType.TEST_CASE_SETTING_SETUP,
+                    RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+                    RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_TEARDOWN,
+                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.KEYWORD_SETTING_TEARDOWN)) {
+                final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("[Setting]", type));
+                final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                        .disableSettingReservedWordPredicate(cellIndex, firstTokenInLine);
+                if (cellIndex != 2) {
+                    assertThat(predicate.test("NONE")).isFalse();
+                } else {
+                    assertThat(predicate.test("NONE")).isTrue();
+                }
+            }
+        }
+    }
+
+    @Test
+    public void whenGivenWordDoesNotMatchReservedWord_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingInSettingsReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsNoTokenGiven_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingInSettingsReservedWordPredicate(cellIndex, Optional.empty());
+            assertThat(predicate.test("NONE")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithoutKeywordBasedSetting_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .disableSettingInSettingsReservedWordPredicate(cellIndex,
+                            Optional.of(RobotToken.create("General Setting")));
+            assertThat(predicate.test("NONE")).isFalse();
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithKeywordBasedSettingAndGivenWordDoesNotMatch_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            for (final RobotTokenType type : EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TASK_SETUP_DECLARATION, RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)) {
+                final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("General Setting", type));
+                final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                        .disableSettingInSettingsReservedWordPredicate(cellIndex, firstTokenInLine);
+                assertThat(predicate.test(null)).isFalse();
+                assertThat(predicate.test("")).isFalse();
+                assertThat(predicate.test("word")).isFalse();
+            }
+        }
+    }
+
+    @Test
+    public void whenThereIsTokenGivenWithKeywordBasedSetting_theDisabledSettingInSettingsPredicateIsSatisfiedOnlyForCertainCells() {
+        for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
+            for (final RobotTokenType type : EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TASK_SETUP_DECLARATION, RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)) {
+                final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("General Setting", type));
+                final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                        .disableSettingInSettingsReservedWordPredicate(cellIndex, firstTokenInLine);
+                if (cellIndex != 1) {
+                    assertThat(predicate.test("NONE")).isFalse();
+                } else {
+                    assertThat(predicate.test("NONE")).isTrue();
+                }
+            }
+        }
+    }
 
     @Test
     public void whenNoParticularVariableIsTested_theGlobalVarsPredicateIsSatisfied() {

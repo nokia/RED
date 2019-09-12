@@ -24,7 +24,7 @@ public class ForLoopReservedWordsProposals {
     static {
         DESCRIPTIONS.put(":FOR",
                 "Defines loop used to repeat keywords. The actions to be repeated have to be written in next lines "
-                        + "and have to bo indented.\n\n*Important:* This is an old syntax which is going to be "
+                        + "and have to be indented.\n\n*Important:* This is an old syntax which is going to be "
                         + "deprecated in Robot Framework 3.2 and eventually removed. Use FOR-END syntax instead.");
         DESCRIPTIONS.put("FOR",
                 "Defines loop used to repeat keywords. The actions to be repeated have to be written in next lines "

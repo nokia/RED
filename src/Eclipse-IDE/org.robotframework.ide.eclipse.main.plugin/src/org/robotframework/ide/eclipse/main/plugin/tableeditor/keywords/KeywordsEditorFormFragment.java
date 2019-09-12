@@ -85,7 +85,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeReservedWordsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
@@ -259,7 +259,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent, dataProvider));
-        gridLayer.addConfiguration(new CodeElementsTableEditConfiguration(fileModel, dataProvider,
+        gridLayer.addConfiguration(new CodeReservedWordsTableEditConfiguration(fileModel, dataProvider,
                 SettingTarget.KEYWORD, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,

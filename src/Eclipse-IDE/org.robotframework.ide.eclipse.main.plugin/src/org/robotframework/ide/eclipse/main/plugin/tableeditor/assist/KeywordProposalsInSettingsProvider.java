@@ -67,10 +67,10 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final List<Runnable> operations = new ArrayList<>();
 
         if (!isTemplateSetting(dataProvider, tableContext.getRow())) {
-            final SelectedKeywordTableUpdater updater = new SelectedKeywordTableUpdater(tableContext, dataProvider);
-            if (updater.shouldInsertWithArgs(proposedKeyword,
-                    values -> tableContext.getColumn() + values.size() < dataProvider.getColumnCount())) {
-                operations.add(() -> updater.insertCallWithArgs(proposedKeyword));
+            final MultipleCellTableUpdater updater = new MultipleCellTableUpdater(tableContext, dataProvider);
+            final List<String> valuesToInsert = KeywordProposalsProvider.getValuesToInsert(proposedKeyword);
+            if (updater.shouldInsertMultipleCellsWithoutColumnExceeding(valuesToInsert)) {
+                operations.add(() -> updater.insertMultipleCells(valuesToInsert));
             }
         }
 

@@ -12,58 +12,63 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class RedWithNameProposalsTest {
+public class LibraryAliasReservedWordProposalsTest {
 
     @Test
     public void noProposalsAreProvided_whenPredicateIsAlwaysFalse() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = AssistProposalPredicates.alwaysFalse();
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                predicateWordHasToSatisfy);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
         assertThat(proposals).isEmpty();
     }
 
     @Test
     public void allProposalsAreProvided_whenPredicateIsAlwaysTrue() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = AssistProposalPredicates.alwaysTrue();
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                predicateWordHasToSatisfy);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
         assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateSelectsThem() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() < 4;
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                predicateWordHasToSatisfy);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
         assertThat(proposals).isEmpty();
     }
 
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateCannotSelectThem() {
         final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() > 4;
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                predicateWordHasToSatisfy);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("");
         assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
     public void onlyProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(AssistProposalPredicates.alwaysTrue());
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                AssistProposalPredicates.alwaysTrue());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("am");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("am");
         assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(prefixesMatcher(),
-                AssistProposalPredicates.alwaysTrue());
+        final LibraryAliasReservedWordProposals proposalsProvider = new LibraryAliasReservedWordProposals(
+                prefixesMatcher(), AssistProposalPredicates.alwaysTrue());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("with");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("with");
         assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("WITH NAME");
     }
 }

@@ -90,7 +90,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesElement
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnsPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsMatchesCollection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTableEditConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeReservedWordsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
@@ -264,7 +264,7 @@ class TasksFormFragment implements ISectionFormFragment {
         }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent, dataProvider));
-        gridLayer.addConfiguration(new CodeElementsTableEditConfiguration(fileModel, dataProvider,
+        gridLayer.addConfiguration(new CodeReservedWordsTableEditConfiguration(fileModel, dataProvider,
                 SettingTarget.TASK, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,

@@ -308,6 +308,30 @@ public class AssistProposalsTest {
     }
 
     @Test
+    public void verifyLibraryAliasReservedWordProposalProperties() {
+        final LibraryAliasReservedWordProposal proposal = AssistProposals
+                .createLibraryAliasReservedWordProposal(ProposalMatch.EMPTY);
+        assertThat(proposal.getContent()).isEqualTo("WITH NAME");
+        assertThat(proposal.getArguments()).containsExactly("alias");
+        assertThat(proposal.getImage()).isNull();
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("WITH NAME");
+        assertThat(proposal.isDocumented()).isFalse();
+        assertThat(proposal.getDescription()).isEmpty();
+    }
+
+    @Test
+    public void verifyDisableSettingReservedWordProposalProperties() {
+        final DisableSettingReservedWordProposal proposal = AssistProposals
+                .createDisableSettingReservedWordProposal(ProposalMatch.EMPTY);
+        assertThat(proposal.getContent()).isEqualTo("NONE");
+        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.getImage()).isNull();
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("NONE");
+        assertThat(proposal.isDocumented()).isTrue();
+        assertThat(proposal.getDescription()).isNotEmpty();
+    }
+
+    @Test
     public void verifySettingProposalProperties() {
         final RedSettingProposal proposal = AssistProposals.createSettingProposal("Documentation",
                 SettingTarget.GENERAL_TESTS, ProposalMatch.EMPTY);

@@ -7,10 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -79,7 +82,55 @@ public class AssistProposalPredicates {
         };
     }
 
-    public static AssistProposalPredicate<String> withNamePredicate(final int cellIndex) {
-        return withName -> cellIndex >= 2 && RedWithNameProposals.WITH_NAME.equals(withName);
+    public static AssistProposalPredicate<String> libraryAliasReservedWordPredicate(final int cellIndex,
+            final Optional<RobotToken> firstTokenInLine) {
+        return reservedWord -> cellIndex >= 2 && LibraryAliasReservedWordProposals.WITH_NAME.equals(reservedWord)
+                && firstTokenInLine.isPresent()
+                && firstTokenInLine.get().getTypes().contains(RobotTokenType.SETTING_LIBRARY_DECLARATION);
+    }
+
+    public static AssistProposalPredicate<String> disableSettingReservedWordPredicate(final int cellIndex,
+            final Optional<RobotToken> firstTokenInLine) {
+        return disableSettingReservedWordPredicate(cellIndex,
+                firstTokenInLine.map(RobotToken::getTypes).orElseGet(ArrayList::new));
+    }
+
+    public static AssistProposalPredicate<String> disableSettingReservedWordPredicate(final int cellIndex,
+            final List<IRobotTokenType> firstTokenInLineTypes) {
+        return reservedWord -> {
+            if (cellIndex == 2 && DisableSettingReservedWordProposals.NONE.equals(reservedWord)) {
+                return firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_SETUP)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TEMPLATE)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_SETUP)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TEARDOWN)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TEMPLATE)
+                        || firstTokenInLineTypes.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN);
+            }
+            return false;
+        };
+    }
+
+    public static AssistProposalPredicate<String> disableSettingInSettingsReservedWordPredicate(final int cellIndex,
+            final Optional<RobotToken> firstTokenInLine) {
+        return disableSettingInSettingsReservedWordPredicate(cellIndex,
+                firstTokenInLine.map(RobotToken::getTypes).orElseGet(ArrayList::new));
+    }
+
+    public static AssistProposalPredicate<String> disableSettingInSettingsReservedWordPredicate(final int cellIndex,
+            final List<IRobotTokenType> firstTokenInLineTypes) {
+        return reservedWord -> {
+            if (cellIndex == 1 && DisableSettingReservedWordProposals.NONE.equals(reservedWord)) {
+                return firstTokenInLineTypes.contains(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_SETUP_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_SETUP_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION);
+            }
+            return false;
+        };
     }
 }

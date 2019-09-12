@@ -118,8 +118,12 @@ public class AssistProposals {
         return new ForLoopReservedWordProposal(word, match);
     }
 
-    static RedWithNameProposal createWithNameProposal(final String word, final ProposalMatch match) {
-        return new RedWithNameProposal(word, match);
+    static LibraryAliasReservedWordProposal createLibraryAliasReservedWordProposal(final ProposalMatch match) {
+        return new LibraryAliasReservedWordProposal(match);
+    }
+
+    static DisableSettingReservedWordProposal createDisableSettingReservedWordProposal(final ProposalMatch match) {
+        return new DisableSettingReservedWordProposal(match);
     }
 
     static RedImportProposal createResourceImportInCodeProposal(final String nameToUse, final String bddPrefix,

@@ -1,18 +1,19 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -25,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -37,11 +39,11 @@ import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-public class WithNameElementsProposalsProviderTest {
+public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(
-            WithNameElementsProposalsProviderTest.class);
+            CodeReservedWordsInSettingsProposalsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
@@ -72,21 +74,18 @@ public class WithNameElementsProposalsProviderTest {
     public void thereAreNoProposalsProvided_whenElementIsNotInSettings() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotElement> elements = getAllElements(suiteFile).stream()
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> !(element instanceof RobotSetting))
                 .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            int row = 0;
-            for (@SuppressWarnings("unused")
-            final RobotElement element : elements) {
+            for (int row = 0; row < elements.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
                 final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
                 assertThat(proposals).isEmpty();
-
-                row++;
             }
         }
     }
@@ -95,20 +94,18 @@ public class WithNameElementsProposalsProviderTest {
     public void thereAreNoProposalsProvided_whenElementIsInSettingsButColumnIsBeforeThird() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> element instanceof RobotSetting)
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
         for (int column = 0; column < 2; column++) {
-
-            int row = 0;
-            for (@SuppressWarnings("unused")
-            final RobotElement element : elements) {
+            for (int row = 0; row < elements.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
                 final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
                 assertThat(proposals).isEmpty();
-
-                row++;
             }
         }
     }
@@ -117,18 +114,17 @@ public class WithNameElementsProposalsProviderTest {
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButInputDoesNotMatch() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> element instanceof RobotSetting)
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
-        int row = 0;
-        for (@SuppressWarnings("unused")
-        final RobotElement element : elements) {
+        for (int row = 0; row < elements.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(2, row);
             final RedContentProposal[] proposals = provider.getProposals("foo", 2, context);
             assertThat(proposals).isEmpty();
-
-            row++;
         }
     }
 
@@ -136,22 +132,20 @@ public class WithNameElementsProposalsProviderTest {
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButNotLibrarySetting() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> element instanceof RobotSetting)
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
-        int row = 0;
-        for (@SuppressWarnings("unused")
-        final RobotElement element : elements) {
+        for (int row = 0; row < elements.size(); row++) {
             if (row == 0) { // skip Library setting
-                row++;
                 continue;
             }
             final AssistantContext context = new NatTableAssistantContext(2, row);
             final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
             assertThat(proposals).isEmpty();
-
-            row++;
         }
     }
 
@@ -159,9 +153,12 @@ public class WithNameElementsProposalsProviderTest {
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> element instanceof RobotSetting)
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("with");
@@ -171,20 +168,23 @@ public class WithNameElementsProposalsProviderTest {
         assertThat(proposals).hasSize(1);
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
         assertThat(text.getText()).isEqualTo("WITH NAME");
+
+        assertThat(proposals[0].getOperationsToPerformAfterAccepting()).hasSize(1);
     }
 
     @Test
     public void thereIsWithNameProposalProvided_whenInAtLeastThirdColumnAndCurrentSettingIsLibrary() {
-        final RobotExecutableRow<?> executableRow = new RobotExecutableRow<>();
-        executableRow.setAction(RobotToken.create("Library"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotSetting> elements = newArrayList(
-                new RobotSetting(null, RobotSetting.SettingsGroup.LIBRARIES, executableRow));
+        final List<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> element instanceof RobotSetting)
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
-        final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(null, dataProvider);
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 0 || column == 1) { // we only test for at least third column
+            if (column < 2) { // we only test for at least third column
                 continue;
             }
             final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
@@ -196,6 +196,35 @@ public class WithNameElementsProposalsProviderTest {
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);
             assertThat(text.getText()).isEqualTo("WITH NAME");
+
+            assertThat(proposals[0].getOperationsToPerformAfterAccepting()).hasSize(1);
+        }
+    }
+
+    @Test
+    public void thereIsDisabledSettingProposalProvided_whenInExactlySecondColumnAndCurrentGeneralSettingIsKeywordBased() {
+        final RobotExecutableRow<?> executableRow = new RobotExecutableRow<>();
+        executableRow.setAction(RobotToken.create("Suite Setup", RobotTokenType.SETTING_SUITE_SETUP_DECLARATION));
+
+        final IRowDataProvider<Object> dataProvider = prepareSettingProvider(new RobotSetting(null, executableRow));
+        final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
+                null, dataProvider);
+
+        for (int column = 0; column < 10; column++) {
+            if (column != 1) { // we only test for exactly second column
+                continue;
+            }
+            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            text.setText("note");
+
+            final AssistantContext context = new NatTableAssistantContext(column, 0);
+            final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
+            assertThat(proposals).hasSize(1);
+
+            proposals[0].getModificationStrategy().insert(text, proposals[0]);
+            assertThat(text.getText()).isEqualTo("NONE");
+
+            assertThat(proposals[0].getOperationsToPerformAfterAccepting()).isEmpty();
         }
     }
 
@@ -215,14 +244,26 @@ public class WithNameElementsProposalsProviderTest {
         }
     }
 
-    private static IRowDataProvider<Object> prepareElementsProvider(final Iterable<? extends RobotElement> elements) {
+    private static IRowDataProvider<Object> prepareElementsProvider(final List<? extends RobotElement> elements) {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getColumnCount()).thenReturn(20);
+        when(dataProvider.getDataValue(anyInt(), anyInt())).thenReturn("");
         int i = 0;
         for (final RobotElement element : elements) {
             when(dataProvider.getRowObject(i)).thenReturn(element);
             i++;
         }
+        return dataProvider;
+    }
+
+    private static IRowDataProvider<Object> prepareSettingProvider(final RobotSetting setting) {
+        @SuppressWarnings("unchecked")
+        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getColumnCount()).thenReturn(20);
+        when(dataProvider.getDataValue(anyInt(), anyInt())).thenReturn("");
+        final Entry<String, Object> entry = new SimpleEntry<String, Object>(setting.getName(), setting);
+        when(dataProvider.getRowObject(anyInt())).thenReturn(entry);
         return dataProvider;
     }
 }
