@@ -60,20 +60,6 @@ public class KeywordProposalsInSettingsProviderTest {
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("all_settings.robot",
-                "*** Settings ***",
-                "Library",
-                "Resource",
-                "Variables",
-                "Metadata",
-                "Suite Setup",
-                "Suite Teardown",
-                "Test Setup",
-                "Test Teardown",
-                "Test Template",
-                "Test Timeout",
-                "Force Tags",
-                "Default Tags");
         projectProvider.createFile("kw_based_settings.robot",
                 "*** Settings ***",
                 "Suite Setup",
@@ -127,31 +113,37 @@ public class KeywordProposalsInSettingsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenColumnIsDifferentThanSecond() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("all_settings.robot"));
+    public void proposalsShouldNotBeShown_whenColumnIsDifferentThanSecond() {
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final RobotKeywordsSection kwSection = (RobotKeywordsSection) suiteFile
+                .createRobotSection(RobotKeywordsSection.SECTION_NAME);
+        kwSection.createChild(0, "keyword");
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
                 dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 1) {
-                continue;
-            }
             for (int row = 0; row < settings.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
-                final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-                assertThat(proposals).isEmpty();
+                if (column == 1) {
+                    assertThat(provider.shouldShowProposals(context)).isTrue();
+                } else {
+                    assertThat(provider.shouldShowProposals(context)).isFalse();
+                }
             }
         }
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() throws Exception {
+    public void proposalsShouldNotBeShown_whenSettingIsNotKeywordBased() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final RobotKeywordsSection kwSection = (RobotKeywordsSection) suiteFile
+                .createRobotSection(RobotKeywordsSection.SECTION_NAME);
+        kwSection.createChild(0, "keyword");
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
@@ -159,8 +151,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-            assertThat(proposals).isEmpty();
+            assertThat(provider.shouldShowProposals(context)).isFalse();
         }
     }
 
@@ -168,6 +159,9 @@ public class KeywordProposalsInSettingsProviderTest {
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final RobotKeywordsSection kwSection = (RobotKeywordsSection) suiteFile
+                .createRobotSection(RobotKeywordsSection.SECTION_NAME);
+        kwSection.createChild(0, "keyword");
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,

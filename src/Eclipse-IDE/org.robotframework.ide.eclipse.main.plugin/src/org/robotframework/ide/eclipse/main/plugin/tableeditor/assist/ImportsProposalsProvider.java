@@ -38,11 +38,14 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow());
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        if (!areApplicable((NatTableAssistantContext) context)) {
-            return new RedContentProposal[0];
-        }
 
         final String prefix = contents.substring(0, position);
         final Stream<? extends AssistProposal> librariesProposals = importType == SettingsGroup.LIBRARIES
@@ -59,10 +62,6 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
         return Streams.concat(librariesProposals, fileLocationProposals, sitePackagesLibrariesProposals)
                 .map(proposal -> new AssistProposalAdapter(env, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
-    }
-
-    private boolean areApplicable(final NatTableAssistantContext tableContext) {
-        return tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow());
     }
 
     private boolean isValidImportSetting(final int row) {

@@ -35,6 +35,6 @@ public class ImportsInSettingsAssistProcessor extends ImportsInCodeAssistProcess
             throws BadLocationException {
         return isInApplicableContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1
-                && KeywordCallsInSettingsAssistProcessor.isKeywordBasedSetting(lineContent);
+                && ModelUtilities.isKeywordBasedGeneralSetting(assist.getModel(), offset);
     }
 }

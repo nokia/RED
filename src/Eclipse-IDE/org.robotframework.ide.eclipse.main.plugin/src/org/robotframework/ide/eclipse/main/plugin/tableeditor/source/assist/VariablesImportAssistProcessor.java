@@ -13,6 +13,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -42,7 +43,9 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
     @Override
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
-        return isInApplicableContentType(document, offset) && lineContent.toLowerCase().startsWith("variables")
+        return isInApplicableContentType(document, offset)
+                && ModelUtilities.firstTokenInLineContains(assist.getModel(), offset,
+                        RobotTokenType.SETTING_VARIABLES_DECLARATION)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 

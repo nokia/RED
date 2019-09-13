@@ -29,11 +29,15 @@ public class ImportsInSettingsProposalsProvider implements RedContentProposalPro
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return tableContext.getColumn() == 1
+                && ModelRowUtilities.isKeywordBasedGeneralSetting(dataProvider, tableContext.getRow());
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        if (!areApplicable((NatTableAssistantContext) context)) {
-            return new RedContentProposal[0];
-        }
 
         final String prefix = contents.substring(0, position);
         final List<? extends AssistProposal> importProposals = new RedImportProposals(suiteFile)
@@ -42,11 +46,6 @@ public class ImportsInSettingsProposalsProvider implements RedContentProposalPro
         final IRuntimeEnvironment env = suiteFile.getRobotProject().getRuntimeEnvironment();
         return importProposals.stream().map(proposal -> new AssistProposalAdapter(env, proposal)).toArray(
                 RedContentProposal[]::new);
-    }
-
-    private boolean areApplicable(final NatTableAssistantContext tableContext) {
-        return tableContext.getColumn() == 1
-                && KeywordProposalsInSettingsProvider.isKeywordBasedSetting(dataProvider, tableContext.getRow());
     }
 
 }

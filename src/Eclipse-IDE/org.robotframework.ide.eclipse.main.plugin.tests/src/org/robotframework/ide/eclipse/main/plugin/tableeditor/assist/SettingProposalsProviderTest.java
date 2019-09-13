@@ -23,16 +23,16 @@ public class SettingProposalsProviderTest {
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
-    public void thereAreNoTestCaseSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
+    public void testCaseSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 0) { // first column is omitted
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-            assertThat(proposals).isEmpty();
+            if (column == 0) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 
@@ -61,16 +61,16 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoKeywordSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
+    public void keywordSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 0) { // first column is omitted
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-            assertThat(proposals).isEmpty();
+            if (column == 0) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 
@@ -100,16 +100,16 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoGeneralSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
+    public void generalSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL_TESTS);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 0) { // first column is omitted
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-            assertThat(proposals).isEmpty();
+            if (column == 0) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 

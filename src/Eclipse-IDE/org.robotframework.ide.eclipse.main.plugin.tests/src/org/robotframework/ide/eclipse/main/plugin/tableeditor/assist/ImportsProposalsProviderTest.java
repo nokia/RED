@@ -70,7 +70,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoResourcesProposalsProvided_whenInAnyColumnNotAResourceSetting() {
+    public void resourcesProposalsShouldNotBeShown_whenInAnyColumnNotAResourceSetting() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
@@ -82,13 +82,12 @@ public class ImportsProposalsProviderTest {
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
-            assertThat(proposals).isEmpty();
+            assertThat(provider.shouldShowProposals(context)).isFalse();
         }
     }
 
     @Test
-    public void thereAreNoResourcesProposalsProvided_whenInColumnOtherThanFirstOfResourceSetting() {
+    public void resourcesProposalsShouldNotBeShown_whenInColumnOtherThanFirstOfResourceSetting() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
@@ -99,12 +98,12 @@ public class ImportsProposalsProviderTest {
                 dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 1) {
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
-            assertThat(proposals).isEmpty();
+            if (column == 1) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 
@@ -146,7 +145,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoVariablesProposalsProvided_whenInAnyColumnNotAVariablesSetting() {
+    public void variablesProposalsShouldNotBeShown_whenInAnyColumnNotAVariablesSetting() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
@@ -158,13 +157,12 @@ public class ImportsProposalsProviderTest {
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
-            assertThat(proposals).isEmpty();
+            assertThat(provider.shouldShowProposals(context)).isFalse();
         }
     }
 
     @Test
-    public void thereAreNoVariablesProposalsProvided_whenInColumnOtherThanFirstOfVariablesSetting() {
+    public void variablesProposalsShouldNotBeShown_whenInColumnOtherThanFirstOfVariablesSetting() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
@@ -175,12 +173,12 @@ public class ImportsProposalsProviderTest {
                 dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 1) {
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
-            assertThat(proposals).isEmpty();
+            if (column == 1) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 
@@ -226,7 +224,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoLibrariesProposalsProvided_whenInFirstOfNonLibrarySetting() {
+    public void librariesProposalsShouldNotBeShown_whenInFirstOfNonLibrarySetting() {
         final RobotModel robotModel = new RobotModel();
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
@@ -240,12 +238,11 @@ public class ImportsProposalsProviderTest {
         final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
-        final RedContentProposal[] proposals = provider.getProposals("abc", 1, context);
-        assertThat(proposals).isEmpty();
+        assertThat(provider.shouldShowProposals(context)).isFalse();
     }
 
     @Test
-    public void thereAreNoLibrariesProposalsProvided_whenInColumnOtherThanFirstOfLibrarySetting() {
+    public void librariesProposalsShouldNotBeShown_whenInColumnOtherThanFirstOfLibrarySetting() {
         final RobotModel robotModel = new RobotModel();
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
@@ -259,12 +256,12 @@ public class ImportsProposalsProviderTest {
         final LibrariesProposalsProvider provider = new LibrariesProposalsProvider(model, dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 1) {
-                continue;
-            }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals("abc", 1, context);
-            assertThat(proposals).isEmpty();
+            if (column == 1) {
+                assertThat(provider.shouldShowProposals(context)).isTrue();
+            } else {
+                assertThat(provider.shouldShowProposals(context)).isFalse();
+            }
         }
     }
 

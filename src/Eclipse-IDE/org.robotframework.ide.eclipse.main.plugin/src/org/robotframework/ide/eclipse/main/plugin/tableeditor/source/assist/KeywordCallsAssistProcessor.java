@@ -75,8 +75,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         final String separator = assist.getSeparatorToFollow();
         final List<ICompletionProposal> proposals = new ArrayList<>();
 
-        final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-        final boolean shouldInsertArguments = atTheEndOfLine && !isTemplateSetting(lineContent);
+        final boolean shouldInsertArguments = atTheEndOfLine && !isTemplateSetting(offset);
         for (final RedKeywordProposal kwProposal : kwProposals) {
             final List<String> args = shouldInsertArguments ? kwProposal.getArguments() : new ArrayList<>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + String.join(separator, args));
@@ -96,13 +95,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return proposals;
     }
 
-    protected boolean isTemplateSetting(final String lineContent) {
-        return startsWithSetting(lineContent, "template");
-    }
-
-    private static boolean startsWithSetting(final String lineContent, final String setting) {
-        final String trimmed = lineContent.trim().toLowerCase();
-        return trimmed.matches("^\\[[ ]?" + setting + "[ ]?\\].*");
+    protected boolean isTemplateSetting(final int offset) {
+        return ModelUtilities.isTemplateLocalSetting(assist.getModel(), offset);
     }
 
     @VisibleForTesting

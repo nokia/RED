@@ -33,28 +33,11 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
             throws BadLocationException {
         return isInApplicableContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1
-                && isKeywordBasedSetting(lineContent);
+                && ModelUtilities.isKeywordBasedGeneralSetting(assist.getModel(), offset);
     }
 
     @Override
-    protected boolean isTemplateSetting(final String lineContent) {
-        return startsWithOptionalSpace(lineContent, "test template")
-                || startsWithOptionalSpace(lineContent, "task template");
-    }
-
-    static boolean isKeywordBasedSetting(final String lineContent) {
-        return startsWithOptionalSpace(lineContent, "test template")
-                || startsWithOptionalSpace(lineContent, "task template")
-                || startsWithOptionalSpace(lineContent, "suite setup")
-                || startsWithOptionalSpace(lineContent, "suite teardown")
-                || startsWithOptionalSpace(lineContent, "test setup")
-                || startsWithOptionalSpace(lineContent, "test teardown")
-                || startsWithOptionalSpace(lineContent, "task setup")
-                || startsWithOptionalSpace(lineContent, "task teardown");
-    }
-
-    private static boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
-        return string.toLowerCase().startsWith(potentialPrefix.toLowerCase())
-                || string.toLowerCase().startsWith(" " + potentialPrefix.toLowerCase());
+    protected boolean isTemplateSetting(final int offset) {
+        return ModelUtilities.isTemplateGeneralSetting(assist.getModel(), offset);
     }
 }

@@ -7,5 +7,7 @@ package org.robotframework.red.jface.assist;
 
 public interface RedContentProposalProvider {
 
+    boolean shouldShowProposals(AssistantContext context);
+
     RedContentProposal[] getProposals(String contents, int position, AssistantContext context);
 }

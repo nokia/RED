@@ -28,11 +28,14 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return tableContext.getColumn() == 0;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        if (!areApplicable((NatTableAssistantContext) context)) {
-            return new RedContentProposal[0];
-        }
 
         final String prefix = contents.substring(0, position);
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
@@ -41,9 +44,5 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
         return settingsProposals.stream()
                 .map(proposal -> new AssistProposalAdapter(environment, proposal, p -> true))
                 .toArray(RedContentProposal[]::new);
-    }
-
-    private boolean areApplicable(final NatTableAssistantContext tableContext) {
-        return tableContext.getColumn() == 0;
     }
 }

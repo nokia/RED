@@ -23,13 +23,17 @@ public class CombinedProposalsProvider implements RedContentProposalProvider {
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        return true;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
         final List<RedContentProposal> proposals = new ArrayList<>();
         for (final RedContentProposalProvider provider : providers) {
-            final RedContentProposal[] newProposals = provider.getProposals(contents, position, context);
-            if (newProposals != null) {
-                for (final RedContentProposal proposal : newProposals) {
+            if (provider.shouldShowProposals(context)) {
+                for (final RedContentProposal proposal : provider.getProposals(contents, position, context)) {
                     proposals.add(proposal);
                 }
             }

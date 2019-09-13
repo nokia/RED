@@ -25,6 +25,11 @@ public class NonContextualKeywordProposalsProvider implements RedContentProposal
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        return true;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
         final String prefix = contents.substring(0, position);

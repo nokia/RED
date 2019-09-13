@@ -5,101 +5,35 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.rf.ide.core.environment.IRuntimeEnvironment;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ImportLibraryTableFixer;
 import org.robotframework.red.jface.assist.AssistantContext;
-import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-public class KeywordProposalsInSettingsProvider implements RedContentProposalProvider {
-
-    private final RobotSuiteFile suiteFile;
-
-    private final IRowDataProvider<?> dataProvider;
+public class KeywordProposalsInSettingsProvider extends KeywordProposalsProvider {
 
     public KeywordProposalsInSettingsProvider(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
-        this.suiteFile = suiteFile;
-        this.dataProvider = dataProvider;
+        super(suiteFile, dataProvider);
     }
 
     @Override
-    public RedContentProposal[] getProposals(final String contents, final int position,
-            final AssistantContext context) {
-        if (!areApplicable((NatTableAssistantContext) context)) {
-            return new RedContentProposal[0];
-        }
-
-        final String prefix = contents.substring(0, position);
-        final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile)
-                .getKeywordProposals(prefix);
-
-        final Predicate<AssistProposal> shouldCommitAfterAccepting = proposal -> !EmbeddedKeywordNamesSupport
-                .hasEmbeddedArguments(proposal.getContent());
-
-        final IRuntimeEnvironment env = suiteFile.getRobotProject().getRuntimeEnvironment();
-        return keywordsProposals.stream()
-                .map(proposal -> new AssistProposalAdapter(env, proposal, shouldCommitAfterAccepting,
-                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposal,
-                                (NatTableAssistantContext) context)))
-                .toArray(RedContentProposal[]::new);
+    public boolean shouldShowProposals(final AssistantContext context) {
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return tableContext.getColumn() == 1
+                && ModelRowUtilities.isKeywordBasedGeneralSetting(dataProvider, tableContext.getRow());
     }
 
-    private boolean areApplicable(final NatTableAssistantContext tableContext) {
-        return tableContext.getColumn() == 1 && isKeywordBasedSetting(dataProvider, tableContext.getRow());
+    @Override
+    protected boolean isTemplateSetting(final NatTableAssistantContext tableContext) {
+        return ModelRowUtilities.isTemplateGeneralSetting(dataProvider, tableContext.getRow());
     }
 
-    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword,
-            final NatTableAssistantContext tableContext) {
-        final List<Runnable> operations = new ArrayList<>();
-
-        if (!isTemplateSetting(dataProvider, tableContext.getRow())) {
-            final MultipleCellTableUpdater updater = new MultipleCellTableUpdater(tableContext, dataProvider);
-            final List<String> valuesToInsert = KeywordProposalsProvider.getValuesToInsert(proposedKeyword);
-            if (updater.shouldInsertMultipleCellsWithoutColumnExceeding(valuesToInsert)) {
-                operations.add(() -> updater.insertMultipleCells(valuesToInsert));
-            }
-        }
-
-        if (!proposedKeyword.isAccessible()) {
-            operations.add(() -> new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile));
-        }
-
-        return operations;
+    @Override
+    protected boolean shouldInsertMultipleCells(final MultipleCellTableUpdater updater,
+            final List<String> valuesToInsert) {
+        return updater.shouldInsertMultipleCellsWithoutColumnExceeding(valuesToInsert);
     }
 
-    static boolean isKeywordBasedSetting(final IRowDataProvider<?> dataProvider, final int row) {
-        final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
-        final String settingName = (String) entry.getKey();
-        final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
-
-        return EnumSet
-                .of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION,
-                        RobotTokenType.SETTING_TEST_SETUP_DECLARATION, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION,
-                        RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION, RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
-                        RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)
-                .contains(actualType);
-    }
-
-    private static boolean isTemplateSetting(final IRowDataProvider<?> dataProvider, final int row) {
-        final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
-        final String settingName = (String) entry.getKey();
-        final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
-
-        return actualType == RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
-                || actualType == RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION;
-    }
 }

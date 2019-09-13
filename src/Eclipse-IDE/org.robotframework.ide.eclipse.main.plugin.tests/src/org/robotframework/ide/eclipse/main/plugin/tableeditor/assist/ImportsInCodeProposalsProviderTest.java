@@ -49,6 +49,7 @@ public class ImportsInCodeProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals("foo", 1, null);
@@ -61,6 +62,7 @@ public class ImportsInCodeProposalsProviderTest {
         text.setText("abc");
 
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, null);

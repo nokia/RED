@@ -11,12 +11,10 @@ import java.util.function.Predicate;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ImportLibraryTableFixer;
 import org.robotframework.red.jface.assist.AssistantContext;
@@ -24,11 +22,13 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class KeywordProposalsProvider implements RedContentProposalProvider {
 
     private final RobotSuiteFile suiteFile;
 
-    private final IRowDataProvider<?> dataProvider;
+    protected final IRowDataProvider<?> dataProvider;
 
     public KeywordProposalsProvider(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
         this.suiteFile = suiteFile;
@@ -36,8 +36,14 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        return true;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
+
         final String prefix = contents.substring(0, position);
         final List<? extends AssistProposal> keywordsProposals = new RedKeywordProposals(suiteFile)
                 .getKeywordProposals(prefix);
@@ -57,10 +63,10 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
             final NatTableAssistantContext tableContext) {
         final List<Runnable> operations = new ArrayList<>();
 
-        if (!isTemplateSetting(dataProvider, tableContext.getRow())) {
+        if (!isTemplateSetting(tableContext)) {
             final MultipleCellTableUpdater updater = new MultipleCellTableUpdater(tableContext, dataProvider);
             final List<String> valuesToInsert = getValuesToInsert(proposedKeyword);
-            if (updater.shouldInsertMultipleCells(valuesToInsert)) {
+            if (shouldInsertMultipleCells(updater, valuesToInsert)) {
                 operations.add(() -> updater.insertMultipleCells(valuesToInsert));
             }
         }
@@ -72,16 +78,16 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         return operations;
     }
 
-    private static boolean isTemplateSetting(final IRowDataProvider<?> dataProvider, final int row) {
-        final Object rowObject = dataProvider.getRowObject(row);
-        if (rowObject instanceof RobotKeywordCall) {
-            final RobotKeywordCall call = (RobotKeywordCall) rowObject;
-            final ModelType modelType = call.getLinkedElement().getModelType();
-            return modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.TASK_TEMPLATE;
-        }
-        return false;
+    protected boolean isTemplateSetting(final NatTableAssistantContext tableContext) {
+        return ModelRowUtilities.isTemplateLocalSetting(dataProvider, tableContext.getRow());
     }
 
+    protected boolean shouldInsertMultipleCells(final MultipleCellTableUpdater updater,
+            final List<String> valuesToInsert) {
+        return updater.shouldInsertMultipleCells(valuesToInsert);
+    }
+
+    @VisibleForTesting
     static List<String> getValuesToInsert(final RedKeywordProposal proposedKeyword) {
         final List<String> values = new ArrayList<>(proposedKeyword.getArguments());
         values.add(0, proposedKeyword.getContent());

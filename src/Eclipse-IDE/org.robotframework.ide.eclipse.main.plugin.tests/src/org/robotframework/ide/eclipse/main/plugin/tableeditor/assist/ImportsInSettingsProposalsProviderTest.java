@@ -48,27 +48,16 @@ public class ImportsInSettingsProposalsProviderTest {
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("all_settings.robot",
-                "*** Settings ***",
-                "Library",
-                "Resource",
-                "Variables",
-                "Metadata",
-                "Suite Setup",
-                "Suite Teardown",
-                "Test Setup",
-                "Test Teardown",
-                "Test Template",
-                "Test Timeout",
-                "Force Tags",
-                "Default Tags");
         projectProvider.createFile("kw_based_settings.robot",
                 "*** Settings ***",
                 "Suite Setup",
                 "Suite Teardown",
                 "Test Setup",
                 "Test Teardown",
-                "Test Template");
+                "Test Template",
+                "Task Setup",
+                "Task Teardown",
+                "Task Template");
         projectProvider.createFile("non_kw_based_settings.robot",
                 "*** Settings ***",
                 "Library",
@@ -76,8 +65,21 @@ public class ImportsInSettingsProposalsProviderTest {
                 "Variables",
                 "Metadata",
                 "Test Timeout",
+                "Task Timeout",
                 "Force Tags",
                 "Default Tags");
+        projectProvider.createFile("kw_based_settings_with_resource.robot",
+                "*** Settings ***",
+                "Suite Setup",
+                "Suite Teardown",
+                "Test Setup",
+                "Test Teardown",
+                "Test Template",
+                "Task Setup",
+                "Task Teardown",
+                "Task Template",
+                "*** Settings ***",
+                "Resource  res.robot");
     }
 
     @AfterClass
@@ -87,7 +89,7 @@ public class ImportsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenColumnIsDifferentThanSecond() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("all_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
@@ -95,19 +97,19 @@ public class ImportsInSettingsProposalsProviderTest {
                 dataProvider);
 
         for (int column = 0; column < 10; column++) {
-            if (column == 1) {
-                continue;
-            }
             for (int row = 0; row < settings.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
-                final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-                assertThat(proposals).isEmpty();
+                if (column == 1) {
+                    assertThat(provider.shouldShowProposals(context)).isTrue();
+                } else {
+                    assertThat(provider.shouldShowProposals(context)).isFalse();
+                }
             }
         }
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() throws Exception {
+    public void proposalsShouldNotBeShown_whenSettingIsNotKeywordBased() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
@@ -118,8 +120,7 @@ public class ImportsInSettingsProposalsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
-            assertThat(proposals).isEmpty();
+            assertThat(provider.shouldShowProposals(context)).isFalse();
         }
     }
 
@@ -144,10 +145,8 @@ public class ImportsInSettingsProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("rrr");
 
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
-        final RobotSettingsSection settingsSection = (RobotSettingsSection) suiteFile
-                .createRobotSection(RobotSettingsSection.SECTION_NAME);
-        settingsSection.createSetting("Resource", "", "res.robot");
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("kw_based_settings_with_resource.robot"));
 
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
 

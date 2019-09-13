@@ -71,18 +71,57 @@ public class CombinedProposalsProviderTest {
         final RedContentProposal[] nestedProposals3 = new RedContentProposal[] { p3, p4, p5 };
 
         final RedContentProposalProvider nested1 = mock(RedContentProposalProvider.class);
+        when(nested1.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
         when(nested1.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals1);
 
         final RedContentProposalProvider nested2 = mock(RedContentProposalProvider.class);
+        when(nested2.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
         when(nested2.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals2);
 
         final RedContentProposalProvider nested3 = mock(RedContentProposalProvider.class);
+        when(nested3.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
         when(nested3.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals3);
 
         final CombinedProposalsProvider provider = new CombinedProposalsProvider(nested1, nested2, nested3);
         final RedContentProposal[] proposals = provider.getProposals("", 0, mock(AssistantContext.class));
 
         assertThat(proposals).containsExactly(p1, p2, p3, p4, p5);
+    }
+
+    @Test
+    public void onlyProposalsThatShouldBeShownAreProvided_whenNestedProvidersDoesProvideSomething() {
+        final RedContentProposal p1 = mock(RedContentProposal.class);
+        final RedContentProposal p2 = mock(RedContentProposal.class);
+        final RedContentProposal p3 = mock(RedContentProposal.class);
+        final RedContentProposal p4 = mock(RedContentProposal.class);
+        final RedContentProposal p5 = mock(RedContentProposal.class);
+        final RedContentProposal p6 = mock(RedContentProposal.class);
+
+        final RedContentProposal[] nestedProposals1 = new RedContentProposal[] { p1, p2 };
+        final RedContentProposal[] nestedProposals2 = new RedContentProposal[] {};
+        final RedContentProposal[] nestedProposals3 = new RedContentProposal[] { p3, p4, p5 };
+        final RedContentProposal[] nestedProposals4 = new RedContentProposal[] { p6 };
+
+        final RedContentProposalProvider nested1 = mock(RedContentProposalProvider.class);
+        when(nested1.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
+        when(nested1.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals1);
+
+        final RedContentProposalProvider nested2 = mock(RedContentProposalProvider.class);
+        when(nested2.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
+        when(nested2.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals2);
+
+        final RedContentProposalProvider nested3 = mock(RedContentProposalProvider.class);
+        when(nested3.shouldShowProposals(any(AssistantContext.class))).thenReturn(false);
+        when(nested3.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals3);
+
+        final RedContentProposalProvider nested4 = mock(RedContentProposalProvider.class);
+        when(nested4.shouldShowProposals(any(AssistantContext.class))).thenReturn(true);
+        when(nested4.getProposals(anyString(), anyInt(), any(AssistantContext.class))).thenReturn(nestedProposals4);
+
+        final CombinedProposalsProvider provider = new CombinedProposalsProvider(nested1, nested2, nested3, nested4);
+        final RedContentProposal[] proposals = provider.getProposals("", 0, mock(AssistantContext.class));
+
+        assertThat(proposals).containsExactly(p1, p2, p6);
     }
 
 }

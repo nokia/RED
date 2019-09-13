@@ -44,16 +44,21 @@ public class CodeReservedWordsInSettingsProposalsProvider implements RedContentP
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        return true;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
 
-        final NatTableAssistantContext assistContext = (NatTableAssistantContext) context;
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
         final String prefix = contents.substring(0, position);
 
         final List<? extends AssistProposal> libraryAliasProposals = new LibraryAliasReservedWordProposals(
-                createLibraryAliasPredicate(assistContext)).getReservedWordProposals(prefix);
+                createLibraryAliasPredicate(tableContext)).getReservedWordProposals(prefix);
         final List<? extends AssistProposal> disableSettingProposals = new DisableSettingReservedWordProposals(
-                createDisableSettingPredicate(assistContext)).getReservedWordProposals(prefix);
+                createDisableSettingPredicate(tableContext)).getReservedWordProposals(prefix);
 
         return Streams.concat(libraryAliasProposals.stream(), disableSettingProposals.stream())
                 .map(proposal -> new AssistProposalAdapter(environment, proposal, p -> true,

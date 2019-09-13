@@ -38,18 +38,23 @@ public class CodeReservedWordsProposalsProvider implements RedContentProposalPro
     }
 
     @Override
+    public boolean shouldShowProposals(final AssistantContext context) {
+        return true;
+    }
+
+    @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
 
-        final NatTableAssistantContext assistContext = (NatTableAssistantContext) context;
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
         final String prefix = contents.substring(0, position);
 
         final List<? extends AssistProposal> loopsProposals = new ForLoopReservedWordsProposals(
-                createForLoopsPredicate(assistContext)).getReservedWordProposals(prefix);
+                createForLoopsPredicate(tableContext)).getReservedWordProposals(prefix);
         final List<? extends AssistProposal> gherkinProposals = new GherkinReservedWordProposals(
-                createGherkinPredicate(assistContext)).getReservedWordProposals(prefix);
+                createGherkinPredicate(tableContext)).getReservedWordProposals(prefix);
         final List<? extends AssistProposal> disableSettingProposals = new DisableSettingReservedWordProposals(
-                createDisableSettingPredicate(assistContext)).getReservedWordProposals(prefix);
+                createDisableSettingPredicate(tableContext)).getReservedWordProposals(prefix);
 
         return Streams.concat(loopsProposals.stream(), gherkinProposals.stream(), disableSettingProposals.stream())
                 .map(proposal -> GherkinReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
