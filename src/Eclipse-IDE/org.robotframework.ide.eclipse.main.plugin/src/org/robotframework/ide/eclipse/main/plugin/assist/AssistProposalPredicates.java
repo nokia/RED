@@ -102,10 +102,16 @@ public class AssistProposalPredicates {
                 return firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_SETUP)
                         || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN)
                         || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TEMPLATE)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TIMEOUT)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION)
                         || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_SETUP)
                         || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TEARDOWN)
                         || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TEMPLATE)
-                        || firstTokenInLineTypes.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN);
+                        || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TIMEOUT)
+                        || firstTokenInLineTypes.contains(RobotTokenType.TASK_SETTING_TAGS_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN)
+                        || firstTokenInLineTypes.contains(RobotTokenType.KEYWORD_SETTING_TIMEOUT)
+                        || firstTokenInLineTypes.contains(RobotTokenType.KEYWORD_SETTING_TAGS);
             }
             return false;
         };
@@ -126,9 +132,11 @@ public class AssistProposalPredicates {
                         || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_SETUP_DECLARATION)
                         || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION)
                         || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION)
                         || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_SETUP_DECLARATION)
                         || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION)
-                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION);
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)
+                        || firstTokenInLineTypes.contains(RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION);
             }
             return false;
         };

@@ -59,7 +59,7 @@ public class CodeReservedWordsAssistProcessorTest {
                 "  [Setup]  Some Keyword  arg",
                 "  [Template]  Not Defined",
                 "  [Teardown]  ",
-                "  [Tags]  abc");
+                "  [Documentation]  abc");
     }
 
     @AfterClass
@@ -227,7 +227,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
                 .containsOnly(new Document("*** Test Cases ***", "case", "  [Setup]  Some Keyword  arg",
-                        "  [Template]  NONE", "  [Teardown]  ", "  [Tags]  abc"));
+                        "  [Template]  NONE", "  [Teardown]  ", "  [Documentation]  abc"));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
                 .containsOnly(new Document("*** Test Cases ***", "case", "  [Setup]  Some Keyword  arg",
-                        "  [Template]  NONE", "  [Teardown]  ", "  [Tags]  abc"));
+                        "  [Template]  NONE", "  [Teardown]  ", "  [Documentation]  abc"));
     }
 
     @Test
@@ -257,7 +257,7 @@ public class CodeReservedWordsAssistProcessorTest {
 
         assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
                 .containsOnly(new Document("*** Test Cases ***", "case", "  [Setup]  Some Keyword  arg",
-                        "  [Template]  Not Defined", "  [Teardown]  NONE", "  [Tags]  abc"));
+                        "  [Template]  Not Defined", "  [Teardown]  NONE", "  [Documentation]  abc"));
     }
 
     @Test
@@ -272,13 +272,13 @@ public class CodeReservedWordsAssistProcessorTest {
     }
 
     @Test
-    public void disableSettingProposalIsNotProvided_whenInApplicableContentTypeButNotInKeywordBasedSetting()
+    public void disableSettingProposalIsNotProvided_whenInApplicableContentTypeButNotInDisableableSetting()
             throws Exception {
         final ITextViewer viewer = createViewer(suiteWithSettings, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
         final CodeReservedWordsAssistProcessor processor = new CodeReservedWordsAssistProcessor(
                 createAssistant(suiteWithSettings));
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 104);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 113);
 
         assertThat(proposals).isEmpty();
     }

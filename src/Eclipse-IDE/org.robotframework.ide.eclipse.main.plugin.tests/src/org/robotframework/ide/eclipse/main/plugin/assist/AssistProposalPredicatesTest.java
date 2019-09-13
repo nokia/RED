@@ -306,7 +306,7 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithoutKeywordBasedSetting_theDisabledSettingPredicateIsNotSatisfied() {
+    public void whenThereIsTokenGivenWithoutDisableableSetting_theDisabledSettingPredicateIsNotSatisfied() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                     .disableSettingReservedWordPredicate(cellIndex, Optional.of(RobotToken.create("[Setting]")));
@@ -315,12 +315,15 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithKeywordBasedSettingAndGivenWordDoesNotMatch_theDisabledSettingPredicateIsNotSatisfied() {
+    public void whenThereIsTokenGivenWithDisableableSettingAndGivenWordDoesNotMatch_theDisabledSettingPredicateIsNotSatisfied() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             for (final RobotTokenType type : EnumSet.of(RobotTokenType.TEST_CASE_SETTING_SETUP,
                     RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+                    RobotTokenType.TEST_CASE_SETTING_TIMEOUT, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                     RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_TEARDOWN,
-                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.KEYWORD_SETTING_TEARDOWN)) {
+                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.TASK_SETTING_TIMEOUT,
+                    RobotTokenType.TASK_SETTING_TAGS_DECLARATION, RobotTokenType.KEYWORD_SETTING_TEARDOWN,
+                    RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_TAGS)) {
                 final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("[Setting]", type));
                 final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                         .disableSettingReservedWordPredicate(cellIndex, firstTokenInLine);
@@ -332,12 +335,15 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithKeywordBasedSetting_theDisabledSettingPredicateIsSatisfiedOnlyForCertainCells() {
+    public void whenThereIsTokenGivenWithDisableableSetting_theDisabledSettingPredicateIsSatisfiedOnlyForCertainCells() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             for (final RobotTokenType type : EnumSet.of(RobotTokenType.TEST_CASE_SETTING_SETUP,
                     RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
+                    RobotTokenType.TEST_CASE_SETTING_TIMEOUT, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                     RobotTokenType.TASK_SETTING_SETUP, RobotTokenType.TASK_SETTING_TEARDOWN,
-                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.KEYWORD_SETTING_TEARDOWN)) {
+                    RobotTokenType.TASK_SETTING_TEMPLATE, RobotTokenType.TASK_SETTING_TIMEOUT,
+                    RobotTokenType.TASK_SETTING_TAGS_DECLARATION, RobotTokenType.KEYWORD_SETTING_TEARDOWN,
+                    RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_TAGS)) {
                 final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("[Setting]", type));
                 final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                         .disableSettingReservedWordPredicate(cellIndex, firstTokenInLine);
@@ -371,7 +377,7 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithoutKeywordBasedSetting_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+    public void whenThereIsTokenGivenWithoutDisableableSetting_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                     .disableSettingInSettingsReservedWordPredicate(cellIndex,
@@ -381,13 +387,14 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithKeywordBasedSettingAndGivenWordDoesNotMatch_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
+    public void whenThereIsTokenGivenWithDisableableSettingAndGivenWordDoesNotMatch_theDisabledSettingInSettingsPredicateIsNotSatisfied() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             for (final RobotTokenType type : EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
                     RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
                     RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION,
-                    RobotTokenType.SETTING_TASK_SETUP_DECLARATION, RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION,
-                    RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)) {
+                    RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION, RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION)) {
                 final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("General Setting", type));
                 final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                         .disableSettingInSettingsReservedWordPredicate(cellIndex, firstTokenInLine);
@@ -399,13 +406,14 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenThereIsTokenGivenWithKeywordBasedSetting_theDisabledSettingInSettingsPredicateIsSatisfiedOnlyForCertainCells() {
+    public void whenThereIsTokenGivenWithDisableableSetting_theDisabledSettingInSettingsPredicateIsSatisfiedOnlyForCertainCells() {
         for (final int cellIndex : ContiguousSet.create(Range.closed(0, 10), DiscreteDomain.integers())) {
             for (final RobotTokenType type : EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
                     RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
                     RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION,
-                    RobotTokenType.SETTING_TASK_SETUP_DECLARATION, RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION,
-                    RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION)) {
+                    RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION, RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION)) {
                 final Optional<RobotToken> firstTokenInLine = Optional.of(RobotToken.create("General Setting", type));
                 final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                         .disableSettingInSettingsReservedWordPredicate(cellIndex, firstTokenInLine);
