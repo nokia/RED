@@ -1,0 +1,188 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistForNONE
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _59eigNVmEemgX-SoeSm2iQ
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 9/13/19 4:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Setting ***\n"
+    + "Resource    \n"
+    + "Variables  \n"
+    + "Library     \n"
+    + "   \n"
+    + "Documentation    \n"
+    + "Default Tags        \n"
+    + "Force Tags    \n"
+    + "Metadata     \n"
+    + "    \n"
+    + "Suite Setup    \n"
+    + "Suite Teardown    \n\n"
+    + "Test Setup    \n"
+    + "Test Teardown    \n"
+    + "Test Template    \n"
+    + "Test Timeout    \n"
+    + "  \n"
+    + "*** Test Cases ***\n"
+    + "dad\n"
+    + "    [Documentation]    \n"
+    + "    [Setup]    \n"
+    + "    [Tags]    \n"
+    + "    [Teardown]    \n"
+    + "    [Template]    \n"
+    + "    [Timeout]  \n"
+    + "    log  8  \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    [Arguments]    \n"
+    + "    [Documentation]    \n"
+    + "    [Return]    \n"
+    + "    [Tags]    \n"
+    + "    [Teardown]    \n"
+    + "    [Timeout]      " 
+    
+get-editor "TestFile.robot" | key-type "M1+s" 
+
+proc "set-cart-end-open-content-assist" [val row] [val column] [val first_line]{
+	with [get-editor "TestFile.robot"] {
+	    with [get-text-viewer] {
+	        set-caret-pos $row $column
+	        key-type "M1+SPACE"
+	    }
+		if [$first_line | eq "NONE"]{
+			with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+			    get-property "getItems().length" -raw|  gt 100 | verify-true
+			    get-property "getItems().TableItem[0].getText()" | equals NONE | verify-true
+			    get-property "getItems().TableItem[1].getText()" | equals "Call Method - BuiltIn" | verify-true
+			}
+		}-else{
+			if [$first_line | eq "NONE2"]{
+				with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+					    get-property "getItems().length" -raw|  lt 40 | verify-true
+					    get-property "getItems().TableItem[0].getText()" | equals NONE | verify-true
+					    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+				}
+			}-else{	
+				get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+			   		| get-property "getItems().TableItem[0].getText()" | equals $first_line | verify-true
+			}   	
+		}	
+	    get-canvas | key-type "TRAVERSE_ESCAPE"
+	    get-text-viewer | key-type ESC
+	}
+}    
+
+
+proc "check-content-assist-in-table" [val first_line][val table]{
+	get-editor "TestFile.robot" |get-editbox -after [get-label $table] -index 1 |   key-type "M1+SPACE"
+
+	if [$first_line | eq "NONE"]{
+		with [get-window -class ContentProposalPopup  | get-table] {
+		    get-property "getItems().length" -raw|  gt 100 | verify-true
+		    get-property "getItems().TableItem[0].getText()" | equals NONE | verify-true
+		    get-property "getItems().TableItem[1].getText()" | equals "Call Method - BuiltIn" | verify-true
+		}
+	}-else{
+		if [$first_line | eq "NONE2"]{
+			with [get-window -class ContentProposalPopup  | get-table] {
+				    get-property "getItems().length" -raw|  lt 40 | verify-true
+				    get-property "getItems().TableItem[0].getText()" | equals NONE | verify-true
+				    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+			}
+		}-else{	
+			get-window -class ContentProposalPopup  | get-table 
+		   		| get-property "getItems().TableItem[0].getText()" | equals $first_line | verify-true
+		}   	
+	}	
+   // close and go down	
+    get-editbox -after [get-label $table] -index 1 |  key-type "Esc"
+    with [get-editor "TestFile.robot" | get-canvas -after [get-label $table] -index 1] {
+	    key-type Down
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	}
+} 
+
+set-cart-end-open-content-assist 2 12 -first_line "${/}"
+set-cart-end-open-content-assist 3  12  -first_line "${/}"
+set-cart-end-open-content-assist 4 12 -first_line "Collections"
+
+set-cart-end-open-content-assist 6 17  -first_line "${/}"
+set-cart-end-open-content-assist 7 17  -first_line "${/}"
+set-cart-end-open-content-assist 8 15  -first_line "${/}"
+set-cart-end-open-content-assist 9 14  -first_line "${/}"
+
+set-cart-end-open-content-assist 11 16 -first_line "NONE"
+set-cart-end-open-content-assist 12 19 -first_line "NONE"
+set-cart-end-open-content-assist 14 15 -first_line "NONE"
+set-cart-end-open-content-assist 15 18 -first_line "NONE"
+set-cart-end-open-content-assist 17 17  -first_line  "NONE2"
+
+set-cart-end-open-content-assist 21 24 -first_line "Call Method - BuiltIn"
+set-cart-end-open-content-assist 22 16 -first_line "NONE"
+set-cart-end-open-content-assist 23 15 -first_line "NONE"
+set-cart-end-open-content-assist 24 18 -first_line "NONE"
+set-cart-end-open-content-assist 25 19 -first_line "NONE"
+set-cart-end-open-content-assist 26 16 -first_line "NONE"
+
+
+set-cart-end-open-content-assist 31 20 -first_line "Call Method - BuiltIn"
+set-cart-end-open-content-assist 32 24 -first_line "Call Method - BuiltIn"
+set-cart-end-open-content-assist 33 17 -first_line "Call Method - BuiltIn"
+set-cart-end-open-content-assist 34 15 -first_line "NONE"
+set-cart-end-open-content-assist 35 19  -first_line "NONE"
+set-cart-end-open-content-assist 36 17 -first_line "NONE"
+
+
+// check in tabl
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/dad" | click
+wait 300
+
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Right
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 |   key-type "M1+SPACE"
+}
+
+check-content-assist-in-table -first_line  "Call Method - BuiltIn"   -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+
+
+// go to KW table
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw 1" | click
+wait 300
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Right
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+SPACE"
+}
+
+check-content-assist-in-table -first_line "Call Method - BuiltIn"  -table "User Keywords"
+check-content-assist-in-table -first_line "Call Method - BuiltIn"  -table "User Keywords"
+check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
+check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
+check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
