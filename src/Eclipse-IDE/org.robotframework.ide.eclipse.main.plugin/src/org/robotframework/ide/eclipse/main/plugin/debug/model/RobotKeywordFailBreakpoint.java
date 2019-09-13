@@ -222,13 +222,4 @@ public class RobotKeywordFailBreakpoint extends Breakpoint implements RobotBreak
         }
         return label;
     }
-
-    public static class InvalidBreakpointPatternException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public InvalidBreakpointPatternException(final String message) {
-            super(message);
-        }
-    }
 }

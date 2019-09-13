@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.debug.AddKeywordFailBreakpointHandler.E4AddKeywordFailBreakpointHandler;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotBreakpointDetailPane.BreakpointValidationException;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint.InvalidBreakpointPatternException;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.graphics.ColorsManager;
 
@@ -106,7 +106,7 @@ public class AddKeywordFailBreakpointHandler extends DIParameterizedHandler<E4Ad
                 getButton(IDialogConstants.OK_ID).setEnabled(true);
                 pathText.setBackground(null);
 
-            } catch (final InvalidBreakpointPatternException e) {
+            } catch (final BreakpointValidationException e) {
                 getButton(IDialogConstants.OK_ID).setEnabled(false);
 
                 decoration = new ControlDecoration(pathText, SWT.LEFT | SWT.TOP);
