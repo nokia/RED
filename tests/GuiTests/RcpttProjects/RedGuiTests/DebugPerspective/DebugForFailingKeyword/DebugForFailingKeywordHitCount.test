@@ -1,0 +1,237 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
+Element-Name: DebugForFailingKeywordHitCount
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _9yGpwNStEemgX-SoeSm2iQ
+Runtime-Version: 2.4.2.201905080442
+Save-Time: 9/13/19 4:44 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//set text 
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Setting ***\n"
+    + "Library    Collections    WITH NAME    abc\n"
+    + "*** Test Cases ***\n"
+    + "tc 1\n"
+    + "    Log    message    \n"
+    + "    Should Be Equal    4    4 \n"
+    + "    Should Be Equal    4    5        \n"
+    + "    lol.Convert To List    \n"
+    + "     \n"
+    + "tc 2\n"
+    + "   Should Be Equal As Strings    7    8\n"
+    + "   Log  9  \n"
+    + "      \n\n"
+    + "tc 3\n"
+    + "    Should Be Equal As Integers   9    10  \n"
+    + "    Convert To String    text123\n\n"
+    + "tc 4\n"
+    + "    Should Be Equal    12    13  \n"
+    + "    \n"
+    + "tc 5\n"
+    + "    log  9\n"
+    + "    abc.Convert To List\n"
+    + "   \n"
+    + "tc 6\n"
+    + "     abc4ef be equal\n"
+    + "     \n"
+    + "*** Keywords ***\n"
+    + "abc4ef be equal\n"
+    + "    fail  \" i will fail\""
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+// go to Breakpoint tab in Debug perspective
+get-button "Open Perspective" | click
+get-window "Open Perspective" | get-table | select Debug | double-click
+
+
+
+
+// set hit count for -6
+get-view Breakpoints | get-button "Add Robot Keyword Fail Breakpoint" | click
+with [get-window "Add new keyword failed breakpoint"] {
+    with [get-editbox 
+        -after [get-label "Define a keyword name which will pause the execution once the matching keyword fails. Use '?' for any character or '*' for any string."]] {
+        set-text "Should be EQUAL"
+    }
+    get-button OK | click
+}
+with [get-view Breakpoints] {
+    get-button "Hit count:" | check
+    get-editbox | set-text "-6"
+}
+
+with [get-view Breakpoints | get-editbox] {
+    get-property "decorators[0].visible" | equals true | verify-true
+    get-property "decorators[0].description" 
+        | equals "Hit count has to be a number greater than zero and less than 2^31" | verify-true
+}
+with [get-view Breakpoints | get-editbox] {
+    set-text ""
+    set-text 3
+    key-type "M1+s"
+}
+get-view Breakpoints | get-editbox | get-property text | equals 3 | verify-true
+get-view Breakpoints | get-editbox | set-text text
+
+with [get-view Breakpoints | get-editbox] {
+    get-property text | equals text | verify-true
+    get-property "decorators[0].visible" | equals true | verify-true
+    get-property "decorators[0].description" 
+        | equals "Hit count has to be a number greater than zero and less than 2^31" | verify-true
+}
+get-view Breakpoints | get-editbox | set-text 9
+get-view Breakpoints | get-editbox |  key-type "M1+s"
+
+// run test - test will stop normally
+with [get-view "Project Explorer"] {
+    click
+    get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Debug As/1 Robot Test" | click
+}
+
+wait-for-message-log -last_line "RobotProject.TestFile.tc 6"
+
+// change to regex and add value 3
+with [get-view Breakpoints] {
+    get-editbox -after [get-label "Keyword pattern:"] | set-text "Should be *"
+    get-editbox | set-text 3
+}
+get-button "Save (M1+S)" | click
+
+// check label in view
+get-view Breakpoints | get-tree | get-item -path "Keyword 'Should be \\*' fails \\[hit count: 3\\]" 
+    | get-property caption | equals "Keyword 'Should be *' fails [hit count: 3]" | verify-true
+    
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Debug As/1 Robot Test" 
+	    | click
+	wait-for-specific-nr-of-threads -nr_items_in_thread 3
+	check-debug-marker-on-ruler -line 16 -script_name "TestFile.robot"     
+	get-button "Resume (F8)" | click
+}
+
+// set normal breakpoint
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | hover-text 8 14
+    with [get-left-ruler | get-ruler-column AnnotationColumn] {
+        click-ruler -line 6
+        double-click-ruler 6
+        double-click-ruler 7
+        double-click-ruler 16
+    }
+}
+
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Debug As/1 Robot Test" 
+	    | click
+	wait-for-specific-nr-of-threads -nr_items_in_thread 3
+	
+	check-debug-marker-on-ruler -line 6 -script_name "TestFile.robot"   
+	  
+	get-button "Resume (F8)" | click
+	check-debug-marker-on-ruler -line 7 -script_name "TestFile.robot"
+	
+	get-button "Resume (F8)" | click
+	check-debug-marker-on-ruler -line 16 -script_name "TestFile.robot"
+	
+	get-button "Resume (F8)" | click
+	check-debug-marker-on-ruler -line 16 -script_name "TestFile.robot"
+	
+	get-button "Resume (F8)" | click
+	
+}
+wait-for-message-log -last_line "RobotProject.TestFile.tc 6"
+
+
+// remove all BP
+get-view Breakpoints | get-button "Remove All Breakpoints" | click
+get-window "Remove All Breakpoints" | get-button Remove | click
+
+//check if fields were disabled
+with [get-view Breakpoints] {
+    get-editbox | get-property enablement | equals false | verify-true
+    get-combo | get-property enablement | equals false | verify-true
+    
+    //  buttons
+    get-button "Hit count:" | get-property enablement | equals false | verify-true
+    get-button Conditional | get-property enablement | equals false | verify-true
+}
+
+// add new kw with hit count
+get-view Breakpoints | get-button "Add Robot Keyword Fail Breakpoint" | click
+with [get-window "Add new keyword failed breakpoint"] {
+    get-editbox 
+        -after [get-label "Define a keyword name which will pause the execution once the matching keyword fails. Use '?' for any character or '*' for any string."] 
+        | set-text Keyword2
+    get-button OK | click
+}
+
+with [get-view Breakpoints] {
+    get-button "Hit count:" | check
+    with [get-editbox] {
+        set-text 14
+        key-type "M1+s"
+    }
+    get-button "Add Robot Keyword Fail Breakpoint" | click
+}
+
+// add kw with double spaces
+with [get-window "Add new keyword failed breakpoint"] {
+    with [get-editbox 
+        -after [get-label "Define a keyword name which will pause the execution once the matching keyword fails. Use '?' for any character or '*' for any string."]] {
+        set-text "ww rr  33"
+    }
+}
+
+with [get-window "Add new keyword failed breakpoint" | get-editbox 
+    -after [get-label "Define a keyword name which will pause the execution once the matching keyword fails. Use '?' for any character or '*' for any string."]] {
+    get-property "decorators[0].visible" | equals true | verify-true
+    get-property "decorators[0].description" | equals "Keyword name cannot contain multiple spaces or tab character" 
+        | verify-true
+}
+
+// remove one space
+with [get-window "Add new keyword failed breakpoint"] {
+    with [get-editbox 
+        -after [get-label "Define a keyword name which will pause the execution once the matching keyword fails. Use '?' for any character or '*' for any string."]] {
+        set-text "ww rr 33"
+    }
+    get-button OK | click
+}
+
+with [get-view Breakpoints] {
+    get-button "Hit count:" | check
+    with [get-editbox] {
+        set-text 5
+        key-type "M1+s"
+    }
+}
+
+// check labels in view
+with [get-view Breakpoints | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals "Keyword 'Keyword2' fails [hit count: 14]" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "Keyword 'ww rr 33' fails [hit count: 5]" | verify-true
+}
+
+// click BP to check if values are changed
+get-view Breakpoints | get-tree | select "Keyword 'Keyword2' fails [hit count: 14]"
+with [get-view Breakpoints] {
+    get-editbox | get-property text | equals 14 | verify-true
+    get-editbox -after [get-label "Keyword pattern:"] | get-property text | equals Keyword2 | verify-true
+}
+get-view Breakpoints | get-tree | select "Keyword 'ww rr 33' fails [hit count: 5]"
+with [get-view Breakpoints] {
+    get-editbox | get-property text | equals 5 | verify-true
+    get-editbox -after [get-label "Keyword pattern:"] | get-property text | equals "ww rr 33" | verify-true
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
