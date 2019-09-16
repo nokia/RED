@@ -103,4 +103,20 @@ public class TestCaseTest {
 
         assertThat(test.getTemplateKeywordName()).isEmpty();
     }
+
+    @Test
+    public void templateKeywordIsNotReturned_whenGlobalIsNone() {
+        final TestTemplate globalTemplate = new TestTemplate(RobotToken.create("TestCase Template"));
+        globalTemplate.setKeywordName("NONE");
+
+        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
+        final RobotFile file = new RobotFile(parentFileOutput);
+        file.includeSettingTableSection();
+        file.getSettingTable().addTestTemplate(globalTemplate);
+        final TestCaseTable table = new TestCaseTable(file);
+        final TestCase test = new TestCase(RobotToken.create("test"));
+        test.setParent(table);
+
+        assertThat(test.getTemplateKeywordName()).isEmpty();
+    }
 }

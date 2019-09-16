@@ -350,20 +350,12 @@ public class Task extends CommonCase<TaskTable, Task> implements Serializable {
     }
 
     public Optional<String> getTemplateKeywordName() {
-        final String keywordName = getLocalTaskTemplateInUse();
-
-        if (keywordName == null) {
-            final SettingTable settingTable = getParent().getParent().getSettingTable();
-            return settingTable.isPresent()
-                    ? Optional.ofNullable(settingTable.getTaskTemplateInUse()).filter(name -> !name.isEmpty())
-                    : Optional.empty();
-
-        } else if (keywordName.isEmpty() || keywordName.equalsIgnoreCase("none")) {
-            return Optional.empty();
-
-        } else {
-            return Optional.of(keywordName);
+        Optional<String> template = Optional.ofNullable(getLocalTaskTemplateInUse());
+        if (!template.isPresent()) {
+            final SettingTable settings = getParent().getParent().getSettingTable();
+            template = settings.isPresent() ? Optional.ofNullable(settings.getTaskTemplateInUse()) : Optional.empty();
         }
+        return template.filter(name -> !name.isEmpty() && !name.equalsIgnoreCase("none"));
     }
 
     private String getLocalTaskTemplateInUse() {

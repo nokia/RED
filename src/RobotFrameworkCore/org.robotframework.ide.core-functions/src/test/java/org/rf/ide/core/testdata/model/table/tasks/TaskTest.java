@@ -471,6 +471,22 @@ public class TaskTest {
         assertThat(task.getTemplateKeywordName()).isEmpty();
     }
 
+    @Test
+    public void templateKeywordIsNotReturned_whenGlobalIsNone() {
+        final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
+        globalTemplate.setKeywordName("NONE");
+
+        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
+        final RobotFile file = new RobotFile(parentFileOutput);
+        file.includeSettingTableSection();
+        file.getSettingTable().addTaskTemplate(globalTemplate);
+        final TaskTable table = new TaskTable(file);
+        final Task task = new Task(RobotToken.create("task"));
+        task.setParent(table);
+
+        assertThat(task.getTemplateKeywordName()).isEmpty();
+    }
+
     private static RobotExecutableRow<Task> row(final String... cells) {
         final RobotExecutableRow<Task> child = new RobotExecutableRow<>();
         if (cells == null || cells.length == 0) {

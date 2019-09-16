@@ -344,20 +344,12 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     }
 
     public Optional<String> getTemplateKeywordName() {
-        final String keywordName = getLocalTestTemplateInUse();
-
-        if (keywordName == null) {
-            final SettingTable settingTable = getParent().getParent().getSettingTable();
-            return settingTable.isPresent()
-                    ? Optional.ofNullable(settingTable.getTestTemplateInUse()).filter(name -> !name.isEmpty())
-                    : Optional.empty();
-
-        } else if (keywordName.isEmpty() || keywordName.equalsIgnoreCase("none")) {
-            return Optional.empty();
-
-        } else {
-            return Optional.of(keywordName);
+        Optional<String> template = Optional.ofNullable(getLocalTestTemplateInUse());
+        if (!template.isPresent()) {
+            final SettingTable settings = getParent().getParent().getSettingTable();
+            template = settings.isPresent() ? Optional.ofNullable(settings.getTestTemplateInUse()) : Optional.empty();
         }
+        return template.filter(name -> !name.isEmpty() && !name.equalsIgnoreCase("none"));
     }
 
     private String getLocalTestTemplateInUse() {
