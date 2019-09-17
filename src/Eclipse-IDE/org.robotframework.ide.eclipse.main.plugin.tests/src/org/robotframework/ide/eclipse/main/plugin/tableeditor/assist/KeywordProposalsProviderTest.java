@@ -5,11 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,9 +78,6 @@ public class KeywordProposalsProviderTest {
                 "  [Setup]",
                 "  [Teardown]",
                 "  [Template]",
-                "  [Tags]",
-                "  [Timeout]",
-                "  [Documentation]",
                 "*** Keywords ***",
                 "kw_no_args",
                 "kw_with_args",
@@ -88,6 +86,32 @@ public class KeywordProposalsProviderTest {
                 "*** Keywords ***",
                 "kw_no_arg",
                 "kw_with_${arg}");
+        projectProvider.createFile("non_kw_based_settings.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  [Documentation]",
+                "  [Tags]",
+                "  [Timeout]");
+        projectProvider.createFile("kw_based_settings.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  [Setup]",
+                "  [Teardown]",
+                "  [Template]");
+        projectProvider.createFile("with_template.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  [Template]  Some Kw",
+                "  Log  message",
+                "  Kw Call  ",
+                "  ");
+        projectProvider.createFile("without_template.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  [Template]  NONE",
+                "  Log  message",
+                "  Kw Call  ",
+                "  ");
     }
 
     @AfterClass
@@ -96,12 +120,93 @@ public class KeywordProposalsProviderTest {
     }
 
     @Test
+    public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() {
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(settings);
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            assertThat(provider.computeProposals("foo", 0, context)).isNull();
+        }
+    }
+
+    @Test
+    public void thereAreProposalsProvided_whenSettingIsKeywordBased() {
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(settings);
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            assertThat(provider.computeProposals("foo", 0, context)).isNotNull();
+        }
+    }
+
+    @Test
+    public void thereAreNoProposalsProvidednInCode_whenTemplateIsUsed() {
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("with_template.robot"));
+        final List<RobotKeywordCall> nonSettings = suiteFile.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .stream()
+                .filter(element -> !element.isLocalSetting())
+                .collect(toList());
+
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(nonSettings);
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
+
+        for (int row = 0; row < nonSettings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            assertThat(provider.computeProposals("foo", 0, context)).isNull();
+        }
+    }
+
+    @Test
+    public void thereAreProposalsProvidedInCode_whenTemplateIsNotUsed() {
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("without_template.robot"));
+        final List<RobotKeywordCall> nonSettings = suiteFile.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .stream()
+                .filter(element -> !element.isLocalSetting())
+                .collect(toList());
+
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(nonSettings);
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
+
+        for (int row = 0; row < nonSettings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            assertThat(provider.computeProposals("foo", 0, context)).isNotNull();
+        }
+    }
+
+    @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
-        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, null);
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
-        final RedContentProposal[] proposals = provider.getProposals("foo", 1, null);
+        final AssistantContext context = new NatTableAssistantContext(0, 0);
+        final RedContentProposal[] proposals = provider.computeProposals("foo", 1, context);
         assertThat(proposals).isEmpty();
     }
 
@@ -112,9 +217,11 @@ public class KeywordProposalsProviderTest {
 
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
-        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, null);
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
+        final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 0, null);
+        final AssistantContext context = new NatTableAssistantContext(0, 0);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 0, context);
         assertThat(proposals).hasSize(2);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -134,11 +241,11 @@ public class KeywordProposalsProviderTest {
 
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("imported_keywords_suite.robot"));
-        final IRowDataProvider<Object> dataProvider = prepareDataProvider();
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 3);
-        final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
         assertThat(proposals).hasSize(4);
 
         assertThat(proposals[0].getLabel()).isEqualTo("kw1 - LibImported");
@@ -155,11 +262,11 @@ public class KeywordProposalsProviderTest {
     public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArguments() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("keywords_with_args_suite.robot"));
-        final IRowDataProvider<Object> dataProvider = prepareDataProvider();
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 3);
-        final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
         assertThat(proposals).hasSize(2);
 
         assertThat(proposals[0].getLabel()).isEqualTo("kw_no_args - keywords_with_args_suite.robot");
@@ -169,7 +276,7 @@ public class KeywordProposalsProviderTest {
     }
 
     @Test
-    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndSettingIsNotTemplate()
+    public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndKeywordBasedSettingIsNotTemplate()
             throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("keywords_with_args_in_setting_suite.robot"));
@@ -184,7 +291,7 @@ public class KeywordProposalsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
             assertThat(proposals).hasSize(2);
 
             assertThat(proposals[0].getLabel())
@@ -204,11 +311,11 @@ public class KeywordProposalsProviderTest {
     public void keywordsWithEmbeddedArgumentsShouldBeInsertedWithoutCommitting() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("keywords_with_embedded_args_suite.robot"));
-        final IRowDataProvider<Object> dataProvider = prepareDataProvider();
+        final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 3);
-        final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
         assertThat(proposals).hasSize(2);
 
         assertThat(proposals[0].getLabel()).isEqualTo("kw_no_arg - keywords_with_embedded_args_suite.robot");
@@ -230,19 +337,11 @@ public class KeywordProposalsProviderTest {
         assertThat(KeywordProposalsProvider.getValuesToInsert(proposedKeyword)).containsExactly("name", "a1", "a2");
     }
 
-    private static IRowDataProvider<Object> prepareDataProvider() {
+    private static IRowDataProvider<Object> prepareDataProvider(final List<RobotKeywordCall> calls) {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        when(dataProvider.getColumnCount()).thenReturn(5);
-        when(dataProvider.getDataValue(anyInt(), anyInt())).thenReturn("");
-        return dataProvider;
-    }
-
-    private static IRowDataProvider<Object> prepareDataProvider(final List<RobotKeywordCall> settings) {
-        @SuppressWarnings("unchecked")
-        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
-        for (int i = 0; i < settings.size(); i++) {
-            when(dataProvider.getRowObject(i)).thenReturn(settings.get(i));
+        for (int i = 0; i < calls.size(); i++) {
+            when(dataProvider.getRowObject(i)).thenReturn(calls.get(i));
         }
         return dataProvider;
     }

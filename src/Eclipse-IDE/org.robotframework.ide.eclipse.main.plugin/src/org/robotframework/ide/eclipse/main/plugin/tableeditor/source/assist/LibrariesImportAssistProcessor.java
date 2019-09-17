@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -47,7 +48,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
             throws BadLocationException {
         return isInApplicableContentType(document, offset)
                 && ModelUtilities.firstTokenInLineContains(assist.getModel(), offset,
-                        RobotTokenType.SETTING_LIBRARY_DECLARATION)
+                        EnumSet.of(RobotTokenType.SETTING_LIBRARY_DECLARATION))
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 

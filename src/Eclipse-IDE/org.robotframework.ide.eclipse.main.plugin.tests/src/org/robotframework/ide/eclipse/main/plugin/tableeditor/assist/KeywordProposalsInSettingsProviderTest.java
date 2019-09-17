@@ -169,7 +169,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 1, context);
+            final RedContentProposal[] proposals = provider.computeProposals("foo", 1, context);
             assertThat(proposals).isEmpty();
         }
     }
@@ -192,7 +192,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, context);
+            final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 1, context);
             assertThat(proposals).hasSize(1);
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -221,7 +221,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size() - 1; row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
             assertThat(proposals).hasSize(4);
 
             assertThat(proposals[0].getLabel()).isEqualTo("kw1 - LibImported");
@@ -248,7 +248,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
             assertThat(proposals).hasSize(2);
 
             assertThat(proposals[0].getLabel())
@@ -276,7 +276,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
             assertThat(proposals).hasSize(2);
 
             assertThat(proposals[0].getLabel())
@@ -300,7 +300,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("kw", 2, context);
             assertThat(proposals).hasSize(2);
 
             assertThat(proposals[0].getLabel())

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -43,6 +45,8 @@ public class ImportsInCodeAssistProcessorTest {
 
     private static IFile suite;
 
+    private static IFile suiteWithTemplate;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
@@ -60,7 +64,19 @@ public class ImportsInCodeAssistProcessorTest {
                 "keyword",
                 "  ",
                 "  rst",
-                "  acb  lkj");
+                "  acb  lkj",
+                "  [Teardown]  ",
+                "  [Tags]  ");
+        suiteWithTemplate = projectProvider.createFile("with_template.robot",
+                "*** Test Cases ***",
+                "tc",
+                "  Kw Call  ",
+                "*** Settings ***",
+                "Library  Lib1",
+                "Library  Lib3",
+                "Resource  res1.robot",
+                "Resource  abcde.robot",
+                "Test Template  Some Kw");
     }
 
     @AfterClass
@@ -87,149 +103,190 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenInSectionDifferentThanKeywords() throws Exception {
-        final int offset = 115;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 115);
 
         assertThat(proposals).isNull();
     }
 
     @Test
     public void noProposalsAreProvided_whenInFirstCellOfExecutionLine() throws Exception {
-        final int offset = 116;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 116);
+
+        assertThat(proposals).isNull();
+    }
+
+    @Test
+    public void noProposalsAreProvided_whenSettingIsNotKeywordBased() throws Exception {
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 158);
+
+        assertThat(proposals).isNull();
+    }
+
+    @Test
+    public void allProposalsAreProvided_whenSettingIsKeywordBased() throws Exception {
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 147);
+
+        assertThat(proposals).hasSize(4)
+                .are(activatingAssistantAfterAccept())
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(2,
+                        proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
+
+        assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
+                .containsOnly(
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  lkj",
+                                "  [Teardown]  Lib1.", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  lkj",
+                                "  [Teardown]  Lib3.", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  lkj",
+                                "  [Teardown]  res1.", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  lkj",
+                                "  [Teardown]  abcde.", "  [Tags]  "));
+    }
+
+    @Test
+    public void noProposalsAreProvided_whenTemplateIsUsed() throws Exception {
+        final ITextViewer viewer = createViewer(suiteWithTemplate, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(suiteWithTemplate);
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 33);
 
         assertThat(proposals).isNull();
     }
 
     @Test
     public void allProposalsAreProvided_whenAtTheEndExecutionLine() throws Exception {
-        final int offset = 115;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 115);
 
         assertThat(proposals).hasSize(4)
             .are(activatingAssistantAfterAccept())
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib1.", "  rst", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib3.", "  rst", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  res1.", "  rst", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  abcde.", "  rst", "  acb  lkj"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
+                .containsOnly(
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib1.", "  rst",
+                                "  acb  lkj", "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib3.", "  rst",
+                                "  acb  lkj", "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  res1.", "  rst",
+                                "  acb  lkj", "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  abcde.", "  rst",
+                                "  acb  lkj", "  [Teardown]  ", "  [Tags]  "));
     }
 
     @Test
     public void allProposalsAreProvided_whenAtTheCellBeginInExecutionLine() throws Exception {
-        final int offset = 118;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 118);
 
         assertThat(proposals).hasSize(4)
             .are(activatingAssistantAfterAccept())
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib1.", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib3.", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  abcde.", "  acb  lkj"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
+                .containsOnly(
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib1.", "  acb  lkj",
+                                "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib3.", "  acb  lkj",
+                                "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj",
+                                "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  abcde.", "  acb  lkj",
+                                "  [Teardown]  ", "  [Tags]  "));
     }
 
     @Test
     public void onlyMatchingProposalsAreProvided_whenInsideTheCellInExecutionLine_1() throws Exception {
-        final int offset = 119;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 119);
 
         assertThat(proposals).hasSize(1)
-            .are(activatingAssistantAfterAccept())
-            .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
+                .are(activatingAssistantAfterAccept())
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getImageForFileWithExtension("robot"))));
 
-        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"));
+        assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
+                .containsOnly(new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj",
+                        "  [Teardown]  ", "  [Tags]  "));
     }
 
     @Test
     public void onlyMatchingProposalsAreProvided_whenInsideTheCellInExecutionLine_2() throws Exception {
-        final int offset = 130;
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
-
-        when(viewer.getDocument()).thenReturn(document);
-        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 130);
 
         assertThat(proposals).hasSize(2)
             .are(activatingAssistantAfterAccept())
             .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
-        assertThat(proposals).extracting(proposal -> applyToDocument(document, proposal)).containsOnly(
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1."),
-                new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib3."));
+        assertThat(proposals).extracting(proposal -> applyToDocument(viewer.getDocument(), proposal))
+                .containsOnly(
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1.",
+                                "  [Teardown]  ", "  [Tags]  "),
+                        new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
+                                "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib3.",
+                                "  [Teardown]  ", "  [Tags]  "));
+    }
+
+    private ITextViewer createViewer(final IFile file, final String contentType) throws BadLocationException {
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(new Document(projectProvider.getFileContent(file)));
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(anyInt())).thenReturn(contentType);
+        return viewer;
     }
 }

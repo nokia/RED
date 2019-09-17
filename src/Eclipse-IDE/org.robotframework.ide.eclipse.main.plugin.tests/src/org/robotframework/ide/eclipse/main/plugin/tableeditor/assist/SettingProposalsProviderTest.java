@@ -23,15 +23,15 @@ public class SettingProposalsProviderTest {
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
-    public void testCaseSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
+    public void thereAreNoTestCaseSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
             if (column == 0) {
-                assertThat(provider.shouldShowProposals(context)).isTrue();
+                assertThat(provider.computeProposals("foo", 0, context)).isNotNull();
             } else {
-                assertThat(provider.shouldShowProposals(context)).isFalse();
+                assertThat(provider.computeProposals("foo", 0, context)).isNull();
             }
         }
     }
@@ -41,7 +41,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
+        final RedContentProposal[] proposals = provider.computeProposals("xyz", 1, context);
         assertThat(proposals).isEmpty();
     }
 
@@ -53,7 +53,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 2, context);
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -61,15 +61,15 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void keywordSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
+    public void thereAreNoKeywordSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
             if (column == 0) {
-                assertThat(provider.shouldShowProposals(context)).isTrue();
+                assertThat(provider.computeProposals("foo", 0, context)).isNotNull();
             } else {
-                assertThat(provider.shouldShowProposals(context)).isFalse();
+                assertThat(provider.computeProposals("foo", 0, context)).isNull();
             }
         }
     }
@@ -79,7 +79,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
+        final RedContentProposal[] proposals = provider.computeProposals("xyz", 1, context);
         assertThat(proposals).isEmpty();
     }
 
@@ -92,7 +92,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 2, context);
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -100,15 +100,15 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void generalSettingProposalsShouldNotBeShown_whenColumnIsDifferentThanFirst() {
+    public void thereAreNoGeneralSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL_TESTS);
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
             if (column == 0) {
-                assertThat(provider.shouldShowProposals(context)).isTrue();
+                assertThat(provider.computeProposals("foo", 0, context)).isNotNull();
             } else {
-                assertThat(provider.shouldShowProposals(context)).isFalse();
+                assertThat(provider.computeProposals("foo", 0, context)).isNull();
             }
         }
     }
@@ -118,7 +118,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL_TESTS);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("xyz", 1, context);
+        final RedContentProposal[] proposals = provider.computeProposals("xyz", 1, context);
         assertThat(proposals).isEmpty();
     }
 
@@ -131,7 +131,7 @@ public class SettingProposalsProviderTest {
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL_TESTS);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 2, context);
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);

@@ -48,7 +48,7 @@ public class CodeReservedWordsTableEditConfiguration extends AbstractRegistryCon
                 new SettingProposalsProvider(env, settingsProposalsTarget),
                 new CodeReservedWordsProposalsProvider(env, dataProvider),
                 new KeywordProposalsProvider(suiteFile, dataProvider),
-                new ImportsInCodeProposalsProvider(suiteFile),
+                new ImportsInCodeProposalsProvider(suiteFile, dataProvider),
                 new VariableProposalsProvider(suiteFile, dataProvider));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,

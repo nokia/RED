@@ -10,4 +10,13 @@ public interface RedContentProposalProvider {
     boolean shouldShowProposals(AssistantContext context);
 
     RedContentProposal[] getProposals(String contents, int position, AssistantContext context);
+
+    default RedContentProposal[] computeProposals(final String contents, final int position,
+            final AssistantContext context) {
+        if (shouldShowProposals(context)) {
+            return getProposals(contents, position, context);
+        } else {
+            return null;
+        }
+    }
 }

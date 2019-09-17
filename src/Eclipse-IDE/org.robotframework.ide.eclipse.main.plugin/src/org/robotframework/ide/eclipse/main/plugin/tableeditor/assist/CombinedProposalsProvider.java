@@ -32,8 +32,9 @@ public class CombinedProposalsProvider implements RedContentProposalProvider {
             final AssistantContext context) {
         final List<RedContentProposal> proposals = new ArrayList<>();
         for (final RedContentProposalProvider provider : providers) {
-            if (provider.shouldShowProposals(context)) {
-                for (final RedContentProposal proposal : provider.getProposals(contents, position, context)) {
+            final RedContentProposal[] newProposals = provider.computeProposals(contents, position, context);
+            if (newProposals != null) {
+                for (final RedContentProposal proposal : newProposals) {
                     proposals.add(proposal);
                 }
             }

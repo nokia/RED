@@ -40,7 +40,10 @@ public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         return isInApplicableContentType(document, offset)
-                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0
+                && (!ModelUtilities.isLocalSetting(assist.getModel(), offset)
+                        && !ModelUtilities.getTemplateInUse(assist.getModel(), offset).isPresent()
+                        || ModelUtilities.isKeywordBasedLocalSetting(assist.getModel(), offset));
     }
 
     @Override

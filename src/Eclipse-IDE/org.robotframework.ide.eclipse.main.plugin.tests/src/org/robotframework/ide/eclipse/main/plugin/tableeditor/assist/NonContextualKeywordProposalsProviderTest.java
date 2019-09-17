@@ -17,12 +17,10 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
-import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 public class NonContextualKeywordProposalsProviderTest {
 
@@ -60,7 +58,7 @@ public class NonContextualKeywordProposalsProviderTest {
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 
-        final RedContentProposal[] proposals = provider.getProposals("foo", 1, null);
+        final RedContentProposal[] proposals = provider.computeProposals("foo", 1, null);
         assertThat(proposals).isEmpty();
     }
 
@@ -74,7 +72,7 @@ public class NonContextualKeywordProposalsProviderTest {
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 0, null);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 0, null);
         assertThat(proposals).hasSize(2);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -88,8 +86,7 @@ public class NonContextualKeywordProposalsProviderTest {
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 
-        final AssistantContext context = new NatTableAssistantContext(1, 3);
-        final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
+        final RedContentProposal[] proposals = provider.computeProposals("kw", 2, null);
         assertThat(proposals).hasSize(2);
 
         assertThat(proposals[0].getLabel()).isEqualTo("kw_no_args - keywords_with_args_suite.robot");

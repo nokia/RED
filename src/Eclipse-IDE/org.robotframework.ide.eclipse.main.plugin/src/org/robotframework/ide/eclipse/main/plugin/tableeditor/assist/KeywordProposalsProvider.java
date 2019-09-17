@@ -37,7 +37,10 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
 
     @Override
     public boolean shouldShowProposals(final AssistantContext context) {
-        return true;
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return !ModelRowUtilities.isLocalSetting(dataProvider, tableContext.getRow())
+                && !ModelRowUtilities.getTemplateInUse(dataProvider, tableContext.getRow()).isPresent()
+                || ModelRowUtilities.isKeywordBasedLocalSetting(dataProvider, tableContext.getRow());
     }
 
     @Override

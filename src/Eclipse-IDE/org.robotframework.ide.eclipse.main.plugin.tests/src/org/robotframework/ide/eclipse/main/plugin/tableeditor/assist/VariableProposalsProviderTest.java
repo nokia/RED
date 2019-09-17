@@ -70,7 +70,7 @@ public class VariableProposalsProviderTest {
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
         final AssistantContext context = new NatTableAssistantContext(0, 0);
 
-        assertThatIllegalStateException().isThrownBy(() -> provider.getProposals("${xyz}", 0, context))
+        assertThatIllegalStateException().isThrownBy(() -> provider.computeProposals("${xyz}", 0, context))
                 .withMessage("Unrecognized element in table")
                 .withNoCause();
     }
@@ -84,7 +84,7 @@ public class VariableProposalsProviderTest {
         final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("${xyz}", 3, context);
+        final RedContentProposal[] proposals = provider.computeProposals("${xyz}", 3, context);
 
         assertThat(proposals).isEmpty();
     }
@@ -98,7 +98,7 @@ public class VariableProposalsProviderTest {
         final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("a${abc}b", 4, context);
+        final RedContentProposal[] proposals = provider.computeProposals("a${abc}b", 4, context);
 
         assertThat(proposals).extracting(RedContentProposal::getContent).containsExactly("${a_var}", "${b_var}");
         assertThat(proposals).extracting(RedContentProposal::getModificationStrategy)
@@ -114,7 +114,7 @@ public class VariableProposalsProviderTest {
         final IRowDataProvider<Object> dataProvider = createDataProvider(callElement);
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("abc", 1, context);
+        final RedContentProposal[] proposals = provider.computeProposals("abc", 1, context);
 
         assertThat(proposals).extracting(RedContentProposal::getContent).containsExactly("${a_var}", "${b_var}");
         assertThat(proposals).extracting(RedContentProposal::getModificationStrategy)
@@ -130,7 +130,7 @@ public class VariableProposalsProviderTest {
                 new SimpleEntry<String, RobotKeywordCall>("x", settingElement));
         final VariableProposalsProvider provider = new VariableProposalsProvider(suite, dataProvider);
         final AssistantContext context = new NatTableAssistantContext(0, 0);
-        final RedContentProposal[] proposals = provider.getProposals("${blah}", 3, context);
+        final RedContentProposal[] proposals = provider.computeProposals("${blah}", 3, context);
 
         assertThat(proposals).extracting(RedContentProposal::getContent).containsExactly("${b_var}");
         assertThat(proposals).extracting(RedContentProposal::getModificationStrategy)

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import java.util.List;
 
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
@@ -14,18 +15,25 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 public class ImportsInCodeProposalsProvider implements RedContentProposalProvider {
 
     private final RobotSuiteFile suiteFile;
 
-    public ImportsInCodeProposalsProvider(final RobotSuiteFile suiteFile) {
+    protected final IRowDataProvider<?> dataProvider;
+
+    public ImportsInCodeProposalsProvider(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
         this.suiteFile = suiteFile;
+        this.dataProvider = dataProvider;
     }
 
     @Override
     public boolean shouldShowProposals(final AssistantContext context) {
-        return true;
+        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
+        return !ModelRowUtilities.isLocalSetting(dataProvider, tableContext.getRow())
+                && !ModelRowUtilities.getTemplateInUse(dataProvider, tableContext.getRow()).isPresent()
+                || ModelRowUtilities.isKeywordBasedLocalSetting(dataProvider, tableContext.getRow());
     }
 
     @Override

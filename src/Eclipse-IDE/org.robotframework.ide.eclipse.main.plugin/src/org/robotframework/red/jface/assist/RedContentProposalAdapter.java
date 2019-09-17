@@ -501,11 +501,7 @@ public class RedContentProposalAdapter {
             position = controlContentAdapter.getCursorPosition(control);
         }
         final String contents = controlContentAdapter.getControlContents(control);
-        if (proposalProvider.shouldShowProposals(context)) {
-            return proposalProvider.getProposals(contents, position, context);
-        } else {
-            return null;
-        }
+        return proposalProvider.computeProposals(contents, position, context);
     }
 
     /**

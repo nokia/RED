@@ -84,7 +84,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
         for (int column = 0; column < 10; column++) {
             for (int row = 0; row < elements.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
-                final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
+                final RedContentProposal[] proposals = provider.computeProposals("foo", 0, context);
                 assertThat(proposals).isEmpty();
             }
         }
@@ -104,7 +104,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
         for (int column = 0; column < 2; column++) {
             for (int row = 0; row < elements.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
-                final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
+                final RedContentProposal[] proposals = provider.computeProposals("foo", 0, context);
                 assertThat(proposals).isEmpty();
             }
         }
@@ -123,7 +123,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
         for (int row = 0; row < elements.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(2, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals("foo", 2, context);
             assertThat(proposals).isEmpty();
         }
     }
@@ -144,7 +144,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
                 continue;
             }
             final AssistantContext context = new NatTableAssistantContext(2, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 0, context);
+            final RedContentProposal[] proposals = provider.computeProposals("foo", 0, context);
             assertThat(proposals).isEmpty();
         }
     }
@@ -164,7 +164,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
         text.setText("with");
 
         final AssistantContext context = new NatTableAssistantContext(2, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 4, context);
+        final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 4, context);
         assertThat(proposals).hasSize(1);
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
         assertThat(text.getText()).isEqualTo("WITH NAME");
@@ -191,7 +191,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
             text.setText("with xyz");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(text.getText(), 4, context);
+            final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 4, context);
             assertThat(proposals).hasSize(1);
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -218,7 +218,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
             text.setText("note");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
+            final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 2, context);
             assertThat(proposals).hasSize(1);
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);

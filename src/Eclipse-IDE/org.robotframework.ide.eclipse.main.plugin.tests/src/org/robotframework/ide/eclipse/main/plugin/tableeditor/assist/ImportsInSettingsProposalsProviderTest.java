@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -57,7 +57,8 @@ public class ImportsInSettingsProposalsProviderTest {
                 "Test Template",
                 "Task Setup",
                 "Task Teardown",
-                "Task Template");
+                "Task Template",
+                "Resource  res.robot");
         projectProvider.createFile("non_kw_based_settings.robot",
                 "*** Settings ***",
                 "Library",
@@ -67,18 +68,7 @@ public class ImportsInSettingsProposalsProviderTest {
                 "Test Timeout",
                 "Task Timeout",
                 "Force Tags",
-                "Default Tags");
-        projectProvider.createFile("kw_based_settings_with_resource.robot",
-                "*** Settings ***",
-                "Suite Setup",
-                "Suite Teardown",
-                "Test Setup",
-                "Test Teardown",
-                "Test Template",
-                "Task Setup",
-                "Task Teardown",
-                "Task Template",
-                "*** Settings ***",
+                "Default Tags",
                 "Resource  res.robot");
     }
 
@@ -90,7 +80,12 @@ public class ImportsInSettingsProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenColumnIsDifferentThanSecond() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
-        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .filter(element -> !element.getName().equals("Resource"))
+                .collect(toList());
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final ImportsInSettingsProposalsProvider provider = new ImportsInSettingsProposalsProvider(suiteFile,
@@ -99,20 +94,26 @@ public class ImportsInSettingsProposalsProviderTest {
         for (int column = 0; column < 10; column++) {
             for (int row = 0; row < settings.size(); row++) {
                 final AssistantContext context = new NatTableAssistantContext(column, row);
+                final RedContentProposal[] proposals = provider.computeProposals("foo", 0, context);
                 if (column == 1) {
-                    assertThat(provider.shouldShowProposals(context)).isTrue();
+                    assertThat(proposals).isNotNull();
                 } else {
-                    assertThat(provider.shouldShowProposals(context)).isFalse();
+                    assertThat(proposals).isNull();
                 }
             }
         }
     }
 
     @Test
-    public void proposalsShouldNotBeShown_whenSettingIsNotKeywordBased() throws Exception {
+    public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
-        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .filter(element -> !element.getName().equals("Resource"))
+                .collect(toList());
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final ImportsInSettingsProposalsProvider provider = new ImportsInSettingsProposalsProvider(suiteFile,
@@ -120,14 +121,19 @@ public class ImportsInSettingsProposalsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            assertThat(provider.shouldShowProposals(context)).isFalse();
+            assertThat(provider.computeProposals("foo", 0, context)).isNull();
         }
     }
 
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
-        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .filter(element -> !element.getName().equals("Resource"))
+                .collect(toList());
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final ImportsInSettingsProposalsProvider provider = new ImportsInSettingsProposalsProvider(suiteFile,
@@ -135,7 +141,7 @@ public class ImportsInSettingsProposalsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 1, context);
+            final RedContentProposal[] proposals = provider.computeProposals("foo", 1, context);
             assertThat(proposals).isEmpty();
         }
     }
@@ -146,17 +152,22 @@ public class ImportsInSettingsProposalsProviderTest {
         text.setText("rrr");
 
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("kw_based_settings_with_resource.robot"));
+                .createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
 
-        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .stream()
+                .filter(element -> !element.getName().equals("Resource"))
+                .collect(toList());
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
         final ImportsInSettingsProposalsProvider provider = new ImportsInSettingsProposalsProvider(suiteFile,
                 dataProvider);
 
-        for (int row = 0; row < settings.size() - 1; row++) {
+        for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, context);
+            final RedContentProposal[] proposals = provider.computeProposals(text.getText(), 1, context);
             assertThat(proposals).hasSize(1);
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -168,10 +179,8 @@ public class ImportsInSettingsProposalsProviderTest {
         @SuppressWarnings("unchecked")
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         for (int i = 0; i < settings.size(); i++) {
-            final Map<String, Object> map = new HashMap<>();
-            map.put(settings.get(i).getName(), settings.get(i));
-            final Entry<String, Object> entry = map.entrySet().iterator().next();
-
+            final RobotKeywordCall call = settings.get(i);
+            final Entry<String, Object> entry = new SimpleEntry<String, Object>(call.getName(), call);
             when(dataProvider.getRowObject(i)).thenReturn(entry);
         }
         return dataProvider;
