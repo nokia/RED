@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _59eigNVmEemgX-SoeSm2iQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/13/19 4:14 PM
+Save-Time: 9/17/19 3:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -126,20 +126,20 @@ set-cart-end-open-content-assist 14 15 -first_line "NONE"
 set-cart-end-open-content-assist 15 18 -first_line "NONE"
 set-cart-end-open-content-assist 17 17  -first_line  "NONE2"
 
-set-cart-end-open-content-assist 21 24 -first_line "Call Method - BuiltIn"
+set-cart-end-open-content-assist 21 24 -first_line "${/}"
 set-cart-end-open-content-assist 22 16 -first_line "NONE"
-set-cart-end-open-content-assist 23 15 -first_line "NONE"
+set-cart-end-open-content-assist 23 15 -first_line "NONE2"
 set-cart-end-open-content-assist 24 18 -first_line "NONE"
 set-cart-end-open-content-assist 25 19 -first_line "NONE"
-set-cart-end-open-content-assist 26 16 -first_line "NONE"
+set-cart-end-open-content-assist 26 16 -first_line "NONE2"
 
 
-set-cart-end-open-content-assist 31 20 -first_line "Call Method - BuiltIn"
-set-cart-end-open-content-assist 32 24 -first_line "Call Method - BuiltIn"
-set-cart-end-open-content-assist 33 17 -first_line "Call Method - BuiltIn"
-set-cart-end-open-content-assist 34 15 -first_line "NONE"
+set-cart-end-open-content-assist 31 20 -first_line "${/}"
+set-cart-end-open-content-assist 32 24 -first_line "${/}"
+set-cart-end-open-content-assist 33 17 -first_line "${/}"
+set-cart-end-open-content-assist 34 15 -first_line "NONE2"
 set-cart-end-open-content-assist 35 19  -first_line "NONE"
-set-cart-end-open-content-assist 36 17 -first_line "NONE"
+set-cart-end-open-content-assist 36 17 -first_line "NONE2"
 
 
 // check in tabl
@@ -157,12 +157,12 @@ with [get-editor "TestFile.robot"] {
     get-editbox -after [get-label "Test Cases"] -index 1 |   key-type "M1+SPACE"
 }
 
-check-content-assist-in-table -first_line  "Call Method - BuiltIn"   -table "Test Cases"
+check-content-assist-in-table -first_line  "${/}"   -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE2" -table "Test Cases"
 check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
 check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
-check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
-check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
-check-content-assist-in-table -first_line  "NONE" -table "Test Cases"
+check-content-assist-in-table -first_line  "NONE2" -table "Test Cases"
 
 
 // go to KW table
@@ -179,10 +179,10 @@ with [get-editor "TestFile.robot"] {
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+SPACE"
 }
 
-check-content-assist-in-table -first_line "Call Method - BuiltIn"  -table "User Keywords"
-check-content-assist-in-table -first_line "Call Method - BuiltIn"  -table "User Keywords"
+check-content-assist-in-table -first_line "${/}" -table "User Keywords"
+check-content-assist-in-table -first_line "${/}"   -table "User Keywords"
+check-content-assist-in-table -first_line  "NONE2" -table "User Keywords"
 check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
-check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
-check-content-assist-in-table -first_line  "NONE" -table "User Keywords"
+check-content-assist-in-table -first_line  "NONE2" -table "User Keywords"
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
