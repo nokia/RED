@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2-5uENShEemgX-SoeSm2iQ
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/13/19 5:23 PM
+Save-Time: 9/18/19 11:15 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -131,7 +131,9 @@ exec-with-options -disableJobWaiting -command {
 
 // add regex
 get-view Breakpoints | get-editbox -after [get-label "Keyword pattern:"] | set-text "Should be *"
+wait 300
 get-button "Save (M1+S)" | click
+get-view Console | get-button "Clear Console" | click
 
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
