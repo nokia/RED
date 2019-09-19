@@ -209,6 +209,25 @@ class VariablesRetrievingTests(unittest.TestCase):
         
         self.assertTrue(response['exception'] is None)
         self.assertDictEqual(response['result'], {'x':'1', 'y':'2', 'z':'3'})
+        
+    
+    def test_variables_are_returned_for_variables_file_reading_another_file_by_relative_path(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        response = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'vars_modules', 'vars_loading.py'), [], [])
+        
+        self.assertTrue(response['exception'] is None)
+        self.assertDictEqual(response['result'], {'a':'10', 'b':'20'})
+
+
+    def test_variables_are_returned_for_yaml_variables_file(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        response = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'vars_modules', 'vars.yaml'), [], [])
+        
+        self.assertTrue(response['exception'] is None)
+        self.assertDictEqual(response['result'], {'a':'1', 'b':'2', 'c':'3'})
+        
 
 
 class RobotFilesConvertingTests(unittest.TestCase):

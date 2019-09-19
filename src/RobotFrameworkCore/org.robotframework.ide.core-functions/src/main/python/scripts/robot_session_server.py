@@ -188,9 +188,16 @@ def get_classes_from_module(module_location, python_paths, class_paths):
 @cleanup_sys_path
 @logargs
 def get_variables(path, args, python_paths):
-    import red_variables
-    __extend_paths(python_paths, [])
-    return red_variables.get_variables(path, args)
+    import os
+    cwd = os.getcwd()
+    
+    try:
+        os.chdir(os.path.dirname(path))
+        import red_variables
+        __extend_paths(python_paths, [])
+        return red_variables.get_variables(path, args)
+    finally:
+        os.chdir(cwd)
 
 
 @logresult
