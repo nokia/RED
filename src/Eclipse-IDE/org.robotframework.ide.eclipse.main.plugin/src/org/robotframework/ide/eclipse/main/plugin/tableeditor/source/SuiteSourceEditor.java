@@ -31,7 +31,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerExtension;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -61,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.KeywordUsagesFinder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
@@ -80,12 +80,19 @@ public class SuiteSourceEditor extends TextEditor {
 
     private SuiteSourceEditorFoldingSupport foldingSupport;
 
+    @Inject
+    private KeywordUsagesFinder kwUsagesFinder;
+
     private final OnSaveSourceFormattingTrigger saveSourceFormatterTrigger = new OnSaveSourceFormattingTrigger();
 
     private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
     public SourceViewer getViewer() {
         return (SourceViewer) getSourceViewer();
+    }
+
+    public KeywordUsagesFinder getKeywordUsagesFinder() {
+        return kwUsagesFinder;
     }
 
     @Override
@@ -258,6 +265,7 @@ public class SuiteSourceEditor extends TextEditor {
         final IPreferenceChangeListener preferenceListener = event -> {
             if (event == null || event.getKey() == null) {
                 return;
+
             } else if (event.getKey().startsWith(RedPreferences.SYNTAX_COLORING)) {
                 final SyntaxHighlightingCategory category = SyntaxHighlightingCategory.fromPreferenceId(event.getKey());
                 final String newValue = (String) event.getNewValue();
@@ -266,20 +274,14 @@ public class SuiteSourceEditor extends TextEditor {
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
                 config.getColoringTokens().refresh(category, newPref);
-                SwtThread.asyncExec(() -> {
-                    config.resetTokensStore();
-                    viewer.invalidateTextPresentation();
-                });
+                refreshViewerColouring();
 
             } else if (RedPreferences.TASKS_DETECTION_ENABLED.equals(event.getKey())) {
                 final boolean isEnabled = Boolean.parseBoolean((String) event.getNewValue());
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
                 config.getColoringTokens().refreshTasksAttributes(isEnabled);
-                SwtThread.asyncExec(() -> {
-                    config.resetTokensStore();
-                    viewer.invalidateTextPresentation();
-                });
+                refreshViewerColouring();
 
             } else if (RedPreferences.TASKS_TAGS.equals(event.getKey())) {
                 final String newValue = (String) event.getNewValue();
@@ -288,10 +290,7 @@ public class SuiteSourceEditor extends TextEditor {
 
                 final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
                 config.getColoringTokens().refreshTasksAttributes(newTags);
-                SwtThread.asyncExec(() -> {
-                    config.resetTokensStore();
-                    viewer.invalidateTextPresentation();
-                });
+                refreshViewerColouring();
 
             } else if (newHashSet(RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_TASKS,
                     RedPreferences.FOLDABLE_KEYWORDS, RedPreferences.FOLDABLE_SECTIONS,
@@ -326,13 +325,30 @@ public class SuiteSourceEditor extends TextEditor {
         viewer.getControl().addDisposeListener(e -> preferences.removePreferenceChangeListener(preferenceListener));
     }
 
+    void refreshViewerColouring() {
+        final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+        final ISourceViewer viewer = getSourceViewer();
+        SwtThread.asyncExec(() -> {
+            if (viewer != null && viewer.getTextWidget() != null && !viewer.getTextWidget().isDisposed()) {
+                try {
+                    viewer.getTextWidget().setRedraw(false);
+
+                    config.resetTokensStore();
+                    viewer.invalidateTextPresentation();
+                } finally {
+                    viewer.getTextWidget().setRedraw(true);
+                }
+            }
+        });
+    }
+
     private void activateContext() {
         final IContextService service = getSite().getService(IContextService.class);
         service.activateContext(SOURCE_PART_CONTEXT_ID);
     }
 
-    public SourceViewerConfiguration getViewerConfiguration() {
-        return super.getSourceViewerConfiguration();
+    public SuiteSourceEditorConfiguration getViewerConfiguration() {
+        return (SuiteSourceEditorConfiguration) super.getSourceViewerConfiguration();
     }
 
     public IDocument getDocument() {

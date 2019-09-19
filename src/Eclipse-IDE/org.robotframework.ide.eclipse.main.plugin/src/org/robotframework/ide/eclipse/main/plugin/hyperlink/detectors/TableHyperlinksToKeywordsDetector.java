@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -26,12 +27,14 @@ public class TableHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDetec
     private final IRowDataProvider<? extends Object> dataProvider;
 
     public TableHyperlinksToKeywordsDetector(final IRowDataProvider<? extends Object> dataProvider) {
-        this(RedPlugin.getModelManager().getModel(), dataProvider);
+        this(RedPlugin.getDefault().getPreferences()::isLibraryKeywordHyperlinkingEnabled,
+                RedPlugin.getModelManager().getModel(), dataProvider);
     }
 
     @VisibleForTesting
-    TableHyperlinksToKeywordsDetector(final RobotModel model, final IRowDataProvider<? extends Object> dataProvider) {
-        super(model);
+    TableHyperlinksToKeywordsDetector(final Supplier<Boolean> shouldLinkLibraryKeywords, final RobotModel model,
+            final IRowDataProvider<? extends Object> dataProvider) {
+        super(shouldLinkLibraryKeywords, model);
         this.dataProvider = dataProvider;
     }
 

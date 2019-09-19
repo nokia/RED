@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
@@ -33,7 +34,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
     private final String bddPrefix;
 
-    private final Documentation documentation;
+    private final Supplier<Documentation> documentation;
 
     private final ProposalMatch match;
 
@@ -49,7 +50,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     @VisibleForTesting
     RedKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
             final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
-            final Documentation documentation, final boolean isDeprecated, final IPath exposingFilePath,
+            final Supplier<Documentation> documentation, final boolean isDeprecated, final IPath exposingFilePath,
             final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
 
         super(scope, sourceName, name, sourceAlias, isDeprecated, argumentsDescriptor, exposingFilePath);
@@ -105,6 +106,14 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         return label;
     }
 
+    public boolean isLibraryKeyword() {
+        return !isUserKeyword();
+    }
+
+    public boolean isUserKeyword() {
+        return false;
+    }
+
     @Override
     public boolean isDocumented() {
         return true;
@@ -116,7 +125,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         builder.append("Name: ").append(getNameFromDefinition()).append("\n");
         builder.append("Source: ").append(getSourceDescription()).append("\n");
         builder.append("Arguments: ").append(getArgumentsDescriptor().getDescription()).append("\n\n");
-        builder.append(documentation.getRawDocumentation());
+        builder.append(documentation.get().getRawDocumentation());
 
         return builder.toString();
     }
@@ -127,7 +136,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     }
 
     public Documentation getDocumentation() {
-        return documentation;
+        return documentation.get();
     }
 
     public boolean isAccessible() {
@@ -139,11 +148,16 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     static class RedUserKeywordProposal extends RedKeywordProposal {
 
         RedUserKeywordProposal(final String sourceName, final KeywordScope scope, final String bddPrefix,
-                final String name, final ArgumentsDescriptor argumentsDescriptor, final Documentation documentation,
-                final boolean isDeprecated, final IPath exposingFilePath,
+                final String name, final ArgumentsDescriptor argumentsDescriptor,
+                final Supplier<Documentation> documentation, final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
             super(sourceName, Optional.empty(), scope, bddPrefix, name, argumentsDescriptor, documentation,
                     isDeprecated, exposingFilePath, shouldUseQualifiedName, match);
+        }
+
+        @Override
+        public boolean isUserKeyword() {
+            return true;
         }
 
         @Override
@@ -172,7 +186,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
         RedLibraryKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
                 final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
-                final Documentation documentation, final boolean isDeprecated, final IPath exposingFilePath,
+                final Supplier<Documentation> documentation, final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
             super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,
                     exposingFilePath, shouldUseQualifiedName, match);
@@ -208,7 +222,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
         RedNotAccessibleLibraryKeywordProposal(final String sourceName, final Optional<String> sourceAlias,
                 final KeywordScope scope, final String bddPrefix, final String name,
-                final ArgumentsDescriptor argumentsDescriptor, final Documentation documentation,
+                final ArgumentsDescriptor argumentsDescriptor, final Supplier<Documentation> documentation,
                 final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
             super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,

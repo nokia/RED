@@ -20,6 +20,8 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 
+import com.google.common.collect.Range;
+
 public class RobotToken implements IRobotLineElement, Serializable {
 
     private static final long serialVersionUID = -7333635148571215189L;
@@ -136,6 +138,14 @@ public class RobotToken implements IRobotLineElement, Serializable {
     @Override
     public int getStartOffset() {
         return fp.getOffset();
+    }
+
+    public int getLength() {
+        return text.length();
+    }
+
+    public Range<Integer> getRange() {
+        return Range.closedOpen(getStartOffset(), getStartOffset() + getLength());
     }
 
     @Override

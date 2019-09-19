@@ -91,7 +91,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         final Group generalGroup = new Group(parent, SWT.NONE);
         generalGroup.setText("General");
         GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(generalGroup);
-        GridLayoutFactory.fillDefaults().applyTo(generalGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(generalGroup);
 
         final BooleanFieldEditor parentDirectoryInTabEditor = new BooleanFieldEditor(
                 RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, "Add parent directory name to editor tab", generalGroup);
@@ -99,6 +99,13 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         final Button parentDirectoryInTabCheckbox = (Button) parentDirectoryInTabEditor
                 .getDescriptionControl(generalGroup);
         GridDataFactory.fillDefaults().indent(5, 10).span(2, 1).applyTo(parentDirectoryInTabCheckbox);
+
+        final BooleanFieldEditor libraryKeywordHyperlinksEditor = new BooleanFieldEditor(
+                RedPreferences.LIBRARY_KEYWORD_HYPERLINKS, "Enable hyperlinking to library keywords", generalGroup);
+        addField(libraryKeywordHyperlinksEditor);
+        final Button libraryKeywordHyperlinksCheckbox = (Button) libraryKeywordHyperlinksEditor
+                .getDescriptionControl(generalGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).span(2, 1).applyTo(libraryKeywordHyperlinksCheckbox);
 
         final ComboBoxFieldEditor elementsOpeningStrategyEditor = new ComboBoxFieldEditor(
                 RedPreferences.FILE_ELEMENTS_OPEN_MODE, "Prefer opening file elements from Project Explorer in",

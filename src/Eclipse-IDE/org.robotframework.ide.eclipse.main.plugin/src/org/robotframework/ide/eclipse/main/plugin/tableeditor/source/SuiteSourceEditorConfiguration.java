@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -81,6 +82,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.C
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordCallOverridingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
@@ -102,7 +104,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.S
 
 import com.google.common.annotations.VisibleForTesting;
 
-class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
+public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private final SuiteSourceEditor editor;
 
@@ -117,6 +119,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private ContentAssistant contentAssistant;
 
     private final RedTokensStore store;
+
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
             final KeySequence contentAssistActivationTrigger) {
@@ -163,12 +166,17 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
+        return getHyperlinkDetectors(RedPlugin.getDefault().getPreferences()::isLibraryKeywordHyperlinkingEnabled);
+    }
+
+    public IHyperlinkDetector[] getHyperlinkDetectors(final Supplier<Boolean> shouldLinkLibraryKeywords) {
         final RobotSuiteFile model = editor.getFileModel();
         if (model.isFromLocalStorage()) {
             return new IHyperlinkDetector[0];
         }
         return new IHyperlinkDetector[] { new SourceHyperlinksToVariablesDetector(model),
-                new SourceHyperlinksToKeywordsDetector(model), new SourceHyperlinksToFilesDetector(model) };
+                new SourceHyperlinksToKeywordsDetector(shouldLinkLibraryKeywords, model),
+                new SourceHyperlinksToFilesDetector(model) };
     }
 
     @Override
@@ -510,6 +518,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken definition = coloringTokens.get(SyntaxHighlightingCategory.DEFINITION);
         final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final IToken libraryKwCall = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB);
         final IToken quote = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final IToken library = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final IToken setting = coloringTokens.get(SyntaxHighlightingCategory.SETTING);
@@ -517,37 +526,44 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken special = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
         final IToken defaultSection = coloringTokens.get(SyntaxHighlightingCategory.DEFAULT_SECTION);
 
+        final Function<ISyntaxColouringRule, ISyntaxColouringRule> callOverridder = r -> new KeywordCallOverridingRule(
+                r, call, libraryKwCall, editor.getKeywordUsagesFinder());
+
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting),
-                new SettingsTemplateRule(call, variable),
-                ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin, library, quote,
-                        variable),
-                ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable),
+                callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin,
+                        library, quote, variable)),
+                callOverridder
+                        .apply(ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new TaskNameRule(definition), new TaskSettingsRule(setting), new SettingsTemplateRule(call, variable),
-                ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin, library, quote,
-                        variable),
-                ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable),
+                new TaskNameRule(definition), new TaskSettingsRule(setting),
+                callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin,
+                        library, quote, variable)),
+                callOverridder.apply(ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, library, quote, variable),
-                ExecutableCallRule.forExecutableInKeyword(call, gherkin, library, quote, variable),
+                callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, library,
+                        quote, variable)),
+                callOverridder
+                        .apply(ExecutableCallRule.forExecutableInKeyword(call, gherkin, library, quote, variable)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new SettingRule(setting), new SettingsTemplateRule(call, variable),
-                ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call, gherkin, library,
-                        quote, variable),
+                new SettingRule(setting), callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call,
+                        gherkin, library, quote, variable)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 

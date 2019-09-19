@@ -24,15 +24,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordCallOverridingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensInNestedExecsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
@@ -60,24 +58,24 @@ public class SuiteSourceEditorConfigurationTest {
                                 MatchEverythingRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, CaseNameRule.class,
-                                TestCaseSettingsRule.class, SettingsTemplateRule.class,
-                                ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
+                                TestCaseSettingsRule.class, KeywordCallOverridingRule.class,
+                                KeywordCallOverridingRule.class, KeywordCallOverridingRule.class,
                                 SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
                                 SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TASKS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, TaskNameRule.class,
-                                TaskSettingsRule.class, SettingsTemplateRule.class,
-                                ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
+                                TaskSettingsRule.class, KeywordCallOverridingRule.class,
+                                KeywordCallOverridingRule.class, KeywordCallOverridingRule.class,
                                 SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
                                 SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, KeywordNameRule.class,
-                                KeywordSettingsRule.class, ExecutableCallInSettingsRule.class, ExecutableCallRule.class,
-                                SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
-                                SpecialTokensRule.class))
+                                KeywordSettingsRule.class, KeywordCallOverridingRule.class,
+                                KeywordCallOverridingRule.class, SpecialTokensInNestedExecsRule.class,
+                                CommentRule.class, VariableUsageRule.class, SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.SETTINGS_SECTION,
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, SettingRule.class,
-                                SettingsTemplateRule.class, ExecutableCallInSettingsRule.class,
+                                KeywordCallOverridingRule.class, KeywordCallOverridingRule.class,
                                 SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
                                 SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.VARIABLES_SECTION,

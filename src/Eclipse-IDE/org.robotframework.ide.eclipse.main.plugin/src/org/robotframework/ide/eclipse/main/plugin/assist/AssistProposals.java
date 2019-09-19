@@ -84,7 +84,7 @@ public class AssistProposals {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
         return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix, keyword.getName(),
-                argsDescriptor, spec.createKeywordDocumentation(keyword.getName()), keyword.isDeprecated(),
+                argsDescriptor, () -> spec.createKeywordDocumentation(keyword.getName()), keyword.isDeprecated(),
                 exposingFilepath, shouldUseQualified, match);
     }
 
@@ -95,7 +95,7 @@ public class AssistProposals {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
         return new RedLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix, keyword.getName(), argsDescriptor,
-                spec.createKeywordDocumentation(keyword.getName()), keyword.isDeprecated(), exposingFilepath,
+                () -> spec.createKeywordDocumentation(keyword.getName()), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
 
@@ -106,8 +106,8 @@ public class AssistProposals {
         final RobotSuiteFile file = userKeyword.getSuiteFile();
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
         return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), scope, bddPrefix,
-                userKeyword.getName(), argsDescriptor, userKeyword.createDocumentation(), userKeyword.isDeprecated(),
-                file.getFile().getFullPath(), shouldUseQualified, match);
+                userKeyword.getName(), argsDescriptor, () -> userKeyword.createDocumentation(),
+                userKeyword.isDeprecated(), file.getFile().getFullPath(), shouldUseQualified, match);
     }
 
     static GherkinReservedWordProposal createGherkinReservedWordProposal(final String word, final ProposalMatch match) {

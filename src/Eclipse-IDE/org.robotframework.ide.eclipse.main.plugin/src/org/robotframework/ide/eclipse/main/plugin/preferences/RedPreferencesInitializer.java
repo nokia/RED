@@ -80,6 +80,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     private void initializeEditorPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, false);
         preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
+        preferences.putBoolean(RedPreferences.LIBRARY_KEYWORD_HYPERLINKS, true);
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         preferences.put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT, CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
         preferences.put(RedPreferences.CELL_WRAPPING, CellWrappingStrategy.SINGLE_LINE_CUT.name());

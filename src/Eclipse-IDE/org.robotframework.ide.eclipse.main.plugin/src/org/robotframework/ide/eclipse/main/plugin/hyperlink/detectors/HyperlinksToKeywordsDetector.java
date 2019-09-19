@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -50,7 +51,10 @@ abstract class HyperlinksToKeywordsDetector {
 
     private final RobotModel model;
 
-    public HyperlinksToKeywordsDetector(final RobotModel model) {
+    private final Supplier<Boolean> shouldLinkLibraryKeywords;
+
+    public HyperlinksToKeywordsDetector(final Supplier<Boolean> shouldLinkLibraryKeywords, final RobotModel model) {
+        this.shouldLinkLibraryKeywords = shouldLinkLibraryKeywords;
         this.model = model;
     }
 
@@ -101,8 +105,10 @@ abstract class HyperlinksToKeywordsDetector {
                                 keywordEntity.exposingResource, keywordEntity.userKeyword, lbl));
                         break;
                     default:
-                        definitionHyperlinks.add(new KeywordInLibrarySourceHyperlink(adjustedFromRegion,
-                                suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
+                        if (shouldLinkLibraryKeywords.get().booleanValue()) {
+                            definitionHyperlinks.add(new KeywordInLibrarySourceHyperlink(adjustedFromRegion,
+                                    suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
+                        }
                         documentationHyperlinks.add(new KeywordDocumentationHyperlink(adjustedFromRegion,
                                 suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
                         break;

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import java.util.function.Supplier;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.IDocument;
@@ -14,6 +16,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
@@ -42,8 +45,14 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     public void initialReconcile() {
         final RobotSuiteFile suiteModel = editor.getFileModel();
         reparseModel(suiteModel);
-        getFoldingSupport().reset();
-        getFoldingSupport().updateFoldingStructure(suiteModel, document);
+
+        if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()) {
+            getEditorProperty(editor::getKeywordUsagesFinder).refresh(editor::refreshViewerColouring);
+        }
+
+        final SuiteSourceEditorFoldingSupport foldingSupport = getEditorProperty(editor::getFoldingSupport);
+        foldingSupport.reset();
+        foldingSupport.updateFoldingStructure(suiteModel, document);
     }
 
     @Override
@@ -59,7 +68,12 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     private void reconcile() {
         final RobotSuiteFile suiteModel = editor.getFileModel();
         reparseModel(suiteModel);
-        getFoldingSupport().updateFoldingStructure(suiteModel, document);
+
+        if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()) {
+            getEditorProperty(editor::getKeywordUsagesFinder).refresh(editor::refreshViewerColouring);
+        }
+        getEditorProperty(editor::getFoldingSupport).updateFoldingStructure(suiteModel, document);
+
         RobotArtifactsValidator.revalidate(suiteModel);
     }
 
@@ -76,17 +90,17 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         }
     }
 
-    private SuiteSourceEditorFoldingSupport getFoldingSupport() {
-        // to make sure folding support is initialized
-        SuiteSourceEditorFoldingSupport foldingSupport = editor.getFoldingSupport();
-        while (foldingSupport == null) {
-            foldingSupport = editor.getFoldingSupport();
+    private <C> C getEditorProperty(final Supplier<C> supplier) {
+        // to make sure property is initialized
+        C editorProperty = supplier.get();
+        while (editorProperty == null) {
+            editorProperty = supplier.get();
             try {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
                 // retry
             }
         }
-        return foldingSupport;
+        return editorProperty;
     }
 }

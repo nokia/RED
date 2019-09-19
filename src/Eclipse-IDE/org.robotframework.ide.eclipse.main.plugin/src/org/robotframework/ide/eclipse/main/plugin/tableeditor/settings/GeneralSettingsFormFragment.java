@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -114,6 +115,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchReques
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.KeywordUsagesFinder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
@@ -133,6 +135,8 @@ import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.TableCellsStrings;
+import org.robotframework.red.nattable.configs.ActionFromLibNamesStyleConfiguration;
+import org.robotframework.red.nattable.configs.ActionNamesOverridingLabelAccumulator;
 import org.robotframework.red.nattable.configs.ActionNamesStyleConfiguration;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
@@ -184,6 +188,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Inject
     private SuiteFileMarkersContainer markersContainer;
+
+    @Inject
+    private KeywordUsagesFinder kwUsagesFinder;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -524,6 +531,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
+        final Function<Integer, Object> rowObjectProvider = row -> dataProvider.getRowObject(row).getValue();
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
                         position -> position.getColumnPosition() < dataProvider.getColumnCount() - 1,
@@ -532,8 +540,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 new EmptyGeneralSettingLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new SettingsActionNamesLabelAccumulator(dataProvider),
+                new ActionNamesOverridingLabelAccumulator(rowObjectProvider, kwUsagesFinder),
                 new SettingsNestedExecsSpecialTokensLabelAccumulator(dataProvider),
-                new SpecialItemsLabelAccumulator(row -> dataProvider.getRowObject(row).getValue()),
+                new SpecialItemsLabelAccumulator(rowObjectProvider),
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());
@@ -644,6 +653,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
+        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
         table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));

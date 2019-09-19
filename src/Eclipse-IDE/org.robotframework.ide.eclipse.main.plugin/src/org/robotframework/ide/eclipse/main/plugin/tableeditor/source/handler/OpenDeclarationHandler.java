@@ -16,9 +16,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditorConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
@@ -36,16 +36,11 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
         @Execute
         public void openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
+            final IRegion region = new Region(viewer.getTextWidget().getCaretOffset(), 0);
+            final SuiteSourceEditorConfiguration configuration = editor.getSourceEditor().getViewerConfiguration();
+            final IHyperlinkDetector[] detectors = configuration.getHyperlinkDetectors(() -> true);
 
-            final IRegion hyperlinkRegion = new Region(viewer.getTextWidget().getCaretOffset(), 0);
-
-            final SourceViewerConfiguration configuration = editor.getSourceEditor().getViewerConfiguration();
-            final IHyperlinkDetector[] detectors = configuration.getHyperlinkDetectors(viewer);
-
-            final Optional<IHyperlink> hyperlink = getHyperlink(viewer, hyperlinkRegion, detectors);
-            if (hyperlink.isPresent()) {
-                hyperlink.get().open();
-            }
+            getHyperlink(viewer, region, detectors).ifPresent(IHyperlink::open);
         }
     }
 

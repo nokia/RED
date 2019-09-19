@@ -21,8 +21,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
-import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -95,6 +95,8 @@ public class RobotFormEditor extends FormEditor {
 
     private SuiteFileMarkersListener validationListener;
 
+    private KeywordUsagesFinder keywordUsagesFinder;
+
     public RedClipboard getClipboard() {
         return clipboard;
     }
@@ -113,6 +115,7 @@ public class RobotFormEditor extends FormEditor {
 
             clipboard = new RedClipboard(site.getShell().getDisplay());
             validationListener = new SuiteFileMarkersListener();
+            keywordUsagesFinder = new KeywordUsagesFinder(this::provideSuiteModel);
 
             prepareEclipseContext();
 
@@ -126,17 +129,14 @@ public class RobotFormEditor extends FormEditor {
     private void prepareEclipseContext() {
         final IEclipseContext parentContext = getSite().getService(IEclipseContext.class);
         final IEclipseContext eclipseContext = parentContext.getActiveLeaf();
-        eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
-
-            @Override
-            public Object compute(final IEclipseContext context, final String contextKey) {
-                return provideSuiteModel();
-            }
-        });
+        eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL,
+                (IContextFunction) (context, contextKey) -> provideSuiteModel());
         eclipseContext.set(RedClipboard.class, clipboard);
         eclipseContext.set(SuiteFileMarkersContainer.class, validationListener);
+        eclipseContext.set(KeywordUsagesFinder.class, keywordUsagesFinder);
         ContextInjectionFactory.inject(this, eclipseContext);
         ContextInjectionFactory.inject(validationListener, eclipseContext);
+        ContextInjectionFactory.inject(keywordUsagesFinder, eclipseContext);
     }
 
     private void initRobotFormEditorPartListener(final IWorkbenchPage page) {
@@ -212,6 +212,7 @@ public class RobotFormEditor extends FormEditor {
             if (editorPart instanceof ISectionEditorPart
                     && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
                 setActivePage(i);
+                keywordUsagesFinder.refresh();
                 return;
             }
         }
@@ -354,6 +355,7 @@ public class RobotFormEditor extends FormEditor {
         final IEclipseContext context = parentContext.getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
         ContextInjectionFactory.uninject(validationListener, context);
+        ContextInjectionFactory.uninject(keywordUsagesFinder, context);
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
         }

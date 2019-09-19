@@ -75,6 +75,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchReques
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.KeywordUsagesFinder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -100,7 +101,9 @@ import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.TableCellsStrings;
+import org.robotframework.red.nattable.configs.ActionFromLibNamesStyleConfiguration;
 import org.robotframework.red.nattable.configs.ActionNamesLabelAccumulator;
+import org.robotframework.red.nattable.configs.ActionNamesOverridingLabelAccumulator;
 import org.robotframework.red.nattable.configs.ActionNamesStyleConfiguration;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
@@ -146,6 +149,9 @@ class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     private SuiteFileMarkersContainer markersContainer;
+
+    @Inject
+    private KeywordUsagesFinder kwUsagesFinder;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -218,6 +224,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
                 new CommentsLabelAccumulator(dataProvider),
                 new CasesElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
+                new ActionNamesOverridingLabelAccumulator(dataProvider::getRowObject, kwUsagesFinder),
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),
@@ -334,6 +341,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), wrapCells,
                 RedImages.getTestCaseImage(), RedImages.getTemplatedTestCaseImage()));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
+        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));

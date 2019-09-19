@@ -98,7 +98,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         assertThat(detector.detectHyperlinks(1, 0, labelWithKeyword, 0)).isEmpty();
     }
 
@@ -119,7 +120,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         assertThat(detector.detectHyperlinks(1, 0, labelWithKeyword, 0)).isEmpty();
     }
 
@@ -144,7 +146,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         assertThat(detector.detectHyperlinks(1, 0, labelWithKeyword, 0)).isEmpty();
     }
 
@@ -166,7 +169,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(1, 0, labelWithKeyword, 0);
 
         assertThat(hyperlinks).hasSize(2);
@@ -199,7 +203,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(1, 0, labelWithKeyword, 0);
 
         assertThat(hyperlinks).hasSize(2);
@@ -211,7 +216,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     }
 
     @Test
-    public void hyperlinksAreProvided_whenKeywordIsLocatedInLibrary() throws Exception {
+    public void hyperlinksAreProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsEnabled() throws Exception {
         final String labelWithKeyword = "lib_kw";
         final IFile file = projectProvider.createFile("f5.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Library  testlib");
@@ -231,7 +236,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(1, 0, labelWithKeyword, 0);
 
         assertThat(hyperlinks).hasSize(2);
@@ -242,6 +248,40 @@ public class TableHyperlinksToKeywordsDetectorTest {
         assertThat(((KeywordDocumentationHyperlink) hyperlinks.get(1)).getDestinationLibrarySpecification())
                 .isSameAs(libSpec);
         assertThat(((KeywordDocumentationHyperlink) hyperlinks.get(1)).getDestinationKeywordSpecification())
+                .isSameAs(libSpec.getKeywords().get(0));
+    }
+
+    @Test
+    public void onlyDocumentationHyperlinkIsProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsDisabled()
+            throws Exception {
+        final String labelWithKeyword = "lib_kw";
+        final IFile file = projectProvider.createFile("f5.robot", "*** Test Cases ***", "case",
+                "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Library  testlib");
+        final RobotModel model = new RobotModel();
+        final RobotSuiteFile suiteFile = model.createSuiteFile(file);
+        final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+
+        final RobotProject project = suiteFile.getRobotProject();
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(refLibs);
+
+        final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
+        when(dataProvider.getRowObject(1)).thenReturn(element);
+
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> false, model,
+                dataProvider);
+        final List<IHyperlink> hyperlinks = detector.detectHyperlinks(1, 0, labelWithKeyword, 0);
+
+        assertThat(hyperlinks).hasSize(1);
+        assertThat(hyperlinks.get(0)).isInstanceOf(KeywordDocumentationHyperlink.class);
+        assertThat(((KeywordDocumentationHyperlink) hyperlinks.get(0)).getDestinationLibrarySpecification())
+                .isSameAs(libSpec);
+        assertThat(((KeywordDocumentationHyperlink) hyperlinks.get(0)).getDestinationKeywordSpecification())
                 .isSameAs(libSpec.getKeywords().get(0));
     }
 
@@ -264,7 +304,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
             when(dataProvider.getRowObject(i)).thenReturn(calls.get(i - 1));
         }
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
 
         int i = 1;
         for (final RobotKeywordCall call : calls) {
@@ -297,7 +338,8 @@ public class TableHyperlinksToKeywordsDetectorTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getRowObject(1)).thenReturn(element);
 
-        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(model, dataProvider);
+        final TableHyperlinksToKeywordsDetector detector = new TableHyperlinksToKeywordsDetector(() -> true, model,
+                dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(1, 0, labelWithKeyword, 0);
 
         assertThat(hyperlinks).hasSize(4);

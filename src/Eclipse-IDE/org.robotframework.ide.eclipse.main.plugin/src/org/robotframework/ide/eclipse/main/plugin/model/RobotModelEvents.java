@@ -11,7 +11,9 @@ public interface RobotModelEvents {
     public static final String ADDITIONAL_DATA = "osgi.event.additionalData";
 
 
-    public static final String ROBOT_SUITE_FILE_ALL = "robot/model/editor/file/structural/*";
+    public static final String ROBOT_SUITE_FILE_ALL = "robot/model/editor/file/*";
+
+    public static final String ROBOT_SUITE_FILE_STRUCTURAL_ALL = "robot/model/editor/file/structural/*";
 
     public static final String ROBOT_SUITE_SECTION_ADDED = "robot/model/editor/file/structural/section/added";
 

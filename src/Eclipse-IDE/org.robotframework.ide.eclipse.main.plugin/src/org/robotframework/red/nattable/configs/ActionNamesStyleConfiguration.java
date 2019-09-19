@@ -29,13 +29,22 @@ import com.google.common.collect.TreeRangeMap;
  */
 public class ActionNamesStyleConfiguration extends RobotElementsStyleConfiguration {
 
+    private final SyntaxHighlightingCategory mainCategory;
+
     public ActionNamesStyleConfiguration(final TableTheme theme) {
-        super(theme, RedPlugin.getDefault().getPreferences());
+        this(theme, RedPlugin.getDefault().getPreferences(), SyntaxHighlightingCategory.KEYWORD_CALL);
     }
 
     @VisibleForTesting
     ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
+        this(theme, preferences, SyntaxHighlightingCategory.KEYWORD_CALL);
+    }
+
+    @VisibleForTesting
+    ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences,
+            final SyntaxHighlightingCategory mainCategory) {
         super(theme, preferences);
+        this.mainCategory = mainCategory;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
 
     @Override
     Style createElementStyle() {
-        final Style style = createStyle(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final Style style = createStyle(mainCategory);
         final Styler gherkinStyler = createStyler(SyntaxHighlightingCategory.GHERKIN);
         final Styler libraryStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final Styler quoteStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);

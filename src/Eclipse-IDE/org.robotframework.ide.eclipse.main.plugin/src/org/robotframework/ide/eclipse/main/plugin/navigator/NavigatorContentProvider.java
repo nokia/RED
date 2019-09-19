@@ -121,7 +121,7 @@ public class NavigatorContentProvider extends TreeContentProvider {
     @Inject
     @Optional
     private void whenStructuralChangeWasMade(
-            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_ALL) final RobotElement affectedElement) {
+            @UIEventTopic(RobotModelEvents.ROBOT_SUITE_FILE_STRUCTURAL_ALL) final RobotElement affectedElement) {
         if (viewer != null) {
             Object elementToUpdate = affectedElement;
             if (affectedElement instanceof RobotSuiteFile) {

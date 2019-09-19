@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.ColorSelector;
@@ -231,6 +232,9 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
                 createStyleRanges(SyntaxHighlightingCategory.KEYWORD_CALL,
                         SyntaxHighlightingPreferencePageSource.keywordCallStartIndexes,
                         SyntaxHighlightingPreferencePageSource.keywordCallRangeLengths),
+                createStyleRanges(SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB,
+                        SyntaxHighlightingPreferencePageSource.keywordCallFromKwStartIndexes,
+                        SyntaxHighlightingPreferencePageSource.keywordCallFromKwRangeLengths),
                 createStyleRanges(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE,
                         SyntaxHighlightingPreferencePageSource.keywordCallQuoteStartIndexes,
                         SyntaxHighlightingPreferencePageSource.keywordCallQuoteRangeLengths),
@@ -304,6 +308,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
         public void selectionChanged(final SelectionChangedEvent event) {
             final Optional<SyntaxHighlightingCategory> selected = Selections.getOptionalFirstElement(
                     (IStructuredSelection) event.getSelection(), SyntaxHighlightingCategory.class);
+
             if (selected.isPresent()) {
                 final SyntaxHighlightingCategory selectedCategory = selected.get();
                 final ColoringPreference currentPreference = currentPreferences.get(selectedCategory);
@@ -314,6 +319,12 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
                 boldButton.setSelection((currentPreference.getFontStyle() & SWT.BOLD) != 0);
                 italicButton.setEnabled(true);
                 italicButton.setSelection((currentPreference.getFontStyle() & SWT.ITALIC) != 0);
+
+                final String newMessage = selectedCategory == SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB
+                        ? "This color is not applied immediately as deciding if keyword is defined in library or not "
+                                + "is done in separate threads"
+                        : null;
+                setMessage(newMessage, IMessageProvider.WARNING);
             } else {
                 colorSelector.setEnabled(false);
                 colorSelector.setColorValue(new RGB(230, 230, 230));
@@ -321,6 +332,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
                 boldButton.setSelection(false);
                 italicButton.setEnabled(false);
                 italicButton.setSelection(false);
+                setMessage(null, IMessageProvider.WARNING);
             }
             refreshPreview();
         }

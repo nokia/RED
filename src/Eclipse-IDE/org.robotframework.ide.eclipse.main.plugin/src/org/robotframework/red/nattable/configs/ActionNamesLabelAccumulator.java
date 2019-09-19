@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String ACTION_NAME_CONFIG_LABEL = "ACTION_NAME";
+    public static final String ACTION_FROM_LIB_NAME_CONFIG_LABEL = "ACTION_FROM_LIB_NAME";
 
     private final IRowDataProvider<Object> dataProvider;
 

@@ -19,8 +19,9 @@ public class VariablesInElementsLabelAccumulator implements IConfigLabelAccumula
     public static final String POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL = "POSSIBLE_VARIABLES_IN_ELEMENTS_INSIDE";
 
     @Override
-    public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
+    public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         if (!(configLabels.hasLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL)
+                || configLabels.hasLabel(ActionNamesLabelAccumulator.ACTION_FROM_LIB_NAME_CONFIG_LABEL)
                 || configLabels.hasLabel(KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL)
                 || configLabels.hasLabel(CasesElementsLabelAccumulator.CASE_CONFIG_LABEL))) {
             configLabels.addLabel(POSSIBLE_VARIABLES_IN_ELEMENTS_CONFIG_LABEL);

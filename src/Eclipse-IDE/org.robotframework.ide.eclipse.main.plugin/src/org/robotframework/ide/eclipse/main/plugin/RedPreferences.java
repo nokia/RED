@@ -52,6 +52,7 @@ public class RedPreferences {
 
     public static final String PARENT_DIRECTORY_NAME_IN_TAB = "red.editor.general.parendDirectoryNameInTab";
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
+    public static final String LIBRARY_KEYWORD_HYPERLINKS = "red.editor.general.libraryKeywordHyperlinks";
 
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "red.editor.tables.minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "red.editor.tables.cellCommitBehavior";
@@ -196,6 +197,10 @@ public class RedPreferences {
 
     public ElementOpenMode getElementOpenMode() {
         return ElementOpenMode.valueOf(store.getString(FILE_ELEMENTS_OPEN_MODE));
+    }
+
+    public boolean isLibraryKeywordHyperlinkingEnabled() {
+        return store.getBoolean(LIBRARY_KEYWORD_HYPERLINKS);
     }
 
     public SeparatorsMode getSeparatorsMode() {
@@ -467,6 +472,11 @@ public class RedPreferences {
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
         final String coloringValue = store.getString(category.getPreferenceId());
         return ColoringPreference.fromPreferenceString(coloringValue);
+    }
+
+    public boolean isLibraryKeywordsColoringEnabled() {
+        return !Objects.equals(getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL),
+                getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB));
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {

@@ -92,11 +92,13 @@ public class RedKeywordProposals {
     }
 
     public Optional<RedKeywordProposal> getBestMatchingKeywordProposal(final String keywordName) {
-        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector();
-        final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
-                suiteFile.getFile().getFullPath(), collector);
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities.getPossibleKeywords(keywordName,
-                false);
+        return getBestMatchingKeywordProposal(getAccessibleKeywordsEntities(suiteFile), keywordName);
+    }
+
+    public Optional<RedKeywordProposal> getBestMatchingKeywordProposal(
+            final AccessibleKeywordsEntities accessibleKeywordsEntities, final String keywordName) {
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
+                .getPossibleKeywords(keywordName, false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             for (final KeywordEntity keyword : keywords.get(scope)) {
@@ -104,6 +106,11 @@ public class RedKeywordProposals {
             }
         }
         return Optional.empty();
+    }
+
+    public AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite) {
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector();
+        return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
     private Predicate<RedKeywordProposal> shouldUseQualifiedName() {

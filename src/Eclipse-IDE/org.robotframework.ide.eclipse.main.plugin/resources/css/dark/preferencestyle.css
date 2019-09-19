@@ -3,6 +3,7 @@ IEclipsePreferences#org-robotframework-ide-eclipse-main-plugin {
         'red.editor.syntaxColoring.comment=128,128,128,0'
         'red.editor.syntaxColoring.gherkin=128,255,255,1'
         'red.editor.syntaxColoring.call=148,100,1,1'
+        'red.editor.syntaxColoring.call_lib_kw=148,100,1,1'
         'red.editor.syntaxColoring.quote=148,100,1,1'
         'red.editor.syntaxColoring.library=148,100,1,1'
         'red.editor.syntaxColoring.definition=64,128,191,1'

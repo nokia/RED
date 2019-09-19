@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
@@ -31,13 +32,15 @@ public class SourceHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDete
 
     private ITextViewer textViewer;
 
-    public SourceHyperlinksToKeywordsDetector(final RobotSuiteFile suiteFile) {
-        this(RedPlugin.getModelManager().getModel(), suiteFile);
+    public SourceHyperlinksToKeywordsDetector(final Supplier<Boolean> shouldLinkLibraryKeywords,
+            final RobotSuiteFile suiteFile) {
+        this(shouldLinkLibraryKeywords, RedPlugin.getModelManager().getModel(), suiteFile);
     }
 
     @VisibleForTesting
-    SourceHyperlinksToKeywordsDetector(final RobotModel model, final RobotSuiteFile suiteFile) {
-        super(model);
+    SourceHyperlinksToKeywordsDetector(final Supplier<Boolean> shouldLinkLibraryKeywords, final RobotModel model,
+            final RobotSuiteFile suiteFile) {
+        super(shouldLinkLibraryKeywords, model);
         this.suiteFile = suiteFile;
     }
 

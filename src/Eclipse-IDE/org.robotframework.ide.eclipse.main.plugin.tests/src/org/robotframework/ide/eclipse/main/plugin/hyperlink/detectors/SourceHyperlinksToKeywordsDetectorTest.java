@@ -82,7 +82,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true,
+                suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(-100, 1), true)).isNull();
         assertThat(detector.detectHyperlinks(textViewer, new Region(100, 1), true)).isNull();
     }
@@ -112,7 +113,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         varsPositions.add(Range.closed(begin3, begin3 + 3));
         varsPositions.add(Range.closed(begin4, begin4 + 3));
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true,
+                suiteFile);
         for (int i = 0; i < document.getLength(); i++) {
             if (!varsPositions.contains(i)) {
                 assertThat(detector.detectHyperlinks(textViewer, new Region(i, 1), true)).isNull();
@@ -133,7 +135,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
 
@@ -151,7 +154,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
 
@@ -173,7 +177,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 7)).isEqualTo("some_kw");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
 
@@ -192,7 +197,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
         assertThat(hyperlinks).hasSize(2);
@@ -221,7 +227,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("res_kw");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
         assertThat(hyperlinks).hasSize(2);
@@ -234,7 +241,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
     }
 
     @Test
-    public void hyperlinksAreProvided_whenKeywordIsLocatedInLibrary() throws Exception {
+    public void hyperlinksAreProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsEnabled() throws Exception {
         final IFile file = projectProvider.createFile("f7.robot", "*** Test Cases ***", "case", "  lib_kw  ${x}",
                 "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
@@ -251,7 +258,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("lib_kw");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
         assertThat(hyperlinks).hasSize(2);
@@ -261,6 +269,37 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         assertThat(((KeywordDocumentationHyperlink) hyperlinks[1]).getDestinationLibrarySpecification())
                 .isSameAs(libSpec);
         assertThat(((KeywordDocumentationHyperlink) hyperlinks[1]).getDestinationKeywordSpecification())
+                .isSameAs(libSpec.getKeywords().get(0));
+    }
+
+    @Test
+    public void onlyDocumentationHyperlinkIsProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsDisabled()
+            throws Exception {
+        final IFile file = projectProvider.createFile("f7.robot", "*** Test Cases ***", "case", "  lib_kw  ${x}",
+                "*** Settings ***", "Library  testlib");
+        final RobotModel model = new RobotModel();
+        final RobotSuiteFile suiteFile = model.createSuiteFile(file);
+        final Document document = new Document(projectProvider.getFileContent(file));
+
+        final RobotProject project = suiteFile.getRobotProject();
+        project.setStandardLibraries(new HashMap<>());
+        project.setReferencedLibraries(refLibs);
+
+        final ITextViewer textViewer = mock(ITextViewer.class);
+        when(textViewer.getDocument()).thenReturn(document);
+
+        final int begin = 26;
+        assertThat(document.get(begin, 6)).isEqualTo("lib_kw");
+
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> false, model,
+                suiteFile);
+        final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
+
+        assertThat(hyperlinks).hasSize(1);
+        assertThat(hyperlinks[0]).isInstanceOf(KeywordDocumentationHyperlink.class);
+        assertThat(((KeywordDocumentationHyperlink) hyperlinks[0]).getDestinationLibrarySpecification())
+                .isSameAs(libSpec);
+        assertThat(((KeywordDocumentationHyperlink) hyperlinks[0]).getDestinationKeywordSpecification())
                 .isSameAs(libSpec.getKeywords().get(0));
     }
 
@@ -283,7 +322,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         assertThat(document.get(begins[3], 7)).isEqualTo("when kw");
         assertThat(document.get(begins[4], 7)).isEqualTo("then kw");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
 
         for (int i = 0; i < begins.length; i++) {
             final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begins[i] + 1, 1), true);
@@ -308,7 +348,8 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("res_kw");
 
-        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
+        final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(() -> true, model,
+                suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
         assertThat(hyperlinks).hasSize(4);
