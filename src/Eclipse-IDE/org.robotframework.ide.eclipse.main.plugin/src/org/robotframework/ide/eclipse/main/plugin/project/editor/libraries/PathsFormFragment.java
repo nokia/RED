@@ -238,8 +238,10 @@ class PathsFormFragment implements ISectionFormFragment {
     }
 
     private int getScrollBarWidth(final Table table) {
+        final int scrollbarsMode = table.getScrollbarsMode();
         final ScrollBar verticalBar = table.getVerticalBar();
-        return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
+        return verticalBar == null || !verticalBar.isVisible() || scrollbarsMode == SWT.SCROLLBAR_OVERLAY ? 0
+                : verticalBar.getSize().x;
     }
 
     @Inject

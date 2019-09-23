@@ -222,8 +222,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         };
         viewer.setContentProvider(new EnvVarsContentProvider());
         ViewerColumnsFactory.newColumn("Variable")
-                .withWidth(150)
-                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(200)
                 .labelsProvidedBy(new EnvVarsNamesLabelProvider())
                 .editingEnabled()
                 .editingSupportedBy(new EnvVarsNamesEditingSupport(viewer, newVarsSupplier))
@@ -231,6 +230,7 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         ViewerColumnsFactory.newColumn("Value")
                 .withWidth(120)
                 .withMinWidth(80)
+                .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new EnvVarsValuesLabelProvider())
                 .editingEnabled()
                 .editingSupportedBy(new EnvVarsValuesEditingSupport(viewer, newVarsSupplier))

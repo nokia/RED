@@ -141,8 +141,7 @@ public class TasksPreferencePage extends RedPreferencePage {
         };
         viewer.setContentProvider(new TaskTagsContentProvider());
         ViewerColumnsFactory.newColumn("Tag")
-                .withWidth(150)
-                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(200)
                 .labelsProvidedBy(new TaskTagsNamesLabelProvider())
                 .editingEnabled()
                 .editingSupportedBy(new TaskTagsNamesEditingSupport(viewer, newTagsSupplier))
@@ -150,6 +149,7 @@ public class TasksPreferencePage extends RedPreferencePage {
         ViewerColumnsFactory.newColumn("Priority")
                 .withWidth(120)
                 .withMinWidth(80)
+                .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new TaskTagsPrioritiesLabelProvider())
                 .editingEnabled()
                 .editingSupportedBy(new TaskTagsPrioritiesEditingSupport(viewer, newTagsSupplier))

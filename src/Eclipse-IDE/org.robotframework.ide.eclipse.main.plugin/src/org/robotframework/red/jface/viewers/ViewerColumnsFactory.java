@@ -216,8 +216,10 @@ public class ViewerColumnsFactory {
     }
 
     private int getScrollBarWidth(final TableViewer viewer) {
+        final int scrollbarsMode = viewer.getTable().getScrollbarsMode();
         final ScrollBar verticalBar = viewer.getTable().getVerticalBar();
-        return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
+        return verticalBar == null || !verticalBar.isVisible() || scrollbarsMode == SWT.SCROLLBAR_OVERLAY ? 0
+                : verticalBar.getSize().x;
     }
 
     private SelectionListener createSortSwitchingListener(final TableViewer viewer) {
