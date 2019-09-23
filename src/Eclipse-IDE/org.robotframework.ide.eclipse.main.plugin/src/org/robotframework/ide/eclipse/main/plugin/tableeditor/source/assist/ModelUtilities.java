@@ -10,11 +10,13 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 
@@ -82,6 +84,15 @@ class ModelUtilities {
                 .flatMap(x -> x.stream().findFirst())
                 .map(RobotToken::getTypes)
                 .orElseGet(ArrayList::new);
+    }
+
+    static boolean isEmptyLine(final RobotSuiteFile model, final int offset) {
+        return model.findElement(offset)
+                .filter(element -> element instanceof RobotKeywordCall)
+                .map(element -> (RobotKeywordCall) element)
+                .map(RobotKeywordCall::getLinkedElement)
+                .filter(element -> element instanceof RobotEmptyRow)
+                .isPresent();
     }
 
     static Optional<String> getTemplateInUse(final RobotSuiteFile model, final int offset) {

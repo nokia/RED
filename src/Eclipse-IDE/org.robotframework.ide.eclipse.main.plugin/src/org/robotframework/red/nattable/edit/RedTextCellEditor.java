@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehav
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
+import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
@@ -101,8 +102,8 @@ public class RedTextCellEditor extends TextCellEditor {
         this(selectionStartShift, selectionEndShift, validator, null, wrapCellContent);
     }
 
-    public RedTextCellEditor(CombinedProposalsProvider proposalProvider, boolean wrapCellContent,
-            IRowDataProvider<?> dataProvider) {
+    public RedTextCellEditor(final CombinedProposalsProvider proposalProvider, final boolean wrapCellContent,
+            final IRowDataProvider<?> dataProvider) {
         this(0, 0, new DefaultRedCellEditorValueValidator(dataProvider), proposalProvider, wrapCellContent);
     }
 
@@ -343,7 +344,11 @@ public class RedTextCellEditor extends TextCellEditor {
             for (final Runnable operation : proposal.getOperationsToPerformAfterAccepting()) {
                 operation.run();
             }
-            if (proposal.getModificationStrategy().shouldCommitAfterInsert()) {
+            final ModificationStrategy modificationStrategy = proposal.getModificationStrategy();
+            if (modificationStrategy.shouldSelectAllAfterInsert()) {
+                RedTextCellEditor.this.getEditorControl().selectAll();
+            }
+            if (modificationStrategy.shouldCommitAfterInsert()) {
                 commit(getCommitMoveDirection());
             }
         }

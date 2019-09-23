@@ -71,6 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Reso
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.TemplateArgumentsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
@@ -321,6 +322,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new SectionsAssistProcessor(assistContext),
+                new TemplateArgumentsAssistProcessor(assistContext),
                 new SettingsAssistProcessor(assistContext),
                 new CodeReservedWordsAssistProcessor(assistContext),
                 keywordCallsAssistProcessor,
@@ -354,6 +356,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
                 new SectionsAssistProcessor(assistContext),
+                new TemplateArgumentsAssistProcessor(assistContext),
                 new SettingsAssistProcessor(assistContext),
                 new CodeReservedWordsAssistProcessor(assistContext),
                 keywordCallsAssistProcessor,
@@ -433,6 +436,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new ResourcesImportAssistProcessor(assistContext),
                 generalSettingProcessor,
                 new SectionsAssistProcessor(assistContext),
+                new TemplateArgumentsAssistProcessor(assistContext),
                 new SettingsAssistProcessor(assistContext),
                 new CodeReservedWordsAssistProcessor(assistContext),
                 new CodeReservedWordsInSettingsAssistProcessor(assistContext),

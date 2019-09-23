@@ -157,7 +157,7 @@ public class KeywordProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvidednInCode_whenTemplateIsUsed() {
+    public void thereAreNoProposalsProvidedInCode_whenTemplateIsUsed() {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("with_template.robot"));
         final List<RobotKeywordCall> nonSettings = suiteFile.findSection(RobotCasesSection.class)
                 .get()

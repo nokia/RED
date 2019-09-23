@@ -16,7 +16,6 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -294,45 +293,40 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void regionsForLiveEditOfEmbeddedKeyword_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
-
+        final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedKeywordProposal proposal = createKeywordProposal("keyword ${e1} with ${e2} args");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
-        assertThat(regions).containsOnly(new Region(108, 5), new Region(119, 5));
+        assertThat(KeywordCallsAssistProcessor.calculateRegionsForLinkedMode(proposal, 100, separatorLength))
+                .containsOnly(new Region(108, 5), new Region(119, 5));
     }
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithoutArguments_areEmpty() {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
-
+        final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedKeywordProposal proposal = createKeywordProposal("keyword");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
-        assertThat(regions).isEmpty();
+        assertThat(KeywordCallsAssistProcessor.calculateRegionsForLinkedMode(proposal, 100, separatorLength)).isEmpty();
     }
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithSingleArgument_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
-
+        final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedKeywordProposal proposal = createKeywordProposal("keyword", "arg1");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
-        assertThat(regions).containsOnly(new Region(109, 4));
+        assertThat(KeywordCallsAssistProcessor.calculateRegionsForLinkedMode(proposal, 100, separatorLength))
+                .containsOnly(new Region(109, 4));
     }
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithManyArgument_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(suite);
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
-
+        final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedKeywordProposal proposal = createKeywordProposal("keyword", "arg1", "arg2");
-        final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(proposal, 100);
 
-        assertThat(regions).containsOnly(new Region(109, 4), new Region(115, 4));
+        assertThat(KeywordCallsAssistProcessor.calculateRegionsForLinkedMode(proposal, 100, separatorLength))
+                .containsOnly(new Region(109, 4), new Region(115, 4));
     }
 
     @Test

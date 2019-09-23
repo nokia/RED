@@ -87,7 +87,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
             final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, () -> {
                 final Collection<IRegion> regionsToLinkedEdit = shouldInsertArguments
-                        ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset())
+                        ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset(), separator.length())
                         : new ArrayList<>();
                 return createOperationsToPerformAfterAccepting(regionsToLinkedEdit, kwProposal);
             });
@@ -103,12 +103,11 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @VisibleForTesting
-    Collection<IRegion> calculateRegionsForLinkedMode(final RedKeywordProposal proposal, final int startOffset) {
+    static Collection<IRegion> calculateRegionsForLinkedMode(final RedKeywordProposal proposal, final int startOffset,
+            final int separatorLength) {
         if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(proposal.getNameFromDefinition())) {
             return calculateRegionsForLinkedModeOfEmbeddedKeyword(startOffset, proposal.getContent());
-
         } else {
-            final int separatorLength = assist.getSeparatorToFollow().length();
             return calculateRegionsForLinkedModeOfRegularKeyword(startOffset, proposal.getContent(),
                     proposal.getArguments(), separatorLength);
         }
@@ -127,10 +126,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     private static Collection<IRegion> calculateRegionsForLinkedModeOfRegularKeyword(final int startOffset,
             final String wholeContent, final List<String> arguments, final int separatorLength) {
         final Collection<IRegion> regions = new ArrayList<>();
-        int offset = startOffset + wholeContent.length();
-        if (!arguments.isEmpty()) {
-            offset += separatorLength;
-        }
+        int offset = startOffset + wholeContent.length() + separatorLength;
         for (final String requiredArg : arguments) {
             regions.add(new Region(offset, requiredArg.length()));
             offset += requiredArg.length() + separatorLength;
@@ -138,8 +134,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return regions;
     }
 
-    private Collection<Runnable> createOperationsToPerformAfterAccepting(final Collection<IRegion> regionsToLinkedEdit,
-            final RedKeywordProposal proposal) {
+    protected Collection<Runnable> createOperationsToPerformAfterAccepting(
+            final Collection<IRegion> regionsToLinkedEdit, final RedKeywordProposal proposal) {
         final Collection<Runnable> operations = new ArrayList<>();
         if (!regionsToLinkedEdit.isEmpty()) {
             final RedPreferences preferences = RedPlugin.getDefault().getPreferences();

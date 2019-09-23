@@ -56,6 +56,12 @@ public class AssistProposalAdapter implements RedContentProposal {
     }
 
     public AssistProposalAdapter(final IRuntimeEnvironment environment, final AssistProposal wrappedProposal,
+            final ModificationStrategy modificationStrategy,
+            final Supplier<Collection<Runnable>> operationsAfterAccepting) {
+        this(environment, wrappedProposal, modificationStrategy, "", operationsAfterAccepting, p -> false);
+    }
+
+    public AssistProposalAdapter(final IRuntimeEnvironment environment, final AssistProposal wrappedProposal,
             final Predicate<AssistProposal> shouldCommitAfterAccepting,
             final Supplier<Collection<Runnable>> operationsAfterAccepting) {
         this(environment, wrappedProposal, null, "", operationsAfterAccepting, shouldCommitAfterAccepting);
@@ -116,6 +122,11 @@ public class AssistProposalAdapter implements RedContentProposal {
     @Override
     public ModificationStrategy getModificationStrategy() {
         return modificationStrategy.orElse(new SubstituteTextModificationStrategy() {
+
+            @Override
+            public boolean shouldSelectAllAfterInsert() {
+                return false;
+            }
 
             @Override
             public boolean shouldCommitAfterInsert() {

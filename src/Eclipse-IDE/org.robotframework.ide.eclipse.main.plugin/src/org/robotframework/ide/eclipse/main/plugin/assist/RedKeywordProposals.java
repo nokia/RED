@@ -57,7 +57,6 @@ public class RedKeywordProposals {
                 AssistProposalPredicates.reservedLibraryPredicate());
     }
 
-    @VisibleForTesting
     public RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile) {
         this(model, suiteFile, ProposalMatchers.keywordsMatcher(), AssistProposalPredicates.reservedLibraryPredicate());
     }

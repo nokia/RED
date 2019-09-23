@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedPro
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsInCodeProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.SettingProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.TemplateArgumentsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.VariableProposalsProvider;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
@@ -45,6 +46,7 @@ public class CodeReservedWordsTableEditConfiguration extends AbstractRegistryCon
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final IRuntimeEnvironment env = suiteFile.getRuntimeEnvironment();
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
+                new TemplateArgumentsProposalsProvider(suiteFile, dataProvider),
                 new SettingProposalsProvider(env, settingsProposalsTarget),
                 new CodeReservedWordsProposalsProvider(env, dataProvider),
                 new KeywordProposalsProvider(suiteFile, dataProvider),

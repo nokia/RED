@@ -16,4 +16,9 @@ public class RedImagesTest {
         assertThat(RedImages.getTemplateImage()).isNotNull();
     }
 
+    @Test
+    public void templatedKeywordImageIsDefined() throws Exception {
+        assertThat(RedImages.getTemplatedKeywordImage()).isNotNull();
+    }
+
 }

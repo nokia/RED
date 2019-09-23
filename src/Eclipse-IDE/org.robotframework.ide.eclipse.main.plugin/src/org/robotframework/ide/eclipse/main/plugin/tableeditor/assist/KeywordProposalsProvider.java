@@ -26,7 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class KeywordProposalsProvider implements RedContentProposalProvider {
 
-    private final RobotSuiteFile suiteFile;
+    protected final RobotSuiteFile suiteFile;
 
     protected final IRowDataProvider<?> dataProvider;
 
@@ -62,7 +62,7 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
                 .toArray(RedContentProposal[]::new);
     }
 
-    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword,
+    protected List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword,
             final NatTableAssistantContext tableContext) {
         final List<Runnable> operations = new ArrayList<>();
 

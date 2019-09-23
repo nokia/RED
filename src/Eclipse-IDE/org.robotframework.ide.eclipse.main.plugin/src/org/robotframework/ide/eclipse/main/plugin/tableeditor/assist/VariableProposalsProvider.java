@@ -134,6 +134,11 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         }
 
         @Override
+        public boolean shouldSelectAllAfterInsert() {
+            return false;
+        }
+
+        @Override
         public boolean shouldCommitAfterInsert() {
             return false;
         }

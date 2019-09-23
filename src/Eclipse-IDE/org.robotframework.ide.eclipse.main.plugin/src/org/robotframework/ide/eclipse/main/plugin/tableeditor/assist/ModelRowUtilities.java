@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -80,6 +81,15 @@ class ModelRowUtilities {
             final String settingName = (String) ((Entry<?, ?>) rowObject).getKey();
             final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
             return types.contains(actualType);
+        }
+        return false;
+    }
+
+    static boolean isEmptyLine(final IRowDataProvider<?> dataProvider, final int row) {
+        final Object rowObject = dataProvider.getRowObject(row);
+        if (rowObject instanceof RobotKeywordCall) {
+            final RobotKeywordCall call = (RobotKeywordCall) rowObject;
+            return call.getLinkedElement() instanceof RobotEmptyRow;
         }
         return false;
     }

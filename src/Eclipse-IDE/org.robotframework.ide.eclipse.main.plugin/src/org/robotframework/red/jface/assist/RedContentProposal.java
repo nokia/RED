@@ -33,6 +33,8 @@ public interface RedContentProposal extends IContentProposal {
 
         void insert(final Combo control, final IContentProposal proposal);
 
+        boolean shouldSelectAllAfterInsert();
+
         boolean shouldCommitAfterInsert();
     }
 }

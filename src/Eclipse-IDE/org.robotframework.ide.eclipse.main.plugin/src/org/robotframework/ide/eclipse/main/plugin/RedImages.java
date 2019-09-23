@@ -338,6 +338,10 @@ public class RedImages {
         return getImageUri("resources", "keyword_user.png");
     }
 
+    public static ImageDescriptor getTemplatedKeywordImage() {
+        return RedPlugin.getImageDescriptor("resources/keyword_templated.png");
+    }
+
     public static ImageDescriptor getRobotProjectConfigFile() {
         return RedPlugin.getImageDescriptor("resources/file_redxml.png");
     }
