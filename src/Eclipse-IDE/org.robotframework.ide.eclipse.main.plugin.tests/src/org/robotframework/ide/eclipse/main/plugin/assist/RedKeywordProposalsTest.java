@@ -13,6 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixes
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -675,6 +676,34 @@ public class RedKeywordProposalsTest {
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("a_other_kw1 - otherLib", "a_other_kw2 - otherLib");
+    }
+
+    @Test
+    public void allKeywordsFromProjectLibrariesAreProvidedButLibraryPrefixIsAddedOnlyWhenConflictExists_whenKeywordFromNotImportedLibraryPreferenceIsEnabled()
+            throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
+
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new LinkedHashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibImported", "keyword"));
+        refLibs.putAll(Libraries.createRefLib("LibNotImported", "keyword"));
+
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Library  LibImported",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("key");
+
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("keyword - LibImported", "keyword - LibNotImported");
+        assertThat(proposals.get(0).getContent()).isEqualTo("keyword");
+        assertThat(proposals.get(1).getContent()).isEqualTo("LibNotImported.keyword");
     }
 
     @Test

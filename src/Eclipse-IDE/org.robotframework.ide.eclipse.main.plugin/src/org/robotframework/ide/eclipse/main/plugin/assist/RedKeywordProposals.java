@@ -76,21 +76,26 @@ public class RedKeywordProposals {
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent,
             final Comparator<? super RedKeywordProposal> comparator) {
-        final AccessibleKeywordsEntities keywordEntities = getAccessibleKeywordsEntities(suiteFile, userContent);
-        final ListMultimap<KeywordScope, KeywordEntity> possible = keywordEntities.getPossibleKeywords();
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
+                shouldIncludeNotImportedLibraries(), userContent);
+        final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
+                suiteFile.getFile().getFullPath(), collector);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities.getPossibleKeywords();
 
-        final List<RedKeywordProposal> entities = new ArrayList<>();
-        for (final KeywordEntity entity : possible.values()) {
-            entities.add((RedKeywordProposal) entity);
+        final List<RedKeywordProposal> proposals = new ArrayList<>();
+        for (final KeywordEntity keyword : keywords.values()) {
+            proposals.add((RedKeywordProposal) keyword);
         }
-        Collections.sort(entities, comparator);
-        return entities;
+        Collections.sort(proposals, comparator);
+        return proposals;
     }
 
     public Optional<RedKeywordProposal> getBestMatchingKeywordProposal(final String keywordName) {
-        final AccessibleKeywordsEntities accessibleKeywordsEntities = getAccessibleKeywordsEntities(suiteFile, "");
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
-                .getPossibleKeywords(keywordName, false);
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector();
+        final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
+                suiteFile.getFile().getFullPath(), collector);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities.getPossibleKeywords(keywordName,
+                false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             for (final KeywordEntity keyword : keywords.get(scope)) {
@@ -98,13 +103,6 @@ public class RedKeywordProposals {
             }
         }
         return Optional.empty();
-    }
-
-    private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite,
-            final String userContent) {
-        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
-                shouldIncludeNotImportedLibraries(), userContent);
-        return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
     private Predicate<RedKeywordProposal> shouldUseQualifiedName() {
@@ -126,8 +124,10 @@ public class RedKeywordProposals {
     }
 
     private boolean keywordProposalIsConflicting(final RedKeywordProposal keywordEntity) {
-        final AccessibleKeywordsEntities accessibleKeywordsEntities = getAccessibleKeywordsEntities(suiteFile, "");
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector();
+        final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
+                suiteFile.getFile().getFullPath(), collector);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities
                 .getPossibleKeywords(keywordEntity.getNameFromDefinition(), false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
@@ -154,6 +154,10 @@ public class RedKeywordProposals {
         private final boolean includeNotImportedLibraries;
 
         private final String userContent;
+
+        private ProposalsKeywordCollector() {
+            this(proposal -> false, false, "");
+        }
 
         private ProposalsKeywordCollector(final Predicate<RedKeywordProposal> shouldUseQualifiedName,
                 final boolean includeNotImportedLibraries, final String userContent) {

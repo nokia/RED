@@ -51,27 +51,6 @@ public class SuiteSourceAssistantContextTest {
     }
 
     @Test
-    public void contextCachesAutomaticKeywordQualifiedNamePrefixPreference() {
-        final MockRedPreferences preferences = spy(new MockRedPreferences(true, "  "));
-
-        final SuiteSourceAssistantContext context = createContext(null, preferences);
-        for (int i = 0; i < 10; i++) {
-            assertThat(context.isKeywordPrefixAutoAdditionEnabled()).isTrue();
-        }
-
-        preferences.setAssistantKeywordPrefixAutoAdditionEnabled(false);
-        for (int i = 0; i < 10; i++) {
-            assertThat(context.isKeywordPrefixAutoAdditionEnabled()).isTrue();
-        }
-
-        context.refreshPreferences();
-        for (int i = 0; i < 10; i++) {
-            assertThat(context.isKeywordPrefixAutoAdditionEnabled()).isFalse();
-        }
-        verify(preferences, times(2)).isAssistantKeywordPrefixAutoAdditionEnabled();
-    }
-
-    @Test
     public void contextCachesRobotFormatSeparatorPreference() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
         final MockRedPreferences preferences = spy(new MockRedPreferences(true, "  "));
