@@ -46,7 +46,7 @@ public class TemplateArgumentsFixerTest {
 
         final TestCase testCase = cases.get(0);
         final List<AModelElement<TestCase>> elements = testCase.getElements();
-        assertThat(elements).hasSize(4);
+        assertThat(elements).hasSize(5);
 
         assertThat(elements.get(0).getModelType()).isEqualTo(ModelType.TEST_CASE_TEMPLATE);
         assertLine(elements.get(0), RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT, newHashSet());
@@ -56,6 +56,8 @@ public class TemplateArgumentsFixerTest {
         assertLine(elements.get(2), RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT, newHashSet(0, 1, 2));
         assertThat(elements.get(3).getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
         assertLine(elements.get(3), RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT, newHashSet(0));
+        assertThat(elements.get(4).getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
+        assertLine(elements.get(4), RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT, newHashSet(0, 1, 2, 3, 4));
     }
 
     @Test
@@ -73,7 +75,7 @@ public class TemplateArgumentsFixerTest {
 
         final Task task = tasks.get(0);
         final List<AModelElement<Task>> elements = task.getElements();
-        assertThat(elements).hasSize(4);
+        assertThat(elements).hasSize(5);
 
         assertThat(elements.get(0).getModelType()).isEqualTo(ModelType.TASK_TEMPLATE);
         assertLine(elements.get(0), RobotTokenType.TASK_TEMPLATE_ARGUMENT, newHashSet());
@@ -83,6 +85,8 @@ public class TemplateArgumentsFixerTest {
         assertLine(elements.get(2), RobotTokenType.TASK_TEMPLATE_ARGUMENT, newHashSet(0, 1, 2));
         assertThat(elements.get(3).getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
         assertLine(elements.get(3), RobotTokenType.TASK_TEMPLATE_ARGUMENT, newHashSet(0));
+        assertThat(elements.get(4).getModelType()).isEqualTo(ModelType.TASK_EXECUTABLE_ROW);
+        assertLine(elements.get(4), RobotTokenType.TASK_TEMPLATE_ARGUMENT, newHashSet(0, 1, 2, 3, 4));
     }
 
     @Test

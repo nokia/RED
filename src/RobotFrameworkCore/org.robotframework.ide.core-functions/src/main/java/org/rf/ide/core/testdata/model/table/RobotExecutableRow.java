@@ -399,13 +399,20 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
     public void fixTemplateArgumentsTypes(final boolean isTemplateUsed, final RobotTokenType templateArgumentType) {
         if (!action.getTypes().contains(RobotTokenType.FOR_TOKEN)
                 && !action.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
-            for (final RobotToken token : getElementTokens()) {
+            final List<RobotToken> elementTokens = getElementTokens();
+            for (int i = 0; i < elementTokens.size(); i++) {
+                final RobotToken token = elementTokens.get(i);
                 token.getTypes().remove(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
                 token.getTypes().remove(RobotTokenType.TASK_TEMPLATE_ARGUMENT);
-                if (isTemplateUsed && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                        && !token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)
-                        && !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                    token.getTypes().add(templateArgumentType);
+                if (isTemplateUsed && !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                    if (i == 0 && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
+                            && !token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
+                        token.getTypes().add(templateArgumentType);
+                    } else if (i != 0) {
+                        token.getTypes().remove(RobotTokenType.FOR_CONTINUE_TOKEN);
+                        token.getTypes().remove(RobotTokenType.FOR_WITH_END_CONTINUATION);
+                        token.getTypes().add(templateArgumentType);
+                    }
                 }
             }
         }
