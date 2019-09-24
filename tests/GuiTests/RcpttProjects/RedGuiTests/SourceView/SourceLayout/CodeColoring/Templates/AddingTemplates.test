@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nyd9cMmbEem4rLX8K5H9uw
 Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/29/19 2:42 PM
+Save-Time: 9/24/19 3:50 PM
 Testcase-Type: ecl
 Verifications: _zVmTUMmkEem4rLX8K5H9uw,_tx_g0MmkEem4rLX8K5H9uw,_4zxMMMmkEem4rLX8K5H9uw,_AzGaQMmlEem4rLX8K5H9uw,_odceAMmkEem4rLX8K5H9uw,_G_fEAMmlEem4rLX8K5H9uw,_ueRikMmlEem4rLX8K5H9uw,_dllnkMo8Eem4rLX8K5H9uw
 
@@ -66,6 +66,26 @@ with [get-editor "loop_in_template.robot" | get-text-viewer] {
     get-property "styles[11].fontStyle" | equals normal | verify-true
     get-property "styles[12].text" | equals 2 | verify-true
     get-property "styles[12].fontStyle" | equals normal | verify-true
+}
+
+// add argument from conten assist
+with [get-editor "loop_in_template.robot" | get-text-viewer] {
+    set-caret-pos 7 9
+    key-type Enter
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Arguments for: Should Be Equal" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "[Documentation]" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Arguments for: Should Be Equal" | click -default
+    
+// leave first arg and change second    
+with [get-editor "loop_in_template.robot" | get-text-viewer] {
+    key-type Tab
+    type-text b2
+    key-type Enter
 }
 
 //add task
@@ -146,9 +166,30 @@ with [get-editor "template_test.robot"] {
         type-text 1
     }
     get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
-    get-editbox -after [get-label "Test Cases"] -index 1 | set-text 2
-    get-tab-folder | get-tab-item Source | click
+    get-editbox -after [get-label "Test Cases"] -index 1 | type-text 2
 }
+
+with [get-editor "template_test.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+SPACE"
+}
+with [get-window -class ContentProposalPopup | get-table] {
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Arguments for: Login with invalid credentials should fail" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "[Documentation]" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "[Setup]" | verify-true
+}
+get-window -class ContentProposalPopup | get-table | select "Arguments for: Login with invalid credentials should fail" 
+    | double-click
+with [get-editor "template_test.robot" | get-editbox -after [get-label "Test Cases"] -index 1] {
+    set-focus
+    key-type "TRAVERSE_ESCAPE"
+}
+
+get-editor "template_test.robot" | get-tab-folder | get-tab-item Source | click
+
 get-editor "template_test.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Test Template         Login with invalid credentials should fail\n\n"
     + "*** Variables ***\n"
@@ -163,11 +204,13 @@ get-editor "template_test.robot" | get-text-viewer | get-property text | equals 
     + "    \n"
     + "case\n"
     + "    1    2\n"
+    + "    username    password\n"
     + "*** Keywords ***\n"
     + "Login with invalid credentials should fail\n"
     + "    [Arguments]    ${username}    ${password}\n"
     + "    log    ${username}\n"
     + "    log   ${password}" | verify-true
+    
 get-editor "template_test.robot" | get-text-viewer | key-type "M1+s"
 
 
