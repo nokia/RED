@@ -79,7 +79,8 @@ public class ElementsUtility {
                     if (headersPossible.size() == 1) {
                         correct = headersPossible.get(0);
                     } else {
-                        // FIXME: error
+                        final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn());
+                        correct = newRobotToken;
                     }
                 } else {
                     final RobotToken comment = findCommentToken(robotTokens, text);
@@ -117,20 +118,11 @@ public class ElementsUtility {
                         if (ParsingState.getSettingsStates().contains(state) || currentTable == TableType.VARIABLES
                                 || currentTable == TableType.KEYWORD || currentTable == TableType.TEST_CASE
                                 || currentTable == TableType.TASKS || state == ParsingState.COMMENT) {
-                            final RobotToken newRobotToken = new RobotToken();
-                            newRobotToken.setLineNumber(fp.getLine());
-                            newRobotToken.setStartColumn(fp.getColumn());
-                            newRobotToken.setText(text);
-                            newRobotToken.setType(RobotTokenType.UNKNOWN);
+                            final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn());
                             correct = newRobotToken;
                         } else {
-                            // FIXME: info that nothing was found so token will
-                            // be treat as UNKNOWN
-                            final RobotToken newRobotToken = new RobotToken();
-                            newRobotToken.setLineNumber(fp.getLine());
-                            newRobotToken.setStartColumn(fp.getColumn());
-                            newRobotToken.setText(text);
-                            newRobotToken.setType(RobotTokenType.UNKNOWN);
+                            // FIXME: info that nothing was found so token will be treat as UNKNOWN
+                            final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn());
                             final List<IRobotTokenType> types = newRobotToken.getTypes();
                             for (final RobotToken currentProposal : robotTokens) {
                                 types.addAll(currentProposal.getTypes());
@@ -155,11 +147,7 @@ public class ElementsUtility {
                 if (exactlyOnPosition.getText().equals(text)) {
                     correct = exactlyOnPosition;
                 } else {
-                    final RobotToken newRobotToken = new RobotToken();
-                    newRobotToken.setLineNumber(fp.getLine());
-                    newRobotToken.setStartColumn(fp.getColumn());
-                    newRobotToken.setText(text);
-                    newRobotToken.setType(RobotTokenType.UNKNOWN);
+                    final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn());
                     final List<IRobotTokenType> types = newRobotToken.getTypes();
                     for (final RobotToken rt : robotTokens) {
                         types.addAll(rt.getTypes());
@@ -170,12 +158,8 @@ public class ElementsUtility {
         } else {
             final RobotToken token = robotTokens.get(0);
             if (!token.getTypes().contains(RobotTokenType.UNKNOWN)) {
-                final RobotToken newRobotToken = new RobotToken();
-                newRobotToken.setLineNumber(fp.getLine());
-                newRobotToken.setStartColumn(fp.getColumn());
-                newRobotToken.setText(text);
-                if (text != null
-                        && !(text.equals(token.getText()) || text.trim().equals(token.getText().trim()))) {
+                final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn());
+                if (text != null && !(text.equals(token.getText()) || text.trim().equals(token.getText().trim()))) {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                 } else {
                     newRobotToken.getTypes().clear();

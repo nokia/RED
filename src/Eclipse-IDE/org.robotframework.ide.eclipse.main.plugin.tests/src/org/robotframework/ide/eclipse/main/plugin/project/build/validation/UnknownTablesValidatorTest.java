@@ -98,6 +98,20 @@ public class UnknownTablesValidatorTest {
         assertThat(problems).isEmpty();
     }
 
+    @Test
+    public void unrecognizedHeaderIsReported_whenUnknownCombinedTableHeaderIsDefined() {
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version)
+                .appendLine("** * Settings ************* Variables")
+                .appendLine("something")
+                .build();
+
+        final Collection<Problem> problems = validate(prepareContext(version), file);
+        assertThat(problems).extracting(ALL)
+                .containsOnly(problem(SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER, 0, 37,
+                        "Unrecognized table header: 'Settings Variables'"));
+    }
+
     private static Tuple problem(final Object... properties) {
         // adding synonym for better readability
         return tuple(properties);

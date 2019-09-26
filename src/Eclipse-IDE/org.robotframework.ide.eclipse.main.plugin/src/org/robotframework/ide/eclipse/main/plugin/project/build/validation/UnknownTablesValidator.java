@@ -89,24 +89,7 @@ class UnknownTablesValidator implements ModelUnitValidator {
         reporter.handleProblem(problem, fileModel.getFile(), token, additionalAttributes);
     }
 
-    String extractSectionName(final String sectionName) {
-        int firstChar = 0;
-        for (int i = 0; i < sectionName.length(); i++) {
-            final char ch = sectionName.charAt(i);
-            if (ch != ' ' && ch != '*') {
-                firstChar = i;
-                break;
-            }
-        }
-        int lastChar = sectionName.length() - 1;
-        for (int i = sectionName.length() - 1; i >= 0; i--) {
-            final char ch = sectionName.charAt(i);
-            if (ch != ' ' && ch != '*') {
-                lastChar = i;
-                break;
-            }
-        }
-
-        return sectionName.substring(firstChar, lastChar + 1);
+    private String extractSectionName(final String text) {
+        return text.replaceAll("\\*+", "").replaceAll("\\s+", " ").trim();
     }
 }
