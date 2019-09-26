@@ -53,7 +53,7 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextCachesRobotFormatSeparatorPreference() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final MockRedPreferences preferences = spy(new MockRedPreferences(true, "  "));
+        final MockRedPreferences preferences = spy(new MockRedPreferences("  "));
 
         final SuiteSourceAssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {
@@ -75,7 +75,7 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextCachesTsvFormatSeparatorPreference() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnlyTsv();
-        final MockRedPreferences preferences = spy(new MockRedPreferences(true, "\t"));
+        final MockRedPreferences preferences = spy(new MockRedPreferences("\t"));
 
         final SuiteSourceAssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {
@@ -97,7 +97,7 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextCachesAutoActivationCharsPreference() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnlyTsv();
-        final MockRedPreferences preferences = spy(new MockRedPreferences(true, "\t", new char[] { 'a', 'b', 'c' }));
+        final MockRedPreferences preferences = spy(new MockRedPreferences("\t", new char[] { 'a', 'b', 'c' }));
 
         final SuiteSourceAssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {

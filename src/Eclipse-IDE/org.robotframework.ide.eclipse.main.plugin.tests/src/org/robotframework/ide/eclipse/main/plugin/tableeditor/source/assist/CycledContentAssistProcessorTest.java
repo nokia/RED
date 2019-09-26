@@ -330,7 +330,7 @@ public class CycledContentAssistProcessorTest {
     @Test
     public void activationCharsAreTakenFromPreferences() {
         final AssistPreferences assistPreferences = new AssistPreferences(
-                new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
+                new MockRedPreferences("  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null,
                 assistPreferences);
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, null);

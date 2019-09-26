@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -545,12 +546,13 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void qualifiedNameIsAddedToInputForProposals_whenKeywordPrefixAutoAdditionPreferenceIsEnabled()
+    public void qualifiedNameIsAddedToInputForProposals_whenKeywordPrefixAutoAdditionPreferenceIsSetToAlways()
             throws Exception {
-        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, true);
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                LibraryPrefixStrategy.ALWAYS.name());
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_lib_kw1"));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_lib_kw1", "a_other_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -562,12 +564,40 @@ public class RedKeywordProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
-        assertThat(proposals).hasSize(1);
-        assertThat(proposals.get(0).getContent()).isEqualTo("stdLib.a_lib_kw1");
+        assertThat(proposals).extracting(AssistProposal::getContent)
+                .containsExactly("stdLib.a_lib_kw1", "stdLib.a_other_kw");
     }
 
     @Test
-    public void qualifiedNameIsAddedToInputForProposals_whenProposalIsConflicting() throws Exception {
+    public void qualifiedNameIsNotAddedToInputForProposals_whenKeywordPrefixAutoAdditionPreferenceIsSetToNever()
+            throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                LibraryPrefixStrategy.NEVER.name());
+
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new LinkedHashMap<>();
+        refLibs.putAll(Libraries.createRefLib("firstLib", "a_conflict_kw", "a_first_kw"));
+        refLibs.putAll(Libraries.createRefLib("secondLib", "a_conflict_kw", "a_second_kw"));
+
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        robotProject.setReferencedLibraries(refLibs);
+
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Library  firstLib",
+                "Library  secondLib",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
+
+        assertThat(proposals).extracting(AssistProposal::getContent)
+                .containsExactly("a_conflict_kw", "a_conflict_kw", "a_first_kw", "a_second_kw");
+    }
+
+    @Test
+    public void qualifiedNameIsAddedToInputForProposals_whenProposalFromNonLocalScopeIsConflicting() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
 
@@ -702,8 +732,8 @@ public class RedKeywordProposalsTest {
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("keyword - LibImported", "keyword - LibNotImported");
-        assertThat(proposals.get(0).getContent()).isEqualTo("keyword");
-        assertThat(proposals.get(1).getContent()).isEqualTo("LibNotImported.keyword");
+        assertThat(proposals).extracting(AssistProposal::getContent)
+                .containsExactly("keyword", "LibNotImported.keyword");
     }
 
     @Test

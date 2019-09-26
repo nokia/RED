@@ -54,13 +54,13 @@ public class ContentAssistPreferencePageTest {
         assertThat(namesGroupedByType).hasEntrySatisfying(BooleanFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED,
                         RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED,
-                        RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED,
-                        RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED));
+                        RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED));
         assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY));
         assertThat(namesGroupedByType).hasEntrySatisfying(StringFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS));
         assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
-                names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE));
+                names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                        RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE));
     }
 }

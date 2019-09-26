@@ -64,6 +64,7 @@ public class RedPlugin extends AbstractUIPlugin {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
             RedPreferencesFixer.updatePreferencesWithoutPrefixesIfNeeded(getPreferenceStore());
+            RedPreferencesFixer.updateModifiedPreferencesIfNeeded(getPreferenceStore());
             enableRedXmlVersionChecker();
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
@@ -137,7 +138,7 @@ public class RedPlugin extends AbstractUIPlugin {
             return null;
         }
     }
-    
+
     private static void enableRedXmlVersionChecker() {
         RedXmlVersionUpdater.checkAlreadyOpenedProjects();
         ResourcesPlugin.getWorkspace().addResourceChangeListener(new RedXmlVersionUpdater(), IResourceChangeEvent.POST_CHANGE);

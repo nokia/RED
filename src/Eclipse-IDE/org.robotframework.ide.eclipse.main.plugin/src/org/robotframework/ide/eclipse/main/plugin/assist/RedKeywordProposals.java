@@ -27,6 +27,7 @@ import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -115,11 +116,16 @@ public class RedKeywordProposals {
 
     private Predicate<RedKeywordProposal> shouldUseQualifiedName() {
         return proposal -> {
-            final boolean isAutoPrefixEnabled = RedPlugin.getDefault()
+            final LibraryPrefixStrategy strategy = RedPlugin.getDefault()
                     .getPreferences()
-                    .isAssistantKeywordPrefixAutoAdditionEnabled();
-            return keywordIsNotInLocalScope(proposal)
-                    && (isAutoPrefixEnabled || keywordProposalIsConflicting(proposal));
+                    .getAssistantKeywordPrefixAutoAddition();
+            if (strategy == LibraryPrefixStrategy.NEVER || keywordIsInLocalScope(proposal)) {
+                return false;
+            } else if (strategy == LibraryPrefixStrategy.ALWAYS) {
+                return true;
+            } else {
+                return keywordProposalIsConflicting(proposal);
+            }
         };
     }
 
@@ -127,21 +133,21 @@ public class RedKeywordProposals {
         return RedPlugin.getDefault().getPreferences().isAssistantKeywordFromNotImportedLibraryEnabled();
     }
 
-    private boolean keywordIsNotInLocalScope(final RedKeywordProposal keywordProposal) {
-        return keywordProposal.getScope(suiteFile.getFile().getFullPath()) != KeywordScope.LOCAL;
+    private boolean keywordIsInLocalScope(final RedKeywordProposal proposal) {
+        return proposal.getScope(suiteFile.getFile().getFullPath()) == KeywordScope.LOCAL;
     }
 
-    private boolean keywordProposalIsConflicting(final RedKeywordProposal keywordEntity) {
+    private boolean keywordProposalIsConflicting(final RedKeywordProposal proposal) {
         final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector();
         final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
                 suiteFile.getFile().getFullPath(), collector);
         final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities
-                .getPossibleKeywords(keywordEntity.getNameFromDefinition(), false);
+                .getPossibleKeywords(proposal.getNameFromDefinition(), false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             final List<KeywordEntity> kwsInScope = keywords.get(scope);
 
-            if (kwsInScope.contains(keywordEntity)) {
+            if (kwsInScope.contains(proposal)) {
                 // current scope contain our proposal we only have conflict if there are more
                 // entities in this scope
                 return kwsInScope.size() > 1;

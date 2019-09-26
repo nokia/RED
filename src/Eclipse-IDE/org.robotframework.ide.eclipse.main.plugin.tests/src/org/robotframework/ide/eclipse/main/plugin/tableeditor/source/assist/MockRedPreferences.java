@@ -9,39 +9,26 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class MockRedPreferences extends RedPreferences {
 
-    private boolean isKeywordPrefixAutoAdditionEnabled;
-
     private String separatorToUseInRobot;
 
     private String separatorToUseInTsv;
 
     private char[] assistantAutoActivationChars;
 
-    MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUse) {
-        this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse, new char[0]);
+    MockRedPreferences(final String separatorToUse) {
+        this(separatorToUse, separatorToUse, new char[0]);
     }
 
-    MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUse,
+    MockRedPreferences(final String separatorToUse, final char[] assistantAutoActivationChars) {
+        this(separatorToUse, separatorToUse, assistantAutoActivationChars);
+    }
+
+    MockRedPreferences(final String separatorToUseInRobot, final String separatorToUseInTsv,
             final char[] assistantAutoActivationChars) {
-        this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse, assistantAutoActivationChars);
-    }
-
-    MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUseInRobot,
-            final String separatorToUseInTsv, final char[] assistantAutoActivationChars) {
         super(null);
-        this.isKeywordPrefixAutoAdditionEnabled = isKeywordPrefixAutoAdditionEnabled;
         this.separatorToUseInRobot = separatorToUseInRobot;
         this.separatorToUseInTsv = separatorToUseInTsv;
         this.assistantAutoActivationChars = assistantAutoActivationChars;
-    }
-
-    @Override
-    public boolean isAssistantKeywordPrefixAutoAdditionEnabled() {
-        return isKeywordPrefixAutoAdditionEnabled;
-    }
-
-    void setAssistantKeywordPrefixAutoAdditionEnabled(final boolean enabled) {
-        this.isKeywordPrefixAutoAdditionEnabled = enabled;
     }
 
     @Override

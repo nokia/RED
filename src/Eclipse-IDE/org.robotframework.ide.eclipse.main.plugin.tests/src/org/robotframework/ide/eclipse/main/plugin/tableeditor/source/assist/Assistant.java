@@ -27,6 +27,6 @@ class Assistant {
             model.parse();
             return model;
         }, KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),
-                new AssistPreferences(new MockRedPreferences(false, "  ")));
+                new AssistPreferences(new MockRedPreferences("  ")));
     }
 }

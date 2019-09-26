@@ -77,7 +77,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "red.editor.assistant.autoActivationEnabled";
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "red.editor.assistant.autoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "red.editor.assistant.autoActivationChars";
-    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "red.editor.assistant.keywordPrefixAutoAdditionEnabled";
+    public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION = "red.editor.assistant.keywordPrefixAutoAddition";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
     public static final String ASSISTANT_LINKED_ARGUMENTS_MODE = "red.editor.assistant.linkedArgumentsMode";
 
@@ -269,8 +269,8 @@ public class RedPreferences {
         return store.getString(ASSISTANT_AUTO_ACTIVATION_CHARS).toCharArray();
     }
 
-    public boolean isAssistantKeywordPrefixAutoAdditionEnabled() {
-        return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
+    public LibraryPrefixStrategy getAssistantKeywordPrefixAutoAddition() {
+        return LibraryPrefixStrategy.valueOf(store.getString(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION));
     }
 
     public boolean isAssistantKeywordFromNotImportedLibraryEnabled() {
@@ -665,6 +665,12 @@ public class RedPreferences {
         NEVER,
         ALWAYS,
         PROMPT
+    }
+
+    public enum LibraryPrefixStrategy {
+        ALWAYS,
+        AUTOMATIC,
+        NEVER
     }
 
     public enum LinkedModeStrategy {

@@ -25,6 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
@@ -126,36 +127,30 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(keywordsGroup);
         GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
 
-        final BooleanFieldEditor automaticKeywordPrefixingEditor = new BooleanFieldEditor(
-                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
-                "Automatically add library or resource name to keyword proposal insertion", keywordsGroup);
-        addField(automaticKeywordPrefixingEditor);
-        final Button automaticKeywordPrefixingButton = (Button) automaticKeywordPrefixingEditor
-                .getDescriptionControl(keywordsGroup);
-        GridDataFactory.fillDefaults().indent(5, 10).applyTo(automaticKeywordPrefixingButton);
-
         final BooleanFieldEditor keywordLibraryImportEditor = new BooleanFieldEditor(
                 RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED,
-                "Include keywords from not imported libraries", keywordsGroup);
+                "Include keywords from red.xml libraries not imported in robot file", keywordsGroup);
         addField(keywordLibraryImportEditor);
         final Button keywordLibraryImportButton = (Button) keywordLibraryImportEditor
                 .getDescriptionControl(keywordsGroup);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(keywordLibraryImportButton);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(keywordLibraryImportButton);
 
-        final Label notImportedLibrariesDescription = new Label(keywordsGroup, SWT.WRAP);
-        notImportedLibrariesDescription.setText("When libraries are added to red.xml but not imported in robot file, "
-                + "keywords from such libraries will be included in propositions.");
-        GridDataFactory.fillDefaults()
-                .hint(150, SWT.DEFAULT)
-                .indent(5, 2)
-                .span(2, 1)
-                .grab(true, false)
-                .applyTo(notImportedLibrariesDescription);
+        final ComboBoxFieldEditor automaticKeywordPrefixingEditor = new ComboBoxFieldEditor(
+                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                "Add library or resource name to keyword proposal insertion", "", 5,
+                createLibraryPrefixLabelsAndValues(), keywordsGroup);
+        addField(automaticKeywordPrefixingEditor);
 
         final ComboBoxFieldEditor argumentsLinkedModeEditor = new ComboBoxFieldEditor(
                 RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, "After pressing Tab in arguments edition mode", "", 5,
                 createArgumentsLinkedModeLabelsAndValues(), keywordsGroup);
         addField(argumentsLinkedModeEditor);
+    }
+
+    private String[][] createLibraryPrefixLabelsAndValues() {
+        return new String[][] { new String[] { "always", LibraryPrefixStrategy.ALWAYS.name() },
+                new String[] { "only when conflict exists", LibraryPrefixStrategy.AUTOMATIC.name() },
+                new String[] { "never", LibraryPrefixStrategy.NEVER.name() } };
     }
 
     private String[][] createArgumentsLinkedModeLabelsAndValues() {

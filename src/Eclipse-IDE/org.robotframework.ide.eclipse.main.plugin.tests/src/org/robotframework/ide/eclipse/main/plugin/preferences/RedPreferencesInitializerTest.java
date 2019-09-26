@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehav
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FormatterType;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -150,8 +151,9 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         verify(preferences).putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         verify(preferences).put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
-        verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
-        verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, false);
+        verify(preferences).put(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                LibraryPrefixStrategy.AUTOMATIC.name());
         verify(preferences).put(RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, LinkedModeStrategy.EXIT_ON_LAST.name());
     }
 

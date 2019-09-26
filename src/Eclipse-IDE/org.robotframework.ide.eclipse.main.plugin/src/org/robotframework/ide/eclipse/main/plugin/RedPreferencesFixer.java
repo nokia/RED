@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,16 +15,45 @@ import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.RGB;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
+// TODO: remove this class somewhere in future, see RED-1238
 class RedPreferencesFixer {
-    // TODO: there are preferences written without "red." prefix
-    // red prefix was added to all preferences in 0.8.12 to fix preference exporting feature
-    // remove this class somewhere in future, see RED-1238
 
+    // there are modified preferences changed in 0.8.14
+    static void updateModifiedPreferencesIfNeeded(final IPreferenceStore store) {
+
+        boolean shouldSave = false;
+
+        for (final String oldBooleanKeywordPrefixPreferenceName : newArrayList(
+                "assistantKeywordPrefixAutoAdditionEnabled", "red.editor.assistant.keywordPrefixAutoAdditionEnabled")) {
+            if (store.contains(oldBooleanKeywordPrefixPreferenceName)) {
+                final boolean oldBooleanKeywordPrefixPreferenceValue = store
+                        .getBoolean(oldBooleanKeywordPrefixPreferenceName);
+                store.setToDefault(oldBooleanKeywordPrefixPreferenceName);
+                if (oldBooleanKeywordPrefixPreferenceValue) {
+                    store.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
+                            LibraryPrefixStrategy.ALWAYS.name());
+                }
+                shouldSave = true;
+            }
+        }
+
+        if (shouldSave && store instanceof IPersistentPreferenceStore) {
+            try {
+                ((IPersistentPreferenceStore) store).save();
+            } catch (final IOException e) {
+                // ok, it will not be saved
+            }
+        }
+    }
+
+    // there are preferences written without "red." prefix
+    // red prefix was added to all preferences in 0.8.12 to fix preference exporting feature
     static void updatePreferencesWithoutPrefixesIfNeeded(final IPreferenceStore store) {
 
         boolean shouldSave = false;
@@ -113,8 +144,6 @@ class RedPreferencesFixer {
         builder.put("foldableKeywords", RedPreferences.FOLDABLE_KEYWORDS);
         builder.put("foldableDocumentation", RedPreferences.FOLDABLE_DOCUMENTATION);
         builder.put("assistantAutoActivationEnabled", RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED);
-        builder.put("assistantKeywordPrefixAutoAdditionEnabled",
-                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
         return builder.build();
     }
 
