@@ -19,7 +19,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 public class GeneralSettingsDataProvider
         implements IFilteringDataProvider, IRowDataProvider<Entry<String, RobotElement>> {
@@ -162,12 +161,7 @@ public class GeneralSettingsDataProvider
         if (filter == null) {
             filteredGeneralSettings.setMatcher(null);
         } else {
-            filteredGeneralSettings.setMatcher(new Matcher<Entry<String, RobotElement>>() {
-                @Override
-                public boolean matches(final Entry<String, RobotElement> item) {
-                    return filter.isMatching(item);
-                }
-            });
+            filteredGeneralSettings.setMatcher(item -> filter.isMatching(item));
         }
     }
 

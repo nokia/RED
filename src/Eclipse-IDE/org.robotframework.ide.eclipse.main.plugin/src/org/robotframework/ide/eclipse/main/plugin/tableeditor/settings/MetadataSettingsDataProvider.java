@@ -16,7 +16,6 @@ import org.robotframework.red.nattable.IFilteringDataProvider;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
@@ -133,12 +132,7 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
         if (filter == null) {
             filteredMetadata.setMatcher(null);
         } else {
-            filteredMetadata.setMatcher(new Matcher<RobotKeywordCall>() {
-                @Override
-                public boolean matches(final RobotKeywordCall item) {
-                    return filter.isMatching(item);
-                }
-            });
+            filteredMetadata.setMatcher(item -> filter.isMatching(item));
         }
     }
 

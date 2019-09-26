@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -17,7 +18,6 @@ import org.robotframework.red.nattable.IFilteringDataProvider;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.matchers.Matcher;
 
 public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
@@ -46,20 +46,19 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     }
 
     private int countImportSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 3; // setting name + args + empty cell + comment
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
+        final int constantColumns = 3; // setting name + empty cell + comment
+        int maxColumns = constantColumns + RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (filteredImports != null) {
-            for (final Object element : filteredImports) {
-                final RobotSetting setting = (RobotSetting) element;
-                if (setting != null) {
-                    max = Math.max(max, setting.getArguments().size());
-                }
+            for (final RobotSetting setting : filteredImports) {
+                final boolean isLibraryImportWithAlias = setting.isLibraryImport()
+                        && ((LibraryImport) setting.getLinkedElement()).getLibraryAliasToken().isPresent();
+                final int currentColumns = isLibraryImportWithAlias
+                        ? constantColumns + setting.getArguments().size() + 2
+                        : constantColumns + setting.getArguments().size();
+                maxColumns = Math.max(maxColumns, currentColumns);
             }
         }
-        return max;
+        return maxColumns;
     }
 
     private void createLists(final RobotSettingsSection section) {
@@ -154,12 +153,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
         if (filter == null) {
             filteredImports.setMatcher(null);
         } else {
-            filteredImports.setMatcher(new Matcher<RobotKeywordCall>() {
-                @Override
-                public boolean matches(final RobotKeywordCall item) {
-                    return filter.isMatching(item);
-                }
-            });
+            filteredImports.setMatcher(item -> filter.isMatching(item));
         }
     }
 

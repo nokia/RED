@@ -68,6 +68,14 @@ public class ImportSettingsDataProviderTest {
     }
 
     @Test
+    public void columnsAreCountedCorrectly_whenImportSettingArgumentsWithAliasExceedLimit() throws Exception {
+        dataProvider.setInput(createSettingsSection("*** Settings ***",
+                "Library    lib.py    a    b    c    d    e    f    WITH NAME    alias"));
+
+        assertThat(dataProvider.getColumnCount()).isEqualTo(12);
+    }
+
+    @Test
     public void columnsAreCountedCorrectly_whenMinimalArgumentsColumnsFieldIsChangedInPreferences() throws Exception {
         preferenceUpdater.setValue(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 15);
 
