@@ -24,6 +24,7 @@ import org.rf.ide.core.testdata.formatter.RedFormatter;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormatterSettings;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.rf.ide.core.testdata.formatter.RobotSourceFormatter;
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -56,7 +57,7 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
 
                 final IRegion firstLineRegion = document.getLineInformation(firstLine);
                 final IRegion lastLineRegion = document.getLineInformation(lastLine);
-                
+
                 final String lastDelimiter = document.getLineDelimiter(lastLine);
                 final int lastDelimiterLength = lastDelimiter != null ? lastDelimiter.length() : 0;
 
@@ -128,7 +129,7 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
         try {
             final List<RobotLine> lines = ((RobotDocument) document).getNewestModel().getFileContent();
 
-            boolean insideFor = false;
+            FilePosition forPosition = null;
             for (int line = 0; line < lines.size(); line++) {
                 final RobotLine currentLine = lines.get(line);
                 final Optional<RobotToken> firstToken = currentLine.elementsStream()
@@ -137,13 +138,14 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
                         .findFirst();
 
                 if (firstToken.isPresent() && firstToken.get().getTypes().contains(RobotTokenType.FOR_WITH_END)) {
-                    insideFor = true;
+                    forPosition = firstToken.get().getFilePosition();
 
                 } else if (firstToken.isPresent()
                         && firstToken.get().getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
-                    insideFor = false;
+                    forPosition = null;
 
-                } else if (insideFor && firstToken.isPresent() && affectedLines.contains(line)) {
+                } else if (forPosition != null && firstToken.isPresent() && affectedLines.contains(line)
+                        && firstToken.get().getFilePosition().getColumn() <= forPosition.getColumn()) {
                     linesToIndent.add(line);
                 }
             }
@@ -152,7 +154,7 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
         }
         return linesToIndent;
     }
-    
+
     @FunctionalInterface
     private static interface DocumentRunnable {
         void run() throws BadLocationException;

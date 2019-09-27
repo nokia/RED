@@ -221,9 +221,9 @@ public class SuiteSourceEditorCustomFormatterTest {
 
         assertThat(document.get()).isEqualTo("case\n\n   Keyword   123\n   [Return]   456\n");
     }
-    
+
     @Test
-    public void newStyleFORLoopBodyIsIndented() throws BadLocationException {
+    public void newStyleFORLoopBodyIsIndented_whenInSameColumnAsForDeclaration() throws BadLocationException {
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
 
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
@@ -235,6 +235,27 @@ public class SuiteSourceEditorCustomFormatterTest {
                 "  FOR  ${x}  IN RANGE  10",
                 "  Log  ${x}",
                 "  kw  1  2  3",
+                "  END",
+                "  kw  1  2  3");
+        formatter.format(document);
+
+        assertThat(document.get()).isEqualTo(
+                "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n    Log  ${x}\n    kw  1  2  3\n  END\n  kw  1  2  3");
+    }
+
+    @Test
+    public void newStyleFORLoopBodyIsNotIndented_whenInColumnGreaterThanForDeclaration() throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
+
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
+
+        final RobotDocument document = robotDocument(
+                "*** Test Cases ***",
+                "case",
+                "  FOR  ${x}  IN RANGE  10",
+                "    Log  ${x}",
+                "    kw  1  2  3",
                 "  END",
                 "  kw  1  2  3");
         formatter.format(document);
