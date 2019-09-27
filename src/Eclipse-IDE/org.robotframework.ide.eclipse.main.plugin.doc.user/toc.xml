@@ -34,6 +34,8 @@
        </topic>
        <topic href="help/user_guide/project_config/variable_files.html" label="Global variables files">
        </topic>
+       <topic href="help/user_guide/project_config/libraries_abs_paths.html" label="Dealing with libraries absolute paths">
+       </topic>
     </topic>
     <topic href="help/user_guide/working_with_RED.html" label="Working with RED">
         <topic href="help/user_guide/working_with_RED/table_general.html" label="Table Editors - general usage hints">
