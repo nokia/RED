@@ -105,5 +105,9 @@
     </topic>
     <topic href="help/user_guide/diagnostics.html" label="Diagnostics">
     </topic>
- </topic> 
+ </topic>
+<topic href="help/whats_new.html" label="What&apos;s new">
+   <topic href="help/whats_new/0_8_14.html" label="RED 0.8.14">
+   </topic>
+</topic> 
 </toc>
