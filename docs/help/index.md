@@ -43,6 +43,8 @@
 </li>
 <li><a href="RED/../../help/user_guide/project_config/variable_files.html">Global variables files</a>
 </li>
+<li><a href="RED/../../help/user_guide/project_config/libraries_abs_paths.html">Dealing with libraries absolute paths</a>
+</li>
 </ul></li>
 <li><a href="RED/../../help/user_guide/working_with_RED.html">Working with RED</a>
 <ul>
@@ -118,6 +120,11 @@
 <li><a href="RED/../../help/user_guide/known_issues.html">Known issues and problems</a>
 </li>
 <li><a href="RED/../../help/user_guide/diagnostics.html">Diagnostics</a>
+</li>
+</ul></li>
+<li><a href="RED/../../help/whats_new.html">What's new</a>
+<ul>
+<li><a href="RED/../../help/whats_new/0_8_14.html">RED 0.8.14</a>
 </li>
 </ul></li>
 </ul>

@@ -20,6 +20,7 @@ Material is intended to provide detailed informations about RED for users alread
     *   [Custom PYTHONPATH/CLASSPATH and path relativeness](RED/../../../help/user_guide/project_config/custom_paths.md)
     *   [Variable mappings](RED/../../../help/user_guide/project_config/variable_mapping.md)
     *   [Global variables files](RED/../../../help/user_guide/project_config/variable_files.md)
+    *   [Dealing with libraries absolute paths](RED/../../../help/user_guide/project_config/libraries_abs_paths.md)
     
     
     

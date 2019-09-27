@@ -21,6 +21,8 @@ cooperation.
 </li>
 <li><a href="RED/../../../help/user_guide/project_config/variable_files.html">Global variables files</a>
 </li>
+<li><a href="RED/../../../help/user_guide/project_config/libraries_abs_paths.html">Dealing with libraries absolute paths</a>
+</li>
 </ul>
 </body>
 </html>
