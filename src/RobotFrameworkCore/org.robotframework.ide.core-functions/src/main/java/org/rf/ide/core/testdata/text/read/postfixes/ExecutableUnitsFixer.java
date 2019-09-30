@@ -17,6 +17,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -341,13 +342,20 @@ class ExecutableUnitsFixer {
                 final List<RobotToken> elementTokens = execRow.getRow().getElementTokens();
                 if (!actionTokenPos.isNotSet()) {
                     for (final RobotToken rt : elementTokens) {
-                        if (rt != actionToken && rt.getLineNumber() < actionToken.getLineNumber()) {
-                            return rt.getLineNumber() < actionToken.getLineNumber();
+                        if (rt != actionToken && rt.getLineNumber() < actionToken.getLineNumber()
+                                && !isVariableDeclaration(rt.getTypes())) {
+                            return true;
                         }
                     }
                 }
             }
         }
         return false;
+    }
+
+    private static boolean isVariableDeclaration(final List<IRobotTokenType> types) {
+        return types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
+                || types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                || types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
     }
 }
