@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9zaK8PE_Eeeotd-8Sx1R8w
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 1/9/18 10:18 AM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/1/19 2:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,10 +68,25 @@ with [get-window -from "NatCombo.createDropdownControl()" | get-table] {
     key-type Down
     select Library | key-type Enter
 }
+// add library alias
+with [get-editor "TestFile.robot" | get-section Imports ] {
+	with [get-editbox] {
+   		type-text "Process" 
+	    key-type Enter
+	}
+	with [get-editbox] {
+	    type-text "WITH NAME"
+	    key-type Enter
+    }
+	with [get-editbox] {
+	    type-text "proc"
+	    key-type Enter
+    }
+}
 // change first Library import to Resource
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
 	key-type ESC
-    key-type Left
+    key-type Left -times 4
     key-type Up -times 3
     key-type Enter
 }
@@ -87,7 +102,7 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 1 -import "Resource" -name "Collection"
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 2 -import "Resource" -name "" 
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 3 -import "Variables" -name ""
-check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Library" -name "" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Library" -name "Process" -c1 "WITH NAME" -c2 "proc" 
 // go to Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
     
@@ -103,7 +118,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Resource    Collection\n"
     + "Resource\n"
     + "Variables\n"
-    + "Library" | verify-true
+    + "Library    Process    WITH NAME    proc" | verify-true
 // complete import names in Source
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
@@ -113,9 +128,9 @@ with [get-editor "TestFile.robot"] {
         key-type Down
         key-type Tab
         type-text "var.py"
-        key-type Down
-        key-type Tab
-        type-text "Process"
+        set-caret-pos 13 12
+        key-type Delete -times 7
+        type-text "Operating System"
         key-type "M1+s"
     }
     // go to Settings table
@@ -125,5 +140,5 @@ with [get-editor "TestFile.robot"] {
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 1 -import "Resource" -name "Collection"
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 2 -import "Resource" -name "a.py" 
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 3 -import "Variables" -name "var.py"
-check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Library" -name "Process" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Library" -name "Operating System" -c1 "WITH NAME" -c2 "proc" 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
