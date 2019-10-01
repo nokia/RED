@@ -102,9 +102,7 @@ public class RobotSetting extends RobotKeywordCall {
                         && type != RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION
                         && type != RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION
                         && type != RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
-                        && type != RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION
-                        && type != RobotTokenType.SETTING_LIBRARY_ALIAS
-                        && type != RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE;
+                        && type != RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION;
             }).map(RobotToken::getText).collect(toList());
         }
         return arguments;

@@ -8,8 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
-import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
-import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
@@ -40,13 +38,6 @@ public class ImportSettingsColumnsPropertyAccessor implements IColumnPropertyAcc
             return rowObject.getComment();
         } else if (columnIndex <= arguments.size()) {
             return arguments.get(columnIndex - 1);
-        } else if (rowObject.isLibraryImport()) {
-            final LibraryAlias alias = ((LibraryImport) rowObject.getLinkedElement()).getAlias();
-            if (alias.getDeclaration() != null && columnIndex == arguments.size() + 1) {
-                return alias.getDeclaration().getText();
-            } else if (alias.getLibraryAlias() != null && columnIndex == arguments.size() + 2) {
-                return alias.getLibraryAlias().getText();
-            }
         }
         return "";
     }

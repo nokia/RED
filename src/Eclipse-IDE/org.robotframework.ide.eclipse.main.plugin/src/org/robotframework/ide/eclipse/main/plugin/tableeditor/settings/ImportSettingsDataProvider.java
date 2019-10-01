@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -50,12 +49,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
         int maxColumns = constantColumns + RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (filteredImports != null) {
             for (final RobotSetting setting : filteredImports) {
-                final boolean isLibraryImportWithAlias = setting.isLibraryImport()
-                        && ((LibraryImport) setting.getLinkedElement()).getLibraryAliasToken().isPresent();
-                final int currentColumns = isLibraryImportWithAlias
-                        ? constantColumns + setting.getArguments().size() + 2
-                        : constantColumns + setting.getArguments().size();
-                maxColumns = Math.max(maxColumns, currentColumns);
+                maxColumns = Math.max(maxColumns, constantColumns + setting.getArguments().size());
             }
         }
         return maxColumns;

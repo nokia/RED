@@ -11,7 +11,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -51,8 +50,8 @@ public class SetSettingArgumentCommand extends EditorCommand {
         }
     }
 
-    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
-        final List<String> arguments = createArgumentsList(call, index);
+    private List<String> prepareArgumentsList(final RobotSetting setting, final String value, final int index) {
+        final List<String> arguments = createArgumentsList(setting, index);
 
         previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
 
@@ -64,15 +63,15 @@ public class SetSettingArgumentCommand extends EditorCommand {
         return arguments;
     }
 
-    public static List<String> createArgumentsList(final RobotKeywordCall call, final int index) {
-        final List<String> arguments = call == null ? new ArrayList<>() : new ArrayList<>(call.getArguments());
+    private static List<String> createArgumentsList(final RobotSetting setting, final int index) {
+        final List<String> arguments = new ArrayList<>(setting.getArguments());
         for (int i = arguments.size(); i <= index; i++) {
             arguments.add("\\");
         }
         return arguments;
     }
 
-    public static void fillArgumentsList(final String value, final int index, final List<String> arguments,
+    private static void fillArgumentsList(final String value, final int index, final List<String> arguments,
             final boolean shouldReplaceValue) {
         final String newValue = value == null || value.trim().isEmpty() ? "\\" : value;
         if (shouldReplaceValue) {

@@ -23,10 +23,10 @@ public class RobotSettingTest {
 
     @Test
     public void testProperObjectIsCreated() {
-        for (final RobotKeywordCall setting : createSettingsForTest(new ArrayList<String>(), new ArrayList<String>())) {
+        for (final RobotKeywordCall setting : createSettingsForTest(new ArrayList<>(), new ArrayList<>())) {
             assertThat(setting).isExactlyInstanceOf(RobotSetting.class);
         }
-        for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), new ArrayList<String>())) {
+        for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), new ArrayList<>())) {
             assertThat(setting).isExactlyInstanceOf(RobotSetting.class);
         }
         for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), newArrayList("# c"))) {
@@ -42,8 +42,8 @@ public class RobotSettingTest {
 
     @Test
     public void testNameGetting() {
-        assertNames(createSettingsForTest(new ArrayList<String>(), new ArrayList<String>()));
-        assertNames(createSettingsForTest(newArrayList("a"), new ArrayList<String>()));
+        assertNames(createSettingsForTest(new ArrayList<>(), new ArrayList<>()));
+        assertNames(createSettingsForTest(newArrayList("a"), new ArrayList<>()));
         assertNames(createSettingsForTest(newArrayList("a"), newArrayList("# c")));
         assertNames(createSettingsForTest(newArrayList("a", "b"), newArrayList("# c")));
         assertNames(createSettingsForTest(newArrayList("a", "b"), newArrayList("# c", "d")));
@@ -51,10 +51,10 @@ public class RobotSettingTest {
 
     @Test
     public void testArgumentsGetting() {
-        for (final RobotKeywordCall setting : createSettingsForTest(new ArrayList<String>(), new ArrayList<String>())) {
+        for (final RobotKeywordCall setting : createSettingsForTest(new ArrayList<>(), new ArrayList<>())) {
             assertThat(setting.getArguments()).isEmpty();
         }
-        for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), new ArrayList<String>())) {
+        for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), new ArrayList<>())) {
             assertThat(setting.getArguments()).containsExactly("a");
         }
         for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a"), newArrayList("# c"))) {
@@ -69,6 +69,10 @@ public class RobotSettingTest {
         for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a", "b", "c", "d", "e"),
                 newArrayList("# c"))) {
             assertThat(setting.getArguments()).containsExactly("a", "b", "c", "d", "e");
+        }
+        for (final RobotKeywordCall setting : createSettingsForTest(newArrayList("a", "b", "WITH NAME", "xyz"),
+                newArrayList("# c", "d"))) {
+            assertThat(setting.getArguments()).containsExactly("a", "b", "WITH NAME", "xyz");
         }
     }
 
