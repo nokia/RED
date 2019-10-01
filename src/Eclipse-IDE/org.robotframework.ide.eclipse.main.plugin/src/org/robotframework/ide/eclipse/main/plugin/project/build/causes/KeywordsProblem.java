@@ -85,6 +85,31 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(AddPrefixToKeywordUsage.createFixers(name, sources));
         }
     },
+    MASKED_KEYWORD_USAGE {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.MASKED_KEYWORD_USAGE;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Masked keyword '%s' reference. Matching keywords are defined in: %s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final List<String> sources = Splitter.on(';')
+                    .splitToList(marker.getAttribute(AdditionalMarkerAttributes.SOURCES, ""));
+            return newArrayList(AddPrefixToKeywordUsage.createFixers(name, sources));
+        }
+    },
     DEPRECATED_KEYWORD {
 
         @Override

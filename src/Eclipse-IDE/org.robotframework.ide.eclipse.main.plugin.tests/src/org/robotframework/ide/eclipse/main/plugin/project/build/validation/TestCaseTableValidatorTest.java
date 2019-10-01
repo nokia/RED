@@ -227,6 +227,41 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
+    public void maskedKeywordUsageIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot")),
+                newRefLibraryKeyword("libA", "kw", new Path("/suite.robot")),
+                newRefLibraryKeyword("libB", "kw", new Path("/suite.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.MASKED_KEYWORD_USAGE, new ProblemPosition(3, Range.closed(28, 30))));
+    }
+
+    @Test
+    public void maskedKeywordUsageIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    libA.kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newResourceKeyword("kw", new Path("/res.robot")),
+                newRefLibraryKeyword("libA", "kw", new Path("/suite.robot")),
+                newRefLibraryKeyword("libB", "kw", new Path("/suite.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
     public void unknownKeywordIsReported_whenUsedWithOriginalLibraryNameInsteadOfAlias() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Library  lib  WITH NAME  alias")

@@ -60,4 +60,19 @@ public class KeywordsProblemTest {
         assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'Some_Keyword_Name'");
     }
 
+    @Test
+    public void maskedKeywordUsage_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("Keyword Name");
+        when(marker.getAttribute(AdditionalMarkerAttributes.SOURCES, "")).thenReturn("LibA;LibB;LibC");
+
+        final KeywordsProblem problem = KeywordsProblem.MASKED_KEYWORD_USAGE;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Add 'LibA' prefix to keyword call", "Add 'LibB' prefix to keyword call",
+                        "Add 'LibC' prefix to keyword call");
+    }
+
 }

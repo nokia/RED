@@ -30,11 +30,6 @@ public enum ProblemCategory {
         public Severity getDefaultSeverity() {
             return Severity.ERROR;
         }
-
-        @Override
-        public Severity[] getPossibleSeverities() {
-            return new Severity[] { Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
-        }
     },
     MISSING_ROBOT_ENVIRONMENT(
             ProblemCategoryType.PROJECT_CONFIGURATION,
@@ -131,6 +126,16 @@ public enum ProblemCategory {
             "Masked keyword name",
             "Occurs when keyword defined in test suite has the same name like keyword from imported library.\n"
                     + "You can use fully qualified name when calling masked keyword."),
+    MASKED_KEYWORD_USAGE(
+            ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
+            "Masked keyword usage",
+            "Occurs when masked keyword is called.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.INFO;
+        }
+    },
     EMPTY_SETTINGS(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Empty settings definition",

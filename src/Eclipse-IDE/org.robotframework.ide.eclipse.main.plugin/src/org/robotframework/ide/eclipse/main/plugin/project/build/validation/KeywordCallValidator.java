@@ -89,7 +89,21 @@ class KeywordCallValidator implements ModelUnitValidator {
                 } else if (keywordEntities.size() == 1) {
                     this.foundKeyword = (ValidationKeywordEntity) keywordEntities.get(0);
                     validateFoundKeyword(name, position);
-
+                    if (keywords.size() > 1) {
+                        final List<String> sources = KeywordScope.defaultOrder()
+                                .stream()
+                                .filter(s -> s != KeywordScope.LOCAL)
+                                .flatMap(s -> keywords.get(s).stream())
+                                .map(KeywordEntity::getSourceNameInUse)
+                                .collect(toList());
+                        reporter.handleProblem(
+                                RobotProblem.causedBy(KeywordsProblem.MASKED_KEYWORD_USAGE)
+                                        .formatMessageWith(name, "[" + String.join(", ", sources) + "]"),
+                                validationContext.getFile(), position,
+                                ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
+                                        AdditionalMarkerAttributes.ORIGINAL_NAME, kwName,
+                                        AdditionalMarkerAttributes.SOURCES, String.join(";", sources)));
+                    }
                 } else {
                     final List<String> sources = keywordEntities.stream()
                             .map(KeywordEntity::getSourceNameInUse)
