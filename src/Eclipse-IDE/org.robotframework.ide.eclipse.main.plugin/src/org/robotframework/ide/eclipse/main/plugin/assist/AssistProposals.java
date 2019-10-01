@@ -197,11 +197,12 @@ public class AssistProposals {
             if (result != 0) {
                 return result;
             }
-            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            return sortedByLabels().compare(proposal1, proposal2);
         };
     }
 
-    public static Comparator<RedKeywordProposal> sortedByLabelsCamelCaseAndPrefixedFirst(final String input) {
+    public static Comparator<RedKeywordProposal> sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder(
+            final String input, final IPath useplaceFilepath) {
         return (proposal1, proposal2) -> {
             final boolean isCamelCase1 = !CamelCaseKeywordNamesSupport.matches(proposal1.getLabel(), input).isEmpty();
             final boolean isCamelCase2 = !CamelCaseKeywordNamesSupport.matches(proposal2.getLabel(), input).isEmpty();
@@ -209,8 +210,18 @@ public class AssistProposals {
             if (result != 0) {
                 return result;
             }
-            final Comparator<AssistProposal> prefixedComparator = sortedByLabelsPrefixedFirst(input);
-            return prefixedComparator.compare(proposal1, proposal2);
+
+            if (proposal1.getKeywordName().equals(proposal2.getKeywordName())) {
+                final List<KeywordScope> scopesOrder = KeywordScope.defaultOrder();
+                final KeywordScope scope1 = proposal1.getScope(useplaceFilepath);
+                final KeywordScope scope2 = proposal2.getScope(useplaceFilepath);
+                final int scopeResult = Integer.compare(scopesOrder.indexOf(scope1), scopesOrder.indexOf(scope2));
+                if (scopeResult != 0) {
+                    return scopeResult;
+                }
+            }
+
+            return sortedByLabelsPrefixedFirst(input).compare(proposal1, proposal2);
         };
     }
 
@@ -227,11 +238,10 @@ public class AssistProposals {
                 if (result != 0) {
                     return result;
                 }
-                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
-
-            } else {
-                return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
+                return sortedByLabels().compare(proposal1, proposal2);
             }
+
+            return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
         };
     }
 
@@ -241,7 +251,7 @@ public class AssistProposals {
             if (result != 0) {
                 return result;
             }
-            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            return sortedByLabels().compare(proposal1, proposal2);
         };
     }
 
@@ -251,7 +261,7 @@ public class AssistProposals {
             if (result != 0) {
                 return result;
             }
-            return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            return sortedByLabels().compare(proposal1, proposal2);
         };
     }
 }

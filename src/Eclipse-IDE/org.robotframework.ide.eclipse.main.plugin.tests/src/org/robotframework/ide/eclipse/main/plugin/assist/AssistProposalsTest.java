@@ -51,7 +51,15 @@ public class AssistProposalsTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        projectProvider.createFile("res.robot",
+                "*** Keywords ***",
+                "kw1",
+                "  Log  1",
+                "kw2",
+                "  Log  2");
         file = projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Resource  res.robot",
                 "*** Keywords ***",
                 "kw1",
                 "  [Arguments]  ${x}  @{list}",
@@ -458,7 +466,7 @@ public class AssistProposalsTest {
     }
 
     @Test
-    public void byLabelsCamelCaseAndPrefixedFirstComparatorProperlySortsProposals() {
+    public void byLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrderComparatorProperlySortsProposals() {
         final List<RedKeywordProposal> proposals = newArrayList(
                 kwProposal("xyz", "src1"),
                 kwProposal("Xyz1", "src2"),
@@ -474,12 +482,41 @@ public class AssistProposalsTest {
                 kwProposal("abCD", "src3"),
                 kwProposal("Do Not Create Docs", "src1"));
 
-        Collections.sort(proposals, AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirst("CD"));
+        Collections.sort(proposals,
+                AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder("CD", file.getFullPath()));
 
         assertThat(proposals).extracting(AssistProposal::getLabel)
                 .containsExactly("Can Detect - src3", "Create Duplicated Name - src2", "Cd1 - src3", "cD2 - src2",
                         "CD345 - src1", "ABC - src2", "abc1 - src1", "abCD - src3", "Do Not Create Docs - src1",
                         "xyz - src1", "Xyz1 - src2", "ZZZ - src3", "zzz1 - src1");
+    }
+
+    @Test
+    public void byLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrderComparatorProperlySortsProposalsFromDifferentScopes() {
+        final List<RobotKeywordDefinition> localKws = getUserKeywords(file);
+        final List<RobotKeywordDefinition> resourceKws = getUserKeywords(projectProvider.getFile("res.robot"));
+
+        final List<RedKeywordProposal> proposals = newArrayList(
+                kwProposal(localKws.get(0), KeywordScope.LOCAL),
+                kwProposal("kw1", "src2", KeywordScope.REF_LIBRARY),
+                kwProposal(resourceKws.get(1), KeywordScope.RESOURCE),
+                kwProposal("kw2", "src2", KeywordScope.REF_LIBRARY),
+                kwProposal("kw2", "src3", KeywordScope.REF_LIBRARY),
+                kwProposal(localKws.get(1), KeywordScope.LOCAL),
+                kwProposal("kw1", "src3", KeywordScope.REF_LIBRARY),
+                kwProposal("kw2", "lib", KeywordScope.STD_LIBRARY),
+                kwProposal("kw2", "src1", KeywordScope.REF_LIBRARY),
+                kwProposal("kw1", "src1", KeywordScope.REF_LIBRARY),
+                kwProposal(resourceKws.get(0), KeywordScope.RESOURCE),
+                kwProposal("kw1", "lib", KeywordScope.STD_LIBRARY));
+
+        Collections.sort(proposals,
+                AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder("kw", file.getFullPath()));
+
+        assertThat(proposals).extracting(AssistProposal::getLabel)
+                .containsExactly("kw1 - suite.robot", "kw1 - res.robot", "kw1 - src1", "kw1 - src2", "kw1 - src3",
+                        "kw1 - lib", "kw2 - suite.robot", "kw2 - res.robot", "kw2 - src1", "kw2 - src2", "kw2 - src3",
+                        "kw2 - lib");
     }
 
     @Test
@@ -546,14 +583,23 @@ public class AssistProposalsTest {
     }
 
     private RedKeywordProposal kwProposal(final String name, final String source) {
+        return kwProposal(name, source, KeywordScope.REF_LIBRARY);
+    }
+
+    private RedKeywordProposal kwProposal(final String name, final String source, final KeywordScope scope) {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setFormat("ROBOT");
         libSpec.setName(source);
         final KeywordSpecification kwSpec = new KeywordSpecification();
         kwSpec.setName(name);
         libSpec.setKeywords(newArrayList(kwSpec));
-        return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY,
-                Optional.empty(), new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
+        return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", scope, Optional.empty(),
+                new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
+    }
+
+    private RedKeywordProposal kwProposal(final RobotKeywordDefinition userKeyword, final KeywordScope scope) {
+        return AssistProposals.createUserKeywordProposal(userKeyword, "", scope, AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
     }
 
     private RedVariableProposal varProposal(final String name, final VariableOrigin origin) {
@@ -572,5 +618,10 @@ public class AssistProposalsTest {
                 .appendLine("${scalar}  0  #something")
                 .build();
         return model.findSection(RobotVariablesSection.class).get().getChildren().get(0);
+    }
+
+    private static List<RobotKeywordDefinition> getUserKeywords(final IFile file) {
+        final RobotSuiteFile fileModel = new RobotModel().createSuiteFile(file);
+        return fileModel.findSection(RobotKeywordsSection.class).get().getChildren();
     }
 }

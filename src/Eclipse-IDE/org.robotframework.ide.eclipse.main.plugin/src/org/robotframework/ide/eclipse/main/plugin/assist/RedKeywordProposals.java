@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createNotAccessibleLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createUserKeywordProposal;
-import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirst;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,7 +71,8 @@ public class RedKeywordProposals {
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent) {
-        return getKeywordProposals(userContent, sortedByLabelsCamelCaseAndPrefixedFirst(userContent));
+        return getKeywordProposals(userContent, sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder(
+                userContent, suiteFile.getFile().getFullPath()));
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent,
