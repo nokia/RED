@@ -126,7 +126,7 @@ public class KeywordUsagesFinder {
                         desc.getKeywordArguments()))
                 .map(NestedExecutables::getExecutables)
                 .map(List::stream)
-                .orElseGet(() -> Stream.of())
+                .orElseGet(Stream::empty)
                 .map(RobotExecutableRow::buildLineDescription)
                 .map(d -> getExecutablesTokens(d, proposalFindFun))
                 .forEach(kwTokens::addAll);
