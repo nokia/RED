@@ -28,6 +28,7 @@ Such problems are reported even when validation is turned off, and building as w
 <li><b>Keyword occurrence not consistent with definition</b> - occurs when name in keyword call is different than in definition. Use name the same as in definition.</li>
 <li><b>Keyword name with dots</b> - occurs when keyword name contains dots. It may be confused with fully qualified name.</li>
 <li><b>Variable given as keyword name</b> - occurs when variable is used as keyword call in test suite setup or teardown.</li>
+<li><b>Template keyword written in multiple cells</b> - occurs when template keyword name is written in multiple cells instead of single one.</li>
 <li><b>Collection size should be equal to keyword arguments number</b> - occurs when collection variable is used in keyword call and collection elements number is different than keyword arguments number.</li>
 <li><b>Invalid time format</b> - occurs when time is not formatted correctly. Use number, time string or timer string.</li>
 <li><b>Variable declared without assignment</b> - occurs when variable is declared without assignment in Variables section.</li>
@@ -37,6 +38,7 @@ Such problems are reported even when validation is turned off, and building as w
 <li><b>Duplicated variable name</b> - occurs when variable name is duplicated and one variable value overrides another.</li>
 <li><b>Duplicated test case name</b> - occurs when test case name is duplicated and both test cases can be run</li>
 <li><b>Masked keyword name</b> - occurs when keyword defined in test suite has the same name like keyword from imported library. You can use fully qualified name when calling masked keyword.</li>
+<li><b>Masked keyword usage</b> - occurs when masked keyword is called.</li>
 </ul>
 <h4>Unnecessary code</h4>
 <ul>
@@ -44,6 +46,7 @@ Such problems are reported even when validation is turned off, and building as w
 <li><b>Unrecognized header type</b> - occurs when Robot Framework does not recognize section header. Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid.</li>
 <li><b>Duplicated configuration path</b> - occurs when path defined in configuration is subpath of different one. Such path is skipped.</li>
 <li><b>Missing configuration path</b> - occurs when missing path is defined in configuration. Such path is skipped.</li>
+<li><b>Overridden named argument</b> - occurs when named argument is passed to keyword multiple times.</li>
 </ul>
 <h4>Import</h4>
 <ul>
@@ -73,6 +76,8 @@ Such problems are reported even when validation is turned off, and building as w
 <ul>
 <li><b>Project configuration file (red.xml) cannot be read</b> - occurs when project has no red.xml configuration file or it cannot be read.</li>
 <li><b>Python Robot Framework environment missing</b> - occurs when there is no Robot Environment defined. Python main directory with Robot modules installed should be defined in preferences. Project may override this setting in its configuration file.</li>
+<li><b>Deprecated Python environment</b> - occurs when deprecated Python version is defined. RED or Robot Framework may not be compatible with it.</li>
+<li><b>Deprecated Robot Framework environment</b> - occurs when deprecated Robot Framework version is defined. RED may not be compatible with it.</li>
 <li><b>Library documentation file cannot be generated</b> - occurs when for some reason Robot framework is unable to generate library specification file, probably due to missing library dependencies or errors in library source code.</li>
 </ul>
 
