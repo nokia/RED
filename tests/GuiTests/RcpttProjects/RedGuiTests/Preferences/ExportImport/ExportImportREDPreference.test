@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _x2ENoKdEEeazyPh6f3_hNQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/15/19 12:13 PM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/4/19 12:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,7 +24,7 @@ with [get-window Preferences] {
     //content assist    
     get-tree | select "Robot Framework/Editor/Content Assist"
     get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | set-text 300
-    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
+    get-group Keywords | get-combo -after [get-label "Add library or resource name to keyword proposal insertion"] | select always
     
     //folding
     get-tree | select "Robot Framework/Editor/Folding"
@@ -133,8 +133,8 @@ get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assis
 with [get-window Preferences] {
     get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | get-property text 
         | equals 300 | verify-true
-    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" 
-        | get-property selected | equals true | verify-true
+    get-group Keywords | get-combo -after [get-label "Add library or resource name to keyword proposal insertion"] | get-property selection 
+            | equals always | verify-true
 }
 
 //folding

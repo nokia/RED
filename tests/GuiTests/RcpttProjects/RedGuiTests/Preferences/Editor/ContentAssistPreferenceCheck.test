@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Nu4IgJQdEeWNpL9oeriwCw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/4/19 4:42 PM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/4/19 12:24 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -61,17 +61,20 @@ with [get-window Preferences] {
         get-property "getChildren().Control[3].getChildren().length" | equals 5 | verify-true
         get-property "getChildren().Control[3].getChildren().Control[0].getSelection()" | equals false | verify-true
         get-property "getChildren().Control[3].getChildren().Control[0].getText()" 
-            | equals "Automatically add library or resource name to keyword proposal insertion" | verify-true
-        get-property "getChildren().Control[3].getChildren().Control[1].getSelection()" | equals false | verify-true
+            | equals "Include keywords from red.xml libraries not imported in robot file" | verify-true
         get-property "getChildren().Control[3].getChildren().Control[1].getText()" 
-            | equals "Include keywords from not imported libraries" | verify-true
-        get-property "getChildren().Control[3].getChildren().Control[2].getText()" 
-            | equals "When libraries are added to red.xml but not imported in robot file, keywords from such libraries will be included in propositions." 
+            | equals "Add library or resource name to keyword proposal insertion" | verify-true
+        get-property "getChildren().Control[3].getChildren().Control[2].getText()"  | equals "only when conflict exists"
             | verify-true
         get-property "getChildren().Control[3].getChildren().Control[3].getText()" 
             | equals "After pressing Tab in arguments edition mode" | verify-true
         get-property "getChildren().Control[3].getChildren().Control[4].getText()" | equals "exit on last argument" 
             | verify-true
+    }
+    with [get-group Keywords | get-combo -after [get-label "Add library or resource name to keyword proposal insertion"]] {
+        get-property "values[0]" | equals "always" | verify-true
+        get-property "values[1]" | equals "only when conflict exists" | verify-true
+        get-property "values[2]" | equals "never" | verify-true
     }
     with [get-group Keywords | get-combo -after [get-label "After pressing Tab in arguments edition mode"]] {
         get-property "values[0]" | equals "cycle between arguments" | verify-true
@@ -97,11 +100,11 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Test\n"
     + "    Call Method    object    method_name" | verify-true
 
-// change Assist option to add lib name 
+// change Assist option to always add lib name 
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-tree | select "Robot Framework/Editor/Content Assist"
-    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
+    get-group Keywords | get-combo -after [get-label "Add library or resource name to keyword proposal insertion"] 
+        | select "always"
     get-button Apply | click
     get-button $Apply_and_OK_in_preference | click
 }
@@ -151,7 +154,8 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 //remove adding prefix    
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | uncheck
+    get-group Keywords | get-combo -after [get-label "Add library or resource name to keyword proposal insertion"] 
+        | select "only when conflict exists"
     get-button Apply | click
     get-button $Apply_and_OK_in_preference | click
 }
