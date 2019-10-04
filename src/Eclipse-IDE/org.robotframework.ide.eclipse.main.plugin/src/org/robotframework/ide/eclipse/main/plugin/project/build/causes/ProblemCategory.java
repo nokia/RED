@@ -224,6 +224,40 @@ public enum ProblemCategory {
         public Severity getDefaultSeverity() {
             return Severity.ERROR;
         }
+    },
+    AMBIGUOUS_KEYWORD(
+            ProblemCategoryType.RUNTIME,
+            "Ambigous keyword call",
+            "Occurs when called keyword is defined in multiple places in same scope. Running this would fail in "
+                    + "runtime unless this problem is mitigated with other means (e.g. setting library search order with"
+                    + "'BuiltIn.Set Library Search Order' keyword.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.ERROR;
+        }
+    },
+    UNDECLARED_VARIABLE_USE(
+            ProblemCategoryType.RUNTIME,
+            "Undeclared variable is used",
+            "Occurs when unable to find declaration of a variable being used. Running this would fail in "
+                    + "runtime unless variable is provided/created dynamically in the runtime.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.ERROR;
+        }
+    },
+    INVALID_NUMBER_OF_PARAMETERS(
+            ProblemCategoryType.RUNTIME,
+            "Invalid number of parameters passed to keyword",
+            "Occurs when called keyword has invalid number of parameters passed. Running this would fail in "
+                    + "runtime unless the keyword use their parameters in non-standard way.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.ERROR;
+        }
     };
 
     private String id;

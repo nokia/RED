@@ -83,6 +83,11 @@ public enum VariablesProblem implements IProblemCause {
     UNDECLARED_VARIABLE_USE {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNDECLARED_VARIABLE_USE;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Variable '%s' is used, but not defined";
         }

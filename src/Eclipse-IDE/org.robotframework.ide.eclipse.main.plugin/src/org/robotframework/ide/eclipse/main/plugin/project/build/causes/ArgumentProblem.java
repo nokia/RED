@@ -25,6 +25,11 @@ public enum ArgumentProblem implements IProblemCause {
     INVALID_NUMBER_OF_PARAMETERS {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.INVALID_NUMBER_OF_PARAMETERS;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Keyword '%s' expects %s but %s %s provided";
         }

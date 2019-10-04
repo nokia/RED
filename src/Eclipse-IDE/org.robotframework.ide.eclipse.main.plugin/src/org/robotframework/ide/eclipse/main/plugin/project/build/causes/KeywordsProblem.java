@@ -68,6 +68,11 @@ public enum KeywordsProblem implements IProblemCause {
     AMBIGUOUS_KEYWORD {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.AMBIGUOUS_KEYWORD;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Ambiguous keyword '%s' reference. Matching keywords are defined in: %s";
         }
