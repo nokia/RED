@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import org.eclipse.compare.internal.TabFolderLayout;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -31,12 +32,16 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -46,6 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
+import org.robotframework.red.jface.preferences.MultiLineStringFieldEditor;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
@@ -72,10 +78,25 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
 
-        createRobotLaunchConfigurationPreferences(parent);
-        createListenerLaunchConfigurationPreferences(parent);
-        createExecutorLaunchConfigurationPreferences(parent);
-        createEnvironmentLaunchConfigurationPreferences(parent);
+        final TabFolder folder = new TabFolder(parent, SWT.NONE);
+        folder.setLayout(new TabFolderLayout());
+        folder.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        final TabItem robotTab = new TabItem(folder, SWT.NONE);
+        robotTab.setText("Robot");
+        robotTab.setControl(createRobotLaunchConfigurationPreferences(folder));
+
+        final TabItem listenerTab = new TabItem(folder, SWT.NONE);
+        listenerTab.setText("Listener");
+        listenerTab.setControl(createListenerLaunchConfigurationPreferences(folder));
+
+        final TabItem executorTab = new TabItem(folder, SWT.NONE);
+        executorTab.setText("Executor");
+        executorTab.setControl(createExecutorLaunchConfigurationPreferences(folder));
+
+        final TabItem environmentTab = new TabItem(folder, SWT.NONE);
+        environmentTab.setText("Environment");
+        environmentTab.setControl(createEnvironmentLaunchConfigurationPreferences(folder));
     }
 
     @Override
@@ -103,108 +124,122 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         super.performDefaults();
     }
 
-    private void createRobotLaunchConfigurationPreferences(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Robot tab");
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
+    private Control createRobotLaunchConfigurationPreferences(final Composite parent) {
+        final Composite composite = new Composite(parent, SWT.NONE);
 
-        final StringFieldEditor additionalRobotArguments = new StringFieldEditor(
-                RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "Additional Robot Framework arguments:", group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalRobotArguments.getLabelControl(group));
+        final MultiLineStringFieldEditor additionalRobotArguments = new MultiLineStringFieldEditor(
+                RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "Additional Robot Framework arguments:",
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalRobotArguments.getLabelControl(composite));
         additionalRobotArguments.load();
         addField(additionalRobotArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalRobotArguments.getTextControl(group)::insert);
+        addButtons(additionalRobotArguments.getTextControl(composite), composite);
+
+        return composite;
     }
 
-    private void createListenerLaunchConfigurationPreferences(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Listener tab");
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
+    private Control createListenerLaunchConfigurationPreferences(final Composite parent) {
+        final Composite composite = new Composite(parent, SWT.NONE);
 
         final StringFieldEditor remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST,
-                "Server IP:", group);
+                "Server IP:", composite);
         remoteHost.setEmptyStringAllowed(false);
         remoteHost.setErrorMessage("Server IP cannot be empty");
         remoteHost.load();
         addField(remoteHost);
+        GridDataFactory.fillDefaults().indent(0, 5).applyTo(remoteHost.getTextControl(composite));
 
         final IntegerFieldEditor remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT,
-                "Server port:", group);
+                "Server port:", composite);
         remotePort.setValidRange(AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
+        GridDataFactory.fillDefaults().indent(0, 5).applyTo(remotePort.getTextControl(composite));
 
         final IntegerFieldEditor remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
-                "Server connection timeout [s]:", group);
+                "Server connection timeout [s]:", composite);
         remoteTimeout.setValidRange(AgentConnectionServer.MIN_CONNECTION_TIMEOUT,
                 AgentConnectionServer.MAX_CONNECTION_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
+        GridDataFactory.fillDefaults().indent(0, 5).applyTo(remoteTimeout.getTextControl(composite));
 
-        final Button exportBtn = new Button(group, SWT.PUSH);
+        final Button exportBtn = new Button(composite, SWT.PUSH);
         GridDataFactory.swtDefaults().applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
         exportBtn.addSelectionListener(
                 widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
+
+        return composite;
     }
 
-    private void createExecutorLaunchConfigurationPreferences(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Executor tab");
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
+    private Control createExecutorLaunchConfigurationPreferences(final Composite parent) {
+        final Composite composite = new Composite(parent, SWT.NONE);
 
-        final StringFieldEditor additionalInterpreterArguments = new StringFieldEditor(
-                RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "Additional interpreter arguments:", group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalInterpreterArguments.getLabelControl(group));
+        final MultiLineStringFieldEditor additionalInterpreterArguments = new MultiLineStringFieldEditor(
+                RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "Additional interpreter arguments:",
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalInterpreterArguments.getLabelControl(composite));
         additionalInterpreterArguments.load();
         addField(additionalInterpreterArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalInterpreterArguments.getTextControl(group)::insert);
+        addButtons(additionalInterpreterArguments.getTextControl(composite), composite);
 
         final ParameterizedFilePathStringFieldEditor scriptPathEditor = new ParameterizedFilePathStringFieldEditor(
-                RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH, "Executable file to run Robot Framework tests:", group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getTextControl(group));
+                RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH, "Executable file to run Robot Framework tests:", composite);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(composite));
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getTextControl(composite));
         scriptPathEditor.setErrorMessage("Value must be an existing file");
         scriptPathEditor.load();
         addField(scriptPathEditor);
 
-        final Composite buttonsParent = new Composite(group, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(3).applyTo(buttonsParent);
-        GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
-        BrowseButtons.selectWorkspaceFileButton(buttonsParent, scriptPathEditor::setStringValue,
-                "Select executor file to run Robot Framework tests:");
-        BrowseButtons.selectSystemFileButton(buttonsParent, scriptPathEditor::setStringValue,
-                BrowseButtons.getSystemDependentExecutableFileExtensions());
-        BrowseButtons.selectVariableButton(buttonsParent, scriptPathEditor::insertValue);
+        addButtons(scriptPathEditor, composite);
 
-        final StringFieldEditor additionalScriptArguments = new StringFieldEditor(
+        final MultiLineStringFieldEditor additionalScriptArguments = new MultiLineStringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS, "Additional executable file arguments:",
-                group);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalScriptArguments.getLabelControl(group));
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalScriptArguments.getLabelControl(composite));
         additionalScriptArguments.load();
         addField(additionalScriptArguments);
 
-        BrowseButtons.selectVariableButton(group, additionalScriptArguments.getTextControl(group)::insert);
+        addButtons(additionalScriptArguments.getTextControl(composite), composite);
+
+        return composite;
     }
 
-    private void createEnvironmentLaunchConfigurationPreferences(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Environment tab");
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).span(2, 1).applyTo(group);
+    private void addButtons(final Text textControl, final Composite parent) {
+        final Composite buttonsParent = new Composite(parent, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(buttonsParent);
+        GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
+        BrowseButtons.selectVariableButton(buttonsParent, textControl::insert);
+    }
 
-        final Label envVarsTableDescription = new Label(group, SWT.WRAP);
+    private void addButtons(final ParameterizedFilePathStringFieldEditor editor, final Composite composite) {
+        final Composite buttonsParent = new Composite(composite, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(4).applyTo(buttonsParent);
+        GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
+        BrowseButtons.selectWorkspaceFileButton(buttonsParent, editor::setStringValue,
+                "Select executor file to run Robot Framework tests:");
+        BrowseButtons.selectSystemFileButton(buttonsParent, editor::setStringValue,
+                BrowseButtons.getSystemDependentExecutableFileExtensions());
+        BrowseButtons.selectVariableButton(buttonsParent, editor::insertValue);
+    }
+
+    private Control createEnvironmentLaunchConfigurationPreferences(final Composite parent) {
+        final Composite composite = new Composite(parent, SWT.NULL);
+        GridLayoutFactory.fillDefaults().applyTo(composite);
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 10).span(2, 1).applyTo(composite);
+
+        final Label envVarsTableDescription = new Label(composite, SWT.WRAP);
         envVarsTableDescription.setText("Environment variables to set:");
         GridDataFactory.fillDefaults()
                 .grab(true, false)
                 .applyTo(envVarsTableDescription);
-        envVarsViewer = createEnvironmentVariablesViewer(group);
+        envVarsViewer = createEnvironmentVariablesViewer(composite);
         initializeEnvironmentVariablesValues();
+
+        return composite;
     }
 
     private TableViewer createEnvironmentVariablesViewer(final Composite parent) {

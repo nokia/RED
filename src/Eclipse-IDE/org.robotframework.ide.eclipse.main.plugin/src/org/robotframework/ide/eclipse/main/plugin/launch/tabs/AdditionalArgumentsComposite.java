@@ -22,12 +22,21 @@ class AdditionalArgumentsComposite extends Composite {
         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 
         createAdditionalArgumentsText(listener);
-        BrowseButtons.selectVariableButton(this, argumentsText::insert);
+
+        final Composite buttonsParent = new Composite(this, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(buttonsParent);
+        GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.FILL).applyTo(buttonsParent);
+        BrowseButtons.selectVariableButton(buttonsParent, argumentsText::insert);
     }
 
     private void createAdditionalArgumentsText(final ModifyListener listener) {
-        argumentsText = new Text(this, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(argumentsText);
+        argumentsText = new Text(this, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
+        GridDataFactory.fillDefaults()
+                .grab(true, false)
+                .hint(SWT.DEFAULT, 60)
+                .span(2, 1)
+                .align(SWT.FILL, SWT.CENTER)
+                .applyTo(argumentsText);
         argumentsText.addModifyListener(listener);
     }
 

@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Rule;
 import org.junit.Test;
+import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.ShellProvider;
 
 public class AdditionalArgumentsCompositeTest {
@@ -67,11 +68,7 @@ public class AdditionalArgumentsCompositeTest {
     }
 
     private static Button getBrowseButton(final Composite composite) {
-        return Stream.of(composite.getChildren())
-                .filter(Button.class::isInstance)
-                .map(Button.class::cast)
-                .findFirst()
-                .get();
+        return Controls.getControls(composite, Button.class).get(0);
     }
 
     private static Condition<? super Control> enabled() {

@@ -15,14 +15,12 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
@@ -81,9 +79,8 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final boolean buttonFound = Stream.of(getGroup(page, 1).getChildren())
-                .filter(Button.class::isInstance)
-                .map(Button.class::cast)
+        final boolean buttonFound = Controls.getControls((Composite) page.getControl(), Button.class)
+                .stream()
                 .anyMatch(button -> button.getText().equals("Export Client Script"));
 
         assertThat(buttonFound).isTrue();
@@ -102,11 +99,8 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final Table table = Stream.of(getGroup(page, 3).getChildren())
-                .filter(Table.class::isInstance)
-                .map(Table.class::cast)
-                .findFirst()
-                .orElse(null);
+        final Table table = Controls.getControls((Composite) page.getControl(), Table.class).get(0);
+
         assertThat(table.getItemCount()).isEqualTo(4);
         assertThat(table.getItem(0).getText(0)).isEqualTo("VAR_1");
         assertThat(table.getItem(0).getText(1)).isEqualTo("some value");
@@ -114,12 +108,5 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         assertThat(table.getItem(1).getText(1)).isEqualTo("1234");
         assertThat(table.getItem(2).getText(0)).isEqualTo("EMPTY_VAR");
         assertThat(table.getItem(2).getText(1)).isEqualTo("");
-    }
-
-    private Group getGroup(final DefaultLaunchConfigurationPreferencePage page, final int index) {
-        final Composite pageControl = (Composite) page.getControl();
-        final Composite fieldEditorParent = (Composite) pageControl.getChildren()[1];
-
-        return Controls.getControls(fieldEditorParent, Group.class).get(index);
     }
 }
