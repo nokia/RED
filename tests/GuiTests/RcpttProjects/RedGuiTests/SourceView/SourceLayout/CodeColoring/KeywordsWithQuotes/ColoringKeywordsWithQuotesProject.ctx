@@ -1,12 +1,12 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Context-Type: org.eclipse.rcptt.ctx.workspace
-Element-Name: KeywordsWithQuotesProject
+Element-Name: ColoringKeywordsWithQuotesProject
 Element-Type: context
 Element-Version: 2.0
 Id: _wnRc4LtKEeiPkNAuISiM4w
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/8/19 2:58 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/7/19 3:41 PM
 
 ------=_contents/Colors/log.html-6f91cc76-1342-36e2-9642-dfce4ed4624c
 Content-Type: q7/binary
@@ -3758,13 +3758,13 @@ Entry-Name: .q7.content
 UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAACdlE1PwzAMhu9I/Icq
 dxJAHNDUgfg6TDC+hgQ31KVmC0vjKHFp+fd4bB0IIdhya+L3eR03jvPjtrLZG4Ro0PXFntwVGTiNpXGT
 vqjpZedQHB9tb+UYJhK0NT6CDNoTSU2tbDDMoi809B67rzN0BC1lbWV6K9/9uS9ncrHH+30xJfI9pZqm
-kVhNJJurp+Ggk/yTa4V3mjn+qVOsUyudyFxRsfoS3nmvjI+Gpnc1EsTbgK+gSWSm7Ivnxt3rgyu6vABz
-O7s+qQcjMzxoBFedZbmel+Poc8FLvyDj0voMLYYollGOvxgLXVD6Lg20oGsqxpZ3KdQg1O8EVGMooXye
-NTLgGDcgLU7klCq7PoE1+ZpkuwkToNwU8BhonZOhLblZumrMOHrQ337sD9/T2lgaOLkU/un9A+Urs3wp
-3JYxBT8vCB5MBUmsKfiektJeFJEgpJA3HkJB/JxH72xRpVjwc9EQk859DxHCG7dNAjvSAcDFKVISTYGL
-TiEfwDpIyvk0vFoLy9Wy37uxorq5shg66mvq5GrTycvQB1BLBwic6agKlwEAANYFAABQSwECFAAUAAgI
-CAAAACEAnOmoCpcBAADWBQAACAAJAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRVVAUAAQAAAABQSwUGAAAA
-AAEAAQA/AAAA1gEAAAAA
+kVhNJJurp+Ggk/yTa4V3mjn+qVOsUyudyFxRsfoMLQau5xLeOVbGR0PTuxoJ4m3AV9AkMlP2xXPj7vXB
+FV1egLmdXZ/Ug5EZHjSCq8+yXM/LcvS54KVfkPF7iiiWUY6/GAtdUPouDbSgayrGlncp1CDU7wRUYyih
+fJ41MuAYNyAtTuSUKrs+gTX5mmS7CROg3BTwGGidk6EtuWm6asw4etDffuwP39PaWBo4uRT+6f0D5Suz
+fCncnjEFPy8IHkwFSawp+J6S0l4UkSCkkDceQkH8DEbvbFGlWPBz0RCTzn0PEcIbt00CO9IBwMUpUhJN
+87efQj6AdZCU82l4tRaWq2W/d2NFdXNlMXTU19TJ1aYTmKEPUEsHCCR4fBSZAQAA3gUAAFBLAQIUABQA
+CAgIAAAAIQAkeHwUmQEAAN4FAAAIAAkAAAAAAAAAAAAAAAAAAAAuY29udGVudFVUBQABAAAAAFBLBQYA
+AAAAAQABAD8AAADYAQAAAAA=
 ------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
 ------=_contents/Colors/embeded_kw.robot-a0902e5c-b7f9-3a86-bb5c-94a5d1484401
 Content-Type: q7/binary

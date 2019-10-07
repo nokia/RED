@@ -1,0 +1,34 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _pIUI8Oj-Eem_OL5VW4uX9Q
+Element-Name: ColoringKeywordsFromLibraries
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _p6BSsOj-Eem_OL5VW4uX9Q
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/7/19 3:45 PM
+Testcase-Type: ecl
+Verifications: _p5bc0Oj-Eem_OL5VW4uX9Q
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select "Keyword from library calls"
+}
+set-dialog-result Color "125,0,125"
+with [get-window Preferences] {
+    get-button -index 3 | click
+    get-button "Apply and Close" | click
+}
+
+
+get-view "Project Explorer" | get-tree | select "Colors/suite.robot" | double-click
+
+// waiting for coloring in separate thread
+wait	1000
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
