@@ -48,12 +48,12 @@ public class RedFormatter implements RobotSourceFormatter {
                     default:
                         throw new IllegalStateException("Unrecognized formatting mode");
                 }
+                lineFormatters.add(new LineIndentFormatter(forBodyLines, separatorLength));
             }
 
             if (settings.isRightTrimEnabled()) {
                 lineFormatters.add(new LineRightTrimFormatter());
             }
-            lineFormatters.add(new LineIndentFormatter(forBodyLines, separatorLength));
 
             return format(toFormat, lineFormatters);
         } catch (final IOException e) {

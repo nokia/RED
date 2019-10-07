@@ -24,7 +24,6 @@ import org.rf.ide.core.testdata.formatter.RedFormatter;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormatterSettings;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.rf.ide.core.testdata.formatter.RobotSourceFormatter;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -129,7 +128,7 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
         try {
             final List<RobotLine> lines = ((RobotDocument) document).getNewestModel().getFileContent();
 
-            FilePosition forPosition = null;
+            boolean insideFor = false;
             for (int line = 0; line < lines.size(); line++) {
                 final RobotLine currentLine = lines.get(line);
                 final Optional<RobotToken> firstToken = currentLine.elementsStream()
@@ -138,14 +137,13 @@ public class SuiteSourceEditorCustomFormatter implements SourceDocumentFormatter
                         .findFirst();
 
                 if (firstToken.isPresent() && firstToken.get().getTypes().contains(RobotTokenType.FOR_WITH_END)) {
-                    forPosition = firstToken.get().getFilePosition();
+                    insideFor = true;
 
                 } else if (firstToken.isPresent()
                         && firstToken.get().getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
-                    forPosition = null;
+                    insideFor = false;
 
-                } else if (forPosition != null && firstToken.isPresent() && affectedLines.contains(line)
-                        && firstToken.get().getFilePosition().getColumn() <= forPosition.getColumn()) {
+                } else if (insideFor && firstToken.isPresent() && affectedLines.contains(line)) {
                     linesToIndent.add(line);
                 }
             }

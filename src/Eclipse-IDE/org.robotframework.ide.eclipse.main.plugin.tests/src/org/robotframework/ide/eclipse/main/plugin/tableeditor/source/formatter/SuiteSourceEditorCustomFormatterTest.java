@@ -224,6 +224,8 @@ public class SuiteSourceEditorCustomFormatterTest {
 
     @Test
     public void newStyleFORLoopBodyIsIndented_whenInSameColumnAsForDeclaration() throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
 
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
@@ -245,6 +247,8 @@ public class SuiteSourceEditorCustomFormatterTest {
 
     @Test
     public void newStyleFORLoopBodyIsNotIndented_whenInColumnGreaterThanForDeclaration() throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
         preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
 
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
@@ -262,6 +266,28 @@ public class SuiteSourceEditorCustomFormatterTest {
 
         assertThat(document.get()).isEqualTo(
                 "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n    Log  ${x}\n    kw  1  2  3\n  END\n  kw  1  2  3");
+    }
+
+    @Test
+    public void newStyleFORLoopBodyIsNotIndented_whenInSameColumnAsForDeclarationAndSeparatorAdjustmentPreferenceIsNotEnabled()
+            throws BadLocationException {
+        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
+
+        final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
+                RedPlugin.getDefault().getPreferences());
+
+        final RobotDocument document = robotDocument(
+                "*** Test Cases ***",
+                "case",
+                "  FOR  ${x}  IN RANGE  10",
+                "  Log  ${x}",
+                "  kw  1  2  3",
+                "  END",
+                "  kw  1  2  3");
+        formatter.format(document);
+
+        assertThat(document.get()).isEqualTo(
+                "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n  Log  ${x}\n  kw  1  2  3\n  END\n  kw  1  2  3");
     }
 
     private static RobotDocument robotDocument(final String... lines) {
