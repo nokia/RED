@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 3:15 PM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/7/19 10:56 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -36,6 +36,7 @@ get-window Preferences | get-tree | select "Robot Framework/Launching/Default La
 
 //add --version
 with [get-window Preferences] {
+	get-tab-item "Executor" | click
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "--version"
     get-button Apply | click
     get-button $Apply_and_OK_in_preference | click
@@ -80,7 +81,9 @@ if [not [get-view Console | get-text-viewer | get-property text -raw
 //remove --version and add Robot interpereter pref
 get-preferences-menu | click
 with [get-window Preferences] {
+	get-tab-item "Executor" | click
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
+    get-tab-item "Robot" | click
     get-editbox -after [get-label "Additional Robot Framework arguments:"] 
         | set-text "-i \"test 1\" -o None -d None -l None -r None"
     get-button $Apply_and_OK_in_preference  | click

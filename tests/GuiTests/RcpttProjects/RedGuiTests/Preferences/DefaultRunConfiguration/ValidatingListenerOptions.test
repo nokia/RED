@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/11/19 3:36 PM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/7/19 2:06 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,76 +22,82 @@ with [get-window Preferences] {
         get-property "getChildren().Control[0].getText()" | equals "Configure default robot launch configurations" 
             | verify-true
             
-        //check how much is gropus    
-        get-property "getChildren().Control[1].getChildren().length" | equals 4 | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "Robot tab" | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "Listener tab" | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[2].getText()" | equals "Executor tab" | verify-true
-        get-property "getChildren().Control[1].getChildren().Control[3].getText()" | equals "Environment tab" | verify-true
+        //check how much is tabs    
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 4 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getItems().Control[0].getText()" | equals "Robot" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getItems().Control[1].getText()" | equals "Listener" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getItems().Control[2].getText()" | equals "Executor" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getItems().Control[3].getText()" | equals "Environment" | verify-true
     }
     
     //main tab
-       with [get-group "Robot tab"] {
-        	get-property "getChildren().length" | equals 3 | verify-true
-		    get-property "getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
-		    get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-		    get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-		    get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
-	  }
+    get-tab-item "Robot" | click
+    with [get-tab-folder] {
+      	get-property "getChildren().Control[0].getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "Additional Robot Framework arguments:" | verify-true
+	    get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[0].getChildren().Control[1].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[0].getChildren().Control[2].getChildren().Control[0].getText()" | equals "Variables..." | verify-true
+	}
     
     //Listener
-    with [get-group "Listener tab"] {
-        get-property childCount | equals 7 | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Server IP:" | verify-true
-        get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "127.0.0.1" | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "Server port:" | verify-true
-        get-property "getChildren().Control[3].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[3].getText()" | equals 43981 | verify-true
-        get-property "getChildren().Control[4].getText()" | equals "Server connection timeout [s]:" | verify-true
-        get-property "getChildren().Control[5].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[5].getText()" | equals 30 | verify-true
-        get-property "getChildren().Control[6].getText()" | equals "Export Client Script" | verify-true
+    get-tab-item "Listener" | click
+    with [get-tab-folder] {
+    	get-property "getChildren().Control[1].getChildren().length" | equals 7 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "Server IP:" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getEditable()" | equals true | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "127.0.0.1" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getText()" | equals "Server port:" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[3].getEditable()" | equals true | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[3].getText()" | equals 43981 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[4].getText()" | equals "Server connection timeout [s]:" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[5].getEditable()" | equals true | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[5].getText()" | equals 30 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[6].getText()" | equals "Export Client Script" | verify-true
     }
+    
     //executor
-    with [get-group "Executor tab"] {
-        get-property "getChildren().length" | equals 9 | verify-true
+    get-tab-item "Executor" | click
+    with [get-tab-folder] {
+        get-property "getChildren().Control[2].getChildren().length" | equals 9 | verify-true
         
         // Additional interpreter
-	    get-property "getChildren().Control[0].getText()" | equals "Additional interpreter arguments:" | verify-true
-	    get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-	    get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "Additional interpreter arguments:" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[2].getChildren().Control[0].getText()" | equals "Variables..." | verify-true
 	    
 	    // Executable file 
-	    get-property "getChildren().Control[3].getText()" | equals "Executable file to run Robot Framework tests:" 
+	    get-property "getChildren().Control[2].getChildren().Control[3].getText()" | equals "Executable file to run Robot Framework tests:" 
 	        | verify-true
-	    get-property "getChildren().Control[4].getText()" | equals "" | verify-true
-	    get-property "getChildren().Control[4].getEditable()" | equals true | verify-true
-	    get-property "getChildren().Control[5].getChildren().length" | equals 3 | verify-true
-	    get-property "getChildren().Control[5].getChildren().Control[0].getText()" | equals "Workspace..." | verify-true
-	    get-property "getChildren().Control[5].getChildren().Control[1].getText()" | equals "File system..." | verify-true
-	    get-property "getChildren().Control[5].getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[4].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[4].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[5].getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[5].getChildren().Control[0].getText()" | equals "Workspace..." | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[5].getChildren().Control[1].getText()" | equals "File system..." | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[5].getChildren().Control[2].getText()" | equals "Variables..." | verify-true
 	    
 	    // Additional executable
-	    get-property "getChildren().Control[6].getText()" | equals "Additional executable file arguments:" | verify-true
-	    get-property "getChildren().Control[7].getText()" | equals "" | verify-true
-	    get-property "getChildren().Control[7].getEditable()" | equals true | verify-true
-	    get-property "getChildren().Control[8].getText()" | equals "Variables..." | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[6].getText()" | equals "Additional executable file arguments:" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[7].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[7].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[8].getChildren().Control[0].getText()" | equals "Variables..." | verify-true
     }
     get-button "Restore Defaults" | get-property enablement | equals true | verify-true
     get-button Apply | get-property enablement | equals true | verify-true
 }
 
 // env vaiables
-with [get-window Preferences | get-group "Environment tab"] {
-    get-property caption | equals "Environment tab" | verify-true
-    get-property "getChildren().length" | equals 2 | verify-true
-    get-property "getChildren().Control[0].getText()" | equals "Environment variables to set:" | verify-true
-    get-property "getChildren().Control[1].getItems().TableItem[0].getData().getName()" | equals PYTHONIOENCODING 
-        | verify-true
-    get-property "getChildren().Control[1].getItems().TableItem[0].getData().getValue()" | equals utf8 | verify-true
-    get-property "getChildren().Control[1].getItems().TableItem[1].getText()" 
-        | equals "...add new environment variable" | verify-true
+with [get-window Preferences] {
+	get-tab-item "Environment" | click
+    with [get-tab-folder] {
+	    get-property "getChildren().Control[3].getChildren().length" | equals 2 | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[0].getText()" | equals "Environment variables to set:" | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[1].getItems().TableItem[0].getData().getName()" | equals PYTHONIOENCODING 
+	        | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[1].getItems().TableItem[0].getData().getValue()" | equals utf8 | verify-true
+	    get-property "getChildren().Control[3].getChildren().Control[1].getItems().TableItem[1].getText()" 
+	        | equals "...add new environment variable" | verify-true
+    }
 }
 
 //validation
@@ -112,40 +118,33 @@ proc "check-error"[val type]{
 }
 //Remote
 
-//IP
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server IP:"] | set-text ""
-get-window Preferences | get-editbox -index 1 | get-property text | equals "Server IP cannot be empty" | verify-true
-
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server IP:"] | set-text "12.4.444444.4"
-check-if-no-error-is-shown
-
-
-//port
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server port:"] | set-text 0
-check-error -type "port"
-
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server port:"] | set-text 8
-check-if-no-error-is-shown
-
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server port:"] | set-text ""
-check-error -type "port"
-
-//timeout
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] 
-    | set-text "466.90"
-check-error -type "timout"
-        
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 89
-check-if-no-error-is-shown
-
-get-window Preferences | get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text ""
-check-error -type "timout"
-
-
-//export file
-set-dialog-result Folder "platform:/resource/"
 with [get-window Preferences] {
-    get-group "Listener tab" | get-button "Export Client Script" | click
+	get-tab-item "Listener" | click
+	//IP
+	get-editbox -after [get-label "Server IP:"] | set-text ""
+	get-editbox -index 1 | get-property text | equals "Server IP cannot be empty" | verify-true
+	get-editbox -after [get-label "Server IP:"] | set-text "12.4.444444.4"
+	check-if-no-error-is-shown
+	
+	//port
+	get-editbox -after [get-label "Server port:"] | set-text 0
+	check-error -type "port"
+	get-editbox -after [get-label "Server port:"] | set-text 8
+	check-if-no-error-is-shown
+	get-editbox -after [get-label "Server port:"] | set-text ""
+	check-error -type "port"
+	
+	//timeout
+	get-editbox -after [get-label "Server connection timeout [s]:"] | set-text "466.90"
+	check-error -type "timout"
+	get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 89
+	check-if-no-error-is-shown
+	get-editbox -after [get-label "Server connection timeout [s]:"] | set-text ""
+	check-error -type "timout"
+	
+	//export file
+	set-dialog-result Folder "platform:/resource/"
+	get-button "Export Client Script" | click
     get-button Cancel | click
 }
 
