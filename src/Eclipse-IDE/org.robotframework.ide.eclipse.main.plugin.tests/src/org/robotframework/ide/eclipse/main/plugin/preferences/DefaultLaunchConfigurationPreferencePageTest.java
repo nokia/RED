@@ -26,6 +26,7 @@ import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.red.jface.preferences.MultiLineStringFieldEditor;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
 import org.robotframework.red.junit.Controls;
 import org.robotframework.red.junit.PreferenceUpdater;
@@ -68,8 +69,9 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         assertThat(namesGroupedByType).hasEntrySatisfying(ParameterizedFilePathStringFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH));
         assertThat(namesGroupedByType).hasEntrySatisfying(StringFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST));
+        assertThat(namesGroupedByType).hasEntrySatisfying(MultiLineStringFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS,
-                        RedPreferences.LAUNCH_AGENT_CONNECTION_HOST,
                         RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
                         RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS));
     }
