@@ -94,7 +94,7 @@ public enum ProblemCategory {
     UNSUPPORTED_API(
             ProblemCategoryType.ROBOT_VERSION,
             "Unsupported Robot Framework API used",
-            "Occurs when syntax from newer Robot Framework version is not available in older version.") {
+            "Occurs when syntax from newer Robot Framework version is not available in current version.") {
 
         @Override
         public Severity getDefaultSeverity() {
@@ -105,14 +105,6 @@ public enum ProblemCategory {
             ProblemCategoryType.ROBOT_VERSION,
             "Deprecated Robot Framework API used",
             "Occurs when deprecated syntax is used. Use current Robot Framework syntax instead."),
-    DUPLICATED_DEFINITION(
-            ProblemCategoryType.ROBOT_VERSION,
-            "Duplicated definitions used",
-            "Occurs when testcase or keywords definitions names are not unique."),
-    INCORRECT_INITIALIZATION(
-            ProblemCategoryType.ROBOT_VERSION,
-            "Incorrect variable initialization",
-            "Occurs when there is syntax error in variable initialization."),
     DUPLICATED_VARIABLE(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated variable name",
@@ -144,7 +136,7 @@ public enum ProblemCategory {
             ProblemCategoryType.UNNECESSARY_CODE,
             "Unrecognized header type",
             "Occurs when Robot Framework does not recognize section header.\n"
-                    + "Only ***Settings***, ***Variables***, ***Test Cases***, ***Tasks***, ***Keywords*** or ***Comments*** sections are valid."),
+                    + "The valid header depends upon Robot Framework version."),
     DUPLICATED_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Duplicated configuration path",

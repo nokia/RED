@@ -105,7 +105,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DUPLICATED_DEFINITION;
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
