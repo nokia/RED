@@ -5,8 +5,8 @@ Element-Name: RemoteTestProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _s-ctEA4_EeePcNCRX_abWA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/17/18 11:48 AM
+Runtime-Version: 2.4.1.201903190000
+Save-Time: 10/7/19 10:41 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -19,7 +19,8 @@ proc "export-agent-to-folder" [val folder]{
 	set-dialog-result Folder $folder
 	
 	with [get-window Preferences] {
-	    get-group "Listener tab" | get-button "Export Client Script" | click
+		get-tab-item "Listener" | click 
+		get-button "Export Client Script" | click
 	    get-button $Apply_and_OK_in_preference | click
 	}
 }
