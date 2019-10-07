@@ -70,10 +70,10 @@ public class ExecutionStatusTrackerTest {
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
         tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), false,
-                ExecutionMode.TESTS, 2, new ArrayList<>(), new ArrayList<>()));
+                ExecutionMode.TESTS, 2, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         verify(store).suiteStarted("suite", new URI("file:///suite.robot"), ExecutionMode.TESTS, 2, new ArrayList<>(),
-                new ArrayList<>());
+                new ArrayList<>(), new ArrayList<>());
         verifyNoMoreInteractions(store);
     }
 

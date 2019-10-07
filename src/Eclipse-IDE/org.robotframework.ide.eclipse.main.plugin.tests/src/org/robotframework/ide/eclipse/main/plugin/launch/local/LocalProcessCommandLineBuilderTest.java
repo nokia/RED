@@ -602,6 +602,10 @@ public class LocalProcessCommandLineBuilderTest {
                 .endsWith(projectProvider.getProject().getLocation().toOSString(), nonWorkspaceDir.getPath(),
                         nonWorkspaceFile1.getPath(), nonWorkspaceFile2.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
+        assertThat(robotConfig.getLinkedResourcesPaths()).containsExactly(
+                "/" + PROJECT_NAME + "/100__VirtualDir/LinkedFolder",
+                "/" + PROJECT_NAME + "/100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot",
+                "/" + PROJECT_NAME + "/200__Linked.robot");
     }
 
     @Test
@@ -640,6 +644,9 @@ public class LocalProcessCommandLineBuilderTest {
                 .endsWith(projectProvider.getProject().getLocation().toOSString(), nonWorkspaceFile1.getPath(),
                         nonWorkspaceFile2.getPath());
         assertThat(commandLine.getArgumentFile()).isNotPresent();
+        assertThat(robotConfig.getLinkedResourcesPaths()).containsExactly(
+                "/" + PROJECT_NAME + "/100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot",
+                "/" + PROJECT_NAME + "/200__Linked.robot");
     }
 
     @Test

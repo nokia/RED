@@ -19,6 +19,7 @@ public class ExecutionTreeNode {
 
     private final ExecutionTreeNode parent;
     private final List<ExecutionTreeNode> children;
+    private List<String> childPaths;
 
     private final String name;
     private URI path;
@@ -29,13 +30,14 @@ public class ExecutionTreeNode {
     private int elapsedTime;
 
     public ExecutionTreeNode(final ExecutionTreeNode parent, final ElementKind kind, final String name) {
-        this(parent, kind, name, null);
+        this(parent, kind, name, null, new ArrayList<>());
     }
 
     public ExecutionTreeNode(final ExecutionTreeNode parent, final ElementKind kind, final String name,
-            final URI path) {
+            final URI path, final List<String> childPaths) {
         this.parent = parent;
         this.children = new ArrayList<>();
+        this.childPaths = childPaths;
 
         this.name = name;
         this.path = path;
@@ -56,6 +58,14 @@ public class ExecutionTreeNode {
 
     public void addChildren(final Collection<ExecutionTreeNode> children) {
         this.children.addAll(children);
+    }
+
+    public List<String> getChildrenPaths() {
+        return childPaths;
+    }
+
+    public void setChildrenPaths(final List<String> childPaths) {
+        this.childPaths = childPaths;
     }
 
     public String getName() {

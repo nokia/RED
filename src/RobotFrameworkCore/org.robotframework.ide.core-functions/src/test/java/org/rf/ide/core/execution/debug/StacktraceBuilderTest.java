@@ -71,7 +71,7 @@ public class StacktraceBuilderTest {
         final ElementsLocator locator = mock(ElementsLocator.class);
         when(locator.findContextForSuite("Suite", URI.create("file:///suite.robot"), false, null)).thenReturn(context);
         final Stacktrace stack = new Stacktrace();
-        
+
         final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
 
         builder.handleResourceImport(
@@ -79,7 +79,7 @@ public class StacktraceBuilderTest {
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res2.robot"), URI.create("file:///suite.robot")));
         builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite.robot"), false,
-                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2")));
+                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2"), newArrayList()));
 
         assertThat(stack.size()).isEqualTo(1);
         final StackFrame frame = stack.peekCurrentFrame().get();
@@ -112,13 +112,13 @@ public class StacktraceBuilderTest {
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///res2.robot"), URI.create("file:///suite")));
         builder.handleSuiteStarted(new SuiteStartedEvent("Suite", URI.create("file:///suite"), true,
-                ExecutionMode.TESTS, 2, newArrayList("Inner"), newArrayList()));
+                ExecutionMode.TESTS, 2, newArrayList("Inner"), newArrayList(), newArrayList()));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///inner_res1.robot"), URI.create("file:///inner.robot")));
         builder.handleResourceImport(
                 new ResourceImportEvent(URI.create("file:///inner_res2.robot"), URI.create("file:///inner.robot")));
         builder.handleSuiteStarted(new SuiteStartedEvent("Inner", URI.create("file:///inner.robot"), false,
-                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2")));
+                ExecutionMode.TESTS, 2, newArrayList(), newArrayList("t1", "t2"), newArrayList()));
 
         assertThat(stack.size()).isEqualTo(2);
         final StackFrame frame = stack.peekCurrentFrame().get();
@@ -140,7 +140,7 @@ public class StacktraceBuilderTest {
 
         final ElementsLocator locator = mock(ElementsLocator.class);
         when(locator.findContextForCase("test", null, Optional.empty())).thenReturn(context);
-        
+
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, mock(StackFrameContext.class)));
 
@@ -162,7 +162,7 @@ public class StacktraceBuilderTest {
     @Test
     public void currentFrameSwitchesContext_whenKeywordIsAboutToStart() {
         final RobotBreakpointSupplier breakpointsSupplier = new RobotBreakpointSupplier();
-        
+
         final CaseContext newContext = mock(CaseContext.class);
         final StackFrameContext oldContext = mock(StackFrameContext.class);
         when(oldContext.moveTo(new RunningKeyword("lib", "kw", KeywordCallType.NORMAL_CALL), breakpointsSupplier))

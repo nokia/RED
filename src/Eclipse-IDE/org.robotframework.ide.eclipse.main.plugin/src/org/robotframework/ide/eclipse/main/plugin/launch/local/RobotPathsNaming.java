@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.google.common.base.CaseFormat;
 
-class RobotPathsNaming {
+public class RobotPathsNaming {
 
     static String createTopLevelSuiteName(final Collection<IResource> dataSources) {
         if (dataSources.size() < 2) {
@@ -66,7 +66,7 @@ class RobotPathsNaming {
         return createSuiteName(topLevelSuiteName, pathSegments) + "." + testName;
     }
 
-    private static String toRobotFrameworkName(final String name) {
+    public static String toRobotFrameworkName(final String name) {
         // converts suite/test name to name used by RF
         String resultName = name;
         final int prefixIndex = resultName.indexOf("__");

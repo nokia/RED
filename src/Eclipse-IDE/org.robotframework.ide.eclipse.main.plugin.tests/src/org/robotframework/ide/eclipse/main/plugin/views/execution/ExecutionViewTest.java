@@ -73,7 +73,7 @@ public class ExecutionViewTest {
         store1.open();
         launch1.getExecutionData(ExecutionStatusStore.class, () -> store1);
         store1.suiteStarted("suite", new URI("file:///suite"), ExecutionMode.TESTS, 2, new ArrayList<>(),
-                newArrayList("t1", "t2"));
+                newArrayList("t1", "t2"), new ArrayList<>());
         store1.testStarted();
         store1.elementEnded(1000, Status.PASS, "");
         store1.testStarted();
@@ -86,7 +86,7 @@ public class ExecutionViewTest {
         store2.open();
         launch2.getExecutionData(ExecutionStatusStore.class, () -> store2);
         store2.suiteStarted("suite2", new URI("file:///suite2"), ExecutionMode.TESTS, 2, new ArrayList<>(),
-                newArrayList("tx", "ty"));
+                newArrayList("tx", "ty"), new ArrayList<>());
         store2.testStarted();
         store2.elementEnded(1000, Status.PASS, "");
         store2.testStarted();

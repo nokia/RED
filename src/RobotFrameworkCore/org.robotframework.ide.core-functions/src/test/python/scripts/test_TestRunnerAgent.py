@@ -2,6 +2,8 @@ import unittest
 
 from TestRunnerAgent import _truncate
 from TestRunnerAgent import _extract_source_path
+from TestRunnerAgent import _collect_children_paths
+
 
 
 class TruncationTests(unittest.TestCase):
@@ -49,3 +51,36 @@ class SourcePathExtractionTests(unittest.TestCase):
         self.assertEqual('/path_to_file.py', _extract_source_path('file:/path_to_file.py'))
         self.assertEqual('/path_to_file.py', _extract_source_path('file:/path_to_file.pyc'))
         self.assertEqual('/path_to_file.py', _extract_source_path('file:/path_to_file$py.class'))
+
+
+class ChildrenPathsCollectingTests(unittest.TestCase):
+
+    def test_collect_children_paths_from_root_node(self):
+        import os
+        
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        suites = ['First Child', 'Second Child']
+        source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'suite')
+        
+        self.assertEqual([os.path.join(source, 'first_child'), os.path.join(source, 'second_child')], _collect_children_paths(suites, source))
+
+    def test_collect_children_paths_from_child_node(self):
+        import os
+        
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        suites = ['Suite File']
+        source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'suite', 'first_child')
+        
+        self.assertEqual([os.path.join(source, 'suite_file.robot')], _collect_children_paths(suites, source))
+
+    def test_collect_children_paths_from_suite_file(self):
+        import os
+        
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        suites = []
+        source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'suite', 'first_child', 'suite_file.robot')
+        
+        self.assertEqual([], _collect_children_paths(suites, source))

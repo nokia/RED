@@ -68,7 +68,7 @@ public class RerunFailedHandler extends DIParameterizedHandler<E4ShowFailedOnlyH
                 final Map<String, List<String>> failedSuitesPaths = statusStore.getFailedSuitePaths(project);
 
                 if (!failedSuitesPaths.isEmpty()) {
-                    RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy, failedSuitesPaths);
+                    RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(launchConfigCopy, failedSuitesPaths);
                     return launchConfigCopy;
                 } else {
                     throw newCoreException("Failed tests do not exist");

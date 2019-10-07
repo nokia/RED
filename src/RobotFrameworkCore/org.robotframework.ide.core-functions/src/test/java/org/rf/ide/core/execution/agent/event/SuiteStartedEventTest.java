@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -97,9 +98,15 @@ public class SuiteStartedEventTest {
 
     @Test
     public void eventIsProperlyConstructed() {
+        final Map<String, Object> suiteMap = new HashMap<>();
+        suiteMap.put("source", "/suite");
+        suiteMap.put("is_dir", true);
+        suiteMap.put("totaltests", 42);
+        suiteMap.put("suites", newArrayList("s1", "s2"));
+        suiteMap.put("tests", newArrayList("t1", "t2"));
+        suiteMap.put("child_paths", newArrayList("/suite/child"));
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite",
-                newArrayList("suite", ImmutableMap.of("source", "/suite", "is_dir", true, "totaltests", 42, "suites",
-                        newArrayList("s1", "s2"), "tests", newArrayList("t1", "t2"))));
+                newArrayList("suite", suiteMap));
         final SuiteStartedEvent event = SuiteStartedEvent.from(eventMap);
 
         assertThat(event.getName()).isEqualTo("suite");
@@ -108,74 +115,88 @@ public class SuiteStartedEventTest {
         assertThat(event.getNumberOfTests()).isEqualTo(42);
         assertThat(event.getChildrenSuites()).containsExactly("s1", "s2");
         assertThat(event.getChildrenTests()).containsExactly("t1", "t2");
+        assertThat(event.getChildrenPaths()).containsExactly("/suite/child");
     }
 
     @Test
     public void equalsTests() {
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
 
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite1", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite1", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite1"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite1"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), false,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), false, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 20, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 20, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 20,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1"), newArrayList("t1", "t2")))
+                newArrayList("s1"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")))
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1")))
+                newArrayList("s1", "s2"), newArrayList("t1"), new ArrayList<>()))
                         .isNotEqualTo(new SuiteStartedEvent("suite", URI.create("file:///suite"), true,
-                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                                ExecutionMode.TESTS, 10, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                                new ArrayList<>()));
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2"))).isNotEqualTo(new Object());
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>())).isNotEqualTo(new Object());
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2"))).isNotEqualTo(null);
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>())).isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
         assertThat(new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2")).hashCode()).isEqualTo(
+                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()).hashCode()).isEqualTo(
                         new SuiteStartedEvent("suite", URI.create("file:///suite"), true, ExecutionMode.TESTS, 10,
-                                newArrayList("s1", "s2"), newArrayList("t1", "t2")).hashCode());
+                                newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()).hashCode());
     }
 }

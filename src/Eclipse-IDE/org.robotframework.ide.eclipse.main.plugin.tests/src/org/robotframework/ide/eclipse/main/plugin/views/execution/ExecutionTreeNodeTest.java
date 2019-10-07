@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -31,13 +32,14 @@ public class ExecutionTreeNodeTest {
         assertThat(new ExecutionTreeNode(null, null, "a").getName()).isEqualTo("a");
 
         assertThat(new ExecutionTreeNode(null, null, "").getPath()).isNull();
-        assertThat(new ExecutionTreeNode(null, null, "", new URI("file:///f.robot")).getPath())
+        assertThat(new ExecutionTreeNode(null, null, "", new URI("file:///f.robot"), new ArrayList<>()).getPath())
                 .isEqualTo(new URI("file:///f.robot"));
 
         assertThat(new ExecutionTreeNode(null, null, "").getMessage()).isEmpty();
         assertThat(new ExecutionTreeNode(null, null, "").getElapsedTime()).isEqualTo(-1);
         assertThat(new ExecutionTreeNode(null, null, "").getStatus()).isEqualTo(Optional.empty());
         assertThat(new ExecutionTreeNode(null, null, "").getChildren()).isEmpty();
+        assertThat(new ExecutionTreeNode(null, null, "").getChildrenPaths()).isEmpty();
     }
 
     @Test
@@ -49,6 +51,18 @@ public class ExecutionTreeNodeTest {
         node.addChildren(newArrayList(c1, c2));
 
         assertThat(node.getChildren()).containsExactly(c1, c2);
+    }
+
+    @Test
+    public void childrenPathsAreSetProperly() {
+        final ExecutionTreeNode c1 = new ExecutionTreeNode(null, ElementKind.SUITE, "c1");
+        final ExecutionTreeNode c2 = new ExecutionTreeNode(null, ElementKind.SUITE, "c2");
+
+        final ExecutionTreeNode node = new ExecutionTreeNode(null, ElementKind.SUITE, "");
+        node.addChildren(newArrayList(c1, c2));
+        node.setChildrenPaths(newArrayList("path/to/c1", "path/to/c2"));
+
+        assertThat(node.getChildrenPaths()).containsExactly("path/to/c1", "path/to/c2");
     }
 
     @Test

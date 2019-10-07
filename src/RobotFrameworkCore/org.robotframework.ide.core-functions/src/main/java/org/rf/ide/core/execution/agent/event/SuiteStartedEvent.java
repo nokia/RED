@@ -6,6 +6,7 @@
 package org.rf.ide.core.execution.agent.event;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +25,7 @@ public final class SuiteStartedEvent {
         final List<?> childSuites = (List<?>) attributes.get("suites");
         final List<?> childTests = (List<?>) attributes.get("tests");
         final Integer totalTests = (Integer) attributes.get("totaltests");
+        final List<?> childPaths = (List<?>) attributes.get("child_paths");
         ExecutionMode mode;
         if (attributes.get("is_rpa") instanceof Boolean) {
             final boolean isRpa = ((Boolean) attributes.get("is_rpa")).booleanValue();
@@ -36,9 +38,14 @@ public final class SuiteStartedEvent {
             throw new IllegalArgumentException("Suite started event should have directory/file flag, children "
                     + "suites and tests as well as number of total tests");
         }
-
-        return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
-                Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests));
+        if (!childPaths.isEmpty()) {
+            return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
+                    Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests),
+                    Events.ensureListOfStrings(childPaths));
+        } else {
+            return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
+                    Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests), new ArrayList<>());
+        }
     }
 
 
@@ -56,9 +63,11 @@ public final class SuiteStartedEvent {
 
     private final List<String> childTests;
 
+    private final List<String> childPaths;
 
     public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final ExecutionMode mode,
-            final int totalTests, final List<String> childSuites, final List<String> childTests) {
+            final int totalTests, final List<String> childSuites, final List<String> childTests,
+            final List<String> childPaths) {
         this.name = name;
         this.suiteFilePath = suiteFilePath;
         this.isDir = isDir;
@@ -66,6 +75,7 @@ public final class SuiteStartedEvent {
         this.totalTests = totalTests;
         this.childSuites = childSuites;
         this.childTests = childTests;
+        this.childPaths = childPaths;
     }
 
     public String getName() {
@@ -96,20 +106,25 @@ public final class SuiteStartedEvent {
         return ImmutableList.copyOf(childTests);
     }
 
+    public List<String> getChildrenPaths() {
+        return childPaths;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == SuiteStartedEvent.class) {
             final SuiteStartedEvent that = (SuiteStartedEvent) obj;
             return this.name.equals(that.name) && this.suiteFilePath.equals(that.suiteFilePath)
                     && this.isDir == that.isDir && this.mode == that.mode && this.totalTests == that.totalTests
-                    && this.childSuites.equals(that.childSuites) && this.childTests.equals(that.childTests);
+                    && this.childSuites.equals(that.childSuites) && this.childTests.equals(that.childTests)
+                    && this.childPaths.equals(that.childPaths);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, suiteFilePath, isDir, mode, totalTests, childSuites, childTests);
+        return Objects.hash(name, suiteFilePath, isDir, mode, totalTests, childSuites, childTests, childPaths);
     }
 
     public static enum ExecutionMode {

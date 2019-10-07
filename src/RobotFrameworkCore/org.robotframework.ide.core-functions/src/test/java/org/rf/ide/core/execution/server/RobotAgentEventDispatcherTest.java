@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,6 +267,7 @@ public class RobotAgentEventDispatcherTest {
         attributes.put("is_dir", false);
         attributes.put("suites", newArrayList("s1", "s2"));
         attributes.put("tests", newArrayList("t1", "t2"));
+        attributes.put("child_paths", new ArrayList<>());
         attributes.put("totaltests", 7);
         attributes.put("vars_scopes",
                 newArrayList(ImmutableMap.of("a", newArrayList("t", 1, "global"), "b", newArrayList("t", 2, "local"))));
@@ -275,7 +277,7 @@ public class RobotAgentEventDispatcherTest {
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false,
-                ExecutionMode.TESTS, 7, newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+                ExecutionMode.TESTS, 7, newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

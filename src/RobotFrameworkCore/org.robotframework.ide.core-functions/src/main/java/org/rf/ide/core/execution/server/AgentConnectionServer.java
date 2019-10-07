@@ -27,7 +27,7 @@ import com.google.common.base.Charsets;
 
 public class AgentConnectionServer {
 
-    public static final int RED_AGENT_PROTOCOL_VERSION = 2;
+    public static final int RED_AGENT_PROTOCOL_VERSION = 3;
 
     public static final String DEFAULT_CONNECTION_HOST = "127.0.0.1";
 

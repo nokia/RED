@@ -69,7 +69,9 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 from robot.libraries.BuiltIn import BuiltIn
 from robot.errors import HandlerExecutionFailed, UserKeywordExecutionFailed
 from robot import version
+from robot.parsing.populators import READERS
 from robot.running import EXECUTION_CONTEXTS
+
 
 
 def _is_logged(level):
@@ -143,6 +145,29 @@ def _modify_source_path_for_jar_files(source, jar_part):
     
     return source[:jar_part_index] + jar_extension
 
+def _collect_children_paths(suites, source):
+    child_paths = []
+    VALID_EXTENSIONS = tuple(READERS)
+    if os.path.isdir(source):
+        for suite in suites:
+            for file in os.listdir(source):
+                file_name = os.path.splitext(file)[0]
+                file_extension = os.path.splitext(file)[1][1:]
+                if (file_extension in VALID_EXTENSIONS) or ("." not in file):
+                    formated_file_name = _format_file_name(file_name)
+                    if suite == formated_file_name:
+                        child_paths.append(os.path.os.path.join(source, file))
+            
+    return child_paths
+    
+def _format_file_name(name):
+    name = _strip_possible_prefix(name)
+    name = name.replace('_', ' ').strip()
+    return name.title() if name.islower() else name
+
+def _strip_possible_prefix(name):
+    return name.split('__', 1)[-1]
+
 
 class RedResponseMessage:
     
@@ -209,7 +234,7 @@ class TestRunnerAgent:
     
     CONNECTION_SLEEP_BETWEEN_TRIALS = 2
     
-    RED_AGENT_PROTOCOL_VERSION = 2
+    RED_AGENT_PROTOCOL_VERSION = 3
     
     MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
@@ -280,10 +305,11 @@ class TestRunnerAgent:
         attrs_copy = copy.copy(attrs)
         del attrs_copy['doc']
         attrs_copy['is_dir'] = os.path.isdir(attrs['source'])
+        attrs_copy['child_paths'] = _collect_children_paths(attrs['suites'], attrs['source'])
         attrs_copy['is_rpa'] = self._is_rpa_mode()
         
         self._send_to_server(AgentEventMessage.START_SUITE, name, attrs_copy)
-        
+    
     def _is_rpa_mode(self):
         try:
             # this is not API and could be sensitive for future

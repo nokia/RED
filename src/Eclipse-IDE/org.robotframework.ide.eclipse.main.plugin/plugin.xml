@@ -7307,6 +7307,11 @@
          </command>
          <command
                categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.execution.rerunNonExecutedTests"
+               name="Rerun Non Executed Tests">
+         </command>
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
                id="org.robotframework.red.view.execution.clearExecutionData"
                name="Clear">
          </command>
@@ -7403,6 +7408,24 @@
             </enabledWhen>
          </handler>
          <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunNonExecutedHandler"
+               commandId="org.robotframework.red.view.execution.rerunNonExecutedTests">
+               <enabledWhen>
+               <with
+                     variable="activePart">
+                  <and>
+	                  <instanceof
+	                        value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+	                  </instanceof>
+	                  <test
+	                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+	                        value="true">
+	                  </test>
+                  </and>
+               </with>
+            </enabledWhen>
+         </handler>
+         <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ClearExecutionHandler"
                commandId="org.robotframework.red.view.execution.clearExecutionData">
             <enabledWhen>
@@ -7474,6 +7497,12 @@
                   commandId="org.robotframework.red.view.execution.rerunFailedTests"
                   icon="resources/relaunchf.png"
                   label="Rerun Failed Tests Only"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.execution.rerunNonExecutedTests"
+                  icon="resources/relaunchne.png"
+                  label="Rerun Non-Executed Tests Only"
                   style="push">
             </command>
          </menuContribution>

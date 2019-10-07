@@ -153,6 +153,7 @@ class LocalProcessCommandLineBuilder {
                 builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
                 builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
             }
+            robotConfig.setLinkedResourcesPaths(linkedResources);
         }
     }
 

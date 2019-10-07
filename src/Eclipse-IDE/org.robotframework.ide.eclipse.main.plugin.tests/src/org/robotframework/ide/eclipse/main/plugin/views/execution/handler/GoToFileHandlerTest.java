@@ -48,14 +48,14 @@ public class GoToFileHandlerTest {
 
     @Test
     public void nothingIsDone_whenNodePathIsNull() throws Exception {
-        goToFile(new ExecutionTreeNode(null, null, "null_path", null));
+        goToFile(new ExecutionTreeNode(null, null, "null_path", null, null));
 
         verifyZeroInteractions(caseSelectionConsumer);
     }
 
     @Test
     public void nothingIsDone_whenNodePathDoesNotExist() throws Exception {
-        goToFile(new ExecutionTreeNode(null, null, "not_existing_path", new URI("file:///unknown.robot")));
+        goToFile(new ExecutionTreeNode(null, null, "not_existing_path", new URI("file:///unknown.robot"), null));
 
         verifyZeroInteractions(caseSelectionConsumer);
     }
@@ -64,7 +64,7 @@ public class GoToFileHandlerTest {
     public void nothingIsDone_whenNodePathIsNotFromWorkspace() throws Exception {
         final File nonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
 
-        goToFile(new ExecutionTreeNode(null, null, "not_linked_file", nonWorkspaceFile.toURI()));
+        goToFile(new ExecutionTreeNode(null, null, "not_linked_file", nonWorkspaceFile.toURI(), null));
 
         verifyZeroInteractions(caseSelectionConsumer);
     }
@@ -73,7 +73,7 @@ public class GoToFileHandlerTest {
     public void caseIsOpened_whenNodePathPointsToProjectFile() throws Exception {
         final IFile suite = projectProvider.createFile("suite.robot");
 
-        goToFile(new ExecutionTreeNode(null, null, "project_file", suite.getLocationURI()));
+        goToFile(new ExecutionTreeNode(null, null, "project_file", suite.getLocationURI(), null));
 
         verify(caseSelectionConsumer).accept(suite, "project_file");
         verifyNoMoreInteractions(caseSelectionConsumer);
@@ -85,7 +85,7 @@ public class GoToFileHandlerTest {
         final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
         resourceCreator.createLink(nonWorkspaceFile.toURI(), linkedSuite);
 
-        goToFile(new ExecutionTreeNode(null, null, "linked_file", nonWorkspaceFile.toURI()));
+        goToFile(new ExecutionTreeNode(null, null, "linked_file", nonWorkspaceFile.toURI(), null));
 
         verify(caseSelectionConsumer).accept(linkedSuite, "linked_file");
         verifyNoMoreInteractions(caseSelectionConsumer);

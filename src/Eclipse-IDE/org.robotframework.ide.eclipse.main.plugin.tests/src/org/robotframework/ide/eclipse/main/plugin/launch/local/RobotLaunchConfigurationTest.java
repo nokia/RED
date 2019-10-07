@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -336,17 +337,18 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithoutExistingArguments()
+    public void failedOrNonExecutedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithoutExistingArguments()
             throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(projectProvider.getFile("Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
-        failedSuitePaths.put("Suite1", asList("test1", "test2"));
-        failedSuitePaths.put("Suite2", asList("test1", "test2"));
+        final Map<String, List<String>> failedOrNonExecutedSuitePaths = new HashMap<>();
+        failedOrNonExecutedSuitePaths.put("Suite1", asList("test1", "test2"));
+        failedOrNonExecutedSuitePaths.put("Suite2", asList("test1", "test2"));
 
-        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), failedSuitePaths);
+        RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(robotConfig.asWorkingCopy(),
+                failedOrNonExecutedSuitePaths);
 
         assertThat(robotConfig.getRobotArguments()).isEmpty();
         assertThat(robotConfig.getSuitePaths()).hasSize(2);
@@ -356,17 +358,18 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithExistingArguments()
+    public void failedOrNonExecutedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithExistingArguments()
             throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(projectProvider.getFile("Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
-        failedSuitePaths.put("Suite", asList("test"));
+        final Map<String, List<String>> failedOrNonExecutedSuitePaths = new HashMap<>();
+        failedOrNonExecutedSuitePaths.put("Suite", asList("test"));
 
         robotConfig.setRobotArguments("-a -b -c");
-        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), failedSuitePaths);
+        RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(robotConfig.asWorkingCopy(),
+                failedOrNonExecutedSuitePaths);
 
         assertThat(robotConfig.getRobotArguments()).contains("-a -b -c");
         assertThat(robotConfig.getSuitePaths()).hasSize(1);
@@ -384,5 +387,33 @@ public class RobotLaunchConfigurationTest {
         robotConfig.addEnvironmentVariable("VAR2", "value2");
 
         assertThat(robotConfig.getEnvironmentVariables()).contains("VAR1=value1", "VAR2=value2");
+    }
+
+    @Test
+    public void linkedResourcesPathsAttributeIsSetInConfig_whenLinkedResourcesExist() throws Exception {
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        final Map<IResource, List<String>> linkedResources = new HashMap<IResource, List<String>>();
+        final IResource resource = projectProvider.createFile("resource");
+        linkedResources.put(resource, new ArrayList<>());
+        robotConfig.setLinkedResourcesPaths(linkedResources);
+
+        assertThat(robotConfig.getLinkedResourcesPaths()).containsExactly("/" + PROJECT_NAME + "/resource");
+    }
+
+    @Test
+    public void linkedResourcesPathsAttributeIsEmptyInConfig_whenLinkedResourcesIsEmpty() throws Exception {
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
+        final Map<IResource, List<String>> linkedResources = new HashMap<IResource, List<String>>();
+        robotConfig.setLinkedResourcesPaths(linkedResources);
+
+        assertThat(robotConfig.getLinkedResourcesPaths()).isEmpty();
+    }
+
+    private RobotLaunchConfiguration createRobotLaunchConfiguration(final IProject project) throws CoreException {
+        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.fillDefaults();
+        robotConfig.setProjectName(project.getName());
+        return robotConfig;
     }
 }

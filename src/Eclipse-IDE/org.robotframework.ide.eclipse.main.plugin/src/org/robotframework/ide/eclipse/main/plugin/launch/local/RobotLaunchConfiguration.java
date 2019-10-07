@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
 
     private static final String TEST_SUITES_UNSELECTED_ATTRIBUTE = "Test suites unselected";
+
+    private static final String LINKED_RESOURCES_PATHS_ATTRIBUTE = "Data sources";
 
     private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
 
@@ -111,10 +114,10 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.setEnvironmentVariables(RedPlugin.getDefault().getPreferences().getLaunchEnvironmentVariables());
     }
 
-    public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
-            final Map<String, List<String>> failedSuitePaths) throws CoreException {
+    public static void fillForFailedOrNonExecutedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
+            final Map<String, List<String>> suitePaths) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setSuitePaths(failedSuitePaths);
+        robotConfig.setSuitePaths(suitePaths);
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -251,6 +254,13 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         launchCopy.setAttribute(TEST_SUITES_UNSELECTED_ATTRIBUTE, suites);
     }
 
+    public void setLinkedResourcesPaths(final Map<IResource, List<String>> linkedResources) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        final List<String> linkedResourcesList = linkedResources.keySet().stream()
+                .map(e -> e.getFullPath().toPortableString()).collect(toList());
+        launchCopy.setAttribute(LINKED_RESOURCES_PATHS_ATTRIBUTE, linkedResourcesList);
+    }
+
     public Map<String, List<String>> getSuitePaths() throws CoreException {
         final Map<String, String> testSuites = configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new HashMap<>());
         return testSuites.entrySet().stream().collect(toMap(e -> e.getKey(), e -> splitTestCases(e.getValue())));
@@ -270,6 +280,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             suitePaths.remove(unselected);
         }
         return suitePaths;
+    }
+
+    public List<String> getLinkedResourcesPaths() throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        return launchCopy.getAttribute(LINKED_RESOURCES_PATHS_ATTRIBUTE, new ArrayList<>());
     }
 
     public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {

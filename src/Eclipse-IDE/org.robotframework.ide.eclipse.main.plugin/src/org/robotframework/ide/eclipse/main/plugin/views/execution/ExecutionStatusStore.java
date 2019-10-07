@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.eclipse.ui.services.IDisposable;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -113,7 +116,8 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     protected void suiteStarted(final String suiteName, final URI suiteFilePath, final ExecutionMode executionMode,
-            final int totalTests, final List<String> childSuites, final List<String> childTests) {
+            final int totalTests, final List<String> childSuites, final List<String> childTests,
+            final List<String> childPaths) {
         Preconditions.checkArgument(isOpen);
 
         if (root == null) {
@@ -125,11 +129,13 @@ public class ExecutionStatusStore implements IDisposable {
 
         current.setStatus(Status.RUNNING);
         current.setPath(suiteFilePath);
+        current.setChildrenPaths(childPaths);
         current.addChildren(childSuites.stream()
                 .map(childSuite -> new ExecutionTreeNode(current, ElementKind.SUITE, childSuite))
                 .collect(toList()));
         current.addChildren(childTests.stream()
-                .map(childTest -> new ExecutionTreeNode(current, ElementKind.TEST, childTest, suiteFilePath))
+                .map(childTest -> new ExecutionTreeNode(current, ElementKind.TEST, childTest, suiteFilePath,
+                        childPaths))
                 .collect(toList()));
 
         current = current.getChildren().isEmpty() ? current : current.getChildren().get(0);
@@ -154,7 +160,7 @@ public class ExecutionStatusStore implements IDisposable {
         if (current.getKind() == ElementKind.TEST) {
             if (status == Status.PASS) {
                 passedTests++;
-            } else {
+            } else if (status == Status.FAIL) {
                 failedTests++;
             }
         }
@@ -225,6 +231,195 @@ public class ExecutionStatusStore implements IDisposable {
             if (current.getStatus().equals(Optional.of(Status.FAIL))) {
                 newPath = newPath.substring(newPath.indexOf(".") + 1);
                 failedTests.add(newPath);
+            }
+        }
+    }
+
+    public final Map<String, List<String>> getNonExecutedSuitePaths(final IProject project,
+            final List<String> linkedResources) {
+        final List<ExecutionTreeNode> nodes = this.getExecutionTree().getChildren();
+        final boolean testsOnly = areOnlyTestsToRerun(nodes);
+        final Map<String, List<String>> nonExecutedSuitePaths = new HashMap<>();
+        final List<String> alreadyUsedPaths = new ArrayList<>();
+        for (final ExecutionTreeNode node : nodes) {
+            if (isNonExecuted(node)) {
+                final List<String> nonExecutedSuitesOrTests = getNonChildren(node, testsOnly, project, linkedResources,
+                        alreadyUsedPaths);
+
+                if (!nonExecutedSuitesOrTests.isEmpty()) {
+                    if (testsOnly) {
+                        final String nodePath = constructProjectRelativePath(node, project, linkedResources,
+                                alreadyUsedPaths);
+                        if (nonExecutedSuitePaths.keySet().contains(nodePath)) {
+                            final List<String> allTests = new ArrayList<>();
+                            allTests.addAll(nonExecutedSuitePaths.get(nodePath));
+                            allTests.addAll(nonExecutedSuitesOrTests);
+                            nonExecutedSuitePaths.put(nodePath, allTests);
+                        } else {
+                            nonExecutedSuitePaths.put(nodePath, nonExecutedSuitesOrTests);
+                        }
+                    } else {
+                        for (final String suitePath : nonExecutedSuitesOrTests) {
+                            nonExecutedSuitePaths.put(suitePath, new ArrayList<>());
+                        }
+                    }
+                } else {
+                    final String nodePath = constructProjectRelativePath(node, project, linkedResources,
+                            alreadyUsedPaths);
+                    nonExecutedSuitePaths.put(nodePath, new ArrayList<>());
+                }
+            }
+        }
+        return nonExecutedSuitePaths;
+    }
+
+    private final List<String> getNonChildren(final ExecutionTreeNode node, final boolean testsOnly,
+            final IProject project, final List<String> linkedResources, final List<String> alreadyUsedPaths) {
+        final List<String> failedTestsOrSuites = new ArrayList<>();
+        if (testsOnly) {
+            collectNonExecutedTestsPaths(node, failedTestsOrSuites, "");
+        } else {
+            collectNonExecutedSuitesPaths(node, failedTestsOrSuites, project, linkedResources, alreadyUsedPaths);
+        }
+        return failedTestsOrSuites;
+    }
+
+    private void collectNonExecutedTestsPaths(final ExecutionTreeNode node, final List<String> failedTests,
+            final String currentPath) {
+
+        if (isNonExecuted(node)) {
+            String newPath = currentPath.isEmpty() ? node.getName() : currentPath + "." + node.getName();
+            if (node.getKind() == ElementKind.SUITE) {
+                for (final ExecutionTreeNode n : node.getChildren()) {
+                    collectNonExecutedTestsPaths(n, failedTests, newPath);
+                }
+            } else {
+                newPath = newPath.substring(newPath.indexOf(".") + 1);
+                failedTests.add(newPath);
+            }
+        }
+    }
+
+    private void collectNonExecutedSuitesPaths(final ExecutionTreeNode node, final List<String> failedSuites,
+            final IProject project, final List<String> linkedResources, final List<String> alreadyUsedPaths) {
+
+        if (isNonExecuted(node)) {
+            if (node.getKind() == ElementKind.SUITE) {
+                if (node.getChildren().size() != 0) {
+                    for (final ExecutionTreeNode n : node.getChildren()) {
+                        collectNonExecutedSuitesPaths(n, failedSuites, project, linkedResources, alreadyUsedPaths);
+                    }
+                } else {
+                    final String path = constructProjectRelativePath(node, project, linkedResources,
+                            alreadyUsedPaths);
+                    failedSuites.add(path);
+                }
+            } else {
+                final String path = constructProjectRelativePath(node.getParent(), project, linkedResources,
+                        alreadyUsedPaths);
+                failedSuites.add(path);
+            }
+        }
+    }
+
+    private String constructProjectRelativePath(final ExecutionTreeNode node, final IProject project,
+            final List<String> linkedResources, final List<String> alreadyUsedPaths) {
+        final String nodeName = node.getName();
+        final ExecutionTreeNode parent = node.getParent();
+        final List<ExecutionTreeNode> suites = parent.getChildren();
+        final List<String> childPaths = parent.getChildrenPaths();
+
+        final IWorkspaceRoot root = project.getWorkspace().getRoot();
+        final RedWorkspace workspace = new RedWorkspace(root);
+
+        try {
+            try {
+                final Optional<String> pathFromChildren = getPathFromChildrenPaths(nodeName, project, suites,
+                        childPaths);
+                if (pathFromChildren.isPresent()) {
+                    alreadyUsedPaths.add("file:///" + pathFromChildren.get());
+                    return pathFromChildren.get();
+                }
+                return getPathFromNodePath(workspace, node, project, alreadyUsedPaths);
+            } catch (final Exception e) {
+
+                return getPathFromNodePath(workspace, node.getParent(), project, alreadyUsedPaths);
+            }
+        } catch (final Exception e) {
+            return getPathFromLinkedResources(nodeName, project, workspace, linkedResources, alreadyUsedPaths);
+        }
+    }
+
+    private static Optional<String> getPathFromChildrenPaths(final String nodeName, final IProject project,
+            final List<ExecutionTreeNode> suites, final List<String> childPaths) {
+        for (final ExecutionTreeNode suite : suites) {
+            if (nodeName.equals(suite.getName())) {
+                if (!childPaths.isEmpty()) {
+                    final Path childPath = Paths.get(childPaths.get(suites.indexOf(suite)));
+                    final Path projectPath = Paths.get(project.getLocation().toPortableString());
+                    final Path relativePath = projectPath.relativize(childPath);
+                    return Optional.of(
+                            org.eclipse.core.runtime.Path.fromOSString(relativePath.toString()).toPortableString());
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static String getPathFromNodePath(final RedWorkspace workspace, final ExecutionTreeNode node,
+            final IProject project, final List<String> alreadyUsedPaths) {
+        final IResource resource = workspace.forUri(node.getPath());
+        final String path = resource.getProjectRelativePath().toPortableString();
+        alreadyUsedPaths.add("file:///" + project.getLocation() + '/' + path.replaceAll(" ", "%20"));
+        return path;
+    }
+
+    private static String getPathFromLinkedResources(final String nodeName, final IProject project,
+            final RedWorkspace workspace, final List<String> linkedResources, final List<String> linkedCandidates) {
+
+        for (final String resource : linkedResources) {
+            final String name = Paths.get(resource).getFileName().toString();
+            final String robotName = RobotPathsNaming
+                    .toRobotFrameworkName(name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name);
+            if (robotName.equals(nodeName)) {
+                final String path = "file:///" + project.getLocation().removeLastSegments(1)
+                        + resource.replaceAll(" ", "%20");
+                if (!(linkedCandidates.stream().anyMatch(candidate -> candidate.startsWith(path)))) {
+                    linkedCandidates.add(path);
+                    final URI pathURI = URI.create(path);
+                    final IResource linkedResource = workspace.forUri(pathURI);
+                    return linkedResource.getProjectRelativePath().toPortableString();
+                }
+            }
+        }
+        return nodeName;
+    }
+
+    private static boolean isNonExecuted(final ExecutionTreeNode node) {
+        return !node.getStatus().isPresent() || node.getStatus().equals(Optional.of(Status.RUNNING));
+    }
+
+    private static boolean areOnlyTestsToRerun(final List<ExecutionTreeNode> nodes) {
+        final List<String> suites = new ArrayList<>();
+        for (final ExecutionTreeNode node : nodes) {
+            collectSuitesNamesIfNonExecuted(node, suites);
+            if (!suites.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void collectSuitesNamesIfNonExecuted(final ExecutionTreeNode node, final List<String> suites) {
+        if (isNonExecuted(node)) {
+            if (node.getKind() == ElementKind.SUITE) {
+                if (node.getChildren().size() == 0) {
+                    suites.add(node.getName());
+                } else {
+                    for (final ExecutionTreeNode n : node.getChildren()) {
+                        collectSuitesNamesIfNonExecuted(n, suites);
+                    }
+                }
             }
         }
     }
