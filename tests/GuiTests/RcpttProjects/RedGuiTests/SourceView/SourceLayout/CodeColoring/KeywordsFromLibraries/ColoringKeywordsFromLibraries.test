@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _p6BSsOj-Eem_OL5VW4uX9Q
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 10/8/19 8:36 AM
+Save-Time: 10/8/19 9:26 AM
 Testcase-Type: ecl
 Verifications: _p5bc0Oj-Eem_OL5VW4uX9Q
 
@@ -30,5 +30,5 @@ with [get-window Preferences] {
 get-view "Project Explorer" | get-tree | select "Colors/suite.robot" | double-click
 
 // waiting for coloring in separate thread
-wait	2000
+wait	5000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
