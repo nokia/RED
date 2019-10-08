@@ -84,6 +84,7 @@
 <li><b>Show failures only</b> - filters the tree, so that only failed elements are presented,</li>
 <li><b>Rerun Tests</b> - launches the configuration again,</li>
 <li><b>Rerun Failed Tests Only</b> - launches the configuration with tests which failed.</li>
+<li><b>Rerun Non Executed Tests</b> - launches the configuration with tests which were not executed.</li>
 <li><b>Go To File</b> - from context menu on test (also by double click) - opens editor and selects
 		test case.</li>
 </ul>
