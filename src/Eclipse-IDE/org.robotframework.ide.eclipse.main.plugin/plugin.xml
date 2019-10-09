@@ -5559,7 +5559,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester"
           id="org.robotframework.red.view.executionProgress"
           namespace="org.robotframework.red.view.execution"
-          properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasFailedTest"
+          properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasTest,currentLaunchHasNonExecutedTest,currentLaunchHasFailedTest"
           type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
     </propertyTester>
     <propertyTester
@@ -7377,6 +7377,10 @@
                            property="org.robotframework.red.view.execution.currentLaunchExecStoreIsDisposed"
                            value="false">
                      </test>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchHasTest"
+                           value="true">
+                     </test>
                   </and>
                </with>
             </enabledWhen>
@@ -7421,6 +7425,14 @@
 	                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
 	                        value="true">
 	                  </test>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchExecStoreIsDisposed"
+                           value="false">
+                     </test>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchHasNonExecutedTest"
+                           value="true">
+                     </test>
                   </and>
                </with>
             </enabledWhen>

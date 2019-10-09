@@ -89,7 +89,11 @@ public class ExecutionStatusStore implements IDisposable {
         return failedTests;
     }
 
-    int getTotalTests() {
+    public int getNonExecutedTests() {
+        return totalTests - (passedTests + failedTests);
+    }
+
+    public int getTotalTests() {
         return totalTests;
     }
 

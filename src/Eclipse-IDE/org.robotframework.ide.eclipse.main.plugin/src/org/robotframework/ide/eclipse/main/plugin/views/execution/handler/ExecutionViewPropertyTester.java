@@ -24,6 +24,15 @@ public class ExecutionViewPropertyTester extends PropertyTester {
     @VisibleForTesting static final String CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = "currentLaunchExecStoreIsDisposed";
     public static final String PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = NAMESPACE + "." + CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED;
 
+    @VisibleForTesting
+    static final String CURRENT_LAUNCH_HAS_TEST = "currentLaunchHasTest";
+    public static final String PROPERTY_CURRENT_LAUNCH_HAS_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_TEST;
+
+    @VisibleForTesting
+    static final String CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = "currentLaunchHasNonExecutedTest";
+    public static final String PROPERTY_CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = NAMESPACE + "."
+            + CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST;
+
     @VisibleForTesting static final String CURRENT_LAUNCH_HAS_FAILED_TEST = "currentLaunchHasFailedTest";
     public static final String PROPERTY_CURRENT_LAUNCH_HAS_FAILED_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_FAILED_TEST;
 
@@ -54,6 +63,16 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .map(ExecutionStatusStore::isDisposed)
                     .orElse(false);
             return isDisposed == expectedValue;
+        } else if (CURRENT_LAUNCH_HAS_TEST.equals(property)) {
+            final int numberOfTests = view.getCurrentlyShownLaunch()
+                    .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
+                    .map(ExecutionStatusStore::getTotalTests).orElse(0);
+            return numberOfTests > 0 == expectedValue;
+        } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST.equals(property)) {
+            final int numberOfNonExecutionTests = view.getCurrentlyShownLaunch()
+                    .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
+                    .map(ExecutionStatusStore::getNonExecutedTests).orElse(0);
+            return numberOfNonExecutionTests > 0 == expectedValue;
         } else if (CURRENT_LAUNCH_HAS_FAILED_TEST.equals(property)) {
             final int numberOfFailedTests = view.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))

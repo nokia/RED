@@ -54,6 +54,7 @@ public class ExecutionStatusStoreTest {
         assertThat(store.getTotalTests()).isEqualTo(0);
         assertThat(store.getPassedTests()).isEqualTo(0);
         assertThat(store.getFailedTests()).isEqualTo(0);
+        assertThat(store.getNonExecutedTests()).isEqualTo(0);
         assertThat(store.getOutputFilePath()).isNull();
     }
 
@@ -67,6 +68,7 @@ public class ExecutionStatusStoreTest {
                 new ArrayList<>(), new ArrayList<>());
 
         assertThat(store.getTotalTests()).isEqualTo(42);
+        assertThat(store.getNonExecutedTests()).isEqualTo(42);
 
         final ExecutionTreeNode root = store.getExecutionTree();
         assertThat(root.getStatus()).isEqualTo(Optional.of(Status.RUNNING));
@@ -107,6 +109,7 @@ public class ExecutionStatusStoreTest {
                 newArrayList("t1", "t2"), new ArrayList<>());
 
         assertThat(store.getTotalTests()).isEqualTo(0);
+        assertThat(store.getNonExecutedTests()).isEqualTo(0);
         assertThat(store.getExecutionTree()).isSameAs(root);
 
         assertThat(current.getStatus()).isEqualTo(Optional.of(Status.RUNNING));
