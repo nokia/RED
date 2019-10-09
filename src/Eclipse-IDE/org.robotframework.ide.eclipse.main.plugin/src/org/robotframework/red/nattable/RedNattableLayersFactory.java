@@ -173,6 +173,12 @@ public class RedNattableLayersFactory {
             public void handleEvent(final Event event) {
 
                 final int tableWidth = event.width - 15; // - row header width
+                if (tableWidth < 0) {
+                    // under GTK3 tables from minimized sections do not have correct dimensions
+                    // until they are expanded
+                    return;
+                }
+
                 final int columnCount = dataProvider.getColumnCount();
 
                 if (columnCount == 3) {
@@ -185,7 +191,7 @@ public class RedNattableLayersFactory {
 
                     dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
                     dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
-                    
+
                     final int argsColumnsCount = columnCount - 3;
                     final int argColumnDefaultWidth = 100;
 
