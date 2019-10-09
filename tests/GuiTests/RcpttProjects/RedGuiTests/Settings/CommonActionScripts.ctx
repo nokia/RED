@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/3/19 4:15 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/9/19 3:01 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -214,6 +214,21 @@ proc "check-tab-folder"  [val tab_index 1] [val active_page] [val pages] {
 	
 		}
 	}  
+}
+
+proc "wait-for-empty-progress"{
+	// open Progress bar tab
+	get-menu "Window/Show View/Other..." | click
+	with [get-window "Show View"] {
+	    get-tree | select "General/Progress"
+	    get-button $Open_Perspective_button | click
+	}
+	try -times 60 -delay 1000 -command{
+		with [get-view Progress] {
+		    get-control Any -index 5 | get-property "getChildren().Control[0].getText()" 
+		        | equals "No operations to display at this time." | verify-true
+		}
+	}
 }
 
 
