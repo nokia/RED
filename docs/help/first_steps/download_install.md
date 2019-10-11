@@ -10,7 +10,7 @@
 <a class="external" href="https://www.java.com" target="_blank">Java official website</a>
 </p>
 <h3>Get Eclipse</h3>
-<p>Currently RED is tested and released with Eclipse 2018-09 (4.9) platform.<br/>
+<p>Currently RED is tested and released with Eclipse 2019-09 (4.13) platform.<br/>
 The oldest supported platform version is Eclipse Oxygen (4.7).<br/>
 <a class="external" href="https://www.eclipse.org/" target="_blank">Official Eclipse website</a>
 </p>
