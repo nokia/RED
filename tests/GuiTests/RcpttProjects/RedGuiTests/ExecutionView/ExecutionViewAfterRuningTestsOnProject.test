@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yrzhQF1JEeWeit3EM6sPPA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 10/9/19 10:21 AM
+Save-Time: 10/11/19 10:44 AM
 Testcase-Type: ecl
 Verifications: _-dwU0F3XEeWeit3EM6sPPA
 
@@ -31,9 +31,9 @@ with [get-view "Execution View"] {
     with [get-control Any -index 9] {
     	// labels
         get-property "getChildren().Control[0].getChildren().length" | equals 3 | verify-true
-        get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "Tests: 25/25" | verify-true
-        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals "Passed: 16" | verify-true
-        get-property "getChildren().Control[0].getChildren().Control[2].getText()" | equals "Failed: 9" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "Tests: 34/34" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals "Passed: 22" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[2].getText()" | equals "Failed: 12" | verify-true
         
         //progress bar
         get-property "getChildren().length" | equals 4 | verify-true
@@ -83,7 +83,7 @@ with [get-view "Execution View" | get-tree] {
 	get-item  "ExecutionViewProject \\(.* s\\)/Duplicate Test Case \\(.* s\\)/test 1 \\(.* s\\)"| click
     select "ExecutionViewProject \\(.* s\\)/Duplicate Test Case \\(.* s\\)/test 1 \\(.* s\\)" | double-click
 }
-get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "No keyword with name 'Convert To Lowercase' found." | verify-true
+get-view "Execution View" | get-editbox -after [get-label "Failed: 12"] | get-property text | equals "No keyword with name 'Convert To Lowercase' found." | verify-true
 
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "duplicate_test_case.robot" | verify-true
@@ -123,7 +123,7 @@ with [get-tab-folder -index 1] {
     get-property activePage | equals "stopped_tests.robot" | verify-true
     get-property tabCount | equals 3 | verify-true
 }
-get-view "Execution View" | get-editbox -after [get-label "Failed: 9"] | get-property text | equals "Big kaboom!!!" 
+get-view "Execution View" | get-editbox -after [get-label "Failed: 12"] | get-property text | equals "Big kaboom!!!" 
     | verify-true
 
 //select not-expanded pass case    
