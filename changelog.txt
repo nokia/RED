@@ -1,3 +1,57 @@
+RED 0.9.0 - 2019/10/11
+
+Feature
+
+	[RED-1285] - Empty argument cell handling in source mode
+	[RED-1319] - Remove library import "tag" from multiple keyword occurences
+	[RED-1324] - Add new elements to Robot Framework > Errors/Warnings > Validation
+
+Enhancement
+
+	[RED-565] - GitHub #47 Add posibility to provide arguments for library imports in red.xml
+	[RED-709] - (GitHub #77) Add possibility to declare breakpoint as stop on keyword failure.
+	[RED-1155] - Validate templated test cases
+	[RED-1290] - [GitHub #320] Library prefix colouring
+	[RED-1291] - Need to Add a button which need to rerun the test case when
+	[RED-1292] - [GitHub #322] Modal windows are blocking each other when changing lib externally
+	[RED-1301] - Unify keyword content assistant for settings
+	[RED-1302] - Templates content assistant improvements
+	[RED-1303] - Add "NONE" to content assistant propositions for global and local settings
+	[RED-1306] - Different syntax highlighting for Robot based keyword and Python based ones
+	[RED-1308] - Speed up edition in tables
+
+Bug
+
+	[RED-452] - Incorrect color for Template arguments
+	[RED-477] - Tables repainting exception under GTK3
+	[RED-961] - GitHub #146 -Table editor can not deal with "a | b" as arg - cell is locked
+	[RED-1269] - [Github #302] Validation problem with continuation
+	[RED-1273] - Cannot change the value of existing variable in Variable mappings section
+	[RED-1282] - [GitHub #312] NONE in setup/teardown is validated as keyword
+	[RED-1284] - GitHub #325 CoreException with Eclipse 2019-06
+	[RED-1287] - [GitHub #314] Embedded args with regular expression problems
+	[RED-1288] - [Github #315 #316] Chinese characters issues
+	[RED-1289] - Checking error: 'An internal error occurred during: "Label Job"' from regression
+	[RED-1295] - Creating new setting comment in table view with tab NPE
+	[RED-1296] - Undo in tables does not work for empty row created from executable row
+	[RED-1298] - SettingsSectionTableDumper does not support task settings
+	[RED-1299] - NPE for empty setting in Settings table
+	[RED-1309] - [GitHub #330] CCE when running tests with dynamic library imports
+	[RED-1311] - [GitHub #328] Column resizing glitches
+	[RED-1312] - [GitHub #324] Exceptions when using 2019.09
+	[RED-1313] - Library alias is not displayed in settings table editor
+	[RED-1314] - Indentation error in new syntax FOR loop
+	[RED-1315] - [GitHub #331] change working directory when importing variable file
+	[RED-1318] - Exception for wrong settings
+	[RED-1325] - Split Additional Robot Framework arguments (debug/run configurations window)
+
+Task
+
+	[RED-762] - Execution view re-run failed should not use -R launching
+	[RED-1307] - Update platform
+	[RED-1323] - [GitHub #321] document workspace-external libs portability solution
+
+
 RED 0.8.13 - 2019/07/18
 
 Enhancement

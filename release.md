@@ -1,3 +1,49 @@
+# RED - Robot Editor v0.9.0
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+For RED feature installed on Eclipse Neon or earlier, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- "What's new" section is available in RED User Guide where more detailed information is available about new features in releases. See http://nokia.github.io/RED/help/whats_new/0_9_0.html
+- RED product is now based on Eclipse 2019-09 (4.13) instead of 2018-09 (4.9). Oxygen (4.7) is still supported and RED feature can be installed there.
+- It is now possible to pass arguments to libraries in red.xml file.
+- A new kind of breakpoint introduced which will suspend the execution when predefined keyword fails.
+- It is possible to re-run tests/suites which were not executed using action in Execution view.
+- Templates in tests or tasks are now fully supported regarding coloring, validation and content assistant.
+- It is possible to assign a color for library/resource name prefixes.
+- Color for keywords defined in libraries can be assigned differently than for user keywords (at call place).
+- Masked keywords are reported at call place.
+
+
+## GitHub issues updates
+ - #47 Add posibility to provide arguments for library imports in red.xml
+ - #77 Add possibility to declare breakpoint as stop on keyword failure.
+ - #146 BUG: Table editor can not deal with "|" charator
+ - #297 When using Test template formatting appears incorrect
+ - #302 Fail to validate a call to a keyword when more than 2 return variables are on their own line
+ - #312 Settings value of NONE in test case table for [Setup] bug
+ - #314 Using variables with custom embedded argument regular expressions
+ - #315 Robot framework project path contain Chinese character throw exception
+ - #316 Python path contain Chinese character in red.xml throw exception
+ - #320 Different syntax color for libraries set before the keyword
+ - #321 Handle environment variables in red.xml for referencedLibrary
+ - #322 RED issue - modal dialogs
+ - #324 Imposible to open robot file after update
+ - #325 CoreException with Eclipse 2019-06
+ - #330 'Agent connection server' problem when starting javaws jnlp application bug
+ - #331 Variables var.py GUI
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.13
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
