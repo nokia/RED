@@ -7141,12 +7141,10 @@
                            </instanceof>
                         </or>
                      </iterate>
-                     <and>
-                        <test
-                              property="org.robotframework.selection.selectedActualFile"
-                              value="true">
-                        </test>
-                     </and>
+                     <test
+                           property="org.robotframework.selection.selectedActualFile"
+                           value="true">
+                     </test>
                   </with>
                </visibleWhen>
             </command>
@@ -7171,16 +7169,20 @@
                                  value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
                            </instanceof>
                            <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotTask">
+                           </instanceof>
+                           <instanceof
                                  value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                           </instanceof>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection">
                            </instanceof>
                         </or>
                      </iterate>
-                     <and>
-                        <test
-                              property="org.robotframework.selection.selectedActualFile"
-                              value="true">
-                        </test>
-                     </and>
+                     <test
+                           property="org.robotframework.selection.selectedActualFile"
+                           value="true">
+                     </test>
                   </with>
                </visibleWhen>
             </command>
@@ -7192,6 +7194,9 @@
                      checkEnabled="false">
                   <with
                         variable="selection">
+                     <count
+                           value="1">
+                     </count>
                      <iterate
                            ifEmpty="false"
                            operator="and">
@@ -7199,17 +7204,10 @@
                               value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall">
                         </instanceof>
                      </iterate>
-                     <and>
-                        <count
-                              value="1">
-                        </count>
-                     </and>
-                     <and>
-                        <test
-                              property="org.robotframework.selection.selectedActualFile"
-                              value="true">
-                        </test>
-                     </and>
+                     <test
+                           property="org.robotframework.selection.selectedActualFile"
+                           value="true">
+                     </test>
                   </with>
                </visibleWhen>
             </command>

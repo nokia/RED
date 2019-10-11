@@ -8,9 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -32,18 +34,26 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
@@ -106,10 +116,71 @@ class RobotOutlinePage extends ContentOutlinePage {
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
         getSite().getActionBars().getToolBarManager().add(new ExpandAllAction());
 
+        // createDeclarativeContextMenu();
+        createContextMenuProgramatically();
+    }
+
+    @SuppressWarnings("unused")
+    private void createDeclarativeContextMenu() {
+        // FIXME : this method should be used but there is an issue populating the menu under
+        // eclipse 4.13, see issue number RED-1326
         final MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
+        menuManager.setRemoveAllWhenShown(true);
         final Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
         getTreeViewer().getControl().setMenu(menu);
         getSite().registerContextMenu("RobotOutlinePage.popup", menuManager, getTreeViewer());
+        Viewers.boundViewerWithContext(getTreeViewer(), getSite(), CONTEXT_ID);
+    }
+
+    private void createContextMenuProgramatically() {
+        final Control control = getTreeViewer().getControl();
+
+        final MenuManager manager = new MenuManager();
+        manager.setRemoveAllWhenShown(true);
+        final Menu menu = manager.createContextMenu(control);
+        control.setMenu(menu);
+        manager.addMenuListener(m -> {
+            final IStructuredSelection selection = (IStructuredSelection) getTreeViewer().getSelection();
+            final boolean shouldEnableExecutionItems = !suiteModel.isFromLocalStorage()
+                    && Stream.of(selection.toArray())
+                            .allMatch(o -> o instanceof RobotCase || o instanceof RobotTask
+                                    || o instanceof RobotCasesSection || o instanceof RobotTasksSection);
+
+            final boolean shouldEnableOpenDeclarationItem = !suiteModel.isFromLocalStorage() && selection.size() == 1
+                    && Selections.getOptionalFirstElement(selection, RobotKeywordCall.class).isPresent();
+
+            if (shouldEnableExecutionItems) {
+                final CommandContributionItemParameter runContributionParameters = new CommandContributionItemParameter(
+                        getSite(), null,
+                        "org.robotframework.red.runSelectedTestsFromTable",
+                        CommandContributionItem.STYLE_PUSH);
+                final HashMap<String, Object> runParameters = new HashMap<>();
+                runParameters.put("org.robotframework.red.runSelectedTestsFromTable.mode", "RUN");
+                runContributionParameters.parameters = runParameters;
+                runContributionParameters.label = "Run";
+                runContributionParameters.icon = RedImages.getExecuteRunImage();
+                m.add(new CommandContributionItem(runContributionParameters));
+
+                final CommandContributionItemParameter debugContributionParameters = new CommandContributionItemParameter(
+                        getSite(), null, "org.robotframework.red.runSelectedTestsFromTable",
+                        CommandContributionItem.STYLE_PUSH);
+                final HashMap<String, Object> debugParameters = new HashMap<>();
+                debugParameters.put("org.robotframework.red.runSelectedTestsFromTable.mode", "DEBUG");
+                debugContributionParameters.parameters = debugParameters;
+                debugContributionParameters.label = "Debug";
+                debugContributionParameters.icon = RedImages.getExecuteDebugImage();
+                m.add(new CommandContributionItem(debugContributionParameters));
+            }
+
+            if (shouldEnableOpenDeclarationItem) {
+                final CommandContributionItemParameter declContributionParameters = new CommandContributionItemParameter(
+                        getSite(), null, "org.robotframework.ide.eclipse.openDeclaration",
+                        CommandContributionItem.STYLE_PUSH);
+                declContributionParameters.label = "Open Declaration";
+                m.add(new CommandContributionItem(declContributionParameters));
+            }
+        });
+        getSite().registerContextMenu("RobotOutlinePage.popup_programm", manager, getTreeViewer());
         Viewers.boundViewerWithContext(getTreeViewer(), getSite(), CONTEXT_ID);
     }
 
