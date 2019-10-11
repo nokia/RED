@@ -6,7 +6,7 @@
 <a href="RED/../../help/index.html">RED - Robot Editor User Guide</a> &gt; 
     <h2>What's new in RED Robot Editor</h2>
 <ul>
-<li><a href="RED/../../help/whats_new/0_8_14.html">RED 0.8.14</a>
+<li><a href="RED/../../help/whats_new/0_9_0.html">RED 0.9.0</a>
 </li>
 </ul>
 </body>

@@ -124,7 +124,7 @@
 </ul></li>
 <li><a href="RED/../../help/whats_new.html">What's new</a>
 <ul>
-<li><a href="RED/../../help/whats_new/0_8_14.html">RED 0.8.14</a>
+<li><a href="RED/../../help/whats_new/0_9_0.html">RED 0.9.0</a>
 </li>
 </ul></li>
 </ul>
