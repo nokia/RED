@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 // TODO: remove this class somewhere in future, see RED-1238
 class RedPreferencesFixer {
 
-    // there are modified preferences changed in 0.8.14
+    // there are modified preferences changed in 0.9.0
     static void updateModifiedPreferencesIfNeeded(final IPreferenceStore store) {
 
         boolean shouldSave = false;
