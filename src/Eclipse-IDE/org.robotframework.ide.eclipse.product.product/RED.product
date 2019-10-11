@@ -9,9 +9,6 @@
    <launcherArgs>
       <programArgs>--launcher.appendVmargs
       </programArgs>
-      <programArgsLin>--launcher.GTK_version
-2
-      </programArgsLin>
       <vmArgs>-Xms512m
          <argsX86>-Xmx1g</argsX86>
          <argsX86_64>-Xmx2g</argsX86_64>
@@ -26,7 +23,6 @@
       location="org.robotframework.ide.eclipse.product.plugin" />
    <launcher name="RED">
       <linux icon="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon32_32.xpm"/>
-      <solaris/>
       <win useIco="false">
          <bmp
             winSmallHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon16_32.bmp"
