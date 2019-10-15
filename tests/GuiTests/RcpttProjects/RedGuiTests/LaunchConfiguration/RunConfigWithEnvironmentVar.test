@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _5CoHQF0qEemotJV7wU5GWw
-Runtime-Version: 2.4.1.201903190000
-Save-Time: 10/7/19 12:47 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/15/19 4:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,6 +58,7 @@ get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
     | click
+wait-for-message-log -times 3 -delay 500 -last_line "RobotProject.TestFile.ad"
     
 //check if var is visible    
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.ad\n"
