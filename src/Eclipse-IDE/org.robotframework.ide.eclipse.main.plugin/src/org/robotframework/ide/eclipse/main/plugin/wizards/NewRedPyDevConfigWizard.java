@@ -144,7 +144,7 @@ public class NewRedPyDevConfigWizard extends Wizard implements INewWizard {
                     }
 
                     final int pipExitCode = runProcess(setupScript.getParentFile(), output, "-m", "pip", "install",
-                            "--upgrade", "--no-index",
+                            "--upgrade", "--no-index", "--user",
                             setupScript.getParentFile().toPath().relativize(archive[0].toPath()).toString());
                     if (pipExitCode != 0) {
                         throw new IllegalSignatureException("The pip ended with exit code " + pipExitCode);
@@ -154,7 +154,7 @@ public class NewRedPyDevConfigWizard extends Wizard implements INewWizard {
                 } catch (final Exception e) {
                     dialog.markDoNotClose();
                     SwtThread.syncExec(() -> ErrorDialog.openError(getShell(), "Installing problem",
-                            "Error occured when installing redpydevd module",
+                            "Error occurred when installing redpydevd module",
                             new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e)));
                     throw new InvocationTargetException(e);
 
@@ -171,7 +171,7 @@ public class NewRedPyDevConfigWizard extends Wizard implements INewWizard {
 
     private int runProcess(final File workingDirectory, final Consumer<String> linesConsumer,
             final String... arguments) throws IOException, InterruptedException {
-        
+
         final String executable = debuggingSessionSetup.createPythonExecutablePath();
         final List<String> command = newArrayList(executable);
         command.addAll(Arrays.asList(arguments));
@@ -198,7 +198,7 @@ public class NewRedPyDevConfigWizard extends Wizard implements INewWizard {
 
                 } catch (final Exception e) {
                     SwtThread.syncExec(() -> ErrorDialog.openError(getShell(), "Exporting problem",
-                            "Error occured when exporting redpydevd module",
+                            "Error occurred when exporting redpydevd module",
                             new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e)));
                     throw new InvocationTargetException(e);
 
