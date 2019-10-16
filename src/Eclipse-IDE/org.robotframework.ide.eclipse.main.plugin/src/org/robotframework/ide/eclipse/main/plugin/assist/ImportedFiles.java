@@ -34,6 +34,13 @@ class ImportedFiles {
                 file -> !file.equals(importingFile) && ASuiteFileDescriber.isResourceFile(file));
     }
 
+    static List<IFile> getVariableFiles() {
+        final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+        return getMatchingFiles(wsRoot, file -> ("py".equalsIgnoreCase(file.getFileExtension())
+                || "yml".equalsIgnoreCase(file.getFileExtension())
+                || "yaml".equalsIgnoreCase(file.getFileExtension())));
+    }
+
     private static List<IFile> getMatchingFiles(final IResource wsRoot, final Predicate<IFile> matcher) {
         final List<IFile> matchingFiles = new ArrayList<>();
         try {

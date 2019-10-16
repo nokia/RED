@@ -39,8 +39,10 @@ public class RedFileLocationProposalsTest {
         projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
         projectProvider.createFile("dir1/lib1.py");
         projectProvider.createFile("dir1/vars1.py");
+        projectProvider.createFile("dir1/vars1.yml");
         projectProvider.createFile("dir2/lib2.py");
         projectProvider.createFile("dir2/vars2.py");
+        projectProvider.createFile("dir2/vars2.yaml");
         projectProvider.createFile("dir2/res2.robot", "*** Variables ***");
         projectProvider.createFile("dir2/tests.robot", "*** Test Cases ***");
 
@@ -127,7 +129,8 @@ public class RedFileLocationProposalsTest {
                 suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/vars1.py", "dir2/vars2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/vars1.py", "dir1/vars1.yml",
+                "dir2/vars2.py", "dir2/vars2.yaml");
     }
 
     @Test
@@ -136,7 +139,8 @@ public class RedFileLocationProposalsTest {
                 suiteFile, prefixesMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1/");
-        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/lib1.py", "dir1/vars1.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir1/lib1.py", "dir1/vars1.py",
+                "dir1/vars1.yml");
     }
 
     @Test
@@ -146,7 +150,8 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
         assertThat(proposals).extracting(AssistProposal::getLabel)
-                .containsExactly("dir1/lib1.py", "dir1/vars1.py", "dir2/lib2.py", "dir2/vars2.py");
+                .containsExactly("dir1/lib1.py", "dir1/vars1.py", "dir1/vars1.yml", "dir2/lib2.py", "dir2/vars2.py",
+                        "dir2/vars2.yaml");
     }
 
     @Test
@@ -156,7 +161,8 @@ public class RedFileLocationProposalsTest {
 
         final Comparator<IFile> comparator = firstFileNameContaining("vars");
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("2", comparator);
-        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir2/vars2.py", "dir2/lib2.py");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("dir2/vars2.py", "dir2/vars2.yaml",
+                "dir2/lib2.py");
     }
 
     @Test

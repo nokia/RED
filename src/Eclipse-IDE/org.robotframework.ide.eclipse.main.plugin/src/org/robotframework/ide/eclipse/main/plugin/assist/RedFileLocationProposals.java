@@ -45,6 +45,7 @@ public abstract class RedFileLocationProposals {
             case RESOURCES:
                 return new RedResourceFileLocationsProposals(suiteFile, matcher);
             case VARIABLES:
+                return new RedVariableFileLocationsProposals(suiteFile, matcher);
             case LIBRARIES:
                 return new RedPythonFileLocationsProposals(suiteFile, matcher);
             default:
@@ -89,6 +90,13 @@ public abstract class RedFileLocationProposals {
 
         private RedResourceFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
             super(suiteFile, () -> ImportedFiles.getResourceFiles(suiteFile.getFile()), matcher);
+        }
+    }
+
+    private static class RedVariableFileLocationsProposals extends RedFileLocationProposals {
+
+        private RedVariableFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
+            super(suiteFile, () -> ImportedFiles.getVariableFiles(), matcher);
         }
     }
 }
