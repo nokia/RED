@@ -68,7 +68,7 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                 return;
             }
 
-            if (actual.getText().equals(action.getText()) && actual.getStartOffset() == action.getStartOffset()) {
+            if (action.getText().equals(actual.getText()) && action.getTypes().containsAll(actual.getTypes())) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
             } else {

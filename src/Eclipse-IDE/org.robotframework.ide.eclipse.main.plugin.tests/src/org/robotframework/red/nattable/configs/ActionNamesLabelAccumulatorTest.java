@@ -281,6 +281,22 @@ public class ActionNamesLabelAccumulatorTest {
         assertThat(labelsAt(call, 1)).isEmpty();
     }
 
+    @Test
+    public void labelsAreProperlyAdded_forCallsWithArgumentsSameAsAction() {
+        final RobotKeywordCall call = createModelWithArgumentsSameAsAction().findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+
+        assertThat(labelsAt(call, 0)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
+        assertThat(labelsAt(call, 1)).isEmpty();
+        assertThat(labelsAt(call, 2)).isEmpty();
+        assertThat(labelsAt(call, 3)).isEmpty();
+        assertThat(labelsAt(call, 4)).isEmpty();
+    }
+
     private static List<String> labelsAt(final RobotKeywordCall call, final int column) {
         return labelsAt(call, column, 0);
     }
@@ -359,6 +375,14 @@ public class ActionNamesLabelAccumulatorTest {
                 .appendLine("case")
                 .appendLine("  [Template]  NONE")
                 .appendLine("    Log  1")
+                .build();
+    }
+
+    private static RobotSuiteFile createModelWithArgumentsSameAsAction() {
+        return new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("    Call  abc  def  Call  Call")
                 .build();
     }
 }
