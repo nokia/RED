@@ -61,7 +61,7 @@ public class RfLintIntegrationServer {
             final Consumer<Exception> onServerException) {
         this.host = "127.0.0.1";
         this.port = findFreePort();
-        this.timeoutInMillis = (int) TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
+        this.timeoutInMillis = (int) timeUnit.toMillis(timeout);
         this.onServerException = onServerException;
     }
 

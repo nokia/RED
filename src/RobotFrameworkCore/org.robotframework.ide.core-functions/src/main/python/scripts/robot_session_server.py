@@ -467,15 +467,6 @@ def __extend_classpath(class_paths):
             cp_updater.add_file(class_path)
 
 
-def __shutdown_server_when_parent_process_becomes_unavailable(server):
-    # this causes the function to block on readline() call; parent process which
-    # started this script shouldn't write anything to the input, so this function will
-    # be blocked until parent process will be closed/killed; this will cause readline()
-    # to read EOF and hence proceed to server.shutdown() which will terminate whole script
-    sys.stdin.readline()
-    server.shutdown()
-
-
 def __get_script_path():
     is_py2 = sys.version_info < (3, 0, 0)
     is_tty = sys.stdout.isatty()
@@ -485,21 +476,14 @@ def __get_script_path():
     return encoded if is_py2 else str(encoded, 'utf-8')
 
 
-if __name__ == '__main__':
-    from threading import Thread
-    import socket
-
-    socket.setdefaulttimeout(10)
-
+def __create_server(address):
     try:
         from xmlrpc.server import SimpleXMLRPCServer
     except ImportError:
         from SimpleXMLRPCServer import SimpleXMLRPCServer
 
-    IP = '127.0.0.1'
-    PORT = int(sys.argv[1])
+    server = SimpleXMLRPCServer(address, allow_none=True)
 
-    server = SimpleXMLRPCServer((IP, PORT), allow_none=True)
     server.register_function(get_modules_search_paths, 'getModulesSearchPaths')
     server.register_function(get_module_path, 'getModulePath')
     server.register_function(get_classes_from_module, 'getClassesFromModule')
@@ -520,15 +504,44 @@ if __name__ == '__main__':
     server.register_function(create_html_doc, 'createHtmlDoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
+    return server
+
+
+def __start_red_checking_thread(server):
+    import socket
+    socket.setdefaulttimeout(10)
+
+    from threading import Thread
     red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args=(server,))
     red_checking_thread.setDaemon(True)
     red_checking_thread.start()
 
-    robot_ver = __get_robot_version()
+
+def __shutdown_server_when_parent_process_becomes_unavailable(server):
+    # this causes the function to block on readline() call; parent process which
+    # started this script shouldn't write anything to the input, so this function will
+    # be blocked until parent process will be closed/killed; this will cause readline()
+    # to read EOF and hence proceed to server.shutdown() which will terminate whole script
+    sys.stdin.readline()
+    server.shutdown()
+
+
+if __name__ == '__main__':
+
+    IP = '127.0.0.1'
+    PORT = int(sys.argv[1])
+    ROBOT_VERSION = __get_robot_version()
+    SCRIPT_PATH = __get_script_path()
+
+    # server has to be started after retrieving version from robot
+    server = __create_server((IP, PORT))
+
+    __start_red_checking_thread(server)
+
     print('# RED session server started @' + str(PORT))
     print('# python version: ' + sys.version)
-    print('# robot version: ' + (robot_ver if robot_ver else '<no robot installed>'))
-    print('# script path: ' + __get_script_path())
+    print('# robot version: ' + (ROBOT_VERSION if ROBOT_VERSION else '<no robot installed>'))
+    print('# script path: ' + SCRIPT_PATH)
     print('\n')
 
     server.serve_forever()

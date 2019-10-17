@@ -60,14 +60,19 @@ import com.google.common.io.Files;
  */
 abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
-    private static final int CONNECTION_TIMEOUT = 30;
-
     private final SuiteExecutor interpreterType;
+
+    private final int timeoutInMillis;
 
     private XmlRpcClient client;
 
     RobotCommandRpcExecutor(final SuiteExecutor interpreterType) {
+        this(interpreterType, 30, TimeUnit.SECONDS);
+    }
+
+    RobotCommandRpcExecutor(final SuiteExecutor interpreterType, final int timeout, final TimeUnit timeUnit) {
         this.interpreterType = interpreterType;
+        this.timeoutInMillis = (int) timeUnit.toMillis(timeout);
     }
 
     abstract void initialize();
@@ -78,20 +83,20 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     abstract void kill();
 
-    void connectToServer(final String url, final String interpreterPath) {
+    void connectToServer(final String serverUrl, final String interpreterPath) {
         try {
-            client = createClient(new URL(url));
+            client = createClient(new URL(serverUrl));
         } catch (final MalformedURLException e) {
             // can't happen here
         }
-        waitForConnectionToServer(CONNECTION_TIMEOUT, interpreterPath);
+        waitForConnectionToServer(interpreterPath);
     }
 
-    private static XmlRpcClient createClient(final URL serverUrl) {
+    private XmlRpcClient createClient(final URL serverUrl) {
         final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(serverUrl);
-        config.setConnectionTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
-        config.setReplyTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
+        config.setConnectionTimeout(timeoutInMillis);
+        config.setReplyTimeout(timeoutInMillis);
         final XmlRpcClient client = new XmlRpcClient();
         final XmlRpcSun15HttpTransportFactory transportFactory = new XmlRpcSun15HttpTransportFactory(client);
         transportFactory.setProxy(Proxy.NO_PROXY);
@@ -101,7 +106,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
         return client;
     }
 
-    private void waitForConnectionToServer(final int timeoutInSec, final String interpreterPath) {
+    private void waitForConnectionToServer(final String interpreterPath) {
         final long start = System.currentTimeMillis();
         while (true) {
             try {
@@ -114,7 +119,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     // we'll try once again
                 }
             }
-            if (System.currentTimeMillis() - start > (timeoutInSec * 1000)) {
+            if (System.currentTimeMillis() - start > timeoutInMillis) {
                 kill();
                 break;
             }
@@ -474,8 +479,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                         e);
             }
 
-            final String url = "http://127.0.0.1:" + port;
-            connectToServer(url, interpreterPath);
+            connectToServer("http://127.0.0.1:" + port, interpreterPath);
 
             if (!isAlive()) {
                 throw new XmlRpcServerException(
