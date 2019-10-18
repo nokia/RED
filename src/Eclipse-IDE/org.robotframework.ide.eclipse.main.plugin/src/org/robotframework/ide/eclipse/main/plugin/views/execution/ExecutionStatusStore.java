@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
-import static java.util.stream.Collectors.toList;
-
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeN
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Streams;
 
 public class ExecutionStatusStore implements IDisposable {
 
@@ -36,12 +36,12 @@ public class ExecutionStatusStore implements IDisposable {
     private boolean isDirty = false;
 
     private ExecutionTreeNode root;
-    private ExecutionTreeNode current;
+
+    private ExecutionTreeNode currentNode;
 
     private int currentTest;
     private int passedTests;
     private int failedTests;
-    private int totalTests;
 
     private URI outputFile;
 
@@ -58,12 +58,12 @@ public class ExecutionStatusStore implements IDisposable {
 
     @VisibleForTesting
     void setCurrent(final ExecutionTreeNode current) {
-        this.current = current;
+        this.currentNode = current;
     }
 
     @VisibleForTesting
     ExecutionTreeNode getCurrent() {
-        return current;
+        return currentNode;
     }
 
     public URI getOutputFilePath() {
@@ -90,23 +90,22 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     public int getNonExecutedTests() {
-        return totalTests - (passedTests + failedTests);
+        return getTotalTests() - (passedTests + failedTests);
     }
 
     public int getTotalTests() {
-        return totalTests;
+        return root == null ? 0 : root.getNumberOfTests();
     }
 
     @Override
     public void dispose() {
         outputFile = null;
         currentTest = 0;
-        totalTests = 0;
         passedTests = 0;
         failedTests = 0;
 
         root = null;
-        current = null;
+        currentNode = null;
 
         isDisposed = true;
     }
@@ -120,66 +119,76 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     protected void suiteStarted(final String suiteName, final URI suiteFilePath, final ExecutionMode executionMode,
-            final int totalTests, final List<String> childSuites, final List<String> childTests,
-            final List<String> childPaths) {
+            final int totalTestsInSuite, final List<String> childTests, final List<String> childSuites,
+            final List<Optional<URI>> childSuitesPaths) {
         Preconditions.checkArgument(isOpen);
 
-        if (root == null) {
-            this.totalTests = totalTests;
+        final ExecutionTreeNode currentSuiteNode;
+        if (currentNode == null) {
             this.mode = executionMode;
-            root = new ExecutionTreeNode(null, ElementKind.SUITE, suiteName);
-            current = root;
+            this.root = ExecutionTreeNode.newSuiteNode(null, suiteName, suiteFilePath);
+
+            currentSuiteNode = root;
+        } else {
+            currentSuiteNode = currentNode.getSuiteOrCreateIfMissing(suiteName, totalTestsInSuite);
         }
 
-        current.setStatus(Status.RUNNING);
-        current.setPath(suiteFilePath);
-        current.setChildrenPaths(childPaths);
-        current.addChildren(childSuites.stream()
-                .map(childSuite -> new ExecutionTreeNode(current, ElementKind.SUITE, childSuite))
-                .collect(toList()));
-        current.addChildren(childTests.stream()
-                .map(childTest -> new ExecutionTreeNode(current, ElementKind.TEST, childTest, suiteFilePath,
-                        childPaths))
-                .collect(toList()));
+        currentSuiteNode.setStatus(Status.RUNNING);
+        currentSuiteNode.setPath(suiteFilePath);
+        currentSuiteNode.setNumberOfTests(totalTestsInSuite);
+        Streams.zip(childSuites.stream(), childSuitesPaths.stream(), (childSuite, childPath) -> ExecutionTreeNode
+                .newSuiteNode(currentSuiteNode, childSuite, childPath.orElse(null)))
+                .forEach(currentSuiteNode::addChildren);
+        childTests.stream()
+                .map(childTest -> ExecutionTreeNode.newTestNode(currentSuiteNode, childTest, suiteFilePath))
+                .forEach(currentSuiteNode::addChildren);
 
-        current = current.getChildren().isEmpty() ? current : current.getChildren().get(0);
+        this.currentNode = currentSuiteNode;
+
         isDirty = true;
     }
 
-    protected void testStarted() {
+    protected void testStarted(final String testName) {
         Preconditions.checkArgument(isOpen);
 
-        current.setStatus(Status.RUNNING);
+        final ExecutionTreeNode currentTestNode = currentNode.getTestOrCreateIfMissing(testName);
+        currentTestNode.setStatus(Status.RUNNING);
+
+        this.currentNode = currentTestNode;
+
         currentTest++;
         isDirty = true;
     }
 
-    protected void elementEnded(final int elapsedTime, final Status status, final String errorMessage) {
+    protected void testEnded(final int elapsedTime, final Status status, final String errorMessage) {
         Preconditions.checkArgument(isOpen);
 
-        current.setElapsedTime(elapsedTime);
-        current.setStatus(status);
-        current.setMessage(errorMessage);
+        currentNode.setElapsedTime(elapsedTime);
+        currentNode.setStatus(status);
+        currentNode.setMessage(errorMessage);
 
-        if (current.getKind() == ElementKind.TEST) {
-            if (status == Status.PASS) {
-                passedTests++;
-            } else if (status == Status.FAIL) {
-                failedTests++;
-            }
+        this.currentNode = currentNode.getParent();
+
+        if (status == Status.PASS) {
+            passedTests++;
+        } else if (status == Status.FAIL) {
+            failedTests++;
         }
 
-        final ExecutionTreeNode parent = current.getParent();
-        if (parent == null) {
-            current = null;
-        } else {
-            final int index = parent.getChildren().indexOf(current);
-            if (index + 1 >= parent.getChildren().size()) {
-                current = parent;
-            } else {
-                current = parent.getChildren().get(index + 1);
-            }
-        }
+        isDirty = true;
+    }
+
+    protected void suiteEnded(final int elapsedTime, final Status status, final String errorMessage) {
+        Preconditions.checkArgument(isOpen);
+
+        currentNode.setElapsedTime(elapsedTime);
+        currentNode.setStatus(status);
+        currentNode.setMessage(errorMessage);
+
+        currentNode.updateNumberOfTestsBalanceOnSuiteEnd();
+
+        this.currentNode = currentNode.getParent();
+
         isDirty = true;
     }
 
@@ -231,24 +240,22 @@ public class ExecutionStatusStore implements IDisposable {
             for (final ExecutionTreeNode c : current.getChildren()) {
                 collectFailedTestsPaths(c, failedTests, newPath);
             }
-        } else {
-            if (current.getStatus().equals(Optional.of(Status.FAIL))) {
-                newPath = newPath.substring(newPath.indexOf(".") + 1);
-                failedTests.add(newPath);
-            }
+        } else if (current.isFailed()) {
+            newPath = newPath.substring(newPath.indexOf(".") + 1);
+            failedTests.add(newPath);
         }
     }
-
-    public final Map<String, List<String>> getNonExecutedSuitePaths(final IProject project,
+    
+    public Map<String, List<String>> getNonExecutedSuitePaths(final IProject project,
             final List<String> linkedResources) {
-        final List<ExecutionTreeNode> nodes = this.getExecutionTree().getChildren();
-        final boolean testsOnly = areOnlyTestsToRerun(nodes);
+        final boolean testsOnly = onlyTestsRequiresRerun(getExecutionTree());
+
         final Map<String, List<String>> nonExecutedSuitePaths = new HashMap<>();
         final List<String> alreadyUsedPaths = new ArrayList<>();
-        for (final ExecutionTreeNode node : nodes) {
-            if (isNonExecuted(node)) {
-                final List<String> nonExecutedSuitesOrTests = getNonChildren(node, testsOnly, project, linkedResources,
-                        alreadyUsedPaths);
+        for (final ExecutionTreeNode node : getExecutionTree().getChildren()) {
+            if (!node.isExecuted()) {
+                final List<String> nonExecutedSuitesOrTests = getNonExecutedChildren(node, testsOnly, project,
+                        linkedResources, alreadyUsedPaths);
 
                 if (!nonExecutedSuitesOrTests.isEmpty()) {
                     if (testsOnly) {
@@ -277,7 +284,7 @@ public class ExecutionStatusStore implements IDisposable {
         return nonExecutedSuitePaths;
     }
 
-    private final List<String> getNonChildren(final ExecutionTreeNode node, final boolean testsOnly,
+    private List<String> getNonExecutedChildren(final ExecutionTreeNode node, final boolean testsOnly,
             final IProject project, final List<String> linkedResources, final List<String> alreadyUsedPaths) {
         final List<String> failedTestsOrSuites = new ArrayList<>();
         if (testsOnly) {
@@ -291,7 +298,7 @@ public class ExecutionStatusStore implements IDisposable {
     private void collectNonExecutedTestsPaths(final ExecutionTreeNode node, final List<String> failedTests,
             final String currentPath) {
 
-        if (isNonExecuted(node)) {
+        if (!node.isExecuted()) {
             String newPath = currentPath.isEmpty() ? node.getName() : currentPath + "." + node.getName();
             if (node.getKind() == ElementKind.SUITE) {
                 for (final ExecutionTreeNode n : node.getChildren()) {
@@ -307,21 +314,18 @@ public class ExecutionStatusStore implements IDisposable {
     private void collectNonExecutedSuitesPaths(final ExecutionTreeNode node, final List<String> failedSuites,
             final IProject project, final List<String> linkedResources, final List<String> alreadyUsedPaths) {
 
-        if (isNonExecuted(node)) {
+        if (!node.isExecuted()) {
             if (node.getKind() == ElementKind.SUITE) {
-                if (node.getChildren().size() != 0) {
+                if (!node.getChildren().isEmpty()) {
                     for (final ExecutionTreeNode n : node.getChildren()) {
                         collectNonExecutedSuitesPaths(n, failedSuites, project, linkedResources, alreadyUsedPaths);
                     }
                 } else {
-                    final String path = constructProjectRelativePath(node, project, linkedResources,
-                            alreadyUsedPaths);
-                    failedSuites.add(path);
+                    failedSuites.add(constructProjectRelativePath(node, project, linkedResources, alreadyUsedPaths));
                 }
             } else {
-                final String path = constructProjectRelativePath(node.getParent(), project, linkedResources,
-                        alreadyUsedPaths);
-                failedSuites.add(path);
+                failedSuites.add(
+                        constructProjectRelativePath(node.getParent(), project, linkedResources, alreadyUsedPaths));
             }
         }
     }
@@ -331,15 +335,13 @@ public class ExecutionStatusStore implements IDisposable {
         final String nodeName = node.getName();
         final ExecutionTreeNode parent = node.getParent();
         final List<ExecutionTreeNode> suites = parent.getChildren();
-        final List<String> childPaths = parent.getChildrenPaths();
 
         final IWorkspaceRoot root = project.getWorkspace().getRoot();
         final RedWorkspace workspace = new RedWorkspace(root);
 
         try {
             try {
-                final Optional<String> pathFromChildren = getPathFromChildrenPaths(nodeName, project, suites,
-                        childPaths);
+                final Optional<String> pathFromChildren = getPathFromChildrenPaths(nodeName, project, suites);
                 if (pathFromChildren.isPresent()) {
                     alreadyUsedPaths.add("file:///" + pathFromChildren.get());
                     return pathFromChildren.get();
@@ -355,16 +357,14 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     private static Optional<String> getPathFromChildrenPaths(final String nodeName, final IProject project,
-            final List<ExecutionTreeNode> suites, final List<String> childPaths) {
+            final List<ExecutionTreeNode> suites) {
         for (final ExecutionTreeNode suite : suites) {
-            if (nodeName.equals(suite.getName())) {
-                if (!childPaths.isEmpty()) {
-                    final Path childPath = Paths.get(childPaths.get(suites.indexOf(suite)));
-                    final Path projectPath = Paths.get(project.getLocation().toPortableString());
-                    final Path relativePath = projectPath.relativize(childPath);
-                    return Optional.of(
-                            org.eclipse.core.runtime.Path.fromOSString(relativePath.toString()).toPortableString());
-                }
+            if (nodeName.equals(suite.getName()) && suite.getPath() != null) {
+                final Path childPath = new File(suite.getPath()).toPath();
+                final Path projectPath = Paths.get(project.getLocation().toPortableString());
+                final Path relativePath = projectPath.relativize(childPath);
+                return Optional
+                        .of(org.eclipse.core.runtime.Path.fromOSString(relativePath.toString()).toPortableString());
             }
         }
         return Optional.empty();
@@ -399,32 +399,18 @@ public class ExecutionStatusStore implements IDisposable {
         return nodeName;
     }
 
-    private static boolean isNonExecuted(final ExecutionTreeNode node) {
-        return !node.getStatus().isPresent() || node.getStatus().equals(Optional.of(Status.RUNNING));
-    }
-
-    private static boolean areOnlyTestsToRerun(final List<ExecutionTreeNode> nodes) {
-        final List<String> suites = new ArrayList<>();
-        for (final ExecutionTreeNode node : nodes) {
-            collectSuitesNamesIfNonExecuted(node, suites);
-            if (!suites.isEmpty()) {
+    private static boolean onlyTestsRequiresRerun(final ExecutionTreeNode node) {
+        if (node.getKind() == ElementKind.SUITE && !node.isExecuted()) {
+            if (node.getChildren().isEmpty()) {
                 return false;
-            }
-        }
-        return true;
-    }
-
-    private static void collectSuitesNamesIfNonExecuted(final ExecutionTreeNode node, final List<String> suites) {
-        if (isNonExecuted(node)) {
-            if (node.getKind() == ElementKind.SUITE) {
-                if (node.getChildren().size() == 0) {
-                    suites.add(node.getName());
-                } else {
-                    for (final ExecutionTreeNode n : node.getChildren()) {
-                        collectSuitesNamesIfNonExecuted(n, suites);
+            } else {
+                for (final ExecutionTreeNode n : node.getChildren()) {
+                    if (!onlyTestsRequiresRerun(n)) {
+                        return false;
                     }
                 }
             }
         }
+        return true;
     }
 }

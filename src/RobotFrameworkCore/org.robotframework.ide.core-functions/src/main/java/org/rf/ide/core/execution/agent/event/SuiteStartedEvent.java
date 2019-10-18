@@ -5,11 +5,14 @@
  */
 package org.rf.ide.core.execution.agent.event;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
 
@@ -22,9 +25,9 @@ public final class SuiteStartedEvent {
 
         final URI suiteFilePath = Events.toFileUri((String) attributes.get("source"));
         final Boolean isDir = (Boolean) attributes.get("is_dir");
-        final List<?> childSuites = (List<?>) attributes.get("suites");
         final List<?> childTests = (List<?>) attributes.get("tests");
         final Integer totalTests = (Integer) attributes.get("totaltests");
+        final List<?> childSuites = (List<?>) attributes.get("suites");
         final List<?> childPaths = (List<?>) attributes.get("child_paths");
         ExecutionMode mode;
         if (attributes.get("is_rpa") instanceof Boolean) {
@@ -38,14 +41,20 @@ public final class SuiteStartedEvent {
             throw new IllegalArgumentException("Suite started event should have directory/file flag, children "
                     + "suites and tests as well as number of total tests");
         }
+        final List<Optional<URI>> paths;
         if (!childPaths.isEmpty()) {
-            return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
-                    Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests),
-                    Events.ensureListOfStrings(childPaths));
+            paths = Events.ensureListOfStrings(childPaths)
+                    .stream()
+                    .map(Optional::ofNullable)
+                    .map(o -> o.map(Events::toFileUri))
+                    .collect(toList());
         } else {
-            return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
-                    Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests), new ArrayList<>());
+            paths = Stream.generate(() -> Optional.<URI> empty())
+                    .limit(childSuites.size())
+                    .collect(toList());
         }
+        return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
+                Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests), paths);
     }
 
 
@@ -63,11 +72,11 @@ public final class SuiteStartedEvent {
 
     private final List<String> childTests;
 
-    private final List<String> childPaths;
+    private final List<Optional<URI>> childPaths;
 
     public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final ExecutionMode mode,
             final int totalTests, final List<String> childSuites, final List<String> childTests,
-            final List<String> childPaths) {
+            final List<Optional<URI>> childPaths) {
         this.name = name;
         this.suiteFilePath = suiteFilePath;
         this.isDir = isDir;
@@ -106,7 +115,7 @@ public final class SuiteStartedEvent {
         return ImmutableList.copyOf(childTests);
     }
 
-    public List<String> getChildrenPaths() {
+    public List<Optional<URI>> getChildrenPaths() {
         return childPaths;
     }
 

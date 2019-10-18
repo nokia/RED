@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.spy;
@@ -27,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler.E4RerunFailedHandler;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 import org.robotframework.red.junit.RunConfigurationProvider;
@@ -57,7 +56,7 @@ public class RerunFailedHandlerTest {
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
 
         assertThatExceptionOfType(CoreException.class)
-                .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
+                .isThrownBy(() -> E4RerunFailedHandler.getConfig(launch))
                 .withMessage("Launch configuration does not exist")
                 .withNoCause();
     }
@@ -70,7 +69,7 @@ public class RerunFailedHandlerTest {
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
 
         assertThatExceptionOfType(CoreException.class)
-                .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
+                .isThrownBy(() -> E4RerunFailedHandler.getConfig(launch))
                 .withMessage("Launch configuration does not exist")
                 .withNoCause();
     }
@@ -84,11 +83,11 @@ public class RerunFailedHandlerTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(projectProvider.getProject().getName());
 
-        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
-        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
-        suite.addChildren(newArrayList(test));
-        root.addChildren(newArrayList(suite));
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", null);
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", null);
+        suite.addChildren(test);
+        root.addChildren(suite);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
@@ -96,7 +95,7 @@ public class RerunFailedHandlerTest {
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
         assertThatExceptionOfType(CoreException.class)
-                .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
+                .isThrownBy(() -> E4RerunFailedHandler.getConfig(launch))
                 .withMessage("Failed tests do not exist")
                 .withNoCause();
     }
@@ -115,7 +114,7 @@ public class RerunFailedHandlerTest {
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
-        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+        assertThat(E4RerunFailedHandler.getConfig(launch).getAttributes())
                 .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
     }
 
@@ -135,7 +134,7 @@ public class RerunFailedHandlerTest {
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
-        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+        assertThat(E4RerunFailedHandler.getConfig(launch).getAttributes())
                 .containsEntry("Test suites", ImmutableMap.of("dir/dir/suite.robot", "test"));
     }
 
@@ -156,7 +155,7 @@ public class RerunFailedHandlerTest {
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
-        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+        assertThat(E4RerunFailedHandler.getConfig(launch).getAttributes())
                 .containsEntry("Test suites", ImmutableMap.of("linkedSuite.robot", "test"));
     }
 
@@ -178,7 +177,7 @@ public class RerunFailedHandlerTest {
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
 
-        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+        assertThat(E4RerunFailedHandler.getConfig(launch).getAttributes())
                 .containsEntry("Test suites", ImmutableMap.of("dir/linkedSuite.robot", "test"));
     }
 
@@ -197,7 +196,7 @@ public class RerunFailedHandlerTest {
         final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
-        assertThat(RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch).getAttributes())
+        assertThat(E4RerunFailedHandler.getConfig(launch).getAttributes())
                 .containsEntry("Robot arguments", "-a -b -c")
                 .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
     }
@@ -207,14 +206,14 @@ public class RerunFailedHandlerTest {
     }
 
     private ExecutionStatusStore createExecutionStatusStore(final String suitePath) {
-        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
-        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", null);
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", null);
         test.setStatus(Status.FAIL);
         suite.setPath(
                 URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + suitePath));
-        suite.addChildren(newArrayList(test));
-        root.addChildren(newArrayList(suite));
+        suite.addChildren(test);
+        root.addChildren(suite);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);

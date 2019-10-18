@@ -74,11 +74,11 @@ public class ExecutionViewTest {
         launch1.getExecutionData(ExecutionStatusStore.class, () -> store1);
         store1.suiteStarted("suite", new URI("file:///suite"), ExecutionMode.TESTS, 2, new ArrayList<>(),
                 newArrayList("t1", "t2"), new ArrayList<>());
-        store1.testStarted();
-        store1.elementEnded(1000, Status.PASS, "");
-        store1.testStarted();
-        store1.elementEnded(2000, Status.FAIL, "error");
-        store1.elementEnded(3000, Status.FAIL, "");
+        store1.testStarted("t1");
+        store1.testEnded(1000, Status.PASS, "");
+        store1.testStarted("t2");
+        store1.testEnded(2000, Status.FAIL, "error");
+        store1.suiteEnded(3000, Status.FAIL, "");
         executionService.testExecutionEnded(launch1);
 
         final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
@@ -87,11 +87,11 @@ public class ExecutionViewTest {
         launch2.getExecutionData(ExecutionStatusStore.class, () -> store2);
         store2.suiteStarted("suite2", new URI("file:///suite2"), ExecutionMode.TESTS, 2, new ArrayList<>(),
                 newArrayList("tx", "ty"), new ArrayList<>());
-        store2.testStarted();
-        store2.elementEnded(1000, Status.PASS, "");
-        store2.testStarted();
-        store2.elementEnded(2000, Status.PASS, "");
-        store2.elementEnded(3000, Status.PASS, "");
+        store2.testStarted("tx");
+        store2.testEnded(1000, Status.PASS, "");
+        store2.testStarted("ty");
+        store2.testEnded(2000, Status.PASS, "");
+        store2.suiteEnded(3000, Status.PASS, "");
         executionService.testExecutionEnded(launch2);
 
         final Shell shell = shellProvider.getShell();

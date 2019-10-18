@@ -87,7 +87,7 @@ public class ExecutionStatusTrackerTest {
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
         tracker.handleSuiteEnded(new SuiteEndedEvent("suite", 100, Status.PASS, ""));
 
-        verify(store).elementEnded(100, Status.PASS, "");
+        verify(store).suiteEnded(100, Status.PASS, "");
         verifyNoMoreInteractions(store);
     }
 
@@ -101,7 +101,7 @@ public class ExecutionStatusTrackerTest {
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
         tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest", null));
 
-        verify(store).testStarted();
+        verify(store).testStarted("test");
         verifyNoMoreInteractions(store);
     }
 
@@ -115,7 +115,7 @@ public class ExecutionStatusTrackerTest {
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
         tracker.handleTestEnded(new TestEndedEvent("test", "teeeeest", 100, Status.FAIL, "error"));
 
-        verify(store).elementEnded(100, Status.FAIL, "error");
+        verify(store).testEnded(100, Status.FAIL, "error");
         verifyNoMoreInteractions(store);
     }
 

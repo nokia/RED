@@ -32,25 +32,25 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     public void handleSuiteStarted(final SuiteStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
                 store -> store.suiteStarted(event.getName(), event.getPath(), event.getMode(), event.getNumberOfTests(),
-                        event.getChildrenSuites(), event.getChildrenTests(), event.getChildrenPaths()));
+                        event.getChildrenTests(), event.getChildrenSuites(), event.getChildrenPaths()));
     }
 
     @Override
     public void handleSuiteEnded(final SuiteEndedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.elementEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
+                store -> store.suiteEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
     }
 
     @Override
     public void handleTestStarted(final TestStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.testStarted());
+                store -> store.testStarted(event.getName()));
     }
 
     @Override
     public void handleTestEnded(final TestEndedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.elementEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
+                store -> store.testEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
     }
 
     @Override

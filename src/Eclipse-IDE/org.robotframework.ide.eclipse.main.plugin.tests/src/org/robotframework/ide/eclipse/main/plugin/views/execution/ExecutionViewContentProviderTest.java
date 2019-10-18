@@ -103,8 +103,8 @@ public class ExecutionViewContentProviderTest {
 
     private ExecutionTreeNode node(final ExecutionTreeNode parent, final Status status,
             final ExecutionTreeNode... children) {
-        final ExecutionTreeNode node = new ExecutionTreeNode(parent, null, "name");
-        node.addChildren(newArrayList(children));
+        final ExecutionTreeNode node = ExecutionTreeNode.newSuiteNode(parent, "name", null);
+        node.addChildren(children);
         node.setStatus(status);
         return node;
     }

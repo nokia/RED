@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 public class ExecutionViewNodesPropertyTesterTest {
 
@@ -26,14 +25,14 @@ public class ExecutionViewNodesPropertyTesterTest {
 
     @Test
     public void falseIsReturned_whenExpectedValueIsABoolean() {
-        final ExecutionTreeNode node = new ExecutionTreeNode(null, ElementKind.SUITE, "name");
+        final ExecutionTreeNode node = ExecutionTreeNode.newSuiteNode(null, "name", null);
 
         assertThat(tester.test(node, ExecutionViewNodesPropertyTester.KIND, null, true)).isFalse();
     }
 
     @Test
     public void falseIsReturnedForUnknownProperty() {
-        final ExecutionTreeNode node = new ExecutionTreeNode(null, ElementKind.SUITE, "name");
+        final ExecutionTreeNode node = ExecutionTreeNode.newSuiteNode(null, "name", null);
 
         assertThat(tester.test(node, "unknown_property", null, "kind")).isFalse();
         assertThat(tester.test(node, "unknown_property", null, "kind")).isFalse();
@@ -41,8 +40,8 @@ public class ExecutionViewNodesPropertyTesterTest {
 
     @Test
     public void testNodeHasGivenKindProperty() {
-        final ExecutionTreeNode suiteNode = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode testNode = new ExecutionTreeNode(null, ElementKind.TEST, "test");
+        final ExecutionTreeNode suiteNode = ExecutionTreeNode.newSuiteNode(null, "suite", null);
+        final ExecutionTreeNode testNode = ExecutionTreeNode.newTestNode(null, "test", null);
 
         assertThat(nodeHasGivenKind(suiteNode, "test")).isFalse();
         assertThat(nodeHasGivenKind(suiteNode, "suite")).isTrue();

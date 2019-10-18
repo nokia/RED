@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class SuiteStartedEventTest {
         assertThat(event.getNumberOfTests()).isEqualTo(42);
         assertThat(event.getChildrenSuites()).containsExactly("s1", "s2");
         assertThat(event.getChildrenTests()).containsExactly("t1", "t2");
-        assertThat(event.getChildrenPaths()).containsExactly("/suite/child");
+        assertThat(event.getChildrenPaths()).containsExactly(Optional.of(URI.create("file:///suite/child")));
     }
 
     @Test

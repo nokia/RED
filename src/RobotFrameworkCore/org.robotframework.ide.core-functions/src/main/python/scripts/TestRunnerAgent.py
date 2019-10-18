@@ -124,7 +124,6 @@ def _label_with_types(data):
 def _extract_source_path(source):
     if 'file:' in source:
         source = source[source.index('file:') + 5:]
-
     if '.jar!' in source.lower():
         source = _modify_source_path_for_jar_files(source, '.jar!')
     elif '.jar/' in source.lower():
@@ -149,15 +148,18 @@ def _collect_children_paths(suites, source):
     child_paths = []
     VALID_EXTENSIONS = tuple(READERS)
     if os.path.isdir(source):
+        added = False
         for suite in suites:
             for file in os.listdir(source):
                 file_name = os.path.splitext(file)[0]
                 file_extension = os.path.splitext(file)[1][1:]
-                if (file_extension in VALID_EXTENSIONS) or ("." not in file):
-                    formated_file_name = _format_file_name(file_name)
-                    if suite == formated_file_name:
+                if file_extension in VALID_EXTENSIONS or '.' not in file:
+                    if suite == _format_file_name(file_name):
                         child_paths.append(os.path.os.path.join(source, file))
-            
+                        added = True
+                        break
+            if not added:
+                child_paths.append(None)
     return child_paths
     
 def _format_file_name(name):
@@ -193,9 +195,9 @@ class AgentEventMessage:
     END_SUITE = 'end_suite'
     START_TEST = 'start_test'
     END_TEST = 'end_test'
-    PRE_START_KEYWORD = "pre_start_keyword"
+    PRE_START_KEYWORD = 'pre_start_keyword'
     START_KEYWORD = 'start_keyword'
-    PRE_END_KEYWORD = "pre_end_keyword"
+    PRE_END_KEYWORD = 'pre_end_keyword'
     END_KEYWORD = 'end_keyword'
     SHOULD_CONTINUE = 'should_continue'
     CONDITION_RESULT = 'condition_result'
@@ -294,9 +296,9 @@ class TestRunnerAgent:
         # this is a workaround from https://bugs.python.org/issue2128
         from ctypes import WINFUNCTYPE, windll, POINTER, byref, c_int
         from ctypes.wintypes import LPWSTR, LPCWSTR
-        GetCommandLineW = WINFUNCTYPE(LPWSTR)(("GetCommandLineW", windll.kernel32))
+        GetCommandLineW = WINFUNCTYPE(LPWSTR)(('GetCommandLineW', windll.kernel32))
         CommandLineToArgvW = WINFUNCTYPE(POINTER(LPWSTR), LPCWSTR, POINTER(c_int)) \
-                                (("CommandLineToArgvW", windll.shell32))
+                                (('CommandLineToArgvW', windll.shell32))
         argc = c_int(0)
         argv_unicode = CommandLineToArgvW(GetCommandLineW(), byref(argc))
         return [argv_unicode[i].encode('utf-8') for i in range(0, argc.value)]
@@ -641,7 +643,7 @@ class TestRunnerAgent:
         try:
             import org.python.core.imp as jimp
             if not source:
-                res = name + ".class"
+                res = name + '.class'
                 return jimp.getSyspathJavaLoader().getResource(res).getPath()
             elif '__pyclasspath__' in source:
                 res = source[source.index('__pyclasspath__') + 16:]

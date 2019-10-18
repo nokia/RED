@@ -27,21 +27,21 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler.E4ShowFailedOnlyHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler.E4RerunFailedHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class RerunFailedHandler extends DIParameterizedHandler<E4ShowFailedOnlyHandler> {
+public class RerunFailedHandler extends DIParameterizedHandler<E4RerunFailedHandler> {
 
     public RerunFailedHandler() {
-        super(E4ShowFailedOnlyHandler.class);
+        super(E4RerunFailedHandler.class);
     }
 
-    public static class E4ShowFailedOnlyHandler {
+    public static class E4RerunFailedHandler {
 
         @Execute
-        public void toggleShowFailedOnly(@Named(ISources.ACTIVE_PART_NAME) final ExecutionViewWrapper view) {
+        public void rerunFailed(@Named(ISources.ACTIVE_PART_NAME) final ExecutionViewWrapper view) {
             view.getComponent().getCurrentlyShownLaunch().ifPresent(launch -> {
                 final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 

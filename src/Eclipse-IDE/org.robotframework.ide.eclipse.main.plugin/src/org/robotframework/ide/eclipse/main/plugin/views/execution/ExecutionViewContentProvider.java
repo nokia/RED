@@ -6,9 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.red.viewers.TreeContentProvider;
 
 public class ExecutionViewContentProvider extends TreeContentProvider {
@@ -30,7 +28,7 @@ public class ExecutionViewContentProvider extends TreeContentProvider {
 
         if (isFailedFilterEnabled) {
             return children.stream()
-                    .filter(child -> child.getStatus().equals(Optional.of(Status.FAIL)))
+                    .filter(child -> child.isFailed())
                     .toArray(ExecutionTreeNode[]::new);
         } else {
             return children.toArray(new ExecutionTreeNode[0]);

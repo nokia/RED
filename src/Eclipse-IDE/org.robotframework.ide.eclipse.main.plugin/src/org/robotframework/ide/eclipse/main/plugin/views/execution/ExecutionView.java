@@ -38,7 +38,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.services.IEvaluationService;
-import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -299,8 +298,7 @@ public class ExecutionView {
     }
 
     private void collectElementsToExpand(final List<TreePath> elementsToExpand, final ExecutionTreeNode node) {
-        final Status status = node.getStatus().orElse(null);
-        if (status == Status.FAIL || status == Status.RUNNING) {
+        if (node.isFailed() || node.isRunning()) {
             elementsToExpand.add(new TreePath(getPath(node).toArray()));
             for (final ExecutionTreeNode child : node.getChildren()) {
                 collectElementsToExpand(elementsToExpand, child);

@@ -277,7 +277,8 @@ public class RobotAgentEventDispatcherTest {
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false,
-                ExecutionMode.TESTS, 7, newArrayList("s1", "s2"), newArrayList("t1", "t2"), new ArrayList<>()));
+                ExecutionMode.TESTS, 7, newArrayList("s1", "s2"), newArrayList("t1", "t2"),
+                newArrayList(Optional.<URI> empty(), Optional.<URI> empty())));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

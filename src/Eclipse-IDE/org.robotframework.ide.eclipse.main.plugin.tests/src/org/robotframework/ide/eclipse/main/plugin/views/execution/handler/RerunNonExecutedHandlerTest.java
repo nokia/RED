@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.spy;
@@ -28,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 import org.robotframework.red.junit.RunConfigurationProvider;
@@ -77,7 +75,7 @@ public class RerunNonExecutedHandlerTest {
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
 
         assertThatExceptionOfType(CoreException.class)
-                .isThrownBy(() -> RerunFailedHandler.E4ShowFailedOnlyHandler.getConfig(launch))
+                .isThrownBy(() -> RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch))
                 .withMessage("Launch configuration does not exist")
                 .withNoCause();
     }
@@ -91,12 +89,12 @@ public class RerunNonExecutedHandlerTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(projectProvider.getProject().getName());
 
-        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
-        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", null);
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", null);
         suite.setStatus(Status.PASS);
-        suite.addChildren(newArrayList(test));
-        root.addChildren(newArrayList(suite));
+        suite.addChildren(test);
+        root.addChildren(suite);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
@@ -210,13 +208,12 @@ public class RerunNonExecutedHandlerTest {
     }
 
     private ExecutionStatusStore createExecutionStatusStore(final String suitePath) {
-        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "root");
-        final ExecutionTreeNode suite = new ExecutionTreeNode(root, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode test = new ExecutionTreeNode(suite, ElementKind.TEST, "test");
-        suite.setPath(
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + suitePath));
-        suite.addChildren(newArrayList(test));
-        root.addChildren(newArrayList(suite));
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite",
+                URI.create("file:///" + projectProvider.getProject().getLocation().toPortableString() + suitePath));
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
+        suite.addChildren(test);
+        root.addChildren(suite);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
