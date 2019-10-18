@@ -170,6 +170,29 @@ public class RedPreferencesTest {
     }
 
     @Test
+    public void rfLintRulesConfigIsTakenFromStore_evenIfSomeOutdatedValuesExist() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_NAMES)).thenReturn("Rule1;Rule2;Rule3");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES)).thenReturn("IGNORE;DEFAULT;OTHER");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_ARGS)).thenReturn("80;;100");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        final Map<String, RfLintRuleConfiguration> rules = preferences.getRfLintRulesConfigs();
+        assertThat(rules).hasSize(3);
+
+        assertThat(rules.keySet()).containsOnly("Rule1", "Rule2", "Rule3");
+
+        assertThat(rules.get("Rule1").getSeverity()).isEqualTo(RfLintViolationSeverity.IGNORE);
+        assertThat(rules.get("Rule1").getArguments()).isEqualTo("80");
+
+        assertThat(rules.get("Rule2").getSeverity()).isNull();
+        assertThat(rules.get("Rule2").getArguments()).isEmpty();
+
+        assertThat(rules.get("Rule3").getSeverity()).isNull();
+        assertThat(rules.get("Rule3").getArguments()).isEqualTo("100");
+    }
+
+    @Test
     public void rfLintRulesAdditionalArgumentsAreTakenFromStore_1() {
         final IPreferenceStore store = mock(IPreferenceStore.class);
         when(store.getString(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS)).thenReturn("");

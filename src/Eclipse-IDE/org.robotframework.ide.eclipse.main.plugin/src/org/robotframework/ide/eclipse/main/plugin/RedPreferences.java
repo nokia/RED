@@ -507,7 +507,13 @@ public class RedPreferences {
         final int limit = Stream.of(names.size(), severities.size(), args.size()).min(Integer::compare).get();
         for (int i = 0; i < limit; i++) {
             final RfLintRuleConfiguration config = new RfLintRuleConfiguration();
-            config.setSeverity(RfLintViolationSeverity.valueOf(severities.get(i)));
+            try {
+                config.setSeverity(RfLintViolationSeverity.valueOf(severities.get(i)));
+            } catch (final IllegalArgumentException e) {
+                // previously there were more severities (DEFAULT and OTHER) and this caused
+                // bugs in 0.8.13 and 0.9.0; now we just skip unkown severities written in
+                // preferences
+            }
             config.setArguments(args.get(i));
 
             rules.put(names.get(i), config);
