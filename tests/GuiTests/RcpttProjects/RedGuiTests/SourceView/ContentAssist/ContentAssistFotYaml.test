@@ -1,0 +1,95 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _8mu44PQUEemMPOq2gIznfw
+Element-Name: ContentAssistFotYaml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _39OXIPQUEemMPOq2gIznfw
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/21/19 6:42 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open test adn check content assist
+get-view "Project Explorer" | get-tree | select "yamlProject/test.robot" | double-click
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 1
+    type-text Var
+    key-type "M1+SPACE"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select Variables | click -default
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "simple_vars.yaml" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "vars_python.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "dir/more_vars.yaml" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "dir/dir2/another_vars.yaml" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "folder/vars2.py" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "${/}" | verify-true
+}
+
+//add one file
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "simple_vars.yaml" | click 
+    -default
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 30
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Va
+    key-type "M1+SPACE"
+}
+
+//add 2 more yaml files
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select Variables | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "dir\\/more_vars.yaml" | click 
+    -default
+with [get-editor "test.robot" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text var
+    key-type "M1+SPACE"
+    key-type Enter
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "dir\\/dir2\\/another_vars.yaml" | click -default
+with [get-editor "test.robot" | get-text-viewer] {
+    key-type "M1+s"
+    set-caret-pos 11 28
+}
+
+//check that one file is incorrect
+get-view Problems | click
+
+wait-for-errors -amount 2 -times 5 -delay 500
+get-view Problems | get-tree | select "Errors \\(2 items\\)" | double-click
+
+with [get-view Problems | get-tree] {
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | contains "Problem importing variable file 'dir/dir2/another_vars.yaml'. Following exception has been thrown:\n"
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "Variable 'simple_dict.abc' is used, but not defined" | verify-true
+}
+
+//correct the yaml file
+get-view "Project Explorer" | get-tree | select "yamlProject/dir/dir2/another_vars.yaml" | double-click
+with [get-editor "another_vars.yaml" | get-text-viewer] {
+    set-caret-pos 6 12
+    type-text ":"
+    key-type "M1+s"
+}
+
+// edit test to run validation
+with [get-editor "test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 11 28
+        type-text " "
+        key-type "M1+s"
+    }
+}
+wait-for-zero-items -times 3 -delay 500
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
