@@ -308,6 +308,7 @@ def get_rf_lint_rules(rulesfiles):
 
 @logresult
 @encode_result_or_exception
+@cleanup_modules
 @logargs
 def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, additional_arguments):
     global INTERPRETER_PATH
