@@ -88,6 +88,14 @@
 <li><b>Go To File</b> - from context menu on test (also by double click) - opens editor and selects
 		test case.</li>
 </ul>
+<h4 id="exec_view_dynamic">Dynamically changing execution tree</h4>
+<p>With Robot Framework <a class="external" href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-version-3" target="_blank">
+	listener API version 3</a> it is possible to create listeners that will be able to modify execution tree very late
+	during tests execution. As an example: suites or tests can be added, removed or renamed as late as when parent
+	suite is starting. RED is able to handle such changes and the affected nodes in the tree are marked. 
+	A screen below presents how added/removed or changed nodes are presented:
+	</p>
+<img src="images/ui_execution_view_dynamic.png"/>
 <h3>Message Log view</h3>
 <p>Message Log view is a view provided by RED which presents messages logged during tests execution. Like
 	execution view it it is also updated during tests launch. Similarly it may also work with Remote 
