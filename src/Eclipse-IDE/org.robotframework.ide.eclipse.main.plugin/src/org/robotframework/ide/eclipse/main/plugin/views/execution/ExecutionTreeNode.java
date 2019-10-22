@@ -106,6 +106,7 @@ public class ExecutionTreeNode {
 
     public ExecutionTreeNode getSuiteOrCreateIfMissing(final String name, final int totalTestsInSuite) {
         final ExecutionTreeNode suiteNode = suites.stream()
+                .filter(n -> n.status == null)
                 .filter(n -> n.getName().equals(name))
                 .findFirst()
                 .orElse(null);
@@ -124,6 +125,7 @@ public class ExecutionTreeNode {
 
     public ExecutionTreeNode getTestOrCreateIfMissing(final String name) {
         final ExecutionTreeNode testNode = tests.stream()
+                .filter(n -> n.status == null)
                 .filter(n -> n.getName().equals(name))
                 .findFirst()
                 .orElse(null);

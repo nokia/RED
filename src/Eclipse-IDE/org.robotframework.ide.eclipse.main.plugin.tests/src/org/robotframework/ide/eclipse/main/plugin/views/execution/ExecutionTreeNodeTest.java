@@ -139,6 +139,28 @@ public class ExecutionTreeNodeTest {
     }
 
     @Test
+    public void existingNotYetExecutedSuiteNodeChildIsReturned_whenThereAreSuitesWithTheSameNames() {
+        final ExecutionTreeNode parent = ExecutionTreeNode.newSuiteNode(null, "parent", null);
+        parent.setNumberOfTests(6);
+        final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(parent, "suite", null);
+        suite1.setNumberOfTests(3);
+        suite1.setStatus(Status.PASS);
+        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(parent, "suite", null);
+        suite2.setNumberOfTests(3);
+        parent.addChildren(suite1, suite2);
+
+        final ExecutionTreeNode found = parent.getSuiteOrCreateIfMissing("suite", 3);
+        assertThat(found).isSameAs(suite2);
+        assertThat(parent.getChildren()).containsExactly(suite1, suite2);
+        assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(suite1.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(suite2.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(parent.getNumberOfTests()).isEqualTo(6);
+        assertThat(suite1.getNumberOfTests()).isEqualTo(3);
+        assertThat(suite2.getNumberOfTests()).isEqualTo(3);
+    }
+
+    @Test
     public void existingSuiteNodeChildIsMovedAndReturned_whenItExistButIsNotFirstWithoutStatus_1() {
         final ExecutionTreeNode parent = ExecutionTreeNode.newSuiteNode(null, "parent", null);
         parent.setNumberOfTests(9);
@@ -264,6 +286,26 @@ public class ExecutionTreeNodeTest {
         assertThat(test1.getNumberOfTests()).isEqualTo(1);
         assertThat(test2.getNumberOfTests()).isEqualTo(1);
         assertThat(test3.getNumberOfTests()).isEqualTo(1);
+    }
+    
+    @Test
+    public void existingNotYetExecutedTestNodeChildIsReturned_whenThereAreTestsWithTheSameNames() {
+        final ExecutionTreeNode parent = ExecutionTreeNode.newSuiteNode(null, "parent", null);
+        parent.setNumberOfTests(2);
+        final ExecutionTreeNode test1 = ExecutionTreeNode.newTestNode(parent, "test", null);
+        test1.setStatus(Status.FAIL);
+        final ExecutionTreeNode test2 = ExecutionTreeNode.newTestNode(parent, "test", null);
+        parent.addChildren(test1, test2);
+
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("test");
+        assertThat(found).isSameAs(test2);
+        assertThat(parent.getChildren()).containsExactly(test1, test2);
+        assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(test1.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(test2.getDynamic()).isEqualTo(DynamicFlag.NONE);
+        assertThat(parent.getNumberOfTests()).isEqualTo(2);
+        assertThat(test1.getNumberOfTests()).isEqualTo(1);
+        assertThat(test2.getNumberOfTests()).isEqualTo(1);
     }
 
     @Test
