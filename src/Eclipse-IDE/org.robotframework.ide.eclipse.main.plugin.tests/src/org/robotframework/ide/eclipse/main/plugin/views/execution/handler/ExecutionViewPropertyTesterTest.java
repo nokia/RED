@@ -12,6 +12,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -24,20 +27,31 @@ public class ExecutionViewPropertyTesterTest {
     private final ExecutionViewPropertyTester tester = new ExecutionViewPropertyTester();
 
     @Test
-    public void exceptionIsThrown_whenReceiverIsNotExecutionView() {
+    public void exceptionIsThrown_whenReceiverIsNotWorkbenchWindow() {
         assertThatIllegalArgumentException().isThrownBy(() -> tester.test(new Object(), "property", null, true))
                 .withMessage("Property tester is unable to test properties of java.lang.Object. It should be used with "
-                        + ExecutionViewWrapper.class.getName())
+                        + IWorkbenchWindow.class.getName())
                 .withNoCause();
     }
 
     @Test
-    public void falseIsReturned_whenExpectedValueIsAString() {
-        final ExecutionViewWrapper viewWrapper = mock(ExecutionViewWrapper.class);
-        final ExecutionView view = mock(ExecutionView.class);
-        when(viewWrapper.getComponent()).thenReturn(view);
+    public void falseIsReturned_whenThereIsNoExecutionViewInActivePage() {
+        final IWorkbenchPage site = mock(IWorkbenchPage.class);
+        when(site.findViewReference(ExecutionView.ID)).thenReturn(null);
+        final IWorkbenchWindow window = mock(IWorkbenchWindow.class);
+        when(window.getActivePage()).thenReturn(site);
 
-        final boolean testResult = tester.test(viewWrapper,
+        final boolean testResult = tester.test(window, ExecutionViewPropertyTester.CURRENT_LAUNCH_IS_TERMINATED, null,
+                false);
+
+        assertThat(testResult).isFalse();
+    }
+
+    @Test
+    public void falseIsReturned_whenExpectedValueIsAString() {
+        final IWorkbenchWindow window = prepareWindow(null);
+
+        final boolean testResult = tester.test(window,
                 ExecutionViewPropertyTester.CURRENT_LAUNCH_IS_TERMINATED, null, "value");
 
         assertThat(testResult).isFalse();
@@ -45,51 +59,60 @@ public class ExecutionViewPropertyTesterTest {
 
     @Test
     public void falseIsReturnedForUnknownProperty() {
-        final ExecutionViewWrapper viewWrapper = mock(ExecutionViewWrapper.class);
-        final ExecutionView view = mock(ExecutionView.class);
-        when(viewWrapper.getComponent()).thenReturn(view);
+        final IWorkbenchWindow window = prepareWindow(null);
 
-        assertThat(tester.test(viewWrapper, "unknown_property", null, true)).isFalse();
-        assertThat(tester.test(viewWrapper, "unknown_property", null, false)).isFalse();
+        assertThat(tester.test(window, "unknown_property", null, true)).isFalse();
+        assertThat(tester.test(window, "unknown_property", null, false)).isFalse();
     }
 
     @Test
-    public void testViewHasTerminatedLaunchProperty() {
-        final RobotTestExecutionService executionService = new RobotTestExecutionService();
+    public void testViewHasTerminatedLaunchProperty_whenThereIsNoCurrentLaunch() {
+        final IWorkbenchWindow window = prepareWindow(null);
 
+        assertThat(viewHasTerminatedLaunch(window, true)).isFalse();
+        assertThat(viewHasTerminatedLaunch(window, false)).isTrue();
+    }
+
+    @Test
+    public void testViewHasTerminatedLaunchProperty_whenCurrentLaunchIsRunning() {
+        final RobotTestExecutionService executionService = new RobotTestExecutionService();
+        final RobotTestsLaunch runningLaunch = executionService.testExecutionStarting(null);
+
+        final IWorkbenchWindow window = prepareWindow(runningLaunch);
+
+        assertThat(viewHasTerminatedLaunch(window, true)).isFalse();
+        assertThat(viewHasTerminatedLaunch(window, false)).isTrue();
+    }
+
+    @Test
+    public void testViewHasTerminatedLaunchProperty_whenCurrentLaunchIsTerminated() {
+        final RobotTestExecutionService executionService = new RobotTestExecutionService();
         final RobotTestsLaunch terminatedLaunch = executionService.testExecutionStarting(null);
         executionService.testExecutionEnded(terminatedLaunch);
 
-        final RobotTestsLaunch runningLaunch = executionService.testExecutionStarting(null);
+        final IWorkbenchWindow window = prepareWindow(terminatedLaunch);
 
-
-        final ExecutionViewWrapper viewWrapperWithoutCurrentLaunch = mock(ExecutionViewWrapper.class);
-        final ExecutionView viewWithoutCurrentLaunch = mock(ExecutionView.class);
-        when(viewWrapperWithoutCurrentLaunch.getComponent()).thenReturn(viewWithoutCurrentLaunch);
-        when(viewWithoutCurrentLaunch.getCurrentlyShownLaunch()).thenReturn(Optional.empty());
-
-        final ExecutionViewWrapper viewWrapperWithRunningLaunch = mock(ExecutionViewWrapper.class);
-        final ExecutionView viewWithRunningLaunch = mock(ExecutionView.class);
-        when(viewWrapperWithRunningLaunch.getComponent()).thenReturn(viewWithRunningLaunch);
-        when(viewWithRunningLaunch.getCurrentlyShownLaunch()).thenReturn(Optional.of(runningLaunch));
-
-        final ExecutionViewWrapper viewWrapperWithTerminatedLaunch = mock(ExecutionViewWrapper.class);
-        final ExecutionView viewWithTerminatedLaunch = mock(ExecutionView.class);
-        when(viewWrapperWithTerminatedLaunch.getComponent()).thenReturn(viewWithTerminatedLaunch);
-        when(viewWithTerminatedLaunch.getCurrentlyShownLaunch()).thenReturn(Optional.of(terminatedLaunch));
-
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithoutCurrentLaunch, true)).isFalse();
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithoutCurrentLaunch, false)).isTrue();
-
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithRunningLaunch, true)).isFalse();
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithRunningLaunch, false)).isTrue();
-
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithTerminatedLaunch, true)).isTrue();
-        assertThat(viewHasTerminatedLaunch(viewWrapperWithTerminatedLaunch, false)).isFalse();
-
+        assertThat(viewHasTerminatedLaunch(window, true)).isTrue();
+        assertThat(viewHasTerminatedLaunch(window, false)).isFalse();
     }
 
-    private boolean viewHasTerminatedLaunch(final ExecutionViewWrapper view, final boolean expected) {
-        return tester.test(view, ExecutionViewPropertyTester.CURRENT_LAUNCH_IS_TERMINATED, null, expected);
+    private IWorkbenchWindow prepareWindow(final RobotTestsLaunch launch) {
+        final ExecutionView view = mock(ExecutionView.class);
+        when(view.getCurrentlyShownLaunch()).thenReturn(Optional.ofNullable(launch));
+
+        final ExecutionViewWrapper viewWrapper = mock(ExecutionViewWrapper.class);
+        when(viewWrapper.getComponent()).thenReturn(view);
+        final IViewReference viewRef = mock(IViewReference.class);
+        when(viewRef.getView(false)).thenReturn(viewWrapper);
+        final IWorkbenchPage site = mock(IWorkbenchPage.class);
+        when(site.findViewReference(ExecutionView.ID)).thenReturn(viewRef);
+        final IWorkbenchWindow window = mock(IWorkbenchWindow.class);
+        when(window.getActivePage()).thenReturn(site);
+
+        return window;
+    }
+
+    private boolean viewHasTerminatedLaunch(final IWorkbenchWindow window, final boolean expected) {
+        return tester.test(window, ExecutionViewPropertyTester.CURRENT_LAUNCH_IS_TERMINATED, null, expected);
     }
 }

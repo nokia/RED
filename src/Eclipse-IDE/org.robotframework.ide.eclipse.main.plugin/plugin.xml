@@ -5560,7 +5560,7 @@
           id="org.robotframework.red.view.executionProgress"
           namespace="org.robotframework.red.view.execution"
           properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasTest,currentLaunchHasNonExecutedTest,currentLaunchHasFailedTest"
-          type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+          type="org.eclipse.ui.IWorkbenchWindow">
     </propertyTester>
     <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedPreferencesPropertyTester"
@@ -7362,11 +7362,8 @@
                commandId="org.robotframework.red.view.execution.rerunTests">
             <enabledWhen>
                <with
-                     variable="activePart">
+                     variable="activeWorkbenchWindow">
                   <and>
-                     <instanceof
-                           value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
-                     </instanceof>
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7388,11 +7385,8 @@
                commandId="org.robotframework.red.view.execution.rerunFailedTests">
             <enabledWhen>
                <with
-                     variable="activePart">
+                     variable="activeWorkbenchWindow">
                   <and>
-                     <instanceof
-                           value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
-                     </instanceof>
                      <test
                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
                            value="true">
@@ -7414,11 +7408,8 @@
                commandId="org.robotframework.red.view.execution.rerunNonExecutedTests">
                <enabledWhen>
                <with
-                     variable="activePart">
+                     variable="activeWorkbenchWindow">
                   <and>
-	                  <instanceof
-	                        value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
-	                  </instanceof>
 	                  <test
 	                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
 	                        value="true">
@@ -7440,14 +7431,11 @@
                commandId="org.robotframework.red.view.execution.clearExecutionData">
             <enabledWhen>
                <with
-                     variable="activePart">
-                  <instanceof
-                        value="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
-                  </instanceof>
-                  <test
-                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
-                        value="true">
-                  </test>
+                     variable="activeWorkbenchWindow">
+                      <test
+                            property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                            value="true">
+                      </test>
                </with>
             </enabledWhen>
          </handler>

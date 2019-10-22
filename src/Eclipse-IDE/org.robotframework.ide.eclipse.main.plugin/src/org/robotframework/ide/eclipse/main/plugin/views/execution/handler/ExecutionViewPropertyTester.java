@@ -5,7 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
+import java.util.Optional;
+
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
@@ -38,16 +42,28 @@ public class ExecutionViewPropertyTester extends PropertyTester {
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
-        Preconditions.checkArgument(receiver instanceof ExecutionViewWrapper,
+        Preconditions.checkArgument(receiver instanceof IWorkbenchWindow,
                 "Property tester is unable to test properties of " + receiver.getClass().getName()
-                        + ". It should be used with " + ExecutionViewWrapper.class.getName());
+                        + ". It should be used with " + IWorkbenchWindow.class.getName());
+
+        final IWorkbenchWindow window = (IWorkbenchWindow) receiver;
+        final IViewPart viewPart = getViewPart(window);
+        if (viewPart == null) {
+            return false;
+        }
 
         @SuppressWarnings("restriction")
-        final ExecutionView view = ((ExecutionViewWrapper) receiver).getComponent();
+        final ExecutionView view = ((ExecutionViewWrapper) viewPart).getComponent();
         if (expectedValue instanceof Boolean) {
             return testProperty(view, property, ((Boolean) expectedValue).booleanValue());
         }
         return false;
+    }
+
+    private IViewPart getViewPart(final IWorkbenchWindow window) {
+        return Optional.ofNullable(window.getActivePage().findViewReference(ExecutionView.ID))
+                .map(vRef -> vRef.getView(false))
+                .orElse(null);
     }
 
     private boolean testProperty(final ExecutionView view, final String property,
