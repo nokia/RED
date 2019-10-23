@@ -123,6 +123,92 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer("..."));
         }
     },
+    TASK_SETTING_USED_IN_TESTS_SUITE {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.TASK_AND_TEST_SETTING_MIXED;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The setting %s is used in Tests suite";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String settingName = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final RobotTokenType originalType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
+
+            String replacement = null;
+            if (originalType == RobotTokenType.SETTING_TASK_SETUP_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TEST_SETUP_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION.getRepresentation().get(0);
+            }
+
+            final List<String> fixedNames = new ArrayList<>();
+            if (replacement != null) {
+                fixedNames.add(replacement);
+            }
+            return ChangeToFixer.createFixers(fixedNames);
+        }
+    },
+    TEST_SETTING_USED_IN_TASKS_SUITE {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.TASK_AND_TEST_SETTING_MIXED;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The setting %s is used in Tasks suite";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String settingName = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final RobotTokenType originalType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
+
+            String replacement = null;
+            if (originalType == RobotTokenType.SETTING_TEST_SETUP_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TASK_SETUP_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION.getRepresentation().get(0);
+
+            } else if (originalType == RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION) {
+                replacement = RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION.getRepresentation().get(0);
+            }
+
+            final List<String> fixedNames = new ArrayList<>();
+            if (replacement != null) {
+                fixedNames.add(replacement);
+            }
+            return ChangeToFixer.createFixers(fixedNames);
+        }
+    },
     MISSING_LIBRARY_NAME {
 
         @Override

@@ -13,12 +13,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
@@ -28,6 +30,10 @@ import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskSetup;
+import org.rf.ide.core.testdata.model.table.setting.TaskTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskTemplate;
+import org.rf.ide.core.testdata.model.table.setting.TaskTimeout;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
@@ -45,10 +51,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 
 class GeneralSettingsTableValidator implements ModelUnitValidator {
 
@@ -88,12 +96,17 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns());
         validateSetupsAndTeardowns(settingsTable.getTestSetups());
         validateSetupsAndTeardowns(settingsTable.getTestTeardowns());
-        validateTestTemplates(settingsTable.getTestTemplatesViews());
+        validateSetupsAndTeardowns(settingsTable.getTaskSetups());
+        validateSetupsAndTeardowns(settingsTable.getTaskTeardowns());
+        validateTemplates(settingsTable.getTestTemplatesViews(), settingsTable.getTaskTemplates());
         validateTestTimeouts(settingsTable.getTestTimeoutsViews());
+        validateTaskTimeouts(settingsTable.getTaskTimeouts());
         validateTags(settingsTable.getDefaultTags());
         validateTags(settingsTable.getForceTags());
         validateDocumentations(settingsTable.getDocumentation());
         validateMetadatas(settingsTable.getMetadatas());
+
+        validateTestAndTasksSettingsMixes(suiteFile, settingsTable);
 
         validateKeywordsAndVariablesUsagesInExecutables(settingsTable);
         reportUnknownVariablesInNonExecutables(settingsTable);
@@ -147,19 +160,24 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         }
     }
 
-    private void validateTestTemplates(final List<TestTemplate> testTemplates) {
-        final boolean areAllEmpty = testTemplates.stream().map(TestTemplate::getKeywordName).allMatch(
-                kwToken -> kwToken == null);
+    private void validateTemplates(final List<TestTemplate> testTemplates, final List<TaskTemplate> taskTemplates) {
+        final List<IDataDrivenSetting> allTemplates = new ArrayList<>(testTemplates);
+        allTemplates.addAll(taskTemplates);
+
+        final boolean areAllEmpty = allTemplates.stream()
+                .map(IDataDrivenSetting::getKeywordName)
+                .allMatch(kwToken -> kwToken == null);
         if (areAllEmpty) {
             reportEmptySettings(testTemplates);
+            reportEmptySettings(taskTemplates);
         }
 
-        reportTemplateWrittenInMultipleCells(testTemplates);
-        reportTemplateKeywordProblems(testTemplates);
+        reportTemplateWrittenInMultipleCells(allTemplates);
+        reportTemplateKeywordProblems(allTemplates);
     }
 
-    private void reportTemplateWrittenInMultipleCells(final List<TestTemplate> testTemplates) {
-        for (final TestTemplate template : testTemplates) {
+    private void reportTemplateWrittenInMultipleCells(final List<? extends IDataDrivenSetting> templates) {
+        for (final IDataDrivenSetting template : templates) {
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final RobotToken settingToken = template.getDeclaration();
                 final RobotProblem problem = RobotProblem
@@ -169,8 +187,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportTemplateKeywordProblems(final List<TestTemplate> testTemplates) {
-        for (final TestTemplate template : testTemplates) {
+    private void reportTemplateKeywordProblems(final List<? extends IDataDrivenSetting> templates) {
+        for (final IDataDrivenSetting template : templates) {
             final RobotToken keywordToken = template.getKeywordName();
             if (keywordToken != null) {
                 final List<String> keywordParts = newArrayList(keywordToken.getText());
@@ -191,21 +209,29 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (areAllEmpty) {
             reportEmptySettings(timeouts);
         }
-        reportInvalidTimeoutSyntax(timeouts);
+        reportInvalidTimeoutSyntax(
+                timeouts.stream().map(TestTimeout::getTimeout).filter(t -> t != null).collect(toList()));
     }
 
-    private void reportInvalidTimeoutSyntax(final List<TestTimeout> timeouts) {
-        for (final TestTimeout testTimeout : timeouts) {
-            final RobotToken timeoutToken = testTimeout.getTimeout();
-            if (timeoutToken != null) {
-                final String timeout = timeoutToken.getText();
-                if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
-                        && !timeout.equalsIgnoreCase("none")
-                        && !RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
-                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
-                            .formatMessageWith(timeout);
-                    reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
-                }
+    private void validateTaskTimeouts(final List<TaskTimeout> timeouts) {
+        final boolean areAllEmpty = timeouts.stream()
+                .map(TaskTimeout::getTimeout)
+                .allMatch(timeoutToken -> timeoutToken == null);
+        if (areAllEmpty) {
+            reportEmptySettings(timeouts);
+        }
+        reportInvalidTimeoutSyntax(
+                timeouts.stream().map(TaskTimeout::getTimeout).filter(t -> t != null).collect(toList()));
+    }
+
+    private void reportInvalidTimeoutSyntax(final List<RobotToken> timeouts) {
+        for (final RobotToken timeoutToken : timeouts) {
+            final String timeout = timeoutToken.getText();
+            if (!timeoutToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE) && !timeout.equalsIgnoreCase("none")
+                    && !RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                        .formatMessageWith(timeout);
+                reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
             }
         }
     }
@@ -241,6 +267,32 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         }
     }
 
+    private void validateTestAndTasksSettingsMixes(final RobotSuiteFile model, final SettingTable settingsTable) {
+        if (model.isSuiteFile()) {
+            final Stream<AModelElement<?>> taskSettings = Streams.concat(settingsTable.getTaskSetups().stream(),
+                    settingsTable.getTaskTeardowns().stream(), settingsTable.getTaskTemplates().stream(),
+                    settingsTable.getTaskTimeouts().stream());
+            taskSettings.map(AModelElement::getDeclaration)
+                    .forEach(settingDecl -> reportTestAndTaskSettingMixed(
+                            GeneralSettingsProblem.TASK_SETTING_USED_IN_TESTS_SUITE, settingDecl));
+
+        } else if (model.isRpaSuiteFile()) {
+            final Stream<AModelElement<?>> testSettings = Streams.concat(settingsTable.getTestSetups().stream(),
+                    settingsTable.getTestTeardowns().stream(), settingsTable.getTestTemplates().stream(),
+                    settingsTable.getTestTimeouts().stream());
+            testSettings.map(AModelElement::getDeclaration)
+                    .forEach(settingDecl -> reportTestAndTaskSettingMixed(
+                            GeneralSettingsProblem.TEST_SETTING_USED_IN_TASKS_SUITE, settingDecl));
+        }
+    }
+
+    private void reportTestAndTaskSettingMixed(final IProblemCause cause, final RobotToken declaration) {
+        final String settingName = declaration.getText();
+        final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(settingName);
+        reporter.handleProblem(problem, validationContext.getFile(), declaration,
+                ImmutableMap.of(AdditionalMarkerAttributes.NAME, settingName));
+    }
+
     private void validateKeywordsAndVariablesUsagesInExecutables(final SettingTable settingsTable) {
         final Set<String> additionalVariables = new HashSet<>();
 
@@ -250,6 +302,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         }
         for (final TestSetup testSetup : settingsTable.getTestSetupsViews()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testSetup, reporter));
+        }
+        for (final TaskSetup taskSetup : settingsTable.getTaskSetups()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, taskSetup, reporter));
+        }
+        for (final TaskTeardown taskTeardown : settingsTable.getTaskTeardowns()) {
+            execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, taskTeardown, reporter));
         }
         for (final TestTeardown testTeardown : settingsTable.getTestTeardownsViews()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testTeardown, reporter));
@@ -265,6 +323,9 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
         for (final TestTimeout testTimeout : settingsTable.getTestTimeouts()) {
             unknownVarsValidator.reportUnknownVars(testTimeout.getTimeout());
+        }
+        for (final TaskTimeout taskTimeout : settingsTable.getTaskTimeouts()) {
+            unknownVarsValidator.reportUnknownVars(taskTimeout.getTimeout());
         }
         for (final DefaultTags defaultTag : settingsTable.getDefaultTags()) {
             unknownVarsValidator.reportUnknownVars(defaultTag.getTags());

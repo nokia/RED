@@ -60,11 +60,13 @@ public class GeneralSettingsTableValidatorTest {
     public void emptySettingsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Test Setup")
+                .appendLine("Task Teardown")
                 .appendLine("Documentation")
                 .appendLine("Metadata")
                 .appendLine("Default Tags")
                 .appendLine("Test Template")
                 .appendLine("Test Timeout")
+                .appendLine("Task Timeout")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -73,10 +75,12 @@ public class GeneralSettingsTableValidatorTest {
         assertThat(problems).contains(
                 new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(2, Range.closed(17, 27))),
                 new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(3, Range.closed(28, 41))),
-                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(4, Range.closed(42, 50))),
-                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(5, Range.closed(51, 63))),
-                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(6, Range.closed(64, 77))),
-                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(7, Range.closed(78, 90))));
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(4, Range.closed(42, 55))),
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(5, Range.closed(56, 64))),
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(6, Range.closed(65, 77))),
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(7, Range.closed(78, 91))),
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(8, Range.closed(92, 104))),
+                new Problem(GeneralSettingsProblem.EMPTY_SETTING, new ProblemPosition(9, Range.closed(105, 117))));
     }
 
     @Test
@@ -125,6 +129,34 @@ public class GeneralSettingsTableValidatorTest {
     public void undeclaredVariableAndKeywordInTestTeardownAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Test Teardown  kw  ${var}")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 34))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(36, 42))));
+    }
+
+    @Test
+    public void undeclaredVariableAndKeywordInTaskSetupAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Task Setup  kw  ${var}")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(29, 31))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(33, 39))));
+    }
+
+    @Test
+    public void undeclaredVariableAndKeywordInTaskTeardownAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Task Teardown  kw  ${var}")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -187,6 +219,60 @@ public class GeneralSettingsTableValidatorTest {
                         new ProblemPosition(4, Range.closed(72, 78))),
                 new Problem(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED,
                         new ProblemPosition(5, Range.closed(94, 100))));
+    }
+
+    @Test
+    public void taskSettingIsReported_whenUsedInTestsSuite() throws CoreException {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("setup"),
+                newBuiltInKeyword("teardown"), newBuiltInKeyword("template"));
+
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("*** Settings ***")
+                .appendLine("Task Setup    setup")
+                .appendLine("Task Teardown    teardown")
+                .appendLine("Task Template    template")
+                .appendLine("Task Timeout    1")
+                .build();
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(
+                new Problem(GeneralSettingsProblem.TASK_SETTING_USED_IN_TESTS_SUITE,
+                        new ProblemPosition(3, Range.closed(36, 46))),
+                new Problem(GeneralSettingsProblem.TASK_SETTING_USED_IN_TESTS_SUITE,
+                        new ProblemPosition(4, Range.closed(56, 69))),
+                new Problem(GeneralSettingsProblem.TASK_SETTING_USED_IN_TESTS_SUITE,
+                        new ProblemPosition(5, Range.closed(82, 95))),
+                new Problem(GeneralSettingsProblem.TASK_SETTING_USED_IN_TESTS_SUITE,
+                        new ProblemPosition(6, Range.closed(108, 120))));
+    }
+
+    @Test
+    public void testSettingIsReported_whenUsedInTasksSuite() throws CoreException {
+        final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("setup"),
+                newBuiltInKeyword("teardown"), newBuiltInKeyword("template"));
+
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Tasks ***")
+                .appendLine("*** Settings ***")
+                .appendLine("Test Setup    setup")
+                .appendLine("Test Teardown    teardown")
+                .appendLine("Test Template    template")
+                .appendLine("Test Timeout    1")
+                .build();
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final Collection<Problem> problems = validate(context, file);
+
+        assertThat(problems).containsOnly(
+                new Problem(GeneralSettingsProblem.TEST_SETTING_USED_IN_TASKS_SUITE,
+                        new ProblemPosition(3, Range.closed(31, 41))),
+                new Problem(GeneralSettingsProblem.TEST_SETTING_USED_IN_TASKS_SUITE,
+                        new ProblemPosition(4, Range.closed(51, 64))),
+                new Problem(GeneralSettingsProblem.TEST_SETTING_USED_IN_TASKS_SUITE,
+                        new ProblemPosition(5, Range.closed(77, 90))),
+                new Problem(GeneralSettingsProblem.TEST_SETTING_USED_IN_TASKS_SUITE,
+                        new ProblemPosition(6, Range.closed(103, 115))));
     }
 
     @Test

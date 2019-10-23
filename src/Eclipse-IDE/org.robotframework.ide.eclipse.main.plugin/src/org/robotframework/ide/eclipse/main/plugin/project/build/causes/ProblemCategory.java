@@ -181,6 +181,10 @@ public enum ProblemCategory {
             ProblemCategoryType.CODE_STYLE,
             "Variable declared without assignment",
             "Occurs when variable is declared without assignment in Variables section."),
+    TASK_AND_TEST_SETTING_MIXED(
+            ProblemCategoryType.CODE_STYLE,
+            "Test setting used in tasks suite or vice versa",
+            "Occurs when general test setting (like Test Setup, Test Timeout) is used in tasks suite or vice versa."),
     ABSOLUTE_PATH(
             ProblemCategoryType.IMPORT,
             "Absolute path used",
