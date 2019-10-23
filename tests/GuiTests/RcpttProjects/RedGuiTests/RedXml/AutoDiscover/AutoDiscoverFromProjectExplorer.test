@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 11:42 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 10/23/19 12:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -185,6 +185,8 @@ get-window "Discovering libraries summary" | get-button OK | click
 get-view "Project Explorer" | get-tree | get-item 
     -path "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource\\/res1.py \\(1\\)" 
     | get-property caption | equals "res1 RobotProject/libs/for_resource/res1.py (1)" | verify-true
+    
+wait-for-progress-view-to-disappear
     
 // remove referenced libraries from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click

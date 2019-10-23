@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 10/9/19 3:01 PM
+Save-Time: 10/23/19 12:25 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -187,6 +187,12 @@ proc "wait-for-loading-red-xml" [val editor_name]{
 proc "wait-for-discover-window" [val times 4]{
 	try -times $times -delay 1000 -command{
 		get-window "Discovering libraries summary"
+	}
+}
+
+proc "wait-for-progress-view-to-disappear"{
+	try -times 4 -delay 500 -command {
+		verify-error  {get-button "Shows background operations in Progress view" | get-property enablement | equals true | verify-true}
 	}
 }
 
