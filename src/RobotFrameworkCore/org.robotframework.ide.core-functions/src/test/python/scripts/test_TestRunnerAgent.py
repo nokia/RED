@@ -64,6 +64,29 @@ class ChildrenPathsCollectingTests(unittest.TestCase):
         source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'suite')
         
         self.assertEqual([os.path.join(source, 'first_child'), os.path.join(source, 'second_child')], _collect_children_paths(suites, source))
+        
+    def test_collect_children_paths_of_same_name_suites(self):
+        import os
+        
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        suites = ['Suite', 'Suite']
+        source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'same_names')
+        
+        collected =  _collect_children_paths(suites, source)
+        self.assertEqual([os.path.join(source, '000__suite'), os.path.join(source, '001__suite')], collected)
+        
+    def test_none_is_returned_for_non_existing_suites(self):
+        import os
+        
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        suites = ['Non Existing']
+        source = os.path.join(parent_path, 'res_test_TestRunnerAgent')
+        
+        collected =  _collect_children_paths(suites, source)
+        self.assertEqual([None], collected)
+    
 
     def test_collect_children_paths_from_child_node(self):
         import os
@@ -84,3 +107,4 @@ class ChildrenPathsCollectingTests(unittest.TestCase):
         source = os.path.join(parent_path, 'res_test_TestRunnerAgent', 'suite', 'first_child', 'suite_file.robot')
         
         self.assertEqual([], _collect_children_paths(suites, source))
+        

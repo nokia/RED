@@ -144,31 +144,60 @@ def _modify_source_path_for_jar_files(source, jar_part):
     
     return source[:jar_part_index] + jar_extension
 
+
 def _collect_children_paths(suites, source):
     child_paths = []
-    VALID_EXTENSIONS = tuple(READERS)
     if os.path.isdir(source):
-        added = False
+        cache = _prepare_names_dictionary_slow_py2(source) if sys.version_info < (3, 5, 0) else _prepare_names_dictionary(source)
         for suite in suites:
-            for file in os.listdir(source):
-                file_name = os.path.splitext(file)[0]
-                file_extension = os.path.splitext(file)[1][1:]
-                if file_extension in VALID_EXTENSIONS or '.' not in file:
-                    if suite == _format_file_name(file_name):
-                        child_paths.append(os.path.os.path.join(source, file))
-                        added = True
-                        break
-            if not added:
-                child_paths.append(None)
+            candidates = cache[suite] if suite in cache else []
+            child_paths.append(candidates.pop(0) if len(candidates) > 0 else None)
     return child_paths
+
+def _prepare_names_dictionary(parent_dir):
+    d = {}
+    with os.scandir(parent_dir) as iter:
+        for entry in iter:
+            entry_name = None
+            if entry.is_file() and _has_suite_extension(entry.name):
+                (entry_name, _) = os.path.splitext(entry.name)
+            elif entry.is_dir():
+                entry_name = entry.name
+            if entry_name != None:
+                formatted = _format_file_name(entry_name)
+                if formatted not in d:
+                    d[formatted] = []
+                d[formatted].append((entry.name, os.path.join(parent_dir, entry.name)))
+    fst = lambda x : x[0]
+    snd = lambda x : x[1]
+    return {formatted_name : list(map(snd, sorted(entries, key = fst))) for (formatted_name, entries) in d.items()}
+
+def _prepare_names_dictionary_slow_py2(parent_dir):
+    d = {}
+    for entry in os.listdir(parent_dir):
+        entry_name = None
+        if os.path.isfile(os.path.join(parent_dir, entry)) and _has_suite_extension(entry):
+            (entry_name, _) = os.path.splitext(entry)
+        elif os.path.isdir(os.path.join(parent_dir, entry)):
+            entry_name = entry
+        if entry_name != None:
+            formatted = _format_file_name(entry_name)
+            if formatted not in d:
+                d[formatted] = []
+            d[formatted].append((entry, os.path.join(parent_dir, entry)))
+    fst = lambda x : x[0]
+    snd = lambda x : x[1]
+    return {formatted_name : list(map(snd, sorted(entries, key = fst))) for (formatted_name, entries) in d.items()}
+
+def _has_suite_extension(name):
+    valid_exts = tuple(READERS)
+    (_, ext) = os.path.splitext(name)
+    return ext[1:] in valid_exts 
     
 def _format_file_name(name):
-    name = _strip_possible_prefix(name)
+    name = name.split('__', 1)[-1]
     name = name.replace('_', ' ').strip()
     return name.title() if name.islower() else name
-
-def _strip_possible_prefix(name):
-    return name.split('__', 1)[-1]
 
 
 class RedResponseMessage:
