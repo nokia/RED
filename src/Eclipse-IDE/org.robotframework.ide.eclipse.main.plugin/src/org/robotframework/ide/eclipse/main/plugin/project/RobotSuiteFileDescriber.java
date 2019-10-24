@@ -15,9 +15,9 @@ import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder;
 public class RobotSuiteFileDescriber extends ASuiteFileDescriber {
 
     private static final Pattern REQUIRED_PATTERN = Pattern
-            .compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)?$");
+            .compile("^" + TestCasesTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)*$");
     private static final Pattern FORBIDDEN_PATTERN = Pattern
-            .compile("^" + TasksTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)?$");
+            .compile("^" + TasksTableHeaderRecognizer.EXPECTED.pattern() + "(\\s)*$");
 
     public RobotSuiteFileDescriber() {
         super(new TokenSeparatorBuilder(FileFormat.TXT_OR_ROBOT), REQUIRED_PATTERN, FORBIDDEN_PATTERN);
