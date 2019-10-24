@@ -15,7 +15,38 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
 
+import com.google.common.base.Strings;
+
 public class Separator implements IRobotLineElement {
+
+    public static Separator pipeSeparator() {
+        final Separator sep = new Separator();
+        sep.setRaw(" | ");
+        sep.setText(" | ");
+        sep.setType(SeparatorType.PIPE);
+        return sep;
+    }
+
+    public static Separator tabSeparator() {
+        final Separator sep = new Separator();
+        sep.setRaw("\t");
+        sep.setText("\t");
+        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+        return sep;
+    }
+
+    public static Separator spacesSeparator() {
+        return spacesSeparator(4);
+    }
+
+    public static Separator spacesSeparator(final int length) {
+        final String spaces = Strings.repeat(" ", length);
+        final Separator sep = new Separator();
+        sep.setRaw(spaces);
+        sep.setText(spaces);
+        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+        return sep;
+    }
 
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
 

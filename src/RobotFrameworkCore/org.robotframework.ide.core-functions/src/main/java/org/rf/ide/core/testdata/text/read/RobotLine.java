@@ -20,6 +20,14 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 public class RobotLine implements IChildElement<RobotFile> {
 
+    public static RobotLine create(final IRobotLineElement... lineElements) {
+        final RobotLine line = new RobotLine(-1, null);
+        for (final IRobotLineElement elem : lineElements) {
+            line.addLineElement(elem);
+        }
+        return line;
+    }
+
     private final RobotFile parent;
 
     private final int lineNumber;
