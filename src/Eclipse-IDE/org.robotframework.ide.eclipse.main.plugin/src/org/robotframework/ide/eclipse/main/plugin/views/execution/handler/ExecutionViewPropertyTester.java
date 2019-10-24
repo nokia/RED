@@ -61,8 +61,10 @@ public class ExecutionViewPropertyTester extends PropertyTester {
     }
 
     private IViewPart getViewPart(final IWorkbenchWindow window) {
-        return Optional.ofNullable(window.getActivePage().findViewReference(ExecutionView.ID))
-                .map(vRef -> vRef.getView(false))
+        return Optional.ofNullable(window)
+                .map(IWorkbenchWindow::getActivePage)
+                .map(page -> page.findViewReference(ExecutionView.ID))
+                .map(viewRef -> viewRef.getView(false))
                 .orElse(null);
     }
 
