@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -103,6 +104,7 @@ import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
+import org.robotframework.red.nattable.configs.SpecialItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
@@ -209,6 +211,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
+        final Function<Integer, Object> rowObjectProvider = row -> dataProvider.getRowObject(row);
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
                         position -> 0 < position.getColumnPosition()
@@ -218,6 +221,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new AddingElementLabelAccumulator(dataProvider),
                 new ImportTypesLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
+                new SpecialItemsLabelAccumulator(rowObjectProvider),
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
                 new VariablesInNamesLabelAccumulator());

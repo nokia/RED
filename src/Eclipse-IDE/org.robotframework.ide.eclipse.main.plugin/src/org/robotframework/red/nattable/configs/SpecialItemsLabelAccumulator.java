@@ -41,7 +41,8 @@ public class SpecialItemsLabelAccumulator implements IConfigLabelAccumulator {
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                 if (types.contains(RobotTokenType.IN_TOKEN) || types.contains(RobotTokenType.FOR_TOKEN)
-                        || types.contains(RobotTokenType.FOR_END_TOKEN)) {
+                        || types.contains(RobotTokenType.FOR_END_TOKEN)
+                        || types.contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
                     configLabels.addLabel(SPECIAL_ITEM_CONFIG_LABEL);
 
                 } else if (SpecialTokensRule.isNoneAwareSetting(tokens.get(columnPosition))) {

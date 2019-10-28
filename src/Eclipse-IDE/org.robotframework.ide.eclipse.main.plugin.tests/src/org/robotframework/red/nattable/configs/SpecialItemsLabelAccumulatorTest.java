@@ -16,8 +16,10 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 /**
@@ -48,7 +50,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSimpleKeywordCall_InTestCases() {
+    public void labelIsNotAdded_forSimpleKeywordCall_inTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(0);
         when(dataProvider.getRowObject(0)).thenReturn(call);
@@ -57,7 +59,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSettingKeywordCall_InTestCases() {
+    public void labelIsNotAdded_forSettingKeywordCall_inTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(1);
         when(dataProvider.getRowObject(1)).thenReturn(call);
@@ -66,7 +68,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSetting_InTestCases() {
+    public void labelIsNotAdded_forSetting_inTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(1);
         when(dataProvider.getRowObject(1)).thenReturn(call);
@@ -75,7 +77,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forArgument_InTestCases() {
+    public void labelIsNotAdded_forArgument_inTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(1);
         when(dataProvider.getRowObject(1)).thenReturn(call);
@@ -84,7 +86,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsAdded_forIn_InTestCases() {
+    public void labelIsAdded_forIn_inTestCases() {
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class).get().getChildren()
                 .get(0).getChildren().get(2);
         when(dataProvider.getRowObject(2)).thenReturn(call);
@@ -93,7 +95,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSimpleKeywordCall_InKeywords() {
+    public void labelIsNotAdded_forSimpleKeywordCall_inKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(2);
         when(dataProvider.getRowObject(2)).thenReturn(call);
@@ -102,7 +104,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSettingKeywordCall_InKeywords() {
+    public void labelIsNotAdded_forSettingKeywordCall_inKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(3);
         when(dataProvider.getRowObject(3)).thenReturn(call);
@@ -111,7 +113,7 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsNotAdded_forSetting_InKeywords() {
+    public void labelIsNotAdded_forSetting_inKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(3);
         when(dataProvider.getRowObject(3)).thenReturn(call);
@@ -120,10 +122,26 @@ public class SpecialItemsLabelAccumulatorTest {
     }
 
     @Test
-    public void labelIsAdded_forInToken_InKeywords() {
+    public void labelIsAdded_forInToken_inKeywords() {
         final RobotKeywordCall call = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren().get(0);
         when(dataProvider.getRowObject(0)).thenReturn(call);
+        labelAccumulator.accumulateConfigLabels(labels, 2, 0);
+        assertThat(labels.getLabels()).containsExactly(SpecialItemsLabelAccumulator.SPECIAL_ITEM_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelIsAdded_forNone_inSettings() {
+        final RobotElement setting = model.findSection(RobotSettingsSection.class).get().getChildren().get(0);
+        when(dataProvider.getRowObject(0)).thenReturn(setting);
+        labelAccumulator.accumulateConfigLabels(labels, 1, 0);
+        assertThat(labels.getLabels()).containsExactly(SpecialItemsLabelAccumulator.SPECIAL_ITEM_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelIsAdded_forLibraryAlias_inSettings() {
+        final RobotElement setting = model.findSection(RobotSettingsSection.class).get().getChildren().get(1);
+        when(dataProvider.getRowObject(0)).thenReturn(setting);
         labelAccumulator.accumulateConfigLabels(labels, 2, 0);
         assertThat(labels.getLabels()).containsExactly(SpecialItemsLabelAccumulator.SPECIAL_ITEM_CONFIG_LABEL);
     }
@@ -142,6 +160,9 @@ public class SpecialItemsLabelAccumulatorTest {
                 .appendLine("  \\  Log  ${x}")
                 .appendLine("  Log  keyword")
                 .appendLine("  [Teardown]  Log  5")
+                .appendLine("*** Settings ***")
+                .appendLine("Suite Setup  NONE")
+                .appendLine("Library  Collections  WITH NAME  alias")
                 .build();
     }
 }
