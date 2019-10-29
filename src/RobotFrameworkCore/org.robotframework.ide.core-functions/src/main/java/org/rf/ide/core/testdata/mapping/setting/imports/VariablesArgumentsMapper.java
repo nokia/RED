@@ -12,7 +12,6 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -21,13 +20,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class VariablesArgumentsMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
-    private final ParsingStateHelper stateHelper;
+    private final ElementsUtility utility = new ElementsUtility();
 
-    public VariablesArgumentsMapper() {
-        this.utility = new ElementsUtility();
-        this.stateHelper = new ParsingStateHelper();
-    }
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -37,21 +32,11 @@ public class VariablesArgumentsMapper implements IParsingMapper {
         rt.getTypes().add(0, RobotTokenType.SETTING_VARIABLES_ARGUMENT);
         rt.setText(text);
 
-        final AImported imported = utility.getNearestImport(robotFileOutput);
-        VariablesImport vars;
-        if (imported instanceof VariablesImport) {
-            vars = (VariablesImport) imported;
-        } else {
-            vars = null;
-
-            // FIXME: sth wrong - declaration of library not inside setting and
-            // was not catch by previous library declaration logic
-        }
-
+        final VariablesImport vars = utility.findNearestVariablesImport(robotFileOutput)
+                .orElseThrow(IllegalStateException::new);
         vars.addArgument(rt);
 
         processingState.push(ParsingState.SETTING_VARIABLE_ARGUMENTS);
-
         return rt;
     }
 

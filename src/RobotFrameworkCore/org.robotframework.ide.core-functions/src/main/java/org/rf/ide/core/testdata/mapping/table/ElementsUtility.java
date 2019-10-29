@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
@@ -24,6 +25,8 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -56,9 +59,27 @@ public class ElementsUtility {
         }
     }
 
-    public LibraryImport findNearestLibraryImport(final RobotFileOutput robotFileOutput) {
-        final AImported imported = getNearestImport(robotFileOutput);
-        return imported instanceof LibraryImport ? (LibraryImport) imported : null;
+    public Optional<LibraryImport> findNearestLibraryImport(final RobotFileOutput robotFileOutput) {
+        return Optional.ofNullable(getNearestImport(robotFileOutput))
+                .filter(LibraryImport.class::isInstance)
+                .map(LibraryImport.class::cast);
+    }
+
+    public Optional<ResourceImport> findNearestResourceImport(final RobotFileOutput robotFileOutput) {
+        return Optional.ofNullable(getNearestImport(robotFileOutput))
+                .filter(ResourceImport.class::isInstance)
+                .map(ResourceImport.class::cast);
+    }
+
+    public Optional<VariablesImport> findNearestVariablesImport(final RobotFileOutput robotFileOutput) {
+        return Optional.ofNullable(getNearestImport(robotFileOutput))
+                .filter(VariablesImport.class::isInstance)
+                .map(VariablesImport.class::cast);
+    }
+
+    public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
+        final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
+        return imports.isEmpty() ? null : imports.get(imports.size() - 1);
     }
 
     public RobotToken computeCorrectRobotToken(final Stack<ParsingState> processingState, final FilePosition fp,
@@ -334,11 +355,6 @@ public class ElementsUtility {
 
     public boolean isTableSection(final RobotLine line) {
         return line.getLineElements().stream().anyMatch(this::isTableHeader);
-    }
-
-    public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
-        final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
-        return imports.isEmpty() ? null : imports.get(imports.size() - 1);
     }
 
     public List<TableHeader<? extends ARobotSectionTable>> getKnownHeadersForTable(

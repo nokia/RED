@@ -12,8 +12,6 @@ import java.util.List;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetaRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetadataRecognizer;
@@ -42,7 +40,7 @@ public class SettingsRecognizersProvider {
     private static final List<ATokenRecognizer> RECOGNIZERS = Arrays.asList(
             new HashCommentRecognizer(),
             new PreviousLineContinueRecognizer(),
-            new LibraryDeclarationRecognizer(), new LibraryAliasRecognizerOld(), new LibraryAliasRecognizer(),
+            new LibraryDeclarationRecognizer(),
             new VariableDeclarationRecognizer(),
             new ResourceDeclarationRecognizer(),
 
@@ -51,11 +49,11 @@ public class SettingsRecognizersProvider {
             new SuiteSetupRecognizer(), new SuiteTeardownRecognizer(),
             new SuitePreconditionRecognizer(), new SuitePostconditionRecognizer(),
             new ForceTagsRecognizer(), new DefaultTagsRecognizer(),
-            
+
             new TestSetupRecognizer(), new TestTeardownRecognizer(),
             new TestPreconditionRecognizer(), new TestPostconditionRecognizer(),
             new TestTemplateRecognizer(), new TestTimeoutRecognizer(),
-            
+
             new TaskSetupRecognizer(), new TaskTeardownRecognizer(),
             new TaskTemplateRecognizer(), new TaskTimeoutRecognizer());
 

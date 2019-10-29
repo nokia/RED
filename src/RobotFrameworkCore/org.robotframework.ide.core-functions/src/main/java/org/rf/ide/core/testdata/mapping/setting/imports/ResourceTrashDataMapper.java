@@ -12,7 +12,6 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -22,15 +21,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ResourceTrashDataMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
-    private final ParsingStateHelper stateHelper;
+    private final ElementsUtility utility = new ElementsUtility();
 
-
-    public ResourceTrashDataMapper() {
-        this.utility = new ElementsUtility();
-        this.stateHelper = new ParsingStateHelper();
-    }
-
+    private final ParsingStateHelper stateHelper = new ParsingStateHelper();
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -39,21 +32,12 @@ public class ResourceTrashDataMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
         rt.setText(text);
-        final AImported imported = utility.getNearestImport(robotFileOutput);
-        ResourceImport resource;
-        if (imported instanceof ResourceImport) {
-            resource = (ResourceImport) imported;
-        } else {
-            resource = null;
 
-            // FIXME: sth wrong - declaration of library not inside setting and
-            // was not catch by previous library declaration logic
-        }
-
+        final ResourceImport resource = utility.findNearestResourceImport(robotFileOutput)
+                .orElseThrow(IllegalStateException::new);
         resource.addUnexpectedTrashArgument(rt);
 
         processingState.push(ParsingState.SETTING_RESOURCE_UNWANTED_ARGUMENTS);
-
         return rt;
     }
 

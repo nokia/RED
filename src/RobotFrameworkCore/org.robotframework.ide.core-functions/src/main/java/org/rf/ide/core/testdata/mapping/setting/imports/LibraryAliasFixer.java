@@ -46,11 +46,13 @@ public class LibraryAliasFixer {
     public void checkAndFixLine(final RobotFileOutput robotFileOutput, final Stack<ParsingState> processingState) {
         final ParsingState state = parsingStateHelper.getLastNotCommentState(processingState);
         if (state == ParsingState.SETTING_LIBRARY_IMPORT_ALIAS) {
-            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
+            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput)
+                    .orElseThrow(IllegalStateException::new);
 
             applyFixes(lib, null, processingState);
         } else if (state == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput);
+            final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput)
+                    .orElseThrow(IllegalStateException::new);
 
             final List<RobotToken> arguments = lib.getArguments();
             final int argumentsSize = arguments.size();

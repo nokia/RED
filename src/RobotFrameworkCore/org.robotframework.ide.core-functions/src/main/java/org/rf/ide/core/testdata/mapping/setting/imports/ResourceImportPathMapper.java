@@ -11,7 +11,6 @@ import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -20,11 +19,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ResourceImportPathMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
-
-    public ResourceImportPathMapper() {
-        this.utility = new ElementsUtility();
-    }
+    private final ElementsUtility utility = new ElementsUtility();
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -33,17 +28,9 @@ public class ResourceImportPathMapper implements IParsingMapper {
             final String text) {
         rt.getTypes().add(0, RobotTokenType.SETTING_RESOURCE_FILE_NAME);
         rt.setText(text);
-        final AImported imported = utility.getNearestImport(robotFileOutput);
-        ResourceImport resource;
-        if (imported instanceof ResourceImport) {
-            resource = (ResourceImport) imported;
-        } else {
-            resource = null;
 
-            // FIXME: sth wrong - declaration of variables not inside setting
-            // and
-            // was not catch by previous variables declaration logic
-        }
+        final ResourceImport resource = utility.findNearestResourceImport(robotFileOutput)
+                .orElseThrow(IllegalStateException::new);
         resource.setPathOrName(rt);
 
         processingState.push(ParsingState.SETTING_RESOURCE_IMPORT_PATH);

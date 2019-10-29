@@ -20,8 +20,6 @@ import org.rf.ide.core.testdata.mapping.setting.MetadataMapper;
 import org.rf.ide.core.testdata.mapping.setting.MetadataValueMapper;
 import org.rf.ide.core.testdata.mapping.setting.SettingDocumentationMapper;
 import org.rf.ide.core.testdata.mapping.setting.SettingDocumentationTextMapper;
-import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasDeclarationMapper;
-import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasMapper;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryArgumentsMapper;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryDeclarationMapper;
 import org.rf.ide.core.testdata.mapping.setting.imports.LibraryNameOrPathMapper;
@@ -80,9 +78,7 @@ public class SettingsMapperProvider {
 
             new HashCommentMapper(),
 
-            new LibraryDeclarationMapper(), new LibraryNameOrPathMapper(),
-            new LibraryArgumentsMapper(), new LibraryAliasDeclarationMapper(),
-            new LibraryAliasMapper(),
+            new LibraryDeclarationMapper(), new LibraryNameOrPathMapper(), new LibraryArgumentsMapper(),
 
             new VariablesDeclarationMapper(), new VariablesImportPathMapper(), new VariablesArgumentsMapper(),
 

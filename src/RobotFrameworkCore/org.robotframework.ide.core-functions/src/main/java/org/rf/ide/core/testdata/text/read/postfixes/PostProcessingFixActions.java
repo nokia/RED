@@ -22,7 +22,8 @@ public class PostProcessingFixActions {
             new ForContinueForItemIssueFixer(),
             new DocumentationLineContinueMissingFixer(),
             new EmptyLinesInExecutableTablesFixer(),
-            new TemplateArgumentsFixer());
+            new TemplateArgumentsFixer(),
+            new LibraryImportAliasFixer());
 
     public void applyFixes(final RobotFileOutput parsingOutput) {
         fixers.forEach(fixer -> fixer.applyFix(parsingOutput));

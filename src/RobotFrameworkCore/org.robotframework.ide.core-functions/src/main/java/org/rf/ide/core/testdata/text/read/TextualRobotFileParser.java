@@ -23,7 +23,6 @@ import java.util.Stack;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler;
 import org.rf.ide.core.testdata.mapping.PreviousLineHandler.LineContinueType;
-import org.rf.ide.core.testdata.mapping.setting.imports.LibraryAliasFixer;
 import org.rf.ide.core.testdata.mapping.table.CommentsMapperProvider;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
@@ -81,8 +80,6 @@ public class TextualRobotFileParser {
     private final MetadataOldSyntaxUtility metadataUtility;
 
     private final ParsingStateHelper parsingStateHelper;
-
-    private LibraryAliasFixer libraryFixer;
 
     private final PreviousLineHandler previousLineHandler;
 
@@ -150,8 +147,6 @@ public class TextualRobotFileParser {
     }
 
     private void initializeRecognizersAndMappers(final RobotVersion robotVersion) {
-        libraryFixer = new LibraryAliasFixer(robotVersion, utility, parsingStateHelper);
-
         recognizers.clear();
         recognizers.addAll(new TableHeadersRecognizersProvider().getRecognizers(robotVersion));
         recognizers.addAll(new SettingsRecognizersProvider().getRecognizers(robotVersion));
@@ -284,7 +279,7 @@ public class TextualRobotFileParser {
                 currentOffset += Constant.getEndOfLineLength(endOfLine);
                 lineNumber++;
                 lastColumnProcessed = 0;
-                libraryFixer.checkAndFixLine(parsingOutput, processingState);
+
                 /**
                  * special for case
                  *

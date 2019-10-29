@@ -11,7 +11,6 @@ import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -20,11 +19,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class VariablesImportPathMapper implements IParsingMapper {
 
-    private final ElementsUtility utility;
-
-    public VariablesImportPathMapper() {
-        this.utility = new ElementsUtility();
-    }
+    private final ElementsUtility utility = new ElementsUtility();
 
     @Override
     public RobotToken map(final RobotLine currentLine,
@@ -34,16 +29,8 @@ public class VariablesImportPathMapper implements IParsingMapper {
         rt.getTypes().add(0, RobotTokenType.SETTING_VARIABLES_FILE_NAME);
         rt.setText(text);
 
-        final AImported imported = utility.getNearestImport(robotFileOutput);
-        VariablesImport vars;
-        if (imported instanceof VariablesImport) {
-            vars = (VariablesImport) imported;
-        } else {
-            vars = null;
-
-            // FIXME: sth wrong - declaration of variables not inside setting
-            // and was not catch by previous variables declaration logic
-        }
+        final VariablesImport vars = utility.findNearestVariablesImport(robotFileOutput)
+                .orElseThrow(IllegalStateException::new);
         vars.setPathOrName(rt);
 
         processingState.push(ParsingState.SETTING_VARIABLE_IMPORT_PATH);
