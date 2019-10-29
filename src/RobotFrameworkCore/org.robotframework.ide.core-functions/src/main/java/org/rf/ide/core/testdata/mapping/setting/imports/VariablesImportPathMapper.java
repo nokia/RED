@@ -29,7 +29,7 @@ public class VariablesImportPathMapper implements IParsingMapper {
         rt.getTypes().add(0, RobotTokenType.SETTING_VARIABLES_FILE_NAME);
         rt.setText(text);
 
-        final VariablesImport vars = utility.findNearestVariablesImport(robotFileOutput)
+        final VariablesImport vars = utility.getCurrentImport(robotFileOutput, VariablesImport.class)
                 .orElseThrow(IllegalStateException::new);
         vars.setPathOrName(rt);
 

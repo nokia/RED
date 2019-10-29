@@ -27,7 +27,7 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
         rt.getTypes().add(0, RobotTokenType.SETTING_LIBRARY_NAME);
         rt.setText(text);
 
-        final LibraryImport lib = utility.findNearestLibraryImport(robotFileOutput)
+        final LibraryImport lib = utility.getCurrentImport(robotFileOutput, LibraryImport.class)
                 .orElseThrow(IllegalStateException::new);
         lib.setPathOrName(rt);
 

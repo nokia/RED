@@ -33,7 +33,7 @@ public class ResourceTrashDataMapper implements IParsingMapper {
         rt.getTypes().add(0, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
         rt.setText(text);
 
-        final ResourceImport resource = utility.findNearestResourceImport(robotFileOutput)
+        final ResourceImport resource = utility.getCurrentImport(robotFileOutput, ResourceImport.class)
                 .orElseThrow(IllegalStateException::new);
         resource.addUnexpectedTrashArgument(rt);
 

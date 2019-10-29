@@ -24,9 +24,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
-import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
-import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
-import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -59,27 +56,14 @@ public class ElementsUtility {
         }
     }
 
-    public Optional<LibraryImport> findNearestLibraryImport(final RobotFileOutput robotFileOutput) {
-        return Optional.ofNullable(getNearestImport(robotFileOutput))
-                .filter(LibraryImport.class::isInstance)
-                .map(LibraryImport.class::cast);
-    }
-
-    public Optional<ResourceImport> findNearestResourceImport(final RobotFileOutput robotFileOutput) {
-        return Optional.ofNullable(getNearestImport(robotFileOutput))
-                .filter(ResourceImport.class::isInstance)
-                .map(ResourceImport.class::cast);
-    }
-
-    public Optional<VariablesImport> findNearestVariablesImport(final RobotFileOutput robotFileOutput) {
-        return Optional.ofNullable(getNearestImport(robotFileOutput))
-                .filter(VariablesImport.class::isInstance)
-                .map(VariablesImport.class::cast);
-    }
-
-    private AImported getNearestImport(final RobotFileOutput robotFileOutput) {
+    public <T extends AImported> Optional<T> getCurrentImport(final RobotFileOutput robotFileOutput,
+            final Class<T> expected) {
         final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
-        return imports.isEmpty() ? null : imports.get(imports.size() - 1);
+        if (imports.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(imports.get(imports.size() - 1)).filter(expected::isInstance).map(expected::cast);
+        }
     }
 
     public RobotToken computeCorrectRobotToken(final Stack<ParsingState> processingState, final FilePosition fp,
