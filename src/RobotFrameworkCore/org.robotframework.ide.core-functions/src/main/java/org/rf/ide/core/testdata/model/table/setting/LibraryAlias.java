@@ -23,6 +23,14 @@ public class LibraryAlias extends AModelElement<LibraryImport> implements Serial
 
     private RobotToken libraryAlias;
 
+    public static boolean equalsIgnoreSpaces(final String a, final String b, final boolean caseSensitive) {
+        if (caseSensitive) {
+            return a.replaceAll("\\s", "").equals(b.replaceAll("\\s", ""));
+        } else {
+            return a.replaceAll("\\s", "").equalsIgnoreCase(b.replaceAll("\\s", ""));
+        }
+    }
+
     public LibraryAlias(final RobotToken aliasDeclaration) {
         fixForTheType(aliasDeclaration, RobotTokenType.SETTING_LIBRARY_ALIAS, true);
         this.libraryAliasDeclaration = aliasDeclaration;
@@ -75,7 +83,7 @@ public class LibraryAlias extends AModelElement<LibraryImport> implements Serial
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation should be performed from LibraryImport.");
     }
 }

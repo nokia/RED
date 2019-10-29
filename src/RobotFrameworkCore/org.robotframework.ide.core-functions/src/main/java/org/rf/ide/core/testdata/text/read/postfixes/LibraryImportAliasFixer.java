@@ -52,19 +52,11 @@ class LibraryImportAliasFixer implements IPostProcessFixer {
             final String aliasRepresentation = RobotTokenType.SETTING_LIBRARY_ALIAS
                     .getTheMostCorrectOneRepresentation(robotVersion)
                     .getRepresentation();
-            if (equalsIgnoreSpaces(penultimateArg, aliasRepresentation,
+            if (LibraryAlias.equalsIgnoreSpaces(penultimateArg, aliasRepresentation,
                     robotVersion.isNewerOrEqualTo(new RobotVersion(3, 1)))) {
                 return size - 2;
             }
         }
         return -1;
-    }
-
-    private boolean equalsIgnoreSpaces(final String a, final String b, final boolean caseSensitive) {
-        if (caseSensitive) {
-            return a.replaceAll("\\s", "").equals(b.replaceAll("\\s", ""));
-        } else {
-            return a.replaceAll("\\s", "").equalsIgnoreCase(b.replaceAll("\\s", ""));
-        }
     }
 }

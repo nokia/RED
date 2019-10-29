@@ -77,7 +77,7 @@ public class ElementsUtility {
                 .map(VariablesImport.class::cast);
     }
 
-    public AImported getNearestImport(final RobotFileOutput robotFileOutput) {
+    private AImported getNearestImport(final RobotFileOutput robotFileOutput) {
         final List<AImported> imports = robotFileOutput.getFileModel().getSettingTable().getImports();
         return imports.isEmpty() ? null : imports.get(imports.size() - 1);
     }

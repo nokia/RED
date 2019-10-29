@@ -15,7 +15,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryAliasRecognizerOld;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -50,12 +50,14 @@ class LibraryAliasNotInUpperCaseValidator31 extends VersionDependentModelUnitVal
             if (!alias.isPresent()) {
                 final List<RobotToken> args = libImport.getArguments();
                 if (args.size() > 1) {
-                    final RobotToken possiblyLowerCasedWithName = args.get(args.size() - 2);
-                    if (LibraryAliasRecognizerOld.EXPECTED.matcher(possiblyLowerCasedWithName.getText()).matches()) {
+                    final String aliasRepresentation = RobotTokenType.SETTING_LIBRARY_ALIAS
+                            .getTheMostCorrectOneRepresentation(new RobotVersion(3, 1))
+                            .getRepresentation();
+                    final RobotToken penultimateArg = args.get(args.size() - 2);
+                    if (LibraryAlias.equalsIgnoreSpaces(aliasRepresentation, penultimateArg.getText(), false)) {
                         reporter.handleProblem(RobotProblem.causedBy(
                                 GeneralSettingsProblem.LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION_NOT_RECOGNIZED)
-                                .formatMessageWith(possiblyLowerCasedWithName.getText()), file,
-                                possiblyLowerCasedWithName);
+                                .formatMessageWith(penultimateArg.getText()), file, penultimateArg);
                     }
                 }
             }
