@@ -25,7 +25,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -51,7 +51,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -77,7 +77,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -103,7 +103,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -129,7 +129,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -155,7 +155,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
@@ -182,7 +182,7 @@
 				</repository>
 				<repository>
 					<id>nattable</id>
-					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>

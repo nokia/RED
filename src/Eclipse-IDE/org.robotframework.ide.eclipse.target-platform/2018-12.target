@@ -25,11 +25,11 @@
             <repository location="http://download.eclipse.org/releases/2018-12/"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
-            <unit id="org.eclipse.nebula.widgets.nattable.core.feature.feature.group" version="1.5.0.201703192131"/>
-            <unit id="org.eclipse.nebula.widgets.nattable.core.source.feature.feature.group" version="1.5.0.201703192131"/>
-            <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.5.0.201703192131"/>
-            <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.5.0.201703192131"/>
-            <repository location="http://download.eclipse.org/nattable/releases/1.5.0/repository/"/>
+            <unit id="org.eclipse.nebula.widgets.nattable.core.feature.feature.group" version="1.6.0.201909181823"/>
+            <unit id="org.eclipse.nebula.widgets.nattable.core.source.feature.feature.group" version="1.6.0.201909181823"/>
+            <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.6.0.201909181823"/>
+            <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.6.0.201909181823"/>
+            <repository location="http://download.eclipse.org/nattable/releases/1.6.0/repository/"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
             <unit id="com.codeaffine.eclipse.swt.feature.feature.group" version="0.5.0.20170519-1200"/>

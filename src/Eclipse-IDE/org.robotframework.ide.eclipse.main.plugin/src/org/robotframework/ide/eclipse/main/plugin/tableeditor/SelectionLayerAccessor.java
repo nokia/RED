@@ -287,7 +287,7 @@ public class SelectionLayerAccessor {
         final boolean isDownBelow = viewportPosition >= viewportHeight;
         if (isDownBelow) {
             final int viewPortTargetPosition = Math.min(elementRow + viewportHeight, dataProvider.getRowCount() - 1);
-            table.doCommand(new ShowRowInViewportCommand(viewportLayer, viewPortTargetPosition));
+            table.doCommand(new ShowRowInViewportCommand(viewPortTargetPosition));
         }
 
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
