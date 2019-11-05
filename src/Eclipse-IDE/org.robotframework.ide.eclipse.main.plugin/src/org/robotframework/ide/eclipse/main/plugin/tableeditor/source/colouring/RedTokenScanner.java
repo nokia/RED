@@ -27,19 +27,19 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class RedTokenScanner implements IRedTokenScanner {
 
-    private RobotDocument document;
+    protected IDocument document;
 
     private final List<ISyntaxColouringRule> rules;
 
     private Deque<IRobotLineElement> tokensToAnalyze;
 
-    private List<RobotLine> lines;
+    protected List<RobotLine> lines;
 
     private Position lastTokenPosition;
 
-    private int rangeOffset;
-    private int rangeLength;
-    private int rangeLine;
+    protected int rangeOffset;
+    protected int rangeLength;
+    protected int rangeLine;
     private int currentOffsetInToken;
 
     public RedTokenScanner(final ISyntaxColouringRule... rules) {
@@ -53,7 +53,7 @@ public class RedTokenScanner implements IRedTokenScanner {
 
     @Override
     public void setRange(final IDocument document, final int offset, final int length) {
-        this.document = (RobotDocument) document;
+        this.document = document;
 
         if (lastTokenPosition == null || lastTokenPosition.getOffset() + lastTokenPosition.getLength() != offset) {
             this.tokensToAnalyze = null;
@@ -69,22 +69,18 @@ public class RedTokenScanner implements IRedTokenScanner {
 
     @Override
     public IToken nextToken() {
-        return nextToken(new Supplier<Deque<IRobotLineElement>>() {
-
-            @Override
-            public Deque<IRobotLineElement> get() {
-                try {
-                    lines = document.getNewestModel().getFileContent();
-                    return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
-                } catch (final InterruptedException e) {
-                    throw new UnableToScanTokensException("Unable to build tokens queue", e);
-                }
+        return nextToken(() -> {
+            try {
+                lines = ((RobotDocument) document).getNewestModel().getFileContent();
+                return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
+            } catch (final InterruptedException e) {
+                throw new UnableToScanTokensException("Unable to build tokens queue", e);
             }
         });
     }
 
     @VisibleForTesting
-    IToken nextToken(final Supplier<Deque<IRobotLineElement>> elementsQueueSupplier) {
+    protected IToken nextToken(final Supplier<Deque<IRobotLineElement>> elementsQueueSupplier) {
         if (tokensToAnalyze == null) {
             tokensToAnalyze = elementsQueueSupplier.get();
 

@@ -33,12 +33,10 @@
 #   Licensed under the Apache License, Version 2.0
 #      http://www.apache.org/licenses/LICENSE-2.0
 
-#
 # Modified by Mateusz Marzec under NSN copyrights
 # Copyright 2015 Nokia Solutions and Networks
 # * Licensed under the Apache License, Version 2.0,
 # * see license.txt file for details.
-#
 
 
 '''A Robot Framework listener that sends information to a socket'''
@@ -214,6 +212,7 @@ class RedResponseMessage:
     EVALUATE_CONDITION = 'evaluate_condition'
     GET_VARIABLES = 'get_variables'
     CHANGE_VARIABLE = 'change_variable'
+    EVALUATE_EXPRESSION = 'evaluate_expression'
     
 class AgentEventMessage:
     
@@ -231,6 +230,7 @@ class AgentEventMessage:
     SHOULD_CONTINUE = 'should_continue'
     CONDITION_RESULT = 'condition_result'
     VARIABLES = 'variables'
+    EXPRESSION_EVAL_RESULT = 'expression_result'
     PAUSED = 'paused'
     RESUMED = 'resumed'
     RESOURCE_IMPORT = 'resource_import'
@@ -265,7 +265,7 @@ class TestRunnerAgent:
     
     CONNECTION_SLEEP_BETWEEN_TRIALS = 2
     
-    RED_AGENT_PROTOCOL_VERSION = 3
+    RED_AGENT_PROTOCOL_VERSION = 4
     
     MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
@@ -461,16 +461,19 @@ class TestRunnerAgent:
         signalhandler.STOP_SIGNAL_MONITOR(signal.SIGINT, None)
                 
     def _evaluate_condition(self, condition):
-        robot_version_str = robot.version.get_version(True)
-        robot_version = tuple([int(num) for num in re.split('\\.', robot_version_str)])
-        evaluator = self._evaluate_condition_old_style if robot_version < (3, 0, 3) else self._evaluate_condition_new_style
-        
         elements = condition[RedResponseMessage.EVALUATE_CONDITION]
         keywordName, argList = elements[0], elements[1:]
-        return evaluator(keywordName, argList)
         
+        return _evaluate_keyword_call(keywordName, argList)
+    
+    def _evaluate_keyword_call(self, keywordName, argList):
+        robot_version_str = robot.version.get_version(True)
+        robot_version = tuple([int(num) for num in re.split('\\.', robot_version_str)])
+        evaluator = self._evaluate_keyword_call_old_style if robot_version < (3, 0, 3) else self._evaluate_keyword_call_new_style
+        
+        return evaluator(keywordName, argList)
 
-    def _evaluate_condition_old_style(self, keywordName, argList):
+    def _evaluate_keyword_call_old_style(self, keywordName, argList):
         try:
             result = self._built_in.run_keyword_and_return_status(keywordName, *argList)
             self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': result})
@@ -480,7 +483,7 @@ class TestRunnerAgent:
             self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'error': msg})
             return True
 
-    def _evaluate_condition_new_style(self,  keywordName, argList):
+    def _evaluate_keyword_call_new_style(self,  keywordName, argList):
         try:
             self._built_in.run_keyword(keywordName, *argList)
             self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': True})
@@ -503,6 +506,7 @@ class TestRunnerAgent:
             RedResponseMessage.DISCONNECT] 
         if self._mode == AgentMode.DEBUG:
             possible_responses.append(RedResponseMessage.CHANGE_VARIABLE)
+            possible_responses.append(RedResponseMessage.EVALUATE_EXPRESSION)
         
         self._send_variables()
         while True:
@@ -528,6 +532,10 @@ class TestRunnerAgent:
                 except ValueError as e:
                     self._print_error_message(str(e))
                     self._send_variables(str(e))
+            elif response_name == RedResponseMessage.EVALUATE_EXPRESSION:
+                # evaluation could have changed some variables so we need to send them
+                self._evaluate_expression_and_send_result(response)
+                self._send_variables()
                     
     def _change_variable_value(self, response):
         try:
@@ -657,6 +665,26 @@ class TestRunnerAgent:
             i += 1
         all_frames.reverse()
         return all_frames
+    
+    def _evaluate_expression_and_send_result(self, response):
+        try:
+            data = response[RedResponseMessage.EVALUATE_EXPRESSION]
+            result = str(self._evaluate_expression(data))
+            self._send_to_server(AgentEventMessage.EXPRESSION_EVAL_RESULT, {'type': data['type'], 'id' : data['id'], 
+                                                                            'result': result, 'error' : None})
+        except Exception as e:
+            self._send_to_server(AgentEventMessage.EXPRESSION_EVAL_RESULT, {'type': data['type'], 'id' : data['id'], 
+                                                                            'result': None, 'error' : str(e)})
+    
+    def _evaluate_expression(self, data):
+        if data['type'] == 'robot':
+            name, args = data['expr'][0], data['expr'][1:]
+            return self._built_in.run_keyword(name, *args)
+        elif data['type'] == 'variable':
+            name = self._built_in._get_var_name(data['expr'][0])
+            return self._built_in._variables[name]
+        elif data['type'] == 'python':
+            return self._built_in.evaluate(data['expr'][0])
 
     def resource_import(self, name, attributes):
         self._send_to_server(AgentEventMessage.RESOURCE_IMPORT, name, attributes)

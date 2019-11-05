@@ -407,6 +407,14 @@
             name="Documentation View"
             restorable="true">
       </view>
+      <view
+            category="org.robotframework.ide.eclipse.views"
+            class="org.robotframework.ide.eclipse.main.plugin.views.debugshell.DebugShellViewWrapper"
+            icon="resources/robot.png"
+            id="org.robotframework.ide.DebugShell"
+            name="Debug Shell"
+            restorable="true">
+      </view>
  </extension>
  <extension point="org.eclipse.core.runtime.adapters">
       <factory class="org.eclipse.core.runtime.IAdaptable"
@@ -1254,6 +1262,11 @@
           name="Context for Robot files selection outline"
           parentId="org.eclipse.ui.contexts.window">
     </context>
+    <context
+          id="org.robotframework.red.view.debug.shell"
+          name="In Robot Debug Shell view"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -1480,6 +1493,11 @@
              name="Mode"
              optional="false">
        </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.inspectElementFromSource"
+          name="Inspect element">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
@@ -3311,6 +3329,15 @@
          </and>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.views.debugshell.InspectElementHandler"
+          commandId="org.robotframework.red.inspectElementFromSource">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Red xml editor handlers"
@@ -3926,6 +3953,12 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+-">
+    </key>
+    <key
+          commandId="org.robotframework.red.view.debug.switchShellMode"
+          contextId="org.robotframework.red.view.debug.shell"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+T">
     </key>
  </extension>
  <extension
@@ -5485,6 +5518,19 @@
          <dynamic
                class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestInDebugDynamicMenuItem"
                id="org.robotframework.red.menu.dynamic.source.debug">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </dynamic>
+         <dynamic
+               class="org.robotframework.ide.eclipse.main.plugin.views.debugshell.InspectElementInDebugShellDynamicMenuItem"
+               id="org.robotframework.red.menu.dynamic.source.inspectInDebugShell">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -7539,6 +7585,51 @@
                   commandId="org.robotframework.red.view.execution.rerunNonExecutedTests"
                   icon="resources/relaunchne.png"
                   label="Rerun Non-Executed Tests Only"
+                  style="push">
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.debug.clearDebugShell"
+               name="Clear">
+         </command>
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.debug.switchShellMode"
+               name="Switch mode">
+         </command>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.debugshell.ClearDebugLogViewHandler"
+               commandId="org.robotframework.red.view.debug.clearDebugShell">
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.debugshell.SwitchShellModeHandler"
+               commandId="org.robotframework.red.view.debug.switchShellMode">
+         </handler>
+      </extension>
+      <extension
+            name="Debug Shell View menus"
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.robotframework.ide.DebugShell">
+            <command
+                  commandId="org.robotframework.red.view.debug.switchShellMode"
+                  icon="resources/gear.png"
+                  label="Switch mode"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.debug.clearDebugShell"
+                  disabledIcon="IMG_ELCL_REMOVE_DISABLED"
+                  icon="IMG_ELCL_REMOVE"
+                  label="Clear"
                   style="push">
             </command>
          </menuContribution>

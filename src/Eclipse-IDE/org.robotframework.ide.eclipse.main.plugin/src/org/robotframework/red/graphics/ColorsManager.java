@@ -7,12 +7,15 @@ package org.robotframework.red.graphics;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class ColorsManager {
+
+    private static final int LIMIT = 130;
     private static final Map<RGB, Color> COLOR_TABLE = new HashMap<>(10);
 
     private ColorsManager() {
@@ -111,11 +114,28 @@ public class ColorsManager {
         COLOR_TABLE.clear();
     }
 
+    public static boolean isDarkColor(final RGB color) {
+        return calculatePerceivedBrightness(color) < LIMIT;
+    }
+
+    // the formula is referenced in the internet in topics regarding perceived brightness
+    private static int calculatePerceivedBrightness(final RGB color) {
+        final int r = color.red;
+        final int g = color.green;
+        final int b = color.blue;
+        return (int) Math.sqrt(r * r * .299 + g * g * .587 + b * b * .114);
+    }
+
     public static RGB blend(final RGB val1, final RGB val2) {
         return new RGB(blend(val1.red, val2.red), blend(val1.green, val2.green), blend(val1.blue, val2.blue));
     }
 
     private static int blend(final int a, final int b) {
         return (a + b) / 2;
+    }
+
+    public static RGB factorRgb(final RGB color, final double factor) {
+        final IntFunction<Integer> fun = i -> Math.min(255, Math.max(0, ((int) (i * factor))));
+        return new RGB(fun.apply(color.red), fun.apply(color.green), fun.apply(color.blue));
     }
 }

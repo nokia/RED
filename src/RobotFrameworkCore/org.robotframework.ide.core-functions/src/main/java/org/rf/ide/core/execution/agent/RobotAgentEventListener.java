@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.agent;
 
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
+import org.rf.ide.core.execution.agent.event.ExpressionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
@@ -66,6 +67,8 @@ public interface RobotAgentEventListener {
     void handleShouldContinue(ShouldContinueEvent event);
 
     void handleConditionEvaluated(ConditionEvaluatedEvent event);
+
+    void handleExpressionEvaluated(ExpressionEvaluatedEvent event);
 
     void handlePaused(PausedEvent event);
 

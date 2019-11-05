@@ -31,12 +31,12 @@ public class ColoringTokens {
 
     private final RedPreferences preferences;
 
-    ColoringTokens(final RedPreferences preferences) {
+    public ColoringTokens(final RedPreferences preferences) {
         this.preferences = preferences;
         this.tokens = new HashMap<>();
     }
 
-    void initialize() {
+    public void initialize() {
         tokens.putAll(
                 EnumSet.allOf(SyntaxHighlightingCategory.class).stream().collect(toMap(Function.identity(), cat -> {
                     final ColoringPreference coloringPref = preferences.getSyntaxColoring(cat);
@@ -92,7 +92,7 @@ public class ColoringTokens {
         token.setData(newAttributes);
     }
 
-    Token get(final SyntaxHighlightingCategory category) {
+    public Token get(final SyntaxHighlightingCategory category) {
         return tokens.get(category);
     }
 

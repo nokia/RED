@@ -412,7 +412,7 @@ public class RobotDebugTargetTest {
         target.setThread(thread);
 
         final ExecutionPauseReasonsListener listener = target.new ExecutionPauseReasonsListener();
-        listener.pausedAfterVariableChange(42);
+        listener.pausedAfterVariableChange();
 
         verify(process).suspended();
         verify(thread).fireSuspendEvent(DebugEvent.EVALUATION);

@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -23,6 +25,7 @@ import org.rf.ide.core.execution.debug.StackFrameVariable;
 import org.rf.ide.core.execution.debug.Stacktrace;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.execution.debug.UserProcessDebugController.PauseReasonListener;
+import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,6 +43,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private final Stacktrace stacktrace;
 
     private final UserProcessDebugController userController;
+
+    private final Semaphore exprEvalSemaphore = new Semaphore(1);
 
     public RobotDebugTarget(final String name, final ILaunch launch, final Stacktrace stacktrace,
             final UserProcessDebugController userController) {
@@ -188,6 +193,21 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         userController.changeVariableInnerValue(frame, variable, path, arguments);
     }
 
+    public void evaluate(final int exprId, final ExpressionType type, final String expression) {
+        if (type == ExpressionType.ROBOT) {
+            final String[] splitted = expression.split("  +");
+            userController.evaluateRobotKeywordCall(exprId, splitted[0],
+                    Arrays.asList(Arrays.copyOfRange(splitted, 1, splitted.length)));
+
+        } else if (type == ExpressionType.PYTHON) {
+            userController.evaluatePythonExpression(exprId, expression);
+
+        } else if (type == ExpressionType.VARIABLE) {
+            userController.evaluateRobotVariable(exprId, expression);
+        }
+        exprEvalSemaphore.release();
+    }
+
     @Override
     public void breakpointAdded(final IBreakpoint breakpoint) {
         // nothing to do
@@ -254,7 +274,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
 
         @Override
-        public void pausedAfterVariableChange(final int frameLevel) {
+        public void pausedAfterVariableChange() {
+            suspended(DebugEvent.EVALUATION);
+        }
+
+        @Override
+        public void pausedAfterExpressionEvaluated() {
             suspended(DebugEvent.EVALUATION);
         }
 

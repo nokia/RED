@@ -78,7 +78,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             }
         }
 
-        final int line = DocumentUtilities.getLine(document, offset);
+        final int line = getLineNumber(document, offset);
         final int lastTokenOffset = lastTokenOffset(offset, line, assist.getModel());
 
         final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(lastTokenOffset,
@@ -95,6 +95,10 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             proposals.add(new RedCompletionProposalAdapter(assist, varProposal, modification));
         }
         return proposals;
+    }
+
+    protected int getLineNumber(final IDocument document, final int offset) {
+        return DocumentUtilities.getLine(document, offset);
     }
 
     private AssistProposalPredicate<String> createGlobalVarPredicate(final int lastTokenOffset,

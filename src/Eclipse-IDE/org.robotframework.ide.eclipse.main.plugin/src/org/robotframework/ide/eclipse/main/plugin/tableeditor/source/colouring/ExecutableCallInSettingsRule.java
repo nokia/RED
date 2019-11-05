@@ -109,7 +109,7 @@ public class ExecutableCallInSettingsRule extends ExecutableCallRule {
     @Override
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
-        final List<RobotToken> tokensBefore = getPreviousTokensInThisExecutable(token, context, shouldStopOnElement);
+        final List<RobotToken> tokensBefore = getPreviousTokensInExecutable(token, context, shouldStopOnElement);
         return (tokensBefore.isEmpty() && isKeywordName.test(token) && !token.getText().equalsIgnoreCase("none"))
                 || isNestedKeyword(token, context, tokensBefore);
     }

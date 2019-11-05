@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.jface.text.rules.IToken;
@@ -47,7 +48,7 @@ public class ExecutableCallRule extends VariableUsageRule {
                 elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_NAME));
     }
 
-    private final EnumSet<RobotTokenType> acceptableTypes;
+    private final Set<? extends IRobotTokenType> acceptableTypes;
 
     private final IToken gherkinToken;
 
@@ -58,7 +59,8 @@ public class ExecutableCallRule extends VariableUsageRule {
     private final Predicate<IRobotLineElement> shouldStopOnElement;
 
     protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken libraryToken,
-            final IToken quoteToken, final IToken embeddedVariablesToken, final EnumSet<RobotTokenType> acceptableTypes,
+            final IToken quoteToken, final IToken embeddedVariablesToken,
+            final Set<? extends IRobotTokenType> acceptableTypes,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
         super(embeddedVariablesToken, textToken);
         this.gherkinToken = gherkinToken;
@@ -164,7 +166,7 @@ public class ExecutableCallRule extends VariableUsageRule {
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
 
-        final List<RobotToken> tokensBefore = getPreviousTokensInThisExecutable(token, context, shouldStopOnElement);
+        final List<RobotToken> tokensBefore = getPreviousTokensInExecutable(token, context, shouldStopOnElement);
 
         if (!isNestedKeyword(token, context, tokensBefore)) {
             for (final RobotToken prevToken : tokensBefore) {
@@ -190,7 +192,7 @@ public class ExecutableCallRule extends VariableUsageRule {
             if (SpecialKeywords.isNestingKeyword(qualifiedKeywordName)) {
                 final List<RobotToken> execTokens = new ArrayList<>(tokensBefore);
                 execTokens.add((RobotToken) token);
-                execTokens.addAll(getNextTokensInThisExecutable(token, context));
+                execTokens.addAll(getNextTokensInExecutable(token, context));
 
                 if (SpecialKeywords.isKeywordNestedInKeyword(qualifiedKeywordName, i, tokensBefore.size() - i,
                         execTokens)) {
@@ -262,7 +264,12 @@ public class ExecutableCallRule extends VariableUsageRule {
         return false;
     }
 
-    private static List<RobotToken> getNextTokensInThisExecutable(final IRobotLineElement token,
+    protected List<RobotToken> getPreviousTokensInExecutable(final IRobotLineElement token, final List<RobotLine> lines,
+            final Predicate<IRobotLineElement> shouldStopOnElement) {
+        return getPreviousTokensInThisExecutable(token, lines, shouldStopOnElement);
+    }
+
+    protected List<RobotToken> getNextTokensInExecutable(final IRobotLineElement token,
             final List<RobotLine> lines) {
         final List<RobotToken> tokens = new ArrayList<>();
         final int line = token.getLineNumber();

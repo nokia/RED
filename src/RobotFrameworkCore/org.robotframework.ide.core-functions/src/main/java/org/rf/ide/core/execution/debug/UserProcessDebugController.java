@@ -17,6 +17,7 @@ import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
 import org.rf.ide.core.execution.server.response.ChangeVariable;
 import org.rf.ide.core.execution.server.response.EvaluateCondition;
+import org.rf.ide.core.execution.server.response.EvaluateExpression;
 import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -83,12 +84,14 @@ public class UserProcessDebugController extends UserProcessController {
             pauseListeners.stream().forEach(listener -> listener.pausedByStepping());
 
         } else if (susupensionData.reason == SuspendReason.VARIABLE_CHANGE) {
-            final int frameLevel = (int) susupensionData.data[0];
-            pauseListeners.stream().forEach(listener -> listener.pausedAfterVariableChange(frameLevel));
+            pauseListeners.stream().forEach(listener -> listener.pausedAfterVariableChange());
 
         } else if (susupensionData.reason == SuspendReason.ERRONEOUS_STATE) {
             final String error = (String) susupensionData.data[0];
             pauseListeners.stream().forEach(listener -> listener.pausedOnError(error));
+
+        } else if (susupensionData.reason == SuspendReason.EXPRESSION_EVALUATED) {
+            pauseListeners.stream().forEach(listener -> listener.pausedAfterExpressionEvaluated());
         }
         susupensionData = null;
         frames().forEach(frame -> frame.unmark(StackFrameMarker.STEPPING));
@@ -100,8 +103,7 @@ public class UserProcessDebugController extends UserProcessController {
         this.lastPausingPoint = pausingPoint;
         return super.takeCurrentResponse(pausingPoint, currentlyFailedKeyword).map(Optional::of)
                 .orElseGet(() -> pauseOnErrorResponse(pausingPoint)).map(Optional::of)
-                .orElseGet(() -> breakpointHitResponse(pausingPoint, currentlyFailedKeyword))
-                .map(Optional::of)
+                .orElseGet(() -> breakpointHitResponse(pausingPoint, currentlyFailedKeyword)).map(Optional::of)
                 .orElseGet(() -> userSteppingResponse(pausingPoint));
     }
 
@@ -266,7 +268,7 @@ public class UserProcessDebugController extends UserProcessController {
             final List<String> arguments) {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), arguments);
-        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE, frame.getLevel());
+        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
         manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
@@ -274,8 +276,26 @@ public class UserProcessDebugController extends UserProcessController {
             final List<Object> path, final List<String> arguments) {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), path, arguments);
-        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE, frame.getLevel());
+        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
         manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {}));
+    }
+
+    public void evaluateRobotKeywordCall(final int exprId, final String keywordName, final List<String> arguments) {
+        final EvaluateExpression evalResponse = EvaluateExpression.robot(exprId, keywordName, arguments);
+        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
+    }
+
+    public void evaluateRobotVariable(final int exprId, final String variable) {
+        final EvaluateExpression evalResponse = EvaluateExpression.variable(exprId, variable);
+        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
+    }
+
+    public void evaluatePythonExpression(final int exprId, final String expression) {
+        final EvaluateExpression evalResponse = EvaluateExpression.python(exprId, expression);
+        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public static interface PauseReasonListener {
@@ -288,7 +308,9 @@ public class UserProcessDebugController extends UserProcessController {
 
         public void pausedOnError(String error);
 
-        public void pausedAfterVariableChange(int frameLevel);
+        public void pausedAfterVariableChange();
+
+        public void pausedAfterExpressionEvaluated();
     }
 
     public static class DebuggerPreferences {
@@ -326,7 +348,7 @@ public class UserProcessDebugController extends UserProcessController {
 
     @VisibleForTesting
     public enum SuspendReason {
-        USER_REQUEST, BREAKPOINT, STEPPING, VARIABLE_CHANGE, ERRONEOUS_STATE
+        USER_REQUEST, BREAKPOINT, STEPPING, VARIABLE_CHANGE, EXPRESSION_EVALUATED, ERRONEOUS_STATE
     }
 
     @VisibleForTesting

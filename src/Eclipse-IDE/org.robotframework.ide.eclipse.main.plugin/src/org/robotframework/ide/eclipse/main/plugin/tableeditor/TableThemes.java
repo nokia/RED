@@ -28,22 +28,8 @@ import com.codeaffine.eclipse.swt.widget.scrollbar.FlatScrollBar;
  */
 public class TableThemes {
 
-    private static final int LIMIT = 130;
-
     public static TableTheme getTheme(final RGB backgroundInUse) {
-        return isDarkColor(backgroundInUse) ? new DarkTheme() : new BrightTheme();
-    }
-
-    private static boolean isDarkColor(final RGB color) {
-        return calculatePerceivedBrightness(color) < LIMIT;
-    }
-
-    // the formula is referenced in the internet in topics regarding perceived brightness
-    private static int calculatePerceivedBrightness(final RGB color) {
-        final int r = color.red;
-        final int g = color.green;
-        final int b = color.blue;
-        return (int) Math.sqrt(r * r * .299 + g * g * .587 + b * b * .114);
+        return ColorsManager.isDarkColor(backgroundInUse) ? new DarkTheme() : new BrightTheme();
     }
 
     public static abstract class TableTheme {

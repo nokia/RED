@@ -17,6 +17,7 @@ import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
+import org.rf.ide.core.execution.agent.event.ExpressionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
@@ -123,6 +124,9 @@ class RobotAgentEventDispatcher {
                     break;
                 case "condition_result":
                     handleConditionResult(eventMap);
+                    break;
+                case "expression_result":
+                    handleExpressionResult(eventMap);
                     break;
                 case "paused":
                     handlePause();
@@ -249,6 +253,13 @@ class RobotAgentEventDispatcher {
         final ConditionEvaluatedEvent event = ConditionEvaluatedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleConditionEvaluated(event);
+        }
+    }
+
+    private void handleExpressionResult(final Map<String, Object> eventMap) {
+        final ExpressionEvaluatedEvent event = ExpressionEvaluatedEvent.from(eventMap);
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleExpressionEvaluated(event);
         }
     }
 

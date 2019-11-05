@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.agent;
 
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
+import org.rf.ide.core.execution.agent.event.ExpressionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
@@ -127,6 +128,11 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
 
     @Override
     public void handleConditionEvaluated(final ConditionEvaluatedEvent event) {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleExpressionEvaluated(final ExpressionEvaluatedEvent event) {
         // implement in subclasses
     }
 

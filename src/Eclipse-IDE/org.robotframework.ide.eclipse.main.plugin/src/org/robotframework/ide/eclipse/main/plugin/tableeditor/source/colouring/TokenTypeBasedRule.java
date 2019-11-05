@@ -5,6 +5,7 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +16,15 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-class TokenTypeBasedRule implements ISyntaxColouringRule {
+public class TokenTypeBasedRule implements ISyntaxColouringRule {
 
     protected final IToken textToken;
 
     private final Collection<? extends IRobotTokenType> types;
+
+    public TokenTypeBasedRule(final IToken textToken, final IRobotTokenType... types) {
+        this(textToken, Arrays.asList(types));
+    }
 
     public TokenTypeBasedRule(final IToken textToken, final Collection<? extends IRobotTokenType> types) {
         this.textToken = textToken;

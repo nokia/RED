@@ -192,12 +192,12 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
         controller.whenSuspended(listener1);
         controller.whenSuspended(listener2);
-        controller.setSuspensionData(new SuspensionData(SuspendReason.VARIABLE_CHANGE, 3));
+        controller.setSuspensionData(new SuspensionData(SuspendReason.VARIABLE_CHANGE));
 
         controller.executionPaused();
 
-        verify(listener1).pausedAfterVariableChange(3);
-        verify(listener2).pausedAfterVariableChange(3);
+        verify(listener1).pausedAfterVariableChange();
+        verify(listener2).pausedAfterVariableChange();
         verifyNoMoreInteractions(listener1, listener2);
     }
 
@@ -1113,7 +1113,7 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ChangeVariable.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.VARIABLE_CHANGE);
-        assertThat(controller.getSuspensionData().data).containsExactly(2);
+        assertThat(controller.getSuspensionData().data).isEmpty();
     }
 
     @Test
@@ -1136,7 +1136,7 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.manualUserResponse).isEmpty();
         assertThat(response).containsInstanceOf(ChangeVariable.class);
         assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.VARIABLE_CHANGE);
-        assertThat(controller.getSuspensionData().data).containsExactly(2);
+        assertThat(controller.getSuspensionData().data).isEmpty();
     }
 
     @Test

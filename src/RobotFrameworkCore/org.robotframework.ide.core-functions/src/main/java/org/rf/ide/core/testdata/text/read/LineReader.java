@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -40,7 +42,6 @@ public class LineReader extends Reader {
         if (c2 != null && c2 != c1) {
             endOfLine.add(c2);
         }
-
         return endOfLine;
     }
 
@@ -78,7 +79,6 @@ public class LineReader extends Reader {
 
             eols.add(new FileRegion(fpStart, fpEnd));
         }
-
         return eols;
     }
 
@@ -126,29 +126,29 @@ public class LineReader extends Reader {
         }
 
         public static Constant get(final char c) {
-            Constant me = null;
             final Constant[] values = Constant.values();
             for (final Constant constant : values) {
                 if (constant.getChar() == c) {
-                    me = constant;
-                    break;
+                    return constant;
                 }
             }
-
-            return me;
+            return null;
         }
 
         public static List<Constant> get(final IRobotLineElement rle) {
-            final List<Constant> converted = new ArrayList<>(0);
-            final char[] cArray = rle.getText().toCharArray();
-            if (cArray.length > 0) {
-                for (final char c : cArray) {
-                    converted.add(Constant.get(c));
-                }
-            } else {
-                converted.add(EOF);
-            }
+            return get(rle.getText());
+        }
 
+        public static List<Constant> get(final String lineEnding) {
+            final char[] chars = lineEnding.toCharArray();
+
+            if (chars.length == 0) {
+                return newArrayList(EOF);
+            }
+            final List<Constant> converted = new ArrayList<>(0);
+            for (final char c : chars) {
+                converted.add(Constant.get(c));
+            }
             return converted;
         }
 
@@ -161,7 +161,6 @@ public class LineReader extends Reader {
                     break;
                 }
             }
-
             return size;
         }
     }

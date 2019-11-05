@@ -14,9 +14,9 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-class RedTokensQueueBuilder {
+public class RedTokensQueueBuilder {
 
-    Deque<IRobotLineElement> buildQueue(final int offset, final int length, final List<RobotLine> lines,
+    public Deque<IRobotLineElement> buildQueue(final int offset, final int length, final List<RobotLine> lines,
             final int startingLine) {
         final Deque<IRobotLineElement> tokens = new ArrayDeque<>();
         for (int lineIndex = startingLine; lineIndex < lines.size(); lineIndex++) {
@@ -82,6 +82,6 @@ class RedTokensQueueBuilder {
     private boolean overlapsWithPreviousToken(final Deque<IRobotLineElement> tokens,
             final IRobotLineElement lineElement) {
         return !tokens.isEmpty() && tokens.getLast().getStartOffset()
-                + tokens.getLast().getText().length() != lineElement.getStartOffset();
+                + tokens.getLast().getText().length() > lineElement.getStartOffset();
     }
 }
