@@ -84,7 +84,7 @@ public class ValidationReportingStrategy {
         problem.createMarker(file, filePosition, additionalAttributes);
     }
 
-    public class ReportingInterruptedException extends RuntimeException {
+    public static class ReportingInterruptedException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 

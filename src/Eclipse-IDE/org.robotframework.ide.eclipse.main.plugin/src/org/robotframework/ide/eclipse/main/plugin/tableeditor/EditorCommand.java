@@ -51,8 +51,9 @@ public abstract class EditorCommand {
         return newUndoCommands;
     }
 
-    @SuppressWarnings("serial")
-    public class CommandExecutionException extends RuntimeException {
+    public static class CommandExecutionException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public CommandExecutionException(final String message) {
             super(message);
