@@ -19,7 +19,6 @@ import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
@@ -66,9 +65,6 @@ public class RedContentProposalAdapter {
 
     public static final int PROPOSAL_SHOULD_INSERT = 1;
     public static final int PROPOSAL_SHOULD_REPLACE = 2;
-
-    /** See explanation for {@link org.eclipse.jface.fieldassist.ContentProposalAdapter.USE_VIRTUAL} */
-    private static final boolean USE_VIRTUAL = !Util.isMotif();
 
     private static final int SECONDARY_POPUP_DELAY = 750;
 
@@ -1093,7 +1089,7 @@ public class RedContentProposalAdapter {
          */
         @Override
         protected final Control createDialogArea(final Composite parent) {
-            final int style = USE_VIRTUAL ? SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL : SWT.H_SCROLL | SWT.V_SCROLL;
+            final int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL;
             proposalTableViewer = new TableViewer(parent, style);
             proposalTableViewer.setContentProvider(new StructuredContentProvider() {
 
@@ -1103,6 +1099,8 @@ public class RedContentProposalAdapter {
                 }
             });
             proposalTableViewer.setLabelProvider(labelProvider);
+
+            proposalTableViewer.getTable().addListener(SWT.SetData, event -> handleSetData(event));
             setProposals(filterProposals(proposals, filterText));
 
             proposalTableViewer.getTable().setHeaderVisible(false);
@@ -1179,6 +1177,22 @@ public class RedContentProposalAdapter {
         }
 
         /*
+         * Handle the set data event. Set the item data of the requested item to
+         * the corresponding proposal in the proposal cache.
+         */
+        private void handleSetData(final Event event) {
+            final TableItem item = (TableItem) event.item;
+            final int index = proposalTableViewer.getTable().indexOf(item);
+
+            if (0 <= index && index < proposals.length) {
+                final RedContentProposal current = proposals[index];
+                item.setText(getString(current));
+                item.setImage(getImage(current));
+                item.setData(current);
+            }
+        }
+
+        /*
          * Caches the specified proposals and repopulates the table if it has
          * been created.
          */
@@ -1190,25 +1204,10 @@ public class RedContentProposalAdapter {
             if (popupExists()) {
                 proposalTableViewer.setInput(proposals);
                 final int newSize = newProposals.length;
-                if (USE_VIRTUAL) {
-                    // Set and clear the virtual table. Data will be
-                    // provided in the SWT.SetData event handler.
-                    proposalTableViewer.getTable().setItemCount(newSize);
-                    proposalTableViewer.getTable().clearAll();
-                } else {
-                    // Populate the table manually
-                    proposalTableViewer.getTable().setRedraw(false);
-                    proposalTableViewer.getTable().setItemCount(newSize);
-                    final TableItem[] items = proposalTableViewer.getTable().getItems();
-                    for (int i = 0; i < items.length; i++) {
-                        final TableItem item = items[i];
-                        final RedContentProposal proposal = newProposals[i];
-                        item.setText(getString(proposal));
-                        item.setImage(getImage(proposal));
-                        item.setData(proposal);
-                    }
-                    proposalTableViewer.getTable().setRedraw(true);
-                }
+                // Set and clear the virtual table. Data will be
+                // provided in the SWT.SetData event handler.
+                proposalTableViewer.getTable().setItemCount(newSize);
+                proposalTableViewer.getTable().clearAll();
                 // Default to the first selection if there is content.
                 if (newProposals.length > 0) {
                     selectProposal(0);

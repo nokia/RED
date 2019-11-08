@@ -16,9 +16,9 @@ import org.eclipse.swt.graphics.Point;
 /**
  * This class enables possibility to provide and customize tooltips when using
  * styled label providers.
- * 
+ *
  * @author Michal Anglart
- * 
+ *
  */
 public class TooltipsEnablingDelegatingStyledCellLabelProvider extends DelegatingStyledCellLabelProvider implements
         ILabelProvider {
@@ -112,6 +112,6 @@ public class TooltipsEnablingDelegatingStyledCellLabelProvider extends Delegatin
 
     @Override
     public String getText(final Object element) {
-        return "";
+        return labelProvider.getStyledText(element).getString();
     }
 }
