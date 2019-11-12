@@ -7101,7 +7101,45 @@
                </entry>
             </mapping>
             <description>
-               Robot Framework preferences: Autodiscovering, Editor, Errors/Warnings
+               Preferences defined in RED (Editor, Errors/Warnings, Installed frameworks, Launching, Libraries, Task Tags)
+            </description>
+         </transfer>
+         <transfer
+               icon="/resources/robot.png"
+               id="org.robotframework.ide.eclipse.main.plugin.transfer2"
+               name="Robot Framework (Eclipse platform)">
+            <mapping
+                  scope="instance">
+               <entry
+                     node="org.eclipse.core.net">
+               </entry>
+               <entry
+                     node="org.eclipse.core.resources">
+               </entry>
+               <entry
+                     node="org.eclipse.core.variables">
+               </entry>
+               <entry
+                     node="org.eclipse.debug.core">
+               </entry>
+               <entry
+                     node="org.eclipse.debug.ui">
+               </entry>
+               <entry
+                     node="org.eclipse.ui.editors">
+               </entry>
+               <entry
+                     node="org.eclipse.ui.ide">
+               </entry>
+               <entry
+                     node="org.eclipse.ui.workbench">
+               </entry>
+               <entry
+                     node="org.eclipse.ui">
+               </entry>
+            </mapping>
+            <description>
+               Preferences from Eclipse platform useful in RED (General, Run/Debug)
             </description>
          </transfer>
       </extension>
