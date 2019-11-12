@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rf.ide.core.RedSystemProperties;
@@ -54,7 +53,7 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     static ImageDescriptor getImageDescriptor(final String path) {
-        return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path).orElse(null);
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     @Override
