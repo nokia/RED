@@ -1,14 +1,50 @@
+RED 0.9.1 - 2019/11/14
+
+Feature
+
+	[RED-1343] - Extend preferences export
+
+Enhancement
+
+	[RED-1279] - [GitHub #305] RED & PyDev wizard unable to install redpydevd without root access rights
+	[RED-1321] - Adding yaml files to content assist for Variable section
+	[RED-1322] - Library alias coloring improvements
+	[RED-1332] - [GitHub #295] RED Unable to start XML-RPC
+
+Bug
+
+	[RED-546] - Wrong problems in pipe script
+	[RED-801] - [GitHub #338] Marker about correct setting when pipe is set as separator in table view
+	[RED-1216] - Backslash is visible in grayout cell for FOR loop
+	[RED-1305] - General task settings are not validated
+	[RED-1310] - Incorrect keyword call coloring for new rows
+	[RED-1327] - Fix Execution view actions enablement
+	[RED-1330] - [GitHub #333] Execution view problems with dynamically modified suites
+	[RED-1331] - RFLint add rule issue
+	[RED-1333] - Update RfLint integration to reflect changes done in RfLint 1.0
+	[RED-1335] - [GitHub #339] trailing spaces in pipe-separated format leads to wrong content type
+
+Task
+
+	[RED-1334] - Update NatTable to version 1.6
+	[RED-1338] - Update Jenkins
+
+Sub-task
+
+	[RED-1337] - Investigate what are the changes in RF 3.2 which require us to change
+
+
 RED 0.9.0 - 2019/10/11
 
 Feature
 
 	[RED-1285] - Empty argument cell handling in source mode
-	[RED-1319] - Remove library import "tag" from multiple keyword occurences
+	[RED-1319] - Remove library import "tag" from multiple keyword occurrences
 	[RED-1324] - Add new elements to Robot Framework > Errors/Warnings > Validation
 
 Enhancement
 
-	[RED-565] - GitHub #47 Add posibility to provide arguments for library imports in red.xml
+	[RED-565] - GitHub #47 Add possibility to provide arguments for library imports in red.xml
 	[RED-709] - (GitHub #77) Add possibility to declare breakpoint as stop on keyword failure.
 	[RED-1155] - Validate templated test cases
 	[RED-1290] - [GitHub #320] Library prefix colouring
@@ -25,12 +61,12 @@ Bug
 	[RED-452] - Incorrect color for Template arguments
 	[RED-477] - Tables repainting exception under GTK3
 	[RED-961] - GitHub #146 -Table editor can not deal with "a | b" as arg - cell is locked
-	[RED-1269] - [Github #302] Validation problem with continuation
+	[RED-1269] - [GitHub #302] Validation problem with continuation
 	[RED-1273] - Cannot change the value of existing variable in Variable mappings section
 	[RED-1282] - [GitHub #312] NONE in setup/teardown is validated as keyword
 	[RED-1284] - GitHub #325 CoreException with Eclipse 2019-06
 	[RED-1287] - [GitHub #314] Embedded args with regular expression problems
-	[RED-1288] - [Github #315 #316] Chinese characters issues
+	[RED-1288] - [GitHub #315 #316] Chinese characters issues
 	[RED-1289] - Checking error: 'An internal error occurred during: "Label Job"' from regression
 	[RED-1295] - Creating new setting comment in table view with tab NPE
 	[RED-1296] - Undo in tables does not work for empty row created from executable row
