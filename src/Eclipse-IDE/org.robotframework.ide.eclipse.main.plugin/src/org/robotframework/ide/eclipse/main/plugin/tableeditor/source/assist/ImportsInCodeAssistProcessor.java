@@ -21,7 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 
 public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
 
-    public ImportsInCodeAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public ImportsInCodeAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

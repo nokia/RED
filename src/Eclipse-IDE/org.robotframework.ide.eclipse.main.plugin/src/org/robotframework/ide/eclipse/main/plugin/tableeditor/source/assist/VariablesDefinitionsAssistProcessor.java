@@ -33,7 +33,7 @@ import com.google.common.base.Splitter;
  */
 public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcessor {
 
-    public VariablesDefinitionsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public VariablesDefinitionsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

@@ -34,9 +34,9 @@ import org.robotframework.red.graphics.ImagesManager;
 public abstract class RedTemplateAssistProcessor extends TemplateCompletionProcessor
         implements IRedContentAssistProcessor {
 
-    protected final SuiteSourceAssistantContext assist;
+    protected final AssistantContext assist;
 
-    public RedTemplateAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public RedTemplateAssistProcessor(final AssistantContext assist) {
         this.assist = assist;
     }
 

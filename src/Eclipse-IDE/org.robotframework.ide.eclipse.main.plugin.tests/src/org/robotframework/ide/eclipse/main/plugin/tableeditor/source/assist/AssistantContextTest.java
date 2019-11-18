@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext.AssistPreferences;
 
-public class SuiteSourceAssistantContextTest {
+public class AssistantContextTest {
 
     @Test
     public void contextProvidesModelSuppliedByGivenSupplier() {
@@ -55,7 +55,7 @@ public class SuiteSourceAssistantContextTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
         final MockRedPreferences preferences = spy(new MockRedPreferences("  "));
 
-        final SuiteSourceAssistantContext context = createContext(model, preferences);
+        final AssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {
             assertThat(context.getSeparatorToFollow()).isEqualTo("  ");
         }
@@ -77,7 +77,7 @@ public class SuiteSourceAssistantContextTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnlyTsv();
         final MockRedPreferences preferences = spy(new MockRedPreferences("\t"));
 
-        final SuiteSourceAssistantContext context = createContext(model, preferences);
+        final AssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {
             assertThat(context.getSeparatorToFollow()).isEqualTo("\t");
         }
@@ -99,7 +99,7 @@ public class SuiteSourceAssistantContextTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnlyTsv();
         final MockRedPreferences preferences = spy(new MockRedPreferences("\t", new char[] { 'a', 'b', 'c' }));
 
-        final SuiteSourceAssistantContext context = createContext(model, preferences);
+        final AssistantContext context = createContext(model, preferences);
         for (int i = 0; i < 10; i++) {
             assertThat(context.getAssistantAutoActivationChars()).containsExactly('a', 'b', 'c');
         }
@@ -120,16 +120,16 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextReturnsActivationTrigger() {
         final KeySequence trigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
-        assertThat(new SuiteSourceAssistantContext(null, null, trigger).getActivationTrigger()).isSameAs(trigger);
+        assertThat(new AssistantContext(null, null, trigger).getActivationTrigger()).isSameAs(trigger);
     }
 
-    private SuiteSourceAssistantContext createContext(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(null, () -> model,
+    private AssistantContext createContext(final RobotSuiteFile model) {
+        return new AssistantContext(null, () -> model,
                 KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
     }
 
-    private SuiteSourceAssistantContext createContext(final RobotSuiteFile model, final RedPreferences redPreferences) {
-        return new SuiteSourceAssistantContext(null, () -> model,
+    private AssistantContext createContext(final RobotSuiteFile model, final RedPreferences redPreferences) {
+        return new AssistantContext(null, () -> model,
                 KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),
                 new AssistPreferences(redPreferences));
     }

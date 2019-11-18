@@ -27,7 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
  */
 public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
 
-    public VariablesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public VariablesImportAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

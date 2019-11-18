@@ -24,7 +24,7 @@ public class RedTemplateAssistProcessorTest {
 
     @Test
     public void processorReturns_itsContextType() {
-        SuiteSourceAssistantContext assistantContext = mock(SuiteSourceAssistantContext.class);
+        AssistantContext assistantContext = mock(AssistantContext.class);
         when(assistantContext.isTsvFile()).thenReturn(false);
         final RedTemplateAssistProcessor processor = new DumbRedTemplateAssistProcessor(assistantContext);
 
@@ -33,7 +33,7 @@ public class RedTemplateAssistProcessorTest {
 
     @Test
     public void processorReturns_itsTemplates() {
-        SuiteSourceAssistantContext assistantContext = mock(SuiteSourceAssistantContext.class);
+        AssistantContext assistantContext = mock(AssistantContext.class);
         when(assistantContext.isTsvFile()).thenReturn(false);
         final RedTemplateAssistProcessor processor = new DumbRedTemplateAssistProcessor(assistantContext);
 
@@ -42,7 +42,7 @@ public class RedTemplateAssistProcessorTest {
 
     @Test
     public void processorReturns_itsImage() {
-        SuiteSourceAssistantContext assistantContext = mock(SuiteSourceAssistantContext.class);
+        AssistantContext assistantContext = mock(AssistantContext.class);
         when(assistantContext.isTsvFile()).thenReturn(false);
         final RedTemplateAssistProcessor processor = new DumbRedTemplateAssistProcessor(assistantContext);
 
@@ -51,7 +51,7 @@ public class RedTemplateAssistProcessorTest {
 
     @Test
     public void processorRecognizes_whenIsInApplicableContent() throws BadLocationException {
-        SuiteSourceAssistantContext assistantContext = mock(SuiteSourceAssistantContext.class);
+        AssistantContext assistantContext = mock(AssistantContext.class);
         when(assistantContext.isTsvFile()).thenReturn(false);
         final RedTemplateAssistProcessor processor = new DumbRedTemplateAssistProcessor(assistantContext);
         final Document doc = spy(new Document());
@@ -65,7 +65,7 @@ public class RedTemplateAssistProcessorTest {
 
 class DumbRedTemplateAssistProcessor extends RedTemplateAssistProcessor {
 
-    public DumbRedTemplateAssistProcessor(SuiteSourceAssistantContext assistantContext) {
+    public DumbRedTemplateAssistProcessor(AssistantContext assistantContext) {
         super(assistantContext);
     }
 

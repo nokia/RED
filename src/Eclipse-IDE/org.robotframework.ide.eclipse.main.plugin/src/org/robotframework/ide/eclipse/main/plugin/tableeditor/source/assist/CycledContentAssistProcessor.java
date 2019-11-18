@@ -28,7 +28,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class CycledContentAssistProcessor extends DefaultContentAssistProcessor implements IContentAssistProcessor,
         ICompletionListener, ICompletionListenerExtension, ICompletionListenerExtension2 {
 
-    private final SuiteSourceAssistantContext assistContext;
+    private final AssistantContext assistContext;
 
     private final AssistantCallbacks assistant;
 
@@ -40,7 +40,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private boolean canReopenAssistantProgramatically;
 
-    public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
+    public CycledContentAssistProcessor(final AssistantContext assistContext,
             final AssistantCallbacks assistant) {
         this.assistContext = assistContext;
         this.assistant = assistant;

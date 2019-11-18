@@ -181,7 +181,7 @@ public class RedCompletionProposalAdapterTest {
         final InformationControlSupport infoControlSupport = mock(InformationControlSupport.class);
         when(infoControlSupport.isBrowserBased()).thenReturn(false);
 
-        final SuiteSourceAssistantContext context = mock(SuiteSourceAssistantContext.class);
+        final AssistantContext context = mock(AssistantContext.class);
         when(context.getInfoControlSupport()).thenReturn(infoControlSupport);
         
         final AssistProposal proposal = mock(AssistProposal.class);

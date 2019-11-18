@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  */
 public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistProcessor {
 
-    public KeywordCallsInSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public KeywordCallsInSettingsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 
 public class NewKeywordTemplateAssistProcessor extends RedTemplateAssistProcessor {
 
-    public NewKeywordTemplateAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public NewKeywordTemplateAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

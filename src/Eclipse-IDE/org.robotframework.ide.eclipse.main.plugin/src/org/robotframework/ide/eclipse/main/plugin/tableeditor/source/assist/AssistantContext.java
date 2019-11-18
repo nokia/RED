@@ -20,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author Michal Anglart
  */
-public class SuiteSourceAssistantContext {
+public class AssistantContext {
 
     private final InformationControlSupport infoControlSupport;
 
@@ -30,14 +30,14 @@ public class SuiteSourceAssistantContext {
 
     private final AssistPreferences assistPreferences;
 
-    public SuiteSourceAssistantContext(final InformationControlSupport infoControlSupport,
+    public AssistantContext(final InformationControlSupport infoControlSupport,
             final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger) {
         this(infoControlSupport, modelSupplier, activationTrigger,
                 new AssistPreferences(RedPlugin.getDefault().getPreferences()));
     }
 
     @VisibleForTesting
-    SuiteSourceAssistantContext(final InformationControlSupport infoControlSupport,
+    AssistantContext(final InformationControlSupport infoControlSupport,
             final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger,
             final AssistPreferences assistPreferences) {
         this.infoControlSupport = infoControlSupport;

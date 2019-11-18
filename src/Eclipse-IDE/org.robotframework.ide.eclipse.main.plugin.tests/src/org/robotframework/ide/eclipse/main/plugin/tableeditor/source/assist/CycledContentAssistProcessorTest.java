@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext.AssistPreferences;
 import org.robotframework.red.swt.SwtThread;
 
 public class CycledContentAssistProcessorTest {
@@ -44,7 +44,7 @@ public class CycledContentAssistProcessorTest {
                 r2 = mock(ICompletionProposal.class), r3 = mock(ICompletionProposal.class);
 
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+        final AssistantContext assistContext = new AssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -87,7 +87,7 @@ public class CycledContentAssistProcessorTest {
                 r2 = mock(ICompletionProposal.class), r3 = mock(ICompletionProposal.class);
 
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+        final AssistantContext assistContext = new AssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -131,7 +131,7 @@ public class CycledContentAssistProcessorTest {
                 r3 = mock(ICompletionProposal.class);
 
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+        final AssistantContext assistContext = new AssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -166,7 +166,7 @@ public class CycledContentAssistProcessorTest {
     @Test
     public void nextProposalStatusesWithCorrectActivationTriggerAreSet_forNestedProcessors() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+        final AssistantContext assistContext = new AssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -209,7 +209,7 @@ public class CycledContentAssistProcessorTest {
     @Test
     public void emptyNextProposalStatusIsSet_forSingleProcessor() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, activationTrigger,
+        final AssistantContext assistContext = new AssistantContext(null, null, activationTrigger,
                 null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
@@ -236,7 +236,7 @@ public class CycledContentAssistProcessorTest {
 
     @Test
     public void nothingHappens_whenOrdinaryProposalIsApplied() {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final ICompletionProposal proposal = mock(ICompletionProposal.class);
@@ -256,7 +256,7 @@ public class CycledContentAssistProcessorTest {
         final Runnable r1 = () -> runnedOperations.incrementAndGet();
         final Runnable r2 = () -> runnedOperations.incrementAndGet();
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposal proposal = mock(RedCompletionProposal.class);
@@ -278,7 +278,7 @@ public class CycledContentAssistProcessorTest {
         final Runnable r1 = () -> runnedOperations.incrementAndGet();
         final Runnable r2 = () -> runnedOperations.incrementAndGet();
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposalAdapter proposal = mock(RedCompletionProposalAdapter.class);
@@ -295,7 +295,7 @@ public class CycledContentAssistProcessorTest {
 
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_1() {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposal proposal = mock(RedCompletionProposal.class);
@@ -312,7 +312,7 @@ public class CycledContentAssistProcessorTest {
 
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_2() {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposalAdapter proposal = mock(RedCompletionProposalAdapter.class);
@@ -331,7 +331,7 @@ public class CycledContentAssistProcessorTest {
     public void activationCharsAreTakenFromPreferences() {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences("  ", new char[] { 'a', 'b', 'c' }));
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null,
+        final AssistantContext assistContext = new AssistantContext(null, null, null,
                 assistPreferences);
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, null);
 
@@ -340,7 +340,7 @@ public class CycledContentAssistProcessorTest {
 
     @Test
     public void nothingHappens_whenSelectionIsChanged() {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, null, null);
+        final AssistantContext assistContext = new AssistantContext(null, null, null);
         final CycledContentAssistProcessor cycledProcessor = spy(new CycledContentAssistProcessor(assistContext, null));
 
         final ICompletionProposal proposal = mock(ICompletionProposal.class);

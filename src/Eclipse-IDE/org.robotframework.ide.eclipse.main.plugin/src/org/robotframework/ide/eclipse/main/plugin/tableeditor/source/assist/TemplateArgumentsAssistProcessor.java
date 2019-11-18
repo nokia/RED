@@ -27,7 +27,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TemplateArgumentsAssistProcessor extends KeywordCallsAssistProcessor {
 
-    public TemplateArgumentsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public TemplateArgumentsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

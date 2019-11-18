@@ -71,7 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewT
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.TemplateArgumentsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
@@ -256,7 +256,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createSettingsAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
@@ -291,7 +291,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createVariablesAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -318,7 +318,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createTestCasesAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
@@ -352,7 +352,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createTasksAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
@@ -386,7 +386,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     private void createKeywordsAssist(final InformationControlSupport infoControlSupport,
             final ContentAssistant contentAssistant, final Supplier<RobotSuiteFile> modelSupplier,
             final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -423,7 +423,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         // position in file (this position always has default content type, but it can be actually
         // prepended with some valid meaningful content type)
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new AssistantContext(infoControlSupport,
                 modelSupplier, contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor generalSettingProcessor = new GeneralSettingsAssistProcessor(

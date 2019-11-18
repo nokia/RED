@@ -15,13 +15,13 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 
 
 class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
 
-    VariablesInShellAssistProcessor(final SuiteSourceAssistantContext assist) {
+    VariablesInShellAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

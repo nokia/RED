@@ -27,7 +27,7 @@ import org.robotframework.red.graphics.ImagesManager;
 public class RedCompletionProposalAdapter implements Comparable<RedCompletionProposalAdapter>, ICompletionProposal,
         ICompletionProposalExtension3, ICompletionProposalExtension6 {
 
-    private final SuiteSourceAssistantContext context;
+    private final AssistantContext context;
 
     private final AssistProposal adaptedProposal;
 
@@ -36,12 +36,12 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
     private final IContextInformation contextInformation;
 
 
-    public RedCompletionProposalAdapter(final SuiteSourceAssistantContext context, final AssistProposal proposal,
+    public RedCompletionProposalAdapter(final AssistantContext context, final AssistProposal proposal,
             final DocumentModification modification) {
         this(context, proposal, modification, null);
     }
 
-    public RedCompletionProposalAdapter(final SuiteSourceAssistantContext context, final AssistProposal proposal,
+    public RedCompletionProposalAdapter(final AssistantContext context, final AssistProposal proposal,
             final DocumentModification modification, final IContextInformation contextInformation) {
         this.context = context;
         this.adaptedProposal = proposal;

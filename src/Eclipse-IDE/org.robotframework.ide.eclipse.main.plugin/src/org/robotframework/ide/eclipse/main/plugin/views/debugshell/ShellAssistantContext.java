@@ -13,10 +13,10 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotThread;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.InformationControlSupport;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 
 
-public class ShellAssistantContext extends SuiteSourceAssistantContext {
+public class ShellAssistantContext extends AssistantContext {
 
     public ShellAssistantContext(final InformationControlSupport infoControlSupport,
             final KeySequence activationTrigger) {

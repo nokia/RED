@@ -29,7 +29,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenNullProposalsAreFound_nullIsReturnedAsProposalsArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssistant(model);
+        final AssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -42,7 +42,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenNoProposalsAreFound_emptyArrayIsReturnedAsProposalsArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssistant(model);
+        final AssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -56,7 +56,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenProposalsAreFound_theyAreReturnedInArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssistant(model);
+        final AssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -169,18 +169,18 @@ public class RedContentAssistProcessorTest {
         assertThat(processor.getVirtualContentType(document, offset)).isEqualTo(IDocument.DEFAULT_CONTENT_TYPE);
     }
 
-    private static RedContentAssistProcessor createProcessorForContentTypes(final SuiteSourceAssistantContext context,
+    private static RedContentAssistProcessor createProcessorForContentTypes(final AssistantContext context,
             final String... applicableContentTypes) {
         return createProcessor(context, newArrayList(applicableContentTypes), null);
     }
 
     private static RedContentAssistProcessor createProcessorFindingProposalsForContentTypes(
-            final SuiteSourceAssistantContext context,
+            final AssistantContext context,
             final List<? extends ICompletionProposal> proposalsToFind) {
         return createProcessor(context, null, proposalsToFind);
     }
 
-    private static RedContentAssistProcessor createProcessor(final SuiteSourceAssistantContext context,
+    private static RedContentAssistProcessor createProcessor(final AssistantContext context,
             final List<String> applicableContentTypes, final List<? extends ICompletionProposal> foundProposals) {
         return new RedContentAssistProcessor(context) {
 

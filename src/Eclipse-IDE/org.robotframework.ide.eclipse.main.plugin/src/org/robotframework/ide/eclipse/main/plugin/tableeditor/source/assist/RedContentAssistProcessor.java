@@ -21,11 +21,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 public abstract class RedContentAssistProcessor extends DefaultContentAssistProcessor
         implements IRedContentAssistProcessor {
 
-    protected final SuiteSourceAssistantContext assist;
+    protected final AssistantContext assist;
 
     protected ITextViewer viewer;
 
-    public RedContentAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public RedContentAssistProcessor(final AssistantContext assist) {
         this.assist = assist;
     }
 

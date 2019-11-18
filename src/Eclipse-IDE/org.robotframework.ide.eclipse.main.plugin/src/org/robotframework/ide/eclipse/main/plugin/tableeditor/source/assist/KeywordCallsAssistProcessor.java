@@ -43,7 +43,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
-    public KeywordCallsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public KeywordCallsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

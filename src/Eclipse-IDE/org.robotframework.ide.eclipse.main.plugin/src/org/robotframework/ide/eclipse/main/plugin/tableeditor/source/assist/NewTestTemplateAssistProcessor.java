@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 
 public class NewTestTemplateAssistProcessor extends RedTemplateAssistProcessor {
 
-    public NewTestTemplateAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public NewTestTemplateAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

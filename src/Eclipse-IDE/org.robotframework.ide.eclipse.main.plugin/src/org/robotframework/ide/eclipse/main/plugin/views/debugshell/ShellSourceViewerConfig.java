@@ -35,7 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Comb
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokenTypeBasedRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
@@ -94,7 +94,7 @@ public class ShellSourceViewerConfig extends SourceViewerConfiguration {
         final InformationControlSupport infoControlSupport = new InformationControlSupport(
                 "Press 'Tab' from proposal table or click for focus");
 
-        final SuiteSourceAssistantContext assistContext = new ShellAssistantContext(infoControlSupport,
+        final AssistantContext assistContext = new ShellAssistantContext(infoControlSupport,
                 contentAssistActivationTrigger);
 
         final KeywordCallsInShellAssistProcessor keywordCallsProcessor = new KeywordCallsInShellAssistProcessor(

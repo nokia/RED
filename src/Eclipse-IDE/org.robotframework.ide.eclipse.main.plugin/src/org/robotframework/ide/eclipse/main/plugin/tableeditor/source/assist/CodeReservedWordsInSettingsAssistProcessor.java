@@ -29,7 +29,7 @@ import com.google.common.collect.Streams;
 
 public class CodeReservedWordsInSettingsAssistProcessor extends RedContentAssistProcessor {
 
-    public CodeReservedWordsInSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public CodeReservedWordsInSettingsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

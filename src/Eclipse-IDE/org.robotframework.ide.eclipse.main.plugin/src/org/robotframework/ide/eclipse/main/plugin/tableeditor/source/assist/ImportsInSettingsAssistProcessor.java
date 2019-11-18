@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 
 public class ImportsInSettingsAssistProcessor extends ImportsInCodeAssistProcessor {
 
-    public ImportsInSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public ImportsInSettingsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 

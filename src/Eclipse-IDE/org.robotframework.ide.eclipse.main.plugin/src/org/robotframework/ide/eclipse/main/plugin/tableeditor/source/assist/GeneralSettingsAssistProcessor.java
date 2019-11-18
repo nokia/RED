@@ -24,7 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
  */
 public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
-    public GeneralSettingsAssistProcessor(final SuiteSourceAssistantContext assist) {
+    public GeneralSettingsAssistProcessor(final AssistantContext assist) {
         super(assist);
     }
 
