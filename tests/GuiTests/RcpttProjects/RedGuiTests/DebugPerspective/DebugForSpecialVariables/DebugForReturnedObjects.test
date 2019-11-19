@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _uTxjELYgEeazMIT-6yPcSw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:21 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/19/19 4:18 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -116,10 +116,10 @@ exec-with-options -disableJobWaiting -command {
 }
 wait-for-console
     
-get-view "Message Log" | get-editbox | get-property text | matches "Starting test: ReturnObjects.Test.test\n"
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: ReturnObjects.Test.test\n"
     + ".* : INFO : @\{List_elems\} = \[ <lib_returns_obj.A object at .*> \| <lib_returns_obj.A object at .*> \]\n"
     + ".* : INFO : \$\{one_elem\} = <lib_returns_obj.A object at .*>\n"
-    + ".* : INFO : &\{map\} = \{.*\}\n"
+    + ".* : INFO : &\{map\} = \{ .* \}\n"
     + ".* : INFO : text\n"
     + ".* : INFO : \$\{val\} = 7\n"
     + ".* : INFO : 7\n"
@@ -128,11 +128,12 @@ get-view "Message Log" | get-editbox | get-property text | matches "Starting tes
     + ".* : INFO : 7\n"
     + ".* : INFO : \$\{val_from_list\} = 7\n"
     + ".* : INFO : 7\n"
-    + ".* : INFO : \$\{keys\} = \[<lib_returns_obj.A object at .*>, 'key', 'key2'\]\n"
+    + ".* : INFO : @\{keys\} = \[ key \| key2 \| <lib_returns_obj.A object at .*> \]\n"
     + ".* : INFO : Those are keys from objects\n"
-    + ".* : INFO : \[<lib_returns_obj.A object at .*>, 'key', 'key2'\]\n"
-    + ".* : INFO : \$\{val_from_list\} = 7\n"
-    + ".* : INFO : 7\n"
+    + ".* : INFO : \['key', 'key2', <lib_returns_obj.A object at .*>\]\n"
+    + ".* : INFO : \$\{x\} = (7|None)\n"
+    + ".* : INFO : \$\{x\} = (7|None)\n"
+    + ".* : INFO : \$\{x\} = (7|None)\n"
     + "Ending test: ReturnObjects.Test.test" | verify-true
-	
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
