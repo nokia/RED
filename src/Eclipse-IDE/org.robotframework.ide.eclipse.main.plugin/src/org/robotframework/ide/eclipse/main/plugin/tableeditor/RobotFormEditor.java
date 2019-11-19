@@ -212,7 +212,10 @@ public class RobotFormEditor extends FormEditor {
             if (editorPart instanceof ISectionEditorPart
                     && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
                 setActivePage(i);
-                keywordUsagesFinder.refresh();
+                if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()
+                        || RedPlugin.getDefault().getPreferences().isKeywordArgumentCellsColoringEnabled()) {
+                    keywordUsagesFinder.refresh();
+                }
                 return;
             }
         }
@@ -438,6 +441,11 @@ public class RobotFormEditor extends FormEditor {
 
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
             page.updateOnActivation();
+
+            if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()
+                    || RedPlugin.getDefault().getPreferences().isKeywordArgumentCellsColoringEnabled()) {
+                keywordUsagesFinder.refresh();
+            }
 
             if (isDirty()) {
                 // there are some locking threads involved which results in blocking

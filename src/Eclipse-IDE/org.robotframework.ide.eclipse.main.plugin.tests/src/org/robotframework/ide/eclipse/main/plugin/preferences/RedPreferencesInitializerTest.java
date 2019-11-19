@@ -70,6 +70,7 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putBoolean(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, false);
         verify(preferences).putBoolean(RedPreferences.LIBRARY_KEYWORD_HYPERLINKS, true);
         verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
+        verify(preferences).putBoolean(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, false);
         verify(preferences).putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         verify(preferences).put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT,
                 CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());

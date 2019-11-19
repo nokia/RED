@@ -30,7 +30,7 @@ public class CommentsLabelAccumulator implements IConfigLabelAccumulator {
     }
 
     @Override
-    public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
+    public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         final Object rowObject = dataProvider.getRowObject(rowPosition);
 
         if (rowObject instanceof RobotKeywordCall) {
@@ -38,16 +38,10 @@ public class CommentsLabelAccumulator implements IConfigLabelAccumulator {
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
                 if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE)
-                        || isFirstTokenInDirtyWholeLineComment(tokens, columnPosition)) {
+                        || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
                     configLabels.addLabel(COMMENT_CONFIG_LABEL);
                 }
             }
         }
-    }
-
-    private boolean isFirstTokenInDirtyWholeLineComment(final List<RobotToken> tokens, final int column) {
-        return (column == 0 && tokens.size() > 1 && tokens.get(0).getText().isEmpty()
-                && tokens.get(1).getText().startsWith("#"));
     }
 }

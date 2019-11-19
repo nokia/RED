@@ -54,6 +54,7 @@ public class RedPreferences {
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
     public static final String LIBRARY_KEYWORD_HYPERLINKS = "red.editor.general.libraryKeywordHyperlinks";
 
+    public static final String KEYWORD_ARGUMENTS_CELL_COLORING = "red.editor.tables.kwArgsCellColoring";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "red.editor.tables.minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "red.editor.tables.cellCommitBehavior";
     public static final String CELL_WRAPPING = "red.editor.tables.cellWrapping";
@@ -477,6 +478,10 @@ public class RedPreferences {
     public boolean isLibraryKeywordsColoringEnabled() {
         return !Objects.equals(getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL),
                 getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB));
+    }
+
+    public boolean isKeywordArgumentCellsColoringEnabled() {
+        return store.getBoolean(KEYWORD_ARGUMENTS_CELL_COLORING);
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {

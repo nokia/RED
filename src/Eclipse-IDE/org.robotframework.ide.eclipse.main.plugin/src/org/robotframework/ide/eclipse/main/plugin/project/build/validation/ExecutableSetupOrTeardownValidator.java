@@ -40,9 +40,10 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        if (setupOrTeardown.getKeywordName() == null) {
+        if (setupOrTeardown.isDisabled()) {
             return;
         }
+
         final RobotExecutableRow<?> row = setupOrTeardown.asExecutableRow();
         final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
 
@@ -60,7 +61,7 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
             final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
             unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, descriptor.getUsedVariables());
 
-        } else if (!keywordNameToken.getText().equalsIgnoreCase("none")) {
+        } else {
             new ExecutableNestedRowValidator(validationContext, additionalVariables, row, descriptor, reporter)
                     .validate(monitor);
         }

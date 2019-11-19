@@ -23,7 +23,7 @@ public class RedTheme {
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
     private static final String ECLIPSE_SEARCH_MATCH_COLOR = "org.eclipse.search.ui.match.highlight";
 
-    private static final String ROBOT_CONSOLE_RED_MESSAGES = "org.robotframework.red.robotConsoleRedStream";
+    private static final String ROBOT_CONSOLE_RED_MESSAGES_COLOR = "org.robotframework.red.robotConsoleRedStream";
 
     private static final String TABLE_HEADER_GRID_COLOR = "org.robotframework.red.table.header.grid";
     private static final String TABLE_HEADER_BACKGROUND_COLOR = "org.robotframework.red.table.header.background";
@@ -41,6 +41,8 @@ public class RedTheme {
     private static final String TABLE_HIGHLIGHTED_CELL_COLOR = "org.robotframework.red.table.body.cell.highlight";
     private static final String TABLE_INACTIVE_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.inactive.background";
     private static final String TABLE_INACTIVE_CELL_FOREGROUND_COLOR = "org.robotframework.red.table.body.cell.inactive.foreground";
+    private static final String TABLE_MISSING_ARG_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.missing.arg.background";
+    private static final String TABLE_OPTIONAL_ARG_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.optional.arg.background";
 
 
     private static ColorRegistry getColorRegistry() {
@@ -81,7 +83,7 @@ public class RedTheme {
         }
 
         public static Color getRobotConsoleRedStreamColor() {
-            return getColorRegistry().get(ROBOT_CONSOLE_RED_MESSAGES);
+            return getColorRegistry().get(ROBOT_CONSOLE_RED_MESSAGES_COLOR);
         }
 
         public static Color getTableHeaderGridColor() {
@@ -96,7 +98,7 @@ public class RedTheme {
             return getColorRegistry().get(TABLE_HEADER_FOREGROUND_COLOR);
         }
 
-        public static Color getTableHeaderHihglightedBackgroundColor() {
+        public static Color getTableHeaderHighlightedBackgroundColor() {
             return getColorRegistry().get(TABLE_HEADER_BACKGROUND_HIGHLIGHTED_COLOR);
         }
 
@@ -132,7 +134,7 @@ public class RedTheme {
             return getColorRegistry().get(TABLE_HIGHLIGHTED_CELL_COLOR);
         }
 
-        public static Color getTableHiglihtedRowColor() {
+        public static Color getTableHighlightedRowColor() {
             return getColorRegistry().get(TABLE_HIGHLIGHTED_ROW_COLOR);
         }
 
@@ -142,6 +144,14 @@ public class RedTheme {
 
         public static Color getTableInactiveCellForegroundColor() {
             return getColorRegistry().get(TABLE_INACTIVE_CELL_FOREGROUND_COLOR);
+        }
+
+        public static Color getTableMissingArgumentCellBackgroundColor() {
+            return getColorRegistry().get(TABLE_MISSING_ARG_CELL_BACKGROUND_COLOR);
+        }
+
+        public static Color getTableOptionalArgumentCellBackgroundColor() {
+            return getColorRegistry().get(TABLE_OPTIONAL_ARG_CELL_BACKGROUND_COLOR);
         }
     }
 }

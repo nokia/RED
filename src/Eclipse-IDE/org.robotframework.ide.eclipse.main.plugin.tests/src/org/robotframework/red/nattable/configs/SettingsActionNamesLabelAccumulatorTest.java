@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -28,7 +29,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     @Test
     public void labelIsNotAdded_forMissingSetting() {
         for (int i = 0; i < 10; i++) {
-            assertThat(labelsAt(entry("Setting", null), i)).isEmpty();
+            assertThat(labelsAt(new SimpleEntry<>("Setting", null), i)).isEmpty();
         }
     }
 
@@ -36,7 +37,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     public void labelIsNotAdded_forNonKeywordBasedSetting() {
         final RobotSetting setting = mock(RobotSetting.class);
         when(setting.isAnySetupOrTeardown()).thenReturn(false);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         assertThat(labelsAt(entry, 0)).isEmpty();
         assertThat(labelsAt(entry, 1)).isEmpty();
@@ -45,9 +46,10 @@ public class SettingsActionNamesLabelAccumulatorTest {
 
     @Test
     public void labelIsNotAdded_forFirstColumnOfKeywordBasedSetting() {
-        final RobotSetting setting = mock(RobotSetting.class);
-        when(setting.isAnySetupOrTeardown()).thenReturn(true);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final SuiteSetup setup = new SuiteSetup(RobotToken.create("[Setup]"));
+        setup.setKeywordName("keyword");
+        final RobotSetting setting = new RobotSetting(null, setup);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         assertThat(labelsAt(entry, 0)).isEmpty();
     }
@@ -57,7 +59,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
         final SuiteSetup linkedSetting = new SuiteSetup(RobotToken.create("Suite Setup"));
         linkedSetting.setKeywordName("Keyword");
         final RobotSetting setting = new RobotSetting(null, linkedSetting);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
     }
@@ -66,7 +68,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
     public void labelIsNotAdded_forSecondColumnOfEmptyKeywordBasedSetting() {
         final SuiteSetup linkedSetting = new SuiteSetup(RobotToken.create("Suite Setup"));
         final RobotSetting setting = new RobotSetting(null, linkedSetting);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         assertThat(labelsAt(entry, 1)).isEmpty();
     }
@@ -78,7 +80,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
         setup.addArgument("arg1");
         setup.addArgument("arg2");
         final RobotSetting setting = new RobotSetting(null, setup);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         for (int i = 2; i < 10; i++) {
             assertThat(labelsAt(entry, i)).isEmpty();
@@ -94,7 +96,7 @@ public class SettingsActionNamesLabelAccumulatorTest {
         setup.addArgument("ELSE");
         setup.addArgument("kw");
         final RobotSetting setting = new RobotSetting(null, setup);
-        final Entry<String, RobotSetting> entry = entry("Setting", setting);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
 
         assertThat(labelsAt(entry, 0)).isEmpty();
         assertThat(labelsAt(entry, 1)).containsOnly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
@@ -114,25 +116,5 @@ public class SettingsActionNamesLabelAccumulatorTest {
                 dataProvider);
         labelAccumulator.accumulateConfigLabels(labels, column, 0);
         return labels.getLabels();
-    }
-
-    private static <K, V> Entry<K, V> entry(final K key, final V value) {
-        return new Entry<K, V>() {
-
-            @Override
-            public V setValue(final V value) {
-                return value;
-            }
-
-            @Override
-            public V getValue() {
-                return value;
-            }
-
-            @Override
-            public K getKey() {
-                return key;
-            }
-        };
     }
 }

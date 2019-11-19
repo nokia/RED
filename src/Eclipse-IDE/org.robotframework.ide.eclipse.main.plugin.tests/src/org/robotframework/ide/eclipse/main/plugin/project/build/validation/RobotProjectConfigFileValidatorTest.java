@@ -156,7 +156,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibspecForStandardLibraryIsMissing_notGeneratedProblemIsReported() throws Exception {
-        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = Libraries.createStdLib("StdLib1");
+        final Map<LibraryDescriptor, LibrarySpecification> stdLibs = Libraries.createStdLib("StdLib1", new String[0]);
         stdLibs.put(LibraryDescriptor.ofStandardLibrary("StdLib2"), null);
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());

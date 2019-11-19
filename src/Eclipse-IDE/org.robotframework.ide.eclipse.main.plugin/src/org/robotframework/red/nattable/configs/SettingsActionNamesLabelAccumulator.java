@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -42,24 +42,16 @@ public class SettingsActionNamesLabelAccumulator implements IConfigLabelAccumula
                 && !setting.getArguments().stream().findFirst().orElse("").equalsIgnoreCase("none")) {
             configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
 
-        } else if (setting.isAnySetupOrTeardown()) {
+        } else if (setting.isAnySetupOrTeardown() && !((ExecutableSetting) setting.getLinkedElement()).isDisabled()) {
             // don't worry about variable here - this case would be served by
             // SettingsVariablesLabelAccumulator
             if (columnPosition == 1) {
-                final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
-
-                final RobotToken keywordName = linkedSetting.getKeywordName();
-                if (keywordName != null && !keywordName.getText().equalsIgnoreCase("none")) {
                     configLabels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
-                }
 
             } else if (columnPosition > 1) {
-                final AKeywordBaseSetting<?> linkedSetting = (AKeywordBaseSetting<?>) setting.getLinkedElement();
+                final ExecutableSetting linkedSetting = (ExecutableSetting) setting.getLinkedElement();
                 final List<RobotToken> allTokens = new ArrayList<>();
-                final RobotToken keywordName = linkedSetting.getKeywordName();
-                if (keywordName != null) {
-                    allTokens.add(keywordName);
-                }
+                allTokens.add(linkedSetting.getKeywordName());
                 allTokens.addAll(linkedSetting.getArguments());
 
                 if (columnPosition - 1 < allTokens.size()) {

@@ -53,6 +53,8 @@ public class MarkersSelectionLayerPainter extends GridLineCellLayerPainter {
                         draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getErrorImage()));
                     } else if (labels.hasLabel(MarkersLabelAccumulator.WARNING_MARKER_LABEL)) {
                         draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getWarningImage()));
+                    } else if (labels.hasLabel(MarkersLabelAccumulator.INFO_MARKER_LABEL)) {
+                        draw(gc, currentCellBounds, ImagesManager.getImage(RedImages.getInfoImage()));
                     }
                 }
             }

@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.libraries;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,16 +19,19 @@ import com.google.common.base.Objects;
 @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
 public class KeywordSpecification {
 
-    public static KeywordSpecification create(final String name) {
+    public static KeywordSpecification create(final String name, final String... arguments) {
         final KeywordSpecification spec = new KeywordSpecification();
         spec.setName(name);
+        for (final String arg : arguments) {
+            spec.arguments.add(arg);
+        }
         return spec;
     }
 
     private String name;
     private String documentation;
 
-    private List<String> arguments;
+    private List<String> arguments = new ArrayList<>();
 
     private Boolean isDeprecated;
 

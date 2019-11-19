@@ -1092,7 +1092,7 @@
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.red.table.body.cell.inactive.background"
-          isEditable="false"
+          isEditable="true"
           label="Table body inactive cell background"
           value="227, 227, 227">
     </colorDefinition>
@@ -1102,6 +1102,20 @@
           isEditable="false"
           label="Table body inactive cell foreground"
           value="192, 192, 192">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.missing.arg.background"
+          isEditable="true"
+          label="Table body missing argument cell background"
+          value="250, 190, 180">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.optional.arg.background"
+          isEditable="true"
+          label="Table body optional argument cell background"
+          value="255, 255, 240">
     </colorDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
@@ -7143,6 +7157,13 @@
                   <key
                         match="prefix"
                         name="red.">
+                  </key>
+               </entry>
+               <entry
+                     node="org.eclipse.ui.workbench">
+                  <key
+                        match="prefix"
+                        name="org.robotframework.">
                   </key>
                </entry>
             </mapping>

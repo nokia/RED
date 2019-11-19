@@ -434,6 +434,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/warning_big.png");
     }
 
+    public static ImageDescriptor getInfoImage() {
+        return RedPlugin.getImageDescriptor("resources/info.png");
+    }
+
     public static ImageDescriptor getBigInfoImage() {
         return RedPlugin.getImageDescriptor("resources/info_big.png");
     }

@@ -51,14 +51,9 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
         }
 
         if (call.isExecutable()) {
-            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linked;
-            final IExecutableRowDescriptor<?> description = row.buildLineDescription();
-            final RobotToken action = description.getKeywordAction().getToken();
-
             // don't worry about comments with artificial action token, it will be served by
             // another case
             final RobotToken actual = tokens.get(columnPosition);
-
             if (actual.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
                     || actual.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)
                     || actual.getTypes().contains(RobotTokenType.FOR_TOKEN)
@@ -68,6 +63,9 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
                 return;
             }
 
+            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linked;
+            final IExecutableRowDescriptor<?> description = row.buildLineDescription();
+            final RobotToken action = description.getKeywordAction().getToken();
             if (action.getText().equals(actual.getText()) && action.getTypes().containsAll(actual.getTypes())) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
@@ -88,28 +86,26 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
 
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 
-            } else if (call.isExecutableSetting() && columnPosition == 1) {
-                final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
-
-                if (!kwBasedSetting.getKeywordName().getText().equalsIgnoreCase("none")) {
+            } else if (call.isExecutableSetting() && !call.getExecutableSetting().isDisabled()) {
+                if (columnPosition == 1) {
                     configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
-                }
 
-            } else if (call.isExecutableSetting() && columnPosition > 1) {
-                final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
+                } else if (columnPosition > 1) {
+                    final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
 
-                final List<RobotToken> allTokens = new ArrayList<>();
-                allTokens.add(kwBasedSetting.getKeywordName());
-                allTokens.addAll(kwBasedSetting.getArguments());
+                    final List<RobotToken> allTokens = new ArrayList<>();
+                    allTokens.add(kwBasedSetting.getKeywordName());
+                    allTokens.addAll(kwBasedSetting.getArguments());
 
-                if (columnPosition - 1 < allTokens.size()) {
-                    for (int i = columnPosition - 2; i >= 0; i--) {
-                        final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName
-                                .fromOccurrence(allTokens.get(i).getText());
-                        if (SpecialKeywords.isNestingKeyword(qualifiedKwName) && SpecialKeywords
-                                .isKeywordNestedInKeyword(qualifiedKwName, i, columnPosition - i - 1, allTokens)) {
-                            configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
-                            break;
+                    if (columnPosition <= allTokens.size()) {
+                        for (int i = columnPosition - 2; i >= 0; i--) {
+                            final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName
+                                    .fromOccurrence(allTokens.get(i).getText());
+                            if (SpecialKeywords.isNestingKeyword(qualifiedKwName) && SpecialKeywords
+                                    .isKeywordNestedInKeyword(qualifiedKwName, i, columnPosition - i - 1, allTokens)) {
+                                configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
+                                break;
+                            }
                         }
                     }
                 }

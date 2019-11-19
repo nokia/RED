@@ -115,6 +115,7 @@ import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.KeywordArgumentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.NestedExecsSpecialTokensLabelAccumulator;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
@@ -227,6 +228,7 @@ class TasksFormFragment implements ISectionFormFragment {
                 new CasesElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new ActionNamesOverridingLabelAccumulator(dataProvider::getRowObject, kwUsagesFinder),
+                new KeywordArgumentsLabelAccumulator(dataProvider, kwUsagesFinder),
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),

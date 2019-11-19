@@ -113,6 +113,8 @@ import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.KeywordArgumentsLabelAccumulator;
+import org.robotframework.red.nattable.configs.KeywordArgumentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.NestedExecsSpecialTokensLabelAccumulator;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
@@ -225,6 +227,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
                 new CasesElementsLabelAccumulator(dataProvider),
                 new ActionNamesLabelAccumulator(dataProvider),
                 new ActionNamesOverridingLabelAccumulator(dataProvider::getRowObject, kwUsagesFinder),
+                new KeywordArgumentsLabelAccumulator(dataProvider, kwUsagesFinder),
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),
@@ -342,6 +345,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
                 RedImages.getTestCaseImage(), RedImages.getTemplatedTestCaseImage()));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
         table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
+        table.addConfiguration(new KeywordArgumentsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));

@@ -75,7 +75,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
         final String text = "Robot editor preferences. See <a href=\"" + generalTextEditorPageId
                 + "\">'Text Editors'</a> for general text editor preferences " + "and <a href=\"" + colorsAndFontsPageId
-                + "\">'Colors and Fonts'</a> to configure the font.";
+                + "\">'Colors and Fonts'</a> to configure colors and fonts.";
         link.setText(text);
         link.addSelectionListener(widgetSelectedAdapter(e -> {
             if (generalTextEditorPageId.equals(e.text)) {
@@ -125,6 +125,13 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
         tablesGroup.setText("Tables");
         GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(tablesGroup);
         GridLayoutFactory.fillDefaults().applyTo(tablesGroup);
+
+        final BooleanFieldEditor keywordArgumentsHighlightingEditor = new BooleanFieldEditor(
+                RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, "Enable keyword argument highlighting", tablesGroup);
+        addField(keywordArgumentsHighlightingEditor);
+        final Button keywordArgumentsHighlightingCheckbox = (Button) keywordArgumentsHighlightingEditor
+                .getDescriptionControl(tablesGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).span(2, 1).applyTo(keywordArgumentsHighlightingCheckbox);
 
         final IntegerFieldEditor columnsEditor = new IntegerFieldEditor(
                 RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS,

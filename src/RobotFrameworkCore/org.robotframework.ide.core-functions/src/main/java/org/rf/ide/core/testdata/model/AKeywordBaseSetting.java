@@ -128,7 +128,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T>
         if (isPresent()) {
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {
-                if (!getKeywordName().isDirty() && !getKeywordName().isNotEmpty()) {
+                if (!getKeywordName().isDirty() && getKeywordName().isEmpty()) {
                     keywordName.setText("\\");
                     setKeywordName(keywordName);
                 }

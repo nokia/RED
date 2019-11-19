@@ -23,4 +23,8 @@ public interface ExecutableSetting {
     boolean isSetup();
 
     boolean isTeardown();
+
+    default boolean isDisabled() {
+        return getKeywordName() == null || getKeywordName().getText().equalsIgnoreCase("none");
+    }
 }

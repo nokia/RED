@@ -145,6 +145,7 @@ import org.robotframework.red.nattable.configs.CommentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.KeywordArgumentsStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
@@ -153,6 +154,7 @@ import org.robotframework.red.nattable.configs.SettingsActionNamesLabelAccumulat
 import org.robotframework.red.nattable.configs.SettingsCommentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsItemsStyleConfiguration;
+import org.robotframework.red.nattable.configs.SettingsKeywordArgumentsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SettingsNestedExecsSpecialTokensLabelAccumulator;
 import org.robotframework.red.nattable.configs.SpecialItemsLabelAccumulator;
 import org.robotframework.red.nattable.configs.SpecialItemsStyleConfiguration;
@@ -541,6 +543,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new SettingsActionNamesLabelAccumulator(dataProvider),
                 new ActionNamesOverridingLabelAccumulator(rowObjectProvider, kwUsagesFinder),
+                new SettingsKeywordArgumentsLabelAccumulator(dataProvider, kwUsagesFinder),
                 new SettingsNestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(rowObjectProvider),
                 new SettingsItemsLabelAccumulator(),
@@ -654,6 +657,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new ActionNamesStyleConfiguration(theme));
         table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
+        table.addConfiguration(new KeywordArgumentsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
         table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));

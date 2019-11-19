@@ -225,7 +225,7 @@ public class LibrariesWatchHandlerTest {
         referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME, pythonLibraryFile.getPath(),
                 LibraryType.PYTHON);
         libSpec = createNewLibSpec(referencedLibrary);
-        final KeywordSpecification kwSpec = createNewKeywordSpec("someNewKeyword", newArrayList("arg"));
+        final KeywordSpecification kwSpec = createNewKeywordSpec("someNewKeyword", "arg");
         libSpec.setKeywords(newArrayList(kwSpec));
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
@@ -535,16 +535,12 @@ public class LibrariesWatchHandlerTest {
     }
 
     private LibrarySpecification createNewLibSpec(final ReferencedLibrary referencedLibrary) {
-        final LibrarySpecification libSpec = LibrarySpecification.create(referencedLibrary.getName());
-        final KeywordSpecification keywordSpec = createNewKeywordSpec("keyword1", newArrayList("arg1"));
-        libSpec.setKeywords(newArrayList(keywordSpec));
-        return libSpec;
+        return LibrarySpecification.create(referencedLibrary.getName(),
+                KeywordSpecification.create("keyword1", "arg1"));
     }
 
-    private KeywordSpecification createNewKeywordSpec(final String name, final List<String> args) {
-        final KeywordSpecification keywordSpec = KeywordSpecification.create(name);
-        keywordSpec.setArguments(args);
-        return keywordSpec;
+    private KeywordSpecification createNewKeywordSpec(final String name, final String... args) {
+        return KeywordSpecification.create(name, args);
     }
 
     static class DummyLibrariesWatchHandler extends LibrariesWatchHandler {

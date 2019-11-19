@@ -47,7 +47,7 @@ public class TableThemes {
         }
 
         public Color getHeadersHighlightedBackground() {
-            return RedTheme.Colors.getTableHeaderHihglightedBackgroundColor();
+            return RedTheme.Colors.getTableHeaderHighlightedBackgroundColor();
         }
 
         public Color getHeadersUnderlineColor() {
@@ -91,11 +91,11 @@ public class TableThemes {
         }
 
         public Color getBodySelectedCellBackground() {
-            return RedTheme.Colors.getTableHiglihtedRowColor();
+            return RedTheme.Colors.getTableHighlightedRowColor();
         }
 
         public Color getBodyAnchoredCellBackground() {
-            return RedTheme.Colors.getTableHiglihtedRowColor();
+            return RedTheme.Colors.getTableHighlightedRowColor();
         }
 
         public Color getBodyInactiveCellBackground() {
@@ -104,6 +104,14 @@ public class TableThemes {
 
         public Color getBodyInactiveCellForeground() {
             return RedTheme.Colors.getTableInactiveCellForegroundColor();
+        }
+
+        public Color getBodyMissingArgumentCellBackground() {
+            return RedTheme.Colors.getTableMissingArgumentCellBackgroundColor();
+        }
+
+        public Color getBodyOptionalArgumentCellBackground() {
+            return RedTheme.Colors.getTableOptionalArgumentCellBackgroundColor();
         }
 
         public abstract NatTable configureScrollBars(Composite parent, final ViewportLayer viewportLayer,

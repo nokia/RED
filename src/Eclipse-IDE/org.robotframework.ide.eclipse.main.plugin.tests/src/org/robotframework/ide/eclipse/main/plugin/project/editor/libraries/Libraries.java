@@ -6,9 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryConstructor;
@@ -26,23 +28,25 @@ public class Libraries {
     public static Map<LibraryDescriptor, LibrarySpecification> createStdLibs(final String... libNames) {
         final Map<LibraryDescriptor, LibrarySpecification> libs = new HashMap<>();
         for (final String libName : libNames) {
-            libs.putAll(createStdLib(libName));
+            libs.putAll(createStdLib(libName, new String[0]));
         }
         return libs;
     }
 
     public static Map<LibraryDescriptor, LibrarySpecification> createStdLib(final String libName,
             final String... kwNames) {
+        return createStdLib(libName,
+                Stream.of(kwNames).map(KeywordSpecification::create).toArray(KeywordSpecification[]::new));
+    }
+
+    public static Map<LibraryDescriptor, LibrarySpecification> createStdLib(final String libName,
+            final KeywordSpecification... kwSpecs) {
         final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardLibrary(libName);
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName(libName);
-        for (final String kwName : kwNames) {
-            final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setName(kwName);
-            libSpec.getKeywords().add(kwSpec);
-        }
+        libSpec.setKeywords(newArrayList(kwSpecs));
         return new HashMap<>(ImmutableMap.of(descriptor, libSpec));
     }
 
@@ -53,32 +57,38 @@ public class Libraries {
         libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName("Remote");
-        final LibraryConstructor constructor = LibraryConstructor.create("", newArrayList("uri=default", "timeout=30"));
-        libSpec.setConstructor(constructor);
-        for (final String kwName : kwNames) {
-            final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setName(kwName);
-            libSpec.getKeywords().add(kwSpec);
-        }
+        libSpec.setConstructor(LibraryConstructor.create("", newArrayList("uri=default", "timeout=30")));
+        libSpec.setKeywords(Stream.of(kwNames).map(KeywordSpecification::create).collect(toList()));
         return ImmutableMap.of(descriptor, libSpec);
     }
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRefLibs(final String... libNames) {
         final Map<LibraryDescriptor, LibrarySpecification> libs = new HashMap<>();
         for (final String libName : libNames) {
-            libs.putAll(createRefLib(libName));
+            libs.putAll(createRefLib(libName, new String[0]));
         }
         return libs;
     }
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final String libName,
             final String... kwNames) {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, libName, libName + ".py");
-        return createRefLib(library, kwNames);
+        return createRefLib(libName,
+                Stream.of(kwNames).map(KeywordSpecification::create).toArray(KeywordSpecification[]::new));
+    }
+
+    public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final String libName,
+            final KeywordSpecification... kwSpecs) {
+        return createRefLib(ReferencedLibrary.create(LibraryType.PYTHON, libName, libName + ".py"), kwSpecs);
     }
 
     public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final ReferencedLibrary library,
             final String... kwNames) {
+        return createRefLib(library,
+                Stream.of(kwNames).map(KeywordSpecification::create).toArray(KeywordSpecification[]::new));
+    }
+
+    public static Map<LibraryDescriptor, LibrarySpecification> createRefLib(final ReferencedLibrary library,
+            final KeywordSpecification... kwSpecs) {
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library, variant);
         final LibrarySpecification libSpec = new LibrarySpecification();
@@ -88,11 +98,7 @@ public class Libraries {
         libSpec.setName(library.getName());
         libSpec.setDescriptor(descriptor);
         libSpec.setDocumentation("library documentation");
-        for (final String kwName : kwNames) {
-            final KeywordSpecification kwSpec = new KeywordSpecification();
-            kwSpec.setName(kwName);
-            libSpec.getKeywords().add(kwSpec);
-        }
+        libSpec.setKeywords(newArrayList(kwSpecs));
         return ImmutableMap.of(descriptor, libSpec);
     }
 

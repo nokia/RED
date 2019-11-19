@@ -47,8 +47,7 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
         } else if (sortModel.getSortDirection(0) == SortDirectionEnum.ASC) {
             return depth == 0 ? new CodeAlphabeticalComparator() : new CallsFileOrderComparator();
         } else if (sortModel.getSortDirection(0) == SortDirectionEnum.DESC) {
-            return depth == 0 ? new ReverseComparator<>(new CodeAlphabeticalComparator())
-                    : new CallsFileOrderComparator();
+            return depth == 0 ? new CodeAlphabeticalComparator().reversed() : new CallsFileOrderComparator();
         }
         return null;
     }
@@ -101,20 +100,6 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
             final int result = elem1.getName().compareToIgnoreCase(elem2.getName());
             // if there are two different elements with same name we compare them using indexes
             return result != 0 || o1 == o2 ? result : elem1.getIndex() - elem2.getIndex();
-        }
-    }
-
-    private static class ReverseComparator<T> implements Comparator<T> {
-
-        private final Comparator<T> comparator;
-
-        public ReverseComparator(final Comparator<T> comparator) {
-            this.comparator = comparator;
-        }
-
-        @Override
-        public int compare(final T o1, final T o2) {
-            return comparator.compare(o2, o1);
         }
     }
 }

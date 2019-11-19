@@ -43,4 +43,6 @@ IEclipsePreferences#org-eclipse-ui-workbench:org-robot-framework-ide-eclipse-mai
         'org.robotframework.red.table.body.cell.highlight=128,100,45'
         'org.robotframework.red.table.body.cell.inactive.background=30,30,30'
         'org.robotframework.red.table.body.cell.inactive.foreground=80,80,80'
+        'org.robotframework.red.table.body.cell.missing.arg.background=241,157,133'
+        'org.robotframework.red.table.body.cell.optional.arg.background=100,100,100'
 }
