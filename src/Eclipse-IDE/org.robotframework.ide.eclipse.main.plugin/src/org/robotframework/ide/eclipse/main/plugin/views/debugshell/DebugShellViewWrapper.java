@@ -14,4 +14,8 @@ public class DebugShellViewWrapper extends DIViewPart<DebugShellView> {
     public DebugShellViewWrapper() {
         super(DebugShellView.class);
     }
+
+    public DebugShellView getView() {
+        return getComponent();
+    }
 }

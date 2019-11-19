@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
@@ -24,21 +23,20 @@ public class LineReader extends Reader {
 
     private int positionInFile = 0;
 
-    private final Map<Integer, Constant> eOLs = new LinkedHashMap<>();
+    private final Map<Integer, Constant> eols = new LinkedHashMap<>();
 
     public LineReader(final Reader reader) {
         this.reader = reader;
     }
 
-    public List<Constant> getLineEnd(final int currentOffset) {
+    public List<Constant> getLineEnd(final int offset) {
         final List<Constant> endOfLine = new ArrayList<>();
-        final Constant c1 = eOLs.get(currentOffset);
-        final Constant c2 = eOLs.get(currentOffset + 1);
+        final Constant c1 = eols.get(offset);
+        final Constant c2 = eols.get(offset + 1);
 
         if (c1 != null) {
             endOfLine.add(c1);
         }
-
         if (c2 != null && c2 != c1) {
             endOfLine.add(c2);
         }
@@ -53,8 +51,7 @@ public class LineReader extends Reader {
         int offset = 0;
         boolean skipNext = false;
 
-        final Set<Integer> offsets = this.eOLs.keySet();
-        for (final Integer currentOffset : offsets) {
+        for (final Integer currentOffset : this.eols.keySet()) {
             if (skipNext) {
                 skipNext = false;
                 continue;
@@ -63,18 +60,17 @@ public class LineReader extends Reader {
             line++;
             column = 0;
             final List<Constant> eol = getLineEnd(currentOffset);
-            int eolSize = eol.size();
-            if (eolSize > 1) {
+            int eolLength = eol.size();
+            if (eolLength > 1) {
                 skipNext = true;
-            } else {
-                if (eol.get(0) == Constant.EOF) {
-                    eolSize = 0;
-                }
+
+            } else if (eol.get(0) == Constant.EOF) {
+                eolLength = 0;
             }
 
-            final int textLength = (currentOffset - offset) + eolSize;
+            final int textLength = currentOffset - offset + eolLength;
             final FilePosition fpStart = new FilePosition(line, column, offset);
-            offset = currentOffset + eolSize;
+            offset = currentOffset + eolLength;
             final FilePosition fpEnd = new FilePosition(line, column + textLength, offset);
 
             eols.add(new FileRegion(fpStart, fpEnd));
@@ -85,26 +81,21 @@ public class LineReader extends Reader {
     @Override
     public int read(final char[] cbuf, final int off, final int len) throws IOException {
         final int read = reader.read(cbuf, off, len);
+        if (read <= 0) {
+            eols.put(positionInFile, Constant.EOF);
+            return read;
+        }
         for (int i = 0; i < read; i++) {
-            final Constant mapped = Constant.get(cbuf[i]);
-            if (mapped != null) {
-                int index = i;
-                if (positionInFile > 0) {
-                    index = positionInFile + index;
-                }
-                eOLs.put(index, mapped);
+            if (cbuf[i] == '\r') {
+                eols.put(positionInFile + i, Constant.CR);
+            } else if (cbuf[i] == '\n') {
+                eols.put(positionInFile + i, Constant.LF);
+            } else if (cbuf[i] == -1) {
+                eols.put(positionInFile, Constant.EOF);
             }
         }
-        if (read > 0) {
-            positionInFile += read;
-        } else {
-            eOLs.put(positionInFile, Constant.EOF);
-        }
+        positionInFile += read;
         return read;
-    }
-
-    public int getPosition() {
-        return positionInFile;
     }
 
     @Override
@@ -125,16 +116,6 @@ public class LineReader extends Reader {
             return c;
         }
 
-        public static Constant get(final char c) {
-            final Constant[] values = Constant.values();
-            for (final Constant constant : values) {
-                if (constant.getChar() == c) {
-                    return constant;
-                }
-            }
-            return null;
-        }
-
         public static List<Constant> get(final IRobotLineElement rle) {
             return get(rle.getText());
         }
@@ -150,6 +131,16 @@ public class LineReader extends Reader {
                 converted.add(Constant.get(c));
             }
             return converted;
+        }
+
+        private static Constant get(final char c) {
+            final Constant[] values = Constant.values();
+            for (final Constant constant : values) {
+                if (constant.getChar() == c) {
+                    return constant;
+                }
+            }
+            return null;
         }
 
         public static int getEndOfLineLength(final List<Constant> eols) {

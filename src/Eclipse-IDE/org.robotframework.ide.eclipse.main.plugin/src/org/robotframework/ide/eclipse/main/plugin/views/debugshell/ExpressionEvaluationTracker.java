@@ -21,7 +21,7 @@ public class ExpressionEvaluationTracker extends RobotDefaultAgentEventListener 
     @Override
     public void handleExpressionEvaluated(final ExpressionEvaluatedEvent event) {
         testsLaunchContext.performOnExecutionData(ExpressionEvaluationResult.class,
-                tracker -> tracker.evaluationEnded(event.getId(), event.getType(), event.getResult(),
+                result -> result.evaluationEnded(event.getId(), event.getType(), event.getResult(),
                         event.getError()));
     }
 

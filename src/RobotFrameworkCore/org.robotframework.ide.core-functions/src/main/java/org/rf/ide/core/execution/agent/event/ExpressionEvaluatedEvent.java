@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -25,7 +25,7 @@ public final class ExpressionEvaluatedEvent {
 
         if (id == null || exprResult == null && error == null) {
             throw new IllegalArgumentException(
-                    "Condition event should either have evaluation result or exception message");
+                    "Expression event should either have evaluation result or exception message");
         }
         return new ExpressionEvaluatedEvent(id.intValue(), type, exprResult, error);
     }

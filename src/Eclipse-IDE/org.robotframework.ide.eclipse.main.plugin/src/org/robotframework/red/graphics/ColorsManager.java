@@ -135,7 +135,7 @@ public class ColorsManager {
     }
 
     public static RGB factorRgb(final RGB color, final double factor) {
-        final IntFunction<Integer> fun = i -> Math.min(255, Math.max(0, ((int) (i * factor))));
+        final IntFunction<Integer> fun = i -> Math.min(255, Math.max(0, (int) Math.round(i * factor)));
         return new RGB(fun.apply(color.red), fun.apply(color.green), fun.apply(color.blue));
     }
 }

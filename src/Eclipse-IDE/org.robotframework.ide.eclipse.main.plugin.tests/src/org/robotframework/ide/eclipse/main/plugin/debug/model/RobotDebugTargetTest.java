@@ -31,6 +31,7 @@ import org.rf.ide.core.execution.debug.StackFrameVariable;
 import org.rf.ide.core.execution.debug.Stacktrace;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.execution.debug.UserProcessDebugController.DebuggerPreferences;
+import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget.ExecutionPauseReasonsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
@@ -311,6 +312,42 @@ public class RobotDebugTargetTest {
     }
 
     @Test
+    public void expressionEvaluationOfRobotRequestsAreSendThroughUserController() {
+        final ILaunch launch = mock(ILaunch.class);
+        final Stacktrace stack = new Stacktrace();
+        final UserProcessDebugController controller = mock(UserProcessDebugController.class);
+
+        final RobotDebugTarget target = new RobotDebugTarget("target", launch, stack, controller);
+        target.evaluate(5, ExpressionType.ROBOT, "keyword    arg1    arg2");
+
+        verify(controller).evaluateRobotKeywordCall(5, "keyword", newArrayList("arg1", "arg2"));
+    }
+
+    @Test
+    public void expressionEvaluationOfVariableRequestsAreSendThroughUserController() {
+        final ILaunch launch = mock(ILaunch.class);
+        final Stacktrace stack = new Stacktrace();
+        final UserProcessDebugController controller = mock(UserProcessDebugController.class);
+
+        final RobotDebugTarget target = new RobotDebugTarget("target", launch, stack, controller);
+        target.evaluate(7, ExpressionType.VARIABLE, "${variable}");
+
+        verify(controller).evaluateRobotVariable(7, "${variable}");
+    }
+
+    @Test
+    public void expressionEvaluationOfPythonRequestsAreSendThroughUserController() {
+        final ILaunch launch = mock(ILaunch.class);
+        final Stacktrace stack = new Stacktrace();
+        final UserProcessDebugController controller = mock(UserProcessDebugController.class);
+
+        final RobotDebugTarget target = new RobotDebugTarget("target", launch, stack, controller);
+        target.evaluate(10, ExpressionType.PYTHON, "3 * 3");
+
+        verify(controller).evaluatePythonExpression(10, "3 * 3");
+    }
+
+    @Test
     public void robotDebugTargetDoesNotSupportMemoryRetrieval() {
         final ILaunch launch = mock(ILaunch.class);
         final Stacktrace stack = new Stacktrace();
@@ -397,6 +434,25 @@ public class RobotDebugTargetTest {
 
         verify(process).suspended();
         verify(thread).fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
+    }
+
+    @Test
+    public void executionSuspendsListenerNotifiesProcessAndThreadAboutExpressionEvaluationSuspension() {
+        final Stacktrace stack = new Stacktrace();
+        final UserProcessDebugController controller = new UserProcessDebugController(stack,
+                mock(DebuggerPreferences.class));
+        final IRobotProcess process = mock(IRobotProcess.class);
+        final RobotThread thread = mock(RobotThread.class);
+
+        final RobotDebugTarget target = new RobotDebugTarget("target", mock(ILaunch.class), stack, controller);
+        target.setProcess(process);
+        target.setThread(thread);
+
+        final ExecutionPauseReasonsListener listener = target.new ExecutionPauseReasonsListener();
+        listener.pausedAfterExpressionEvaluated();
+
+        verify(process).suspended();
+        verify(thread).fireSuspendEvent(DebugEvent.EVALUATION);
     }
 
     @Test

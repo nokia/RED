@@ -21,10 +21,9 @@ public class ClearDebugLogViewHandler extends DIParameterizedHandler<E4ClearDebu
 
     public static class E4ClearDebugLogViewHandler {
 
-        @SuppressWarnings("restriction")
         @Execute
         public void clear(final @Named(ISources.ACTIVE_PART_NAME) DebugShellViewWrapper view) {
-            view.getComponent().clear();
+            view.getView().clear();
         }
     }
 }

@@ -37,10 +37,12 @@ import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.server.response.ChangeVariable;
 import org.rf.ide.core.execution.server.response.DisconnectExecution;
 import org.rf.ide.core.execution.server.response.EvaluateCondition;
+import org.rf.ide.core.execution.server.response.EvaluateExpression;
 import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ResumeExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
 import org.rf.ide.core.execution.server.response.TerminateExecution;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 @RunWith(Theories.class)
@@ -217,6 +219,25 @@ public class UserProcessDebugControllerTest {
 
         verify(listener1).pausedOnError("error");
         verify(listener2).pausedOnError("error");
+        verifyNoMoreInteractions(listener1, listener2);
+    }
+
+    @Test
+    public void whenExecutionPausesWithControllerBeingInExpressionEvaluationState_listenersAreNotified() {
+        final Stacktrace stack = new Stacktrace();
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+
+        final PauseReasonListener listener1 = mock(PauseReasonListener.class);
+        final PauseReasonListener listener2 = mock(PauseReasonListener.class);
+
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+        controller.whenSuspended(listener1);
+        controller.whenSuspended(listener2);
+        controller.setSuspensionData(new SuspensionData(SuspendReason.EXPRESSION_EVALUATED));
+        controller.executionPaused();
+
+        verify(listener1).pausedAfterExpressionEvaluated();
+        verify(listener2).pausedAfterExpressionEvaluated();
         verifyNoMoreInteractions(listener1, listener2);
     }
 
@@ -473,6 +494,138 @@ public class UserProcessDebugControllerTest {
         final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
 
         final Optional<ServerResponse> response = controller.takeCurrentResponse(point, null);
+
+        assertThat(response).isEmpty();
+        assertThat(controller.getSuspensionData()).isNull();
+    }
+
+    @Test
+    public void pauseResponseIsReturned_whenThereIsAKwFailBreakpointWithoutConditionWithHitCountFulfilledAndMatchingName() {
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpoint.evaluateHitCount()).thenReturn(true);
+        when(breakpoint.isConditionEnabled()).thenReturn(false);
+
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2,
+                failBreakpointContext(breakpoint, QualifiedKeywordName.create("kw", "lib"))));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_END_KEYWORD,
+                QualifiedKeywordName.create("kw", "lib"));
+
+        assertThat(response).isNotEmpty().containsInstanceOf(PauseExecution.class);
+        assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.BREAKPOINT);
+        assertThat(controller.getSuspensionData().data).containsOnly(breakpoint);
+    }
+
+    @Test
+    public void evaluateConditionResponseIsReturned_whenThereIsAKwFailBreakpointWithConditionWithHitCountFulfilledAndMatchingName() {
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpoint.evaluateHitCount()).thenReturn(true);
+        when(breakpoint.isConditionEnabled()).thenReturn(true);
+        when(breakpoint.getCondition()).thenReturn(newArrayList("Assert Equals", "1", "2"));
+
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2,
+                failBreakpointContext(breakpoint, QualifiedKeywordName.create("kw", "lib"))));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_END_KEYWORD,
+                QualifiedKeywordName.create("kw", "lib"));
+
+        assertThat(response).isNotEmpty().containsInstanceOf(EvaluateCondition.class);
+        assertThat(response.get().toMessage()).isEqualTo("{\"evaluate_condition\":[\"Assert Equals\",\"1\",\"2\"]}");
+        assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.BREAKPOINT);
+        assertThat(controller.getSuspensionData().data).containsOnly(breakpoint);
+    }
+
+    @Test
+    public void noResponseIsReturned_whenThereIsAKwFailBreakpointWithMatchingNameButHitCountIsNotFulfilled() {
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpoint.evaluateHitCount()).thenReturn(false);
+
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2,
+                failBreakpointContext(breakpoint, QualifiedKeywordName.create("kw", "lib"))));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_END_KEYWORD,
+                QualifiedKeywordName.create("kw", "lib"));
+
+        assertThat(response).isEmpty();
+        assertThat(controller.getSuspensionData()).isNull();
+    }
+
+    @Test
+    public void noResponseIsReturned_whenThereIsAKwFailBreakpointWithSomeDifferentNameOfKeyword() {
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpoint.evaluateHitCount()).thenReturn(true);
+
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2,
+                failBreakpointContext(breakpoint, QualifiedKeywordName.create("other kw", "lib"))));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_END_KEYWORD,
+                QualifiedKeywordName.create("kw", "lib"));
+
+        assertThat(response).isEmpty();
+        assertThat(controller.getSuspensionData()).isNull();
+    }
+
+    @Test
+    public void noResponseIsReturned_whenThereIsNoKwFailBreakpoint() {
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2, context()));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.PRE_END_KEYWORD,
+                QualifiedKeywordName.create("kw", "lib"));
+
+        assertThat(response).isEmpty();
+        assertThat(controller.getSuspensionData()).isNull();
+    }
+
+    @Theory
+    public void noResponseIsReturned_whenThereIsAKwFailBreakpointButPausingPointIsOtherThanPreEnd(
+            final PausingPoint point) {
+        assumeTrue(point != PausingPoint.PRE_END_KEYWORD);
+
+        final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
+        when(breakpoint.evaluateHitCount()).thenReturn(true);
+        when(breakpoint.isConditionEnabled()).thenReturn(false);
+
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2,
+                failBreakpointContext(breakpoint, QualifiedKeywordName.create("kw", "lib"))));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(point,
+                QualifiedKeywordName.create("kw", "lib"));
 
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData()).isNull();
@@ -1140,6 +1293,69 @@ public class UserProcessDebugControllerTest {
     }
 
     @Test
+    public void whenRobotExpressionEvaluationIsRequested_properResponseIsQueued() {
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2, context()));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        controller.evaluateRobotKeywordCall(1, "kw", newArrayList("1", "2"));
+
+        assertThat(controller.manualUserResponse).hasSize(1);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
+
+        assertThat(controller.manualUserResponse).isEmpty();
+        assertThat(response).containsInstanceOf(EvaluateExpression.class);
+        assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.EXPRESSION_EVALUATED);
+        assertThat(controller.getSuspensionData().data).isEmpty();
+    }
+
+    @Test
+    public void whenRobotVariableEvaluationIsRequested_properResponseIsQueued() {
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2, context()));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        controller.evaluateRobotVariable(1, "${var}");
+
+        assertThat(controller.manualUserResponse).hasSize(1);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
+
+        assertThat(controller.manualUserResponse).isEmpty();
+        assertThat(response).containsInstanceOf(EvaluateExpression.class);
+        assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.EXPRESSION_EVALUATED);
+        assertThat(controller.getSuspensionData().data).isEmpty();
+    }
+
+    @Test
+    public void whenPythonExpresionEvaluationIsRequested_properResponseIsQueued() {
+        final Stacktrace stack = new Stacktrace();
+        stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
+        stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
+        stack.push(new StackFrame("keyword", FrameCategory.KEYWORD, 2, context()));
+
+        final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
+        final UserProcessDebugController controller = new UserProcessDebugController(stack, prefs);
+
+        controller.evaluatePythonExpression(1, "[x for x in range(5)]");
+
+        assertThat(controller.manualUserResponse).hasSize(1);
+        final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null);
+
+        assertThat(controller.manualUserResponse).isEmpty();
+        assertThat(response).containsInstanceOf(EvaluateExpression.class);
+        assertThat(controller.getSuspensionData().reason).isEqualTo(SuspendReason.EXPRESSION_EVALUATED);
+        assertThat(controller.getSuspensionData().data).isEmpty();
+    }
+
+    @Test
     public void whenFutureResponseWasOrdered_itIsReturnedAsFutureTask() throws Exception {
         final Stacktrace stack = new Stacktrace();
         final DebuggerPreferences prefs = new DebuggerPreferences(() -> false, true);
@@ -1165,6 +1381,13 @@ public class UserProcessDebugControllerTest {
     private static StackFrameContext breakpointContext(final RobotBreakpoint breakpoint) {
         final StackFrameContext context = mock(StackFrameContext.class);
         when(context.getLineBreakpoint()).thenReturn(Optional.of(breakpoint));
+        return context;
+    }
+
+    private static StackFrameContext failBreakpointContext(final RobotBreakpoint breakpoint,
+            final QualifiedKeywordName kwName) {
+        final StackFrameContext context = mock(StackFrameContext.class);
+        when(context.getKeywordFailBreakpoint(kwName)).thenReturn(Optional.of(breakpoint));
         return context;
     }
 

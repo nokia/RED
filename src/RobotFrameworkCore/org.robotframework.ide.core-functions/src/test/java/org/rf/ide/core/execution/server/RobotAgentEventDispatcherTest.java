@@ -31,6 +31,7 @@ import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
+import org.rf.ide.core.execution.agent.event.ExpressionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
@@ -49,6 +50,7 @@ import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
+import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -492,6 +494,42 @@ public class RobotAgentEventDispatcherTest {
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionEvaluated(new ConditionEvaluatedEvent("Error evaluating condition"));
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutExpressionEvaluationResult() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final ImmutableMap<String, Object> attributes = ImmutableMap.of("id", 1, "type", "robot", "result", "123");
+        final String json = toJson(ImmutableMap.of("expression_result", newArrayList(attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).eventsProcessingAboutToStart();
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleExpressionEvaluated(new ExpressionEvaluatedEvent(1, ExpressionType.ROBOT, "123", null));
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutExpressionEvaluationError() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final ImmutableMap<String, Object> attributes = ImmutableMap.of("id", 1, "type", "robot", "error", "fail");
+        final String json = toJson(ImmutableMap.of("expression_result", newArrayList(attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).eventsProcessingAboutToStart();
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleExpressionEvaluated(new ExpressionEvaluatedEvent(1, ExpressionType.ROBOT, null, "fail"));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

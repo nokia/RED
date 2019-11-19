@@ -17,9 +17,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
 import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -42,6 +44,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
+import org.eclipse.ui.texteditor.IUpdate;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
@@ -252,17 +255,17 @@ public class DebugShellView {
         styledText.setTopIndex(getDocument().getNumberOfLines());
     }
 
-    void clear() {
+    protected void clear() {
         getDocument().reset();
         refreshAndMoveToTheEnd();
     }
 
-    void switchToNextMode() {
+    protected void switchToNextMode() {
         getDocument().switchToNextMode();
         refreshAndMoveToTheEnd();
     }
 
-    void putExpression(final ExpressionType type, final String expression) {
+    protected void putExpression(final ExpressionType type, final String expression) {
         getDocument().switchTo(type, expression);
         refreshAndMoveToTheEnd();
     }
@@ -357,6 +360,29 @@ public class DebugShellView {
         @Override
         public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
             // nothing to do
+        }
+    }
+
+    private class ShellViewViewAction extends Action implements IUpdate {
+
+        private final int operationCode;
+
+        private final ITextOperationTarget operationTarget;
+
+        private ShellViewViewAction(final ITextOperationTarget target, final int operationCode) {
+            this.operationTarget = target;
+            this.operationCode = operationCode;
+            update();
+        }
+
+        @Override
+        public void run() {
+            operationTarget.doOperation(operationCode);
+        }
+
+        @Override
+        public void update() {
+            setEnabled(operationTarget.canDoOperation(operationCode));
         }
     }
 }

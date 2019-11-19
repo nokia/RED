@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -43,8 +42,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private final Stacktrace stacktrace;
 
     private final UserProcessDebugController userController;
-
-    private final Semaphore exprEvalSemaphore = new Semaphore(1);
 
     public RobotDebugTarget(final String name, final ILaunch launch, final Stacktrace stacktrace,
             final UserProcessDebugController userController) {
@@ -205,7 +202,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         } else if (type == ExpressionType.VARIABLE) {
             userController.evaluateRobotVariable(exprId, expression);
         }
-        exprEvalSemaphore.release();
     }
 
     @Override

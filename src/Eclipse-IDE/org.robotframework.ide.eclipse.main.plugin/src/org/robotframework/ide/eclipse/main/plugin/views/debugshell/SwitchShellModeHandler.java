@@ -21,10 +21,9 @@ public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShell
 
     public static class E4SwitchShellModeHandler {
 
-        @SuppressWarnings("restriction")
         @Execute
         public void switchMode(final @Named(ISources.ACTIVE_PART_NAME) DebugShellViewWrapper view) {
-            view.getComponent().switchToNextMode();
+            view.getView().switchToNextMode();
         }
     }
 }

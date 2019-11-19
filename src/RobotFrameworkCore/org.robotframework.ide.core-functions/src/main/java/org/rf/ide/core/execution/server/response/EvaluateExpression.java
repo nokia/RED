@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -8,7 +8,7 @@ package org.rf.ide.core.execution.server.response;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public final class EvaluateExpression implements ServerResponseOnShouldContinue 
     @Override
     public String toMessage() {
         try {
-            final Map<String, Object> data = new HashMap<>();
+            final Map<String, Object> data = new LinkedHashMap<>();
             data.put("id", exprId);
             data.put("type", type.name().toLowerCase());
             data.put("expr", expressions);
@@ -63,7 +63,7 @@ public final class EvaluateExpression implements ServerResponseOnShouldContinue 
 
             return mapper.writeValueAsString(value);
         } catch (final IOException e) {
-            throw new ResponseException("Unable to serialize breakpoint condition response arguments to json", e);
+            throw new ResponseException("Unable to serialize expression evaluation response arguments to json", e);
         }
     }
 

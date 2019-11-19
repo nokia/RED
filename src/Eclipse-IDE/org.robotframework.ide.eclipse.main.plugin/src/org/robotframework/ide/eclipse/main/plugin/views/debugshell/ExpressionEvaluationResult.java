@@ -13,7 +13,7 @@ import org.eclipse.ui.services.IDisposable;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 
 
-class ExpressionEvaluationResult implements IDisposable {
+public class ExpressionEvaluationResult implements IDisposable {
 
     private final Map<Integer, ExpressionEvaluationResultListener> listeners = new HashMap<>();
 
@@ -23,7 +23,7 @@ class ExpressionEvaluationResult implements IDisposable {
         listeners.put(id, listener);
     }
 
-    void evaluationEnded(final int id, final ExpressionType expressionType, final Optional<String> result,
+    protected void evaluationEnded(final int id, final ExpressionType expressionType, final Optional<String> result,
             final Optional<String> error) {
 
         // the listener has to be informed that the evaluator finished when it paused again or
@@ -34,13 +34,13 @@ class ExpressionEvaluationResult implements IDisposable {
         }
     }
 
-    void paused() {
+    protected void paused() {
         if (listener != null) {
             listener.evaluatorFinished();
         }
     }
 
-    void terminated() {
+    protected void terminated() {
         if (listener != null) {
             listener.evaluatorFinished();
         }
@@ -53,7 +53,7 @@ class ExpressionEvaluationResult implements IDisposable {
         terminated();
     }
 
-    static interface ExpressionEvaluationResultListener {
+    public static interface ExpressionEvaluationResultListener {
 
         void handleResult(int id, ExpressionType expressionType, Optional<String> result, Optional<String> error);
 

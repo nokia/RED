@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2019 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -16,7 +16,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -34,8 +33,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.views.debugshell.InspectElementHandler.E4InspectElementHandler;
-import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
 import org.robotframework.red.commands.DIParameterizedHandler;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
@@ -53,24 +53,35 @@ public class InspectElementHandler extends DIParameterizedHandler<E4InspectEleme
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel) {
 
             final IWorkbenchPage page = editor.getSite().getPage();
-            final SourceViewer viewer = editor.getSourceEditor().getViewer();
-            final IDocument document = editor.getSourceEditor().getDocument();
-            final ITextSelection selection = (ITextSelection) viewer.getSelection();
-            final int offset = selection.getOffset();
+            final DebugShellView view = getView(page);
+            if (view != null) {
+                final IDocument document = editor.getSourceEditor().getDocument();
+                final ITextSelection selection = (ITextSelection) editor.getSourceEditor()
+                        .getSelectionProvider()
+                        .getSelection();
+
+                inspectElement(view, suiteModel, document, selection);
+            }
+        }
+
+        @VisibleForTesting
+        static void inspectElement(final DebugShellView view, final RobotSuiteFile suiteModel, final IDocument document,
+                final ITextSelection selection) {
 
             try {
                 final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document,
-                        suiteModel.isTsvFile(), offset);
+                        suiteModel.isTsvFile(), selection.getOffset());
                 if (variableRegion.isPresent()) {
                     final String var = document.get(variableRegion.get().getOffset(), variableRegion.get().getLength());
-                    display(page, ExpressionType.VARIABLE, var);
+
+                    view.putExpression(ExpressionType.VARIABLE, var);
                     return;
                 }
             } catch (final BadLocationException e) {
                 // we'll look for the element
             }
 
-            final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
+            final Optional<? extends RobotElement> element = suiteModel.findElement(selection.getOffset());
             if (element.isPresent() && element.get().getClass() == RobotKeywordCall.class) {
                 final RobotKeywordCall call = (RobotKeywordCall) element.get();
                 final RobotExecutableRow<?> execRow = (RobotExecutableRow<?>) call.getLinkedElement();
@@ -80,27 +91,26 @@ public class InspectElementHandler extends DIParameterizedHandler<E4InspectEleme
                     inspectedCall.add(descriptor.getKeywordAction().getToken().getText());
                     descriptor.getKeywordArguments().stream().map(RobotToken::getText).forEach(inspectedCall::add);
 
-                    display(page, ExpressionType.ROBOT, String.join("    ", inspectedCall));
+                    view.putExpression(ExpressionType.ROBOT, String.join("    ", inspectedCall));
                 }
             }
         }
 
-        @SuppressWarnings("restriction")
-        private static DebugShellViewWrapper display(final IWorkbenchPage page, final ExpressionType type,
-                final String expression) {
+        @VisibleForTesting
+        static DebugShellView getView(final IWorkbenchPage page) {
             final DebugShellViewWrapper shellView = openDebugShellViewIfNeeded(page);
-            page.activate(shellView);
             if (shellView != null) {
-                shellView.getComponent().putExpression(type, expression);
+                page.activate(shellView);
+                return shellView.getView();
             }
-            return shellView;
+            return null;
         }
 
         private static DebugShellViewWrapper openDebugShellViewIfNeeded(final IWorkbenchPage page) {
             final IViewPart shellViewPart = page.findView(DebugShellView.ID);
             if (shellViewPart == null) {
                 try {
-                    return ((DebugShellViewWrapper) page.showView(DocumentationView.ID));
+                    return ((DebugShellViewWrapper) page.showView(DebugShellView.ID));
                 } catch (final PartInitException e) {
                     RedPlugin.logError("Unable to show Debug Shell View.", e);
                     return null;

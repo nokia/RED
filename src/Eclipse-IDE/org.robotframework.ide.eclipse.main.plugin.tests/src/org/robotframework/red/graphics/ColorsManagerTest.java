@@ -75,4 +75,30 @@ public class ColorsManagerTest {
         assertThat(ColorsManager.size()).isEqualTo(3);
     }
 
+    @Test
+    public void darkColorDetectionTest() {
+        assertThat(ColorsManager.isDarkColor(new RGB(0, 0, 0))).isTrue();
+        assertThat(ColorsManager.isDarkColor(new RGB(30, 50, 110))).isTrue();
+        assertThat(ColorsManager.isDarkColor(new RGB(110, 30, 50))).isTrue();
+        assertThat(ColorsManager.isDarkColor(new RGB(50, 110, 30))).isTrue();
+
+        assertThat(ColorsManager.isDarkColor(new RGB(255, 255, 255))).isFalse();
+        assertThat(ColorsManager.isDarkColor(new RGB(160, 180, 200))).isFalse();
+        assertThat(ColorsManager.isDarkColor(new RGB(200, 160, 180))).isFalse();
+        assertThat(ColorsManager.isDarkColor(new RGB(180, 200, 160))).isFalse();
+    }
+
+    @Test
+    public void colorsFactorgingTest() {
+        assertThat(ColorsManager.factorRgb(new RGB(1, 2, 3), 10.0)).isEqualTo(new RGB(10, 20, 30));
+        assertThat(ColorsManager.factorRgb(new RGB(100, 100, 100), 2.0)).isEqualTo(new RGB(200, 200, 200));
+        assertThat(ColorsManager.factorRgb(new RGB(100, 100, 100), -2.0)).isEqualTo(new RGB(0, 0, 0));
+        assertThat(ColorsManager.factorRgb(new RGB(100, 100, 100), 2.55)).isEqualTo(new RGB(255, 255, 255));
+        assertThat(ColorsManager.factorRgb(new RGB(100, 100, 100), 3.0)).isEqualTo(new RGB(255, 255, 255));
+
+        assertThat(ColorsManager.factorRgb(new RGB(10, 20, 30), 0.1)).isEqualTo(new RGB(1, 2, 3));
+        assertThat(ColorsManager.factorRgb(new RGB(200, 200, 200), 0.5)).isEqualTo(new RGB(100, 100, 100));
+        assertThat(ColorsManager.factorRgb(new RGB(200, 200, 200), -0.5)).isEqualTo(new RGB(0, 0, 0));
+        assertThat(ColorsManager.factorRgb(new RGB(255, 255, 255), 0.3922)).isEqualTo(new RGB(100, 100, 100));
+    }
 }
