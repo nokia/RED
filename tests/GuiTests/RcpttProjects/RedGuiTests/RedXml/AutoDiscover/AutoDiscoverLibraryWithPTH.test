@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KASD8JISEea_J4BglwdxcA
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 11:38 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/18/19 5:19 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -103,9 +103,9 @@ if [ get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-editor "ImportFromSitePkg/red.xml" | get-section "Libraries" | get-tree] {
 	    get-property itemCount | equals 4 | verify-true
 	    get-property "getItems().TableItem[2].getText()" 
-	        | equals  "pthRedTest.api.LogLib.LogLib - /usr/lib/python2.7/site-packages/pthRedTest/api/LogLib.py" | verify-true
+	        | equals  "pthRedTest.api.LogLib.LogLib - .*site-packages/pthRedTest/api/LogLib.py" |  verify-true
 	    get-property "getItems().TableItem[1].getText()" 
-	        | equals  "pthRedTest.api.dump.Dump - /usr/lib/python2.7/site-packages/pthRedTest/api/dump.py" | verify-true
+	        | equals  "pthRedTest.api.dump.Dump - .*site-packages/pthRedTest/api/dump.py" | verify-true
 	}	
 }					
 
@@ -138,10 +138,10 @@ if [ get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 }-else{
 	with [get-view Problems | get-tree] {
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-	        | equals "The path /usr/lib/python2.7/site-packages/pthRedTest/api/dump.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
+	        | equals "The path .*site-packages/pthRedTest/api/dump.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
 	        	| verify-true
 	    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
-	        | equals "The path /usr/lib/python2.7/site-packages/pthRedTest/api/LogLib.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"| verify-true
+	        | equals "The path .*/site-packages/pthRedTest/api/LogLib.py is absolute. RED prefers using workspace-relative paths which makes your projects more portable"| verify-true
 	}
 }	
 
