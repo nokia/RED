@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ueh6UCC5EemEjfjIU9tmyw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/23/19 11:06 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/20/19 3:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,38 +25,35 @@ Entry-Name: .content
 
 proc "check-referenced-libs"{
 	
-	//this is for debug purpose
-	get-view "Project Explorer" | get-tree 
-	    | select "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py.*"
-	exec-with-options {
-	    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
-	    try -command{
-		    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
-		    get-window "Progress Information" | get-window "Problem Occurred" | maximize
-	    }-catch{}
-	} -allowStatusDialog
-	
-	get-view "Project Explorer" | get-tree 
-	    | select "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py.*"
-	exec-with-options {
-	    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
-	    try -command{
-		    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
-		    get-window "Progress Information" | get-window "Problem Occurred" | maximize
-	    }-catch{}
-	} -allowStatusDialog
-
-	with [get-view "Project Explorer" | get-tree] {
-	    get-item 
-	        -path "SpecialLibs/Robot Referenced libraries/JSONLibrary .*site-packages\\/JSONLibrary\\/__init__.py \\(\d\\)" 
-	        | get-property enablement | equals false | verify-true
-	    get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py \\(1\\)" 
-	        | get-property enablement | equals false | verify-true
-
-	    get-item -path "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py \\(1\\)" 
-	        | get-property enablement | equals false | verify-true
+	if [$python_version | eq 2]{
+		//this is for debug purpose
+		get-view "Project Explorer" | get-tree 
+		    | select "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py.*"
+		exec-with-options {
+		    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+		    try -command{
+			    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+			    get-window "Progress Information" | get-window "Problem Occurred" | maximize
+		    }-catch{}
+		} -allowStatusDialog
+		
+		get-view "Project Explorer" | get-tree 
+		    | select "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py.*"
+		exec-with-options {
+		    get-view "Project Explorer" | get-tree | get-menu -path Reload | click
+		    try -command{
+			    get-window "Progress Information" | get-window "Problem Occurred" | get-button "Details >>" | click
+			    get-window "Progress Information" | get-window "Problem Occurred" | maximize
+		    }-catch{}
+		} -allowStatusDialog
+		
+		get-view "Project Explorer" | get-tree
+		    | get-item -path "SpecialLibs/Robot Referenced libraries/LibWithPymouse SpecialLibs\\/LibWithPymouse.py \\(1\\)" 
+		    | get-property enablement | equals false | verify-true
+	        
 	}
-	// lib is only for windows
+	
+			// lib is only for windows
 	if [get-by-os -win "Windows" -linux "Linux" | eq "Windows"]{
 		get-view "Project Explorer" | get-tree | get-item 
 		    -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(1\\)" 
@@ -67,7 +64,18 @@ proc "check-referenced-libs"{
 	        -path "SpecialLibs/Robot Referenced libraries/LibWithPywintypes SpecialLibs\\/LibWithPywintypes.py \\(non-accessible\\)"
 	        | get-property enablement | equals false | verify-true
 	}
+	
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item 
+	        -path "SpecialLibs/Robot Referenced libraries/JSONLibrary .*site-packages\\/JSONLibrary\\/__init__.py \\(\d\\)" 
+	        | get-property enablement | equals false | verify-true
+	        
+	    get-item -path "SpecialLibs/Robot Referenced libraries/PandasLib SpecialLibs\\/PandasLib.py \\(1\\)" 
+	        | get-property enablement | equals false | verify-true
+	}
+	
 }
+
 
 
 //autodisocver test

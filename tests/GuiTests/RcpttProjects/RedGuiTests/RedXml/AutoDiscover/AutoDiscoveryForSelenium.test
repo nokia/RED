@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _jZaVsO-kEeaEfJH5Ahap2w
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 4:54 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/20/19 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,55 +19,96 @@ Entry-Name: .content
 //
 //  To run this test you must have installed libraries:
 //
-//
+// python 2:
 // pip install robotframework-requests
 // pip install robotframework-databaselibrary
 // pip install robotframework-extendedselenium2library
-// pip install robotframework-selenium2library
+// pip install robotframework-selenium2library==1.8.0
 //
 //
+
+// python 3:
+// pip install robotframework-requests
+// pip install robotframework-databaselibrary
+// pip install robotframework-extendedseleniumLibrary
 
 
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | double-click
 
-//add test with robot libraries 
-get-editor "lib_with_variable.robot" | get-text-viewer | set-text  "*** Settings ***\n"
-    + "Library    multiply.py\n\n"
-    + "library  ExtendedSelenium2Library\n"
-    + "Library    Selenium2Library\n"
-    + "library  RequestsLibrary\n"
-    + "library  DatabaseLibrary\n"
-    + "Library    libs/add.py\n\n \n"
-    + "*** Test Cases ***\n"
-    + "test\n"
-    + "    log  67\n"
-    + "    ExtendedSelenium2Library.Choose File    locator    file_path\n"
-    + "    ExtendedSelenium2Library.Drag And Drop    source    target\n"
-    + "    Post    alias    uri    \n"
-    + "    Add\n"
-    + "    Execute Sql Script    sqlScriptFileName" 
-    
-    
-    
-get-editor "lib_with_variable.robot" | get-text-viewer |  key-type "M1+s"
-wait-for-discover-window -times 6
+if [$python_version | eq 2]{
+	//add test with robot libraries 
+	get-editor "lib_with_variable.robot" | get-text-viewer | set-text  "*** Settings ***\n"
+	    + "Library    multiply.py\n\n"
+	    + "library  ExtendedSelenium2Library\n"
+	    + "Library    Selenium2Library\n"
+	    + "library  RequestsLibrary\n"
+	    + "library  DatabaseLibrary\n"
+	    + "Library    libs/add.py\n\n \n"
+	    + "*** Test Cases ***\n"
+	    + "test\n"
+	    + "    log  67\n"
+	    + "    ExtendedSelenium2Library.Choose File    locator    file_path\n"
+	    + "    ExtendedSelenium2Library.Drag And Drop    source    target\n"
+	    + "    Post    alias    uri    \n"
+	    + "    Add\n"
+	    + "    Execute Sql Script    sqlScriptFileName" 
+	    
+	    
+	    
+	get-editor "lib_with_variable.robot" | get-text-viewer |  key-type "M1+s"
+	wait-for-discover-window -times 6
+	
+	//check if all were added
+	with [get-window "Discovering libraries summary" | get-tree] {
+	    get-item add | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true
+	    get-item DatabaseLibrary | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true
+	    get-item ExtendedSelenium2Library | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true
+	    get-item multiply | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true
+	    get-item RequestsLibrary | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true
+	    get-item Selenium2Library | get-property "image.path" 
+	        | equals ".*success_big.png" | verify-true    
+	}
+	get-window "Discovering libraries summary" | get-button OK | click
+	
+}-else{
 
-//check if all were added
-with [get-window "Discovering libraries summary" | get-tree] {
-    get-item add | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true
-    get-item DatabaseLibrary | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true
-    get-item ExtendedSelenium2Library | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true
-    get-item multiply | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true
-    get-item RequestsLibrary | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true
-    get-item Selenium2Library | get-property "image.path" 
-        | equals ".*success_big.png" | verify-true    
+	get-editor "lib_with_variable.robot" | get-text-viewer |set-text "*** Settings ***\n"
+	    + "Library  multiply.py\n"
+	    + "library  RequestsLibrary\n"
+	    + "library  DatabaseLibrary\n"
+	    + "Library  libs/add.py\n"
+	    + "Library    SeleniumLibrary    \n\n \n"
+	    + "*** Test Cases ***\n"
+	    + "test\n"
+	    + "    log  67\n"
+	    + "    Add\n"
+	    + "    Execute Sql Script    sqlScriptFileName\n"
+	    + "    Check If Exists In Database    selectStatement    \n"
+	    + "    Click Link    locator"
+	    
+	get-editor "lib_with_variable.robot" | key-type "M1+s"
+	wait-for-discover-window -times 6
+	
+	with [get-window "Discovering libraries summary" | get-tree] {
+	    get-property itemCount | equals 5 | verify-true
+	    get-item -path add | get-property "image.path" 
+	        | equals ".*/success_big.png" | verify-true
+	    get-item -path DatabaseLibrary | get-property "image.path" 
+	        | equals ".*/success_big.png" | verify-true
+	    get-item -path multiply | get-property "image.path" 
+	        | equals ".*/success_big.png" | verify-true
+	    get-item -path RequestsLibrary | get-property "image.path" 
+	        | equals ".*/success_big.png" | verify-true
+	    get-item -path SeleniumLibrary | get-property "image.path" 
+	        | equals ".*/success_big.png" | verify-true
+	}
+	get-window "Discovering libraries summary" | get-button OK | click
 }
-get-window "Discovering libraries summary" | get-button OK | click
 
 
 
