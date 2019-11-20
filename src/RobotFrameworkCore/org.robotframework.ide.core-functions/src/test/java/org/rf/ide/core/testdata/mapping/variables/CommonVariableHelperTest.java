@@ -82,7 +82,7 @@ public class CommonVariableHelperTest {
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forNonVariableDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forNonVariableDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("abc", new FilePosition(1, 2, 2), RobotTokenType.KEYWORD_ACTION_NAME),
                 new Separator(),
@@ -90,13 +90,13 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forIncorrectListDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forIncorrectListDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("@{var}[0]= ", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_LIST_DECLARATION),
                 new Separator(),
@@ -104,13 +104,14 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getText().trim()).endsWith("=");
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forIncorrectDictionaryDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forIncorrectDictionaryDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("&{var}['key']= ", new FilePosition(1, 0, 0),
                         RobotTokenType.VARIABLES_LIST_DECLARATION),
@@ -119,13 +120,14 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getText().trim()).endsWith("=");
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forScalarVariableDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forScalarVariableDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("${var}", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_SCALAR_DECLARATION),
                 new Separator(),
@@ -133,13 +135,13 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsExtracted_forScalarVariableDeclarationWithEqualSign() throws Exception {
+    public void assignmentPartIsMarked_forScalarVariableDeclarationWithEqualSign() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("${var}= ", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_SCALAR_DECLARATION),
                 new Separator(),
@@ -147,14 +149,14 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        elements.add(1, RobotToken.create("= ", new FilePosition(1, 6, 6), RobotTokenType.ASSIGNMENT));
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getText().trim()).endsWith("=");
+        assertThat(elements.get(0).getTypes()).contains(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forListVariableDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forListVariableDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("@{var}", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_SCALAR_DECLARATION),
                 new Separator(),
@@ -162,13 +164,13 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsExtracted_forListVariableDeclarationWithEqualSign() throws Exception {
+    public void assignmentPartIsMarked_forListVariableDeclarationWithEqualSign() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("@{var} =", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_LIST_DECLARATION),
                 new Separator(),
@@ -176,14 +178,14 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        elements.add(1, RobotToken.create(" =", new FilePosition(1, 6, 6), RobotTokenType.ASSIGNMENT));
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getText()).isEqualTo("@{var} =");
+        assertThat(elements.get(0).getTypes()).contains(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsNotExtracted_forDictionaryVariableDeclaration() throws Exception {
+    public void assignmentPartIsNotMarked_forDictionaryVariableDeclaration() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("&{var}", new FilePosition(1, 0, 0), RobotTokenType.VARIABLES_SCALAR_DECLARATION),
                 new Separator(),
@@ -191,13 +193,13 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getTypes()).doesNotContain(RobotTokenType.ASSIGNMENT);
     }
 
     @Test
-    public void assignmentPartIsExtracted_forDictionaryVariableDeclarationWithEqualSign() throws Exception {
+    public void assignmentPartIsMarked_forDictionaryVariableDeclarationWithEqualSign() throws Exception {
         final List<IRobotLineElement> elements = newArrayList(
                 RobotToken.create("&{var}=", new FilePosition(1, 0, 0),
                         RobotTokenType.VARIABLES_DICTIONARY_DECLARATION),
@@ -206,10 +208,10 @@ public class CommonVariableHelperTest {
 
         final RobotLine line = createLine(elements);
 
-        helper.extractVariableAssignmentPart(line);
+        helper.markVariableAssignmentPart(line);
 
-        elements.add(1, RobotToken.create("=", new FilePosition(1, 6, 6), RobotTokenType.ASSIGNMENT));
-        assertLineElements(line, elements);
+        assertThat(elements.get(0).getText().trim()).endsWith("=");
+        assertThat(elements.get(0).getTypes()).contains(RobotTokenType.ASSIGNMENT);
     }
 
     private void assertIncorrectVariable(final String text, final RobotTokenType... types) {
@@ -227,17 +229,4 @@ public class CommonVariableHelperTest {
         }
         return line;
     }
-
-    private void assertLineElements(final RobotLine line, final List<IRobotLineElement> expected) {
-        assertThat(line.getLineElements()).hasSize(expected.size());
-        for (int i = 0; i < expected.size(); i++) {
-            final IRobotLineElement actualElement = line.getLineElements().get(i);
-            final IRobotLineElement expectedElement = expected.get(i);
-            assertThat(actualElement.getText()).isEqualTo(expectedElement.getText());
-            assertThat(actualElement.getTypes()).containsExactlyElementsOf(expectedElement.getTypes());
-            assertThat(actualElement.getFilePosition()).isEqualTo(expectedElement.getFilePosition());
-            assertThat(actualElement.isDirty()).isEqualTo(expectedElement.isDirty());
-        }
-    }
-
 }

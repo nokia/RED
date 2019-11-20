@@ -26,6 +26,7 @@ import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -36,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Range;
 
 class VariablesTableValidator implements ModelUnitValidator {
 
@@ -200,8 +202,15 @@ class VariablesTableValidator implements ModelUnitValidator {
                                 .formatMessageWith(variable.getName());
                         final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
                                 variable.getName());
-                        reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(),
-                                attributes);
+                        if (variableToken.getText().trim().endsWith("=")) {
+                            final int variableLength = variableToken.getText().lastIndexOf("}") + 1;
+                            final ProblemPosition position = new ProblemPosition(variableToken.getLineNumber(),
+                                    Range.closed(variableToken.getStartOffset(),
+                                            variableToken.getStartOffset() + variableLength));
+                            reporter.handleProblem(problem, validationContext.getFile(), position, attributes);
+                        } else {
+                            reporter.handleProblem(problem, validationContext.getFile(), variableToken, attributes);
+                        }
                     }
                 }
             }

@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -33,13 +30,9 @@ public class ExecutablesRowView {
     public static <R> List<R> rowTokens(final RobotKeywordCall element, final Function<RobotToken, R> fun) {
         if (element.isExecutable()) {
             final AModelElement<?> modelElement = element.getLinkedElement();
-            @SuppressWarnings("unchecked")
-            final RobotExecutableRowView view = RobotExecutableRowView
-                    .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) modelElement);
 
             return modelElement.getElementTokens()
                     .stream()
-                    .map(RobotKeywordCall.tokenViaExecutableViewUpdateToken(view))
                     .map(fun)
                     .collect(toList());
 

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -26,11 +25,9 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
-import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -78,24 +75,11 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     @Override
     public String getName() {
         final RobotToken declaration = linkedElement.getDeclaration();
-
-        if (isExecutable()) {
-            @SuppressWarnings("unchecked")
-            final RobotExecutableRowView view = RobotExecutableRowView
-                    .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
-            if (wasNotUpdatedWithAssignment()) {
-                declaration.setText(view.getTokenRepresentation(declaration));
-            }
-        } else if (isLocalSetting()) {
+        if (!isExecutable() && isLocalSetting()) {
             final String nameInBrackets = declaration.getText();
             return nameInBrackets.substring(1, nameInBrackets.length() - 1);
         }
         return declaration.getText();
-    }
-
-    private boolean wasNotUpdatedWithAssignment() {
-        final RobotToken declaration = linkedElement.getDeclaration();
-        return !declaration.isDirty() && !linkedElement.getDeclaration().getText().trim().endsWith("=");
     }
 
     public String getLabel() {
@@ -226,11 +210,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                                     && type != RobotTokenType.TEST_CASE_ACTION_NAME
                                     && type != RobotTokenType.TASK_ACTION_NAME;
                         });
-                @SuppressWarnings("unchecked")
-                final RobotExecutableRowView view = RobotExecutableRowView
-                        .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
 
-                arguments = tokensWithoutComments.map(tokenViaExecutableView(view)).collect(toList());
+                arguments = tokensWithoutComments.map(RobotToken::getText).collect(toList());
 
             } else if (isLocalSetting()) {
                 arguments = getLinkedElement().getElementTokens().stream().filter(token -> {
@@ -241,25 +222,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             }
         }
         return arguments;
-    }
-
-    static Function<RobotToken, String> tokenViaExecutableView(final RobotExecutableRowView view) {
-        return token -> tokenViaExecutableViewUpdateToken(view).apply(token).getText();
-    }
-
-    public static Function<RobotToken, RobotToken> tokenViaExecutableViewUpdateToken(
-            final RobotExecutableRowView view) {
-        return token -> {
-            if (wasAlreadyUpdatedWithAssignment(token)) {
-                final String text = view.getTokenRepresentation(token);
-                token.setText(text);
-            }
-            return token;
-        };
-    }
-
-    private static boolean wasAlreadyUpdatedWithAssignment(final RobotToken token) {
-        return !token.isDirty() && !token.getText().trim().endsWith("=");
     }
 
     public void resetStored() {

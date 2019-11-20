@@ -293,7 +293,7 @@ public class TextualRobotFileParser {
                 if (utility.isNotOnlySeparatorOrEmptyLine(line)) {
                     final ParsingState currentState = parsingStateHelper.getCurrentState(processingState);
                     if (currentState != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
-                        variableHelper.extractVariableAssignmentPart(line);
+                        variableHelper.markVariableAssignmentPart(line);
                     }
                     previousLineHandler.flushNew(processingState);
                 }

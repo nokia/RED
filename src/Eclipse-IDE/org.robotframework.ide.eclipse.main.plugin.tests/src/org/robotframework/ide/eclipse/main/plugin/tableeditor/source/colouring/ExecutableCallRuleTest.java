@@ -154,8 +154,10 @@ public class ExecutableCallRuleTest {
                     thereWasVar = true;
 
                     assertThat(evaluatedToken).isPresent();
+                    final int lengthToExpect = token.getText().length()
+                            - (token.getTypes().contains(RobotTokenType.ASSIGNMENT) ? 1 : 0);
                     assertThat(evaluatedToken.get().getPosition())
-                            .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
+                            .isEqualTo(new Position(token.getStartOffset(), lengthToExpect));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
 
                 } else if (!token.getText().equals("call") && !token.getText().equals(":FOR")
@@ -173,7 +175,8 @@ public class ExecutableCallRuleTest {
         final List<RobotLine> lines = TokensSource.createTokensInLines();
         for (final RobotLine line : lines) {
             for (final IRobotLineElement token : line.getLineElements()) {
-                final int positionInsideToken = new Random().nextInt(token.getText().length());
+                final int assignmentCorrection = token.getTypes().contains(RobotTokenType.ASSIGNMENT) ? -1 : 0;
+                final int positionInsideToken = new Random().nextInt(token.getText().length() + assignmentCorrection);
                 final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken, lines);
 
                 if (token.getText().contains("var_asgn")) {
@@ -182,7 +185,7 @@ public class ExecutableCallRuleTest {
                     assertThat(evaluatedToken).isPresent();
                     assertThat(evaluatedToken.get().getPosition())
                             .isEqualTo(new Position(token.getStartOffset() + positionInsideToken,
-                                    token.getText().length() - positionInsideToken));
+                                    token.getText().length() + assignmentCorrection - positionInsideToken));
                     assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
 
                 } else if (!token.getText().equals("call") && !token.getText().equals(":FOR")

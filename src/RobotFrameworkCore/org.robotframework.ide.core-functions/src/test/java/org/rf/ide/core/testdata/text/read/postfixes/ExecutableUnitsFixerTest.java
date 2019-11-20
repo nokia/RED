@@ -43,7 +43,7 @@ public class ExecutableUnitsFixerTest extends RobotFormatParameterizedTest {
         // verify
         assertThat(modelFile.getFileContent().get(3).getLineTokens().get(0).getTypes()).containsExactly(
                 RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.VARIABLES_SCALAR_DECLARATION,
-                RobotTokenType.VARIABLE_USAGE);
+                RobotTokenType.VARIABLE_USAGE, RobotTokenType.ASSIGNMENT);
     }
 
     private String convert(final String fileName) {

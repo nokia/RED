@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -51,41 +50,29 @@ public class CommonVariableHelper {
         return false;
     }
 
-    public void extractVariableAssignmentPart(final RobotLine line) {
+    public void markVariableAssignmentPart(final RobotLine line) {
         final List<IRobotLineElement> lineElements = line.getLineElements();
         for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
             final IRobotLineElement element = lineElements.get(elementIndex);
             if (element instanceof RobotToken) {
                 final RobotToken token = (RobotToken) element;
                 if (isVariable(token)) {
-                    final String variableText = token.getText();
-                    final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
-                    if (assignment.isNotEmpty()) {
-                        final String variable = variableText.substring(0,
-                                assignment.getStartColumn() - token.getStartColumn());
-                        token.setText(variable);
-                        line.addLineElementAt(elementIndex + 1, assignment);
-                        elementIndex++;
-                    }
+                    markAssignmentPart(token);
                 }
             }
         }
     }
 
-    private RobotToken extractAssignmentPart(final FilePosition startPosition, final String text) {
-        final Matcher nameMatcher = NAME.matcher(text);
+    private void markAssignmentPart(final RobotToken token) {
+        final Matcher nameMatcher = NAME.matcher(token.getText());
         if (nameMatcher.find()) {
             final int assignPart = nameMatcher.end();
-            final String assignmentText = text.substring(assignPart);
+            final String assignmentText = token.getText().substring(assignPart);
             final Matcher assignMatcher = ASSIGN.matcher(assignmentText);
             if (assignMatcher.matches()) {
-                final FilePosition filePosition = new FilePosition(startPosition.getLine(),
-                        startPosition.getColumn() + assignPart, startPosition.getOffset() + assignPart);
-                return RobotToken.create(assignmentText, filePosition, RobotTokenType.ASSIGNMENT);
+                token.getTypes().add(RobotTokenType.ASSIGNMENT);
             }
         }
-
-        return new RobotToken();
     }
 
     public String extractVariableName(final String text) {
