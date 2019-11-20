@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/18/19 4:37 PM
+Save-Time: 11/20/19 6:03 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -190,8 +190,8 @@ proc "wait-for-discover-window" [val times 4]{
 	}
 }
 
-proc "wait-for-progress-view-to-disappear"{
-	try -times 4 -delay 500 -command {
+proc "wait-for-progress-view-to-disappear" [val times 4] [val delay 500] {
+	try -times $times -delay $delay -command {
 		verify-error  {get-button "Shows background operations in Progress view" | get-property enablement | equals true | verify-true}
 	}
 }
