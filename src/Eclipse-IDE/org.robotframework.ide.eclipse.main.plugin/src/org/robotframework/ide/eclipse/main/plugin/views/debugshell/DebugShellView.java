@@ -165,8 +165,7 @@ public class DebugShellView {
 
     private boolean isEditModifyingKey(final int keyCode) {
         return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR || keyCode == SWT.BS || keyCode == SWT.DEL
-                || keyCode == SWT.CTRL || keyCode == SWT.ALT || keyCode == SWT.ALT_GR || keyCode == SWT.SHIFT
-                || keyCode == SWT.ESC;
+                || keyCode == SWT.CTRL || keyCode == SWT.ALT || keyCode == SWT.SHIFT || keyCode == SWT.ESC;
     }
 
     private boolean isCaretNavigationKey(final int keyCode) {
