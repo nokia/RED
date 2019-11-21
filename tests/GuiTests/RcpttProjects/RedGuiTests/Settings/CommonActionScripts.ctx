@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/20/19 6:03 PM
+Save-Time: 11/21/19 5:59 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -16,24 +16,27 @@ Entry-Name: .ecl.context
 //make full screen
 get-eclipse-window | maximize 
 
-
 proc "restore-interpreters"{
 	get-preferences-menu | click
 	get-window Preferences| get-tree | select "Robot Framework/Installed frameworks"
-		if [get-window Preferences | get-table | get-property itemCount -raw | equals 0 ]{
-			with [get-window Preferences] {
-				try -times 10 -delay 1500 -command{
-				    get-button Discover | click
-				}
-				try -times 10 -delay 1500 -command{
-				    get-table | get-item [format "Robot Framework .*\(Python %s.*\)" $python_version]| check
-				}
-				    get-button $Apply_and_OK_in_preference | click
-				    get-window "Rebuild required" | get-button OK | click
+	if [get-window Preferences | get-table | get-property itemCount -raw | equals 0 ]{
+		with [get-window Preferences] {
+			try -times 10 -delay 1500 -command{
+			    get-button Discover | click
 			}
-		}-else{
-			get-window Preferences | get-button  $Apply_and_OK_in_preference | click
+		}		
+	}	
+	if [get-window Preferences | get-table | get-item -path [format "Robot Framework.*\\(Python %s.*\\)" $python_version]
+       | get-property checked -raw | not-eq true ]{	
+		try -times 10 -delay 1500 -command{
+			get-window Preferences | get-table | get-item [format "Robot Framework .*\(Python %s.*\)" $python_version]| check
 		}
+		
+		get-window Preferences | get-button $Apply_and_OK_in_preference | click
+	    get-window "Rebuild required" | get-button OK | click		
+	}-else{
+		get-window Preferences | get-button $Apply_and_OK_in_preference | click
+	}
 }
 restore-interpreters
 
