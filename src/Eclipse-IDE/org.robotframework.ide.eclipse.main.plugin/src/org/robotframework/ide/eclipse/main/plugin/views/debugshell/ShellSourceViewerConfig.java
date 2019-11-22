@@ -145,6 +145,7 @@ public class ShellSourceViewerConfig extends SourceViewerConfiguration {
 
         final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
         final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final IToken gherkin = coloringTokens.get(SyntaxHighlightingCategory.GHERKIN);
         final IToken quote = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final IToken library = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final IToken modeToken = new Token(new TextAttribute(ColorsManager.getColor(100, 130, 185), null, 0));
@@ -155,7 +156,8 @@ public class ShellSourceViewerConfig extends SourceViewerConfiguration {
                 new TokenTypeBasedRule(modeToken, ShellTokenType.MODE_FLAG, ShellTokenType.MODE_CONTINUATION),
                 new TokenTypeBasedRule(passToken, ShellTokenType.PASS),
                 new TokenTypeBasedRule(failToken, ShellTokenType.FAIL),
-                new ExecutableCallInShellRule(call, library, quote, variable), new VariableUsageRule(variable) };
+                new ExecutableCallInShellRule(call, gherkin, library, quote, variable),
+                new VariableUsageRule(variable) };
 
         final Map<String, ISyntaxColouringRule[]> rules = new HashMap<>();
         rules.put(IDocument.DEFAULT_CONTENT_TYPE, colouringRules);

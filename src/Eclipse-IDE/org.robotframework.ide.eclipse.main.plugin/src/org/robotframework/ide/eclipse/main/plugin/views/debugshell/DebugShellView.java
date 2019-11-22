@@ -186,10 +186,12 @@ public class DebugShellView {
         if (getDocument().getType() == ExpressionType.ROBOT && e.end - e.start == 0 && e.text.equals("\t")) {
             // exchange tabs in ROBOT mode for separator
             e.text = ShellDocument.SEPARATOR;
+            return;
 
         } else if (!getDocument().isInEditEnabledRegion(e.start) || !getDocument().isInEditEnabledRegion(e.end)) {
             // do not allow to modify anything in non-editable area
             e.doit = false;
+            return;
 
         } else if (e.text.contains("\n") || e.text.contains("\r")) {
             // take only first line if adding multiline content (e.g. by pasting)
@@ -199,6 +201,14 @@ public class DebugShellView {
                     ? Math.min(firstIndexOfLf, firstIndexOfCr)
                     : Math.max(firstIndexOfLf, firstIndexOfCr);
             e.text = e.text.substring(0, firstLineEnd);
+        }
+
+        if (e.text.length() > 1) {
+            if (getDocument().getType() == ExpressionType.PYTHON) {
+                e.text = e.text.replaceAll("\\s*$", ""); // trim right only
+            } else {
+                e.text = e.text.trim();
+            }
         }
     }
 

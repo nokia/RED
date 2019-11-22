@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.E
 
 public class ExecutableCallInShellRule extends ExecutableCallRule {
 
-    protected ExecutableCallInShellRule(final IToken textToken, final IToken libraryToken, final IToken quoteToken,
-            final IToken embeddedVariablesToken) {
-        super(textToken, textToken, libraryToken, quoteToken, embeddedVariablesToken,
+    protected ExecutableCallInShellRule(final IToken textToken, final IToken gherkinToken, final IToken libraryToken,
+            final IToken quoteToken, final IToken embeddedVariablesToken) {
+        super(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(ShellTokenType.CALL_KW, ShellTokenType.CALL_ARG),
                 elem -> elem.getTypes().contains(ShellTokenType.MODE_FLAG));
     }
