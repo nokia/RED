@@ -34,7 +34,8 @@ class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         final ShellDocument shellDocument = (ShellDocument) document;
-        return EnumSet.of(ExpressionType.ROBOT, ExpressionType.VARIABLE).contains(shellDocument.getType());
+        return EnumSet.of(ExpressionType.ROBOT, ExpressionType.VARIABLE).contains(shellDocument.getType())
+                && shellDocument.isInEditEnabledRegion(offset) && shellDocument.isExpressionPromptLine(offset);
     }
 
     @Override

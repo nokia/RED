@@ -31,11 +31,11 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.ColoringTokens;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.InformationControlSupport;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokenTypeBasedRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
@@ -148,7 +148,7 @@ public class ShellSourceViewerConfig extends SourceViewerConfiguration {
         final IToken quote = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final IToken library = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final IToken modeToken = new Token(new TextAttribute(ColorsManager.getColor(100, 130, 185), null, 0));
-        final IToken passToken = new Token(new TextAttribute(ColorsManager.getColor(50, 255, 50), null, 0));
+        final IToken passToken = new Token(new TextAttribute(ColorsManager.getColor(30, 170, 30), null, 0));
         final IToken failToken = new Token(new TextAttribute(ColorsManager.getColor(255, 50, 50), null, 0));
 
         final ISyntaxColouringRule[] colouringRules = new ISyntaxColouringRule[] {

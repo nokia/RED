@@ -126,7 +126,15 @@ public class DebugShellView {
         final int caretOffset = styledText.getCaretOffset();
         final boolean isInEditEnabledRegion = getDocument().isInEditEnabledRegion(caretOffset);
 
-        if (isInEditEnabledRegion && !getDocument().isInEditEnabledRegion(caretOffset - 1) && e.keyCode == SWT.BS) {
+        if (e.keyCode == SWT.HOME) {
+            final Optional<Integer> homeOffset = getDocument().getLineStartOffsetOmittingPrompt(caretOffset);
+            if (homeOffset.isPresent()) {
+                styledText.setCaretOffset(homeOffset.get().intValue());
+                e.doit = false;
+            }
+
+        } else if (isInEditEnabledRegion && !getDocument().isInEditEnabledRegion(caretOffset - 1)
+                && e.keyCode == SWT.BS) {
             // do not allow to use BACKSPACE when at first editable offset
             e.doit = false;
 

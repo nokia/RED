@@ -464,7 +464,7 @@ class TestRunnerAgent:
         elements = condition[RedResponseMessage.EVALUATE_CONDITION]
         keywordName, argList = elements[0], elements[1:]
         
-        return _evaluate_keyword_call(keywordName, argList)
+        return self._evaluate_keyword_call(keywordName, argList)
     
     def _evaluate_keyword_call(self, keywordName, argList):
         robot_version_str = robot.version.get_version(True)

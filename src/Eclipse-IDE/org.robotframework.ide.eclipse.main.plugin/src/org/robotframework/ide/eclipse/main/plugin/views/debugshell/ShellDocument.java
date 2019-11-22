@@ -39,18 +39,18 @@ import com.google.common.collect.TreeRangeMap;
 class ShellDocument extends Document {
 
     static final String SEPARATOR = "    ";
-    private static final String CATEGORY_EXPR_MODE = "expr_mode";
-    private static final String CATEGORY_EXPR_MODE_CONTINUATION = "expr_mode_continuation";
+    private static final String CATEGORY_MODE_PROMPT = "mode_prompt";
+    private static final String CATEGORY_PROMPT_CONTINUATION = "prompt_continuation";
     private static final String CATEGORY_AWAITING_RESULT_PREFIX = "awaiting_result";
     private static final String CATEGORY_RESULT_SUCC = "result";
     private static final String CATEGORY_RESULT_ERROR = "error";
 
-    static boolean isModeCategory(final String category) {
-        return CATEGORY_EXPR_MODE.equals(category);
+    static boolean isModePromptCategory(final String category) {
+        return CATEGORY_MODE_PROMPT.equals(category);
     }
 
-    static boolean isModeContinuationCategory(final String category) {
-        return CATEGORY_EXPR_MODE_CONTINUATION.equals(category);
+    static boolean isPromptContinuationCategory(final String category) {
+        return CATEGORY_PROMPT_CONTINUATION.equals(category);
     }
 
     static boolean isResultPassCategory(final String category) {
@@ -73,8 +73,8 @@ class ShellDocument extends Document {
     ShellDocument() {
         this.type = ExpressionType.ROBOT;
 
-        addPositionCategory(CATEGORY_EXPR_MODE);
-        addPositionCategory(CATEGORY_EXPR_MODE_CONTINUATION);
+        addPositionCategory(CATEGORY_MODE_PROMPT);
+        addPositionCategory(CATEGORY_PROMPT_CONTINUATION);
         addPositionCategory(CATEGORY_RESULT_SUCC);
         addPositionCategory(CATEGORY_RESULT_ERROR);
 
@@ -82,19 +82,18 @@ class ShellDocument extends Document {
     }
 
     void reset() {
-        getExprModesPositionsStream().forEach(this::removePosition);
-        getExprContinuationsPositionsStream().forEach(this::removePosition);
+        getModePromptPositionsStream().forEach(this::removePosition);
+        getPromptContinuationPositionsStream().forEach(this::removePosition);
         getAwaitingResultsPositions().forEach(this::removePosition);
         getResultSuccessPositionsStream().forEach(this::removePosition);
         getResultErrorPositionsStream().forEach(this::removePosition);
 
         removeEmptyAwaitingResultCategories();
         
-        addAwaitingPositionOnWholeLine(CATEGORY_EXPR_MODE, 0);
+        addAwaitingPositionOnWholeLine(CATEGORY_MODE_PROMPT, 0);
         set(type.name() + "> ");
 
-        expressionsHistory.clear();
-        currentExpressionInHistory = 1;
+        currentExpressionInHistory = expressionsHistory.size();
     }
 
     void addListener(final ShellDocumentListener listener) {
@@ -105,21 +104,12 @@ class ShellDocument extends Document {
         listeners.remove(listener);
     }
 
-    private void notifyListenersOnResultBeingWritten() {
-        listeners.forEach(ShellDocumentListener::resultWritten);
-    }
-
     ExpressionType getType() {
         return type;
     }
 
     boolean isInEditEnabledRegion(final int caretOffset) {
-        for (final Position position : getEditablePositions()) {
-            if (position.getOffset() <= caretOffset && caretOffset <= position.getOffset() + position.getLength()) {
-                return true;
-            }
-        }
-        return false;
+        return getEditablePositions().stream().anyMatch(pos -> pos.includes(caretOffset));
     }
 
     private List<Position> getEditablePositions() {
@@ -129,33 +119,35 @@ class ShellDocument extends Document {
         for (int i = lastLine - 1; i >= 0; i--) {
             final String line = getLine(i);
             
-            if (!isExpressionLine(line) && !isExpressionContinuationLine(line)) {
+            if (!isExpressionPromptLine(line) && !isExpressionContinuationLine(line)) {
                 break;
             }
-            final IRegion lineRegion = getLineInfo(i);
+            final IRegion lineRegion = getLineInformation(i);
             final int shift = line.indexOf(' ');
-            regions.add(new Position(lineRegion.getOffset() + shift + 1, lineRegion.getLength() - shift - 1));
+            regions.add(new Position(lineRegion.getOffset() + shift + 1, lineRegion.getLength() - shift));
         }
         return regions;
     }
 
-    static boolean isExpressionLine(final String line) {
-        for (final ExpressionType type : EnumSet.allOf(ExpressionType.class)) {
-            if (line.startsWith(type.name() + "> ")) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isExpressionPromptLine(final String line) {
+        return EnumSet.allOf(ExpressionType.class)
+                .stream()
+                .map(t -> t.name() + "> ")
+                .anyMatch(prompt -> line.startsWith(prompt));
     }
 
-    static boolean isExpressionContinuationLine(final String line) {
-        for (final ExpressionType type : EnumSet.allOf(ExpressionType.class)) {
-            final String dots = Strings.repeat(".", type.name().length() + 1);
-            if (line.startsWith(dots + " ")) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isExpressionContinuationLine(final String line) {
+        return EnumSet.allOf(ExpressionType.class)
+                .stream()
+                .map(t -> Strings.repeat(".", t.name().length() + 1) + " ")
+                .anyMatch(prompt -> line.startsWith(prompt));
+    }
+
+    boolean isExpressionPromptLine(final int offset) {
+        final IRegion lineInfo = getLineInformationOfOffset(offset);
+        return getModePromptPositionsStream().filter(pos -> pos.getOffset() == lineInfo.getOffset())
+                .findAny()
+                .isPresent();
     }
 
     void executeExpression(final Function<String, Integer> evaluationRequest) {
@@ -165,7 +157,7 @@ class ShellDocument extends Document {
         final int nextLineNumber = getNumberOfLines();
         final String resultCategory = CATEGORY_AWAITING_RESULT_PREFIX + "_" + exprId;
         addAwaitingPositionOnWholeLine(resultCategory, nextLineNumber);
-        addAwaitingPositionOnWholeLine(CATEGORY_EXPR_MODE, nextLineNumber + 1);
+        addAwaitingPositionOnWholeLine(CATEGORY_MODE_PROMPT, nextLineNumber + 1);
 
         appendLines("evaluating...", type.name() + "> ");
 
@@ -239,13 +231,14 @@ class ShellDocument extends Document {
         replace(awaitingResOffset, awaitingResLenght, toPrint);
         addPosition(newResultPosition);
         shiftPositions(awaitingResOffset, toPrint.length() - awaitingResLenght);
-        notifyListenersOnResultBeingWritten();
+
+        listeners.forEach(ShellDocumentListener::resultWritten);
     }
 
     void continueExpressionInNewLine() {
         final int nextLineNumber = getNumberOfLines();
 
-        addAwaitingPositionOnWholeLine(CATEGORY_EXPR_MODE_CONTINUATION, nextLineNumber);
+        addAwaitingPositionOnWholeLine(CATEGORY_PROMPT_CONTINUATION, nextLineNumber);
         appendLines(Strings.repeat(".", type.name().length() + 1) + " ");
     }
 
@@ -256,7 +249,7 @@ class ShellDocument extends Document {
     }
 
     private void switchMode(final ExpressionType newType) {
-        final CategorizedPosition lastModePosition = getExprModesPositionsStream()
+        final CategorizedPosition lastModePosition = getModePromptPositionsStream()
                 .collect(maxBy(Comparator.comparing(CategorizedPosition::getOffset)))
                 .orElseThrow(IllegalStateException::new);
         final int modeOffset = lastModePosition.getOffset();
@@ -268,7 +261,7 @@ class ShellDocument extends Document {
         shiftPositions(modeOffset, delta);
 
         if (delta != 0) {
-            final List<CategorizedPosition> continuations = getExprContinuationsPositionsStream()
+            final List<CategorizedPosition> continuations = getPromptContinuationPositionsStream()
                     .filter(p -> p.getOffset() > modeOffset)
                     .sorted((p1, p2) -> Integer.compare(p1.getOffset(), p2.getOffset()))
                     .collect(toList());
@@ -316,13 +309,13 @@ class ShellDocument extends Document {
 
     private void cleanCurrentExpression() {
         final Range<Integer> currentExpressionLines = getLinesOfExpression(getLength());
-        final IRegion startLineInfo = getLineInfo(currentExpressionLines.lowerEndpoint());
+        final IRegion startLineInfo = getLineInformation(currentExpressionLines.lowerEndpoint());
 
         final int toRemoveStart = startLineInfo.getOffset() + type.name().length() + 2;
 
         replace(toRemoveStart, getLength() - toRemoveStart, "");
 
-        getExprContinuationsPositionsStream().filter(p -> p.getOffset() > toRemoveStart).forEach(this::removePosition);
+        getPromptContinuationPositionsStream().filter(p -> p.getOffset() > toRemoveStart).forEach(this::removePosition);
     }
 
     private void insertNewExpression(final String expression) {
@@ -332,7 +325,7 @@ class ShellDocument extends Document {
         for (int i = 1; i < lines.length; i++) {
             final int nextLineNumber = getNumberOfLines();
 
-            addAwaitingPositionOnWholeLine(CATEGORY_EXPR_MODE_CONTINUATION, nextLineNumber);
+            addAwaitingPositionOnWholeLine(CATEGORY_PROMPT_CONTINUATION, nextLineNumber);
             appendLines(Strings.repeat(".", type.name().length() + 1) + " ");
 
             append(lines[i]);
@@ -355,7 +348,7 @@ class ShellDocument extends Document {
 
             int start = line;
             int end = line;
-            final Predicate<String> linePredicate = l -> isExpressionLine(l) || isExpressionContinuationLine(l);
+            final Predicate<String> linePredicate = l -> isExpressionPromptLine(l) || isExpressionContinuationLine(l);
             if (linePredicate.test(getLine(line))) {
                 for (int i = line - 1; i >= 0 && linePredicate.test(getLine(i)); i--) {
                     start--;
@@ -432,8 +425,8 @@ class ShellDocument extends Document {
     }
     
     private void shiftPositions(final int startingAfterOffset, final int delta) {
-        Streams.concat(getExprModesPositionsStream(),
-                       getExprContinuationsPositionsStream(),
+        Streams.concat(getModePromptPositionsStream(),
+                       getPromptContinuationPositionsStream(),
                        getAwaitingResultsPositions(),
                        getResultSuccessPositionsStream(),
                        getResultErrorPositionsStream())
@@ -442,8 +435,8 @@ class ShellDocument extends Document {
     }
     
     private void extendPositions(final int overlappingOffset, final int delta) {
-        Streams.concat(getExprModesPositionsStream(),
-                       getExprContinuationsPositionsStream(),
+        Streams.concat(getModePromptPositionsStream(),
+                       getPromptContinuationPositionsStream(),
                        getAwaitingResultsPositions(),
                        getResultSuccessPositionsStream(),
                        getResultErrorPositionsStream())
@@ -462,21 +455,21 @@ class ShellDocument extends Document {
 
     RangeMap<Integer, String> getPositionsRanges() {
         final RangeMap<Integer, String> positions = TreeRangeMap.create();
-        Streams.concat(getExprModesPositionsStream(), getExprContinuationsPositionsStream(),
+        Streams.concat(getModePromptPositionsStream(), getPromptContinuationPositionsStream(),
                 getResultSuccessPositionsStream(), getResultErrorPositionsStream())
                 .forEach(p -> positions.put(Range.closedOpen(p.getOffset(), p.getOffset() + p.getLength()),
                         p.getCategory()));
         return positions;
     }
 
-    Stream<CategorizedPosition> getExprModesPositionsStream() {
-        return Stream.of(getPositions(CATEGORY_EXPR_MODE))
-                .map(p -> new CategorizedPosition(CATEGORY_EXPR_MODE, p));
+    Stream<CategorizedPosition> getModePromptPositionsStream() {
+        return Stream.of(getPositions(CATEGORY_MODE_PROMPT))
+                .map(p -> new CategorizedPosition(CATEGORY_MODE_PROMPT, p));
     }
 
-    Stream<CategorizedPosition> getExprContinuationsPositionsStream() {
-        return Stream.of(getPositions(CATEGORY_EXPR_MODE_CONTINUATION))
-                .map(p -> new CategorizedPosition(CATEGORY_EXPR_MODE_CONTINUATION, p));
+    Stream<CategorizedPosition> getPromptContinuationPositionsStream() {
+        return Stream.of(getPositions(CATEGORY_PROMPT_CONTINUATION))
+                .map(p -> new CategorizedPosition(CATEGORY_PROMPT_CONTINUATION, p));
     }
 
     Stream<CategorizedPosition> getResultSuccessPositionsStream() {
@@ -514,9 +507,27 @@ class ShellDocument extends Document {
         return Stream.of(getPositionCategories()).filter(cat -> cat.startsWith(CATEGORY_AWAITING_RESULT_PREFIX));
     }
 
-    IRegion getLineInfo(final int line) {
+    Optional<Integer> getLineStartOffsetOmittingPrompt(final int offset) {
+        final IRegion lineInfo = getLineInformationOfOffset(offset);
+        return Streams.concat(getModePromptPositionsStream(), getPromptContinuationPositionsStream())
+                .filter(pos -> pos.getOffset() == lineInfo.getOffset())
+                .findFirst()
+                .map(pos -> pos.getOffset() + pos.getLength());
+    }
+
+    @Override
+    public IRegion getLineInformation(final int line) {
         try {
-            return getLineInformation(line);
+            return super.getLineInformation(line);
+        } catch (final BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public IRegion getLineInformationOfOffset(final int offset) {
+        try {
+            return super.getLineInformationOfOffset(offset);
         } catch (final BadLocationException e) {
             throw new IllegalStateException(e);
         }
@@ -536,7 +547,7 @@ class ShellDocument extends Document {
     }
 
     private void addAwaitingPositionOnWholeLine(final String category, final int line) {
-        addAwaitingPosition(() -> new CategorizedPosition(category, toPosition(getLineInfo(line))));
+        addAwaitingPosition(() -> new CategorizedPosition(category, toPosition(getLineInformation(line))));
     }
 
     private void addAwaitingPosition(final Supplier<CategorizedPosition> positionSupplier) {
@@ -600,6 +611,10 @@ class ShellDocument extends Document {
 
         void setLength(final int length) {
             position.setLength(length);
+        }
+
+        Position getPosition() {
+            return position;
         }
     }
 }

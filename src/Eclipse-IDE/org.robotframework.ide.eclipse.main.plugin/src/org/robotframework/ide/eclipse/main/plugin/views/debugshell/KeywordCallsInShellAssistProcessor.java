@@ -35,7 +35,7 @@ class KeywordCallsInShellAssistProcessor extends KeywordCallsAssistProcessor {
             throws BadLocationException {
         final ShellDocument shellDocument = (ShellDocument) document;
         return shellDocument.getType() == ExpressionType.ROBOT
-                && shellDocument.isInEditEnabledRegion(offset) && ShellDocument.isExpressionLine(lineContent)
+                && shellDocument.isInEditEnabledRegion(offset) && shellDocument.isExpressionPromptLine(offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 0;
     }
 

@@ -49,13 +49,13 @@ public class ShellTokensScanner extends RedTokenScanner {
         final List<RobotLine> lines = new ArrayList<>();
         ExpressionType currentType = null;
         for (int i = 0; i < shellDocument.getNumberOfLines(); i++) {
-            final int offset = shellDocument.getLineInfo(i).getOffset();
+            final int offset = shellDocument.getLineInformation(i).getOffset();
 
             final String line = shellDocument.getLine(i);
-            if (ShellDocument.isModeCategory(positions.get(offset))) {
+            if (ShellDocument.isModePromptCategory(positions.get(offset))) {
                 currentType = getType(line);
 
-            } else if (!ShellDocument.isModeContinuationCategory(positions.get(offset))) {
+            } else if (!ShellDocument.isPromptContinuationCategory(positions.get(offset))) {
                 currentType = null;
             }
 
@@ -71,7 +71,7 @@ public class ShellTokensScanner extends RedTokenScanner {
         final RobotLine robotLine = new RobotLine(lineNumber, null);
 
         if (currentType != null) {
-            final boolean isContinuation = ShellDocument.isModeContinuationCategory(positions.get(offset));
+            final boolean isContinuation = ShellDocument.isPromptContinuationCategory(positions.get(offset));
             parseExpressionLine(robotLine, line, offset, currentType, isContinuation);
         } else {
             parseResultLine(robotLine, line, offset, positions);
