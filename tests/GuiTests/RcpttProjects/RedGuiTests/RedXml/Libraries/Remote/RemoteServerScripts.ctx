@@ -5,8 +5,8 @@ Element-Name: RemoteServerScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _YDbWsNnJEeeKxYJgF2NTmg
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/11/19 2:47 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/25/19 12:38 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -22,6 +22,6 @@ proc "run-python-remote-server-in-background" [val project_name "RobotProject"] 
 } 
 
 proc "stop-python-remote-server" [val address "127.0.0.1:8270"]{
-	exec-process "python" "-m"  "robotremoteserver"  "stop"  $address | log
+	exec-process "python" "-m"  "robotremoteserver"  "stop"  $address -ignoreStderr | log
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
