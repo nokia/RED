@@ -95,15 +95,15 @@ public class ExecutableCallRule extends VariableUsageRule {
                 return evaluated;
             }
 
+            evaluated = super.evaluate(token, offsetInToken, context);
+            if (evaluated.isPresent()) {
+                return evaluated;
+            }
+
             evaluated = evaluateAssignment(token, offsetInToken);
             if (evaluated.isPresent()) {
                 // This way we color the "=" sign with the default color
                 return Optional.empty();
-            }
-
-            evaluated = super.evaluate(token, offsetInToken, context);
-            if (evaluated.isPresent()) {
-                return evaluated;
             }
 
             return evaluateQuotes(token.getStartOffset(), offsetInToken, token.getText(), offsetInToken);
@@ -140,8 +140,8 @@ public class ExecutableCallRule extends VariableUsageRule {
 
     private Optional<PositionedTextToken> evaluateAssignment(final IRobotLineElement token, final int offsetInToken) {
         if (token.getTypes().contains(RobotTokenType.ASSIGNMENT)) {
-            final int assignIndex = token.getText().lastIndexOf('=', offsetInToken);
-            if (assignIndex > 0) {
+            final int assignIndex = token.getText().lastIndexOf('=');
+            if (assignIndex >= offsetInToken) {
                 //the returned value is ignored anyway - just cannot be empty
                 return Optional.of(new PositionedTextToken(null, token.getStartOffset() + assignIndex, 1));
             }
