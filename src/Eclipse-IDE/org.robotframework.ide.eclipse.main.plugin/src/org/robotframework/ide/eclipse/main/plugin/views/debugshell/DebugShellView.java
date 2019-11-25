@@ -119,6 +119,8 @@ public class DebugShellView {
         site.setSelectionProvider(sourceViewer);
         final IContextService service = site.getService(IContextService.class);
         service.activateContext("org.robotframework.red.view.debug.shell");
+
+        SwitchShellModeHandler.setMode(getDocument().getType());
     }
 
     private void verifyKey(final VerifyEvent e) {
@@ -277,9 +279,11 @@ public class DebugShellView {
         refreshAndMoveToTheEnd();
     }
 
-    protected void switchToNextMode() {
-        getDocument().switchToNextMode();
+    protected ExpressionType switchToMode(final ExpressionType mode) {
+        getDocument().switchToMode(mode);
         refreshAndMoveToTheEnd();
+
+        return getDocument().getType();
     }
 
     protected void putExpression(final ExpressionType type, final String expression) {

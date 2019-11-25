@@ -7600,6 +7600,15 @@
                categoryId="org.robotframework.ide.eclipse.robotCommands"
                id="org.robotframework.red.view.debug.switchShellMode"
                name="Switch mode">
+            <commandParameter
+                  id="org.robotframework.red.view.debug.switchShellMode.mode"
+                  name="Mode"
+                  optional="true">
+            </commandParameter>
+            <state
+                  class="org.eclipse.jface.menus.TextState"
+                  id="org.robotframework.red.view.debug.switchShellMode.state">
+            </state>
          </command>
       </extension>
       <extension
@@ -7621,10 +7630,44 @@
                locationURI="toolbar:org.robotframework.ide.DebugShell">
             <command
                   commandId="org.robotframework.red.view.debug.switchShellMode"
-                  icon="resources/gear.png"
-                  label="Switch mode"
-                  style="push">
+                  icon="resources/keyword.png"
+                  id="org.robotframework.ide.DebugShell.switchMode"
+                  label="Robot keywords"
+                  style="radio"
+                  tooltip="Robot keywords">
+               <parameter
+                     name="org.robotframework.red.view.debug.switchShellMode.mode"
+                     value="ROBOT">
+               </parameter>
             </command>
+            <command
+                  commandId="org.robotframework.red.view.debug.switchShellMode"
+                  icon="resources/variable_scalar.png"
+                  id="org.robotframework.ide.DebugShell.switchMode"
+                  label="Robot variables"
+                  style="radio"
+                  tooltip="Robot variables">
+               <parameter
+                     name="org.robotframework.red.view.debug.switchShellMode.mode"
+                     value="VARIABLE">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.debug.switchShellMode"
+                  icon="resources/python.png"
+                  id="org.robotframework.ide.DebugShell.switchMode"
+                  label="Python expressions"
+                  style="radio"
+                  tooltip="Python expressions">
+               <parameter
+                     name="org.robotframework.red.view.debug.switchShellMode.mode"
+                     value="PYTHON">
+               </parameter>
+            </command>
+            <separator
+                  name="view"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.robotframework.red.view.debug.clearDebugShell"
                   disabledIcon="IMG_ELCL_REMOVE_DISABLED"

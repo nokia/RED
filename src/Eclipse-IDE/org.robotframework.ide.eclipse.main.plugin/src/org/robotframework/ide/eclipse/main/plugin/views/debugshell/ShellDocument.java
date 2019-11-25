@@ -242,10 +242,14 @@ class ShellDocument extends Document {
         appendLines(Strings.repeat(".", type.name().length() + 1) + " ");
     }
 
-    void switchToNextMode() {
-        final ExpressionType[] allTypes = ExpressionType.values();
-        final int nextTypeIndex = (newArrayList(allTypes).indexOf(type) + 1) % allTypes.length;
-        switchMode(allTypes[nextTypeIndex]);
+    void switchToMode(final ExpressionType mode) {
+        if (mode != null) {
+            switchMode(mode);
+        } else {
+            final ExpressionType[] allTypes = ExpressionType.values();
+            final int nextTypeIndex = (newArrayList(allTypes).indexOf(type) + 1) % allTypes.length;
+            switchMode(allTypes[nextTypeIndex]);
+        }
     }
 
     private void switchMode(final ExpressionType newType) {
