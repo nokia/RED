@@ -5,8 +5,8 @@ Element-Name: CheckingVariablesProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/6/17 5:31 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/26/19 4:17 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -14,7 +14,7 @@ Entry-Name: .ecl.context
 
 global [val sys_sep2 [get-by-os -win "\\\\" -linux "/"]]
 global [val project_path [concat [  replace $RED_workspace_path -old "\\" -new "\\\\"] $sys_sep2 "ScopeProject"]]
-global [val temp_dir [replace [get-java-property "java.io.tmpdir" | invoke toLowerCase | invoke replaceAll "\\\$" "" ] -old "\\" -new "\\\\"]] 
+global [val temp_dir [replace [get-java-property "java.io.tmpdir" | invoke replaceAll "\\\$" "" ] -old "\\" -new "\\\\"]] 
 
 proc "wait-for-automatic-vars"{
 	try -times 3 -delay 1000 -command{

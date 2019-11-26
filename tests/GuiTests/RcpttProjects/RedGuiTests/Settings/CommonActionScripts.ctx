@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/25/19 5:55 PM
+Save-Time: 11/26/19 4:07 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -19,7 +19,7 @@ get-eclipse-window | maximize
 proc "restore-interpreters"{
 	get-preferences-menu | click
 	get-window Preferences| get-tree | select "Robot Framework/Installed frameworks"
-	try -times 10 -delay 1000 -command {
+	try -times 10 -delay 2000 -command {
 //		get-window Preferences | get-table | get-property enablement | equals true | verify-true
 		get-window Preferences | get-button "Add..." | get-property enablement | equals true | verify-true
 	}
