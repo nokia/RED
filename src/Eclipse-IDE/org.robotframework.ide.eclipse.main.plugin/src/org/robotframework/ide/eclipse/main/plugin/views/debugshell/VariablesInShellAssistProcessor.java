@@ -34,8 +34,8 @@ class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         final ShellDocument shellDocument = (ShellDocument) document;
-        return EnumSet.of(ExpressionType.ROBOT, ExpressionType.VARIABLE).contains(shellDocument.getType())
-                && shellDocument.isInEditEnabledRegion(offset) && shellDocument.isExpressionPromptLine(offset);
+        return EnumSet.of(ExpressionType.ROBOT, ExpressionType.VARIABLE).contains(shellDocument.getMode())
+                && shellDocument.isInEditEnabledRegion(offset);
     }
 
     @Override
@@ -45,9 +45,9 @@ class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
             return new ArrayList<>();
         }
         final ShellDocument shellDocument = (ShellDocument) document;
-        final int prefixLength = userContent.startsWith(shellDocument.getType().name().toUpperCase() + "> ")
-                ? shellDocument.getType().name().length() + 2
-                : 0;
+
+        // user content contains the prompt prefix which needs to be removed for further processing
+        final int prefixLength = shellDocument.getPromptLenght(offset).get().intValue();
         return super.computeProposals(document, offset, cellLength - prefixLength, userContent.substring(prefixLength),
                 atTheEndOfLine);
     }
@@ -55,6 +55,6 @@ class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
 
     @Override
     protected int getLineNumber(final IDocument document, final int offset) {
-        return ((ShellAssistantContext) assist).getLineNumber();
+        return assist instanceof ShellAssistantContext ? ((ShellAssistantContext) assist).getLineNumber() : -1;
     }
 }

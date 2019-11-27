@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
@@ -73,7 +74,8 @@ public class RedKeywordProposals {
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent) {
         return getKeywordProposals(userContent, sortedByLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrder(
-                userContent, suiteFile.getFile().getFullPath()));
+                userContent,
+                Optional.ofNullable(suiteFile).map(RobotSuiteFile::getFile).map(IFile::getFullPath).orElse(null)));
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent,
@@ -81,7 +83,8 @@ public class RedKeywordProposals {
         final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
                 shouldIncludeNotImportedLibraries(), userContent);
         final AccessibleKeywordsEntities keywordEntities = new AccessibleKeywordsEntities(
-                suiteFile.getFile().getFullPath(), collector);
+                Optional.ofNullable(suiteFile).map(RobotSuiteFile::getFile).map(IFile::getFullPath).orElse(null),
+                collector);
         final ListMultimap<KeywordScope, KeywordEntity> keywords = keywordEntities.getPossibleKeywords();
 
         final List<RedKeywordProposal> proposals = new ArrayList<>();

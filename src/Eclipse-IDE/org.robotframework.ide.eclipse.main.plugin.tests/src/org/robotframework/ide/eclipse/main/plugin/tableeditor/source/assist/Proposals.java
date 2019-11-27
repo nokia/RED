@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 /**
  * @author Michal Anglart
  */
-class Proposals {
+public class Proposals {
 
-    static Condition<? super ICompletionProposal> activatingAssistantAfterAccept() {
+    public static Condition<? super ICompletionProposal> activatingAssistantAfterAccept() {
         return new Condition<ICompletionProposal>() {
 
             @Override
@@ -31,7 +31,7 @@ class Proposals {
         };
     }
 
-    static Condition<? super ICompletionProposal> proposalWithImage(final Image image) {
+    public static Condition<? super ICompletionProposal> proposalWithImage(final Image image) {
         return new Condition<ICompletionProposal>() {
 
             @Override
@@ -41,7 +41,7 @@ class Proposals {
         };
     }
 
-    static Condition<? super ICompletionProposal> proposalWithOperationsToPerformAfterAccepting(final int size) {
+    public static Condition<? super ICompletionProposal> proposalWithOperationsToPerformAfterAccepting(final int size) {
         return new Condition<ICompletionProposal>() {
 
             @Override
@@ -51,13 +51,14 @@ class Proposals {
         };
     }
 
-    static IDocument applyToDocument(final IDocument document, final ICompletionProposal proposal) {
+    public static IDocument applyToDocument(final IDocument document, final ICompletionProposal proposal) {
         final Document docCopy = new Document(document);
         proposal.apply(docCopy);
         return docCopy;
     }
 
-    static IDocument applyToDocument(final ITextViewer viewer, final int offset, final TemplateProposal proposal) {
+    public static IDocument applyToDocument(final ITextViewer viewer, final int offset,
+            final TemplateProposal proposal) {
         proposal.apply(viewer, (char) -1, -1, offset);
         return new Document(viewer.getDocument());
     }

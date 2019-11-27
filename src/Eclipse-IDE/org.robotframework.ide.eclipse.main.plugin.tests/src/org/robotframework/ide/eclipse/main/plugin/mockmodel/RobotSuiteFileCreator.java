@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.text.IDocument;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
@@ -43,6 +44,13 @@ public class RobotSuiteFileCreator {
 
     public RobotSuiteFileCreator appendLines(final List<String> lines) {
         this.lines.addAll(lines);
+        return this;
+    }
+
+    public RobotSuiteFileCreator appendDocumentContent(final IDocument document) {
+        for (final String line : document.get().split("\\r?\\n")) {
+            appendLine(line);
+        }
         return this;
     }
 

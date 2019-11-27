@@ -42,6 +42,10 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class InspectElementHandler extends DIParameterizedHandler<E4InspectElementHandler> {
 
+    public static final String COMMAND_ID = "org.robotframework.red.inspectElementFromSource";
+
+    public static final String COMMAND_MODE_PARAMETER = COMMAND_ID + ".mode";
+
     public InspectElementHandler() {
         super(E4InspectElementHandler.class);
     }

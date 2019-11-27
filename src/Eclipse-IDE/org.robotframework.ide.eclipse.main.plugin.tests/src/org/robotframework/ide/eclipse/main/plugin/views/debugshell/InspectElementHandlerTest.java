@@ -62,9 +62,10 @@ public class InspectElementHandlerTest {
                 "test",
                 "  Log  ${variable}",
                 "  ${x}=  Set Variable  3");
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
 
         final DebugShellView view = mock(DebugShellView.class);
-        E4InspectElementHandler.inspectElement(view, createModel(document), document, new TextSelection(36, 0));
+        E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(36, 0));
         
         verify(view).putExpression(ExpressionType.VARIABLE, "${variable}");
     }
@@ -76,9 +77,10 @@ public class InspectElementHandlerTest {
                 "test",
                 "  Log  ${variable}",
                 "  ${x}=  Set Variable  3");
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
 
         final DebugShellView view = mock(DebugShellView.class);
-        E4InspectElementHandler.inspectElement(view, createModel(document), document, new TextSelection(28, 0));
+        E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(28, 0));
 
         verify(view).putExpression(ExpressionType.ROBOT, "Log    ${variable}");
     }
@@ -90,9 +92,10 @@ public class InspectElementHandlerTest {
                 "test",
                 "  Log  ${variable}",
                 "  ${x}=  Set Variable  3");
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
 
         final DebugShellView view = mock(DebugShellView.class);
-        E4InspectElementHandler.inspectElement(view, createModel(document), document, new TextSelection(56, 0));
+        E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(56, 0));
 
         verify(view).putExpression(ExpressionType.ROBOT, "Set Variable    3");
     }
@@ -104,18 +107,11 @@ public class InspectElementHandlerTest {
                 "test",
                 "  Log  ${variable}",
                 "  ${x}=  Set Variable  3");
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
 
         final DebugShellView view = mock(DebugShellView.class);
-        E4InspectElementHandler.inspectElement(view, createModel(document), document, new TextSelection(5, 0));
+        E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(5, 0));
 
         verifyZeroInteractions(view);
-    }
-
-    private RobotSuiteFile createModel(final IDocument document) {
-        final RobotSuiteFileCreator creator = new RobotSuiteFileCreator();
-        for (final String line : document.get().split("\\r?\\n")) {
-            creator.appendLine(line);
-        }
-        return creator.build();
     }
 }

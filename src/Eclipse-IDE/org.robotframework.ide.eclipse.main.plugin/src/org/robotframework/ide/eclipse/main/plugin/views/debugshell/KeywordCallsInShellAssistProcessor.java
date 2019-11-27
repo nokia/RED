@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.views.debugshell;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -34,7 +33,7 @@ class KeywordCallsInShellAssistProcessor extends KeywordCallsAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         final ShellDocument shellDocument = (ShellDocument) document;
-        return shellDocument.getType() == ExpressionType.ROBOT
+        return shellDocument.getMode() == ExpressionType.ROBOT
                 && shellDocument.isInEditEnabledRegion(offset) && shellDocument.isExpressionPromptLine(offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 0;
     }
@@ -43,12 +42,12 @@ class KeywordCallsInShellAssistProcessor extends KeywordCallsAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
         if (assist.getModel() == null) {
-            return new ArrayList<>();
+            return null;
         }
         final ShellDocument shellDocument = (ShellDocument) document;
-        final int prefixLength = userContent.startsWith(shellDocument.getType().name().toUpperCase() + "> ")
-                ? shellDocument.getType().name().length() + 2
-                : 0;
+
+        // user content contains the prompt prefix which needs to be removed for further processing
+        final int prefixLength = shellDocument.getPromptLenght(offset).get().intValue();
         return super.computeProposals(document, offset, cellLength - prefixLength, userContent.substring(prefixLength),
                 atTheEndOfLine);
     }

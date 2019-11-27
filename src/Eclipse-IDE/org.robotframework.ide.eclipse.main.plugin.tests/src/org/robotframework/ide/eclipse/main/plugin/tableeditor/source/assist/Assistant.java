@@ -14,15 +14,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext.AssistPreferences;
 
-class Assistant {
+public class Assistant {
 
-    static AssistantContext createAssistant(final IFile suite) {
+    public static AssistantContext createAssistant(final IFile suite) {
         final RobotModel model = new RobotModel();
         model.createRobotProject(suite.getProject()).setRobotParserComplianceVersion(new RobotVersion(3, 0));
         return createAssistant(model.createSuiteFile(suite));
     }
 
-    static AssistantContext createAssistant(final RobotSuiteFile model) {
+    public static AssistantContext createAssistant(final RobotSuiteFile model) {
         return new AssistantContext(null, () -> {
             model.parse();
             return model;

@@ -11,9 +11,11 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Function;
@@ -30,6 +32,7 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -39,11 +42,11 @@ import com.google.common.collect.TreeRangeMap;
 class ShellDocument extends Document {
 
     static final String SEPARATOR = "    ";
-    private static final String CATEGORY_MODE_PROMPT = "mode_prompt";
-    private static final String CATEGORY_PROMPT_CONTINUATION = "prompt_continuation";
-    private static final String CATEGORY_AWAITING_RESULT_PREFIX = "awaiting_result";
-    private static final String CATEGORY_RESULT_SUCC = "result";
-    private static final String CATEGORY_RESULT_ERROR = "error";
+    static final String CATEGORY_MODE_PROMPT = "mode_prompt";
+    static final String CATEGORY_PROMPT_CONTINUATION = "prompt_continuation";
+    static final String CATEGORY_AWAITING_RESULT_PREFIX = "awaiting_result";
+    static final String CATEGORY_RESULT_SUCC = "result";
+    static final String CATEGORY_RESULT_ERROR = "error";
 
     static boolean isModePromptCategory(final String category) {
         return CATEGORY_MODE_PROMPT.equals(category);
@@ -63,6 +66,7 @@ class ShellDocument extends Document {
 
     private final List<ShellDocumentListener> listeners = new ArrayList<>();
 
+    private final String delimiter;
     private ExpressionType type;
 
     private final List<Expression> expressionsHistory = new ArrayList<>();
@@ -71,6 +75,12 @@ class ShellDocument extends Document {
     private final Queue<Supplier<CategorizedPosition>> awaitingPositions = new ArrayDeque<>();
 
     ShellDocument() {
+        this(null);
+    }
+
+    ShellDocument(final String delimiter) {
+        Preconditions.checkArgument(delimiter == null || Arrays.asList(getLegalLineDelimiters()).contains(delimiter));
+        this.delimiter = delimiter;
         this.type = ExpressionType.ROBOT;
 
         addPositionCategory(CATEGORY_MODE_PROMPT);
@@ -84,7 +94,7 @@ class ShellDocument extends Document {
     void reset() {
         getModePromptPositionsStream().forEach(this::removePosition);
         getPromptContinuationPositionsStream().forEach(this::removePosition);
-        getAwaitingResultsPositions().forEach(this::removePosition);
+        getAwaitingResultsPositionsStream().forEach(this::removePosition);
         getResultSuccessPositionsStream().forEach(this::removePosition);
         getResultErrorPositionsStream().forEach(this::removePosition);
 
@@ -104,7 +114,7 @@ class ShellDocument extends Document {
         listeners.remove(listener);
     }
 
-    ExpressionType getType() {
+    ExpressionType getMode() {
         return type;
     }
 
@@ -198,6 +208,7 @@ class ShellDocument extends Document {
         for (final Position p : positions) {
             removePosition(resultCategory, p);
         }
+        removePositionCategory(resultCategory);
 
         String toPrint;
         CategorizedPosition newResultPosition;
@@ -375,7 +386,7 @@ class ShellDocument extends Document {
         }
     }
 
-    private void append(final String toAppend) {
+    void append(final String toAppend) {
         replace(getLength(), 0, toAppend);
     }
 
@@ -384,7 +395,7 @@ class ShellDocument extends Document {
     }
 
     private void appendLines(final List<String> lines) {
-        final String delimiter = DocumentUtilities.getDelimiter(this);
+        final String delimiter = this.delimiter != null ? this.delimiter : DocumentUtilities.getDelimiter(this);
         final String text = delimiter + String.join(delimiter, lines);
         replace(getLength(), 0, text);
     }
@@ -428,10 +439,19 @@ class ShellDocument extends Document {
         }
     }
     
+    @Override
+    public void removePositionCategory(final String category) {
+        try {
+            super.removePositionCategory(category);
+        } catch (final BadPositionCategoryException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private void shiftPositions(final int startingAfterOffset, final int delta) {
         Streams.concat(getModePromptPositionsStream(),
                        getPromptContinuationPositionsStream(),
-                       getAwaitingResultsPositions(),
+                       getAwaitingResultsPositionsStream(),
                        getResultSuccessPositionsStream(),
                        getResultErrorPositionsStream())
                 .filter(p -> p.getOffset() > startingAfterOffset)
@@ -441,7 +461,7 @@ class ShellDocument extends Document {
     private void extendPositions(final int overlappingOffset, final int delta) {
         Streams.concat(getModePromptPositionsStream(),
                        getPromptContinuationPositionsStream(),
-                       getAwaitingResultsPositions(),
+                       getAwaitingResultsPositionsStream(),
                        getResultSuccessPositionsStream(),
                        getResultErrorPositionsStream())
                  .filter(p -> p.getOffset() <= overlappingOffset && overlappingOffset < p.getOffset() + p.getLength())
@@ -492,31 +512,32 @@ class ShellDocument extends Document {
     }
 
     private void removeEmptyAwaitingResultCategories() {
-        getAwaitingResultCategories().filter(cat -> getPositions(cat).length == 0)
-                .forEach(cat -> {
-                    try {
-                        removePositionCategory(cat);
-                    } catch (final BadPositionCategoryException e) {
-                        throw new IllegalStateException(e);
-                    }
-                });
+        getAwaitingResultCategoriesStream().filter(cat -> getPositions(cat).length == 0)
+                .forEach(this::removePositionCategory);
     }
 
-    private Stream<CategorizedPosition> getAwaitingResultsPositions() {
-        return getAwaitingResultCategories().filter(cat -> getPositions(cat).length > 0)
+    Stream<CategorizedPosition> getAwaitingResultsPositionsStream() {
+        return getAwaitingResultCategoriesStream().filter(cat -> getPositions(cat).length > 0)
                 .flatMap(cat -> Stream.of(getPositions(cat)).map(p -> new CategorizedPosition(cat, p)));
     }
 
-    private Stream<String> getAwaitingResultCategories() {
+    Stream<String> getAwaitingResultCategoriesStream() {
         return Stream.of(getPositionCategories()).filter(cat -> cat.startsWith(CATEGORY_AWAITING_RESULT_PREFIX));
     }
 
     Optional<Integer> getLineStartOffsetOmittingPrompt(final int offset) {
+        return getPromptPosition(offset).map(pos -> pos.getOffset() + pos.getLength());
+    }
+
+    Optional<Integer> getPromptLenght(final int offset) {
+        return getPromptPosition(offset).map(CategorizedPosition::getLength);
+    }
+
+    private Optional<CategorizedPosition> getPromptPosition(final int offset) {
         final IRegion lineInfo = getLineInformationOfOffset(offset);
         return Streams.concat(getModePromptPositionsStream(), getPromptContinuationPositionsStream())
                 .filter(pos -> pos.getOffset() == lineInfo.getOffset())
-                .findFirst()
-                .map(pos -> pos.getOffset() + pos.getLength());
+                .findFirst();
     }
 
     @Override
@@ -586,13 +607,17 @@ class ShellDocument extends Document {
         }
     }
 
-    static class CategorizedPosition {
+    static final class CategorizedPosition {
 
         private final String category;
 
         private final Position position;
 
-        private CategorizedPosition(final String category, final Position position) {
+        CategorizedPosition(final String category, final int offset, final int lenght) {
+            this(category, new Position(offset, lenght));
+        }
+
+        CategorizedPosition(final String category, final Position position) {
             this.category = category;
             this.position = position;
         }
@@ -619,6 +644,25 @@ class ShellDocument extends Document {
 
         Position getPosition() {
             return position;
+        }
+
+        @Override
+        public String toString() {
+            return category + ": " + position.toString();
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == CategorizedPosition.class) {
+                final CategorizedPosition that = (CategorizedPosition) obj;
+                return this.category.equals(that.category) && this.position.equals(that.position);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(category, position);
         }
     }
 }

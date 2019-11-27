@@ -49,7 +49,7 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+    public List<ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final List<ICompletionProposal> proposals = newArrayList();
         boolean proposalsFound = false;
 

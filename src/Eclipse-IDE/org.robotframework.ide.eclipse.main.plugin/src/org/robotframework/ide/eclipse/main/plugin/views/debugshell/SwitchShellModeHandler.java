@@ -13,10 +13,11 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.commands.PersistentState;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
+import org.eclipse.ui.services.IServiceLocator;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.views.debugshell.SwitchShellModeHandler.E4SwitchShellModeHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -25,19 +26,23 @@ import org.robotframework.red.commands.DIParameterizedHandler;
 public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShellModeHandler> implements IElementUpdater{
 
     public static final String COMMAND_ID = "org.robotframework.red.view.debug.switchShellMode";
-
     public static final String COMMAND_MODE_PARAMETER = COMMAND_ID + ".mode";
     public static final String COMMAND_STATE_ID = COMMAND_ID + ".state";
 
-    static void setMode(final ExpressionType mode) {
-        final PersistentState state = provideState();
-        state.setShouldPersist(true);
-        state.setValue(mode.name());
+    static void setMode(final IServiceLocator serviceLocator, final ExpressionType mode) {
+        final PersistentState state = provideState(serviceLocator);
+        if (state != null) {
+            state.setShouldPersist(true);
+            state.setValue(mode.name());
+        }
     }
 
-    private static PersistentState provideState() {
-        final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-        return (PersistentState) commandService.getCommand(COMMAND_ID).getState(COMMAND_STATE_ID);
+    private static PersistentState provideState(final IServiceLocator serviceLocator) {
+        final ICommandService commandService = serviceLocator.getService(ICommandService.class);
+        return (PersistentState) java.util.Optional.ofNullable(commandService)
+                .map(s -> s.getCommand(COMMAND_ID))
+                .map(c -> c.getState(COMMAND_STATE_ID))
+                .orElse(null);
     }
 
 
@@ -47,7 +52,8 @@ public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShell
     
     @Override
     public void updateElement(final UIElement element, @SuppressWarnings("rawtypes") final Map parameters) {
-        final PersistentState state = provideState();
+        final IWorkbenchWindow window = (IWorkbenchWindow) parameters.get(IWorkbenchWindow.class.getName());
+        final PersistentState state = provideState(window);
         state.setShouldPersist(true);
 
         element.setChecked(state.getValue().equals(parameters.get(COMMAND_MODE_PARAMETER)));

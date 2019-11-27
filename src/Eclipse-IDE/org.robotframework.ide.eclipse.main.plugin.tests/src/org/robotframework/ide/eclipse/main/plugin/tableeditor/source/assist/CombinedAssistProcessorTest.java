@@ -131,7 +131,7 @@ public class CombinedAssistProcessorTest {
         }
 
         @Override
-        protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+        public List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
             return proposalsToReturn;
         }
 

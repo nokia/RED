@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
@@ -81,7 +80,7 @@ public class DebugShellView {
     private final ExprIdGenerator idGenerator = new ExprIdGenerator();
     private final Semaphore exprEvalSemaphore = new Semaphore(1, true);
 
-    private IWorkbenchPartSite site;
+    private IViewSite site;
     private IHandlerActivation handlerActivation;
 
     private SourceViewer sourceViewer;
@@ -97,7 +96,7 @@ public class DebugShellView {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
         GridLayoutFactory.fillDefaults().applyTo(parent);
 
-        this.site = part.getSite();
+        this.site = part.getViewSite();
         this.assistListener = new AssistListener();
 
         this.sourceViewer = new SourceViewer(parent, null, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -112,7 +111,7 @@ public class DebugShellView {
         sourceViewer.setDocument(new ShellDocument());
         sourceViewer.getContentAssistantFacade().addCompletionListener(assistListener);
 
-        createActions(part);
+        createActions();
         styledText.setCaretOffset(styledText.getCharCount());
         getDocument().addListener(() -> SwtThread.syncExec(() -> refreshAndMoveToTheEnd()));
 
@@ -120,7 +119,7 @@ public class DebugShellView {
         final IContextService service = site.getService(IContextService.class);
         service.activateContext("org.robotframework.red.view.debug.shell");
 
-        SwitchShellModeHandler.setMode(getDocument().getType());
+        SwitchShellModeHandler.setMode(site, getDocument().getMode());
     }
 
     private void verifyKey(final VerifyEvent e) {
@@ -142,7 +141,7 @@ public class DebugShellView {
 
         } else if (isInEditEnabledRegion && (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)
                 && !assistListener.isSessionActive()) {
-            if ((e.stateMask & SWT.SHIFT) != 0 && getDocument().getType() != ExpressionType.VARIABLE) {
+            if ((e.stateMask & SWT.SHIFT) != 0 && getDocument().getMode() != ExpressionType.VARIABLE) {
                 getDocument().continueExpressionInNewLine();
             } else {
                 final EvaluationRequester requester = new EvaluationRequester(idGenerator.getNextId(),
@@ -185,7 +184,7 @@ public class DebugShellView {
     }
 
     private void verifyModification(final VerifyEvent e) {
-        if (getDocument().getType() == ExpressionType.ROBOT && e.end - e.start == 0 && e.text.equals("\t")) {
+        if (getDocument().getMode() == ExpressionType.ROBOT && e.end - e.start == 0 && e.text.equals("\t")) {
             // exchange tabs in ROBOT mode for separator
             e.text = ShellDocument.SEPARATOR;
             return;
@@ -206,7 +205,7 @@ public class DebugShellView {
         }
 
         if (e.text.length() > 1) {
-            if (getDocument().getType() == ExpressionType.PYTHON) {
+            if (getDocument().getMode() == ExpressionType.PYTHON) {
                 e.text = e.text.replaceAll("\\s*$", ""); // trim right only
             } else {
                 e.text = e.text.trim();
@@ -227,7 +226,7 @@ public class DebugShellView {
                 ColorsManager.getColor(lineBackground));
     }
 
-    private void createActions(final IViewPart part) {
+    private void createActions() {
         final ShellViewViewAction contentAssistAction = new ShellViewViewAction(sourceViewer,
                 ISourceViewer.CONTENTASSIST_PROPOSALS);
         contentAssistAction.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
@@ -240,7 +239,7 @@ public class DebugShellView {
                 .setHoverImageDescriptor(DebugUITools.getImageDescriptor(IDebugUIConstants.IMG_LCL_CONTENT_ASSIST));
         contentAssistAction
                 .setDisabledImageDescriptor(DebugUITools.getImageDescriptor(IDebugUIConstants.IMG_DLCL_CONTENT_ASSIST));
-        part.getViewSite().getActionBars().updateActionBars();
+        site.getActionBars().updateActionBars();
 
         final IHandlerService handlerService = site.getService(IHandlerService.class);
         this.handlerActivation = handlerService
@@ -283,7 +282,7 @@ public class DebugShellView {
         getDocument().switchToMode(mode);
         refreshAndMoveToTheEnd();
 
-        return getDocument().getType();
+        return getDocument().getMode();
     }
 
     protected void putExpression(final ExpressionType type, final String expression) {
@@ -328,7 +327,7 @@ public class DebugShellView {
                 if (result != null && target.isPresent() && target.get().isSuspended()) {
                     result.addListener(id, this);
 
-                    target.get().evaluate(id, shellDocument.getType(), expression);
+                    target.get().evaluate(id, shellDocument.getMode(), expression);
                     // semaphore will be released after evaluation is done and debugger pauses again
                 } else {
                     handleResult(id, ExpressionType.PYTHON, Optional.empty(),

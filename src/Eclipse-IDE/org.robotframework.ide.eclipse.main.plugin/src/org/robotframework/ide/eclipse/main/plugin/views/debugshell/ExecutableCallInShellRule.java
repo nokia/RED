@@ -30,8 +30,9 @@ public class ExecutableCallInShellRule extends ExecutableCallRule {
     protected boolean shouldBeColored(final IRobotLineElement token, final List<RobotLine> context,
             final Predicate<IRobotLineElement> shouldStopOnElement) {
 
-        final List<RobotToken> tokensBefore = getPreviousTokensInExecutable(token, context, shouldStopOnElement);
-        return token.getTypes().contains(ShellTokenType.CALL_KW) || isNestedKeyword(token, context, tokensBefore);
+        return token.getTypes().contains(ShellTokenType.CALL_KW)
+                || token instanceof RobotToken && isNestedKeyword(token, context,
+                        getPreviousTokensInExecutable(token, context, shouldStopOnElement));
     }
 
     @Override

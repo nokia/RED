@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.swt.SWT;
@@ -26,20 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 
 public class InspectElementInDebugShellDynamicMenuItem extends CompoundContributionItem {
 
-    private static final String INSPECT_COMMAND_ID = "org.robotframework.red.inspectElementFromSource";
-
-    static final String INSPECT_COMMAND_MODE_PARAMETER = INSPECT_COMMAND_ID + ".mode";
-
-    private final String id;
-
-    public InspectElementInDebugShellDynamicMenuItem() {
-        this("org.robotframework.red.menu.dynamic.source.inspect");
-    }
-
-    public InspectElementInDebugShellDynamicMenuItem(final String id) {
-        this.id = id;
-    }
-
     @Override
     protected IContributionItem[] getContributionItems() {
         final IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -50,13 +37,14 @@ public class InspectElementInDebugShellDynamicMenuItem extends CompoundContribut
         final ITextSelection selection = (ITextSelection) activeWindow.getSelectionService().getSelection();
         final RobotFormEditor suiteEditor = (RobotFormEditor) activeWindow.getActivePage().getActiveEditor();
         final RobotSuiteFile suiteModel = suiteEditor.provideSuiteModel();
-        final int offset = selection.getOffset();
+        final IDocument document = suiteEditor.getSourceEditor().getDocument();
 
+        final int offset = selection.getOffset();
         try {
-            final Optional<IRegion> variableRegion = DocumentUtilities
-                    .findVariable(suiteEditor.getSourceEditor().getDocument(), suiteModel.isTsvFile(), offset);
+            final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, suiteModel.isTsvFile(),
+                    offset);
             if (variableRegion.isPresent()) {
-                return new IContributionItem[] { createInspectVariableItem(activeWindow) };
+                return new IContributionItem[] { createInspectMenuItem(activeWindow, "Inspect variable") };
             }
         } catch (final BadLocationException e) {
             // we'll look for the element
@@ -64,23 +52,15 @@ public class InspectElementInDebugShellDynamicMenuItem extends CompoundContribut
 
         final Optional<? extends RobotElement> element = suiteModel.findElement(offset);
         if (element.isPresent() && element.get().getClass() == RobotKeywordCall.class) {
-            return new IContributionItem[] { createInspectCallItem(activeWindow) };
+            return new IContributionItem[] { createInspectMenuItem(activeWindow, "Inspect call") };
         }
         return new IContributionItem[0];
     }
 
-    private IContributionItem createInspectVariableItem(final IServiceLocator serviceLocator) {
+    private static IContributionItem createInspectMenuItem(final IServiceLocator serviceLocator, final String label) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
-                serviceLocator, id, INSPECT_COMMAND_ID, SWT.PUSH);
-        contributionParameters.label = "Inspect variable";
-        contributionParameters.icon = null;
-        return new CommandContributionItem(contributionParameters);
-    }
-
-    private IContributionItem createInspectCallItem(final IServiceLocator serviceLocator) {
-        final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
-                serviceLocator, id, INSPECT_COMMAND_ID, SWT.PUSH);
-        contributionParameters.label = "Inspect call";
+                serviceLocator, null, InspectElementHandler.COMMAND_ID, SWT.PUSH);
+        contributionParameters.label = label;
         contributionParameters.icon = null;
         return new CommandContributionItem(contributionParameters);
     }

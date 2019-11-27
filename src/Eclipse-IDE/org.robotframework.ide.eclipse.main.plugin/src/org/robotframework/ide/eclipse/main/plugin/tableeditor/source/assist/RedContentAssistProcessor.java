@@ -35,7 +35,7 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
         return proposals == null ? null : proposals.toArray(new ICompletionProposal[0]);
     }
 
-    protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+    public List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         this.viewer = viewer;
         final IDocument document = viewer.getDocument();
         try {

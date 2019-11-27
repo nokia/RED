@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.debugshell;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokenScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokensQueueBuilder;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 
@@ -43,7 +46,8 @@ public class ShellTokensScanner extends RedTokenScanner {
         });
     }
 
-    private List<RobotLine> getLines(final ShellDocument shellDocument) {
+    @VisibleForTesting
+    List<RobotLine> getLines(final ShellDocument shellDocument) {
         final RangeMap<Integer, String> positions = shellDocument.getPositionsRanges();
 
         final List<RobotLine> lines = new ArrayList<>();
@@ -99,22 +103,32 @@ public class ShellTokensScanner extends RedTokenScanner {
                 final IRobotTokenType mainType = isFirst && !isContinuation ? ShellTokenType.CALL_KW
                         : ShellTokenType.CALL_ARG;
                 addToken(robotLine,
-                        RobotToken.create(expression.substring(i, j), mainType, RobotTokenType.VARIABLE_USAGE), offset);
+                        createTokenWithPossibleVariables(expression.substring(i, j), mainType), offset);
 
                 i = matcher.end();
                 addSeparator(robotLine, Separator.spacesSeparator(i - j), offset);
             }
-            final boolean isFirst = robotLine.getLineElements().size() == 1;
-            final IRobotTokenType mainType = isFirst && !isContinuation ? ShellTokenType.CALL_KW
-                    : ShellTokenType.CALL_ARG;
-            addToken(robotLine, RobotToken.create(expression.substring(i), mainType, RobotTokenType.VARIABLE_USAGE),
-                    offset);
+            if (i < expression.length()) {
+                final boolean isFirst = robotLine.getLineElements().size() == 1;
+                final IRobotTokenType mainType = isFirst && !isContinuation ? ShellTokenType.CALL_KW
+                        : ShellTokenType.CALL_ARG;
+                addToken(robotLine, createTokenWithPossibleVariables(expression.substring(i), mainType), offset);
+            }
 
-        } else {
+        } else if (!expression.isEmpty()) {
             final IRobotTokenType tokenType = currentType == ExpressionType.VARIABLE ? RobotTokenType.VARIABLE_USAGE
                     : RobotTokenType.UNKNOWN;
             addToken(robotLine, RobotToken.create(expression, tokenType), offset);
         }
+    }
+
+    private static RobotToken createTokenWithPossibleVariables(final String text,
+            final IRobotTokenType mainType) {
+        final List<IRobotTokenType> types = newArrayList(mainType);
+        if (text.contains("$") || text.contains("@") || text.contains("&") || text.contains("%")) {
+            types.add(RobotTokenType.VARIABLE_USAGE);
+        }
+        return RobotToken.create(text, types);
     }
 
     private void parseResultLine(final RobotLine robotLine, final String line, final int offset,
