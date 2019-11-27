@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1-5iYJDYEeire7gJDYnRIA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/7/19 3:16 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 11/27/19 12:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -26,9 +26,9 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 
 //check some site-packages libraries in CA
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {      
-    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "Selenium2Library" 
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "SeleniumLibrary" 
     | get-property enablement | equals false | verify-true
-    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path Selenium2Library 
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path SeleniumLibrary 
     | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
     
     get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path "requests" 
@@ -36,17 +36,17 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path requests 
     | get-property "image.path" | equals "org.robotframework.ide.eclipse.main.plugin/resources/library_python_site_packages.png" | verify-true
     
-    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select Selenium2Library | click -default
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select SeleniumLibrary | click -default
 }
 // add rflint to red.xml config file
 with [get-editor "lib_with_variable.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 2 28
+        set-caret-pos 2 21
         key-type "M1+1"
     }
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'Selenium2Library' and add to configuration" | click -default
+    | select "Discover 'SeleniumLibrary' and add to configuration" | click -default
 get-editor "PrefixProject/red.xml" | get-section "Libraries" | get-control Any 
     -after [get-label "Specify third party libraries and/or locations for Remote standard library to be used by the project"] 
     -index 1 | key-type "M1+s"
@@ -62,13 +62,13 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 }
 // verify if rflint is already imported and has different image
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-item -path "Selenium2Library \\(already imported\\)" | get-property caption | equals "Selenium2Library (already imported)" 
+    get-item -path "SeleniumLibrary \\(already imported\\)" | get-property caption | equals "SeleniumLibrary (already imported)" 
         | verify-true
-    get-item -path "Selenium2Library \\(already imported\\)" | get-property enablement | equals false | verify-true
-    get-item -path "Selenium2Library \\(already imported\\)" | get-property "image.path" 
+    get-item -path "SeleniumLibrary \\(already imported\\)" | get-property enablement | equals false | verify-true
+    get-item -path "SeleniumLibrary \\(already imported\\)" | get-property "image.path" 
         | equals "org.robotframework.ide.eclipse.main.plugin/resources/library.png" | verify-true
 }
-// verify if Selenium2Library is in CA and has proper image
+// verify if SeleniumLibrary is in CA and has proper image
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select requests
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-item -path requests | get-property caption | equals requests | verify-true
