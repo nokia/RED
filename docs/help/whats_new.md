@@ -10,6 +10,8 @@
 </li>
 <li><a href="RED/../../help/whats_new/0_9_1.html">RED 0.9.1</a>
 </li>
+<li><a href="RED/../../help/whats_new/0_9_2.html">RED 0.9.2</a>
+</li>
 </ul>
 </body>
 </html>

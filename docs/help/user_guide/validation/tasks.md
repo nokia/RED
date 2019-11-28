@@ -29,7 +29,8 @@ The detection is based on tags. When defined tag is found by RED inside the comm
 
 Detected tasks are visible in RED in couple of places:
 
-*   __Tasks__ view - this view is similar to Problems view and displays all the tasks reported for files in whole workspace (this view can be open from menu by choosing __`` Window -> Show View -> Other... -> General -> Tasks ``__), 
+*   __Tasks__ view - this view is similar to Problems view and displays all the tasks reported for files in whole workspace (this view can be open from menu by choosing <a class="command" href="javascript:executeCommand('org.eclipse.ui.views.showView(org.eclipse.ui.views.showView.viewId=org.eclipse.ui.views.TaskList)')">
+    Window -> Show View -> Other... -> General -> Tasks</a>), 
 *   __Source__ tab of editor - icon is visible in line where task is defined on left vertical ruler as well as small square on right overview vertical ruler, 
 *   __Tables__ tab of editor - icon is visible on element to which the task is attached on left ruler, 
 *   __syntax coloring__ of comment - the detected tag is colored differently than the rest of the comment both  in source tab as well as tables 

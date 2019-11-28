@@ -45,6 +45,30 @@
 <p>Additionally you may see that there is a single execution thread (RF executes tests in single thread); the 
 	execution is suspended and agent is communicating with RED using localhost at port <code>59344</code>.
 	</p>
+<h3 id="debug_shell_view">Debug Shell view</h3>
+<p>Whenever execution is suspended and a frame inside <b>Debug</b> view is selected then it is possible to use
+	<b>Debug Shell</b> view in order to evaluate different expressions. The view is not opened in <b>Debug</b>
+	perspective by default and needs to be opened using <a class="command" href="javascript:executeCommand('org.eclipse.ui.views.showView(org.eclipse.ui.views.showView.viewId=org.robotframework.ide.DebugShell)')">
+	Window -> Show View -> Other... -> Robot -> Debug Shell</a>.
+	</p>
+<img src="images/debug_shell.png"/>
+<p>The view allows to evaluate expressions in 3 modes:
+	</p>
+<ul>
+<li><b>ROBOT</b> in which <b>keyword</b> calls can be executed; under the hood it uses <code>BuiltIn.Run Keyword</code>
+	   keyword from standard library,
+	   </li>
+<li><b>VARIABLE</b> in which variable-like expressions can be evaluated,
+	   </li>
+<li><b>PYTHON</b> which allows to evaluate Python expressions; under the hood the expression is passed to
+       <code>BuiltIn.Evaluate</code> keyword which effectively calls Python <code>eval()</code>.
+       </li>
+</ul>
+<p>Switching between modes is done using view buttons or through <kbd>Ctrl + T</kbd> shortcut. The view
+	remembers last 5 exuected expressions so it is possible to switch between them using up/down arrows. 
+	In <b>ROBOT</b> and <b>PYTHON</b> mode it is possible to continue expression in multiple lines using 
+	<kbd>Shift+Enter</kbd> keys.
+	</p>
 <h3>Variables view</h3>
 <p>Whenever you select some frame inside <b>Debug</b> view the Robot variables defined inside it are shown in
 	<b>Variables</b> view. This view handles scalar, list and dictionary variables. The scalar variable only shows 

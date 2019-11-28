@@ -92,4 +92,5 @@ RED can show execution status of TestCases along with outcome result and executi
 ![](images/view_exec.png) 
   
 
-To open Execution go to: `` Window -> Show View -> Robot -> Execution View ``
+To open Execution go to: <a class="command" href="javascript:executeCommand('org.eclipse.ui.views.showView(org.eclipse.ui.views.showView.viewId=org.robotframework.ide.ExecutionView)')">
+    Window -> Show View -> Other... -> Robot -> Execution View</a>
