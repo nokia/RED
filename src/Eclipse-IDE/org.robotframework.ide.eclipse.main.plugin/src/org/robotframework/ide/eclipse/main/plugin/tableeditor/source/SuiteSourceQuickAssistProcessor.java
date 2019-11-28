@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,18 +80,9 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         return false;
     }
 
-    private static Position getPosition(final MarkerAnnotation annotation) {
-        try {
-            final Integer start = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_START);
-            final Integer end = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_END);
-            return start != null && end != null ? new Position(start, end - start) : null;
-        } catch (final CoreException e) {
-            return null;
-        }
-    }
-
     @Override
     public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
+        final List<ICompletionProposal> proposals = new ArrayList<>();
 
         final Iterator<?> annotations = invocationContext.getSourceViewer()
                 .getAnnotationModel()
@@ -99,24 +91,32 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         while (annotations.hasNext()) {
             final Annotation annotation = (Annotation) annotations.next();
             if (annotation instanceof MarkerAnnotation) {
-                final IMarker marker = ((MarkerAnnotation) annotation).getMarker();
+                final MarkerAnnotation markerAnnotation = (MarkerAnnotation) annotation;
+                final IMarker marker = markerAnnotation.getMarker();
                 try {
                     if (RobotProblem.TYPE_ID.equals(marker.getType())) {
-                        final Position position = getPosition((MarkerAnnotation) annotation);
                         final IProblemCause cause = ProjectsFixesGenerator.getCause(marker);
-
-                        if (cause.hasResolution() && isInvokedWithinAnnotationPosition(invocationContext, position)) {
-                            final List<ICompletionProposal> proposals = computeRobotProblemsAssistants(
-                                    invocationContext, marker, cause);
-                            return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
+                        if (cause.hasResolution() && isInvokedWithinAnnotationPosition(invocationContext,
+                                getPosition(markerAnnotation))) {
+                            proposals.addAll(computeRobotProblemsAssistants(invocationContext, marker, cause));
                         }
                     }
                 } catch (final CoreException e) {
-                    return null;
+                    // ok let's go to next annotation
                 }
             }
         }
-        return null;
+        return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
+    }
+
+    private static Position getPosition(final MarkerAnnotation annotation) {
+        try {
+            final Integer start = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_START);
+            final Integer end = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_END);
+            return start != null && end != null ? new Position(start, end - start) : null;
+        } catch (final CoreException e) {
+            return null;
+        }
     }
 
     private List<ICompletionProposal> computeRobotProblemsAssistants(
