@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/29/19 1:28 PM
+Save-Time: 11/29/19 5:03 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -215,9 +215,12 @@ proc "get-arg-file-path"{
 }
 
 // release files handle when files are locked under Windows. Proc used in Jython tests
-proc "release-files-handle"{
+proc "release-files-handle" [val path ""] [val project_name ""]{
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-		exec-process -command "c:\\Handle\\RemoveFilesHandle.bat" -args  $RED_workspace_path  
+		exec-process -command "c:\\Handle\\RemoveFilesHandle.bat" -args  [concat $RED_workspace_path "\\" $project_name] -timeout 120 | log
+		if [$path | not-eq ""]{
+			exec-process -command "c:\\Handle\\RemoveFilesHandle.bat" -args  $path |log
+		}		
     }
 }
 
