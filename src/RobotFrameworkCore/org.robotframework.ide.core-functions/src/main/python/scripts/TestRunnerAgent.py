@@ -67,9 +67,12 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 from robot.libraries.BuiltIn import BuiltIn
 from robot.errors import HandlerExecutionFailed, UserKeywordExecutionFailed
 from robot import version
-from robot.parsing.populators import READERS
 from robot.running import EXECUTION_CONTEXTS
 
+
+def _get_robot_version():
+    robot_version_str = version.get_version(True)
+    return tuple([int(num) for num in re.split('\\.', robot_version_str)])
 
 
 def _is_logged(level):
@@ -188,7 +191,10 @@ def _prepare_names_dictionary_slow_py2(parent_dir):
     return {formatted_name : list(map(snd, sorted(entries, key = fst))) for (formatted_name, entries) in d.items()}
 
 def _has_suite_extension(name):
-    valid_exts = tuple(READERS)
+    if _get_robot_version() >= (3, 2, 0):
+        valid_exts = {'robot', 'txt', 'tsv', 'rst', 'rest'}
+    else:
+        valid_exts = {'robot', 'txt', 'tsv', 'rst', 'rest', 'html', 'htm', 'xhtml'}
     (_, ext) = os.path.splitext(name)
     return ext[1:] in valid_exts 
     
@@ -467,11 +473,10 @@ class TestRunnerAgent:
         return self._evaluate_keyword_call(keywordName, argList)
     
     def _evaluate_keyword_call(self, keywordName, argList):
-        robot_version_str = robot.version.get_version(True)
-        robot_version = tuple([int(num) for num in re.split('\\.', robot_version_str)])
-        evaluator = self._evaluate_keyword_call_old_style if robot_version < (3, 0, 3) else self._evaluate_keyword_call_new_style
-        
-        return evaluator(keywordName, argList)
+        if _get_robot_version() < (3, 0, 3):
+            return self._evaluate_keyword_call_old_style(keywordName, argList)
+        else:
+            return self._evaluate_keyword_call_new_style(keywordName, argList)
 
     def _evaluate_keyword_call_old_style(self, keywordName, argList):
         try:
