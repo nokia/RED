@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
  */
 public class Snippets {
 
-    static String createSnippetInfo(final IDocument document, final IRegion regionToChange,
+    public static String createSnippetInfo(final IDocument document, final IRegion regionToChange,
             final String replacement) {
         final Optional<IRegion> snippetRegion = DocumentUtilities.getSnippet(document, regionToChange.getOffset(), 2);
         if (snippetRegion.isPresent()) {

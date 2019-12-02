@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +54,7 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHype
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteAutoEditStrategy.EditStrategyPreferences;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
@@ -68,10 +71,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewK
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewSectionTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTaskTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTestTemplateAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LocalAssignQuickAssistProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.TemplateArgumentsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
@@ -472,6 +475,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IQuickAssistAssistant assistant = new QuickAssistAssistant();
         final SuiteSourceQuickAssistProcessor processor = new SuiteSourceQuickAssistProcessor(editor.getFileModel(),
                 sourceViewer);
+        processor.addAssistProviders(newArrayList(new LocalAssignQuickAssistProvider()));
         assistant.setQuickAssistProcessor(processor);
         assistant.addCompletionListener(processor);
         sourceViewer.getTextWidget().addDisposeListener(e -> assistant.removeCompletionListener(processor));

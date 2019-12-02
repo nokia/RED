@@ -5,10 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
@@ -33,6 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfigMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.QuickAssistProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter;
 
@@ -49,9 +52,15 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
 
     private final SourceViewer sourceViewer;
 
+    private final List<QuickAssistProvider> assistProviders = new ArrayList<>();
+
     public SuiteSourceQuickAssistProcessor(final RobotSuiteFile fileModel, final ISourceViewer sourceViewer) {
         this.suiteModel = fileModel;
         this.sourceViewer = (SourceViewer) sourceViewer;
+    }
+
+    public void addAssistProviders(final Collection<? extends QuickAssistProvider> providers) {
+        this.assistProviders.addAll(providers);
     }
 
     @Override
@@ -77,17 +86,30 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
 
     @Override
     public boolean canAssist(final IQuickAssistInvocationContext invocationContext) {
-        return false;
+        return assistProviders.stream().anyMatch(provider -> provider.canAssist(invocationContext));
     }
 
     @Override
     public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
         final List<ICompletionProposal> proposals = new ArrayList<>();
+        proposals.addAll(computeQuickAssists(invocationContext));
+        proposals.addAll(computeQuickFixes(invocationContext));
+        return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
+    }
+
+    private List<ICompletionProposal> computeQuickAssists(
+            final IQuickAssistInvocationContext invocationContext) {
+        return assistProviders.stream()
+                .flatMap(provider -> provider.computeQuickAssistProposals(suiteModel, invocationContext).stream())
+                .collect(toList());
+    }
+
+    private List<ICompletionProposal> computeQuickFixes(final IQuickAssistInvocationContext invocationContext) {
+        final List<ICompletionProposal> proposals = new ArrayList<>();
 
         final Iterator<?> annotations = invocationContext.getSourceViewer()
                 .getAnnotationModel()
                 .getAnnotationIterator();
-
         while (annotations.hasNext()) {
             final Annotation annotation = (Annotation) annotations.next();
             if (annotation instanceof MarkerAnnotation) {
@@ -98,7 +120,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                         final IProblemCause cause = ProjectsFixesGenerator.getCause(marker);
                         if (cause.hasResolution() && isInvokedWithinAnnotationPosition(invocationContext,
                                 getPosition(markerAnnotation))) {
-                            proposals.addAll(computeRobotProblemsAssistants(invocationContext, marker, cause));
+                            proposals.addAll(computeRobotProblemsFixes(invocationContext, marker, cause));
                         }
                     }
                 } catch (final CoreException e) {
@@ -106,7 +128,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                 }
             }
         }
-        return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
+        return proposals;
     }
 
     private static Position getPosition(final MarkerAnnotation annotation) {
@@ -119,7 +141,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         }
     }
 
-    private List<ICompletionProposal> computeRobotProblemsAssistants(
+    private List<ICompletionProposal> computeRobotProblemsFixes(
             final IQuickAssistInvocationContext invocationContext, final IMarker marker, final IProblemCause cause) {
 
         final List<? extends IMarkerResolution> fixers = cause.createFixers(marker);
@@ -133,8 +155,9 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                 .map(resolution -> resolution
                         .asContentProposal(marker, invocationContext.getSourceViewer().getDocument(), suiteModel)
                         .orElse(null));
-        return Stream.concat(redXmlRepairProposals, suiteRepairProposals).filter(Predicates.notNull()).collect(
-                Collectors.toList());
+        return Stream.concat(redXmlRepairProposals, suiteRepairProposals)
+                .filter(Predicates.notNull())
+                .collect(toList());
     }
 
     private boolean isInvokedWithinAnnotationPosition(final IQuickAssistInvocationContext invocationContext,
@@ -152,6 +175,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         if (shouldActivateAssist(proposal)) {
             Display.getCurrent().asyncExec(() -> sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS));
         }
+        getOperationsAfterAccept(proposal).forEach(Runnable::run);
     }
 
     private boolean shouldActivateAssist(final ICompletionProposal proposal) {
@@ -159,6 +183,15 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                 && ((RedCompletionProposal) proposal).shouldActivateAssistantAfterAccepting()
                 || proposal instanceof RedCompletionProposalAdapter
                         && ((RedCompletionProposalAdapter) proposal).shouldActivateAssistantAfterAccepting();
+    }
+
+    private Collection<Runnable> getOperationsAfterAccept(final ICompletionProposal proposal) {
+        if (proposal instanceof RedCompletionProposal) {
+            return ((RedCompletionProposal) proposal).operationsToPerformAfterAccepting();
+        } else if (proposal instanceof RedCompletionProposalAdapter) {
+            return ((RedCompletionProposalAdapter) proposal).operationsToPerformAfterAccepting();
+        }
+        return new ArrayList<>();
     }
 
     @Override
