@@ -127,7 +127,11 @@ class LocalProcessCommandLineBuilder {
             if (!suitePaths.isEmpty()) {
                 final Function<IResource, List<String>> mapper = r -> newArrayList(
                         removeFileExtensionIfNeeded(r, r.getLocation()).lastSegment());
-                builder.testsToRun(RobotPathsNaming.createTestNames(allResources, "", mapper));
+                final String topLevelSuiteName = createTopLevelSuiteName(new ArrayList<>(),
+                        parseArguments(robotConfig.getRobotArguments()));
+                final int pathSegmentsToSkip = !topLevelSuiteName.isEmpty() ? 1 : 0;
+                builder.testsToRun(RobotPathsNaming.createTestNames(allResources, topLevelSuiteName, mapper,
+                        pathSegmentsToSkip));
             }
         } else {
             final List<IResource> dataSources = new ArrayList<>();
@@ -148,10 +152,15 @@ class LocalProcessCommandLineBuilder {
                         return segments;
                     }
                 };
-                builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper));
-                builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper));
-                builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper));
-                builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper));
+                final int pathSegmentsToSkip = (linkedResources.isEmpty() && !topLevelSuiteName.isEmpty()) ? 1 : 0;
+                builder.suitesToRun(RobotPathsNaming.createSuiteNames(notLinkedResources, topLevelSuiteName, mapper,
+                        pathSegmentsToSkip));
+                builder.suitesToRun(RobotPathsNaming.createSuiteNames(linkedResources, topLevelSuiteName, mapper,
+                        pathSegmentsToSkip));
+                builder.testsToRun(RobotPathsNaming.createTestNames(notLinkedResources, topLevelSuiteName, mapper,
+                        pathSegmentsToSkip));
+                builder.testsToRun(RobotPathsNaming.createTestNames(linkedResources, topLevelSuiteName, mapper,
+                        pathSegmentsToSkip));
             }
             robotConfig.setLinkedResourcesPaths(linkedResources);
         }

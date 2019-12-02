@@ -220,11 +220,52 @@ public class ExecutionStatusStore implements IDisposable {
                 final RedWorkspace workspace = new RedWorkspace(root);
                 final IResource resource = workspace.forUri(node.getPath());
                 final String path = resource.getProjectRelativePath().toPortableString();
-                failedSuitePaths.put(path, failedTests);
+                if (path.isEmpty()) {
+                    final Map<String, List<String>> failedTestsMap = createFailedTestsMapFromTestsList(workspace,
+                            node.getChildren(), failedTests);
+                    failedSuitePaths.putAll(failedTestsMap);
+                } else {
+                    failedSuitePaths.put(path, failedTests);
+                }
             }
         }
         return failedSuitePaths;
     };
+
+    private Map<String, List<String>> createFailedTestsMapFromTestsList(final RedWorkspace workspace,
+            final List<ExecutionTreeNode> nodes, final List<String> failedTests) {
+        final Map<String, List<String>> testsMap = new HashMap<>();
+        String parentName = "";
+        List<String> tests = new ArrayList<>();
+        for (final String test : failedTests) {
+            final String currentName = test.split("\\.")[0];
+            final String currentTest = test.substring(test.indexOf(".") + 1);
+            if (parentName.equals(currentName)) {
+                tests.add(currentTest);
+            } else {
+                if (!parentName.isEmpty()) {
+                    testsMap.put(getParentFileName(workspace, nodes, parentName), tests);
+                }
+                parentName = currentName;
+                tests = new ArrayList<>();
+                tests.add(currentTest);
+            }
+        }
+        testsMap.put(getParentFileName(workspace, nodes, parentName), tests);
+        return testsMap;
+    }
+
+    private String getParentFileName(final RedWorkspace workspace, final List<ExecutionTreeNode> nodes,
+            final String parentRobotName) {
+        for (final ExecutionTreeNode node : nodes) {
+            final IResource resource = workspace.forUri(node.getPath());
+            final String fileName = resource.getName();
+            if (RobotPathsNaming.toRobotFrameworkName(fileName).equals(parentRobotName)) {
+                return fileName;
+            }
+        }
+        return "";
+    }
 
     private List<String> getFailedChildren(final ExecutionTreeNode node) {
         final List<String> failedTests = new ArrayList<>();
@@ -245,7 +286,7 @@ public class ExecutionStatusStore implements IDisposable {
             failedTests.add(newPath);
         }
     }
-    
+
     public Map<String, List<String>> getNonExecutedSuitePaths(final IProject project,
             final List<String> linkedResources) {
         final boolean testsOnly = onlyTestsRequiresRerun(getExecutionTree());

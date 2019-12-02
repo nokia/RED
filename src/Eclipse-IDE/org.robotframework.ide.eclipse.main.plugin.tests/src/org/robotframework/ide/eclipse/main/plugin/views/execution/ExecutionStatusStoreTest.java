@@ -414,6 +414,70 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
+    public void whenManySuitesAndLinkedResourceContainFailedTests_failedSuitePathsMapIsReturnedWithManySuites()
+            throws IOException, CoreException {
+        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1");
+        final IFile linkedSuite1 = projectProvider.getFile("linked_suite");
+        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
+
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode project = ExecutionTreeNode.newSuiteNode(root, "Project",
+                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString()));
+        final ExecutionTreeNode suite1_catalog = ExecutionTreeNode.newSuiteNode(project, "Suite1 Catalog", URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite1_catalog"));
+        final ExecutionTreeNode suite2_catalog = ExecutionTreeNode.newSuiteNode(project, "Suite2 Catalog", URI
+                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite2_catalog"));
+        final ExecutionTreeNode suiteLinked3 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 1",
+                linkedNonWorkspaceFile1.toURI());
+
+        final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(suite1_catalog, "Suite1",
+                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString()
+                        + "/suite1_catalog/suite1.robot"));
+        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(suite2_catalog, "Suite2", URI.create("file://"
+                + projectProvider.getProject().getLocation().toPortableString()
+                        + "/suite2_catalog/suite2.robot"));
+
+        final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
+        final ExecutionTreeNode testPassed1 = ExecutionTreeNode.newTestNode(suite1, "test2", suite1.getPath());
+        final ExecutionTreeNode testFailed2 = ExecutionTreeNode.newTestNode(suite2, "test1", suite2.getPath());
+        final ExecutionTreeNode testPassed2 = ExecutionTreeNode.newTestNode(suite2, "test2", suite2.getPath());
+        final ExecutionTreeNode testFailedSec2 = ExecutionTreeNode.newTestNode(suite2, "test3", suite2.getPath());
+        final ExecutionTreeNode testFailed3 = ExecutionTreeNode.newTestNode(suiteLinked3, "test1",
+                suiteLinked3.getPath());
+
+        suite1_catalog.setStatus(Status.FAIL);
+        suite2_catalog.setStatus(Status.FAIL);
+        suiteLinked3.setStatus(Status.FAIL);
+        suite1.setStatus(Status.FAIL);
+        suite2.setStatus(Status.FAIL);
+        testFailed1.setStatus(Status.FAIL);
+        testFailed2.setStatus(Status.FAIL);
+        testFailedSec2.setStatus(Status.FAIL);
+        testFailed3.setStatus(Status.FAIL);
+        suite1.addChildren(testFailed1, testPassed1);
+        suite2.addChildren(testFailed2, testPassed2, testFailedSec2);
+        suite1_catalog.addChildren(suite1);
+        suite2_catalog.addChildren(suite2);
+        suiteLinked3.addChildren(testFailed3);
+        project.addChildren(suite1_catalog, suite2_catalog);
+        root.addChildren(project, suiteLinked3);
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        projectProvider.createDir("suite1_catalog");
+        projectProvider.createDir("suite2_catalog");
+        projectProvider.createFile("suite1_catalog/suite1.robot");
+        projectProvider.createFile("suite2_catalog/suite2.robot");
+        projectProvider.createFile("suiteLinked3.robot");
+
+        assertThat(store.getFailedSuitePaths(projectProvider.getProject()))
+                .containsEntry("suite1_catalog", newArrayList("Suite1.test1"))
+                .containsEntry("suite2_catalog", newArrayList("Suite2.test1", "Suite2.test3"))
+                .containsEntry("linked_suite", newArrayList("test1"));
+    }
+
+    @Test
     public void whenSingleSuiteContainsFailedTests_failedSuitePathsMapIsReturnedWithSingleSuite()
             throws IOException, CoreException {
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",

@@ -1147,7 +1147,7 @@ public class LocalProcessCommandLineBuilderTest {
         final List<String> robotArguments = new ArrayList<>();
         dataSources.add(projectProvider.getProject());
         dataSources.add(projectProvider.getFile("LinkedSuite.robot"));
-        robotArguments.addAll(newArrayList("-s", "Suite.robot", "--name"));
+        robotArguments.addAll(newArrayList("-s", "LinkedSuite.robot", "--name"));
 
         assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
                 .isEqualTo(projectProvider.getProject().getName() + " & "
@@ -1161,7 +1161,7 @@ public class LocalProcessCommandLineBuilderTest {
         final List<String> robotArguments = new ArrayList<>();
         dataSources.add(projectProvider.getProject());
         dataSources.add(projectProvider.getFile("LinkedSuite.robot"));
-        robotArguments.addAll(newArrayList("--name", "-s", "Suite.robot"));
+        robotArguments.addAll(newArrayList("--name", "-s", "LinkedSuite.robot"));
 
         assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
                 .isEqualTo(projectProvider.getProject().getName() + " & "
@@ -1201,6 +1201,19 @@ public class LocalProcessCommandLineBuilderTest {
 
         assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
                 .isEqualTo("OtherName");
+    }
+
+    @Test
+    public void topLevelSuiteNameIsCreatedFromNameArgument_whenRobotArgumentsContainNameArgumentAndThereAreTwoDataSources()
+            throws CoreException {
+        final List<IResource> dataSources = new ArrayList<>();
+        final List<String> robotArguments = new ArrayList<>();
+        dataSources.add(projectProvider.getProject());
+        dataSources.add(projectProvider.getFile("LinkedSuite.robot"));
+        robotArguments.addAll(newArrayList("-s", "LinkedSuite.robot", "--name", "Other Name"));
+
+        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
+                .isEqualTo("Other Name");
     }
 
     @Test

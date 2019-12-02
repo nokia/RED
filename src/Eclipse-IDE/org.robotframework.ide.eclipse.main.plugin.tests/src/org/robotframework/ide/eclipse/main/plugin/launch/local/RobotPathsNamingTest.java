@@ -79,46 +79,56 @@ public class RobotPathsNamingTest {
     @Test
     public void testCreatingSuiteNames() throws Exception {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(RobotPathsNaming.createSuiteNames(ImmutableMap.of(), "", LAST_SEGMENT)).isEmpty();
+            softly.assertThat(RobotPathsNaming.createSuiteNames(ImmutableMap.of(), "", LAST_SEGMENT, 0)).isEmpty();
 
             softly.assertThat(RobotPathsNaming
-                    .createSuiteNames(ImmutableMap.of(projectProvider.getProject(), newArrayList()), "", LAST_SEGMENT))
+                    .createSuiteNames(ImmutableMap.of(projectProvider.getProject(), newArrayList()), "", LAST_SEGMENT,
+                            0))
                     .containsExactly(PROJECT_NAME);
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
-                    ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList()), "", LAST_SEGMENT))
+                    ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList()), "", LAST_SEGMENT, 0))
                     .containsExactly("Suite");
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
-                    ImmutableMap.of(projectProvider.getFile("ProjectLink.robot"), newArrayList()), "", LAST_SEGMENT))
+                    ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList()), "Top", LAST_SEGMENT, 1))
+                    .containsExactly("Top");
+
+            softly.assertThat(RobotPathsNaming.createSuiteNames(
+                    ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList(),
+                            projectProvider.getFile("ProjectLink.robot"), newArrayList()),
+                    "Top", LAST_SEGMENT, 0)).contains("Top.Suite", "Top.Linked Suite");
+
+            softly.assertThat(RobotPathsNaming.createSuiteNames(
+                    ImmutableMap.of(projectProvider.getFile("ProjectLink.robot"), newArrayList()), "", LAST_SEGMENT, 0))
                     .containsExactly("Linked Suite");
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
                     ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList("tc1", "tc2")), "",
-                    LAST_SEGMENT)).containsExactly("Suite");
+                    LAST_SEGMENT, 0)).containsExactly("Suite");
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
                     ImmutableMap.of(projectProvider.getFile("some/path/to/suite.robot"), newArrayList()), "",
-                    ALL_SEGMENTS)).containsExactly(PROJECT_NAME + ".Some.Path.To.Suite");
+                    ALL_SEGMENTS, 0)).containsExactly(PROJECT_NAME + ".Some.Path.To.Suite");
 
             softly.assertThat(
                     RobotPathsNaming.createSuiteNames(
                             ImmutableMap.of(projectProvider.getFile("001__same_suite.robot"), newArrayList(),
                                     projectProvider.getFile("002__same_suite.robot"), newArrayList(),
                                     projectProvider.getFile("003__same_suite.robot"), newArrayList()),
-                            "", ALL_SEGMENTS))
+                            "", ALL_SEGMENTS, 0))
                     .containsExactly(PROJECT_NAME + ".Same Suite");
 
             softly.assertThat(RobotPathsNaming.createSuiteNames(
                     ImmutableMap.of(projectProvider.getFile("some/path/to/suite.robot"), newArrayList()), "Top",
-                    ALL_SEGMENTS)).containsExactly("Top." + PROJECT_NAME + ".Some.Path.To.Suite");
+                    ALL_SEGMENTS, 1)).containsExactly("Top.Some.Path.To.Suite");
 
             softly.assertThat(
                     RobotPathsNaming.createSuiteNames(
                             ImmutableMap.of(projectProvider.getFile("very/very/long/path/to/suite.robot"),
                                     newArrayList(), projectProvider.getFile("another/path/to/test.robot"),
                                     newArrayList(), projectProvider.getDir("different/folder"), newArrayList()),
-                            "TopName", ALL_SEGMENTS))
+                            "TopName", ALL_SEGMENTS, 0))
                     .containsExactly("TopName." + PROJECT_NAME + ".Very.Very.Long.Path.To.Suite",
                             "TopName." + PROJECT_NAME + ".Another.Path.To.Test",
                             "TopName." + PROJECT_NAME + ".Different.Folder");
@@ -128,35 +138,37 @@ public class RobotPathsNamingTest {
     @Test
     public void testCreatingTestNames() throws Exception {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(RobotPathsNaming.createTestNames(ImmutableMap.of(), "", LAST_SEGMENT)).isEmpty();
+            softly.assertThat(RobotPathsNaming.createTestNames(ImmutableMap.of(), "", LAST_SEGMENT, 1)).isEmpty();
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList("tc1", "tc2")), "",
-                    LAST_SEGMENT)).containsExactly("Suite.tc1", "Suite.tc2");
+                    LAST_SEGMENT, 0)).containsExactly("Suite.tc1", "Suite.tc2");
+
+            softly.assertThat(RobotPathsNaming.createTestNames(
+                    ImmutableMap.of(projectProvider.getFile("suite.robot"), newArrayList("tc1", "tc2")), "Top Name",
+                    LAST_SEGMENT, 1)).containsExactly("Top Name.tc1", "Top Name.tc2");
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("001__same_suite.robot"), newArrayList("tc1", "tc2"),
                             projectProvider.getFile("002__same_suite.robot"), newArrayList("tc1", "tc2"),
                             projectProvider.getFile("003__same_suite.robot"), newArrayList("tc1", "tc2")),
-                    "", ALL_SEGMENTS))
+                    "", ALL_SEGMENTS, 0))
                     .containsExactly(PROJECT_NAME + ".Same Suite.tc1", PROJECT_NAME + ".Same Suite.tc2");
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("ProjectLink.robot"), newArrayList("tc1", "tc2")), "",
-                    LAST_SEGMENT)).containsExactly("Linked Suite.tc1", "Linked Suite.tc2");
+                    LAST_SEGMENT, 0)).containsExactly("Linked Suite.tc1", "Linked Suite.tc2");
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("test/suite.robot"), newArrayList("tc1", "tc2", "tc3")),
-                    "TopName", ALL_SEGMENTS))
-                    .containsExactly("TopName." + PROJECT_NAME + ".Test.Suite.tc1",
-                            "TopName." + PROJECT_NAME + ".Test.Suite.tc2",
-                            "TopName." + PROJECT_NAME + ".Test.Suite.tc3");
+                    "TopName", ALL_SEGMENTS, 1))
+                    .containsExactly("TopName.Test.Suite.tc1", "TopName.Test.Suite.tc2", "TopName.Test.Suite.tc3");
 
             softly.assertThat(RobotPathsNaming.createTestNames(
                     ImmutableMap.of(projectProvider.getFile("path/first.robot"), newArrayList("tc1"),
                             projectProvider.getFile("path/second.robot"), newArrayList("tc1", "tc2"),
                             projectProvider.getFile("path/third.robot"), newArrayList("tc1", "tc2", "tc3")),
-                    "TopName", ALL_SEGMENTS))
+                    "TopName", ALL_SEGMENTS, 0))
                     .containsExactly("TopName." + PROJECT_NAME + ".Path.First.tc1",
                             "TopName." + PROJECT_NAME + ".Path.Second.tc1",
                             "TopName." + PROJECT_NAME + ".Path.Second.tc2",
@@ -169,34 +181,35 @@ public class RobotPathsNamingTest {
     @Test
     public void testCreatingSuiteName() throws Exception {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList())).isEmpty();
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList(), 0)).isEmpty();
 
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList(""))).isEmpty();
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList(""), 0)).isEmpty();
 
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a"))).isEqualTo("A");
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a"), 0)).isEqualTo("A");
 
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a", "b", "c"))).isEqualTo("A.B.C");
-
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("abc"))).isEqualTo("Abc");
-
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a_b_c"))).isEqualTo("A B C");
-
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("some path", "to suite")))
-                    .isEqualTo("Some Path.To Suite");
-
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("some_path", "to_suite")))
-                    .isEqualTo("Some Path.To Suite");
-
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a", "001__b", "c")))
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a", "b", "c"), 0))
                     .isEqualTo("A.B.C");
 
-            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("001__a__b_c", "001__d__e_f")))
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("abc"), 0)).isEqualTo("Abc");
+
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a_b_c"), 0)).isEqualTo("A B C");
+
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("some path", "to suite"), 0))
+                    .isEqualTo("Some Path.To Suite");
+
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("some_path", "to_suite"), 0))
+                    .isEqualTo("Some Path.To Suite");
+
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("a", "001__b", "c"), 0))
+                    .isEqualTo("A.B.C");
+
+            softly.assertThat(RobotPathsNaming.createSuiteName("", newArrayList("001__a__b_c", "001__d__e_f"), 0))
                     .isEqualTo("A B C.D E F");
 
-            softly.assertThat(RobotPathsNaming.createSuiteName(PROJECT_NAME, newArrayList("a", "b", "c")))
+            softly.assertThat(RobotPathsNaming.createSuiteName(PROJECT_NAME, newArrayList("a", "b", "c"), 0))
                     .isEqualTo(PROJECT_NAME + ".A.B.C");
 
-            softly.assertThat(RobotPathsNaming.createSuiteName("Path1 & Path2", newArrayList("a", "b", "c")))
+            softly.assertThat(RobotPathsNaming.createSuiteName("Path1 & Path2", newArrayList("a", "b", "c"), 0))
                     .isEqualTo("Path1 & Path2.A.B.C");
         });
     }
@@ -204,17 +217,17 @@ public class RobotPathsNamingTest {
     @Test
     public void testCreatingTestName() throws Exception {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(RobotPathsNaming.createTestName("", newArrayList("path", "to", "suite"), "case"))
+            softly.assertThat(RobotPathsNaming.createTestName("", newArrayList("path", "to", "suite"), "case", 0))
                     .isEqualTo("Path.To.Suite.case");
 
             softly.assertThat(RobotPathsNaming.createTestName(PROJECT_NAME, newArrayList("path", "to", "suite"),
-                    "project test case")).isEqualTo(PROJECT_NAME + ".Path.To.Suite.project test case");
+                    "project test case", 0)).isEqualTo(PROJECT_NAME + ".Path.To.Suite.project test case");
 
             softly.assertThat(RobotPathsNaming.createTestName(PROJECT_NAME, newArrayList("20__Some_path", "to_suite"),
-                    "Test case")).isEqualTo(PROJECT_NAME + ".Some Path.To Suite.Test case");
+                    "Test case", 0)).isEqualTo(PROJECT_NAME + ".Some Path.To Suite.Test case");
 
             softly.assertThat(RobotPathsNaming.createTestName("Path1 & Path2", newArrayList("path", "to", "suite"),
-                    "100__test_case")).isEqualTo("Path1 & Path2.Path.To.Suite.100__test_case");
+                    "100__test_case", 0)).isEqualTo("Path1 & Path2.Path.To.Suite.100__test_case");
         });
     }
 }
