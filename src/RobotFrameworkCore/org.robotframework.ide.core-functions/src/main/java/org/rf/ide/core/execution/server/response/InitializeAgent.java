@@ -13,6 +13,7 @@ import org.rf.ide.core.execution.agent.TestsMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 public final class InitializeAgent implements ServerResponse {
 
@@ -22,23 +23,31 @@ public final class InitializeAgent implements ServerResponse {
 
     private final boolean agentShouldWaitForSignal;
 
-    public InitializeAgent(final TestsMode mode, final boolean agentShouldWaitForSignal) {
-        this(ResponseObjectsMapper.OBJECT_MAPPER, mode, agentShouldWaitForSignal);
+    private final int maxValueLenght;
+
+    public InitializeAgent(final TestsMode mode, final boolean agentShouldWaitForSignal, final int maxValueLenght) {
+        this(ResponseObjectsMapper.OBJECT_MAPPER, mode, agentShouldWaitForSignal, maxValueLenght);
     }
 
     @VisibleForTesting
-    InitializeAgent(final ObjectMapper mapper, final TestsMode mode, final boolean agentShouldWaitForSignal) {
+    InitializeAgent(final ObjectMapper mapper, final TestsMode mode, final boolean agentShouldWaitForSignal,
+            final int maxValueLenght) {
         this.mapper = mapper;
         this.mode = mode;
         this.agentShouldWaitForSignal = agentShouldWaitForSignal;
+        this.maxValueLenght = maxValueLenght;
     }
 
     @Override
     public String toMessage() throws ResponseException {
         try {
-            final Map<String, ? extends Object> arguments = ImmutableMap.of("mode", mode.name(),
-                    "wait_for_start_allowance", agentShouldWaitForSignal);
-            final Map<String, Object> value = ImmutableMap.of("operating_mode", arguments);
+            final Builder<Object, Object> argsBuilder = ImmutableMap.builder()
+                    .put("mode", mode.name())
+                    .put("wait_for_start_allowance", agentShouldWaitForSignal);
+            if (maxValueLenght >= 0) {
+                argsBuilder.put("max_lenght", maxValueLenght);
+            }
+            final Map<String, Object> value = ImmutableMap.of("operating_mode", argsBuilder.build());
 
             return mapper.writeValueAsString(value);
         } catch (final IOException e) {

@@ -20,14 +20,21 @@ public class AgentServerTestsStarter extends RobotDefaultAgentEventListener {
 
     private final TestsMode mode;
 
+    private final int maxValueLenght;
+
     public AgentServerTestsStarter(final TestsMode mode) {
+        this(mode, -1);
+    }
+
+    public AgentServerTestsStarter(final TestsMode mode, final int maxValueLenght) {
         this.mode = mode;
+        this.maxValueLenght = maxValueLenght;
     }
 
     @Override
     public void handleAgentInitializing(final AgentInitializingEvent event) {
         try {
-            event.responder().initialize(mode, true);
+            event.responder().initialize(mode, true, maxValueLenght);
         } catch (final ResponseException e) {
             throw new RobotAgentEventsListenerException("Unable to send response to client", e);
         }

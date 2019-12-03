@@ -21,14 +21,14 @@ public class InitializeAgentTest {
 
     @Test
     public void properMessageIsConstructed_forInitializeAgentResponse() {
-        assertThat(new InitializeAgent(TestsMode.RUN, true).toMessage())
-                .isEqualTo("{\"operating_mode\":{\"mode\":\"RUN\",\"wait_for_start_allowance\":true}}");
-        assertThat(new InitializeAgent(TestsMode.RUN, false).toMessage())
-                .isEqualTo("{\"operating_mode\":{\"mode\":\"RUN\",\"wait_for_start_allowance\":false}}");
-        assertThat(new InitializeAgent(TestsMode.DEBUG, true).toMessage())
-                .isEqualTo("{\"operating_mode\":{\"mode\":\"DEBUG\",\"wait_for_start_allowance\":true}}");
-        assertThat(new InitializeAgent(TestsMode.DEBUG, false).toMessage())
-                .isEqualTo("{\"operating_mode\":{\"mode\":\"DEBUG\",\"wait_for_start_allowance\":false}}");
+        assertThat(new InitializeAgent(TestsMode.RUN, true, 100).toMessage()).isEqualTo(
+                "{\"operating_mode\":{\"mode\":\"RUN\",\"wait_for_start_allowance\":true,\"max_lenght\":100}}");
+        assertThat(new InitializeAgent(TestsMode.RUN, false, 200).toMessage()).isEqualTo(
+                "{\"operating_mode\":{\"mode\":\"RUN\",\"wait_for_start_allowance\":false,\"max_lenght\":200}}");
+        assertThat(new InitializeAgent(TestsMode.DEBUG, true, 300).toMessage()).isEqualTo(
+                "{\"operating_mode\":{\"mode\":\"DEBUG\",\"wait_for_start_allowance\":true,\"max_lenght\":300}}");
+        assertThat(new InitializeAgent(TestsMode.DEBUG, false, 400).toMessage()).isEqualTo(
+                "{\"operating_mode\":{\"mode\":\"DEBUG\",\"wait_for_start_allowance\":false,\"max_lenght\":400}}");
     }
 
     @Test(expected = ResponseException.class)
@@ -36,7 +36,7 @@ public class InitializeAgentTest {
         final ObjectMapper mapper = mock(ObjectMapper.class);
         when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
 
-        final InitializeAgent response = new InitializeAgent(mapper, TestsMode.RUN, false);
+        final InitializeAgent response = new InitializeAgent(mapper, TestsMode.RUN, false, 100);
 
         response.toMessage();
     }

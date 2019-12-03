@@ -62,7 +62,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
 
         try {
             final UserProcessController userController;
-            final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
+            final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode, getMaxValueLenght());
 
             final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {

@@ -41,10 +41,10 @@ public class AgentInitializingEventTest {
         final AgentClient client = mock(AgentClient.class);
         final AgentInitializingEvent event = AgentInitializingEvent.from(client);
 
-        event.responder().initialize(TestsMode.RUN, true);
-        event.responder().initialize(TestsMode.RUN, false);
-        event.responder().initialize(TestsMode.DEBUG, true);
-        event.responder().initialize(TestsMode.DEBUG, false);
+        event.responder().initialize(TestsMode.RUN, true, 1);
+        event.responder().initialize(TestsMode.RUN, false, 2);
+        event.responder().initialize(TestsMode.DEBUG, true, 3);
+        event.responder().initialize(TestsMode.DEBUG, false, 4);
         
         verify(client, times(4)).send(any(InitializeAgent.class));
         verifyNoMoreInteractions(client);

@@ -46,8 +46,9 @@ public final class AgentInitializingEvent {
             this.client = client;
         }
 
-        public void initialize(final TestsMode mode, final boolean agentShouldWaitForSignal) throws ResponseException {
-            client.send(new InitializeAgent(mode, agentShouldWaitForSignal));
+        public void initialize(final TestsMode mode, final boolean agentShouldWaitForSignal, final int maxValueLenght)
+                throws ResponseException {
+            client.send(new InitializeAgent(mode, agentShouldWaitForSignal, maxValueLenght));
         }
     }
 }

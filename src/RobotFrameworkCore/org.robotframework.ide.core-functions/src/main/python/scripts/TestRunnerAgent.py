@@ -107,7 +107,7 @@ def _fix_unicode(max_length, data):
 
     
 def _truncate(max_length, s):
-    return s[:max_length] + ' <truncated>' if len(s) > max_length else s
+    return s[:max_length] + ' <truncated>' if 0 < max_length and max_length < len(s) else s
 
 
 def _label_with_types(data):
@@ -272,8 +272,6 @@ class TestRunnerAgent:
     CONNECTION_SLEEP_BETWEEN_TRIALS = 2
     
     RED_AGENT_PROTOCOL_VERSION = 4
-    
-    MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
     def __init__(self, *args):
         if len(args) == 1:
@@ -294,7 +292,7 @@ class TestRunnerAgent:
         
     def _handshake(self):
         self._send_to_server(AgentEventMessage.AGENT_INITIALIZING)
-        self._mode, wait_for_signal = self._receive_operating_mode()
+        self._mode, wait_for_signal, self._max_lenght = self._receive_operating_mode()
         
         self._send_version()
         _, response = self._wait_for_reponse(RedResponseMessage.PROTOCOL_VERSION)
@@ -312,7 +310,9 @@ class TestRunnerAgent:
     def _receive_operating_mode(self):
         _, response = self._wait_for_reponse(RedResponseMessage.OPERATING_MODE)
         operating_mode = response[RedResponseMessage.OPERATING_MODE]
-        return operating_mode['mode'].lower(), operating_mode['wait_for_start_allowance']
+        return (operating_mode['mode'].lower(), 
+                operating_mode['wait_for_start_allowance'],
+                operating_mode['max_lenght'] if 'max_lenght' in operating_mode else 2048)
         
     def _send_version(self):
         robot_version = 'Robot Framework ' + version.get_full_version()
@@ -655,7 +655,7 @@ class TestRunnerAgent:
                 else:
                     try:
                         labeled = _label_with_types(value)
-                        fixed = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, labeled)
+                        fixed = _fix_unicode(self._max_lenght, labeled)
                         if isinstance(value, (list, tuple, Mapping)):
                             frame_vars[var] = (fixed[0], fixed[1], identified_scope)
                         else:
@@ -720,7 +720,7 @@ class TestRunnerAgent:
 
     def log_message(self, message):
         if _is_logged(message['level']):
-            message['message'] = _truncate(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, message['message'])
+            message['message'] = _truncate(self._max_lenght, message['message'])
             self._send_to_server(AgentEventMessage.LOG_MESSAGE, message)
 
     def log_file(self, path):

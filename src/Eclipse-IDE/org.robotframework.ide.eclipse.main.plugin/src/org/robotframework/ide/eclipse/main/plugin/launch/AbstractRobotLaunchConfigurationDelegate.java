@@ -16,6 +16,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -106,6 +108,10 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         final ILaunchConfiguration original = copy.doSave();
         final ILaunchConfigurationWorkingCopy parent = copy.getParent();
         return parent == null ? original : deepSaveConfigurationWorkingCopy(parent);
+    }
+
+    protected final int getMaxValueLenght() {
+        return DebugUITools.getPreferenceStore().getInt(IDebugUIConstants.PREF_MAX_DETAIL_LENGTH);
     }
 
     protected static class LaunchExecution {
