@@ -6,13 +6,13 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2JCD4B3CEeehL98jfxP8Sw
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/2/19 4:09 PM
+Save-Time: 12/3/19 2:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
-proc "remove-all-libraries-from-xml" [val project_name "RobotProject/"]{
+proc "remove-all-libraries-from-xml" [val project_name "RobotProject"]{
 	get-view "Project Explorer" | get-tree | select [format "%s/red.xml" $project_name] | double-click
 	get-editor [format "%s/red.xml" $project_name]  | get-tab-folder | get-tab-item "Libraries" | click
 	get-editor [format "%s/red.xml" $project_name]  | get-section Libraries | get-tree | select "^\w.*" -all 
