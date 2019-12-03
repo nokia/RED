@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Ph_egGfOEeiEwYlEOPk68w
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/2/19 6:47 PM
+Save-Time: 12/3/19 2:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,115 +29,162 @@ with [get-window Preferences] {
     get-window "Rebuild required" | get-button OK | click
 }
 
-
-	//open red.xml and add 2 jars from user folder
-	get-view "Project Explorer" | get-tree | select "JythonProject/red.xml" | double-click
-	wait-for-loading-red-xml -editor_name "JythonProject/red.xml"
-	
-	with [get-editor "JythonProject/red.xml"] {
-	    get-tab-folder | get-tab-item "Libraries" | click
-	    get-section Paths | get-table -after [get-label "Relative paths defined below are relative to:"] -index 1 
-	        | get-item "...add new search path" | double-click
-	}
-	with [get-window "Add new search path"] {
-	    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
-	        | type-text [concat $user_folder "/Jars/JavaAndPython.jar" ]
-	    get-button OK | click
-	}
-	get-editor "JythonProject/red.xml" | get-section Paths | get-table 
-	    -after [get-label "Relative paths defined below are relative to:"] -index 1 | get-item "...add new search path" 
-	    | double-click
-	with [get-window "Add new search path"] {
-	    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
-	        | type-text [concat $user_folder "/Jars/OnlyPython.jar" ]
-	    get-button OK | click
-	}
-	get-button "Save (M1+S)" | click
-	
-	//change script to run autodiscovery
-	get-view "Project Explorer" | get-tree | select "JythonProject/Test.robot" | double-click
-	with [get-editor "Test.robot"] {
-	    click
-	    with [get-text-viewer] {
-	        set-caret-pos 18 10
-	        type-text " "
-	        key-type "M1+s"
-	    }
-	}
-	wait-for-discover-window -times 30 
-	
-	//check if all are added
-	with [get-window "Discovering libraries summary"] {
-	    with [get-tree] {
-	        get-item -path CalculatorLibrary | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path module1 | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path "nested_module.module3" | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path "only_python" | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path "Outer.Inner.PrintModule" | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path outside | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path PythonOnly | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path "PythonOnly.Other" | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path PythonWithJava | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path RemoteSwingLibrary | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	        get-item -path "simple_function" | get-property "image.path" 
-	            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
-	    }
-	    get-label "Discovered libraries (11):" | get-property caption | equals "Discovered libraries (11):" | verify-true
-	}
-	get-window "Discovering libraries summary" | get-button OK | click
-	
-	
-	with [get-editor "JythonProject/red.xml" | get-section Libraries | get-tree] {
-	    select "CalculatorLibrary - JythonProject\\/very_hidden_module\\/go_deeeper\\/and deeper\\/CalculatorLibrary.py"
-	    "module1 - JythonProject\\/module1\\/__init__.py" 
-	     "nested_module.module3 - JythonProject\\/nested_module\\/module3\\/__init__.py" 
-	     "only_python - .*Jars\\/OnlyPython.jar" 
-	     "Outer.Inner.PrintModule - JythonProject\\/Outer\\/Inner\\/PrintModule\\/__init__.py" 
-	     "outside - .*Jars\\/JavaAndPython.jar" 
-	     "PythonOnly - JythonProject\\/jars\\/JythonLibWithPython.jar" 
-	     "PythonWithJava - JythonProject\\/jars\\/JythonLibWithPython.jar" 
-	      "RemoteSwingLibrary - JythonProject\\/remoteswinglibrary-2.2.1.jar" 
-	      
-	}
-
-with [get-editor "JythonProject/red.xml" | get-section Libraries | get-tree] {
-    key-type Del
-    key-type "M1+s"
+get-preferences-menu | click
+with [get-window Preferences] {
+     get-tree | select "Robot Framework/Libraries"
+    get-group "Libdoc generating" | get-button "Generate Python libraries libdocs in separate process" | uncheck
+    get-button "Apply and Close" | click
 }
-wait-for-empty-progress
+
+
+//open red.xml and add 2 jars from user folder
+get-view "Project Explorer" | get-tree | select "JythonProject/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "JythonProject/red.xml"
+
+with [get-editor "JythonProject/red.xml"] {
+    get-tab-folder | get-tab-item "Libraries" | click
+    get-section Paths | get-table -after [get-label "Relative paths defined below are relative to:"] -index 1 
+        | get-item "...add new search path" | double-click
+}
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | type-text [concat $user_folder "/Jars/JavaAndPython.jar" ]
+    get-button OK | click
+}
+get-editor "JythonProject/red.xml" | get-section Paths | get-table 
+    -after [get-label "Relative paths defined below are relative to:"] -index 1 | get-item "...add new search path" 
+    | double-click
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | type-text [concat $user_folder "/Jars/OnlyPython.jar" ]
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+//change script to run autodiscovery
+get-view "Project Explorer" | get-tree | select "JythonProject/Test.robot" | double-click
+with [get-editor "Test.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 18 10
+        type-text " "
+        key-type "M1+s"
+    }
+}
+wait-for-discover-window -times 30
 
 try -command{
+//check if all are added
+with [get-window "Discovering libraries summary"] {
+    with [get-tree] {
+        get-item -path CalculatorLibrary | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path module1 | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "nested_module.module3" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "only_python" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "Outer.Inner.PrintModule" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path outside | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path PythonOnly | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "PythonOnly.Other" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path PythonWithJava | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path RemoteSwingLibrary | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+        get-item -path "simple_function" | get-property "image.path" 
+            | equals "org.robotframework.ide.eclipse.main.plugin/resources/success_big.png" | verify-true
+    }
+    get-label "Discovered libraries (11):" | get-property caption | equals "Discovered libraries (11):" | verify-true
+}
+	get-window "Discovering libraries summary" | get-button OK | click
+	get-button "Save All (M1+M2+S)" | click
+	
+	
+
 	get-view "Project Explorer" | get-tree | get-item "JythonProject/Robot Referenced libraries" | expand-all
 	with [get-view "Project Explorer" | get-tree] {
-	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().length" | equals 2 
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().length" | equals 11 
+	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
+	        | equals 4 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Push Button" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "Push Buttons" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "Result Should Be" 
+	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" | equals "Should Cause Error" 
 	        | verify-true
 	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
-	        | equals "PythonOnly.Other JythonProject/jars/JythonLibWithPython.jar (1)" | verify-true
-	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
-	        | equals 1 | verify-true
-	    get-item -path "JythonProject/Robot Referenced libraries" 
-	        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Kw 2" | verify-true
-	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
-	        | equals "simple_function JythonProject/simple_function.py (1)" | verify-true
-	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItems().length" 
-	        | equals 1 | verify-true
-	    get-item -path "JythonProject/Robot Referenced libraries" 
-	        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "Simple Kw From Function" 
+	        | equals "CalculatorLibrary JythonProject/very_hidden_module/go_deeeper/and deeper/CalculatorLibrary.py (4)" 
 	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "Kw 1" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals "Kw 2" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "module1 JythonProject/module1/__init__.py (2)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[2].getItems().TreeItem[0].getText()" | equals Sum | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "nested_module.module3 JythonProject/nested_module/module3/__init__.py (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[3].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[3].getItems().TreeItem[0].getText()" | equals "My Kw From Jar2" 
+	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[3].getText()" 
+	        | equals "only_python C:/Users/cloud/Jars/OnlyPython.jar (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[4].getItems().TreeItem[0].getText()" | equals "Print Formatted" 
+	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[4].getText()" 
+	        | equals "Outer.Inner.PrintModule JythonProject/Outer/Inner/PrintModule/__init__.py (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[5].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[5].getItems().TreeItem[0].getText()" | equals "My Kw From Jar" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[5].getText()" 
+	        | equals "outside C:/Users/cloud/Jars/JavaAndPython.jar (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[6].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[6].getItems().TreeItem[0].getText()" | equals "Kw 2" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[6].getText()" 
+	        | equals "PythonOnly.Other JythonProject/jars/JythonLibWithPython.jar (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[7].getItems().length" 
+	        | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[7].getItems().TreeItem[0].getText()" | equals "Kw 1" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[7].getText()" 
+	        | equals "PythonOnly JythonProject/jars/JythonLibWithPython.jar (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[8].getItems().TreeItem[0].getText()" | equals "Call Testlib" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[8].getText()" 
+	        | equals "PythonWithJava JythonProject/jars/JythonLibWithPython.jar (1)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[9].getText()" 
+	        | equals "RemoteSwingLibrary JythonProject/remoteswinglibrary-2.2.1.jar (194)" | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[10].getItems().length" | equals 1 | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" 
+	        | get-property "getItems().TreeItem[10].getItems().TreeItem[0].getText()" | equals "Simple Kw From Function" 
+	        | verify-true
+	    get-item -path "JythonProject/Robot Referenced libraries" | get-property "getItems().TreeItem[10].getText()" 
+	        | equals "simple_function JythonProject/simple_function.py (1)" | verify-true
 	}
-	remove-all-libraries-from-xml -project_name "JythonProject"
-	get-editor "JythonProject/red.xml" | get-section Libraries | get-tree | key-type "M1+s"
-	
+
 }-finally{
 	release-files-handle -project_name "JythonProject" -path [concat  $user_folder  "\\Jars"]
 }
