@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _tAQV0PpcEeWSorJ4SRUI3Q
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/20/19 3:24 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/4/19 5:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -79,5 +79,7 @@ get-view "Project Explorer" | get-tree | get-item "ImportLibFromPythonPath/Robot
     | get-property "getItems().TreeItem[0].getText()" | matches "LibFromPythonPath.*" 
     | verify-true
 
-    
+// delete cache
+delete-file [uri-from-path  [concat $RCPTT_project_path "/TestData/LibsFromPythonPath/__pycache__"] ]
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
