@@ -42,6 +42,28 @@ When unicode characters are used in paths, Python 3 is recommended.
 </p>
 <p>Workaround for XML-RPC server starting problems is changing TEMP folder path to path without unicode characters.</p> 
 
+<h3 id="issue_dialogs_linux">Dialogs library not recognized under Linux</h3>
+
+<p>Under Linux the Robot standard library <b>Dialogs</b> is usually not recognized and the specification file cannot
+be generated. This is due to the fact that the <a href="https://en.wikipedia.org/wiki/Tkinter" target="_blank" class="external">tkinter</a>
+library is not installed but it is required by <b>Dialogs</b>. In distributions using <b>APT</b> (Debian, Ubuntu, Mint)
+it can be installed with following commands:
+</p>
+
+<code>
+apt-get install python-tk<br/>
+apt-get install python3-tk<br/>
+</code>
+
+<p>for python2 and python3 respectively. In distributions using <b>YUM</b> (RedHat, CentOS) use similar commands:</p>
+<code>
+yum -y install tkinter<br/>
+yum -y install python3-tkinter<br/>
+</code>
+
+<p>depending on exact OS version the latter can be also: <code>python34-tkinter</code> or <code>python36u-tkinter</code>.
+</p>
+
 <h3>GTK3 issues under Linux</h3>
 
 <p>It was observed that using GTK3 library with Eclipse (older then version 2019-03 - in this version GTK3 is required) causes unexpected graphical glitches.
