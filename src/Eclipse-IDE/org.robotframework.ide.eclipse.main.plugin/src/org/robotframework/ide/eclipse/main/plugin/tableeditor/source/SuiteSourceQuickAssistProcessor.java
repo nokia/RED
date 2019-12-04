@@ -92,8 +92,8 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
     @Override
     public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
         final List<ICompletionProposal> proposals = new ArrayList<>();
-        proposals.addAll(computeQuickAssists(invocationContext));
         proposals.addAll(computeQuickFixes(invocationContext));
+        proposals.addAll(computeQuickAssists(invocationContext));
         return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
     }
 
