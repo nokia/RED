@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XxFF4JQgEeWNpL9oeriwCw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/29/18 5:34 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/4/19 2:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -57,14 +57,18 @@ proc "set-incorrect-column-number-in-preference" [val col_nr]{
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Editor"
 with [get-window Preferences | get-group Tables] {
-    get-property "getChildren().length" | equals 6 | verify-true
+    get-property "getChildren().length" | equals 7 | verify-true
     get-property "getChildren().Control[0].getText()" 
+        | equals "Enable keyword argument highlighting" | verify-true
+    get-property "getChildren().Control[0].getSelection()" | equals false | verify-true
+        
+    get-property "getChildren().Control[1].getText()" 
         | equals "Default number of columns for arguments in table editors" | verify-true
-    get-property "getChildren().Control[1].getText()" | equals 5 | verify-true
-    get-property "getChildren().Control[2].getText()" | equals "When cell is too small for content" | verify-true
-    get-property "getChildren().Control[3].getText()" | equals "cut the content" | verify-true
-    get-property "getChildren().Control[4].getText()" | equals "After pressing Enter in cell under edit" | verify-true
-    get-property "getChildren().Control[5].getText()" | equals "move to next cell (previous with Shift pressed)" 
+    get-property "getChildren().Control[2].getText()" | equals 5 | verify-true
+    get-property "getChildren().Control[3].getText()" | equals "When cell is too small for content" | verify-true
+    get-property "getChildren().Control[4].getText()" | equals "cut the content" | verify-true
+    get-property "getChildren().Control[5].getText()" | equals "After pressing Enter in cell under edit" | verify-true
+    get-property "getChildren().Control[6].getText()" | equals "move to next cell (previous with Shift pressed)" 
         | verify-true
     with [get-combo -after [get-label "When cell is too small for content"]] {
         get-property "values[0]" | equals "cut the content" | verify-true

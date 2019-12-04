@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _aU7gYMpCEem4rLX8K5H9uw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/29/19 3:50 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/4/19 2:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,7 +20,7 @@ exec-with-options {
 	str "New line" | write-lines   -uri "workspace:/PR1/libs/lib2.py" -append
 	
 	// wait for window and close it - RED should not be blocked
-	wait 1000
+	wait-for-progress-view-to-disappear
 	with [get-window "Multiple problems have occurred" | get-table] {
 	    get-property itemCount | equals 2 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "Library specification generation problem" | verify-true
