@@ -196,17 +196,13 @@ public class KeywordUsagesFinder {
             if (proposal != null) {
                 kwTokens.add(new SimpleImmutableEntry<>(proposal, kwToken));
 
-                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.create(proposal.getKeywordName(),
+                final QualifiedKeywordName qualifiedKwName = QualifiedKeywordName.create(proposal.getKeywordName(),
                         proposal.getSourceName());
-                if (SpecialKeywords.isNestingKeyword(qualifiedName)) {
-                    SpecialKeywords
-                            .getNestedExecutables(qualifiedName, desc.getRow().getParent(), desc.getKeywordArguments())
-                            .getExecutables()
-                            .stream()
-                            .map(RobotExecutableRow::buildLineDescription)
-                            .map(this::getExecutablesTokens)
-                            .forEach(kwTokens::addAll);
-                }
+                SpecialKeywords.findNestedExecutableRows(desc, qualifiedKwName)
+                        .stream()
+                        .map(RobotExecutableRow::buildLineDescription)
+                        .map(this::getExecutablesTokens)
+                        .forEach(kwTokens::addAll);
             }
 
             return kwTokens;

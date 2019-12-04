@@ -52,6 +52,7 @@ import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferences
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -212,10 +213,7 @@ public class RobotFormEditor extends FormEditor {
             if (editorPart instanceof ISectionEditorPart
                     && ((ISectionEditorPart) editorPart).getId().equals(pageIdToActivate)) {
                 setActivePage(i);
-                if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()
-                        || RedPlugin.getDefault().getPreferences().isKeywordArgumentCellsColoringEnabled()) {
-                    keywordUsagesFinder.refresh();
-                }
+                refreshKeywordUsages();
                 return;
             }
         }
@@ -236,6 +234,13 @@ public class RobotFormEditor extends FormEditor {
         final int newEditorPart = addPage(editorPart, getEditorInput());
         setPageImage(newEditorPart, image);
         setPageText(newEditorPart, partName);
+    }
+
+    private void refreshKeywordUsages() {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        if (preferences.isLibraryKeywordsColoringEnabled() || preferences.isKeywordArgumentCellsColoringEnabled()) {
+            keywordUsagesFinder.refresh();
+        }
     }
 
     private void prepareCommandsContext() {
@@ -442,10 +447,7 @@ public class RobotFormEditor extends FormEditor {
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
             page.updateOnActivation();
 
-            if (RedPlugin.getDefault().getPreferences().isLibraryKeywordsColoringEnabled()
-                    || RedPlugin.getDefault().getPreferences().isKeywordArgumentCellsColoringEnabled()) {
-                keywordUsagesFinder.refresh();
-            }
+            refreshKeywordUsages();
 
             if (isDirty()) {
                 // there are some locking threads involved which results in blocking

@@ -5,6 +5,7 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -14,6 +15,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.SpecialKeywords;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -56,53 +58,57 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
         }
 
         if (call.isExecutable() && !call.isForLoopDefinition() && !call.isTemplateData()) {
-            final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            final RobotToken action = row.buildLineDescription().getKeywordAction().getToken();
+            final IExecutableRowDescriptor<?> desc = ((RobotExecutableRow<?>) linkedElement).buildLineDescription();
+            final RobotToken action = desc.getKeywordAction().getToken();
             if (!action.isEmpty()) {
-                final String kwName = action.getText();
-                if (kwUsagesFinder.getQualifiedName(kwName).filter(SpecialKeywords::isNestingKeyword).isPresent()) {
-                    addNestedLabels(row,
-                            (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, offset));
-                } else {
-                    addLabels(configLabels, columnPosition, rowPosition, kwName,
-                            call.isForLoopBody() || call.isVariableDeclaration() ? 1 : 0);
-                }
+                final int start = call.isForLoopBody() || call.isVariableDeclaration() ? 1 : 0;
+                addRowLabels(desc, action.getText(), 0,
+                        (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, start + offset));
             }
         } else if (call.isExecutableSetting()) {
             final ExecutableSetting kwBasedSetting = call.getExecutableSetting();
             if (!kwBasedSetting.isDisabled()) {
-                final String kwName = kwBasedSetting.getKeywordName().getText();
-                if (kwUsagesFinder.getQualifiedName(kwName).filter(SpecialKeywords::isNestingKeyword).isPresent()) {
-                    final RobotExecutableRow<?> row = kwBasedSetting.asExecutableRow();
-                    addNestedLabels(row,
-                            (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, offset + 1));
-                } else {
-                    addLabels(configLabels, columnPosition, rowPosition, kwName, 1);
-                }
+                final IExecutableRowDescriptor<?> desc = kwBasedSetting.asExecutableRow().buildLineDescription();
+                final int start = 1;
+                addRowLabels(desc, kwBasedSetting.getKeywordName().getText(), 0,
+                        (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, start + offset));
             }
         }
     }
 
-    private void addNestedLabels(final RobotExecutableRow<?> row, final BiConsumer<String, Integer> consumer) {
-        // TODO: find executables in nested row
-        consumer.accept(row.getAction().getText(), 0);
+    private void addRowLabels(final IExecutableRowDescriptor<?> desc, final String kwName, final int offset,
+            final BiConsumer<String, Integer> labelAdder) {
+        final List<RobotExecutableRow<?>> nestedExecutables = kwUsagesFinder.getQualifiedName(kwName)
+                .map(name -> SpecialKeywords.findNestedExecutableRows(desc, name))
+                .orElseGet(ArrayList::new);
+        if (nestedExecutables.isEmpty()) {
+            labelAdder.accept(kwName, offset);
+        } else {
+            final RobotExecutableRow<?> nestedExec = nestedExecutables.get(nestedExecutables.size() - 1);
+            final IExecutableRowDescriptor<?> nestedDesc = nestedExec.buildLineDescription();
+            final String lastExecutableKwName = nestedDesc.getKeywordAction().getToken().getText();
+            final int nestedOffset = offset + desc.getKeywordArguments().size() - nestedExec.getElementTokens().size();
+            addRowLabels(nestedDesc, lastExecutableKwName, nestedOffset + 1, labelAdder);
+        }
     }
 
     private void addLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition,
             final String kwName, final int argStartOffset) {
-        kwUsagesFinder.getArgumentsDescriptor(kwName).ifPresent(descriptor -> {
-            if (columnPosition > descriptor.getRequiredArguments().size() + argStartOffset) {
-                if (descriptor.getPossibleNumberOfArguments().contains(columnPosition - argStartOffset)) {
-                    configLabels.addLabelOnTop(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        if (columnPosition > argStartOffset) {
+            kwUsagesFinder.getArgumentsDescriptor(kwName).ifPresent(descriptor -> {
+                if (columnPosition > descriptor.getRequiredArguments().size() + argStartOffset) {
+                    if (descriptor.getPossibleNumberOfArguments().contains(columnPosition - argStartOffset)) {
+                        configLabels.addLabelOnTop(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+                    } else {
+                        configLabels.addLabelOnTop(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+                    }
                 } else {
-                    configLabels.addLabelOnTop(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+                    final String value = (String) dataProvider.getDataValue(columnPosition, rowPosition);
+                    if (value.isEmpty()) {
+                        configLabels.addLabelOnTop(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+                    }
                 }
-            } else {
-                final String value = (String) dataProvider.getDataValue(columnPosition, rowPosition);
-                if (value.isEmpty()) {
-                    configLabels.addLabelOnTop(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
-                }
-            }
-        });
+            });
+        }
     }
 }

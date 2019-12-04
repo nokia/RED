@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLib;
+import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLib;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -59,12 +60,26 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
                 "Test Setup  Limited Args  1  2  #comment",
                 "Test Teardown  Limited Args  1  2",
                 "Library  UserLib");
+        projectProvider.createFile("nested.robot",
+                "*** Settings ***",
+                "Suite Setup  Run Keyword",
+                "Suite Teardown  Wait Until Keyword Succeeds  1  2  Limited Args  1",
+                "Test Setup  Run Keywords  Limited Args  1  AND  Limited Args  3",
+                "Test Teardown  Run Keyword If  c1  Limited Args  1",
+                "Library  UserLib");
 
         robotModel = RedPlugin.getModelManager().getModel();
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
 
         robotProject.setReferencedLibraries(
                 createRefLib("UserLib", KeywordSpecification.create("Limited Args", "a", "b", "c", "d=10", "e=20")));
+
+        robotProject.setStandardLibraries(createStdLib("BuiltIn",
+                KeywordSpecification.create("Run Keyword", "name", "*args"),
+                KeywordSpecification.create("Run Keyword If", "condition", "name", "*args"),
+                KeywordSpecification.create("Run Keywords", "*kws"),
+                KeywordSpecification.create("Repeat Keyword", "repeat", "name", "*args"),
+                KeywordSpecification.create("Wait Until Keyword Succeeds", "retry", "interval", "name", "*args")));
 
         projectProvider.configure();
     }
@@ -189,6 +204,78 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
         assertThat(labelsAt(file, entry, 6)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, entry, 7)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, entry, 8)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelsAreAdded_forEmptyNestedKeywordCall() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .get(0);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
+
+        assertThat(labelsAt(file, entry, 2)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 3)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 4)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 5)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 6)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 7)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 8)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelsAreAdded_forNotEmptyNestedKeywordCall() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .get(1);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
+
+        assertThat(labelsAt(file, entry, 2)).isEmpty();
+        assertThat(labelsAt(file, entry, 3)).isEmpty();
+        assertThat(labelsAt(file, entry, 4)).isEmpty();
+        assertThat(labelsAt(file, entry, 5)).isEmpty();
+        assertThat(labelsAt(file, entry, 6)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 7)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 8)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelsAreAdded_forRunKeywordsCall() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .get(2);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
+
+        assertThat(labelsAt(file, entry, 2)).isEmpty();
+        assertThat(labelsAt(file, entry, 3)).isEmpty();
+        assertThat(labelsAt(file, entry, 4)).isEmpty();
+        assertThat(labelsAt(file, entry, 5)).isEmpty();
+        assertThat(labelsAt(file, entry, 6)).isEmpty();
+        assertThat(labelsAt(file, entry, 7)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 8)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelsAreAdded_forRunKeywordIfCall() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
+                .get()
+                .getChildren()
+                .get(3);
+        final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", setting);
+
+        assertThat(labelsAt(file, entry, 2)).isEmpty();
+        assertThat(labelsAt(file, entry, 3)).isEmpty();
+        assertThat(labelsAt(file, entry, 4)).isEmpty();
+        assertThat(labelsAt(file, entry, 5)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 6)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 7)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, entry, 8)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
     }
 
     private static List<String> labelsAt(final RobotSuiteFile file, final Entry<String, RobotSetting> entry,

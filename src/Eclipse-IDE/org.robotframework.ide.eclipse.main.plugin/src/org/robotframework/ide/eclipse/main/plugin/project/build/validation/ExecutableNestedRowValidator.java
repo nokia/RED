@@ -31,7 +31,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
     private final FileValidationContext validationContext;
     private final Set<String> additionalVariables;
     private final ValidationReportingStrategy reporter;
-    
+
     private final RobotExecutableRow<?> nestedRow;
     private final IExecutableRowDescriptor<?> descriptor;
 
@@ -63,11 +63,11 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                     descriptor.getKeywordArguments());
             if (nested.hasNestedExecutables()) {
                 for (final RobotExecutableRow<?> nestedRow : nested.getExecutables()) {
-                    if (!nestedRow.getAction().getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
+                    final RobotToken action = nestedRow.getAction();
+                    if (!action.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
                         new ExecutableNestedRowValidator(validationContext, additionalVariables, nestedRow,
                                 nestedRow.buildLineDescription(), reporter).validate(monitor);
                     } else {
-                        final RobotToken action = nestedRow.getAction();
                         final RobotProblem problem = RobotProblem
                                 .causedBy(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED)
                                 .formatMessageWith(action.getText(),
@@ -77,6 +77,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                         unknownVarsValidator.reportUnknownVars(additionalVariables, newArrayList(action));
                     }
                 }
+
                 unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
 
             } else {

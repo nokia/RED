@@ -280,6 +280,19 @@ public class SpecialKeywords {
         }
     }
 
+    public static List<RobotExecutableRow<?>> findNestedExecutableRows(final IExecutableRowDescriptor<?> desc,
+            final QualifiedKeywordName qualifiedKwName) {
+        if (SpecialKeywords.isNestingKeyword(qualifiedKwName)) {
+            try {
+                return getNestedExecutables(qualifiedKwName, desc.getRow().getParent(), desc.getKeywordArguments())
+                        .getExecutables();
+            } catch (final NestedKeywordsSyntaxException e) {
+                // ok, empty list will be returned
+            }
+        }
+        return new ArrayList<>();
+    }
+
     public static NestedExecutables getNestedExecutables(final QualifiedKeywordName qualifiedKeywordName,
             final Object nestedExecutableParent, final List<RobotToken> arguments)
             throws NestedKeywordsSyntaxException {
@@ -293,7 +306,7 @@ public class SpecialKeywords {
         } else if (NESTED_EXECUTABLE_KEYWORDS.containsKey(qualifiedKeywordName)) {
             final NestedExecutables nested = new NestedExecutables();
             final int indexOfKeywordName = NESTED_EXECUTABLE_KEYWORDS.get(qualifiedKeywordName);
-            nested.addOmittedTokens(arguments.subList(0, Math.min(indexOfKeywordName + 1, arguments.size())));
+            nested.addOmittedTokens(arguments.subList(0, Math.min(indexOfKeywordName, arguments.size())));
             if (indexOfKeywordName < arguments.size()) {
                 nested.addExecutable(createExecutable(nestedExecutableParent, arguments.get(indexOfKeywordName),
                         arguments.subList(indexOfKeywordName + 1, arguments.size())));
