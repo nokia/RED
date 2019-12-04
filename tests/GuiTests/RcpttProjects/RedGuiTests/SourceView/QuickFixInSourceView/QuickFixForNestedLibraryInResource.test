@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _CE_i0BtEEem1wI435MvTNA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/14/19 5:35 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/4/19 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,10 +47,12 @@ with [get-editor "test.robot" | get-text-viewer] {
 }
 wait 200
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().length" | equals 4 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Import 'lib1' library" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Assign to local scalar" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Assign to local list" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Assign to local dictionary" | verify-true
 }
-
 //select lib1 from resource
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Import 'lib1' library" 
     | click -default
@@ -93,8 +95,10 @@ with [get-editor "test.robot" | get-text-viewer] {
 }
 wait 200
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Import 'String' library" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Assign to local scalar" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Assign to local list" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Assign to local dictionary" | verify-true
 }
 
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Import 'String' library" 
