@@ -289,6 +289,7 @@ class TestRunnerAgent:
             self._built_in = BuiltIn()
         else:
             self._mode = None
+            self._max_lenght = 2048
         
     def _handshake(self):
         self._send_to_server(AgentEventMessage.AGENT_INITIALIZING)
