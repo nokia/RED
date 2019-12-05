@@ -25,8 +25,9 @@ public class RobotProblem {
 
     public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".robotProblem";
 
-    public static final String CAUSE_ENUM_CLASS = "class";
-    public static final String CAUSE_ATTRIBUTE = "cause";
+    private static final String CAUSE_ENUM_CLASS = "class";
+
+    private static final String CAUSE_ATTRIBUTE = "cause";
 
     private final IProblemCause cause;
     private Object[] objects;
@@ -45,6 +46,24 @@ public class RobotProblem {
         } catch (final CoreException e) {
             throw new IllegalStateException("Given marker should have offsets defined", e);
         }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static IProblemCause getCause(final IMarker marker) {
+        final String causeEnumClass = marker.getAttribute(CAUSE_ENUM_CLASS, null);
+        final String causeStr = marker.getAttribute(CAUSE_ATTRIBUTE, null);
+        if (causeEnumClass != null && causeStr != null) {
+            try {
+                return (IProblemCause) Enum.valueOf((Class<? extends Enum>) Class.forName(causeEnumClass), causeStr);
+            } catch (final ClassNotFoundException | IllegalArgumentException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static String getCauseName(final IMarker marker) {
+        return marker.getAttribute(CAUSE_ATTRIBUTE, null);
     }
 
     public static RobotProblem causedBy(final IProblemCause cause) {

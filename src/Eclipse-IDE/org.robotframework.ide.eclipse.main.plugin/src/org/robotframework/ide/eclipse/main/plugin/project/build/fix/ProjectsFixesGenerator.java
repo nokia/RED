@@ -19,7 +19,7 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
 
     @Override
     public boolean hasResolutions(final IMarker marker) {
-        final IProblemCause cause = getCause(marker);
+        final IProblemCause cause = RobotProblem.getCause(marker);
         if (cause != null) {
             return cause.hasResolution();
         }
@@ -30,24 +30,10 @@ public class ProjectsFixesGenerator implements IMarkerResolutionGenerator2 {
     public IMarkerResolution[] getResolutions(final IMarker marker) {
         final List<IMarkerResolution> resolutions = newArrayList();
 
-        final IProblemCause problemCause = getCause(marker);
+        final IProblemCause problemCause = RobotProblem.getCause(marker);
         if (problemCause != null) {
             resolutions.addAll(problemCause.createFixers(marker));
         }
         return resolutions.toArray(new IMarkerResolution[0]);
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static IProblemCause getCause(final IMarker marker) {
-        final String causeEnumClass = marker.getAttribute(RobotProblem.CAUSE_ENUM_CLASS, null);
-        final String causeStr = marker.getAttribute(RobotProblem.CAUSE_ATTRIBUTE, null);
-        if (causeEnumClass != null && causeStr != null) {
-            try {
-                return (IProblemCause) Enum.valueOf((Class<? extends Enum>) Class.forName(causeEnumClass), causeStr);
-            } catch (final ClassNotFoundException | IllegalArgumentException e) {
-                return null;
-            }
-        }
-        return null;
     }
 }

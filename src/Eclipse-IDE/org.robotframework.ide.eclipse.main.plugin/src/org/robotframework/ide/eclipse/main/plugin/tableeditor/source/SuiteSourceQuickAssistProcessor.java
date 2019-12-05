@@ -5,17 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
 import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionListenerExtension;
@@ -32,7 +36,6 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfigMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.QuickAssistProvider;
@@ -74,7 +77,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
             try {
                 final IMarker marker = ((MarkerAnnotation) annotation).getMarker();
                 if (RobotProblem.TYPE_ID.equals(marker.getType())) {
-                    final IProblemCause cause = ProjectsFixesGenerator.getCause(marker);
+                    final IProblemCause cause = RobotProblem.getCause(marker);
                     return cause != null && cause.hasResolution();
                 }
             } catch (final CoreException e) {
@@ -105,7 +108,10 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
     }
 
     private List<ICompletionProposal> computeQuickFixes(final IQuickAssistInvocationContext invocationContext) {
-        final List<ICompletionProposal> proposals = new ArrayList<>();
+        final Map<PositionedCauseName, List<ICompletionProposal>> proposals = new HashMap<>();
+
+        final int offset = invocationContext.getOffset();
+        final IDocument document = invocationContext.getSourceViewer().getDocument();
 
         final Iterator<?> annotations = invocationContext.getSourceViewer()
                 .getAnnotationModel()
@@ -117,10 +123,13 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                 final IMarker marker = markerAnnotation.getMarker();
                 try {
                     if (RobotProblem.TYPE_ID.equals(marker.getType())) {
-                        final IProblemCause cause = ProjectsFixesGenerator.getCause(marker);
-                        if (cause.hasResolution() && isInvokedWithinAnnotationPosition(invocationContext,
-                                getPosition(markerAnnotation))) {
-                            proposals.addAll(computeRobotProblemsFixes(invocationContext, marker, cause));
+                        final IProblemCause cause = RobotProblem.getCause(marker);
+                        final Range<Integer> range = getRange(marker);
+                        if (cause.hasResolution() && isInvokedWithinAnnotationPosition(offset, range)) {
+                            final List<ICompletionProposal> fixes = computeRobotProblemsFixes(document, marker, cause);
+                            if (!fixes.isEmpty()) {
+                                proposals.put(new PositionedCauseName(range, RobotProblem.getCauseName(marker)), fixes);
+                            }
                         }
                     }
                 } catch (final CoreException e) {
@@ -128,21 +137,37 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                 }
             }
         }
-        return proposals;
+
+        return proposals.keySet()
+                .stream()
+                .sorted(comparing(problemStartProximity(offset)).thenComparing(problemEndProximity(offset))
+                        .thenComparing(causeName()))
+                .flatMap(positionedCause -> proposals.get(positionedCause).stream())
+                .collect(toList());
     }
 
-    private static Position getPosition(final MarkerAnnotation annotation) {
+    private static Function<PositionedCauseName, Integer> problemStartProximity(final int currentOffset) {
+        return positionedCause -> currentOffset - positionedCause.range.lowerEndpoint().intValue();
+    }
+
+    private static Function<PositionedCauseName, Integer> problemEndProximity(final int currentOffset) {
+        return positionedCause -> positionedCause.range.upperEndpoint().intValue() - currentOffset;
+    }
+
+    private static Function<PositionedCauseName, String> causeName() {
+        return positionedCause -> positionedCause.causeName;
+    }
+
+    private static Range<Integer> getRange(final IMarker marker) {
         try {
-            final Integer start = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_START);
-            final Integer end = (Integer) annotation.getMarker().getAttribute(IMarker.CHAR_END);
-            return start != null && end != null ? new Position(start, end - start) : null;
-        } catch (final CoreException e) {
+            return RobotProblem.getRangeOf(marker);
+        } catch (final IllegalStateException e) {
             return null;
         }
     }
 
     private List<ICompletionProposal> computeRobotProblemsFixes(
-            final IQuickAssistInvocationContext invocationContext, final IMarker marker, final IProblemCause cause) {
+            final IDocument document, final IMarker marker, final IProblemCause cause) {
 
         final List<? extends IMarkerResolution> fixers = cause.createFixers(marker);
         final Stream<ICompletionProposal> redXmlRepairProposals = fixers.stream()
@@ -152,19 +177,15 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         final Stream<ICompletionProposal> suiteRepairProposals = fixers.stream()
                 .filter(RedSuiteMarkerResolution.class::isInstance)
                 .map(RedSuiteMarkerResolution.class::cast)
-                .map(resolution -> resolution
-                        .asContentProposal(marker, invocationContext.getSourceViewer().getDocument(), suiteModel)
-                        .orElse(null));
+                .map(resolution -> resolution.asContentProposal(marker, document, suiteModel).orElse(null));
         return Stream.concat(redXmlRepairProposals, suiteRepairProposals)
                 .filter(Predicates.notNull())
                 .collect(toList());
     }
 
-    private boolean isInvokedWithinAnnotationPosition(final IQuickAssistInvocationContext invocationContext,
-            final Position annotationPosition) {
-        return annotationPosition != null && Range
-                .closed(annotationPosition.getOffset(), annotationPosition.getOffset() + annotationPosition.getLength())
-                .contains(invocationContext.getOffset());
+    private boolean isInvokedWithinAnnotationPosition(final int invocationOffset,
+            final Range<Integer> annotationRange) {
+        return annotationRange != null && annotationRange.contains(invocationOffset);
     }
 
     @Override
@@ -212,5 +233,17 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
     @Override
     public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
         // nothing to do
+    }
+
+    private static class PositionedCauseName {
+
+        private final Range<Integer> range;
+
+        private final String causeName;
+
+        public PositionedCauseName(final Range<Integer> range, final String causeName) {
+            this.range = range;
+            this.causeName = causeName;
+        }
     }
 }

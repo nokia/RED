@@ -210,7 +210,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
                 if (alreadyVisitedMarkers.contains(marker)) {
                     continue;
                 }
-                final Range<Integer> markerRange = getMarkerRange(marker);
+                final Range<Integer> markerRange = RobotProblem.getRangeOf(marker);
                 // -2 because when token is newly created it may have -1 as line number
                 final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
 
@@ -229,12 +229,6 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
     private Range<Integer> getTokenRange(final RobotToken token) {
         final FilePosition tokenPosition = token.getFilePosition();
         return Range.closed(tokenPosition.getOffset(), tokenPosition.getOffset() + token.getText().length());
-    }
-
-    private Range<Integer> getMarkerRange(final IMarker marker) {
-        final int start = marker.getAttribute(IMarker.CHAR_START, -1);
-        final int end = marker.getAttribute(IMarker.CHAR_END, -1);
-        return start != -1 && end != -1 ? Range.closed(start, end) : null;
     }
 
     @Override
