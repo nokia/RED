@@ -55,7 +55,8 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage("Unable to find output console")
+                .withMessage(
+                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
                 .withNoCause();
 
         verify(consolesSupplier).get();
@@ -71,7 +72,8 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage("Unable to find output console")
+                .withMessage(
+                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
                 .withNoCause();
 
         verify(consolesSupplier).get();
@@ -88,7 +90,8 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage("Unable to find output console")
+                .withMessage(
+                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
                 .withNoCause();
 
         verify(consolesSupplier).get();

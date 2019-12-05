@@ -66,7 +66,8 @@ public class RobotConsoleFacade {
 
             // to avoid infinite loops
             if (System.currentTimeMillis() - start > timeout) {
-                throw new IllegalStateException("Unable to find output console");
+                throw new IllegalStateException(
+                        "Unable to find output console. Trying to look for a console with name:\n" + consoleName);
             }
         }
     }
