@@ -123,30 +123,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return linkedElement instanceof RobotExecutableRow;
     }
 
-    public boolean isForLoopDefinition() {
-        final List<IRobotTokenType> types = getLinkedElement().getDeclaration().getTypes();
-        return types.contains(RobotTokenType.FOR_TOKEN) || types.contains(RobotTokenType.FOR_END_TOKEN);
-    }
-
-    public boolean isForLoopBody() {
-        final List<IRobotTokenType> types = getLinkedElement().getDeclaration().getTypes();
-        return types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                || types.contains(RobotTokenType.FOR_WITH_END_CONTINUATION);
-    }
-
-    public boolean isVariableDeclaration() {
-        final List<IRobotTokenType> types = getLinkedElement().getDeclaration().getTypes();
-        return types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)
-                || types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
-                || types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
-    }
-
-    public boolean isTemplateData() {
-        final List<IRobotTokenType> types = getLinkedElement().getDeclaration().getTypes();
-        return types.contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT)
-                || types.contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT);
-    }
-
     public boolean isEmptyLine() {
         return linkedElement instanceof RobotEmptyRow;
     }

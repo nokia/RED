@@ -16,7 +16,10 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.SpecialKeywords;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -57,11 +60,11 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
             return;
         }
 
-        if (call.isExecutable() && !call.isForLoopDefinition() && !call.isTemplateData()) {
+        if (call.isExecutable() && hasKeywordAction(call)) {
             final IExecutableRowDescriptor<?> desc = ((RobotExecutableRow<?>) linkedElement).buildLineDescription();
             final RobotToken action = desc.getKeywordAction().getToken();
             if (!action.isEmpty()) {
-                final int start = call.isForLoopBody() || call.isVariableDeclaration() ? 1 : 0;
+                final int start = findKeywordActionOffset(desc);
                 addRowLabels(desc, action.getText(), 0,
                         (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, start + offset));
             }
@@ -74,6 +77,24 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
                         (name, offset) -> addLabels(configLabels, columnPosition, rowPosition, name, start + offset));
             }
         }
+    }
+
+    private static boolean hasKeywordAction(final RobotKeywordCall call) {
+        final List<IRobotTokenType> types = call.getLinkedElement().getDeclaration().getTypes();
+        return !types.contains(RobotTokenType.FOR_TOKEN) && !types.contains(RobotTokenType.FOR_END_TOKEN)
+                && !types.contains(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT)
+                && !types.contains(RobotTokenType.TASK_TEMPLATE_ARGUMENT);
+    }
+
+    private static int findKeywordActionOffset(final IExecutableRowDescriptor<?> desc) {
+        int start = 0;
+        if (desc.getRowType() == RowType.FOR_CONTINUE) {
+            start++;
+        }
+        if (!desc.getCreatedVariables().isEmpty()) {
+            start++;
+        }
+        return start;
     }
 
     private void addRowLabels(final IExecutableRowDescriptor<?> desc, final String kwName, final int offset,

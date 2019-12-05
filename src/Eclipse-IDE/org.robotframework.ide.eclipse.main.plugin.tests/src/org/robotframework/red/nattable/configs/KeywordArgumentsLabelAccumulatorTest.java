@@ -112,6 +112,14 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 "  [Teardown]  Repeat Keyword  5  Limited Args  1",
                 "*** Settings ***",
                 "Library  UserLib");
+        projectProvider.createFile("embedded.robot",
+                "*** Test Cases ***",
+                "case",
+                "  My ${x} Kw ${y} Xyz",
+                "  [Teardown]  My 123 Kw 456 Xyz",
+                "*** Keywords ***",
+                "My ${a} Kw ${b} Xyz",
+                "  Log Many  ${a}  ${b} ");
 
         robotModel = RedPlugin.getModelManager().getModel();
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
@@ -723,6 +731,44 @@ public class KeywordArgumentsLabelAccumulatorTest {
         assertThat(labelsAt(file, call, 6)).containsExactly(TableConfigurationLabels.MISSING_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, call, 7)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, call, 8)).containsExactly(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 9)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 10)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelsAreAdded_forEmbeddedKeywordCall() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("embedded.robot"));
+        final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+
+        for (int column = 1; column <= 10; column++) {
+            assertThat(labelsAt(file, call, column))
+                    .containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        }
+    }
+
+    @Test
+    public void labelsAreAdded_forEmbeddedKeywordCallInKeywordBasedSetting() {
+        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("embedded.robot"));
+        final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(1);
+
+        assertThat(labelsAt(file, call, 1)).isEmpty();
+        assertThat(labelsAt(file, call, 2)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 3)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 4)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 5)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 6)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 7)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
+        assertThat(labelsAt(file, call, 8)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, call, 9)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
         assertThat(labelsAt(file, call, 10)).containsExactly(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL);
     }
