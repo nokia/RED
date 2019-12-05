@@ -114,6 +114,10 @@ public class TableThemes {
             return RedTheme.Colors.getTableOptionalArgumentCellBackgroundColor();
         }
 
+        public Color getBodyRedundantArgumentCellBackground() {
+            return RedTheme.Colors.getTableRedundantArgumentCellBackgroundColor();
+        }
+
         public abstract NatTable configureScrollBars(Composite parent, final ViewportLayer viewportLayer,
                 Function<Composite, NatTable> tableCreator);
     }

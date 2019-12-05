@@ -55,7 +55,7 @@ public class KeywordArgumentsStyleConfiguration extends AbstractRegistryConfigur
 
     private Style createRedundantArgumentStyle() {
         final Style style = new Style();
-        style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyInactiveCellBackground());
+        style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyRedundantArgumentCellBackground());
         return style;
     }
 }

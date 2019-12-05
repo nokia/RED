@@ -32,12 +32,12 @@ public class KeywordArgumentsStyleConfigurationTest {
     public void configurationCheck() {
         final Color bodyMissingArgumentBgColorInUse = ColorsManager.getColor(1, 1, 1);
         final Color bodyOptionalArgumentCellBgColorInUse = ColorsManager.getColor(2, 2, 2);
-        final Color bodyInactiveCellBgColorInUse = ColorsManager.getColor(3, 3, 3);
+        final Color bodyRedundantArgumentCellBgColorInUse = ColorsManager.getColor(3, 3, 3);
 
         final TableTheme theme = mock(TableTheme.class);
         when(theme.getBodyMissingArgumentCellBackground()).thenReturn(bodyMissingArgumentBgColorInUse);
         when(theme.getBodyOptionalArgumentCellBackground()).thenReturn(bodyOptionalArgumentCellBgColorInUse);
-        when(theme.getBodyInactiveCellBackground()).thenReturn(bodyInactiveCellBgColorInUse);
+        when(theme.getBodyRedundantArgumentCellBackground()).thenReturn(bodyRedundantArgumentCellBgColorInUse);
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
@@ -57,10 +57,10 @@ public class KeywordArgumentsStyleConfigurationTest {
                 argThat((hasBackground(bodyOptionalArgumentCellBgColorInUse))), eq(DisplayMode.SELECT),
                 eq(TableConfigurationLabels.OPTIONAL_ARGUMENT_CONFIG_LABEL));
         verify(configRegistry).registerConfigAttribute(isA(ConfigAttribute.class),
-                argThat((hasBackground(bodyInactiveCellBgColorInUse))), eq(DisplayMode.NORMAL),
+                argThat((hasBackground(bodyRedundantArgumentCellBgColorInUse))), eq(DisplayMode.NORMAL),
                 eq(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL));
         verify(configRegistry).registerConfigAttribute(isA(ConfigAttribute.class),
-                argThat((hasBackground(bodyInactiveCellBgColorInUse))), eq(DisplayMode.SELECT),
+                argThat((hasBackground(bodyRedundantArgumentCellBgColorInUse))), eq(DisplayMode.SELECT),
                 eq(TableConfigurationLabels.REDUNDANT_ARGUMENT_CONFIG_LABEL));
         verifyNoMoreInteractions(configRegistry);
     }

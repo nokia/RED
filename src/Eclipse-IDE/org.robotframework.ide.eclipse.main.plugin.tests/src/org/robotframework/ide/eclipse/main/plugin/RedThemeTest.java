@@ -32,7 +32,7 @@ public class RedThemeTest {
         final List<String> colorIds = extractRedThemeColorIds();
         final String styles = readPreferenceStylesFile("resources/css/dark/preferencestyle.css");
 
-        assertThat(colorIds).hasSize(18);
+        assertThat(colorIds).hasSize(19);
         for (final String colorId : colorIds) {
             assertThat(styles).containsPattern("\'" + colorId + "=\\d+,\\d+,\\d+\'");
         }

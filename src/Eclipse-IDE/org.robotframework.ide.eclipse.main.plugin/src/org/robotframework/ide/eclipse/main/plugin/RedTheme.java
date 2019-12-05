@@ -43,6 +43,7 @@ public class RedTheme {
     private static final String TABLE_INACTIVE_CELL_FOREGROUND_COLOR = "org.robotframework.red.table.body.cell.inactive.foreground";
     private static final String TABLE_MISSING_ARG_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.missing.arg.background";
     private static final String TABLE_OPTIONAL_ARG_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.optional.arg.background";
+    private static final String TABLE_REDUNDANT_ARG_CELL_BACKGROUND_COLOR = "org.robotframework.red.table.body.cell.redundant.arg.background";
 
 
     private static ColorRegistry getColorRegistry() {
@@ -152,6 +153,10 @@ public class RedTheme {
 
         public static Color getTableOptionalArgumentCellBackgroundColor() {
             return getColorRegistry().get(TABLE_OPTIONAL_ARG_CELL_BACKGROUND_COLOR);
+        }
+
+        public static Color getTableRedundantArgumentCellBackgroundColor() {
+            return getColorRegistry().get(TABLE_REDUNDANT_ARG_CELL_BACKGROUND_COLOR);
         }
     }
 }

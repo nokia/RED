@@ -1094,7 +1094,7 @@
           id="org.robotframework.red.table.body.cell.inactive.background"
           isEditable="true"
           label="Table body inactive cell background"
-          value="227, 227, 227">
+          value="210, 210, 210">
     </colorDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
@@ -1119,10 +1119,17 @@
     </colorDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.redundant.arg.background"
+          isEditable="true"
+          label="Table body redundant argument cell background"
+          value="227, 227, 227">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.red.table.body.cell.highlight"
           isEditable="true"
           label="Table highlighted cell"
-          value="255, 245, 210">
+          value="255, 230, 204">
        <description>
           This color is used in RED table editor in order to highlight currently hovered cell
        </description>
