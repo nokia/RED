@@ -10,6 +10,12 @@
 spell check. Validation mechanism walk down the project tree and read all test files format supported by RED 
 (.robot, .txt and .tsv), mark all unknown/undefined keywords, variable misuse, missing resources etc. <br/>
 </p>
+<h3>Validating &amp; revalidating whole project/workspace</h3>
+Validation of test case is triggered by any user actions, it is also done during files &amp; project imports.<br/>
+Whenever there is a change in multiple files (for instance find/replace) or  big file import/deletion, it is good to force revalidation of project.<br/>
+It is done accessing option <b><code>Project -> Clean...</code></b>
+<br/><br/><img src="images/gen_1.png"/> <br/><br/>
+At the bottom right of RED, progress bar will appear with the status of validation.<br/>
 <h3>Validation execution</h3>
 <p>Validation mechanism is executed any time when edited file is changed with slight delay while <b>Build Automatic </b>
 option is selected from Project. Whole project validation can be manually started using option <b><code>Project -> Clean</code></b>.<br/>

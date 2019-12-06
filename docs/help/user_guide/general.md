@@ -11,12 +11,6 @@ Window -> Preferences -> Robot Framework -> Editor</a></code> in <b>Source</b> s
 It is set by default to be aware of the file type. For .tsv files each Tab will produce item separator, for text files 4 spaces will generated. <br/>
 Moreover, <b>jump out of active region</b> behavior can be enabled there. If enabled, instead of inserting defined separator in source editor, RED will move cursor to the end of active region. It may be useful for example for variables edition. 
 <br/><br/><img src="images/tab_behaviour.png"/> <br/><br/>
-<h3>Validating &amp; revalidating whole project/workspace</h3>
-Validation of test case is triggered by any user actions, it is also done during files &amp; project imports.<br/>
-Whenever there is a change in multiple files (for instance find/replace) or  big file import/deletion, it is good to force revalidation of project.<br/>
-It is done accessing option <b><code>Project -> Clean...</code></b>
-<br/><br/><img src="images/gen_1.png"/> <br/><br/>
-At the bottom right of RED, progress bar will appear with the status of validation.<br/>
 <h3>Automatic source formatting CTRL+SHIFT+F</h3>
 <p>Formatting source is Eclipse based mechanism which provides code formatting with several predefined rules which are 
 disabled by default. Alternatively it is also possible to use <code>Robot Tidy</code> tool to format the source.
