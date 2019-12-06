@@ -409,6 +409,72 @@ public class ExecutableCallRuleTest {
     }
 
     @Test
+    public void variableAssignmentIsDetected() {
+        final String content = "${var}=";
+
+        final NavigableMap<Integer, String> tokenPositions = new TreeMap<>();
+        tokenPositions.put(0, "var_token");
+        tokenPositions.put(6, null);
+
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
+
+            final RobotToken token = createToken(actionType, content);
+            token.getTypes().add(RobotTokenType.ASSIGNMENT);
+            final List<RobotLine> lines = newArrayList(line(token));
+
+            for (final Map.Entry<Integer, String> entry : tokenPositions.entrySet()) {
+                final int position = entry.getKey();
+                final int length = tokenPositions.higherEntry(position) == null ? content.length() - position
+                        : tokenPositions.higherEntry(position).getKey() - position;
+                final String tokenData = entry.getValue();
+
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, position, lines);
+                assertThat(evaluatedToken).isPresent();
+                assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(position, length));
+                assertThat(evaluatedToken.get().getToken().getData()).isEqualTo(tokenData);
+            }
+        }
+    }
+
+    @Test
+    public void variableAssignmentWithSpacesIsDetected() {
+        final String content = "${var} = ";
+
+        final Position variablePosition = new Position(0, 6);
+        final Position assignmentPosition = new Position(7, 1);
+
+        for (final RobotTokenType actionType : EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME,
+                RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TASK_ACTION_NAME,
+                RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
+                RobotTokenType.TASK_ACTION_ARGUMENT)) {
+
+            final RobotToken token = createToken(actionType, content);
+            token.getTypes().add(RobotTokenType.ASSIGNMENT);
+            final List<RobotLine> lines = newArrayList(line(token));
+
+            for (int i = 0; i < content.length(); i++) {
+                final Optional<PositionedTextToken> evaluatedToken = evaluate(token, i, lines);
+                assertThat(evaluatedToken).isPresent();
+
+                if (variablePosition.includes(i)) {
+                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(
+                            new Position(i, variablePosition.getOffset() + variablePosition.getLength() - i));
+                    assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
+                }
+
+                if (assignmentPosition.includes(i)) {
+                    assertThat(evaluatedToken.get().getPosition()).isEqualTo(
+                            new Position(i, assignmentPosition.getOffset() + assignmentPosition.getLength() - i));
+                    assertThat(evaluatedToken.get().getToken().getData()).isNull();
+                }
+            }
+        }
+    }
+
+    @Test
     public void executableCallIsNotRecognized_whenTestCaseHasTemplate() {
         boolean thereWasTemplate = false;
         final List<RobotLine> lines = TokensSource.createTokensOfTemplatedCases();
