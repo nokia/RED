@@ -154,12 +154,16 @@ public class DebugShellView {
 
         } else if (isInEditEnabledRegion && e.keyCode == SWT.ARROW_UP && !assistListener.isSessionActive()) {
             getDocument().switchToPreviousExpression();
+            SwitchShellModeHandler.setMode(site, getDocument().getMode());
+
             styledText.setCaretOffset(styledText.getCharCount());
             styledText.setTopIndex(getDocument().getNumberOfLines());
             e.doit = false;
 
         } else if (isInEditEnabledRegion && e.keyCode == SWT.ARROW_DOWN && !assistListener.isSessionActive()) {
             getDocument().switchToNextExpression();
+            SwitchShellModeHandler.setMode(site, getDocument().getMode());
+
             styledText.setCaretOffset(styledText.getCharCount());
             styledText.setTopIndex(getDocument().getNumberOfLines());
             e.doit = false;
@@ -288,6 +292,8 @@ public class DebugShellView {
     protected void putExpression(final ExpressionType type, final String expression) {
         getDocument().switchTo(type, expression);
         refreshAndMoveToTheEnd();
+
+        SwitchShellModeHandler.setMode(site, getDocument().getMode());
     }
 
     private static class ExprIdGenerator {

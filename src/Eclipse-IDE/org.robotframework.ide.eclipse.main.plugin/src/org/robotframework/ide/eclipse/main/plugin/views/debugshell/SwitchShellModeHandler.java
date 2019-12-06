@@ -35,6 +35,7 @@ public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShell
             state.setShouldPersist(true);
             state.setValue(mode.name());
         }
+        serviceLocator.getService(ICommandService.class).refreshElements(COMMAND_ID, null);
     }
 
     private static PersistentState provideState(final IServiceLocator serviceLocator) {
