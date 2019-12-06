@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g5qHQFFlEemaBdiDDGirUQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/20/19 4:49 PM
+Save-Time: 12/4/19 5:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -162,7 +162,7 @@ with [get-window "Debug Configurations" | get-tab-folder] {
 }
 with [get-window "Debug Configurations" | get-group "External script"] {
     get-editbox -after [get-label "Executable file to run Robot Framework tests:"] | get-property text 
-        | equals [concat $python_exe_path $sys_sep  [os-specific "python.exe" "python3" ]]| verify-true
+        | equals [concat $python_exe_path $sys_sep  [os-specific "python.exe" "python" ]]| verify-true
     get-editbox 
         -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
         | get-property text 
