@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.IRegionCacheable;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.CommonCase;
@@ -355,12 +356,19 @@ public class TestCase extends CommonCase<TestCaseTable, TestCase> implements Ser
     private String getLocalTestTemplateInUse() {
         final List<LocalSetting<TestCase>> templates = getTemplates();
         if (templates.size() == 1) {
-            final LocalSetting<TestCase> template = templates.get(0);
-            return template.getTokensWithoutDeclaration()
-                    .stream()
-                    .filter(t -> t != null)
-                    .map(RobotToken::getText)
-                    .collect(joining(" "));
+            final RobotVersion robotVersion = getVersion();
+            final TemplateSetting template = templates.get(0).adaptTo(TemplateSetting.class);
+
+            if (robotVersion.isNewerOrEqualTo(new RobotVersion(3, 2)) && !template.getUnexpectedArguments().isEmpty()) {
+                return null;
+            } else {
+                return templates.get(0)
+                        .getTokensWithoutDeclaration()
+                        .stream()
+                        .filter(t -> t != null)
+                        .map(RobotToken::getText)
+                        .collect(joining(" "));
+            }
         }
         return null;
     }

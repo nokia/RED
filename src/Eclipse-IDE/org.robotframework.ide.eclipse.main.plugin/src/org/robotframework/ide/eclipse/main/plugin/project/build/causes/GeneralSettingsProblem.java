@@ -37,7 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResour
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.JoinTemplateNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveTimeoutMessageFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveSettingValuesExceptFirstFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -121,6 +121,28 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new ChangeToFixer("..."));
+        }
+    },
+    INVALID_NUMBER_OF_SETTING_VALUES {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.RUNTIME_ERROR;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' accepts only 1 value but %d are given%s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveSettingValuesExceptFirstFixer("Remove unexpected values"));
         }
     },
     TASK_SETTING_USED_IN_TESTS_SUITE {
@@ -506,7 +528,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new RemoveTimeoutMessageFixer());
+            return newArrayList(new RemoveSettingValuesExceptFirstFixer("Remove Test Timeout message"));
         }
     },
     METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_29 {

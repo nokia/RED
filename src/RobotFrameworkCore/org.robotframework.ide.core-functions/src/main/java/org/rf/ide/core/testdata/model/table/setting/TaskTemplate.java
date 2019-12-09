@@ -13,14 +13,14 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
-import org.rf.ide.core.testdata.model.IDataDrivenSetting;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TaskTemplate extends AModelElement<SettingTable>
-        implements IDataDrivenSetting, ICommentHolder, Serializable {
+        implements TemplateSetting, ICommentHolder, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -63,7 +63,7 @@ public class TaskTemplate extends AModelElement<SettingTable>
     }
 
     @Override
-    public List<RobotToken> getUnexpectedTrashArguments() {
+    public List<RobotToken> getUnexpectedArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
@@ -141,7 +141,7 @@ public class TaskTemplate extends AModelElement<SettingTable>
             if (getKeywordName() != null) {
                 tokens.add(getKeywordName());
             }
-            tokens.addAll(getUnexpectedTrashArguments());
+            tokens.addAll(getUnexpectedArguments());
             tokens.addAll(getComment());
         }
 

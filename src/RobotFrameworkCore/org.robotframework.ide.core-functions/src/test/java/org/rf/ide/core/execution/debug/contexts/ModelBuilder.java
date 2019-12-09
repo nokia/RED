@@ -15,13 +15,17 @@ import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.TaskTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TaskTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
+import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -35,6 +39,8 @@ public class ModelBuilder {
         VariablesTableBuildingStep withVariablesTable();
 
         TestCasesTableBuildingStep withTestCasesTable();
+
+        TasksTableBuildingStep withTasksTable();
 
         KeywordsTableBuildingStep withKeywordsTable();
         
@@ -51,9 +57,15 @@ public class ModelBuilder {
 
         SettingsTableBuildingStep withSuiteTeardown(String keyword, String... arguments);
 
+        SettingsTableBuildingStep withTestTemplate(String keyword, String... arguments);
+
+        SettingsTableBuildingStep withTaskTemplate(String keyword, String... arguments);
+
         VariablesTableBuildingStep withVariablesTable();
 
         TestCasesTableBuildingStep withTestCasesTable();
+
+        TasksTableBuildingStep withTasksTable();
 
         KeywordsTableBuildingStep withKeywordsTable();
 
@@ -65,6 +77,8 @@ public class ModelBuilder {
         SettingsTableBuildingStep withSettingsTable();
 
         TestCasesTableBuildingStep withTestCasesTable();
+
+        TasksTableBuildingStep withTasksTable();
 
         KeywordsTableBuildingStep withKeywordsTable();
 
@@ -81,6 +95,8 @@ public class ModelBuilder {
 
         TestCasesTableBuildingStep withTestCasesTable();
 
+        TasksTableBuildingStep withTasksTable();
+
         RobotFile build();
     }
 
@@ -96,12 +112,46 @@ public class ModelBuilder {
 
         TestCasesTableBuildingStep withTestCasesTable();
 
+        TasksTableBuildingStep withTasksTable();
+
         RobotFile build();
     }
 
     public static interface TestCasesTableBuildingStep {
 
         TestCaseBuildingStep withTestCase(String testName);
+
+        SettingsTableBuildingStep withSettingsTable();
+
+        VariablesTableBuildingStep withVariablesTable();
+
+        KeywordsTableBuildingStep withKeywordsTable();
+
+        TasksTableBuildingStep withTasksTable();
+
+        RobotFile build();
+    }
+
+    public static interface TasksTableBuildingStep {
+
+        TaskBuildingStep withTask(String taskName);
+
+        TestCasesTableBuildingStep withTestCasesTable();
+
+        SettingsTableBuildingStep withSettingsTable();
+
+        VariablesTableBuildingStep withVariablesTable();
+
+        KeywordsTableBuildingStep withKeywordsTable();
+
+        RobotFile build();
+    }
+
+    public static interface TaskBuildingStep {
+
+        TaskBuildingStep withTemplate(String keyword, String... arguments);
+
+        TestCasesTableBuildingStep withTestCasesTable();
 
         SettingsTableBuildingStep withSettingsTable();
 
@@ -118,6 +168,8 @@ public class ModelBuilder {
 
         TestCaseBuildingStep withTestTeardown(String keyword, String... arguments);
 
+        TestCaseBuildingStep withTemplate(String keyword, String... arguments);
+
         TestCaseBuildingStep executable(String action, String... arguments);
 
         TestCaseBuildingStep executableEndTerminatedLoop(String action, String... arguments);
@@ -127,6 +179,8 @@ public class ModelBuilder {
         VariablesTableBuildingStep withVariablesTable();
 
         KeywordsTableBuildingStep withKeywordsTable();
+
+        TasksTableBuildingStep withTasksTable();
 
         RobotFile build();
     }
@@ -155,6 +209,12 @@ public class ModelBuilder {
         public TestCasesTableBuildingStep withTestCasesTable() {
             robotFile.includeTestCaseTableSection();
             return new TestCasesTableBuilder(this, robotFile.getTestCaseTable());
+        }
+
+        @Override
+        public TasksTableBuildingStep withTasksTable() {
+            robotFile.includeTaskTableSection();
+            return new TasksTableBuilder(this, robotFile.getTasksTable());
         }
 
         @Override
@@ -233,6 +293,32 @@ public class ModelBuilder {
         }
 
         @Override
+        public SettingsTableBuildingStep withTestTemplate(final String keyword, final String... arguments) {
+            final TestTemplate testTemplate = new TestTemplate(RobotToken.create("Test Template"));
+            if (keyword != null) {
+                testTemplate.setKeywordName(RobotToken.create(keyword));
+            }
+            for (final String arg : arguments) {
+                testTemplate.addUnexpectedTrashArgument(RobotToken.create(arg));
+            }
+            settingsTable.addTestTemplate(testTemplate);
+            return this;
+        }
+
+        @Override
+        public SettingsTableBuildingStep withTaskTemplate(final String keyword, final String... arguments) {
+            final TaskTemplate taskTemplate = new TaskTemplate(RobotToken.create("Task Template"));
+            if (keyword != null) {
+                taskTemplate.setKeywordName(RobotToken.create(keyword));
+            }
+            for (final String arg : arguments) {
+                taskTemplate.addUnexpectedTrashArgument(RobotToken.create(arg));
+            }
+            settingsTable.addTaskTemplate(taskTemplate);
+            return this;
+        }
+
+        @Override
         public VariablesTableBuildingStep withVariablesTable() {
             return tableBuilder.withVariablesTable();
         }
@@ -240,6 +326,11 @@ public class ModelBuilder {
         @Override
         public TestCasesTableBuildingStep withTestCasesTable() {
             return tableBuilder.withTestCasesTable();
+        }
+
+        @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return tableBuilder.withTasksTable();
         }
 
         @Override
@@ -275,6 +366,11 @@ public class ModelBuilder {
         }
 
         @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return tableBuilder.withTasksTable();
+        }
+
+        @Override
         public KeywordsTableBuildingStep withKeywordsTable() {
             return tableBuilder.withKeywordsTable();
         }
@@ -301,6 +397,11 @@ public class ModelBuilder {
             final TestCase test = new TestCase(RobotToken.create(testName));
             testCaseTable.addTest(test);
             return new TestCaseBuilder(this, test);
+        }
+
+        @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return tableBuilder.withTasksTable();
         }
 
         @Override
@@ -364,6 +465,20 @@ public class ModelBuilder {
         }
 
         @Override
+        public TestCaseBuildingStep withTemplate(final String keyword, final String... arguments) {
+            final LocalSetting<TestCase> template = new LocalSetting<>(ModelType.TEST_CASE_TEMPLATE,
+                    RobotToken.create("[Template]"));
+            if (keyword != null) {
+                template.addToken(keyword);
+            }
+            for (final String arg : arguments) {
+                template.addToken(arg);
+            }
+            test.addElement(template);
+            return this;
+        }
+
+        @Override
         public TestCaseBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
@@ -395,6 +510,11 @@ public class ModelBuilder {
         }
 
         @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return testsTableBuilder.withTasksTable();
+        }
+
+        @Override
         public SettingsTableBuildingStep withSettingsTable() {
             return testsTableBuilder.withSettingsTable();
         }
@@ -415,6 +535,102 @@ public class ModelBuilder {
         }
     }
 
+    private static class TasksTableBuilder implements TasksTableBuildingStep {
+
+        private final TableBuilder tableBuilder;
+
+        private final TaskTable tasksTable;
+
+        public TasksTableBuilder(final TableBuilder tableBuilder, final TaskTable tasksTable) {
+            this.tableBuilder = tableBuilder;
+            this.tasksTable = tasksTable;
+        }
+
+        @Override
+        public TaskBuildingStep withTask(final String taskName) {
+            final Task task = new Task(RobotToken.create(taskName));
+            tasksTable.addTask(task);
+            return new TaskBuilder(this, task);
+        }
+
+        @Override
+        public KeywordsTableBuildingStep withKeywordsTable() {
+            return tableBuilder.withKeywordsTable();
+        }
+
+        @Override
+        public SettingsTableBuildingStep withSettingsTable() {
+            return tableBuilder.withSettingsTable();
+        }
+
+        @Override
+        public VariablesTableBuildingStep withVariablesTable() {
+            return tableBuilder.withVariablesTable();
+        }
+
+        @Override
+        public TestCasesTableBuildingStep withTestCasesTable() {
+            return tableBuilder.withTestCasesTable();
+        }
+
+        @Override
+        public RobotFile build() {
+            return tableBuilder.build();
+        }
+    }
+
+    private static class TaskBuilder implements TaskBuildingStep {
+
+        private final TasksTableBuilder tasksTableBuilder;
+
+        private final Task task;
+
+        public TaskBuilder(final TasksTableBuilder tasksTableBuilder, final Task task) {
+            this.tasksTableBuilder = tasksTableBuilder;
+            this.task = task;
+        }
+
+        @Override
+        public TaskBuilder withTemplate(final String keyword, final String... arguments) {
+            final LocalSetting<TestCase> template = new LocalSetting<>(ModelType.TASK_TEMPLATE,
+                    RobotToken.create("[Template]"));
+            if (keyword != null) {
+                template.addToken(keyword);
+            }
+            for (final String arg : arguments) {
+                template.addToken(arg);
+            }
+            task.addElement(template);
+            return this;
+        }
+
+        @Override
+        public TestCasesTableBuildingStep withTestCasesTable() {
+            return tasksTableBuilder.withTestCasesTable();
+        }
+
+        @Override
+        public SettingsTableBuildingStep withSettingsTable() {
+            return tasksTableBuilder.withSettingsTable();
+        }
+
+        @Override
+        public VariablesTableBuildingStep withVariablesTable() {
+            return tasksTableBuilder.withVariablesTable();
+        }
+
+        @Override
+        public KeywordsTableBuildingStep withKeywordsTable() {
+            return tasksTableBuilder.withKeywordsTable();
+        }
+
+        @Override
+        public RobotFile build() {
+            return tasksTableBuilder.build();
+        }
+
+    }
+
     private static class KeywordsTableBuilder implements KeywordsTableBuildingStep {
 
         private final TableBuilder tableBuilder;
@@ -431,6 +647,11 @@ public class ModelBuilder {
             final UserKeyword keyword = new UserKeyword(RobotToken.create(keywordName));
             keywordTable.addKeyword(keyword);
             return new UserKeywordBuilder(this, keyword);
+        }
+
+        @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return tableBuilder.withTasksTable();
         }
 
         @Override
@@ -531,6 +752,11 @@ public class ModelBuilder {
         @Override
         public TestCasesTableBuildingStep withTestCasesTable() {
             return keywordsTableBuilder.withTestCasesTable();
+        }
+
+        @Override
+        public TasksTableBuildingStep withTasksTable() {
+            return keywordsTableBuilder.withTasksTable();
         }
 
         @Override

@@ -1,11 +1,10 @@
 /*
- * Copyright 2018 Nokia Solutions and Networks
+ * Copyright 2016 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,38 +15,44 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.TemplateSetting;
-import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.collect.Range;
 
-public class JoinTemplateNameFixer extends RedSuiteMarkerResolution {
+public class RemoveSettingValuesExceptFirstFixer extends RedSuiteMarkerResolution {
 
-    // Joins Test Template keyword written in multiple cells:
+    private final String label;
+
+    // Removes unexpected values from setting:
     // *** Settings ***
-    // Test Template    key    word
+    // Test Timeout    2 min    my custom    message
+    // ...  which continues    even more    # and have some comment    here
     //
     // ->
     // *** Settings ***
-    // Test Template    key word
+    // Test Timeout    2 min    # and have some comment    here
+
+    public RemoveSettingValuesExceptFirstFixer(final String label) {
+        this.label = label;
+    }
 
     @Override
     public String getLabel() {
-        return "Merge name into single cell";
+        return label;
     }
 
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
-        
         final Range<Integer> range = RobotProblem.getRangeOf(marker);
         final Optional<? extends RobotElement> element = suiteModel.findElement(range.lowerEndpoint());
         return element.filter(RobotFileInternalElement.class::isInstance)
@@ -55,47 +60,44 @@ public class JoinTemplateNameFixer extends RedSuiteMarkerResolution {
                 .map(RobotFileInternalElement::getLinkedElement)
                 .filter(AModelElement.class::isInstance)
                 .map(AModelElement.class::cast)
-                .filter(elem -> elem.getModelType() == ModelType.TEST_CASE_TEMPLATE
-                        || elem.getModelType() == ModelType.TASK_TEMPLATE
-                        || elem.getModelType() == ModelType.SUITE_TEST_TEMPLATE
-                        || elem.getModelType() == ModelType.SUITE_TASK_TEMPLATE)
+                .filter(elem -> ModelType.getSettings().contains(elem.getModelType())
+                        || ModelType.getTestCaseSettings().contains(elem.getModelType())
+                        || ModelType.getTaskSettings().contains(elem.getModelType())
+                        || ModelType.getKeywordSettings().contains(elem.getModelType()))
                 .map(elem -> createProposal(document, suiteModel, elem));
     }
 
-    private ICompletionProposal createProposal(final IDocument document, final RobotSuiteFile suiteModel,
-            final AModelElement<?> templateSetting) {
+    private RedCompletionProposal createProposal(final IDocument document, final RobotSuiteFile suiteModel,
+            final AModelElement<?> linkedSetting) {
 
-        TemplateSetting template;
-        if (templateSetting instanceof TemplateSetting) {
-            template = (TemplateSetting) templateSetting;
-        } else if (templateSetting instanceof LocalSetting<?>) {
-            template = ((LocalSetting<?>) templateSetting).adaptTo(TemplateSetting.class);
-        } else {
-            throw new IllegalStateException();
-        }
+        final List<RobotToken> tokens = linkedSetting.getElementTokens();
+        final RobotToken declaration = tokens.get(0);
+        final RobotToken firstValue = tokens.get(1);
 
-        final RobotToken declaration = template.getDeclaration();
         final int offset = declaration.getStartOffset();
-
-        final List<RobotToken> elements = template.getUnexpectedArguments();
-        final IRegion toChange = new Region(offset, elements.get(elements.size() - 1).getEndOffset() - offset);
+        final IRegion toChange = calculateRegion(tokens, offset);
         final String cellSeparator = getSeparator(suiteModel, offset);
 
-        final List<String> nameParts = new ArrayList<>();
-        nameParts.add(template.getKeywordName().getText());
-        template.getUnexpectedArguments().stream().map(RobotToken::getText).forEach(nameParts::add);
-        final String joinedName = String.join(" ", nameParts);
+        final String correctedTimeout = declaration.getText() + cellSeparator + firstValue.getText();
 
-        final String correctedTemplate = declaration.getText() + cellSeparator + joinedName;
-
-        final String info = Snippets.createSnippetInfo(document, toChange, correctedTemplate);
+        final String info = Snippets.createSnippetInfo(document, toChange, correctedTimeout);
         return RedCompletionBuilder.newProposal()
-                .willPut(correctedTemplate)
+                .willPut(correctedTimeout)
                 .byReplacingRegion(toChange)
                 .secondaryPopupShouldBeDisplayedUsingHtml(info)
                 .thenCursorWillStopAtTheEndOfInsertion()
                 .displayedLabelShouldBe(getLabel())
                 .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getRobotSettingImage()))
                 .create();
+    }
+
+    private IRegion calculateRegion(final List<RobotToken> tokens, final int offset) {
+        final int lastTokenIndex = tokens.stream()
+                .filter(token -> token.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
+                .findFirst()
+                .map(tokens::indexOf)
+                .orElseGet(() -> tokens.size())
+                .intValue() - 1;
+        return new Region(offset, tokens.get(lastTokenIndex).getEndOffset() - offset);
     }
 }

@@ -31,67 +31,68 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 
 import com.google.common.collect.ArrayListMultimap;
 
-class Contexts {
+public class Contexts {
 
-    static KeywordEntity newResourceKeyword(final String name, final IPath exposingPath, final String... args) {
+    public static KeywordEntity newResourceKeyword(final String name, final IPath exposingPath, final String... args) {
         final String sourceName = exposingPath.removeFileExtension().segment(exposingPath.segmentCount() - 1);
         return new ValidationKeywordEntity(KeywordScope.RESOURCE, sourceName, name, Optional.empty(), false,
                 exposingPath, 0, ArgumentsDescriptor.createDescriptor(args));
     }
 
-    static KeywordEntity newStdLibraryKeyword(final String libName, final String name, final IPath exposingPath,
+    public static KeywordEntity newStdLibraryKeyword(final String libName, final String name, final IPath exposingPath,
             final String... args) {
         return new ValidationKeywordEntity(KeywordScope.STD_LIBRARY, libName, name, Optional.empty(), false,
                 exposingPath, 0, ArgumentsDescriptor.createDescriptor(args));
     }
 
-    static KeywordEntity newRefLibraryKeyword(final String libName, final String name, final IPath exposingPath,
+    public static KeywordEntity newRefLibraryKeyword(final String libName, final String name, final IPath exposingPath,
             final String... args) {
         return new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, libName, name, Optional.empty(), false,
                 exposingPath, 0, ArgumentsDescriptor.createDescriptor(args));
     }
 
-    static KeywordEntity newRefLibraryKeyword(final String libName, final String alias, final String name,
+    public static KeywordEntity newRefLibraryKeyword(final String libName, final String alias, final String name,
             final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, libName, name, Optional.of(alias), false,
                 exposingPath, 0, ArgumentsDescriptor.createDescriptor(args));
     }
 
-    static KeywordEntity newBuiltInKeyword(final String name, final String... args) {
+    public static KeywordEntity newBuiltInKeyword(final String name, final String... args) {
         return newStdLibraryKeyword("BuiltIn", name, new Path("/suite.robot"), args);
     }
 
-    static FileValidationContext prepareContext() {
+    public static FileValidationContext prepareContext() {
         return prepareContext(new ArrayList<>(), new HashSet<>());
     }
 
-    static FileValidationContext prepareContext(final RobotVersion version) {
+    public static FileValidationContext prepareContext(final RobotVersion version) {
         return prepareContext(new ArrayList<>(), new HashSet<>(), version);
     }
 
-    static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords) {
+    public static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords) {
         return prepareContext(accessibleKeywords, new HashSet<>());
     }
 
-    static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords,
+    public static FileValidationContext prepareContext(final List<KeywordEntity> accessibleKeywords,
             final RobotVersion version) {
         return prepareContext(accessibleKeywords, new HashSet<>(), version);
     }
 
-    static FileValidationContext prepareContext(final Set<String> accessibleVariables) {
+    public static FileValidationContext prepareContext(final Set<String> accessibleVariables) {
         return prepareContext(new ArrayList<>(), accessibleVariables);
     }
 
-    static FileValidationContext prepareContext(final Set<String> accessibleVariables, final RobotVersion version) {
+    public static FileValidationContext prepareContext(final Set<String> accessibleVariables,
+            final RobotVersion version) {
         return prepareContext(new ArrayList<>(), accessibleVariables, version);
     }
 
-    static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
+    public static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
             final Set<String> accessibleVariables) {
         return prepareContext(accessibleKeywords, accessibleVariables, RobotVersion.from("0.0"));
     }
 
-    static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
+    public static FileValidationContext prepareContext(final Collection<KeywordEntity> accessibleKeywords,
             final Set<String> accessibleVariables, final RobotVersion version) {
         final Map<String, Collection<KeywordEntity>> accessibleKws = accessibleKeywords.stream()
                 .collect(groupingBy(KeywordEntity::getKeywordName, toCollection(ArrayList::new)));

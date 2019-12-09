@@ -10,11 +10,11 @@ import java.util.List;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
-public interface IDataDrivenSetting {
+public interface TemplateSetting {
 
     RobotToken getDeclaration();
 
     RobotToken getKeywordName();
 
-    List<RobotToken> getUnexpectedTrashArguments();
+    List<RobotToken> getUnexpectedArguments();
 }

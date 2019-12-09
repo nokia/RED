@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 
-class KeywordCallValidator implements ModelUnitValidator {
+public class KeywordCallValidator implements ModelUnitValidator {
 
     protected final FileValidationContext validationContext;
     protected final ValidationReportingStrategy reporter;
@@ -44,7 +44,7 @@ class KeywordCallValidator implements ModelUnitValidator {
 
     private ValidationKeywordEntity foundKeyword;
 
-    KeywordCallValidator(final FileValidationContext validationContext, final RobotToken keywordNameToken,
+    protected KeywordCallValidator(final FileValidationContext validationContext, final RobotToken keywordNameToken,
             final List<RobotToken> arguments, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.reporter = reporter;
@@ -58,7 +58,7 @@ class KeywordCallValidator implements ModelUnitValidator {
         validateKeywordCall();
     }
 
-    void validateKeywordCall() {
+    protected void validateKeywordCall() {
         final String kwName = getActualKeywordName();
         final ListMultimap<String, KeywordEntity> foundKeywords = validationContext.findPossibleKeywords(kwName);
         final Optional<String> nameToUse = validationContext.findAccessibleGherkinNameVariant(foundKeywords, kwName);

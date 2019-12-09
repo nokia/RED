@@ -36,7 +36,7 @@ public class TaskTemplateDumper extends ANotExecutableTableElementDumper<Setting
         }
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TEMPLATE_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, 2,
-                taskTemplate.getUnexpectedTrashArguments());
+                taskTemplate.getUnexpectedArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
                 elemUtility.filter(taskTemplate.getComment(), RobotTokenType.START_HASH_COMMENT));
         sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,

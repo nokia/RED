@@ -92,7 +92,7 @@ public class TaskTemplateTrashDataMapperTest {
         final Stack<ParsingState> states = stack(ParsingState.SETTING_TASK_TEMPLATE);
         final RobotToken token = mapper.map(null, states, output, RobotToken.create(""), null, "trash");
 
-        assertThat(template.getUnexpectedTrashArguments()).containsOnly(token);
+        assertThat(template.getUnexpectedArguments()).containsOnly(token);
         assertThat(token.getTypes()).contains(RobotTokenType.SETTING_TASK_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
         assertThat(token.getText()).isEqualTo("trash");
 

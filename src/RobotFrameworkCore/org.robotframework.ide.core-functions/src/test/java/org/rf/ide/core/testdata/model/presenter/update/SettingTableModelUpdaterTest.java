@@ -202,7 +202,7 @@ public class SettingTableModelUpdaterTest {
 
         assertThat(modelElement.getModelType()).isEqualTo(ModelType.SUITE_TEST_TEMPLATE);
         final TestTemplate setting = (TestTemplate) modelElement;
-        checkSetting(setting.getKeywordName(), template, setting.getUnexpectedTrashArguments(), settingArgs,
+        checkSetting(setting.getKeywordName(), template, setting.getUnexpectedArguments(), settingArgs,
                 setting.getComment(), comment);
 
         final String newKeywordName = "new template";
@@ -215,7 +215,7 @@ public class SettingTableModelUpdaterTest {
         modelUpdater.update(setting, 2, newArg);
         modelUpdater.updateComment(setting, newComment);
 
-        checkSetting(setting.getKeywordName(), newKeywordName, setting.getUnexpectedTrashArguments(), settingArgs,
+        checkSetting(setting.getKeywordName(), newKeywordName, setting.getUnexpectedArguments(), settingArgs,
                 setting.getComment(), newComment);
 
         assertThat(settingTable.getTestTemplates()).isNotEmpty();

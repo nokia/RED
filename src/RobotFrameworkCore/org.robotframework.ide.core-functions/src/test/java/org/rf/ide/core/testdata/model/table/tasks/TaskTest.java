@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.execution.debug.contexts.ModelBuilder;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -19,7 +20,6 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TaskTable;
-import org.rf.ide.core.testdata.model.table.setting.TaskTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -386,105 +386,124 @@ public class TaskTest {
     }
 
     @Test
-    public void templateKeywordIsReturnedFromLocalSetting() {
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
-
-        final LocalSetting<Task> template = task.newTemplate(0);
-        template.addToken("keyword");
-        template.addToken("to");
-        template.addToken("use");
+    public void templateKeywordIsReturnedFromLocalSettingInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("keyword", "to", "use")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
 
         assertThat(task.getTemplateKeywordName()).hasValue("keyword to use");
     }
 
     @Test
-    public void templateKeywordIsReturnedFromLocalSetting_evenWhenGlobalIsDefined() {
-        final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
-        globalTemplate.setKeywordName("global kw");
-
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        file.includeSettingTableSection();
-        file.getSettingTable().addTaskTemplate(globalTemplate);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
-
-        final LocalSetting<Task> template = task.newTemplate(0);
-        template.addToken("keyword");
+    public void templateKeywordIsReturnedFromLocalSetting_evenWhenGlobalIsDefinedInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withSettingsTable()
+                .withTaskTemplate("global kw")
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("keyword")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
 
         assertThat(task.getTemplateKeywordName()).hasValue("keyword");
     }
 
     @Test
-    public void templateKeywordIsReturnedFromSettingsTable_whenThereIsNoLocalTemplate() {
-        final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
-        globalTemplate.setKeywordName("global kw");
-
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        file.includeSettingTableSection();
-        file.getSettingTable().addTaskTemplate(globalTemplate);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
+    public void templateKeywordIsReturnedFromSettingsTable_whenThereIsNoLocalTemplateInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withSettingsTable()
+                .withTaskTemplate("global kw")
+                .withTasksTable()
+                .withTask("task")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
 
         assertThat(task.getTemplateKeywordName()).hasValue("global kw");
     }
 
     @Test
-    public void templateKeywordIsNotReturned_whenTemplatesAreDuplicated() {
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
-
-        final LocalSetting<Task> template1 = task.newTemplate(0);
-        template1.addToken("keyword1");
-        final LocalSetting<Task> template2 = task.newTemplate(1);
-        template2.addToken("keyword2");
-
-        assertThat(task.getTemplateKeywordName()).isEmpty();
-    }
-
-    @Test
-    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancelsIt() {
-        final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
-        globalTemplate.setKeywordName("global kw");
-
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        file.includeSettingTableSection();
-        file.getSettingTable().addTaskTemplate(globalTemplate);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
-
-        final LocalSetting<Task> template = task.newTemplate(0);
-        template.addToken("NONE");
+    public void templateKeywordIsNotReturned_whenTemplatesAreDuplicatedInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("keyword1")
+                .withTemplate("keyword2")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
 
         assertThat(task.getTemplateKeywordName()).isEmpty();
     }
 
     @Test
-    public void templateKeywordIsNotReturned_whenGlobalIsNone() {
-        final TaskTemplate globalTemplate = new TaskTemplate(RobotToken.create("Task Template"));
-        globalTemplate.setKeywordName("NONE");
-
-        final RobotFileOutput parentFileOutput = new RobotFileOutput(new RobotVersion(3, 1));
-        final RobotFile file = new RobotFile(parentFileOutput);
-        file.includeSettingTableSection();
-        file.getSettingTable().addTaskTemplate(globalTemplate);
-        final TaskTable table = new TaskTable(file);
-        final Task task = new Task(RobotToken.create("task"));
-        task.setParent(table);
+    public void templateKeywordIsNotReturned_whenGlobalIsDefinedButLocalCancelsItInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withSettingsTable()
+                .withTaskTemplate("global kw")
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("NONE")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
 
         assertThat(task.getTemplateKeywordName()).isEmpty();
+    }
+
+    @Test
+    public void templateKeywordIsNotReturned_whenGlobalIsNoneInRf31() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 1))
+                .withSettingsTable()
+                .withTaskTemplate("NONE")
+                .withTasksTable()
+                .withTask("task")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
+
+        assertThat(task.getTemplateKeywordName()).isEmpty();
+    }
+
+    @Test
+    public void templateKeywordIsReturnedFromLocalSettingInRf32() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 2))
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("keyword")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
+
+        assertThat(task.getTemplateKeywordName()).hasValue("keyword");
+    }
+
+    @Test
+    public void templateKeywordIsReturnedFromGlobalSetting_whenLocalHasUnexpectedArgumentsInRf32() {
+        final Task task = ModelBuilder.modelForFile(new RobotVersion(3, 2))
+                .withSettingsTable()
+                .withTaskTemplate("global kw")
+                .withTasksTable()
+                .withTask("task")
+                .withTemplate("keyword", "to", "us")
+                .build()
+                .getTasksTable()
+                .getTasks()
+                .get(0);
+
+        assertThat(task.getTemplateKeywordName()).hasValue("global kw");
     }
 
     private static RobotExecutableRow<Task> row(final String... cells) {

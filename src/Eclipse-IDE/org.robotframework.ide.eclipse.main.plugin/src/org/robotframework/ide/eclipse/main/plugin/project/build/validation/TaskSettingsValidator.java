@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
@@ -21,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TasksProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
@@ -121,38 +119,6 @@ public class TaskSettingsValidator implements ModelUnitValidator {
                 .stream()
                 .filter(template -> template.getToken(RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME) == null)
                 .forEach(this::reportEmptySetting);
-
-        reportTemplateWrittenInMultipleCells(task.getTemplates());
-        reportTemplateKeywordProblems(task.getTemplates());
-    }
-
-    private void reportTemplateWrittenInMultipleCells(final List<LocalSetting<Task>> templates) {
-        for (final LocalSetting<Task> template : templates) {
-            final boolean hasUnwantedArgs = template
-                    .getToken(RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT) != null;
-            if (hasUnwantedArgs) {
-                final RobotToken settingToken = template.getDeclaration();
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS);
-                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
-            }
-        }
-    }
-
-    private void reportTemplateKeywordProblems(final List<LocalSetting<Task>> templates) {
-        for (final LocalSetting<Task> template : templates) {
-            final List<RobotToken> keywordNameParts = template.getTokensWithoutDeclaration();
-            if (!keywordNameParts.isEmpty()) {
-                final RobotToken firstPartOfName = keywordNameParts.get(0);
-
-                final String keywordName = keywordNameParts.stream().map(RobotToken::getText).collect(joining(" "));
-                if (keywordName.isEmpty() || keywordName.toLowerCase().equals("none")) {
-                    continue;
-                }
-                new KeywordCallInTemplateValidator(validationContext, keywordName, firstPartOfName, reporter)
-                        .validate();
-            }
-        }
     }
 
     private void reportSetupProblems() {

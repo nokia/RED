@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
@@ -86,6 +87,18 @@ public class VersionDependentValidators {
 
                 new DeprecatedGeneralSettingNameValidator(file, table, reporter),
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
+                new TemplateSettingUntilRf31Validator(validationContext, table.getTestTemplatesViews(), reporter),
+                new TemplateSettingUntilRf31Validator(validationContext, table.getTaskTemplates(), reporter),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, table::getTestTimeouts, reporter,
+                        ". No timeout will be checked"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, table::getTaskTimeouts, reporter,
+                        ". No timeout will be checked"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, table::getTestTemplates, reporter,
+                        ". No template will be used in this suite unless one is defined locally in test"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, table::getTaskTemplates, reporter,
+                        ". No template will be used in this suite unless one is defined locally in task"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, table::getResourcesImports,
+                        reporter, ". File will not be imported"),
                 new TimeoutMessageValidator<>(file, table::getTestTimeouts, TestTimeout::getMessageArguments, reporter),
                 new LibraryAliasNotInUpperCaseValidator(file, table, reporter),
                 new LibraryAliasNotInUpperCaseValidator31(file, table, reporter));
@@ -117,9 +130,16 @@ public class VersionDependentValidators {
                 new SettingsDuplicationValidator<>(file, testCase::getTags, reporter),
                 new SettingsDuplicationValidator<>(file, testCase::getDocumentation, reporter),
                 new DeprecatedTestCaseSettingNameValidator(file, testCase, reporter),
+                new TemplateSettingUntilRf31Validator(validationContext,
+                        testCase.getTemplates().stream().map(t -> t.adaptTo(TemplateSetting.class)).collect(toList()),
+                        reporter),
                 new TimeoutMessageValidator<>(file, testCase::getTimeouts,
                         timeout -> timeout.tokensOf(RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE).collect(toList()),
-                        reporter));
+                        reporter),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, testCase::getTimeouts, reporter,
+                        ". No timeout will be checked"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, testCase::getTemplates, reporter,
+                        ". No template will be used in this test unless defined in suite settings"));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
@@ -133,9 +153,16 @@ public class VersionDependentValidators {
                 new SettingsDuplicationValidator<>(file, task::getTimeouts, reporter, ". No timeout will be checked"),
                 new SettingsDuplicationValidator<>(file, task::getTags, reporter),
                 new SettingsDuplicationValidator<>(file, task::getDocumentation, reporter),
+                new TemplateSettingUntilRf31Validator(validationContext,
+                        task.getTemplates().stream().map(t -> t.adaptTo(TemplateSetting.class)).collect(toList()),
+                        reporter),
                 new TimeoutMessageValidator<>(file, task::getTimeouts,
                         timeout -> timeout.tokensOf(RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE).collect(toList()),
-                        reporter));
+                        reporter),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, task::getTimeouts, reporter,
+                        ". No timeout will be checked"),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, task::getTemplates, reporter,
+                        ". No template will be used in this task unless defined in suite settings"));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
@@ -157,7 +184,9 @@ public class VersionDependentValidators {
                 new DeprecatedKeywordSettingNameValidator(file, keyword, reporter),
                 new TimeoutMessageValidator<>(file, keyword::getTimeouts,
                         timeout -> timeout.tokensOf(RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE).collect(toList()),
-                        reporter));
+                        reporter),
+                new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, keyword::getTimeouts, reporter,
+                        ". No timeout will be checked"));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }

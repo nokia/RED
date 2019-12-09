@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.table;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -398,6 +401,10 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
                 && EnumSet.of(ModelType.TEST_CASE_TEARDOWN, ModelType.TASK_TEARDOWN, ModelType.USER_KEYWORD_TEARDOWN)
                         .contains(modelType)) {
             return clazz.cast(new ExecutableAdapter(false));
+
+        } else if (clazz == TemplateSetting.class
+                && EnumSet.of(ModelType.TEST_CASE_TEMPLATE, ModelType.TASK_TEMPLATE).contains(modelType)) {
+            return clazz.cast(new TemplateAdapter());
         }
         return null;
     }
@@ -508,6 +515,24 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
 
         private LocalSetting<?> getOuterSettingObject() {
             return LocalSetting.this;
+        }
+    }
+
+    private class TemplateAdapter implements TemplateSetting {
+
+        @Override
+        public RobotToken getDeclaration() {
+            return LocalSetting.this.getDeclaration();
+        }
+
+        @Override
+        public RobotToken getKeywordName() {
+            return tokens.stream().skip(1).findFirst().orElse(null);
+        }
+
+        @Override
+        public List<RobotToken> getUnexpectedArguments() {
+            return tokens.stream().skip(2).collect(toList());
         }
     }
 }

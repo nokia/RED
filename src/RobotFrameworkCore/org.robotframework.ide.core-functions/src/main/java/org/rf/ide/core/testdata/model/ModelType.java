@@ -5,6 +5,9 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum ModelType {
 
     UNKNOWN,
@@ -71,5 +74,27 @@ public enum ModelType {
     TASK_EXECUTABLE_ROW,
     USER_KEYWORD_EXECUTABLE_ROW,
 
-    EMPTY_LINE
+    EMPTY_LINE;
+
+    public static Set<ModelType> getSettings() {
+        return EnumSet.of(LIBRARY_IMPORT_SETTING, VARIABLES_IMPORT_SETTING, RESOURCE_IMPORT_SETTING,
+                DEFAULT_TAGS_SETTING, FORCE_TAGS_SETTING, METADATA_SETTING, SUITE_DOCUMENTATION, SUITE_SETUP,
+                SUITE_TEARDOWN, SUITE_TEST_SETUP, SUITE_TEST_TEARDOWN, SUITE_TEST_TEMPLATE, SUITE_TEST_TIMEOUT,
+                SUITE_TASK_SETUP, SUITE_TASK_TEARDOWN, SUITE_TASK_TEMPLATE, SUITE_TASK_TIMEOUT, SETTINGS_UNKNOWN);
+    }
+
+    public static Set<ModelType> getTestCaseSettings() {
+        return EnumSet.of(TEST_CASE_SETUP, TEST_CASE_TEARDOWN, TEST_CASE_TEMPLATE, TEST_CASE_TIMEOUT, TEST_CASE_TAGS,
+                TEST_CASE_DOCUMENTATION, TEST_CASE_SETTING_UNKNOWN);
+    }
+
+    public static Set<ModelType> getTaskSettings() {
+        return EnumSet.of(TASK_SETUP, TASK_TEARDOWN, TASK_TEMPLATE, TASK_TIMEOUT, TASK_TAGS, TASK_DOCUMENTATION,
+                TASK_SETTING_UNKNOWN);
+    }
+
+    public static Set<ModelType> getKeywordSettings() {
+        return EnumSet.of(USER_KEYWORD_ARGUMENTS, USER_KEYWORD_SETTING_UNKNOWN, USER_KEYWORD_DOCUMENTATION,
+                USER_KEYWORD_RETURN, USER_KEYWORD_TAGS, USER_KEYWORD_TEARDOWN, USER_KEYWORD_TIMEOUT);
+    }
 }

@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -383,6 +384,33 @@ public class LocalSettingTest {
         assertThat(typesOf(setting3)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
                 RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+    }
+
+    @Test
+    public void templateAdapterIsNotReturnedForNonTemplateSetting() {
+        assertThat(createSetting(null, "[Setup]", newArrayList("1", "2"), newArrayList("c", "d"))
+                .adaptTo(TemplateSetting.class)).isNull();
+        assertThat(createSetting(null, "[Teardown]", newArrayList("1", "2"), newArrayList("c", "d"))
+                .adaptTo(TemplateSetting.class)).isNull();
+        assertThat(createSetting(null, "[Documentation]", newArrayList("1", "2"), newArrayList("c", "d"))
+                .adaptTo(TemplateSetting.class)).isNull();
+    }
+
+    @Test
+    public void templateAdapterIsProperlyConstructed() {
+        final LocalSetting<TestCase> template = createSetting(null, "[Template]", newArrayList("1", "2"),
+                newArrayList("c", "d"));
+
+        final TemplateSetting templateSetting = template.adaptTo(TemplateSetting.class);
+
+        assertThat(templateSetting).isNotNull();
+        assertThat(templateSetting.getDeclaration()).isSameAs(template.getDeclaration());
+        assertThat(templateSetting.getDeclaration().getText()).isEqualTo("[Template]");
+        assertThat(templateSetting.getKeywordName()).isSameAs(template.getTokens().get(1));
+        assertThat(templateSetting.getKeywordName().getText()).isEqualTo("1");
+        assertThat(templateSetting.getUnexpectedArguments()).hasSize(1);
+        assertThat(templateSetting.getUnexpectedArguments().get(0)).isSameAs(template.getTokens().get(2));
+        assertThat(templateSetting.getUnexpectedArguments().get(0).getText()).isEqualTo("2");
     }
 
     private static List<String> args(final String... arguments) {

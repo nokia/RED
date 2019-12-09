@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
-import org.rf.ide.core.testdata.model.IDataDrivenSetting;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
@@ -161,45 +160,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     }
 
     private void validateTemplates(final List<TestTemplate> testTemplates, final List<TaskTemplate> taskTemplates) {
-        final List<IDataDrivenSetting> allTemplates = new ArrayList<>(testTemplates);
+        final List<TemplateSetting> allTemplates = new ArrayList<>(testTemplates);
         allTemplates.addAll(taskTemplates);
 
         final boolean areAllEmpty = allTemplates.stream()
-                .map(IDataDrivenSetting::getKeywordName)
+                .map(TemplateSetting::getKeywordName)
                 .allMatch(kwToken -> kwToken == null);
         if (areAllEmpty) {
             reportEmptySettings(testTemplates);
             reportEmptySettings(taskTemplates);
-        }
-
-        reportTemplateWrittenInMultipleCells(allTemplates);
-        reportTemplateKeywordProblems(allTemplates);
-    }
-
-    private void reportTemplateWrittenInMultipleCells(final List<? extends IDataDrivenSetting> templates) {
-        for (final IDataDrivenSetting template : templates) {
-            if (!template.getUnexpectedTrashArguments().isEmpty()) {
-                final RobotToken settingToken = template.getDeclaration();
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.TEMPLATE_KEYWORD_NAME_IN_MULTIPLE_CELLS);
-                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
-            }
-        }
-    }
-
-    private void reportTemplateKeywordProblems(final List<? extends IDataDrivenSetting> templates) {
-        for (final IDataDrivenSetting template : templates) {
-            final RobotToken keywordToken = template.getKeywordName();
-            if (keywordToken != null) {
-                final List<String> keywordParts = newArrayList(keywordToken.getText());
-                template.getUnexpectedTrashArguments().stream().map(RobotToken::getText).forEach(keywordParts::add);
-
-                final String keywordName = String.join(" ", keywordParts);
-                if (keywordName.toLowerCase().equals("none")) {
-                    continue;
-                }
-                new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();
-            }
         }
     }
 

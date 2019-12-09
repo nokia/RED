@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.RedSystemProperties;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.testdata.importer.LibraryImportResolver;
@@ -237,7 +238,9 @@ public class RobotSetting extends RobotKeywordCall {
         }
 
         final List<String> args = getArguments();
-        if (args.isEmpty()) {
+        if (args.isEmpty() || args.size() > 1 && getSuiteFile().getRobotProject()
+                .getRobotParserComplianceVersion()
+                .isNewerOrEqualTo(new RobotVersion(3, 2))) {
             return Optional.empty();
         }
 

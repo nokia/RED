@@ -32,7 +32,7 @@ public class TestTemplateView extends TestTemplate {
                     super.setKeywordName(template.getKeywordName());
                 }
             }
-            for (final RobotToken arg : template.getUnexpectedTrashArguments()) {
+            for (final RobotToken arg : template.getUnexpectedArguments()) {
                 super.addUnexpectedTrashArgument(arg);
             }
             for (final RobotToken commentText : template.getComment()) {
@@ -56,7 +56,7 @@ public class TestTemplateView extends TestTemplate {
 
     @Override
     public void setUnexpectedTrashArgument(final int index, final String argument) {
-        final List<RobotToken> tokens = super.getUnexpectedTrashArguments();
+        final List<RobotToken> tokens = super.getUnexpectedArguments();
         if (tokens.size() <= index) {
             joinIfNeeded();
         }
@@ -65,7 +65,7 @@ public class TestTemplateView extends TestTemplate {
 
     @Override
     public void setUnexpectedTrashArgument(final int index, final RobotToken argument) {
-        final List<RobotToken> tokens = super.getUnexpectedTrashArguments();
+        final List<RobotToken> tokens = super.getUnexpectedArguments();
         if (tokens.size() <= index) {
             joinIfNeeded();
         }

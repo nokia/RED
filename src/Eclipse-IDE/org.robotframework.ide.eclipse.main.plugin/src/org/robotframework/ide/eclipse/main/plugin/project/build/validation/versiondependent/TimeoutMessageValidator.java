@@ -43,7 +43,7 @@ class TimeoutMessageValidator<T extends AModelElement<?>> extends VersionDepende
 
     @Override
     protected Range<RobotVersion> getApplicableVersionRange() {
-        return Range.atLeast(new RobotVersion(3, 0, 1));
+        return Range.closedOpen(new RobotVersion(3, 0, 1), new RobotVersion(3, 2));
     }
 
     @Override

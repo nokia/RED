@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.IDataDrivenSetting;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
@@ -499,14 +499,19 @@ public class SettingTable extends ARobotSectionTable {
                     .collect(joining(" "));
 
         } else if (testTemplates.size() == 1) {
-                final TestTemplate template = testTemplates.get(0);
+            final TestTemplate template = testTemplates.get(0);
+
+            if (robotVersion.isNewerOrEqualTo(new RobotVersion(3, 2)) && !template.getUnexpectedArguments().isEmpty()) {
+                return null;
+            } else {
                 return tokensOf(template).filter(t -> t != null).map(RobotToken::getText).collect(joining(" "));
+            }
         }
         return null;
     }
 
-    private static Stream<RobotToken> tokensOf(final IDataDrivenSetting template) {
-        return Stream.concat(Stream.of(template.getKeywordName()), template.getUnexpectedTrashArguments().stream());
+    private static Stream<RobotToken> tokensOf(final TemplateSetting template) {
+        return Stream.concat(Stream.of(template.getKeywordName()), template.getUnexpectedArguments().stream());
     }
 
     public TestTemplate newTestTemplate() {
@@ -535,11 +540,15 @@ public class SettingTable extends ARobotSectionTable {
 
     public String getTaskTemplateInUse() {
         if (taskTemplates.size() == 1) {
+            final RobotVersion robotVersion = getVersion();
+
             final TaskTemplate template = taskTemplates.get(0);
-            return Stream.concat(Stream.of(template.getKeywordName()), template.getUnexpectedTrashArguments().stream())
-                    .filter(t -> t != null)
-                    .map(RobotToken::getText)
-                    .collect(joining(" "));
+
+            if (robotVersion.isNewerOrEqualTo(new RobotVersion(3, 2)) && !template.getUnexpectedArguments().isEmpty()) {
+                return null;
+            } else {
+                return tokensOf(template).filter(t -> t != null).map(RobotToken::getText).collect(joining(" "));
+            }
         }
         return null;
     }
