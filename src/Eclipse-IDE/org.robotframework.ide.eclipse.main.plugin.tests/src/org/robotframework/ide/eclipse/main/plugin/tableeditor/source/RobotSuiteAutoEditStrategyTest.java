@@ -413,8 +413,8 @@ public class RobotSuiteAutoEditStrategyTest {
 
     @Test
     public void indentIsAdded_whenMovingToNewLineFromTaskDefinitionLine() {
-        final RobotDocument document = newDocument("*** Tasks ***", " task");
-        final DocumentCommand command = newDocumentCommand(19, "\n");
+        final RobotDocument document = newDocument("*** Tasks ***", "task");
+        final DocumentCommand command = newDocumentCommand(18, "\n");
 
         final EditStrategyPreferences preferences = newPreferences();
         final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
@@ -425,8 +425,8 @@ public class RobotSuiteAutoEditStrategyTest {
 
     @Test
     public void indentIsNotAdded_whenMovingToNewLineFromTaskDefinitionLineButWithCaretJustBeforeDefinition() {
-        final RobotDocument document = newDocument("*** Tasks ***", " task");
-        final DocumentCommand command = newDocumentCommand(15, "\n");
+        final RobotDocument document = newDocument("*** Tasks ***", "task");
+        final DocumentCommand command = newDocumentCommand(14, "\n");
 
         final EditStrategyPreferences preferences = newPreferences();
         final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
@@ -603,6 +603,35 @@ public class RobotSuiteAutoEditStrategyTest {
             assertThat(command.text).isEqualTo("\n...  ");
         }
     }
+
+    @Test
+    public void breakingLineShouldAddContinuation_whenOffsetInBreakableCells() {
+        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}  a  b");
+        for (int offset = 34; offset <= 45; offset++) {
+            final DocumentCommand command = newDocumentCommand(offset, "\n");
+
+            final EditStrategyPreferences preferences = newPreferences();
+            final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo("\n  ...  ");
+        }
+    }
+
+    @Test
+    public void breakingLineShouldNotAddContinuation_whenOffsetInNonBreakableCells() {
+        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}  #comment  abc");
+        for (int offset = 40; offset <= 55; offset++) {
+            final DocumentCommand command = newDocumentCommand(offset, "\n");
+
+            final EditStrategyPreferences preferences = newPreferences();
+            final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+            strategy.customizeDocumentCommand(document, command);
+
+            assertThat(command.text).isEqualTo("\n  ");
+        }
+    }
+
 
     private static RobotDocument newDocument(final String... lines) {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());

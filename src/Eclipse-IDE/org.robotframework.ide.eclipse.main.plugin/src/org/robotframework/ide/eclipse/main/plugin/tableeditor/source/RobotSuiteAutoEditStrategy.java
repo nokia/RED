@@ -135,11 +135,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             return;
         }
 
-        final IRobotLineElement firstElement = firstElem.get();
         if (isDefinitionRequiringIndent(currentLine, command.offset)) {
             command.text += preferences.getSeparatorToUse(isTsvFile);
 
         } else {
+            final IRobotLineElement firstElement = firstElem.get();
             String addedIndent = "";
             if (firstElement instanceof Separator || isEmptyCellToken(firstElement)) {
                 final int length = Math.max(0,
@@ -171,7 +171,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                 command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
-            } else if (isRequiringContinuation(firstMeaningfulToken)) {
+            } else if (isRequiringContinuation(firstMeaningfulToken) || isLineBreak(currentLine, command.offset)) {
                 command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
 
             }
@@ -241,6 +241,13 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION)
                 || types.contains(RobotTokenType.TASK_SETTING_DOCUMENTATION)
                 || types.contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
+    }
+
+    private boolean isLineBreak(final RobotLine currentLine, final int modificationStartOffset) {
+        return currentLine.elementsStream()
+                .filter(e -> modificationStartOffset < e.getEndOffset())
+                .anyMatch(e -> !(e instanceof Separator || e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                        || e.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)));
     }
 
     static class EditStrategyPreferences {
