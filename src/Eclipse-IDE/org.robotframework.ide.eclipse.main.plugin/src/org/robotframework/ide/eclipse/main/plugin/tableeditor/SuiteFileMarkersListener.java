@@ -210,7 +210,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
                 if (alreadyVisitedMarkers.contains(marker)) {
                     continue;
                 }
-                final Range<Integer> markerRange = RobotProblem.getRangeOf(marker);
+                final Range<Integer> markerRange = RobotProblem.getRangeOf(marker, -1);
                 // -2 because when token is newly created it may have -1 as line number
                 final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
 

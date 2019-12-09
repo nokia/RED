@@ -48,6 +48,11 @@ public class RobotProblem {
         }
     }
 
+    public static Range<Integer> getRangeOf(final IMarker marker, final int defaultValue) {
+        return Range.closed((Integer) marker.getAttribute(IMarker.CHAR_START, defaultValue),
+                (Integer) marker.getAttribute(IMarker.CHAR_END, defaultValue));
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static IProblemCause getCause(final IMarker marker) {
         final String causeEnumClass = marker.getAttribute(CAUSE_ENUM_CLASS, null);
