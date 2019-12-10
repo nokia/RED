@@ -1,0 +1,340 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _jcbUQGu1Eeeps9cepQRw2Q,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: DebugShell
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ETmwIBqEEeq6f9_VBibLOg
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/10/19 10:52 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  ${x}\n"
+    + "    Should Be Equal As Strings    a1    a1    \n"
+    + "    Create List    4  5   6\n"
+    + "    Should Be Equal As Integers    ${y}    6    \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    log  7" 
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
+
+
+exec-with-options -disableJobWaiting -command {
+	//run test
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	
+	wait-for-thread -file "TestFile.robot"
+	
+	// inspect created varaible
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    set-caret-pos 8 12
+	    get-menu -path "Inspect variable" | click
+	}
+	
+    // check text and button
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}" | verify-true
+	get-view "Debug Shell" | get-button "Robot variables" | get-property selected | equals true | verify-true
+	
+	// press enter to run command
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 1 15
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	}
+	
+	// check result
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "VARIABLE>" | verify-true
+	    
+	// set focus on KW and inspect    
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    hover-text 8 6
+	    set-caret-pos 8 6
+	    get-menu -path "Inspect call" | click
+	}
+	
+	//check text
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}" | verify-true
+	    
+	// press Enter and check result
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	}
+	
+	
+	// reulst:	
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT>" | verify-true
+	    
+	//check if CA is enabled    
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 5 8
+	    key-type "M1+SPACE"
+	}
+	
+	// check 4 first KW
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Catenate - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "Comment - BuiltIn" | verify-true
+	}
+	
+	// select KW
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Convert To Hex - BuiltIn" 
+	    | click -default
+	
+	// add value
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    key-type "NUMPAD_8" 8
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	    set-caret-pos 7 8
+	}
+	
+	// check if KW was resolved
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "ROBOT>" | verify-true
+	    
+	//change mode to variables    
+	with [get-view "Debug Shell"] {
+	    get-button "Robot variables" | click
+	}
+	
+	// check if mode is changed (last line)
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE>" | verify-true
+	    
+	// open CA    
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 7 11
+	    key-type "M1+SPACE"
+	}
+	
+	// check that only varaible
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "${x}" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "${:}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "${\\n"
+	        + "}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "${CURDIR}" | verify-true
+	}
+	// select {curidr}
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${CURDIR}" | click -default
+	
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 7 20
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	    set-caret-pos 9 11
+	}
+	
+	// check if error is shown
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "VARIABLE>" | verify-true
+	    
+	// select python expression    
+	with [get-view "Debug Shell"] {
+	    get-button "Python expressions" | click
+	    get-text-viewer | set-caret-pos 9 9
+	}
+	
+	// check shell if mode was changed
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON>" | verify-true
+	    
+	// open CA    
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 9 9
+	    key-type "M1+SPACE"
+	}
+	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	    get-property itemCount | equals 1 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
+	}
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "no proposals" 
+	    | key-type "TRAVERSE_ESCAPE"
+	    
+	
+	
+	// ------------------------------------------------------------ python eval -------------------------------
+	
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 9 9
+	    type-text "int(22\")"
+	    key-type Enter
+	}
+	
+	// check error from python
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON>" | verify-true
+	    
+	// correct expression
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    key-type Up
+	    key-type Left -times 4
+	    type-text "\""
+	    key-type Enter
+	}
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON> int(\"22\")\n"
+	    + "22\n"
+	    + "PYTHON>" | verify-true
+	    
+	//-----------------------------------------------  wrong KW name ---------------------------------------------------------    
+	//change mode and enter wrong KW name    
+	with [get-view "Debug Shell"] {
+	    get-button "Robot keywords" | click
+	    with [get-text-viewer] {
+	        set-caret-pos 13 8
+	        type-text abc
+	        key-type Enter
+	    }
+	}
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON> int(\"22\")\n"
+	    + "22\n"
+	    + "ROBOT> abc\n"
+	    + "FAIL: No keyword with name 'abc' found.\n"
+	    + "ROBOT>" | verify-true
+	 
+	// ------------------------------------------------------ variable ok -------------------------------    
+	// changed to variable and use exsiting variable	    
+	with [get-view "Debug Shell"] {
+	    get-button "Robot variables" | click
+	    with [get-text-viewer] {
+	        set-caret-pos 15 11
+	        type-text "${x}"
+	        key-type Enter
+	        set-caret-pos 17 11
+	    }
+	}
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON> int(\"22\")\n"
+	    + "22\n"
+	    + "ROBOT> abc\n"
+	    + "FAIL: No keyword with name 'abc' found.\n"
+	    + "VARIABLE> ${x}\n5\n"
+	    + "VARIABLE>" | verify-true
+	    
+	    
+	// ---------------------- history --------------------------------------------------
+	
+	// use arrow up to check history
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    set-caret-pos 17 11
+	    key-type Up
+	    set-caret-pos 17 15
+	    key-type Up
+	    set-caret-pos 17 11
+	}
+	
+	// wrong KW
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON> int(\"22\")\n"
+	    + "22\n"
+	    + "ROBOT> abc\n"
+	    + "FAIL: No keyword with name 'abc' found.\n"
+	    + "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> abc" | verify-true
+	    
+	// change to python    
+	with [get-view "Debug Shell" | get-text-viewer] {
+	    key-type Up
+	    set-caret-pos 17 18
+	}
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> ${x}\n5\n"
+	    + "ROBOT> log    ${x}\n"
+	    + "PASS: None\n"
+	    + "ROBOT> Convert To Hex    8    \n"
+	    + "PASS: 8\n"
+	    + "VARIABLE> ${CURDIR}\n"
+	    + "Variable '${CURDIR}' not found.\n"
+	    + "PYTHON> int(22\")\n"
+	    + "Evaluating expression 'int(22\")' failed: SyntaxError: EOL while scanning string literal (<string>, line 1)\n"
+	    + "PYTHON> int(\"22\")\n"
+	    + "22\n"
+	    + "ROBOT> abc\n"
+	    + "FAIL: No keyword with name 'abc' found.\n"
+	    + "VARIABLE> ${x}\n5\n"
+	    + "PYTHON> int(\"22\")" | verify-true
+	    
+	    get-button "Terminate (M1+F2)" | click
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
