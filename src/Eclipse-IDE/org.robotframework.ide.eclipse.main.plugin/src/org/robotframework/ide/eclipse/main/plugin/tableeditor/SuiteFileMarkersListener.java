@@ -210,12 +210,7 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
                 if (alreadyVisitedMarkers.contains(marker)) {
                     continue;
                 }
-                final Range<Integer> markerRange = RobotProblem.getRangeOf(marker, -1);
-                // -2 because when token is newly created it may have -1 as line number
-                final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
-
-                if ((markerRange != null && getTokenRange(token).isConnected(markerRange))
-                        || (markerRange == null && token.getFilePosition().getLine() == markerLine)) {
+                if (shouldVisitMarker(token, marker)) {
                     alreadyVisitedMarkers.add(marker);
                     final boolean shallContinue = visitor.visit(marker);
                     if (!shallContinue) {
@@ -224,6 +219,15 @@ public class SuiteFileMarkersListener implements IResourceChangeListener, SuiteF
                 }
             }
         }
+    }
+
+    private boolean shouldVisitMarker(final RobotToken token, final IMarker marker) {
+        final Range<Integer> markerRange = RobotProblem.getRangeOf(marker, -1);
+        final boolean isRangeDefined = !markerRange.contains(-1);
+        // -2 because when token is newly created it may have -1 as line number
+        final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
+        return isRangeDefined && getTokenRange(token).isConnected(markerRange)
+                || !isRangeDefined && token.getFilePosition().getLine() == markerLine;
     }
 
     private Range<Integer> getTokenRange(final RobotToken token) {
