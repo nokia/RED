@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2Q6oEPOSEeaWpbE3jg39cA,_OCxtEBRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_jcbUQGu1Eeeps9cepQRw2Q
+Element-Name: DebugVariablesLimit
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Zw8aYBtTEeq6f9_VBibLOg
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/10/19 3:54 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Test Cases ***\n"
+    + "test1\n"
+    + "    # 9999 + 500 + 1\n"
+    + "    ${s}=  Evaluate    \"p\"*5000 + \"r\"*2000 + \"s\" * 2999 + \"t\"*500 + \"u\" \n"
+    + "    log  text1\n"
+    + "    \n"
+    + "    # 1999 +300 + 1\n"
+    + "    ${s}=  Evaluate    \"a\"*500 + \"b\"*500 + \"c\" * 500 + \"d\"*499 + \"e\" *300 + \"f\"\n"
+    + "    log  text1" 
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"    
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 5
+
+exec-with-options -disableJobWaiting -command {
+
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Debug As/1 Robot Test" 
+	    | click
+	    
+	wait-for-thread -file "TestFile.robot"    
+	
+	// check default limit value
+	get-view Variables | get-editbox | get-menu -path "Max Length..." | click
+	with [get-window "Configure Details Pane"] {
+	    get-label "Maximum characters to display in details pane (0 = unlimited):" | get-property caption 
+	        | equals "&Maximum characters to display in details pane (0 = unlimited):" | verify-true
+	    get-editbox -after [get-label "Maximum characters to display in details pane (0 = unlimited):"] | get-property text 
+	        | equals 10000 | verify-true
+	}
+    get-window "Configure Details Pane" | get-button OK | click
+	
+	
+	get-view Variables | get-tree | select "${s}"
+	get-view Variables | get-text-viewer | get-property "getCharCount()" | equals 10003 | verify-true
+	get-button "Terminate (M1+F2)" | click
+	
+	
+	// add BP on line where more than 2000 chtas are set
+	with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+	    click-ruler -line 9
+	    double-click-ruler 9
+	    
+	    // remove old
+	    double-click-ruler 5
+	}
+	
+	// set limit to 2000
+	get-view Variables | get-editbox | get-menu -path "Max Length..." | click
+	with [get-window "Configure Details Pane"] {
+	    get-editbox -after [get-label "Maximum characters to display in details pane (0 = unlimited):"] | set-text 2000
+	    get-button OK | click
+	}
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	get-view Variables | get-text-viewer | get-property "getCharCount()" | equals 2003 | verify-true
+	get-button "Terminate (M1+F2)" | click
+	
+	// set unlimited
+	get-view Variables | get-editbox | get-menu -path "Max Length..." | click
+	with [get-window "Configure Details Pane"] {
+	    get-editbox -after [get-label "Maximum characters to display in details pane (0 = unlimited):"] | set-text 0
+	    get-button OK | click
+	}
+	
+	// set more characters
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    set-caret-pos 4 40
+	    key-type BackSpace
+	    key-type "NUMPAD_5" 5
+	    key-type "M1+s"
+	}
+
+    // set breakpoint
+	with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+	    click-ruler -line 5
+	    double-click-ruler 5
+	}
+	
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	get-view Variables | get-tree | select "${s}"
+	get-view Variables | get-text-viewer | get-property "getCharCount()" | equals 13500 | verify-true
+	get-button "Terminate (M1+F2)" | click
+	
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
