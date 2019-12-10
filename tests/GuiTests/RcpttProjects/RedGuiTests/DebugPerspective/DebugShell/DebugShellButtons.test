@@ -7,7 +7,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-CA7oBqWEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/10/19 10:52 AM
+Save-Time: 12/10/19 2:19 PM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -244,6 +245,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	// use Step over
 	get-button "Step Over (F6)" | click
+	wait-for-specified_line-in-first-thread -line 9 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 9 -script_name "TestFile.robot"
 	
 	// close view and try to remove some characters in lie that was execeuted
@@ -306,5 +308,4 @@ exec-with-options -disableJobWaiting -command {
 	}        
 }
 
-	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
