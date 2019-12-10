@@ -18,8 +18,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
@@ -93,15 +91,11 @@ public class DebugShellView {
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
-        GridLayoutFactory.fillDefaults().applyTo(parent);
-
         this.site = part.getViewSite();
         this.assistListener = new AssistListener();
 
         this.sourceViewer = new SourceViewer(parent, null, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         final StyledText styledText = sourceViewer.getTextWidget();
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(styledText);
         styledText.setFont(JFaceResources.getTextFont());
         styledText.addVerifyKeyListener(this::verifyKey);
         styledText.addVerifyListener(this::verifyModification);
