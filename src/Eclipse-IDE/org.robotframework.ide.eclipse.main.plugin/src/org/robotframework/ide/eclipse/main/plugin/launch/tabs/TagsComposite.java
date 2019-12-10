@@ -52,7 +52,7 @@ class TagsComposite extends Composite {
         this.tagsSupport = tagsSupport;
 
         RowLayoutFactory.fillDefaults().fill(true).type(SWT.HORIZONTAL).spacing(2).wrap(true).applyTo(this);
-        createTagsControls(new ArrayList<String>());
+        createTagsControls(new ArrayList<>());
         createDefinitionText();
         createAddingButton();
     }

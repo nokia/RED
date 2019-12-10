@@ -375,6 +375,39 @@ public class LaunchConfigurationTabValidatorTest {
         validator.validateExecutorTab(launchConfig);
     }
 
+    @Test
+    public void whenRobotAdditionalArgumentsContainTabulators_fatalExceptionIsThrown() throws Exception {
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setRobotArguments("some\t\t srg\tuments");
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateRobotTab(launchConfig))
+                .withMessage("Tabulators are not allowed in arguments")
+                .withNoCause();
+    }
+
+    @Test
+    public void whenInterpreterAdditionalArgumentsContainTabulators_fatalExceptionIsThrown() throws Exception {
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setInterpreterArguments("some\t\t srg\tuments");
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateExecutorTab(launchConfig))
+                .withMessage("Tabulators are not allowed in arguments")
+                .withNoCause();
+    }
+
+    @Test
+    public void whenExecutableFileAdditionalArgumentsContainTabulators_fatalExceptionIsThrown() throws Exception {
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFileArguments("some\t\t srg\tuments");
+
+        assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
+                .isThrownBy(() -> validator.validateExecutorTab(launchConfig))
+                .withMessage("Tabulators are not allowed in arguments")
+                .withNoCause();
+    }
+
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
         final ILaunchConfiguration configuration = robotRunConfigurationProvider.create("robot");
         final RobotLaunchConfiguration launchConfig = new RobotLaunchConfiguration(configuration);

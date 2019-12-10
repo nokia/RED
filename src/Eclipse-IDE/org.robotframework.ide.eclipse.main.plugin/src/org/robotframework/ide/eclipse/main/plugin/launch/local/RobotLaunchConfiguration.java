@@ -225,7 +225,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public List<String> getIncludedTags() throws CoreException {
-        return configuration.getAttribute(INCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
+        return configuration.getAttribute(INCLUDED_TAGS_ATTRIBUTE, new ArrayList<>());
     }
 
     public boolean isExcludeTagsEnabled() throws CoreException {
@@ -233,7 +233,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public List<String> getExcludedTags() throws CoreException {
-        return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
+        return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<>());
     }
 
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {

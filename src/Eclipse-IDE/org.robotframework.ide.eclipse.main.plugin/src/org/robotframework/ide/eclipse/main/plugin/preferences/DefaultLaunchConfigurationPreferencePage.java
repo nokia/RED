@@ -53,6 +53,7 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 import org.robotframework.red.jface.preferences.MultiLineStringFieldEditor;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
+import org.robotframework.red.jface.preferences.RegexValidatedMultilineStringFieldEditor;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
 import org.robotframework.red.viewers.ElementAddingToken;
@@ -65,6 +66,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPreferencePage {
+
+    private static final String MULTILINE_PATTERN = "[^\t]*";
 
     private final List<EnvVariable> envVars = new ArrayList<>();
 
@@ -127,9 +130,11 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
     private Control createRobotLaunchConfigurationPreferences(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
 
-        final MultiLineStringFieldEditor additionalRobotArguments = new MultiLineStringFieldEditor(
+        final MultiLineStringFieldEditor additionalRobotArguments = new RegexValidatedMultilineStringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "Additional Robot Framework arguments:",
-                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE,
+                MULTILINE_PATTERN, composite);
+        additionalRobotArguments.setErrorMessage("Tabulators are not allowed in arguments editor");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalRobotArguments.getLabelControl(composite));
         additionalRobotArguments.load();
         addField(additionalRobotArguments);
@@ -177,9 +182,11 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
     private Control createExecutorLaunchConfigurationPreferences(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
 
-        final MultiLineStringFieldEditor additionalInterpreterArguments = new MultiLineStringFieldEditor(
+        final MultiLineStringFieldEditor additionalInterpreterArguments = new RegexValidatedMultilineStringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "Additional interpreter arguments:",
-                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE,
+                MULTILINE_PATTERN, composite);
+        additionalInterpreterArguments.setErrorMessage("Tabulators are not allowed in arguments editor");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalInterpreterArguments.getLabelControl(composite));
         additionalInterpreterArguments.load();
         addField(additionalInterpreterArguments);
@@ -196,9 +203,11 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
 
         addButtons(scriptPathEditor, composite);
 
-        final MultiLineStringFieldEditor additionalScriptArguments = new MultiLineStringFieldEditor(
+        final MultiLineStringFieldEditor additionalScriptArguments = new RegexValidatedMultilineStringFieldEditor(
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS, "Additional executable file arguments:",
-                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, composite);
+                MultiLineStringFieldEditor.UNLIMITED, 4, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE,
+                MULTILINE_PATTERN, composite);
+        additionalScriptArguments.setErrorMessage("Tabulators are not allowed in arguments editor");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(additionalScriptArguments.getLabelControl(composite));
         additionalScriptArguments.load();
         addField(additionalScriptArguments);

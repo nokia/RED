@@ -47,13 +47,18 @@ class LaunchConfigurationTabValidator {
     void validateRobotTab(final RobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationException, LaunchConfigurationValidationFatalException {
         try {
-            final List<String> warnings = new ArrayList<>();
 
             try {
                 robotConfig.getProject();
             } catch (final CoreException e) {
                 throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
             }
+
+            if (robotConfig.getRobotArguments().contains("\t")) {
+                throw new LaunchConfigurationValidationFatalException("Tabulators are not allowed in arguments");
+            }
+
+            final List<String> warnings = new ArrayList<>();
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
@@ -96,6 +101,12 @@ class LaunchConfigurationTabValidator {
     void validateExecutorTab(final RobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationException, LaunchConfigurationValidationFatalException {
         try {
+
+            if (robotConfig.getInterpreterArguments().contains("\t")
+                    || robotConfig.getExecutableFileArguments().contains("\t")) {
+                throw new LaunchConfigurationValidationFatalException("Tabulators are not allowed in arguments");
+            }
+
             final List<String> warnings = new ArrayList<>();
 
             if (robotConfig.isUsingInterpreterFromProject()) {
