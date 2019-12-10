@@ -22,6 +22,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteAutoEditStrategy.EditStrategyPreferences;
 import org.robotframework.red.junit.ProjectProvider;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
+
 public class RobotSuiteAutoEditStrategyTest {
 
     @ClassRule
@@ -605,16 +609,22 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void breakingLineShouldAddContinuation_whenOffsetInBreakableCells() {
-        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}  a  b");
-        for (int offset = 34; offset <= 45; offset++) {
+    public void breakingLineShouldAddContinuation_onlyForOffsetsBetweenCells() {
+        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}   aa    bbb");
+        final RangeSet<Integer> offsetsBetweenCells = TreeRangeSet
+                .create(Arrays.asList(Range.closed(34, 36), Range.closed(40, 43), Range.closed(45, 49)));
+        for (int offset = 34; offset <= 52; offset++) {
             final DocumentCommand command = newDocumentCommand(offset, "\n");
 
             final EditStrategyPreferences preferences = newPreferences();
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            assertThat(command.text).isEqualTo("\n  ...  ");
+            if (offsetsBetweenCells.contains(offset)) {
+                assertThat(command.text).isEqualTo("\n  ...  ");
+            } else {
+                assertThat(command.text).isEqualTo("\n  ");
+            }
         }
     }
 

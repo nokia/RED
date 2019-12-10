@@ -151,7 +151,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             final RobotToken firstMeaningfulToken = firstElement instanceof RobotToken ? (RobotToken) firstElement
                     : getSecondElement(currentLine).filter(RobotToken.class::isInstance)
                             .map(RobotToken.class::cast)
-                            .orElse(RobotToken.create(""));
+                            .orElseGet(RobotToken::new);
 
             if (command.offset < firstMeaningfulToken.getEndOffset()) {
                 // we're modifying region before the end of the token so we don't want to add
@@ -171,7 +171,8 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                 command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
-            } else if (isRequiringContinuation(firstMeaningfulToken) || isLineBreak(currentLine, command.offset)) {
+            } else if (isRequiringContinuation(firstMeaningfulToken)
+                    || isBetweenCells(currentLine, command.offset) && !isInCommentPart(currentLine, command.offset)) {
                 command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
 
             }
@@ -221,7 +222,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             if (firstElement instanceof RobotToken && !isEmptyCellToken(firstElement)) {
                 return true;
             }
-            final RobotToken firstToken = line.tokensStream().findFirst().orElseGet(() -> RobotToken.create(""));
+            final RobotToken firstToken = line.tokensStream().findFirst().orElseGet(RobotToken::new);
             if (firstToken.getTypes().contains(RobotTokenType.FOR_END_TOKEN)) {
                 return false;
             }
@@ -243,11 +244,20 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
     }
 
-    private boolean isLineBreak(final RobotLine currentLine, final int modificationStartOffset) {
+    private boolean isBetweenCells(final RobotLine currentLine, final int modificationStartOffset) {
+        return currentLine.elementsStream()
+                .filter(e -> e.getStartOffset() <= modificationStartOffset
+                        && modificationStartOffset <= e.getEndOffset())
+                .findFirst()
+                .filter(e -> e instanceof Separator || e.getEndOffset() == modificationStartOffset)
+                .isPresent();
+    }
+
+    private boolean isInCommentPart(final RobotLine currentLine, final int modificationStartOffset) {
         return currentLine.elementsStream()
                 .filter(e -> modificationStartOffset < e.getEndOffset())
-                .anyMatch(e -> !(e instanceof Separator || e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                        || e.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)));
+                .allMatch(e -> e instanceof Separator || e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                        || e.getTypes().contains(RobotTokenType.COMMENT_CONTINUE));
     }
 
     static class EditStrategyPreferences {
