@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -16,7 +17,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
@@ -28,26 +28,13 @@ import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.collect.Range;
 
-public class RemoveSettingValuesExceptFirstFixer extends RedSuiteMarkerResolution {
+public class RemoveSettingFixer extends RedSuiteMarkerResolution {
 
-    private final String label;
-
-    // Removes unexpected values from setting:
-    // *** Settings ***
-    // Test Timeout    2 min    my custom    message
-    // ...  which continues    even more    # and have some comment    here
-    //
-    // ->
-    // *** Settings ***
-    // Test Timeout    2 min    # and have some comment    here
-
-    public RemoveSettingValuesExceptFirstFixer(final String label) {
-        this.label = label;
-    }
+    // Removes a setting - general or local:
 
     @Override
     public String getLabel() {
-        return label;
+        return "Remove setting";
     }
 
     @Override
@@ -69,29 +56,27 @@ public class RemoveSettingValuesExceptFirstFixer extends RedSuiteMarkerResolutio
 
     private RedCompletionProposal createProposal(final IDocument document, final AModelElement<?> linkedSetting) {
         final List<RobotToken> tokens = linkedSetting.getElementTokens();
-        final RobotToken firstValue = tokens.get(1);
+        final int startLine = tokens.get(0).getLineNumber() - 1;
+        final int endLine = tokens.get(tokens.size() - 1).getLineNumber();
 
-        final IRegion toChange = calculateRegion(tokens, firstValue.getStartOffset());
-        final String correctedTimeout = firstValue.getText();
+        try {
+            final int startOffset = document.getLineInformation(startLine).getOffset();
+            final int endOffset = document.getLineInformation(endLine).getOffset();
 
-        final String info = Snippets.createSnippetInfo(document, toChange, correctedTimeout);
-        return RedCompletionBuilder.newProposal()
-                .willPut(correctedTimeout)
-                .byReplacingRegion(toChange)
-                .secondaryPopupShouldBeDisplayedUsingHtml(info)
-                .thenCursorWillStopAtTheEndOfInsertion()
-                .displayedLabelShouldBe(getLabel())
-                .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getRobotSettingImage()))
-                .create();
-    }
+            final IRegion toRemove = new Region(startOffset, endOffset - startOffset);
 
-    private IRegion calculateRegion(final List<RobotToken> tokens, final int offset) {
-        final int lastTokenIndex = tokens.stream()
-                .filter(token -> token.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
-                .findFirst()
-                .map(tokens::indexOf)
-                .orElseGet(() -> tokens.size())
-                .intValue() - 1;
-        return new Region(offset, tokens.get(lastTokenIndex).getEndOffset() - offset);
+            final String info = Snippets.createSnippetInfo(document, toRemove, "");
+            return RedCompletionBuilder.newProposal()
+                    .willRemove()
+                    .theRegion(toRemove)
+                    .secondaryPopupShouldBeDisplayedUsingHtml(info)
+                    .thenCursorWillStopAtTheEndOfInsertion()
+                    .displayedLabelShouldBe(getLabel())
+                    .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getRobotSettingImage()))
+                    .create();
+
+        } catch (final BadLocationException e) {
+            return null;
+        }
     }
 }

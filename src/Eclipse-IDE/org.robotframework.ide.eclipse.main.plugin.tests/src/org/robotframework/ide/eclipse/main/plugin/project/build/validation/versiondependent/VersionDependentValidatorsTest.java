@@ -49,7 +49,7 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersion30() {
-            assertThat(getGeneralSettingsTableValidators("3.0.4")).hasSize(15)
+            assertThat(getGeneralSettingsTableValidators("3.0.4")).hasSize(19)
                     .hasOnlyElementsOfTypes(DeprecatedGeneralSettingsTableHeaderValidator.class,
                             SettingsDuplicationValidator.class, DeprecatedGeneralSettingNameValidator.class,
                             TimeoutMessageValidator.class, LibraryAliasNotInUpperCaseValidator.class,
@@ -58,14 +58,14 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersion31() {
-            assertThat(getGeneralSettingsTableValidators("3.1")).hasSize(13)
+            assertThat(getGeneralSettingsTableValidators("3.1")).hasSize(17)
                     .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class,
                             LibraryAliasNotInUpperCaseValidator31.class, TemplateSettingUntilRf31Validator.class);
         }
 
         @Test
         public void properValidatorsAreReturnedForVersion32() {
-            assertThat(getGeneralSettingsTableValidators("3.2")).hasSize(15)
+            assertThat(getGeneralSettingsTableValidators("3.2")).hasSize(19)
                     .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class,
                             LibraryAliasNotInUpperCaseValidator31.class,
                             SingleValuedSettingsHaveMultipleValuesProvidedValidator.class);

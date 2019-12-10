@@ -24,19 +24,14 @@ class SettingsDuplicationValidator<T extends AModelElement<?>> extends VersionDe
 
     private final IFile file;
 
-    private Supplier<List<T>> elementsSupplier;
+    private final Supplier<List<T>> elementsSupplier;
 
     private final ValidationReportingStrategy reporter;
 
-    private String problemDescriptionDetail;
+    private final String problemDescriptionDetail;
 
 
     SettingsDuplicationValidator(final IFile file, final Supplier<List<T>> elementsSupplier,
-            final ValidationReportingStrategy reporter) {
-        this(file, elementsSupplier, reporter, "");
-    }
-
-    public SettingsDuplicationValidator(final IFile file, final Supplier<List<T>> elementsSupplier,
             final ValidationReportingStrategy reporter, final String problemDescriptionDetail) {
         this.file = file;
         this.elementsSupplier = elementsSupplier;

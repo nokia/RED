@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -55,35 +56,45 @@ public class VersionDependentValidators {
 
     public Stream<VersionDependentModelUnitValidator> getGeneralSettingsTableValidators(final SettingTable table) {
         final IFile file = validationContext.getFile();
+        final String settingDuplDetail = getDuplicatedSettingDetailInfo();
+
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
                 new DeprecatedGeneralSettingsTableHeaderValidator(file, table, reporter),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTemplates, reporter),
-                new SettingsDuplicationValidator<>(file, table::getTestTemplates, reporter, ". No template will be used"),
+                new SettingsDuplicationValidator<>(file, table::getTestTemplates, reporter, settingDuplDetail),
+
+                new SettingsDuplicationValidator<>(file, table::getTaskTemplates, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteSetups, reporter),
-                new SettingsDuplicationValidator<>(file, table::getSuiteSetups, reporter, ". No Suite Setup will be executed"),
+                new SettingsDuplicationValidator<>(file, table::getSuiteSetups, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getSuiteTeardowns, reporter),
-                new SettingsDuplicationValidator<>(file, table::getSuiteTeardowns, reporter, ". No Suite Teardown will be executed"),
+                new SettingsDuplicationValidator<>(file, table::getSuiteTeardowns, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestSetups, reporter),
-                new SettingsDuplicationValidator<>(file, table::getTestSetups, reporter, ". No Test Setup will be executed"),
+                new SettingsDuplicationValidator<>(file, table::getTestSetups, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTeardowns, reporter),
-                new SettingsDuplicationValidator<>(file, table::getTestTeardowns, reporter, ". No Test Teardown will be executed"),
+                new SettingsDuplicationValidator<>(file, table::getTestTeardowns, reporter, settingDuplDetail),
+
+                new SettingsDuplicationValidator<>(file, table::getTaskSetups, reporter, settingDuplDetail),
+
+                new SettingsDuplicationValidator<>(file, table::getTaskTeardowns, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getTestTimeouts, reporter),
-                new SettingsDuplicationValidator<>(file, table::getTestTimeouts, reporter, ". No timeout will be checked"),
+                new SettingsDuplicationValidator<>(file, table::getTestTimeouts, reporter, settingDuplDetail),
+
+                new SettingsDuplicationValidator<>(file, table::getTaskTimeouts, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getForceTags, reporter),
-                new SettingsDuplicationValidator<>(file, table::getForceTags, reporter),
+                new SettingsDuplicationValidator<>(file, table::getForceTags, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getDefaultTags, reporter),
-                new SettingsDuplicationValidator<>(file, table::getDefaultTags, reporter),
+                new SettingsDuplicationValidator<>(file, table::getDefaultTags, reporter, settingDuplDetail),
 
                 new SettingsDuplicationInOldRfValidator<>(file, table::getDocumentation, reporter),
-                new SettingsDuplicationValidator<>(file, table::getDocumentation, reporter),
+                new SettingsDuplicationValidator<>(file, table::getDocumentation, reporter, settingDuplDetail),
 
                 new DeprecatedGeneralSettingNameValidator(file, table, reporter),
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, table, reporter),
@@ -115,20 +126,18 @@ public class VersionDependentValidators {
     }
 
     public Stream<VersionDependentModelUnitValidator> getTestCaseSettingsValidators(final TestCase testCase) {
+        final String settingDuplDetail = getDuplicatedSettingDetailInfo();
         final IFile file = validationContext.getFile();
         final List<RobotLine> fileContent = testCase.getParent().getParent().getFileContent();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
                 new LocalSettingsDuplicationInOldRfValidator(file, fileContent, testCase.getBeginPosition(),
                         testCase.getEndPosition(), RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION, reporter),
-                new SettingsDuplicationValidator<>(file, testCase::getSetups, reporter, ". No Setup will be executed"),
-                new SettingsDuplicationValidator<>(file, testCase::getTeardowns, reporter,
-                        ". No Teardown will be executed"),
-                new SettingsDuplicationValidator<>(file, testCase::getTemplates, reporter,
-                        ". No template will be used"),
-                new SettingsDuplicationValidator<>(file, testCase::getTimeouts, reporter,
-                        ". No timeout will be checked"),
-                new SettingsDuplicationValidator<>(file, testCase::getTags, reporter),
-                new SettingsDuplicationValidator<>(file, testCase::getDocumentation, reporter),
+                new SettingsDuplicationValidator<>(file, testCase::getSetups, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, testCase::getTeardowns, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, testCase::getTemplates, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, testCase::getTimeouts, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, testCase::getTags, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, testCase::getDocumentation, reporter, settingDuplDetail),
                 new DeprecatedTestCaseSettingNameValidator(file, testCase, reporter),
                 new TemplateSettingUntilRf31Validator(validationContext,
                         testCase.getTemplates().stream().map(t -> t.adaptTo(TemplateSetting.class)).collect(toList()),
@@ -144,15 +153,16 @@ public class VersionDependentValidators {
     }
 
     public Stream<VersionDependentModelUnitValidator> getTaskSettingsValidators(final Task task) {
+        final String settingDuplDetail = getDuplicatedSettingDetailInfo();
         final IFile file = validationContext.getFile();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
-                new SettingsDuplicationValidator<>(file, task::getSetups, reporter, ". No Setup will be executed"),
-                new SettingsDuplicationValidator<>(file, task::getTeardowns, reporter,
-                        ". No Teardown will be executed"),
-                new SettingsDuplicationValidator<>(file, task::getTemplates, reporter, ". No template will be used"),
-                new SettingsDuplicationValidator<>(file, task::getTimeouts, reporter, ". No timeout will be checked"),
-                new SettingsDuplicationValidator<>(file, task::getTags, reporter),
-                new SettingsDuplicationValidator<>(file, task::getDocumentation, reporter),
+                new SettingsDuplicationValidator<>(file, task::getSetups, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, task::getTeardowns, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, task::getTemplates, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, task::getTimeouts, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, task::getTags, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, task::getDocumentation, reporter, settingDuplDetail),
+
                 new TemplateSettingUntilRf31Validator(validationContext,
                         task.getTemplates().stream().map(t -> t.adaptTo(TemplateSetting.class)).collect(toList()),
                         reporter),
@@ -168,19 +178,18 @@ public class VersionDependentValidators {
     }
 
     public Stream<VersionDependentModelUnitValidator> getKeywordSettingsValidators(final UserKeyword keyword) {
+        final String settingDuplDetail = getDuplicatedSettingDetailInfo();
         final IFile file = validationContext.getFile();
         final List<RobotLine> fileContent = keyword.getParent().getParent().getFileContent();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
                 new LocalSettingsDuplicationInOldRfValidator(file, fileContent, keyword.getBeginPosition(),
                         keyword.getEndPosition(), RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION, reporter),
-                new SettingsDuplicationValidator<>(file, keyword::getArguments, reporter),
-                new SettingsDuplicationValidator<>(file, keyword::getTeardowns, reporter,
-                        ". No Teardown will be executed"),
-                new SettingsDuplicationValidator<>(file, keyword::getReturns, reporter),
-                new SettingsDuplicationValidator<>(file, keyword::getTimeouts, reporter,
-                        ". No timeout will be checked"),
-                new SettingsDuplicationValidator<>(file, keyword::getTags, reporter),
-                new SettingsDuplicationValidator<>(file, keyword::getDocumentation, reporter),
+                new SettingsDuplicationValidator<>(file, keyword::getArguments, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, keyword::getTeardowns, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, keyword::getReturns, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, keyword::getTimeouts, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, keyword::getTags, reporter, settingDuplDetail),
+                new SettingsDuplicationValidator<>(file, keyword::getDocumentation, reporter, settingDuplDetail),
                 new DeprecatedKeywordSettingNameValidator(file, keyword, reporter),
                 new TimeoutMessageValidator<>(file, keyword::getTimeouts,
                         timeout -> timeout.tokensOf(RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE).collect(toList()),
@@ -189,6 +198,12 @@ public class VersionDependentValidators {
                         ". No timeout will be checked"));
 
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    private String getDuplicatedSettingDetailInfo() {
+        return validationContext.getVersion().isNewerOrEqualTo(new RobotVersion(3, 2))
+                ? ". Only first setting will be used"
+                : ". It will not be applied";
     }
 
     public Stream<VersionDependentModelUnitValidator> getForLoopValidators(

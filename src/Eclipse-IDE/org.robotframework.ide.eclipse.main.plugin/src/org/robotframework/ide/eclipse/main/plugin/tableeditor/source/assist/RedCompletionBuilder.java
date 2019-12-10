@@ -19,16 +19,23 @@ public class RedCompletionBuilder {
 
     public static interface ProposalContentStep {
 
-        LocationStep willPut(String string);
+        InsertLocationStep willPut(String string);
+
+        RemoveLocationStep willRemove();
     }
 
-    public static interface LocationStep {
+    public static interface InsertLocationStep {
 
         OptionalSettingsStep byInsertingAt(int offset);
 
         OptionalSettingsStep byReplacingRegion(IRegion region);
 
         OptionalSettingsStep byReplacingRegion(int offset, int length);
+    }
+
+    public static interface RemoveLocationStep {
+
+        OptionalSettingsStep theRegion(IRegion region);
     }
 
     public static interface OptionalSettingsStep {
@@ -55,8 +62,8 @@ public class RedCompletionBuilder {
         RedCompletionProposal create();
     }
 
-    private static class BuildingSteps
-            implements ProposalContentStep, LocationStep, OptionalSettingsStep, DecorationsStep {
+    private static class BuildingSteps implements ProposalContentStep, InsertLocationStep, RemoveLocationStep,
+            OptionalSettingsStep, DecorationsStep {
 
         private String contentToInsert;
 
@@ -83,9 +90,15 @@ public class RedCompletionBuilder {
         private final Collection<Runnable> operationsAfterAccept = new ArrayList<>();
 
         @Override
-        public LocationStep willPut(final String contentToInsert) {
+        public InsertLocationStep willPut(final String contentToInsert) {
             this.contentToInsert = contentToInsert;
             this.labelToDisplay = contentToInsert;
+            return this;
+        }
+
+        @Override
+        public RemoveLocationStep willRemove() {
+            willPut("");
             return this;
         }
 
@@ -104,6 +117,11 @@ public class RedCompletionBuilder {
             this.offset = offset;
             this.length = length;
             return this;
+        }
+
+        @Override
+        public OptionalSettingsStep theRegion(final IRegion region) {
+            return byReplacingRegion(region);
         }
 
         @Override

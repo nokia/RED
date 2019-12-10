@@ -37,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResour
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.JoinTemplateNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveSettingFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveSettingValuesExceptFirstFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
@@ -99,6 +100,16 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The setting '%s' is duplicated%s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new RemoveSettingFixer());
         }
     },
     DUPLICATED_SETTING_OLD {
