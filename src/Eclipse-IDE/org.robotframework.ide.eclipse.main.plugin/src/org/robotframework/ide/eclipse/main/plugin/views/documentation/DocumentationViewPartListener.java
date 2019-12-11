@@ -151,16 +151,17 @@ class DocumentationViewPartListener implements IPartListener {
             displayForSourceSelection(offset);
         }
 
-        private void displayForSourceSelection(final int offset) {
+        private void displayForSourceSelection(final int viewerOffset) {
             final IWorkbenchPage page = currentlyActiveEditor.getSite().getPage();
             Documentations.markViewSyncBroken(page);
 
             final SuiteSourceEditor sourceEditor = currentlyActiveEditor.getSourceEditor();
             final RobotSuiteFile fileModel = currentlyActiveEditor.provideSuiteModel();
             final IDocument document = sourceEditor.getDocument();
+            final int documentOffset = sourceEditor.getViewer().widgetOffset2ModelOffset(viewerOffset);
             try {
                 final Optional<SelectionInput> newInput = DocumentUtilities
-                        .findCellRegion(document, fileModel.isTsvFile(), offset)
+                        .findCellRegion(document, fileModel.isTsvFile(), documentOffset)
                         .map(SourceSelectedCellInput::new);
 
                 if (newInput.isPresent() && !Objects.equals(selectionInput, newInput.get())) {
@@ -192,7 +193,7 @@ class DocumentationViewPartListener implements IPartListener {
                         } catch (final InterruptedException e) {
                             // ok, out of sync in that case
                         }
-                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, offset));
+                    }, () -> Documentations.showDocForEditorSourceSelection(page, fileModel, document, documentOffset));
 
                 }
             } catch (final BadLocationException e) {
