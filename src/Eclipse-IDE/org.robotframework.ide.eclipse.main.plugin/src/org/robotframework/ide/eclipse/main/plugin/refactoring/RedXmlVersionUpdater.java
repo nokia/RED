@@ -59,19 +59,26 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
     final static List<RedXmlVersionTransition> RED_XML_TRANSITIONS = newArrayList(
             new TransitionFromVer1_0ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
 
+    public static void init() {
+        checkAlreadyOpenedProjects();
+        ResourcesPlugin.getWorkspace()
+                .addResourceChangeListener(new RedXmlVersionUpdater(), IResourceChangeEvent.POST_CHANGE);
+    }
+
     public RedXmlVersionUpdater() {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override
-    public void resourceChanged(IResourceChangeEvent event) {
+    public void resourceChanged(final IResourceChangeEvent event) {
         final IResourceDelta delta = event.getDelta();
         if (delta != null) {
             try {
                 delta.accept(new IResourceDeltaVisitor() {
 
-                    public boolean visit(IResourceDelta delta) throws CoreException {
-                        IResource resource = delta.getResource();
+                    @Override
+                    public boolean visit(final IResourceDelta delta) throws CoreException {
+                        final IResource resource = delta.getResource();
                         if (((resource.getType() & IResource.PROJECT) != 0) && resource.getProject().isOpen()
                                 && (delta.getKind() == IResourceDelta.CHANGED
                                         || delta.getKind() == IResourceDelta.ADDED)
@@ -94,7 +101,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
                         return true;
                     }
                 });
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 StatusManager.getManager()
                         .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()), StatusManager.SHOW);
             }
@@ -105,7 +112,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         if (!PlatformUI.isWorkbenchRunning()) { // do not do anything for headless
             return;
         }
-        List<RobotProject> projectsToUpdate = Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
+        final List<RobotProject> projectsToUpdate = Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
                 .filter(p -> RobotProjectNature.hasRobotNature(p))
                 .map(p -> RedPlugin.getModelManager().getModel().createRobotProject(p))
                 .filter(p -> !RobotProjectConfig.CURRENT_VERSION
@@ -122,18 +129,18 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
     }
 
     @Override
-    public void run(IMarker marker) {
+    public void run(final IMarker marker) {
         final IResource redXmlFile = marker.getResource();
         if (redXmlFile == null || !redXmlFile.exists() || !redXmlFile.getName().equals(RobotProjectConfig.FILENAME)) {
             throw new IllegalStateException("Marker is assigned to invalid file");
         }
-        IProject project = redXmlFile.getProject();
+        final IProject project = redXmlFile.getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
         tryToUpdateRedXml(newArrayList(robotProject));
         if (RobotProjectConfig.CURRENT_VERSION.equals(robotProject.getRobotProjectConfig().getVersion().getVersion())) {
             try {
                 marker.delete();
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 StatusManager.getManager()
                         .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()), StatusManager.SHOW);
             }
@@ -193,16 +200,16 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         config.setVersion(RobotProjectConfig.CURRENT_VERSION);
     }
 
-    private static void askAndUpdateRedXml(List<RobotProject> robotProjects) {
+    private static void askAndUpdateRedXml(final List<RobotProject> robotProjects) {
         new Thread(() -> {
-            List<RobotProject> projects = askUserAboutUpdateRedXml(robotProjects);
+            final List<RobotProject> projects = askUserAboutUpdateRedXml(robotProjects);
             tryToUpdateRedXml(projects);
         }).start();
     }
 
     private static void tryToUpdateRedXml(final List<RobotProject> robotProjects) {
         final List<RobotProject> nonUpdatable = new ArrayList<>();
-        for (RobotProject project : robotProjects) {
+        for (final RobotProject project : robotProjects) {
             if (isAutoUpdatePossible(project)) {
                 executeRedXmlUpdate(project);
             } else {
@@ -284,12 +291,12 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
     static class TransitionFromVer1_0ToVer1 extends RedXmlVersionTransition {
 
-        TransitionFromVer1_0ToVer1(String version, boolean canBeAutoUpgraded) {
+        TransitionFromVer1_0ToVer1(final String version, final boolean canBeAutoUpgraded) {
             super(version, canBeAutoUpgraded);
         }
 
         @Override
-        void upgradeRedXml(RobotProjectConfig config) {
+        void upgradeRedXml(final RobotProjectConfig config) {
             // nothing to do, version alias only
         }
 
@@ -297,7 +304,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
     static class TransitionFromVer1ToVer2 extends RedXmlVersionTransition {
 
-        TransitionFromVer1ToVer2(String version, boolean canBeAutoUpgraded) {
+        TransitionFromVer1ToVer2(final String version, final boolean canBeAutoUpgraded) {
             super(version, canBeAutoUpgraded);
         }
 
@@ -305,7 +312,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         void upgradeRedXml(final RobotProjectConfig config) {
             final List<ReferencedLibrary> refLibs = config.getReferencedLibraries();
 
-            for (ReferencedLibrary lib : refLibs) {
+            for (final ReferencedLibrary lib : refLibs) {
                 updateReferencedLibraryRecord(lib);
             }
         }
@@ -314,7 +321,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
             // this method uses python search order - directory module then file then file with
             // class inside
             if (LibraryType.PYTHON.name().equals(lib.getType())) {
-                String oldPathWithName = lib.getPath() + "/" + lib.getName().replaceAll("\\.", "/");
+                final String oldPathWithName = lib.getPath() + "/" + lib.getName().replaceAll("\\.", "/");
                 if (!checkAndUpdatePathIfCorrect(lib, new Path(oldPathWithName + "/__init__.py"))) {
                     if (!checkAndUpdatePathIfCorrect(lib, new Path(oldPathWithName + ".py"))) {
                         final IPath pathToCheck = new Path(oldPathWithName).removeLastSegments(1)
@@ -326,7 +333,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         }
 
         private boolean checkAndUpdatePathIfCorrect(final ReferencedLibrary lib, final IPath pathToCheck) {
-            File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(pathToCheck).toFile();
+            final File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(pathToCheck).toFile();
             if (file.exists()) {
                 lib.setPath(pathToCheck.toString());
                 return true;

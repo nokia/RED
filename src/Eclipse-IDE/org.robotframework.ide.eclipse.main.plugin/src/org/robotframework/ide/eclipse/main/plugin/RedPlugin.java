@@ -8,8 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -52,6 +50,7 @@ public class RedPlugin extends AbstractUIPlugin {
         return RobotTestExecutionServiceManager.getInstance().service;
     }
 
+    @SuppressWarnings("deprecation")
     static ImageDescriptor getImageDescriptor(final String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
@@ -65,11 +64,12 @@ public class RedPlugin extends AbstractUIPlugin {
             }
             RedPreferencesFixer.updatePreferencesWithoutPrefixesIfNeeded(getPreferenceStore());
             RedPreferencesFixer.updateModifiedPreferencesIfNeeded(getPreferenceStore());
-            enableRedXmlVersionChecker();
+            RedXmlVersionUpdater.init();
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
         }
         plugin = this;
+        logInfo("RED plugin started, version: " + getDefault().getBundle().getVersion().toString());
     }
 
     @Override
@@ -137,11 +137,6 @@ public class RedPlugin extends AbstractUIPlugin {
         } else {
             return null;
         }
-    }
-
-    private static void enableRedXmlVersionChecker() {
-        RedXmlVersionUpdater.checkAlreadyOpenedProjects();
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(new RedXmlVersionUpdater(), IResourceChangeEvent.POST_CHANGE);
     }
 
     private static class RobotTestExecutionServiceManager {
