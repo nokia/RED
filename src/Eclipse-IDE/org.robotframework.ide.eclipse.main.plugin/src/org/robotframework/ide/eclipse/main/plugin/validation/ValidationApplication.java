@@ -35,9 +35,9 @@ public class ValidationApplication implements IApplication {
         // this is necessary to load preferences before start or sometimes error stack
         // would appear due to using prefs in another thread before fully loaded
         RedPlugin.getDefault().getPreferences();
-        
+
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
-        final boolean isAutobuildingEnabled = description.isAutoBuilding();
+        final boolean isAutoBuildingEnabled = description.isAutoBuilding();
         description.setAutoBuilding(false);
         ResourcesPlugin.getWorkspace().setDescription(description);
         try {
@@ -71,7 +71,7 @@ public class ValidationApplication implements IApplication {
             return -200;
         } finally {
             description = ResourcesPlugin.getWorkspace().getDescription();
-            description.setAutoBuilding(isAutobuildingEnabled);
+            description.setAutoBuilding(isAutoBuildingEnabled);
             ResourcesPlugin.getWorkspace().setDescription(description);
         }
     }
@@ -90,14 +90,13 @@ public class ValidationApplication implements IApplication {
             } else if (!project.isOpen()) {
                 logger.log("Project '" + projectName + "' validation was SKIPPED (is closed)");
             } else {
-                final RobotProject robotProject = new RobotModel().createRobotProject(project);
-                RobotProjectBuilder.clean(robotProject);
-
                 final RobotProjectBuilder builder = new RobotProjectBuilder(reporter, fatalReporter, logger);
 
                 fatalReporter.projectValidationStarted(projectName);
                 reporter.projectValidationStarted(projectName);
 
+                final RobotProject robotProject = new RobotModel().createRobotProject(project);
+                RobotProjectBuilder.clean(robotProject);
                 builder.build(IncrementalProjectBuilder.FULL_BUILD, robotProject, new NullProgressMonitor());
 
                 fatalReporter.projectValidationFinished(projectName);

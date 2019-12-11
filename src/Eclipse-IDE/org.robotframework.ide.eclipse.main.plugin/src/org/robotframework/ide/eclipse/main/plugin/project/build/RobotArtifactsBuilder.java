@@ -40,23 +40,13 @@ class RobotArtifactsBuilder {
     Job createBuildJob(final boolean rebuildNeeded, final ValidationReportingStrategy reporter,
             final ValidationReportingStrategy fatalReporter) {
         if (rebuildNeeded) {
-            logger.log("BUILDING: refreshing project");
-
             return new Job("Building") {
 
                 @Override
                 protected IStatus run(final IProgressMonitor monitor) {
                     try {
-                        try {
-                            project.getFile(".project")
-                                    .deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                            project.getFile(RobotProjectConfig.FILENAME)
-                                    .deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                        } catch (final CoreException e) {
-                            // that's fine, lets try to build project
-                        }
+                        refreshConfigFiles();
                         buildArtifacts(project, monitor, reporter, fatalReporter);
-
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
                         return new Status(IStatus.CANCEL, RedPlugin.PLUGIN_ID, "Unable to build project", e);
@@ -75,6 +65,17 @@ class RobotArtifactsBuilder {
                     return Status.OK_STATUS;
                 }
             };
+        }
+    }
+
+    private void refreshConfigFiles() {
+        try {
+            logger.log("BUILDING: refreshing project");
+            project.getFile(".project").deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+            project.getFile(RobotProjectConfig.FILENAME)
+                    .deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        } catch (final CoreException e) {
+            // that's fine, lets try to build project
         }
     }
 
@@ -152,6 +153,7 @@ class RobotArtifactsBuilder {
         return runtimeEnvironment;
     }
 
+    @VisibleForTesting
     void checkRuntimeEnvironment(final IRuntimeEnvironment runtimeEnvironment, final RobotProject robotProject,
             final ValidationReportingStrategy reporter) {
 

@@ -258,10 +258,10 @@ public class RedProjectEditor extends MultiPageEditorPart {
             dirtyEditor.doSave(monitor);
         }
         final RobotProject project = editorInput.getRobotProject();
-        project.clearAll();
+
         new RedEclipseProjectConfigWriter().writeConfiguration(editorInput.getProjectConfiguration(), project);
 
-        RobotProjectBuilder.removeAllUnusedLibspecsFiles(project);
+        RobotProjectBuilder.scheduleClean(project);
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {

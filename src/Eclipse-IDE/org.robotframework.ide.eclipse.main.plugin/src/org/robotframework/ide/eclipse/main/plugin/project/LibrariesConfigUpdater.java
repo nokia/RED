@@ -15,6 +15,7 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProjectBuilder;
 
 /**
  * @author bembenek
@@ -70,6 +71,7 @@ public class LibrariesConfigUpdater {
                 robotProject.clearConfiguration();
                 robotProject.clearKwSources();
                 new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
+                RobotProjectBuilder.scheduleClean(robotProject);
             }
             fireEvents(eventBroker);
             addedLibraries.clear();

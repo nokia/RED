@@ -54,7 +54,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
     public void build(final int kind, final RobotProject robotProject, final IProgressMonitor monitor)
             throws CoreException {
-        final boolean isValidationTurnedOff = RedPlugin.getDefault().getPreferences().isValidationTurnedOff();
+        final boolean isValidationEnabled = !RedPlugin.getDefault().getPreferences().isValidationTurnedOff();
         try {
             final IProject project = robotProject.getProject();
             final LibspecsFolder libspecsFolder = LibspecsFolder.createIfNeeded(project);
@@ -64,7 +64,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded, reporter,
                     fatalReporter);
             Job validationJob = null;
-            if (!isValidationTurnedOff) {
+            if (isValidationEnabled) {
                 final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(project, delta,
                         kind, reporter);
                 validationJob = new RobotArtifactsValidator(project, logger).createValidationJob(buildJob,
@@ -75,7 +75,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
                 monitor.subTask("waiting for project " + projectPath + " build end");
                 buildJob.schedule();
-                if (!isValidationTurnedOff) {
+                if (isValidationEnabled) {
                     validationJob.schedule();
                 }
                 buildJob.join();
@@ -85,7 +85,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                         || buildJob.getResult().getSeverity() == IStatus.ERROR) {
                     if (libspecsFolder.exists()) {
                         libspecsFolder.remove();
-                        if (!isValidationTurnedOff) {
+                        if (isValidationEnabled) {
                             validationJob.cancel();
                         }
                         return;
@@ -93,11 +93,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
                 }
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
-                if (!monitor.isCanceled()) {
+                if (isValidationEnabled && !monitor.isCanceled()) {
                     monitor.subTask("waiting for project " + projectPath + " validation end");
-                    if (!isValidationTurnedOff) {
-                        validationJob.join();
-                    }
+                    validationJob.join();
                 }
             } catch (final InterruptedException e) {
                 throw new CoreException(Status.CANCEL_STATUS);
@@ -116,14 +114,12 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         clean(RedPlugin.getModelManager().createProject(project));
     }
 
-    public static void clean(final RobotProject project) throws CoreException {
-        project.clearConfiguration();
-        project.clearKwSources();
-
+    public static void clean(final RobotProject project) {
+        project.clearAll();
         removeAllUnusedLibspecsFiles(project);
     }
 
-    public static void removeAllUnusedLibspecsFiles(final RobotProject project) {
+    private static void removeAllUnusedLibspecsFiles(final RobotProject project) {
         final LibspecsFolder libspecsFolder = project.getLibspecsFolder();
         final Set<IFile> filesToPreserve = project.getLibraryDescriptorsStream()
                 .map(LibraryDescriptor::generateLibspecFileName)
@@ -134,6 +130,24 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             libspecsFolder.preserveOnly(filesToPreserve);
         } catch (final CoreException e) {
             // ok, so the unused files are still there
+        }
+    }
+
+    public static void scheduleClean(final RobotProject project) {
+        if (project.getProject().exists() && project.getProject().isOpen()) {
+            final Job cleanJob = new Job("Cleaning project") {
+
+                @Override
+                public IStatus run(final IProgressMonitor monitor) {
+                    try {
+                        project.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+                        return Status.OK_STATUS;
+                    } catch (final CoreException e) {
+                        return e.getStatus();
+                    }
+                }
+            };
+            cleanJob.schedule();
         }
     }
 }
