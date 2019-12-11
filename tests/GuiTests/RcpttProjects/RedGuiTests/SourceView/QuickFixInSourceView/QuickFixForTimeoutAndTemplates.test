@@ -1,0 +1,210 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: QuickFixForTimeoutAndTemplates
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _GRUFABtrEeq6f9_VBibLOg
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/11/19 11:28 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings *** \n"
+    + "Test Timeout    10  message\n"
+    + "# Test Template     Example    keyword\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "   [Timeout]  20  message\n"
+    + "   log  8\n"
+    + "    \n\n"
+    + "test 2\n"
+    + "    [Template]    Example    keyword\n"
+    + "    1    2    3\n\n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a1}    ${a2}    ${a3}=default\n"
+    + "    Log Many    ${a1}    ${a2}    ${a3}\n"
+    + "    \n\n"
+    + "keyword with timeout\n"
+    + "   [Timeout]  30  message   \n"
+    + "   ...  second line  \n"
+    + "   log  7" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+wait-for-warnings  -amount 4
+
+// use QF fo timout settings
+with [get-editor "TestFile.robot" | get-text-viewer] {     
+    set-caret-pos 2 22
+    hover-text 2 24
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Remove Test Timeout message" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Remove Test Timeout message" 
+    | click -default
+    
+// check if was removed    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings *** \n"
+    + "Test Timeout    10\n"
+    + "# Test Template     Example    keyword\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "   [Timeout]  20  message\n"
+    + "   log  8\n"
+    + "    \n\n"
+    + "test 2\n"
+    + "    [Template]    Example    keyword\n"
+    + "    1    2    3\n\n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a1}    ${a2}    ${a3}=default\n"
+    + "    Log Many    ${a1}    ${a2}    ${a3}\n"
+    + "    \n\n"
+    + "keyword with timeout\n"
+    + "   [Timeout]  30  message   \n"
+    + "   ...  second line  \n"
+    + "   log  7" | verify-true
+    
+
+// set focus on TC timeout    
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 7 22
+
+// use QF from Problems view
+with [get-view Problems] {
+    click
+    get-tree | select [get-item -path "Warnings (3 items)" | get-item 
+        -path "Specifying custom timeout messages is deprecated" -index 1] | get-menu -path "Quick Fix" | click
+}
+with [get-window "Quick Fix" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Remove Test Timeout message" | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+
+
+// check text
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings *** \n"
+    + "Test Timeout    10\n"
+    + "# Test Template     Example    keyword\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "   [Timeout]  20\n"
+    + "   log  8\n"
+    + "    \n\n"
+    + "test 2\n"
+    + "    [Template]    Example    keyword\n"
+    + "    1    2    3\n\n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a1}    ${a2}    ${a3}=default\n"
+    + "    Log Many    ${a1}    ${a2}    ${a3}\n"
+    + "    \n\n"
+    + "keyword with timeout\n"
+    + "   [Timeout]  30  message   \n"
+    + "   ...  second line  \n"
+    + "   log  7" | verify-true
+    
+// use QF for KW  from source and menu
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 22 23
+    get-menu -path "Quick Fix" | click
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Remove Test Timeout message" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Remove Test Timeout message" 
+    | click -default
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings *** \n"
+    + "Test Timeout    10\n"
+    + "# Test Template     Example    keyword\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "   [Timeout]  20\n"
+    + "   log  8\n"
+    + "    \n\n"
+    + "test 2\n"
+    + "    [Template]    Example    keyword\n"
+    + "    1    2    3\n\n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a1}    ${a2}    ${a3}=default\n"
+    + "    Log Many    ${a1}    ${a2}    ${a3}\n"
+    + "    \n\n"
+    + "keyword with timeout\n"
+    + "   [Timeout]  30  \n"
+    + "   log  7" | verify-true
+    
+    
+// ------------------------------------------- templates ---------------------------------------------------------------
+
+// use QF by shortcut in TC tempaltes
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 12 12
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Merge name into single cell" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Merge name into single cell" 
+    | click -default
+    
+// uncomet tempaltes in settings    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 17
+    key-type "M1+/"
+}
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+
+// use QF from Problems view
+wait-for-warnings -amount 1
+try -times 3 -delay 500 -command{
+get-view Problems | get-tree | get-item 
+    -path "Warnings \\(1 item\\)/The name of template keyword is written in multiple cells" | get-property "image.path" 
+    | equals ".*quickfix_warning_obj.png" | verify-true
+}
+wait 500    
+get-view Problems | get-tree | select "Warnings (1 item)/The name of template keyword is written in multiple cells" 
+    | get-menu -path "Quick Fix" | click
+    
+with [get-window "Quick Fix" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Merge name into single cell" | verify-true
+}
+with [get-window "Quick Fix"] {
+    get-table | select "Merge name into single cell" | double-click
+    get-button Finish | click
+}
+// check text
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings *** \n"
+    + "Test Timeout    10\n"
+    + "Test Template    Example keyword\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "   [Timeout]  20\n"
+    + "   log  8\n"
+    + "    \n\n"
+    + "test 2\n"
+    + "    [Template]    Example keyword\n"
+    + "    1    2    3\n\n"
+    + "*** Keywords ***\n"
+    + "Example keyword\n"
+    + "    [Arguments]    ${a1}    ${a2}    ${a3}=default\n"
+    + "    Log Many    ${a1}    ${a2}    ${a3}\n"
+    + "    \n\n"
+    + "keyword with timeout\n"
+    + "   [Timeout]  30  \n"
+    + "   log  7" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
