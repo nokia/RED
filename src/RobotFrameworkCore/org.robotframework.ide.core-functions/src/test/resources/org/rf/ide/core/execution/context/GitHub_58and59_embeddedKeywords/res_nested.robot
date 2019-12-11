@@ -1,3 +1,0 @@
-*** Keywords ***
-KeyNested
-	Log	ok
