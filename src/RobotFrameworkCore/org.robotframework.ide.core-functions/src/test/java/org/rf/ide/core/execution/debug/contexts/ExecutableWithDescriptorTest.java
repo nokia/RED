@@ -171,9 +171,10 @@ public class ExecutableWithDescriptorTest {
         final RobotToken token = RobotToken.create("keyword");
         token.setFilePosition(new FilePosition(42, 0, 100));
 
-        final IExecutableRowDescriptor descriptor = mock(IExecutableRowDescriptor.class);
-        when(descriptor.getKeywordAction()).thenReturn(new RobotAction(token, newArrayList()));
         final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
+        executable.setAction(token);
+        final IExecutableRowDescriptor descriptor = mock(IExecutableRowDescriptor.class);
+        when(descriptor.getRow()).thenReturn(executable);
 
         final ExecutableWithDescriptor execDescriptor = new ExecutableWithDescriptor(executable, descriptor, null);
 
@@ -185,9 +186,9 @@ public class ExecutableWithDescriptorTest {
         final RobotToken token = RobotToken.create("keyword_in_loop");
         token.setFilePosition(new FilePosition(57, 0, 100));
         final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
+        executable.setAction(token);
 
         final ForLoopContinueRowDescriptor<?> descriptor = new ForLoopContinueRowDescriptor<>(executable);
-        descriptor.setKeywordAction(new RobotAction(token, newArrayList()));
 
         final ExecutableWithDescriptor execDescriptor = new ExecutableWithDescriptor(executable, descriptor, null);
 

@@ -77,27 +77,23 @@ class CommonContextsTransitions {
             final ExecutableSetting setting, final boolean isTest, final RunningKeyword keyword,
             final StackFrameContext previousContext, final RobotBreakpointSupplier breakpointSupplier) {
 
+        final int declarationLine = setting.getDeclaration().getLineNumber();
         final RobotToken keywordToken = setting.getKeywordName();
 
         final boolean isSetup = setting.isSetup();
-
         if (keywordToken == null || keywordToken.getText().isEmpty()) {
-            final String msg = ErrorMessages
-                    .errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(isSetup, isTest);
+            final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(isSetup, isTest);
             final String errorMessage = String.format(msg, keyword.asCall());
-            return new SetupTeardownContext(fileUri, setting.getDeclaration().getLineNumber(), errorMessage,
-                    previousContext);
+            return new SetupTeardownContext(fileUri, declarationLine, errorMessage, previousContext);
 
         } else if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-            return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(),
-                    previousContext, breakpointSupplier);
+            return new SetupTeardownContext(fileUri, keywordToken.getText(), declarationLine, previousContext,
+                    breakpointSupplier);
 
         } else {
-            final String msg = ErrorMessages
-                    .errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, isTest);
+            final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, isTest);
             final String errorMessage = String.format(msg, keyword.asCall(), keywordToken.getText());
-            return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), errorMessage,
-                    previousContext);
+            return new SetupTeardownContext(fileUri, declarationLine, errorMessage, previousContext);
         }
     }
 
@@ -116,6 +112,7 @@ class CommonContextsTransitions {
 
             final ExecutableSetting setting = settings.isEmpty() ? null : settings.get(0);
             if (setting != null) {
+                final int declarationLine = setting.getDeclaration().getLineNumber();
                 final RobotToken keywordToken = setting.getKeywordName();
                 final URI fileUri = fileModel.getParent().getProcessedFile().toURI();
 
@@ -123,17 +120,16 @@ class CommonContextsTransitions {
                     final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(isSetup,
                             true);
                     final String errorMsg = String.format(msg, keyword.asCall());
-                    return new SetupTeardownContext(fileUri, setting.getDeclaration().getLineNumber(), errorMsg,
-                            previousContext);
+                    return new SetupTeardownContext(fileUri, declarationLine, errorMsg, previousContext);
 
                 } else if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-                    return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(),
-                            previousContext, breakpointSupplier);
+                    return new SetupTeardownContext(fileUri, keywordToken.getText(), declarationLine, previousContext,
+                            breakpointSupplier);
 
                 } else {
                     final String msg = ErrorMessages.errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(isSetup, true);
                     final String errorMsg = String.format(msg, keyword.asCall(), keywordToken.getText());
-                    return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), errorMsg, previousContext);
+                    return new SetupTeardownContext(fileUri, declarationLine, errorMsg, previousContext);
                 }
             }
         }

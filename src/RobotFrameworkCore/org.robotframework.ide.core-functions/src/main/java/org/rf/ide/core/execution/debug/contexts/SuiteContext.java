@@ -121,24 +121,23 @@ public class SuiteContext extends DefaultContext {
                 return new SetupTeardownContext(fileUri, line, errorMsg, this);
             }
 
+            final int declarationLine = setting.getDeclaration().getLineNumber();
             final RobotToken keywordToken = setting.getKeywordName();
             if (keywordToken == null || keywordToken.getText().isEmpty()) {
                 final String msg = ErrorMessages
                         .errorOfSuitePrePostKwNotFoundBecauseOfMissingSetting(keyword.isSetup());
                 final String errorMsg = String.format(msg, keyword.asCall());
-                final int line = setting.getDeclaration().getLineNumber();
 
-                return new SetupTeardownContext(fileUri, line, errorMsg, this, breakpointSupplier);
+                return new SetupTeardownContext(fileUri, declarationLine, errorMsg, this, breakpointSupplier);
             }
 
             if (CallChecker.isCallOf(keywordToken.getText(), keyword)) {
-                return new SetupTeardownContext(fileUri, keywordToken.getText(), keywordToken.getLineNumber(), this,
+                return new SetupTeardownContext(fileUri, keywordToken.getText(), declarationLine, this,
                         breakpointSupplier);
             } else {
                 final String msg = ErrorMessages.errorOfSuitePrePostKwNotFoundBecauseOfDifferentCall(keyword.isSetup());
                 final String errorMsg = String.format(msg, keyword.asCall(), keywordToken.getText());
-                return new SetupTeardownContext(fileUri, keywordToken.getLineNumber(), errorMsg, this,
-                        breakpointSupplier);
+                return new SetupTeardownContext(fileUri, declarationLine, errorMsg, this, breakpointSupplier);
             }
         } else {
             throw new IllegalDebugContextStateException(

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -17,16 +19,24 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.ui.ISources;
-import org.rf.ide.core.testdata.model.ExecutableLineChecker;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ExecutableSetting;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.LocalSetting;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler.E4ToggleBreakpointHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
@@ -41,7 +51,7 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
 
         @Execute
         public void toggleBreakpoint(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
-                @Optional @Named(ISources.ACTIVE_MENU_NAME) final Set<String> menuName)
+                @org.eclipse.e4.core.di.annotations.Optional @Named(ISources.ACTIVE_MENU_NAME) final Set<String> menuName)
                 throws CoreException {
 
             final SuiteSourceEditor sourceEditor = editor.getSourceEditor();
@@ -61,27 +71,73 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
 
         public static void toggle(final IResource file, final int line) throws CoreException {
             final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
-            for (final IBreakpoint breakpoint : breakpointManager.getBreakpoints()) {
-                if (breakpoint.getMarker().getResource().equals(file)
-                        && breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == line) {
-                    breakpoint.delete();
+            final Optional<IBreakpoint> existingBreakpoint = findBreakpoint(breakpointManager, file, line);
+            if (existingBreakpoint.isPresent()) {
+                existingBreakpoint.get().delete();
+                return;
+            }
+
+            final Optional<Integer> targetBreakpointLine = getPossibleBreakpointLine(file, line);
+            if (targetBreakpointLine.isPresent()) {
+                final int targetLine = targetBreakpointLine.get();
+
+                final Optional<IBreakpoint> existingBreakpointInTargetLine = findBreakpoint(breakpointManager, file,
+                        targetLine);
+                if (existingBreakpointInTargetLine.isPresent()) {
+                    // we do not delete it because it means that line != targetLine but there is
+                    // already breakpoint in target line so we simply do not want to duplicate it
                     return;
                 }
-            }
-            if (isExecutableLine(file, line)) {
-                breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, line));
+                breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, targetLine));
             }
         }
 
-        private static boolean isExecutableLine(final IResource file, final int line) {
-            if (file instanceof IFile) {
-                final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) file);
-                if (robotSuiteFile != null) {
-                    return ExecutableLineChecker.isExecutableLine(robotSuiteFile.getLinkedElement(), line);
+        private static Optional<IBreakpoint> findBreakpoint(final IBreakpointManager manager, final IResource file,
+                final int line) {
+            for (final IBreakpoint breakpoint : manager.getBreakpoints()) {
+                if (breakpoint.getMarker().getResource().equals(file)
+                        && breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1) == line) {
+                    return Optional.of(breakpoint);
                 }
             }
-            return false;
+            return Optional.empty();
         }
 
+        private static Optional<Integer> getPossibleBreakpointLine(final IResource file, final int lineOfToggle) {
+            return Optional.ofNullable(file)
+                    .filter(IFile.class::isInstance)
+                    .map(IFile.class::cast)
+                    .map(f -> RedPlugin.getModelManager().createSuiteFile(f))
+                    .flatMap(m -> getPossibleBreakpointLine(m, lineOfToggle));
+        }
+
+        @VisibleForTesting
+        static Optional<Integer> getPossibleBreakpointLine(final RobotSuiteFile robotSuiteFile,
+                final int lineOfToggle) {
+            final RobotFile model = robotSuiteFile.getLinkedElement();
+            return getFirstTokenOffset(model, lineOfToggle).flatMap(robotSuiteFile::findElement)
+                    .filter(RobotFileInternalElement.class::isInstance)
+                    .map(RobotFileInternalElement.class::cast)
+                    .map(RobotFileInternalElement::getLinkedElement)
+                    .filter(AModelElement.class::isInstance)
+                    .map(AModelElement.class::cast)
+                    .filter(E4ToggleBreakpointHandler::canPlaceLineBreakpointOn)
+                    .map(AModelElement::getDeclaration)
+                    .map(RobotToken::getLineNumber);
+        }
+
+        private static Optional<Integer> getFirstTokenOffset(final RobotFile model, final int line) {
+            final List<RobotLine> content = model.getFileContent();
+            return 0 <= line - 1 && line - 1 < content.size()
+                    ? content.get(line - 1).tokensStream().findFirst().map(RobotToken::getStartOffset)
+                    : Optional.empty();
+        }
+
+        private static boolean canPlaceLineBreakpointOn(final AModelElement<?> modelElem) {
+            return modelElem instanceof RobotExecutableRow<?>
+                    || modelElem instanceof ExecutableSetting
+                    || modelElem instanceof LocalSetting<?>
+                            && ((LocalSetting<?>) modelElem).adaptTo(ExecutableSetting.class) != null;
+        }
     }
 }

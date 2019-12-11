@@ -69,7 +69,7 @@ class ExecutableWithDescriptor {
     }
 
     int getLine() {
-        return getDescriptor().getKeywordAction().getToken().getLineNumber();
+        return getDescriptor().getRow().getDeclaration().getLineNumber();
     }
 
     String getCalledKeywordName() {
