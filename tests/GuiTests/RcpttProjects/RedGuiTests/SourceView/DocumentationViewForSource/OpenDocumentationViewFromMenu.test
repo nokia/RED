@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 3:11 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/12/19 3:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -131,5 +131,22 @@ with [get-editor "checking_doc.robot" | get-text-viewer] {
 check-documentation-view -kw_name "Log"  -arguments "\[message, level=INFO, html=False, console=False, repr=False, formatter=str\]" -library "BuiltIn" 
 	-spec "Logs the given message with the given level.*"
 	
+// bug RED-1375
+
+// fold two tests
+with [get-editor "checking_doc.robot"] {
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 5
+    wait 500
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 10
+    with [get-text-viewer] {
+        set-caret-pos 17 10
+    }
+}
+check-documentation-view-for-user-kw -kw_name "kw_with_only_doc" -path "/RobotProject/checking_doc.robot"  -spec "I have only doc, no args"
+    
+get-editor "checking_doc.robot" | get-text-viewer | set-caret-pos 16 6
 	
+check-documentation-view -kw_name "Log"  -arguments "\[message, level=INFO, html=False, console=False, repr=False, formatter=str\]" -library "BuiltIn" 
+	-spec "Logs the given message with the given level.*"
+		
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
