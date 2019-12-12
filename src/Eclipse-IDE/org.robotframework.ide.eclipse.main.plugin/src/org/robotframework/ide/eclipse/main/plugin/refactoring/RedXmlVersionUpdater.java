@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -49,6 +48,7 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author lwlodarc
@@ -56,50 +56,42 @@ import com.google.common.annotations.VisibleForTesting;
 public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerResolution {
 
     @VisibleForTesting
-    final static List<RedXmlVersionTransition> RED_XML_TRANSITIONS = newArrayList(
-            new TransitionFromVer1_0ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
+    final static List<RedXmlVersionTransition> RED_XML_TRANSITIONS = ImmutableList
+            .of(new TransitionFromVer1_0ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
 
     public static void init() {
-        checkAlreadyOpenedProjects();
+        final List<RobotProject> projectsToUpdate = Arrays
+                .stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
+                .filter(RobotProjectNature::hasRobotNature)
+                .map(p -> RedPlugin.getModelManager().getModel().createRobotProject(p))
+                .filter(RedXmlVersionUpdater::hasVersionMismatch)
+                .collect(Collectors.toList());
+        askAndUpdateRedXml(projectsToUpdate);
         ResourcesPlugin.getWorkspace()
                 .addResourceChangeListener(new RedXmlVersionUpdater(), IResourceChangeEvent.POST_CHANGE);
     }
 
-    public RedXmlVersionUpdater() {
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-    }
-
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
-        final IResourceDelta delta = event.getDelta();
-        if (delta != null) {
+        if (event.getDelta() != null) {
             try {
-                delta.accept(new IResourceDeltaVisitor() {
+                event.getDelta().accept(delta -> {
+                    final IResource resource = delta.getResource();
+                    if (((resource.getType() & IResource.PROJECT) != 0) && resource.getProject().isOpen()
+                            && (delta.getKind() == IResourceDelta.CHANGED || delta.getKind() == IResourceDelta.ADDED)
+                            && ((delta.getFlags() & IResourceDelta.OPEN) != 0)
+                            && RobotProjectNature.hasRobotNature((IProject) resource)) {
 
-                    @Override
-                    public boolean visit(final IResourceDelta delta) throws CoreException {
-                        final IResource resource = delta.getResource();
-                        if (((resource.getType() & IResource.PROJECT) != 0) && resource.getProject().isOpen()
-                                && (delta.getKind() == IResourceDelta.CHANGED
-                                        || delta.getKind() == IResourceDelta.ADDED)
-                                && ((delta.getFlags() & IResourceDelta.OPEN) != 0)
-                                && RobotProjectNature.hasRobotNature((IProject) resource)) {
+                        final RobotProject robotProject = RedPlugin.getModelManager()
+                                .createProject((IProject) resource);
 
-                            final RobotProject robotProject = RedPlugin.getModelManager()
-                                    .createProject((IProject) resource);
-                            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
-
-                            // TODO: Importing project would not trigger this.
-                            // IFile.exists() == false;
-                            if (PlatformUI.isWorkbenchRunning() // do not do anything for headless
-                                    && !config.isNullConfig()
-                                    && !RobotProjectConfig.CURRENT_VERSION.equals(config.getVersion().getVersion())) {
-
-                                askAndUpdateRedXml(newArrayList(robotProject));
-                            }
+                        // TODO: Importing project would not trigger this
+                        // (IFile.exists() == false) in RedEclipseProjectConfigReader
+                        if (hasVersionMismatch(robotProject)) {
+                            askAndUpdateRedXml(newArrayList(robotProject));
                         }
-                        return true;
                     }
+                    return true;
                 });
             } catch (final CoreException e) {
                 StatusManager.getManager()
@@ -108,19 +100,9 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         }
     }
 
-    public static void checkAlreadyOpenedProjects() {
-        if (!PlatformUI.isWorkbenchRunning()) { // do not do anything for headless
-            return;
-        }
-        final List<RobotProject> projectsToUpdate = Arrays.stream(ResourcesPlugin.getWorkspace().getRoot().getProjects())
-                .filter(p -> RobotProjectNature.hasRobotNature(p))
-                .map(p -> RedPlugin.getModelManager().getModel().createRobotProject(p))
-                .filter(p -> !RobotProjectConfig.CURRENT_VERSION
-                        .equals(p.getRobotProjectConfig().getVersion().getVersion()))
-                .collect(Collectors.toList());
-        if (!projectsToUpdate.isEmpty()) {
-            askAndUpdateRedXml(projectsToUpdate);
-        }
+    private static boolean hasVersionMismatch(final RobotProject robotProject) {
+        final RobotProjectConfig config = robotProject.getRobotProjectConfig();
+        return !config.isNullConfig() && !RobotProjectConfig.CURRENT_VERSION.equals(config.getVersion().getVersion());
     }
 
     @Override
@@ -182,7 +164,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         return -1;
     }
 
-    public static void executeRedXmlUpdate(final RobotProject robotProject) {
+    private static void executeRedXmlUpdate(final RobotProject robotProject) {
         final RobotProjectConfig config = new RedEclipseProjectConfigReader()
                 .readConfiguration(robotProject.getConfigurationFile());
 
@@ -201,22 +183,25 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
     }
 
     private static void askAndUpdateRedXml(final List<RobotProject> robotProjects) {
-        new Thread(() -> {
-            final List<RobotProject> projects = askUserAboutUpdateRedXml(robotProjects);
-            tryToUpdateRedXml(projects);
-        }).start();
+        // do not do anything for headless
+        if (PlatformUI.isWorkbenchRunning() && !robotProjects.isEmpty()) {
+            new Thread(() -> {
+                final List<RobotProject> projectsToUpdate = askUserAboutUpdateRedXml(robotProjects);
+                tryToUpdateRedXml(projectsToUpdate);
+            }).start();
+        }
     }
 
     private static void tryToUpdateRedXml(final List<RobotProject> robotProjects) {
-        final List<RobotProject> nonUpdatable = new ArrayList<>();
+        final List<RobotProject> notUpdated = new ArrayList<>();
         for (final RobotProject project : robotProjects) {
             if (isAutoUpdatePossible(project)) {
                 executeRedXmlUpdate(project);
             } else {
-                nonUpdatable.add(project);
+                notUpdated.add(project);
             }
         }
-        if (!nonUpdatable.isEmpty()) {
+        if (!notUpdated.isEmpty()) {
             final String detailedMessage = robotProjects.stream()
                     .map(project -> "\nProject " + project.getName() + " from version "
                             + project.getRobotProjectConfig().getVersion().getVersion())
@@ -258,24 +243,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         return SwtThread.syncEval(projectsEval);
     }
 
-    static class RobotProjectListContainer {
-
-        List<RobotProject> projects;
-
-        RobotProjectListContainer(final List<RobotProject> projects) {
-            this.projects = projects;
-        }
-
-        List<RobotProject> getProjects() {
-            return projects;
-        }
-
-        void setProjects(final List<RobotProject> projects) {
-            this.projects = projects;
-        }
-    }
-
-    static abstract class RedXmlVersionTransition {
+    private static abstract class RedXmlVersionTransition {
 
         final String version;
 
@@ -289,7 +257,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         abstract void upgradeRedXml(final RobotProjectConfig config);
     }
 
-    static class TransitionFromVer1_0ToVer1 extends RedXmlVersionTransition {
+    private static class TransitionFromVer1_0ToVer1 extends RedXmlVersionTransition {
 
         TransitionFromVer1_0ToVer1(final String version, final boolean canBeAutoUpgraded) {
             super(version, canBeAutoUpgraded);
@@ -302,7 +270,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
     }
 
-    static class TransitionFromVer1ToVer2 extends RedXmlVersionTransition {
+    private static class TransitionFromVer1ToVer2 extends RedXmlVersionTransition {
 
         TransitionFromVer1ToVer2(final String version, final boolean canBeAutoUpgraded) {
             super(version, canBeAutoUpgraded);
