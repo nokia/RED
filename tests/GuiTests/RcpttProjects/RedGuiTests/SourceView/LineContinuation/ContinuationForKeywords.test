@@ -1,0 +1,431 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContinuationForKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _5Lj7UB0NEeq8Rrp68Tq-Rw
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/13/19 2:41 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33    a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" 
+        
+// set caret at the end of line
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+    set-caret-pos 2 51
+}
+get-button "Show Whitespace Characters" | click
+
+// press Enter and check no conntinuation is added
+get-editor "TestFile.robot" | get-text-viewer | key-type "NUMPAD_ENTER" "\\u000D"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33    a2cdef\n\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// revert and pres enter bedore KW name 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 2 18
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+// continuation is added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    \n"
+    + "...    Convert To Binary    33    a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter before second arg - continuation is added    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 2 43
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter in the KW name    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 16
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Star\n"
+    + "    t With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter after first arg    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 7 30
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1 \n"
+    + "    ...     text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter before comment    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 8 53
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+// comment is moved with no continuation
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   \n"
+    + "    #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter in th var name    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 8 47
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+// no continuation
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${\n"
+    + "    a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+
+// press enter in contiuation    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 10 15
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text text
+}
+
+// new line is added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter in last line with continuation    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 12 20
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+    
+    
+// press enter after [Arg..]       
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 18 16
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]\n"
+    + "    ...        ${d}   ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter between args
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 18 25
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d} \n"
+    + "    ...      ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+  
+
+
+
+
+
+
+
+
+
+// press enter in Run Keyword
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 20 38
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+// no continuation
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d} \n"
+    + "    ...      ${w}\n"
+    + "    Run Keyword If  C=4    Variable S\n"
+    + "    hould Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+//  press enter in the list scalar   
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    hover-text 20 65
+    set-caret-pos 20 66
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d} \n"
+    + "    ...      ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{li\n"
+    + "    st}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter after condition    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    set-caret-pos 20 20
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d} \n"
+    + "    ...      ${w}\n"
+    + "    Run Keyword If \n"
+    + "    ...     C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
+    
+// press enter in teardown    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+z"
+    hover-text 21 26
+    set-caret-pos 21 35
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Teardown    Convert To Binary    33  \n"
+    + "...      a2cdef\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
+    + "    Should Be Equal As Integers    first    ${a1}   #text\n"
+    + "    Should Be Equal As Strings    ijk    \n"
+    + "    ...    klm\n"
+    + "    ...    text\n"
+    + "    ...    opr     \n"
+    + "    ...    \n"
+    + "    \n\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Arguments]    ${d} \n"
+    + "    ...      ${w}\n"
+    + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Teardown]    Should Be Equal \n"
+    + "    ...       first    second    dd" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
