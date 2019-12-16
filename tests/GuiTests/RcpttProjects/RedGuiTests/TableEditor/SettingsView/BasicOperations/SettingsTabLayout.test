@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: __KaXoDPMEeat08T3d_ERug
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 6/29/18 3:57 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/16/19 1:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -156,7 +156,7 @@ get-editor "res.robot"  | get-section Imports | get-canvas | get-object | invoke
 //save all and check Source
 get-button "Save All (M1+M2+S)" | click
 get-editor "res.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Setting ***" | verify-true
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***" | verify-true
 
     
 //========================================================= init ======================================================
@@ -263,13 +263,13 @@ get-editor "__init__.robot"  | get-section Imports | get-canvas | get-object | i
 
 //check source if section was added
 get-editor "__init__.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "__init__.robot" | get-text-viewer | get-property text | equals "*** Setting ***" | verify-true		    
+get-editor "__init__.robot" | get-text-viewer | get-property text | equals "*** Settings ***" | verify-true		    
 
 //check source for Suite
 get-editor "TestFile.robot" | click
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "*** Test Cases ***" | verify-true  
     
 get-editor "__init__.robot" | restore    

@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _FOu6MDSAEeat08T3d_ERug
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 3:11 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/16/19 2:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -91,7 +91,7 @@ get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_sel
       
 //check Source    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation    a    \n"
     + "...    \\    \n"
     + "...    b    \n"

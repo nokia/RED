@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _czEysDPaEeat08T3d_ERug
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 3:57 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/16/19 1:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,7 +55,7 @@ get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_se
 
 //go to Source and check text  
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation    First line    \n"
     + "...    next1    \n"
     + "...    next2 with\\ttab    \n"
@@ -130,7 +130,7 @@ with [get-editor "res.robot"] {
 }
 
 //check text in Source
-get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation    abc    \n"
     + "...    def    \n"
     + "...    ghi    \n"
@@ -161,7 +161,7 @@ with [get-editor "res.robot"] {
 
 //check Source
 get-editor "res.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation    a    \n"
     + "...    b    \n"
     + "...    c    \n"
@@ -182,7 +182,7 @@ with [get-editor "res.robot"] {
 get-editor "res.robot" | get-tab-folder | get-tab-item Source | click
 
 //comment is escaped and double space too
-get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation    a    \n"
     + "...    b    \n"
     + "...    c val1 \\ \\#comment here    \n"
@@ -232,10 +232,11 @@ get-editor "file.tsv" | get-section General | get-editbox [$doc_editbox_selector
 //go to Source and check text    
 get-editor "file.tsv" | get-tab-folder | get-tab-item Source | click
     
-get-editor "file.tsv" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+get-editor "file.tsv" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation\tline1 with tab\\t\t\n"
     + "...\tlin2 with space\t\n"
     + "...\t\n"
     + "...\tline3 end \\t\\#commnet\n"
     + "*** Test Cases ***" | verify-true    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
