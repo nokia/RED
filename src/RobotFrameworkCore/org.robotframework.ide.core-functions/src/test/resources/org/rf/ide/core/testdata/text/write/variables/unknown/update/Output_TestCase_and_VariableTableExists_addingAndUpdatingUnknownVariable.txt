@@ -1,4 +1,4 @@
-*** Variable ***
+*** Variables ***
 ^{incorrect_var}	updated
 ^{new_incorrect}	new
 *** Test Cases ***

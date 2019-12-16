@@ -1,2 +1,2 @@
-*** Setting ***
+*** Settings ***
 Force Tags

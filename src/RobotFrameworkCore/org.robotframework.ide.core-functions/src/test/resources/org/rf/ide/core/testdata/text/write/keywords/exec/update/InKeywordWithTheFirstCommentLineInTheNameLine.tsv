@@ -1,4 +1,4 @@
-*** Keyword ***
+*** Keywords ***
 Kw with comments	#comment in line with kw
 	2 keyword
 	${EMPTY}

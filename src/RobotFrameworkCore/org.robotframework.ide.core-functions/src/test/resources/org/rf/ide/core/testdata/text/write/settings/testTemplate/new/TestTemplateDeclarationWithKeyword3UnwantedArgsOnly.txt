@@ -1,2 +1,2 @@
-*** Setting ***
+*** Settings ***
 Test Template	keyword	unArg1	unArg2	unArg3

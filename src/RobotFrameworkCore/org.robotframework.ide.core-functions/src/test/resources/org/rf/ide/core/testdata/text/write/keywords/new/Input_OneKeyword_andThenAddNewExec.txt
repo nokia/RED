@@ -1,2 +1,2 @@
-*** Keyword ***
+*** Keywords ***
 | KeywordT

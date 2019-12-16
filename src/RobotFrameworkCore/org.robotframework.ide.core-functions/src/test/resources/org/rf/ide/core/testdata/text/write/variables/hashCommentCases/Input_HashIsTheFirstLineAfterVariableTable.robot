@@ -1,4 +1,4 @@
-*** Variable ***
+*** Variables ***
 #commented
 ${c}	a	#data
 #not_variable

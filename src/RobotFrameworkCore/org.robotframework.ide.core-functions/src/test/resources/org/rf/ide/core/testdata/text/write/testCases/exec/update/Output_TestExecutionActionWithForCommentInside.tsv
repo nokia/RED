@@ -1,4 +1,4 @@
-*** Test Case ***
+*** Test Cases ***
 TestCase
 	:FOR	${x}	IN	c	d
 	...	e	f	g	#cm1	cm2	cm3

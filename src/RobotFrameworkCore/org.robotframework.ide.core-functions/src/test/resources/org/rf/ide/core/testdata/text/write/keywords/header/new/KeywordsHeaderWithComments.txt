@@ -1,1 +1,1 @@
-*** Keyword ***	#comment	comment2
+*** Keywords ***	#comment	comment2

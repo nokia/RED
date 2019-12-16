@@ -1,1 +1,1 @@
-*** Variable ***	*** col1 ***	*** col2 ***
+*** Variables ***	*** col1 ***	*** col2 ***

@@ -1,4 +1,4 @@
-*** Variable ***
+*** Variables ***
 #comment
 ${var}    1  #comment
 #comment

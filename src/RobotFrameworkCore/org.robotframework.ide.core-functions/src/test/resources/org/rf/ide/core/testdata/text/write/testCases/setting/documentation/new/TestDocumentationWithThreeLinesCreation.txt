@@ -1,4 +1,4 @@
-*** Test Case ***
+*** Test Cases ***
 TestCase
 	[Documentation]	doc me
 	...	textZero

@@ -42,37 +42,37 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTINGS_TABLE_HEADER(
             TableType.SETTINGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Setting").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Settings").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Setting").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").deprecatedFrom("3.0").build()),
     /**
      */
     VARIABLES_TABLE_HEADER(
             TableType.VARIABLES,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Variable").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Variables").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Variables").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Variable").build()),
     COMMENTS_TABLE_HEADER(
             TableType.COMMENTS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Comment").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Comments").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Comments").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Comment").build()),
     /**
      */
     TEST_CASES_TABLE_HEADER(
             TableType.TEST_CASES,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Test Case").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Test Cases").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Test Cases").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Test Case").build()),
     TASKS_TABLE_HEADER(
             TableType.TASKS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Task").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Tasks").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Tasks").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Task").build()),
     /**
      */
     KEYWORDS_TABLE_HEADER(
             TableType.KEYWORDS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Keyword").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Keywords").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keyword").deprecatedFrom("3.0").build(),
-            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keywords").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("Keyword").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keywords").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("User Keyword").deprecatedFrom("3.0").build()),
     /**
      */
     TABLE_HEADER_COLUMN(TableType.NOT_STRICTLY_BELONGS),

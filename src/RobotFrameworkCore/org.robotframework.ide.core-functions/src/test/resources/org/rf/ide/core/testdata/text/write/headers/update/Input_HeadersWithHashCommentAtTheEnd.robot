@@ -1,5 +1,5 @@
 *** Test Cases ***
-*** Keyword ***
+*** Keywords ***
 Keyword
     log  12
     Should Be Equal    11    11

@@ -1,4 +1,4 @@
-*** Keyword ***
+*** Keywords ***
 UserKeyword
 	#cm1	cm2	cm3
 	

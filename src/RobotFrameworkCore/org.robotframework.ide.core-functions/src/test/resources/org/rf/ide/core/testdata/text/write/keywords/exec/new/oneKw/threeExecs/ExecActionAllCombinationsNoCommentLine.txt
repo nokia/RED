@@ -1,4 +1,4 @@
-*** Keyword ***
+*** Keywords ***
 UserKeyword
 	execAction1
 	execAction2	arg1	arg2	arg3

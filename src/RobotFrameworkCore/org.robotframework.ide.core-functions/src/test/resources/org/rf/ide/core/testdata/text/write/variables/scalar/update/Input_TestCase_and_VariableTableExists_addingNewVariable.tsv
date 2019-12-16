@@ -1,4 +1,4 @@
-*** Variable ***
+*** Variables ***
 ${var1}	c
 *** Test Cases ***
 T1

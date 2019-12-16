@@ -1,4 +1,4 @@
-*** Variable ***
+*** Variables ***
 ${var}    1
 ${var1}    text with space
 ${path}  C:\new\file.txt
