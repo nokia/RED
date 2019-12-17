@@ -20,6 +20,7 @@ public class RobotSpecialTokens {
 
     private static final List<ATokenRecognizer> SPECIAL_RECOGNIZERS = newArrayList(
             new ForActionLiteral(),
+            new ForInActionLiteralOld(),
             new ForInActionLiteral(),
             new ForContinueToken(),
             new EndTerminatedForLoopActionLiteral(),
@@ -106,15 +107,34 @@ public class RobotSpecialTokens {
         }
     }
 
-    private static class ForInActionLiteral extends ATokenRecognizer {
+    private static class ForInActionLiteralOld extends ATokenRecognizer {
 
-        protected ForInActionLiteral() {
+        protected ForInActionLiteralOld() {
             super(Pattern.compile("^(\\s)*" + "("
                     + RobotTokenType.IN_TOKEN.getRepresentation()
                             .stream()
                             .map(ATokenRecognizer::createUpperLowerCaseWordWithSpacesInside)
                             .collect(Collectors.joining("|"))
                     + ")" + "(\\s)*$"), RobotTokenType.IN_TOKEN);
+        }
+
+        @Override
+        public boolean isApplicableFor(final RobotVersion robotVersion) {
+            return robotVersion.isOlderThan(new RobotVersion(3, 2));
+        }
+
+        @Override
+        public ATokenRecognizer newInstance() {
+            return new ForInActionLiteralOld();
+        }
+    }
+
+    private static class ForInActionLiteral extends ATokenRecognizer {
+
+        protected ForInActionLiteral() {
+            super(Pattern.compile("^(\\s)*" + "("
+                    + RobotTokenType.IN_TOKEN.getRepresentation().stream().collect(Collectors.joining("|")) + ")"
+                    + "(\\s)*$"), RobotTokenType.IN_TOKEN);
         }
 
         @Override

@@ -482,14 +482,20 @@ public class ModelBuilder {
         public TestCaseBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
-            if (action.equals("FOR") || action.equalsIgnoreCase(":for")) {
+            final boolean isForLoop = action.equals("FOR") || action.equalsIgnoreCase(":for");
+            if (isForLoop) {
                 row.getAction().getTypes().add(RobotTokenType.FOR_TOKEN);
             }
             if (action.equals("END")) {
                 row.getAction().getTypes().add(RobotTokenType.FOR_END_TOKEN);
             }
             for (final String arg : arguments) {
-                row.addArgument(RobotToken.create(arg));
+                final RobotToken token = RobotToken.create(arg);
+                if (isForLoop && (arg.equals("IN") || arg.equals("IN RANGE") || arg.equals("IN ZIP")
+                        || arg.equals("IN ENUMERATE"))) {
+                    token.setType(RobotTokenType.IN_TOKEN);
+                }
+                row.addArgument(token);
             }
             test.addElement(row);
             return this;
@@ -729,11 +735,17 @@ public class ModelBuilder {
         public UserKeywordBuildingStep executable(final String action, final String... arguments) {
             final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
             row.setAction(RobotToken.create(action));
-            if (action.equalsIgnoreCase("for") || action.equalsIgnoreCase(":for")) {
+            final boolean isForLoop = action.equalsIgnoreCase("for") || action.equalsIgnoreCase(":for");
+            if (isForLoop) {
                 row.getAction().getTypes().add(RobotTokenType.FOR_TOKEN);
             }
             for (final String arg : arguments) {
-                row.addArgument(RobotToken.create(arg));
+                final RobotToken token = RobotToken.create(arg);
+                if (isForLoop && (arg.equals("IN") || arg.equals("IN RANGE") || arg.equals("IN ZIP")
+                        || arg.equals("IN ENUMERATE"))) {
+                    token.setType(RobotTokenType.IN_TOKEN);
+                }
+                row.addArgument(token);
             }
             keyword.addElement(row);
             return this;
