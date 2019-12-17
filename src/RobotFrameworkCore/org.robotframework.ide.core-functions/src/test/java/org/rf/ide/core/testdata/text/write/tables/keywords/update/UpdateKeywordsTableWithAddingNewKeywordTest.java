@@ -16,9 +16,9 @@ import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UpdateKeywordsTableWithAddingNewKeyword extends RobotFormatParameterizedTest {
+public class UpdateKeywordsTableWithAddingNewKeywordTest extends RobotFormatParameterizedTest {
 
-    public UpdateKeywordsTableWithAddingNewKeyword(final String extension, final FileFormat format) {
+    public UpdateKeywordsTableWithAddingNewKeywordTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 

@@ -28,9 +28,9 @@ import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 /**
  * @author wypych
  */
-public class UpdateExecRowWithEmptyElementsInside extends RobotFormatParameterizedTest {
+public class UpdateExecRowWithEmptyElementsInsideTest extends RobotFormatParameterizedTest {
 
-    public UpdateExecRowWithEmptyElementsInside(final String extension, final FileFormat format) {
+    public UpdateExecRowWithEmptyElementsInsideTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 

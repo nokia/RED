@@ -24,9 +24,9 @@ import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 /**
  * @author wypych
  */
-public class UpdateExecRowWithCommentOnlySameLineAsKeywordName extends RobotFormatParameterizedTest {
+public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends RobotFormatParameterizedTest {
 
-    public UpdateExecRowWithCommentOnlySameLineAsKeywordName(final String extension, final FileFormat format) {
+    public UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 

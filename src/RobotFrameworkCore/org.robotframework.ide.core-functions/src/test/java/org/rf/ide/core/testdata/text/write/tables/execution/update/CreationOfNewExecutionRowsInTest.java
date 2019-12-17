@@ -22,9 +22,9 @@ import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 /**
  * @author wypych
  */
-public class CreationOfNewExecutionRowsInTestCase extends RobotFormatParameterizedTest {
+public class CreationOfNewExecutionRowsInTest extends RobotFormatParameterizedTest {
 
-    public CreationOfNewExecutionRowsInTestCase(final String extension, final FileFormat format) {
+    public CreationOfNewExecutionRowsInTest(final String extension, final FileFormat format) {
         super(extension, format);
     }
 
