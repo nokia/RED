@@ -1,3 +1,39 @@
+RED 0.9.2 - 2019/12/17
+
+Enhancement
+
+	[RED-1236] - Keyword Argument Highlight Enhancement in Table Mode
+	[RED-1258] - [GitHub #289] Possibility to evaluate expressions while debugging
+	[RED-1362] - [GitHub #348] messages/var values truncation limit is not configurable
+	[RED-1370] - Only fix proposals for single problem are shown
+
+Bug
+
+	[RED-1178] - Consistency of creating new section in table
+	[RED-1180] - Quick fix doesn't work for Timeout setting in KW/TC
+	[RED-1294] - Template name merge QuickFix works only for settings table
+	[RED-1304] - Equal sign is wrong colored after preference changing
+	[RED-1329] - Name (--name) robot argument does not work in launch configuration
+	[RED-1363] - [GitHub #350] Debugger is lost when IBM Jazz source control is used
+	[RED-1364] - Quick Assist for return value assignment
+	[RED-1365] - Added library marked as faulty until open
+	[RED-1367] - Line continuation marker is not inserting in some cases
+	[RED-1372] - Cannot set breakpoint in the new "FOR-END" loop
+	[RED-1373] - Debugger does not stop on breakpoint set on multi line keyword
+	[RED-1375] - [GitHub #357] documentation view shows wrong input when something is folded
+
+Task
+
+	[RED-1342] - Check if Jython 2.7.1 is working
+	[RED-1358] - Log RED version in .log/session server logs
+
+Sub-task
+
+	[RED-1349] - Remove case insensitive for loop separators support
+	[RED-1350] - Remove custom timeout message support
+	[RED-1369] - [GitHub #353] Debugger does not work under 3.2
+
+
 RED 0.9.1 - 2019/11/14
 
 Feature

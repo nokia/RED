@@ -1,3 +1,33 @@
+# RED - Robot Editor v0.9.2
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+For RED feature installed on Eclipse Neon or earlier, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- New Debug Shell view allowing to interact with suspended execution
+- Quick Assist (Ctrl+1) in source editor allowing to quickly assign result of a keyword to a variable
+- Keywords arguments highlighting in table editors
+- Line continuation is automatically inserted when breaking a line in the middle
+
+
+## GitHub issues updates
+ - #289 Equivalent to "Immediate" window
+ - #348 Debugging: Configuring "Maximum characters to display" not working
+ - #350 Debugging: "RED was unable to find suite where the test could be located" error when debugging project located in IBM Jazz source control
+ - #353 Incompatibility with RobotFramework 3.2a1
+ - #357 Documentation not working correctly when keywords and testcases are folded
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.9.1
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
