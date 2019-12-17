@@ -119,7 +119,7 @@ public class RedWorkspace {
             } else {
                 try {
                     for (final IResource project : root.members()) {
-                        if (project.getLocation().isPrefixOf(path)) {
+                        if (Optional.ofNullable(project.getLocation()).filter(p -> p.isPrefixOf(path)).isPresent()) {
                             final IPath projectRelativePath = path.makeRelativeTo(project.getLocation());
                             final IPath workspaceRelativePath = project.getFullPath().append(projectRelativePath);
                             return workspaceRelativePath.makeRelativeTo(root.getFullPath());

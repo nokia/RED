@@ -72,13 +72,7 @@ public class EclipseElementsLocator implements ElementsLocator {
 
     private final LoadingCache<TypedUri, Optional<URI>> pathsTranslationsCache = CacheBuilder.newBuilder()
             .maximumSize(10000)
-            .build(new CacheLoader<TypedUri, Optional<URI>>() {
-
-                @Override
-                public Optional<URI> load(final TypedUri remoteUri) {
-                    return Optional.ofNullable(translate(remoteUri.uri, remoteUri.isDirectory));
-                }
-            });
+            .build(CacheLoader.from(remoteUri -> Optional.ofNullable(translate(remoteUri.uri, remoteUri.isDirectory))));
 
     private final LoadingCache<IFile, AccessibleKeywordsEntities> entitiesCache = CacheBuilder.newBuilder()
             .maximumSize(100)
@@ -89,17 +83,14 @@ public class EclipseElementsLocator implements ElementsLocator {
                             new DebuggerAccessibleKeywordsCollector(model, file));
                 }
             });
+
     private final LoadingCache<KeywordWithFile, ListMultimap<KeywordScope, KeywordEntity>> keywordsCache = CacheBuilder
             .newBuilder()
             .maximumSize(100)
-            .build(new CacheLoader<KeywordWithFile, ListMultimap<KeywordScope, KeywordEntity>>() {
-
-                @Override
-                public ListMultimap<KeywordScope, KeywordEntity> load(final KeywordWithFile kwWithFile) {
-                    final AccessibleKeywordsEntities keywordEntities = entitiesCache.getUnchecked(kwWithFile.file);
-                    return keywordEntities.getPossibleKeywords(kwWithFile.keywordName, false);
-                }
-            });
+            .build(CacheLoader.from(kwWithFile -> {
+                final AccessibleKeywordsEntities keywordEntities = entitiesCache.getUnchecked(kwWithFile.file);
+                return keywordEntities.getPossibleKeywords(kwWithFile.keywordName, false);
+            }));
 
     public EclipseElementsLocator(final IProject project) {
         this.model = RedPlugin.getModelManager().getModel();
@@ -112,7 +103,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         final Optional<? extends IResource> resource = isDirectory ? workspace.containerForUri(path)
                 : workspace.fileForUri(path);
         if (resource.isPresent()) {
-            return resource.get().getLocationURI();
+            return RedWorkspace.tryToGetLocalUri(resource.get());
         }
 
         try {
@@ -125,7 +116,7 @@ public class EclipseElementsLocator implements ElementsLocator {
                 if (localResourceIsDir == isDirectory) {
                     final IPath location = res.getLocation();
                     if (location.segment(location.segmentCount() - 1).equalsIgnoreCase(fileName)) {
-                        candidates.add(res.getLocationURI());
+                        candidates.add(RedWorkspace.tryToGetLocalUri(res));
                     }
                 }
                 return true;
