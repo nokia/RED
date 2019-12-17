@@ -76,7 +76,7 @@ public class UpdateExecRowWithEmptyElementsInside extends RobotFormatParameteriz
         // verify
         final FilePosition endPositionUK = userKeyword.getEndPosition();
         assertThat(endPositionUK).isNotNull();
-        assertThat(endPositionUK.getOffset()).isEqualTo(113);
+        assertThat(endPositionUK.getOffset()).isEqualTo(116);
     }
 
     private String convert(final String fileName) {
