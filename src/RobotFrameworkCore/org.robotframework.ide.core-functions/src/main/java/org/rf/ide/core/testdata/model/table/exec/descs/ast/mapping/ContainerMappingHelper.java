@@ -78,7 +78,7 @@ public class ContainerMappingHelper {
                 if (container.isOpenForModification()) {
                     if (container.getParent() != null) {
                         final BuildMessage warn = BuildMessage.createWarnMessage(
-                                createWarningAboutMissingClose(containerType, startElement),
+                                createWarningAboutMissingClose(containerType),
                                 mappingResult.getFileName(), new FileRegion(currentPosition, newPosition));
                         mappingResult.addBuildMessage(warn);
                     }
@@ -103,8 +103,7 @@ public class ContainerMappingHelper {
         return mappingHelper;
     }
 
-    private static String createWarningAboutMissingClose(final ContainerType containerType,
-            final IContainerElement startElement) {
+    private static String createWarningAboutMissingClose(final ContainerType containerType) {
         return String.format("Missing closing bracket \'%s\' for type %s.",
                 ContainerElementType.getCloseContainerType(containerType.getOpenType()).getRepresentation().get(0),
                 containerType);

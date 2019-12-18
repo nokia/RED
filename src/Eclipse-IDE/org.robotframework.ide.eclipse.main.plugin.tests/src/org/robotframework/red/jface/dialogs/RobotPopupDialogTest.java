@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
 
+@SuppressWarnings("restriction")
 public class RobotPopupDialogTest {
 
     @Rule
@@ -43,7 +44,6 @@ public class RobotPopupDialogTest {
         assertThat(((Label) internalParent.getChildren()[0])).isSameAs(dialog.getFocusControl());
     }
 
-    @SuppressWarnings("restriction")
     private static RobotPopupDialog prepareDialogToTest(final Shell shell) {
         return new RobotPopupDialog(shell, mock(IThemeEngine.class)) {
             private Label label;

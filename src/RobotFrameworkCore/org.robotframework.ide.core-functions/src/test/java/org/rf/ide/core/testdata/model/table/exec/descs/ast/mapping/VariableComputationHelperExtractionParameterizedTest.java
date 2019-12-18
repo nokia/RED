@@ -92,8 +92,8 @@ public class VariableComputationHelperExtractionParameterizedTest {
 
     private final boolean shouldExtract;
 
-    public VariableComputationHelperExtractionParameterizedTest(final String testName, final String text,
-            final int variableNameStart, final String variableName, final boolean shouldExtract) {
+    public VariableComputationHelperExtractionParameterizedTest(@SuppressWarnings("unused") final String testName,
+            final String text, final int variableNameStart, final String variableName, final boolean shouldExtract) {
         this.text = text;
         this.variableNameStart = variableNameStart;
         this.variableName = variableName;

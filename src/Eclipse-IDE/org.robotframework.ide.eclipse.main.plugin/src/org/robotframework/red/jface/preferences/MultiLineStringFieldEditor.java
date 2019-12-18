@@ -19,6 +19,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import com.google.common.base.Strings;
+
 // TODO: replace this class with StringFieldEditor when platform is updated somewhere in future
 /**
  * This is copy org.eclipse.jface.preference.StringFieldEditor with support of multiline text field
@@ -491,14 +493,12 @@ public class MultiLineStringFieldEditor extends FieldEditor {
      * @param value
      *            the new value, or <code>null</code> meaning the empty string
      */
-    public void setStringValue(String value) {
+    public void setStringValue(final String value) {
         if (textField != null) {
-            if (value == null) {
-                value = "";//$NON-NLS-1$
-            }
+            final String newValue = Strings.nullToEmpty(value);
             oldValue = textField.getText();
-            if (!oldValue.equals(value)) {
-                textField.setText(value);
+            if (!oldValue.equals(newValue)) {
+                textField.setText(newValue);
                 valueChanged();
             }
         }

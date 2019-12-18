@@ -33,20 +33,18 @@ public abstract class ACreationOfThreeExecUnitsTest extends RobotFormatParameter
 
     @Test
     public void test_exec_actions_withoutCommentedLine() throws Exception {
-        assert_three_execUnits_noCommentedLines_template(getExecutablesAllWithNames(),
-                getCompareFilesStoreForExecutableWithName());
+        assert_three_execUnits_noCommentedLines_template(getExecutablesAllWithNames());
 
     }
 
     @Test
     public void test_exec_actions_withoutCommentedLine_unitWithoutName() throws Exception {
-        assert_three_execUnits_noCommentedLines_template(getExecutablesTheFirstWithoutName(),
-                getCompareFilesStoreForExecutableWithTheFirstWithoutName());
+        assert_three_execUnits_noCommentedLines_template(getExecutablesTheFirstWithoutName());
     }
 
     private void assert_three_execUnits_noCommentedLines_template(
-            final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnit)
+            throws Exception {
         // prepare
         checkEnvironment();
         final RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitOneExecRowOne = execUnit

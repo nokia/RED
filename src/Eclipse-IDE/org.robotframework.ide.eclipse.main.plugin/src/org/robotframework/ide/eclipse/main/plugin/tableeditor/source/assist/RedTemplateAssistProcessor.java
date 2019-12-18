@@ -63,25 +63,26 @@ public abstract class RedTemplateAssistProcessor extends TemplateCompletionProce
     }
 
     @Override
-    public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, int offset) {
+    public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
+        int targetOffset = offset;
         try {
             final IDocument document = viewer.getDocument();
-            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, targetOffset);
 
-            if (!shouldShowProposals(document, offset, lineContent)) {
+            if (!shouldShowProposals(document, targetOffset, lineContent)) {
                 return new ICompletionProposal[0];
             }
 
-            final String userContent = extractUserContent(document, offset);
+            final String userContent = extractUserContent(document, targetOffset);
 
             final ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
             // adjust offset to end of normalized selection
-            if (selection.getOffset() == offset) {
-                offset = selection.getOffset() + selection.getLength();
+            if (selection.getOffset() == targetOffset) {
+                targetOffset = selection.getOffset() + selection.getLength();
             }
 
-            final String prefix = extractPrefix(viewer, offset);
-            final Region region = new Region(offset - prefix.length(), prefix.length());
+            final String prefix = extractPrefix(viewer, targetOffset);
+            final Region region = new Region(targetOffset - prefix.length(), prefix.length());
             final TemplateContext context = createContext(viewer, region);
             if (context == null) {
                 return new ICompletionProposal[0];

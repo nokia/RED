@@ -29,11 +29,7 @@ public class DeclarationMapper {
     }
 
     public MappingResult map(final FilePosition fp, final Container container, final String filename) {
-        return map(new MappingResult(fp, filename), fp, container, filename);
-    }
 
-    private MappingResult map(final MappingResult topLevel, final FilePosition fp, final Container container,
-            final String filename) {
         final MappingResult mappingResult = new MappingResult(fp, filename);
         FilePosition currentPosition = fp;
 
@@ -56,7 +52,7 @@ public class DeclarationMapper {
             if (containerElement.isComplex()) {
                 final Container subContainer = (Container) containerElement;
                 final FilePosition previousForContainer = currentPosition;
-                final MappingResult subResult = map(mappingResult, currentPosition, subContainer, filename);
+                final MappingResult subResult = map(currentPosition, subContainer, filename);
                 mappingResult.addCorrectVariables(subResult.getCorrectVariables());
                 mappingResult.addBuildMessages(subResult.getMessages());
                 if (topContainer != null) {

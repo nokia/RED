@@ -20,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.Range;
 
@@ -217,8 +216,8 @@ public class VariablesTableValidatorTest {
     private Collection<Problem> validate(final FileValidationContext context, final RobotSuiteFile fileModel)
             throws CoreException {
         final MockReporter reporter = new MockReporter();
-        new VariablesTableValidator(context, fileModel.findSection(RobotVariablesSection.class), reporter,
-                new VersionDependentValidators(context, reporter)).validate(new NullProgressMonitor());
+        new VariablesTableValidator(context, fileModel.findSection(RobotVariablesSection.class), reporter)
+                .validate(new NullProgressMonitor());
         return reporter.getReportedProblems();
     }
 }

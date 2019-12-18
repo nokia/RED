@@ -71,8 +71,8 @@ public class MappingResultCollectionWithIndexGetCheckTest {
 
     private final boolean shouldMarkAsVariableIndex;
 
-    public MappingResultCollectionWithIndexGetCheckTest(final String testName, final String text,
-            final boolean shouldMarkAsVariableIndex) {
+    public MappingResultCollectionWithIndexGetCheckTest(@SuppressWarnings("unused") final String testName,
+            final String text, final boolean shouldMarkAsVariableIndex) {
         this.text = text;
         this.shouldMarkAsVariableIndex = shouldMarkAsVariableIndex;
     }

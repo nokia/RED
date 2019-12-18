@@ -1262,7 +1262,7 @@ public class ExternalLibrariesImportCollectorTest {
     private RobotSuiteFile createSuiteFileForSingleRemoteImport(final String suiteNameOrPath,
             final String librarySetting) throws Exception {
         return model.createSuiteFile(
-                projectProvider.createFile("suite.robot", "*** Settings ***", librarySetting, "*** Test Cases ***"));
+                projectProvider.createFile(suiteNameOrPath, "*** Settings ***", librarySetting, "*** Test Cases ***"));
     }
 
     private RobotSuiteFile createSuiteFileForMultipleRemoteImport(final String suiteNameOrPath,

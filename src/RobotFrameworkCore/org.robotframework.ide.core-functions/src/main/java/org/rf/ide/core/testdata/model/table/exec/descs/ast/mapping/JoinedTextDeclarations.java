@@ -90,6 +90,7 @@ public class JoinedTextDeclarations extends AContainerOperation {
         return parent;
     }
 
+    @Override
     public String getText() {
         final StringBuilder text = new StringBuilder();
         int end = 0;

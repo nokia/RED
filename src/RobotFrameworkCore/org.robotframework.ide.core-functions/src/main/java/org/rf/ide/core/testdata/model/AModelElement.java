@@ -97,6 +97,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
     }
 
+    @SuppressWarnings("unused")
     public void insertValueAt(final String value, final int position) {
         throw new UnsupportedOperationException("Operation not supported for " + this.getClass().getName() + " type");
     }

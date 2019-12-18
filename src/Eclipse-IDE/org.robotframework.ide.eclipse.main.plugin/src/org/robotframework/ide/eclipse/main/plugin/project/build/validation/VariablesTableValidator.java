@@ -33,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -49,16 +48,9 @@ class VariablesTableValidator implements ModelUnitValidator {
 
     private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
 
-    VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reporter) {
-        this(validationContext, variablesSection, reporter,
-                new VersionDependentValidators(validationContext, reporter));
-    }
-
     @VisibleForTesting
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reporter,
-            final VersionDependentValidators versionDependentValidators) {
+            final Optional<RobotVariablesSection> variablesSection, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.variablesSection = variablesSection;
         this.reporter = reporter;
