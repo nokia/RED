@@ -155,6 +155,29 @@ public enum SuiteFileProblem implements IProblemCause {
             return file.isPresent() ? newArrayList(new ConvertToRobotFileFormat(file.get())) : new ArrayList<>();
         }
     },
+    REMOVED_SUITE_FILE_EXTENSION {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The '*.%s' file extension is not supported. Only '*.robot' should be used for suites. %s";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final Optional<File> file = RedWorkspace.getLocalFile(marker.getResource());
+            return file.isPresent() ? newArrayList(new ConvertToRobotFileFormat(file.get())) : new ArrayList<>();
+        }
+    },
     BUILD_ERROR_MESSAGE {
 
         @Override

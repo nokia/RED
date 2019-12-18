@@ -42,15 +42,17 @@ public class VersionDependentValidators {
 
     public Stream<VersionDependentModelUnitValidator> getTestSuiteFileValidators(final RobotSuiteFile fileModel) {
         final IFile file = validationContext.getFile();
-        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
-                .of(new SuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter));
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
+                new DeprecatedSuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter),
+                new UnsupportedSuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
     public Stream<VersionDependentModelUnitValidator> getTaskSuiteFileValidators(final RobotSuiteFile fileModel) {
         final IFile file = validationContext.getFile();
-        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
-                .of(new SuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter));
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
+                new DeprecatedSuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter),
+                new UnsupportedSuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 

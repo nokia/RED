@@ -38,7 +38,9 @@ class WizardNewRobotSuiteFileCreationPage extends WizardNewRobotFileCreationPage
         }
         final String extension = getSelectedExtension();
         if (!extension.equals("robot")) {
-            setMessage("The '*." + extension + "' extension for suites is deprecated in RobotFramework 3.1",
+            setMessage(
+                    "The '*." + extension
+                            + "' extension support for suites is deprecated in RF 3.1 and removed in RF 3.2",
                     IMessageProvider.WARNING);
         }
         return true;

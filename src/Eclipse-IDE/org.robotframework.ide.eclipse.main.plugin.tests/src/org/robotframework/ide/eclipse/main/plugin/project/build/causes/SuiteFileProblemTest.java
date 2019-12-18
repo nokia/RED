@@ -9,12 +9,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.ui.IMarkerResolution;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ConvertToRobotFileFormat;
 
 
 public class SuiteFileProblemTest {
@@ -76,5 +80,37 @@ public class SuiteFileProblemTest {
 
         assertThat(fixers).extracting(IMarkerResolution::getLabel)
                 .containsExactly("Change to '*** Keywords ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void deprecatedSuiteExtensionProblemForRf31_hasDeprecatedApiCategoryAndHasResolution()
+            throws URISyntaxException {
+        final IResource resource = mock(IResource.class);
+        when(resource.getLocationURI()).thenReturn(new URI("file", null, "/path", null));
+
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getResource()).thenReturn(resource);
+
+        assertThat(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION.getProblemCategory())
+                .isEqualTo(ProblemCategory.DEPRECATED_API);
+        assertThat(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION.hasResolution()).isTrue();
+        assertThat(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION.createFixers(marker)).hasSize(1)
+                .allMatch(fixer -> fixer instanceof ConvertToRobotFileFormat);
+    }
+
+    @Test
+    public void unsupportedSuiteExtensionProblemForRf32_hasRemovedApiCategoryAndHasResolution()
+            throws URISyntaxException {
+        final IResource resource = mock(IResource.class);
+        when(resource.getLocationURI()).thenReturn(new URI("file", null, "/path", null));
+
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getResource()).thenReturn(resource);
+
+        assertThat(SuiteFileProblem.REMOVED_SUITE_FILE_EXTENSION.getProblemCategory())
+                .isEqualTo(ProblemCategory.REMOVED_API);
+        assertThat(SuiteFileProblem.REMOVED_SUITE_FILE_EXTENSION.hasResolution()).isTrue();
+        assertThat(SuiteFileProblem.REMOVED_SUITE_FILE_EXTENSION.createFixers(marker)).hasSize(1)
+                .allMatch(fixer -> fixer instanceof ConvertToRobotFileFormat);
     }
 }

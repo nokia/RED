@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFile
 
 import com.google.common.collect.Range;
 
-class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
+class DeprecatedSuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
 
     private final IFile file;
 
@@ -30,7 +30,7 @@ class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
 
     private final ValidationReportingStrategy reporter;
 
-    public SuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
+    public DeprecatedSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
             final Class<? extends RobotSuiteFileSection> suiteSectionClass,
             final ValidationReportingStrategy reporter) {
         this.file = file;
@@ -41,7 +41,7 @@ class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
 
     @Override
     protected Range<RobotVersion> getApplicableVersionRange() {
-        return Range.atLeast(new RobotVersion(3, 1));
+        return Range.closedOpen(new RobotVersion(3, 1), new RobotVersion(3, 2));
     }
 
     @Override
@@ -54,10 +54,14 @@ class SuiteFileExtensionValidator extends VersionDependentModelUnitValidator {
                 final ProblemPosition position = ProblemPosition
                         .fromRegion(section.getDefinitionPosition().toFileRegion());
 
-                final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION)
-                        .formatMessageWith(extension);
+                final RobotProblem problem = createProblem(extension);
                 reporter.handleProblem(problem, file, position);
             }
         }
+    }
+
+    protected RobotProblem createProblem(final String extension) {
+        return RobotProblem.causedBy(SuiteFileProblem.DEPRECATED_SUITE_FILE_EXTENSION)
+                .formatMessageWith(extension);
     }
 }
