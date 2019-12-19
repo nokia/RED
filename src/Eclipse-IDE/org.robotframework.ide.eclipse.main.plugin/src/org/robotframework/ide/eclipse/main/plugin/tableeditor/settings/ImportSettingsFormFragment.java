@@ -596,7 +596,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private class ImportSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
 
         public ImportSettingsColumnHeaderDataProvider() {
-            super(dataProvider);
+            super(dataProvider::getColumnCount);
         }
 
         @Override

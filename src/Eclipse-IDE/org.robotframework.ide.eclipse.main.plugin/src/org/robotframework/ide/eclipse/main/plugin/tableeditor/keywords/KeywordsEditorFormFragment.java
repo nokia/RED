@@ -85,6 +85,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersCo
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsColumnHeaderDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeReservedWordsTableEditConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
@@ -94,7 +95,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableValu
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
-import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.TableCellsStrings;
@@ -166,6 +166,8 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     private KeywordsDataProvider dataProvider;
 
+    private CodeElementsColumnHeaderDataProvider<RobotKeywordsSection> columnHeaderDataProvider;
+
     private RowSelectionProvider<Object> selectionProvider;
 
     private SelectionLayerAccessor selectionLayerAccessor;
@@ -173,6 +175,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
     private TreeLayerAccessor treeLayerAccessor;
 
     private TableHyperlinksSupport detector;
+
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -210,7 +213,8 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
                 commandsCollector);
         dataProvider = new KeywordsDataProvider(propertyAccessor, getSection());
 
-        final IDataProvider columnHeaderDataProvider = new KeywordsColumnHeaderDataProvider();
+        columnHeaderDataProvider = new CodeElementsColumnHeaderDataProvider<>(dataProvider::getColumnCount,
+                getSection());
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
@@ -562,6 +566,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
             final List<Integer> expandedRowIndexes = treeLayerAccessor
                     .expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
 
+            columnHeaderDataProvider.setInput(getSection());
             dataProvider.setInput(getSection());
             table.refresh();
             setDirty();
@@ -606,6 +611,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() == null) {
+            columnHeaderDataProvider.setInput(getSection());
             dataProvider.setInput(getSection());
             table.refresh();
             setDirty();
@@ -621,6 +627,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
             if (activeCellEditor != null && !activeCellEditor.isClosed()) {
                 activeCellEditor.close();
             }
+            columnHeaderDataProvider.setInput(getSection());
             dataProvider.setInput(getSection());
             selectionLayerAccessor.clear();
             table.refresh();
@@ -638,6 +645,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
                     ? (RobotSuiteFile) change.getElement()
                     : null;
             if (suite == fileModel) {
+                columnHeaderDataProvider.setInput(getSection());
                 dataProvider.setInput(getSection());
                 table.refresh();
 
@@ -654,6 +662,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
             commandsStack.clear();
+            columnHeaderDataProvider.setInput(getSection());
             dataProvider.setInput(getSection());
             table.refresh();
         }
@@ -665,18 +674,6 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
             table.refresh();
-        }
-    }
-
-    private class KeywordsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
-
-        public KeywordsColumnHeaderDataProvider() {
-            super(dataProvider);
-        }
-
-        @Override
-        public Object getDataValue(final int columnIndex, final int rowIndex) {
-            return "";
         }
     }
 

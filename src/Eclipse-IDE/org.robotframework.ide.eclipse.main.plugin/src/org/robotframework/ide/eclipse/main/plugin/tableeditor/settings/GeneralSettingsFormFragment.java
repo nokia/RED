@@ -995,7 +995,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private class GeneralSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
 
         public GeneralSettingsColumnHeaderDataProvider() {
-            super(dataProvider);
+            super(dataProvider::getColumnCount);
         }
 
         @Override

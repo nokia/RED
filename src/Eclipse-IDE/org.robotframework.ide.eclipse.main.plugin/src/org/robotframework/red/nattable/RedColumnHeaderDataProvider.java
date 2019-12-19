@@ -5,14 +5,16 @@
 */
 package org.robotframework.red.nattable;
 
+import java.util.function.Supplier;
+
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
 public abstract class RedColumnHeaderDataProvider implements IDataProvider {
 
-    private final IDataProvider dataProvider;
+    private final Supplier<Integer> columnsNumberSupplier;
 
-    public RedColumnHeaderDataProvider(final IDataProvider dataProvider) {
-        this.dataProvider = dataProvider;
+    public RedColumnHeaderDataProvider(final Supplier<Integer> columnsNumberSupplier) {
+        this.columnsNumberSupplier = columnsNumberSupplier;
     }
 
     protected final boolean isLastColumn(final int column) {
@@ -26,7 +28,7 @@ public abstract class RedColumnHeaderDataProvider implements IDataProvider {
 
     @Override
     public int getColumnCount() {
-        return dataProvider.getColumnCount();
+        return columnsNumberSupplier.get().intValue();
     }
 
     @Override
