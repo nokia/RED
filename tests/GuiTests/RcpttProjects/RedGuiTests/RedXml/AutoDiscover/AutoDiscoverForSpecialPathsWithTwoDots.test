@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PqJNkIJTEeeVzuwK_hMKqA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/25/19 11:26 AM
+Save-Time: 12/19/19 2:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,26 +15,16 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 // open test file
-with [get-view "Project Explorer" | get-tree] {
-    select AutoProject | double-click
-    select "AutoProject/test" | double-click
-    select "AutoProject/test/test.robot" | double-click
-}
+get-view "Project Explorer" | get-tree | select "AutoProject/test/test.robot" | double-click
+
 // add . to path and save (autodiscover run)
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 11
     type-text "."
     key-type "M1+s"
 }
-
 // check Problem if there is 0 items
 get-view Problems | click
-get-editor "test.robot" | click
-
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 2 29
-}
-
 wait-for-zero-items -times 6 -delay 1000
 
 // verify if library was added to Robot Referenced libraries
@@ -51,13 +41,16 @@ with [get-editor "AutoProject/red.xml" | get-section "Libraries" | get-tree] {
     select "discover - AutoProject\\/libs\\/discover.py" | key-type Del
     key-type "M1+s"
 }
-// set wrong path and start QuickFix, choose valid path
-get-editor "test.robot" | click
 get-editor "AutoProject/red.xml" | close
+
+// set wrong path and start QuickFix, choose valid path
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 12
     key-type BackSpace
-    wait -ms 1000
+}
+wait-for-errors 2
+
+with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 26
     key-type "M1+1"
     key-type Down
@@ -65,10 +58,8 @@ with [get-editor "test.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
-get-view Problems | click
-get-editor "test.robot" | get-text-viewer | set-caret-pos 2 26
-
 // check if there is no Problems
+get-view Problems | click
 wait-for-zero-items -times 4 -delay 1000
 
 
