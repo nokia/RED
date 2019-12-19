@@ -76,10 +76,9 @@ class SuiteSourceEditorLineComparator implements IRangeComparator {
         if (hash == null) {
             final IRegion lineRegion = fDocument.getLineInformation(line);
             final String lineContents = fDocument.get(lineRegion.getOffset(), lineRegion.getLength());
-            hash = new Integer(computeDJBHash(lineContents));
+            hash = Integer.valueOf(computeDJBHash(lineContents));
             fHashes.set(line, hash);
         }
-
         return hash;
     }
 
@@ -91,12 +90,10 @@ class SuiteSourceEditorLineComparator implements IRangeComparator {
      */
     private int computeDJBHash(final String string) {
         int hash = 5381;
-        final int len = string.length();
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < string.length(); i++) {
             final char ch = string.charAt(i);
             hash = (hash << 5) + hash + ch;
         }
-
         return hash;
     }
 }

@@ -68,7 +68,10 @@ class ProjectsImporter {
     private void copyProjectFiles(final File sourceLocation, final File targetLocation) throws IOException {
         if (sourceLocation.isDirectory()) {
             if (!targetLocation.exists()) {
-                targetLocation.mkdir();
+                final boolean created = targetLocation.mkdir();
+                if (!created) {
+                    return;
+                }
             }
 
             final String[] children = sourceLocation.list();

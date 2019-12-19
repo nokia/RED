@@ -49,7 +49,7 @@ public class MultiLineStringFieldEditor extends FieldEditor {
      * Text limit constant (value <code>-1</code>) indicating unlimited
      * text limit and width.
      */
-    public static int UNLIMITED = -1;
+    public static final int UNLIMITED = -1;
 
     /**
      * Cached valid state.

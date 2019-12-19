@@ -48,27 +48,29 @@ public class RobotConsoleParticipant implements IConsolePageParticipant {
 
     @Override
     public void init(final IPageBookViewPage page, final IConsole console) {
-        final org.eclipse.debug.ui.console.IConsole ioConsole = (org.eclipse.debug.ui.console.IConsole) console;
-        final IProcess process = ioConsole.getProcess();
-        if (process instanceof IRobotProcess) {
-            final IRobotProcess robotProcess = (IRobotProcess) process;
+        if (console instanceof org.eclipse.debug.ui.console.IConsole) {
+            final org.eclipse.debug.ui.console.IConsole ioConsole = (org.eclipse.debug.ui.console.IConsole) console;
+            final IProcess process = ioConsole.getProcess();
+            if (process instanceof IRobotProcess) {
+                final IRobotProcess robotProcess = (IRobotProcess) process;
 
-            final InterruptTestsAction interruptAction = new InterruptTestsAction(robotProcess);
-            final PauseTestsAction pauseAction = new PauseTestsAction(robotProcess);
-            final ResumeTestsAction resumeAction = new ResumeTestsAction(robotProcess);
-            resumeAction.setEnabled(false);
+                final InterruptTestsAction interruptAction = new InterruptTestsAction(robotProcess);
+                final PauseTestsAction pauseAction = new PauseTestsAction(robotProcess);
+                final ResumeTestsAction resumeAction = new ResumeTestsAction(robotProcess);
+                resumeAction.setEnabled(false);
 
-            final String groupName = "testsSuspsensions";
-            final IActionBars actionBars = page.getSite().getActionBars();
-            final IToolBarManager toolbarManager = actionBars.getToolBarManager();
-            toolbarManager.insertAfter(IConsoleConstants.LAUNCH_GROUP, new GroupMarker(groupName));
-            toolbarManager.appendToGroup(groupName, new Separator());
-            toolbarManager.appendToGroup(groupName, resumeAction);
-            toolbarManager.appendToGroup(groupName, pauseAction);
-            toolbarManager.appendToGroup(groupName, interruptAction);
+                final String groupName = "testsSuspsensions";
+                final IActionBars actionBars = page.getSite().getActionBars();
+                final IToolBarManager toolbarManager = actionBars.getToolBarManager();
+                toolbarManager.insertAfter(IConsoleConstants.LAUNCH_GROUP, new GroupMarker(groupName));
+                toolbarManager.appendToGroup(groupName, new Separator());
+                toolbarManager.appendToGroup(groupName, resumeAction);
+                toolbarManager.appendToGroup(groupName, pauseAction);
+                toolbarManager.appendToGroup(groupName, interruptAction);
 
-            debugPlugin.addDebugEventListener(
-                    new DebugEventsListener(robotProcess, interruptAction, pauseAction, resumeAction));
+                debugPlugin.addDebugEventListener(
+                        new DebugEventsListener(robotProcess, interruptAction, pauseAction, resumeAction));
+            }
         }
     }
 

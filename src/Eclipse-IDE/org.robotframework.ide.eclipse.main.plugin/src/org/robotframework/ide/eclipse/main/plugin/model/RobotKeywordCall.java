@@ -328,7 +328,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     private void addAssignmentToRobotKeywordCall() {
-        this.getName();
         this.getArguments();
         this.getComment();
     }

@@ -90,8 +90,6 @@ public class LineReader extends Reader {
                 eols.put(positionInFile + i, Constant.CR);
             } else if (cbuf[i] == '\n') {
                 eols.put(positionInFile + i, Constant.LF);
-            } else if (cbuf[i] == -1) {
-                eols.put(positionInFile, Constant.EOF);
             }
         }
         positionInFile += read;

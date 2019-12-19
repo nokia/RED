@@ -564,7 +564,10 @@ public class RedImages {
             final File stateLocation = RedPlugin.getDefault().getStateLocation().toFile();
             final File docsDir = new File(stateLocation, "docs");
             if (!docsDir.exists()) {
-                docsDir.mkdir();
+                final boolean dirCreated = docsDir.mkdir();
+                if (!dirCreated) {
+                    return Optional.empty();
+                }
             }
             final File targetFile = new File(docsDir, filename);
             if (!targetFile.exists()) {

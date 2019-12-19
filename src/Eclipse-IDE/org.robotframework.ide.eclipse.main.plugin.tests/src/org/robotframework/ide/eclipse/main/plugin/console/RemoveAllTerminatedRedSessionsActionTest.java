@@ -20,6 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RemoveAllTerminatedRedSessionsActionTest {
 
+    private final Random random = new Random();
+
     @Test
     public void whenCreatedTheActionIsDisabledHasProperNameAndIconsSet() {
         final RemoveAllTerminatedRedSessionsAction action = new RemoveAllTerminatedRedSessionsAction();
@@ -82,10 +84,10 @@ public class RemoveAllTerminatedRedSessionsActionTest {
         verifyNoMoreInteractions(consoleManager);
     }
 
-    private static IConsole sessionConsole(final boolean isAlive) {
+    private IConsole sessionConsole(final boolean isAlive) {
         final Process process = mock(Process.class);
         when(process.isAlive()).thenReturn(isAlive);
 
-        return new RedSessionConsole("c" + new Random().nextInt(), process);
+        return new RedSessionConsole("c" + random.nextInt(), process);
     }
 }
