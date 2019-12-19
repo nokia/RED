@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _weV9oNy2Eea53q6vmC55pw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/1/18 12:16 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/19/19 2:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -59,7 +59,7 @@ check-error-and-Finish-button -file_name "abc.tsv"
 get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text "abc1.tsv"
 with [get-window "New Robot Test Suite"] {
     get-editbox -after [get-label "Robot Test Suite"] | get-property text 
-    	| equals "The '*.tsv' extension for suites is deprecated in RobotFramework 3.1" | verify-true
+    	| equals "The '*.tsv' extension support for suites is deprecated in RF 3.1 and removed in RF 3.2" | verify-true
     get-button Finish | get-property enablement | equals true | verify-true
 }
 get-window "New Robot Test Suite" | get-button Cancel | click
@@ -96,7 +96,7 @@ with [get-window "New Robot Test Suite"] {
 //check that .tsv is ok
 get-window "New Robot Test Suite" | get-button "as .tsv file" | click
 get-window "New Robot Test Suite" | get-editbox -after [get-label "Robot Test Suite"] | get-property text 
-    | equals "The '*.tsv' extension for suites is deprecated in RobotFramework 3.1" | verify-true
+    | equals "The '*.tsv' extension support for suites is deprecated in RF 3.1 and removed in RF 3.2" | verify-true
     
 //add tsv file    
 get-window "New Robot Test Suite" | get-button Finish | click
