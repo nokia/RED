@@ -63,7 +63,7 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.getSuspensionData()).isNotNull();
 
         controller.conditionEvaluated(new ConditionEvaluatedEvent(false));
-        
+
         assertThat(controller.getSuspensionData()).isNull();
     }
 
@@ -719,7 +719,7 @@ public class UserProcessDebugControllerTest {
     }
 
     @Test
-    public void noResponseIsReturned_whenSteppingIntoOmittingLibKeywordsButPausingPointIsAtEndKeyword() {
+    public void noResponseIsReturned_whenSteppingIntoOmittingLibKeywordsButPausingPointIsAtEndOfLibraryKeyword() {
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
