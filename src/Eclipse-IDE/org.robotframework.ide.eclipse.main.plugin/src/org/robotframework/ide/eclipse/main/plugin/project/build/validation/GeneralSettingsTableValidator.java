@@ -51,7 +51,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReport
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.ImmutableMap;
@@ -113,12 +112,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void reportVersionSpecificProblems(final SettingTable table, final IProgressMonitor monitor)
             throws CoreException {
-        final List<VersionDependentModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsTableValidators(table)
-                .collect(toList());
-        for (final ModelUnitValidator validator : validators) {
-            validator.validate(monitor);
-        }
+        versionDependentValidators.getGeneralSettingsTableValidators(table).forEach(ModelUnitValidator::validate);
     }
 
     private void reportUnknownSettings(final List<UnknownSetting> unknownSettings) {

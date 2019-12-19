@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
+import static org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -58,22 +60,38 @@ public enum GeneralSettingsProblem implements IProblemCause {
             final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
             final RobotVersion robotVersion = Optional
                     .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
-                    .map(RobotVersion::from).orElse(new RobotVersion(3, 1));
+                    .map(RobotVersion::from)
+                    .orElse(new RobotVersion(3, 1));
 
-            final Map<Pattern, String> oldSettingName = new HashMap<>();
-            oldSettingName.put(SettingDocumentRecognizer.EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION
-                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
-            oldSettingName.put(SuitePreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
-                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
-            oldSettingName.put(SuitePostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
-                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
-            oldSettingName.put(TestPreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_SETUP_DECLARATION
-                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
-            oldSettingName.put(TestPostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
-                    .getTheMostCorrectOneRepresentation(robotVersion).getRepresentation());
+            final Map<Pattern, RobotTokenType> nameMapping = new HashMap<>();
+            nameMapping.put(SettingDocumentRecognizer.EXPECTED, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
+            nameMapping.put(SuitePreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
+            nameMapping.put(SuitePostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION);
+            nameMapping.put(TestPreconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_SETUP_DECLARATION);
+            nameMapping.put(TestPostconditionRecognizer.EXPECTED, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
 
-            return oldSettingName.entrySet().stream().filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> new ChangeToFixer(entry.getValue())).collect(toList());
+            Stream.of(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION, RobotTokenType.SETTING_METADATA_DECLARATION,
+                    RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION, RobotTokenType.SETTING_FORCE_TAGS_DECLARATION,
+                    RobotTokenType.SETTING_LIBRARY_DECLARATION, RobotTokenType.SETTING_RESOURCE_DECLARATION,
+                    RobotTokenType.SETTING_VARIABLES_DECLARATION, RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION, RobotTokenType.SETTING_TASK_SETUP_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TASK_TEMPLATE_DECLARATION,
+                    RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION).forEach(type -> {
+                        final String correct = type.getTheMostCorrectOneRepresentation(robotVersion)
+                                .getRepresentation();
+                        final String word = createUpperLowerCaseWordWithSpacesInside(correct);
+                        final Pattern pattern = Pattern.compile("[ ]?(" + word + "[\\s]*:" + "|" + word + ")");
+                        nameMapping.put(pattern, type);
+                    });
+
+            return nameMapping.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().matcher(name).matches())
+                    .map(entry -> entry.getValue().getTheMostCorrectOneRepresentation(robotVersion).getRepresentation())
+                    .map(ChangeToFixer::new)
+                    .collect(toList());
         }
     },
     EMPTY_SETTING {

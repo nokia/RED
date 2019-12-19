@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -84,9 +83,9 @@ class UnknownTablesValidator implements ModelUnitValidator {
                     .formatMessageWith(extractedName);
 
         }
-        final Map<String, Object> additionalAttributes = ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
-                extractedName);
-        reporter.handleProblem(problem, fileModel.getFile(), token, additionalAttributes);
+        final String robotVersion = validationContext.getVersion().asString();
+        reporter.handleProblem(problem, fileModel.getFile(), token, ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
+                extractedName, AdditionalMarkerAttributes.ROBOT_VERSION, robotVersion));
     }
 
     private String extractSectionName(final String text) {

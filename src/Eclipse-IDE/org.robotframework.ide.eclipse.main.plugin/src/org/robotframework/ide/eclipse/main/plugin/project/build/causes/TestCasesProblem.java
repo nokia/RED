@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
+import static org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
@@ -24,6 +26,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePostcondi
 import org.rf.ide.core.testdata.text.read.recognizer.testcases.TestCasePreconditionRecognizer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
+
+import com.google.common.base.CharMatcher;
 
 /**
  * @author Michal Anglart
@@ -98,21 +102,28 @@ public enum TestCasesProblem implements IProblemCause {
                     .map(RobotVersion::from)
                     .orElse(new RobotVersion(3, 1));
 
-            final Map<Pattern, String> oldSettingName = new HashMap<>();
-            oldSettingName.put(TestCaseDocumentRecognizer.EXPECTED,
-                    RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(TestCasePreconditionRecognizer.EXPECTED,
-                    RobotTokenType.TEST_CASE_SETTING_SETUP.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(TestCasePostconditionRecognizer.EXPECTED,
-                    RobotTokenType.TEST_CASE_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
+            final Map<Pattern, RobotTokenType> nameMapping = new HashMap<>();
+            nameMapping.put(TestCaseDocumentRecognizer.EXPECTED, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
+            nameMapping.put(TestCasePreconditionRecognizer.EXPECTED, RobotTokenType.TEST_CASE_SETTING_SETUP);
+            nameMapping.put(TestCasePostconditionRecognizer.EXPECTED, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
 
-            return oldSettingName.entrySet()
+            Stream.of(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION, RobotTokenType.TEST_CASE_SETTING_SETUP,
+                    RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION, RobotTokenType.TEST_CASE_SETTING_TEARDOWN,
+                    RobotTokenType.TEST_CASE_SETTING_TEMPLATE, RobotTokenType.TEST_CASE_SETTING_TIMEOUT)
+                    .forEach(type -> {
+                        final String correct = type.getTheMostCorrectOneRepresentation(robotVersion)
+                                .getRepresentation();
+                        final String word = createUpperLowerCaseWordWithSpacesInside(
+                                CharMatcher.anyOf("[]").removeFrom(correct).trim());
+                        final Pattern pattern = Pattern.compile("[ ]?((\\[\\s*" + word + "\\s*\\]))");
+                        nameMapping.put(pattern, type);
+                    });
+
+            return nameMapping.entrySet()
                     .stream()
                     .filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> new ChangeToFixer(entry.getValue()))
+                    .map(entry -> entry.getValue().getTheMostCorrectOneRepresentation(robotVersion).getRepresentation())
+                    .map(ChangeToFixer::new)
                     .collect(toList());
         }
     },

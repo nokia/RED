@@ -9,11 +9,15 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
@@ -61,10 +65,15 @@ public enum SuiteFileProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final String wrongName = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+            final RobotVersion robotVersion = Optional
+                    .ofNullable(marker.getAttribute(AdditionalMarkerAttributes.ROBOT_VERSION, null))
+                    .map(RobotVersion::from)
+                    .orElse(new RobotVersion(3, 1));
 
             final List<ChangeToFixer> fixers = new ArrayList<>();
-            new SimilaritiesAnalyst().provideSimilarSectionNames(wrongName)
-                    .stream()
+            final Collection<String> similarSectionNames = new SimilaritiesAnalyst()
+                    .provideSimilarSectionNames(wrongName);
+            similarSectionNames.stream()
                     .map(name -> "*** " + name + " ***")
                     .map(ChangeToFixer::new)
                     .forEach(fixers::add);
@@ -75,6 +84,17 @@ public enum SuiteFileProblem implements IProblemCause {
 
             } else if (canonicalWrongName.contains("userkeyword")) {
                 fixers.add(new ChangeToFixer("*** Keywords ***"));
+            } else {
+                Stream.of(RobotTokenType.KEYWORDS_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
+                        RobotTokenType.TASKS_TABLE_HEADER, RobotTokenType.SETTINGS_TABLE_HEADER,
+                        RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.COMMENTS_TABLE_HEADER).forEach(type -> {
+                            final String correctName = type.getTheMostCorrectOneRepresentation(robotVersion)
+                                    .getRepresentation();
+                            if (!similarSectionNames.contains(correctName)
+                                    && canonicalWrongName.contains(correctName.replaceAll("\\s", "").toLowerCase())) {
+                                fixers.add(new ChangeToFixer("*** " + correctName + " ***"));
+                            }
+                        });
             }
             fixers.add(new ChangeToFixer("*** Comments ***"));
             return fixers;

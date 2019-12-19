@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
+import static org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -29,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywor
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 
 public enum KeywordsProblem implements IProblemCause {
@@ -372,18 +375,26 @@ public enum KeywordsProblem implements IProblemCause {
                     .map(RobotVersion::from)
                     .orElse(new RobotVersion(3, 1));
 
-            final Map<Pattern, String> oldSettingName = new HashMap<>();
-            oldSettingName.put(KeywordDocumentRecognizer.EXPECTED,
-                    RobotTokenType.KEYWORD_SETTING_DOCUMENTATION.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
-            oldSettingName.put(KeywordPostconditionRecognizer.EXPECTED,
-                    RobotTokenType.KEYWORD_SETTING_TEARDOWN.getTheMostCorrectOneRepresentation(robotVersion)
-                            .getRepresentation());
+            final Map<Pattern, RobotTokenType> nameMapping = new HashMap<>();
+            nameMapping.put(KeywordDocumentRecognizer.EXPECTED, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
+            nameMapping.put(KeywordPostconditionRecognizer.EXPECTED, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
 
-            return oldSettingName.entrySet()
+            Stream.of(RobotTokenType.KEYWORD_SETTING_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION,
+                    RobotTokenType.KEYWORD_SETTING_RETURN, RobotTokenType.KEYWORD_SETTING_TAGS,
+                    RobotTokenType.KEYWORD_SETTING_TEARDOWN, RobotTokenType.KEYWORD_SETTING_TIMEOUT).forEach(type -> {
+                        final String correct = type.getTheMostCorrectOneRepresentation(robotVersion)
+                                .getRepresentation();
+                        final String word = createUpperLowerCaseWordWithSpacesInside(
+                                CharMatcher.anyOf("[]").removeFrom(correct).trim());
+                        final Pattern pattern = Pattern.compile("[ ]?((\\[\\s*" + word + "\\s*\\]))");
+                        nameMapping.put(pattern, type);
+                    });
+
+            return nameMapping.entrySet()
                     .stream()
                     .filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> new ChangeToFixer(entry.getValue()))
+                    .map(entry -> entry.getValue().getTheMostCorrectOneRepresentation(robotVersion).getRepresentation())
+                    .map(ChangeToFixer::new)
                     .collect(toList());
         }
     },

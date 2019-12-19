@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -19,6 +20,15 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class CommentsTableHeaderRecognizerTest {
 
     private final CommentsTableHeaderRecognizer rec = new CommentsTableHeaderRecognizer();
+
+    @Test
+    public void recognizerIsApplicable_whenRobotVersionIsAtLeast31() throws Exception {
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0, 9))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1, 5))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 2))).isTrue();
+    }
 
     @Test
     public void test_check_Comments_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -259,10 +269,17 @@ public class CommentsTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_Comment_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** Comme nt ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Comments") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Comment") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Comments") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Comment") + ")([\\s]*[*])*");
     }
 
     @Test

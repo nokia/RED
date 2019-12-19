@@ -16,12 +16,15 @@ import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TasksProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Michal Anglart
@@ -70,7 +73,10 @@ public class TaskSettingsValidator implements ModelUnitValidator {
             final RobotProblem problem = RobotProblem.causedBy(TasksProblem.UNKNOWN_TASK_SETTING)
                     .formatMessageWith(token.getText());
 
-            reporter.handleProblem(problem, validationContext.getFile(), token);
+            final String robotVersion = validationContext.getVersion().asString();
+            reporter.handleProblem(problem, validationContext.getFile(), token,
+                    ImmutableMap.of(AdditionalMarkerAttributes.NAME, token.getText(),
+                            AdditionalMarkerAttributes.ROBOT_VERSION, robotVersion));
         }
     }
 

@@ -258,10 +258,17 @@ public class KeywordsTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_Keyword_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** K e y w o r d ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Keywords") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Keyword") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Keywords") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Keyword") + ")([\\s]*[*])*");
     }
 
     @Test

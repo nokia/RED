@@ -258,11 +258,18 @@ public class TestCasesTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_TestCase_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** T est Cas e ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern())
-                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Test")
-                        + "([\\s]+)?(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Cases") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Case") + ")([\\s]*[*])*");
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*" + ATokenRecognizer.createUpperLowerCaseWord("Test") + "([\\s]+)?("
+                        + ATokenRecognizer.createUpperLowerCaseWord("Cases") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Case") + ")([\\s]*[*])*");
     }
 
     @Test

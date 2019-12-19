@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ConvertToRobotFileFormat;
 
+import com.google.common.collect.ImmutableMap;
 
 public class SuiteFileProblemTest {
 
@@ -53,6 +54,52 @@ public class SuiteFileProblemTest {
     }
 
     @Test
+    public void unrecognizedMetadataHeaderProblemForOlderRf_providesChangeToSettings() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn("*** Metadata ***");
+
+        final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER
+                .createFixers(marker);
+
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Change to '*** Settings ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void unrecognizedUserKeywordsHeaderProblemForOlderRf_providesChangeToKeywords() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn("*** User Keywords ***");
+
+        final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER
+                .createFixers(marker);
+
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Change to '*** Keywords ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void unrecognizedHeaderWithAdditionalSpacesProblemForOlderRf_providesChangeToCorrectHeader() {
+        final ImmutableMap<String, String> mapping = ImmutableMap.<String, String> builder()
+                .put("*** K eywords ***", "*** Keywords ***")
+                .put("*** T e s t Cases ***", "*** Test Cases ***")
+                .put("*** T a s k s ***", "*** Tasks ***")
+                .put("*** S ett ing s ***", "*** Settings ***")
+                .put("*** Var i a b l e s ***", "*** Variables ***")
+                .put("*** Co mm en ts ***", "*** Comments ***")
+                .build();
+        mapping.forEach((value, replacement) -> {
+            final IMarker marker = mock(IMarker.class);
+            when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn(value);
+
+            final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER
+                    .createFixers(marker);
+
+            assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                    .containsExactly("Change to '" + replacement + "'", "Change to '*** Comments ***'");
+        });
+    }
+
+    @Test
     public void unrecognizedHeaderProblemForNewerRf_hasItsRuntimeErrorCategoryAndHasResolution() {
         assertThat(SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER_RF31.getProblemCategory())
                 .isEqualTo(ProblemCategory.RUNTIME_ERROR);
@@ -80,6 +127,52 @@ public class SuiteFileProblemTest {
 
         assertThat(fixers).extracting(IMarkerResolution::getLabel)
                 .containsExactly("Change to '*** Keywords ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void unrecognizedMetadataHeaderProblemForNewerRf_providesChangeToSettings() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn("*** Metadata ***");
+
+        final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER_RF31
+                .createFixers(marker);
+
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Change to '*** Settings ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void unrecognizedUserKeywordsHeaderProblemForNewerRf_providesChangeToKeywords() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn("*** User Keywords ***");
+
+        final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER_RF31
+                .createFixers(marker);
+
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Change to '*** Keywords ***'", "Change to '*** Comments ***'");
+    }
+
+    @Test
+    public void unrecognizedHeaderWithAdditionalSpacesProblemForNewerRf_providesChangeToCorrectHeader() {
+        final ImmutableMap<String, String> mapping = ImmutableMap.<String, String> builder()
+                .put("*** K eywords ***", "*** Keywords ***")
+                .put("*** T e s t Cases ***", "*** Test Cases ***")
+                .put("*** T a s k s ***", "*** Tasks ***")
+                .put("*** S ett ing s ***", "*** Settings ***")
+                .put("*** Var i a b l e s ***", "*** Variables ***")
+                .put("*** Co mm en ts ***", "*** Comments ***")
+                .build();
+        mapping.forEach((value, replacement) -> {
+            final IMarker marker = mock(IMarker.class);
+            when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn(value);
+
+            final List<? extends IMarkerResolution> fixers = SuiteFileProblem.UNRECOGNIZED_TABLE_HEADER_RF31
+                    .createFixers(marker);
+
+            assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                    .containsExactly("Change to '" + replacement + "'", "Change to '*** Comments ***'");
+        });
     }
 
     @Test

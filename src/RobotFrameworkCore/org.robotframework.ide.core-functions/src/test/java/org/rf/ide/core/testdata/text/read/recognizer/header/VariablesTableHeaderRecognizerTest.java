@@ -258,10 +258,17 @@ public class VariablesTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_Variable_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** Variab le ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Variables") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Variable") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Variables") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Variable") + ")([\\s]*[*])*");
     }
 
     @Test

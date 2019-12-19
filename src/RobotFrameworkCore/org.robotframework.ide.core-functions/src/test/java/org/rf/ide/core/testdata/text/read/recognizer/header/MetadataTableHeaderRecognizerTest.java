@@ -10,15 +10,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.rf.ide.core.testdata.text.read.recognizer.header.MetadataTableHeaderRecognizer;
 
 public class MetadataTableHeaderRecognizerTest {
 
     private final MetadataTableHeaderRecognizer rec = new MetadataTableHeaderRecognizer();
+
+    @Test
+    public void recognizerIsApplicable_whenRobotVersionIsOlderThan31() throws Exception {
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0, 9))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1, 5))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 2))).isFalse();
+    }
 
     @Test
     public void test_check_MetadataAllPossibilities_withAsterisks_atTheBeginAndEnd() {

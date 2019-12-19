@@ -12,9 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class VariablesTableHeaderRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern
-            .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("Variables") + "|"
-                    + createUpperLowerCaseWordWithSpacesInside("Variable") + ")([\\s]*[*])*");
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?([*][\\s]*)+[\\s]*("
+            + createUpperLowerCaseWord("Variables") + "|" + createUpperLowerCaseWord("Variable") + ")([\\s]*[*])*");
 
     public VariablesTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.VARIABLES_TABLE_HEADER);

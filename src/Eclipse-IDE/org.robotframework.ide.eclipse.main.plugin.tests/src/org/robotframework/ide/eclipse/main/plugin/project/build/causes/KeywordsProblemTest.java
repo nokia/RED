@@ -16,6 +16,8 @@ import org.eclipse.ui.IMarkerResolution;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 
+import com.google.common.collect.ImmutableMap;
+
 public class KeywordsProblemTest {
 
     @Test
@@ -73,6 +75,53 @@ public class KeywordsProblemTest {
         assertThat(fixers).extracting(IMarkerResolution::getLabel)
                 .containsExactly("Add 'LibA' prefix to keyword call", "Add 'LibB' prefix to keyword call",
                         "Add 'LibC' prefix to keyword call");
+    }
+
+    @Test
+    public void unknownKeywordDocumentSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("[Document]");
+
+        final KeywordsProblem problem = KeywordsProblem.UNKNOWN_KEYWORD_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '[Documentation]'");
+    }
+
+    @Test
+    public void unknownKeywordPostconditionSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("[Postcondition]");
+
+        final KeywordsProblem problem = KeywordsProblem.UNKNOWN_KEYWORD_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '[Teardown]'");
+    }
+
+    @Test
+    public void unknownKeywordSpaceSensitiveSetting_hasResolutionAndProvidesFixer() {
+        final ImmutableMap<String, String> mapping = ImmutableMap.<String, String> builder()
+                .put("[Ar gu me nts ]", "[Arguments]")
+                .put("[ D oc umentati on]", "[Documentation]")
+                .put("[ R e t u r n ]", "[Return]")
+                .put("[ Tag s ]", "[Tags]")
+                .put("[ Teard o w n]", "[Teardown]")
+                .put("[ T imeou t ]", "[Timeout]")
+                .build();
+        mapping.forEach((name, replacement) -> {
+            final IMarker marker = mock(IMarker.class);
+            when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn(name);
+
+            final KeywordsProblem problem = KeywordsProblem.UNKNOWN_KEYWORD_SETTING;
+
+            assertThat(problem.hasResolution()).isTrue();
+            final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+            assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                    .containsExactly("Change to '" + replacement + "'");
+        });
     }
 
 }

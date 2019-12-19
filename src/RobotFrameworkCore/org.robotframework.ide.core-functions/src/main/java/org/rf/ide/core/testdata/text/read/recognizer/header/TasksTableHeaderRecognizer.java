@@ -13,9 +13,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TasksTableHeaderRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern
-            .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("Tasks") + "|"
-                    + createUpperLowerCaseWordWithSpacesInside("Task") + ")([\\s]*[*])*");
+    public static final Pattern EXPECTED = Pattern.compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWord("Tasks")
+            + "|" + createUpperLowerCaseWord("Task") + ")([\\s]*[*])*");
 
     public TasksTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.TASKS_TABLE_HEADER);

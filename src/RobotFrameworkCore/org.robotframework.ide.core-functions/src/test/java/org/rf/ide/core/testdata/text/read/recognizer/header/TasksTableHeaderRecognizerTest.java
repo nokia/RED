@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -23,6 +24,15 @@ public class TasksTableHeaderRecognizerTest {
     @Before
     public void setUp() {
         rec = new TasksTableHeaderRecognizer();
+    }
+
+    @Test
+    public void recognizerIsApplicable_whenRobotVersionIsAtLeast31() throws Exception {
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 0, 9))).isFalse();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 1, 5))).isTrue();
+        assertThat(rec.isApplicableFor(new RobotVersion(3, 2))).isTrue();
     }
 
     @Test
@@ -264,10 +274,17 @@ public class TasksTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_Task_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** Ta sk ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Tasks") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Task") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Tasks") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Task") + ")([\\s]*[*])*");
     }
 
     @Test

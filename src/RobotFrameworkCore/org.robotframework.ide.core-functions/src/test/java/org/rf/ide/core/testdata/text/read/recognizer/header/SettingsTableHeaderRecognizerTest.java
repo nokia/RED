@@ -258,10 +258,17 @@ public class SettingsTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_Setting_withSpacesInside() {
+        final StringBuilder text = new StringBuilder("*** Se t t i ng ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Settings") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Setting") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Settings") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWord("Setting") + ")([\\s]*[*])*");
     }
 
     @Test
