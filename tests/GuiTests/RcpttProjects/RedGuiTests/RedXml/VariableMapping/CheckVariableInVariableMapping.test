@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/27/19 12:24 PM
+Save-Time: 12/20/19 2:02 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -86,11 +86,18 @@ with [get-view "Project Explorer" | get-tree] {
     select "ProjectWithResource/resource_folder/second" | get-menu Paste | click
     select "ProjectWithResource/resource_folder/second/res_1.robot" | get-menu "Rename..." | click
 }
-with [get-window "Rename Resource"] {
-    get-editbox -after [get-label "New name:"] | set-text "res_2.robot"
-    get-button OK | click
+
+if [$is_eclipse_12_2019 | equals True]{
+	get-view "Project Explorer" | get-tree | get-editbox | set-text "res_2.robot"
+	get-view "Project Explorer" | get-tree | key-type Enter
+}-else{
+	// old eclipse
+	with [get-window "Rename Resource"] {
+	    get-editbox -after [get-label "New name:"] | set-text "res_2.robot"
+	    get-button OK | click
+	}
 }
-// modify res_2 file
+
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/resource_folder/second/res_2.robot" | double-click
 with [get-editor "res_2.robot" | get-text-viewer] {
     set-caret-pos 2 14
@@ -182,10 +189,19 @@ with [get-view "Project Explorer" | get-tree] {
     select "ProjectWithResource/external_var/second" | double-click
     select "ProjectWithResource/external_var/second/var.py" | get-menu "Rename..." | click
 }
-with [get-window "Rename Resource"] {
-    get-editbox -after [get-label "New name:"] | set-text "var_2.py"
-    get-button OK | click
+
+if [$is_eclipse_12_2019 | equals True]{
+	get-view "Project Explorer" | get-tree | get-editbox | set-text "var_2.py"
+	get-view "Project Explorer" | get-tree | key-type Enter
+}-else{
+	// old eclipse
+	with [get-window "Rename Resource"] {
+	    get-editbox -after [get-label "New name:"] | set-text "var_2.py"
+	    get-button OK | click
+	}
 }
+
+
 // set Source content
 with [get-editor "TestSuite.robot" | get-text-viewer] {
     set-caret-pos 12 27
@@ -237,9 +253,16 @@ with [get-view "Project Explorer" | get-tree] {
     select "ProjectWithResource/external_lib/second/calculator.py"
     select "ProjectWithResource/external_lib/second/calculator.py" | get-menu "Rename..." | click
 }
-with [get-window "Rename Resource"] {
-    get-editbox -after [get-label "New name:"] | set-text "calculator_2.py"
-    get-button OK | click
+
+if [$is_eclipse_12_2019 | equals True]{
+	get-view "Project Explorer" | get-tree | get-editbox | set-text "calculator_2.py"
+	get-view "Project Explorer" | get-tree | key-type Enter
+}-else{
+	// old eclipse
+	with [get-window "Rename Resource"] {
+	    get-editbox -after [get-label "New name:"] | set-text "calculator_2.py"
+	    get-button OK | click
+	}
 }
 // set Source content
 with [get-editor "TestSuite.robot" | get-text-viewer] {

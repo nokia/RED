@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-fkNYJGpEemOWdSh6VSwkQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/1/19 4:40 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/20/19 2:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -183,10 +183,17 @@ get-window Preferences | get-button "Apply and Close" | click
 
 //rename rule
 get-view "Project Explorer" | get-tree | select "project_a/my_rules/customRules.py" | key-type F2
-with [get-window "Rename Resource"] {
-    get-editbox -after [get-label "New name:"] | set-text "abc.py"
-    get-button OK | click
-}
+
+if [$is_eclipse_12_2019 | equals True]{
+	get-view "Project Explorer" | get-tree | get-editbox | set-text "abc.py"
+	get-view "Project Explorer" | get-tree | key-type Enter
+}-else{
+	// old eclipse
+	with [get-window "Rename Resource"] {
+	    get-editbox -after [get-label "New name:"] | set-text "abc.py"
+	    get-button OK | click
+	}
+} 
 
 //check that now 3 rules are uknown
 get-preferences-menu | click
@@ -226,12 +233,16 @@ get-window Preferences | get-button "Apply and Close" | click
 
 //rename to old name
 get-view "Project Explorer" | get-tree | select "project_a/my_rules/abc.py" | key-type F2
-with [get-window "Rename Resource"] {
-    with [get-editbox -after [get-label "New name:"]] {
-        set-text "customRules.py"
-    }
-    get-button OK | click
-}
+if [$is_eclipse_12_2019 | equals True]{
+	get-view "Project Explorer" | get-tree | get-editbox | set-text "customRules.py"
+	get-view "Project Explorer" | get-tree | key-type Enter
+}-else{
+	// old eclipse
+	with [get-window "Rename Resource"] {
+	    get-editbox -after [get-label "New name:"] | set-text "customRules.py"
+	    get-button OK | click
+	}
+} 
 
 //open preference and check that custom rules are not red
 get-preferences-menu | click
