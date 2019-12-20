@@ -1,0 +1,91 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: TableHeader
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _X-zPcCM3EeqTZcv4p-erQA
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/20/19 4:00 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Test Cases ***   TC name   column 2  \"text 11111123\"  !@#$%^&*()_  ${var}\n"
+    + "test 1\n"
+    + "    log  test\n"
+    + "    \n"
+    + "*** Test Cases ***  a1  a2  a3  a4   a5  a6  a7  a8\n"
+    + "test 2\n"
+    + "    log  8\n"
+    + "    \n"
+    + "*** Keywords ***  KW NAME  col2  col 3  'text'  żółć\n"
+    + "kw 1\n"
+    + "    log  8" 
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-object 
+	| invoke getCellByPosition 1 0|  invoke getDataValue  | eq "TC name" |  verify-true
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-object 
+	| invoke getCellByPosition 2 0|  invoke getDataValue  | eq "column 2" |  verify-true
+	
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-object 
+	| invoke getCellByPosition 3 0|  invoke getDataValue  | eq "\"text 11111123\""  |  verify-true
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-object 
+	| invoke getCellByPosition 4 0|  invoke getDataValue  | eq "!@#$%^&*()_" |  verify-true
+	
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-object 
+	| invoke getCellByPosition 5 0|  invoke getDataValue  | eq "${var}" |  verify-true	
+	
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+	
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 1 0|  invoke getDataValue  | eq "KW NAME" |  verify-true
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 2 0|  invoke getDataValue  | eq "col2" |  verify-true
+	
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 3 0|  invoke getDataValue  | eq "col 3"  |  verify-true
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 4 0|  invoke getDataValue  | eq "'text'" |  verify-true
+	
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 5 0|  invoke getDataValue  | eq "żółć" |  verify-true		
+	
+	
+with [get-editor "TestFile.robot"] {
+    with [get-tab-folder] {
+        get-tab-item Keywords | click
+        get-tab-item Source | click
+    }
+    with [get-text-viewer] {
+        set-caret-pos 9 52
+        select-range 9 49 9 53
+        type-text "last  #comment"
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+	
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 5 0|  invoke getDataValue  | eq "last" |  verify-true	
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-object 
+	| invoke getCellByPosition 6 0|  invoke getDataValue  | eq "" |  verify-true		
+	
+				
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
