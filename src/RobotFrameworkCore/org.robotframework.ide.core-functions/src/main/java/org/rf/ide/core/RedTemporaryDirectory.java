@@ -65,7 +65,10 @@ public final class RedTemporaryDirectory {
                     + Stream.of(filepath).limit(filepath.length - 1).collect(joining(File.separator)));
 
             if (!dirFile.exists()) {
-                dirFile.mkdirs();
+                final boolean dirsCreated = dirFile.mkdirs();
+                if (!dirsCreated) {
+                    throw new IOException("Unable to create '" + dirFile.getAbsolutePath() + "' directory");
+                }
             }
             final File tempFile = new File(dirFile, filepath[filepath.length - 1]);
             Files.copy(source, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -88,8 +91,17 @@ public final class RedTemporaryDirectory {
 
     public static File createTemporaryFile(final String filename) throws IOException {
         final File tempFile = getTemporaryFile(filename);
-        tempFile.delete();
-        tempFile.createNewFile();
+
+        if (tempFile.exists()) {
+            final boolean deleted = tempFile.delete();
+            if (!deleted) {
+                throw new IOException("Unable to delete '" + tempFile.getAbsolutePath() + "' file");
+            }
+        }
+        final boolean created = tempFile.createNewFile();
+        if (!created) {
+            throw new IOException("Unable to create '" + tempFile.getAbsolutePath() + "' file");
+        }
         return tempFile;
     }
 

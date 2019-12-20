@@ -269,7 +269,7 @@ public class UserProcessDebugController extends UserProcessController {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), arguments);
         susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
-        manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {}));
+        offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
     public void changeVariableInnerValue(final StackFrame frame, final StackFrameVariable variable,
@@ -277,25 +277,25 @@ public class UserProcessDebugController extends UserProcessController {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), path, arguments);
         susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
-        manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {}));
+        offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
     public void evaluateRobotKeywordCall(final int exprId, final String keywordName, final List<String> arguments) {
         final EvaluateExpression evalResponse = EvaluateExpression.robot(exprId, keywordName, arguments);
         susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
-        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
+        offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public void evaluateRobotVariable(final int exprId, final String variable) {
         final EvaluateExpression evalResponse = EvaluateExpression.variable(exprId, variable);
         susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
-        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
+        offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public void evaluatePythonExpression(final int exprId, final String expression) {
         final EvaluateExpression evalResponse = EvaluateExpression.python(exprId, expression);
         susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
-        manualUserResponse.offer(new ResponseWithCallback(evalResponse, () -> {}));
+        offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public static interface PauseReasonListener {

@@ -246,10 +246,17 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             throws IOException {
         final File libspecFolder = outputFile.getParentFile();
         if (!libspecFolder.exists()) {
-            libspecFolder.mkdir();
+            final boolean dirCreated = libspecFolder.mkdir();
+            if (!dirCreated) {
+                throw new IOException("Unable to create '" + libspecFolder.getAbsolutePath() + "' directory");
+            }
         }
         if (!outputFile.exists()) {
-            outputFile.createNewFile();
+            final boolean libspecFileCreated = outputFile.createNewFile();
+            if (!libspecFileCreated) {
+                throw new IOException(
+                        "Unable to create '" + outputFile.getAbsolutePath() + "' library specification file");
+            }
         }
         final byte[] decodedFileContent = Base64.getDecoder().decode(encodedFileContent);
         Files.write(decodedFileContent, outputFile);

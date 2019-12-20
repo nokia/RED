@@ -54,16 +54,14 @@ public abstract class AVariableImported<T> implements IVariableHolder {
     }
 
     private String correctName(final String oldName) {
-        String newName = oldName;
         if (oldName != null && oldName.length() > 3) {
             final int startIndex = oldName.indexOf('{');
             final int endIndex = oldName.lastIndexOf('}');
             if (startIndex > -1 && endIndex > -1) {
-                newName = new String(oldName.substring(startIndex + 1, endIndex));
+                return oldName.substring(startIndex + 1, endIndex);
             }
         }
-
-        return newName;
+        return oldName;
     }
 
     @Override

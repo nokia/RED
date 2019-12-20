@@ -96,7 +96,10 @@ public class ArgumentsFile {
 
     private void writeTo(final File file, final String content) throws IOException {
         if (!file.exists()) {
-            file.createNewFile();
+            final boolean created = file.createNewFile();
+            if (!created) {
+                throw new IllegalStateException("The arguments file '" + file.getName() + "' already exists");
+            }
         }
         Files.asCharSink(file, Charsets.UTF_8).write(content);
     }

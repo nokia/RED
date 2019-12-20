@@ -30,7 +30,6 @@ public class SeparatorsDumpHelper {
             final IRobotLineElement currentToken, final List<RobotLine> lines) {
         int dumpEndIndex = -1;
         List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        currentLine.getEndOfLine();
         final Optional<Integer> forCurrentLine = getDumpEndIndex(lineElements, currentToken);
         if (forCurrentLine.isPresent()) {
             dumpEndIndex = forCurrentLine.get();
@@ -74,6 +73,7 @@ public class SeparatorsDumpHelper {
 
     public void dumpSeparatorsBeforeToken(final RobotFile model, final RobotLine currentLine,
             final IRobotLineElement currentToken, final List<RobotLine> lines) {
+
         int dumpStartIndex = -1;
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         final int tokenPosIndex = lineElements.indexOf(currentToken);
@@ -89,7 +89,6 @@ public class SeparatorsDumpHelper {
                 dumpStartIndex = index;
             }
         }
-
         if (dumpStartIndex >= 0) {
             for (int myIndex = dumpStartIndex; myIndex < tokenPosIndex; myIndex++) {
                 dumpHelper.getDumpLineUpdater().updateLine(model, lines, lineElements.get(myIndex));

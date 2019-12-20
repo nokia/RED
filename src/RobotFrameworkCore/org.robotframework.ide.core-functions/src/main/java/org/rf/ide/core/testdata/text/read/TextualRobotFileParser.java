@@ -414,19 +414,13 @@ public class TextualRobotFileParser {
         if (processThisElement) {
             ParsingState newState = parsingStateHelper.getState(robotToken);
             boolean wasRecognizedCorrectly = true;
-            if (robotToken != null) {
-                if (!text.trim().equals(robotToken.getText().trim())) {
-                    wasRecognizedCorrectly = false;
-                    // FIXME: incorrect type
-                    final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn(),
-                            RobotTokenType.UNKNOWN);
-                    newRobotToken.getTypes().addAll(robotToken.getTypes());
-                    robotToken = newRobotToken;
-
-                    newState = ParsingState.UNKNOWN;
-                }
-            } else {
-                robotToken = RobotToken.create(text, fp.getLine(), fp.getColumn(), RobotTokenType.UNKNOWN);
+            if (!text.trim().equals(robotToken.getText().trim())) {
+                wasRecognizedCorrectly = false;
+                // FIXME: incorrect type
+                final RobotToken newRobotToken = RobotToken.create(text, fp.getLine(), fp.getColumn(),
+                        RobotTokenType.UNKNOWN);
+                newRobotToken.getTypes().addAll(robotToken.getTypes());
+                robotToken = newRobotToken;
 
                 newState = ParsingState.UNKNOWN;
             }

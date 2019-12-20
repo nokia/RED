@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 import com.google.common.base.Strings;
 
@@ -34,10 +33,12 @@ class ArgumentsParser {
                     args.projectNames.addAll(parseProjectsArgument(passedArgs));
                     break;
                 case REPORT:
+                    args.generateReport = true;
                     args.reportFilepath = parseReportArgument(passedArgs);
                     break;
                 case NO_REPORT:
-                    args.reportFilepath = parseNoReportArgument(passedArgs);
+                    args.generateReport = false;
+                    parseNoReportArgument(passedArgs);
                     break;
                 default:
                     throw new IllegalStateException();
@@ -64,17 +65,16 @@ class ArgumentsParser {
         return projects;
     }
 
-    private Optional<String> parseReportArgument(final List<String> passedArgs) {
+    private String parseReportArgument(final List<String> passedArgs) {
         passedArgs.remove(0);
         if (passedArgs.isEmpty() || isSwitch(passedArgs.get(0))) {
             throw new InvalidArgumentsProvidedException("No report was specified after -report switch");
         }
-        return Optional.of(passedArgs.remove(0));
+        return passedArgs.remove(0);
     }
 
-    private Optional<String> parseNoReportArgument(final List<String> passedArgs) {
+    private void parseNoReportArgument(final List<String> passedArgs) {
         passedArgs.remove(0);
-        return null;
     }
 
     private boolean isSwitch(final String arg) {
@@ -85,15 +85,14 @@ class ArgumentsParser {
 
         private final List<String> projectsToImport = new ArrayList<>();
 
-        private Optional<String> reportFilepath = Optional.empty();
+        private boolean generateReport = true;
+
+        private String reportFilepath = "report.xml";
 
         private final List<String> projectNames = new ArrayList<>();
 
         String getReportFilePath() {
-            if (reportFilepath == null) {
-                return null;
-            }
-            return reportFilepath.isPresent() ? reportFilepath.get() : "report.xml";
+            return generateReport ? reportFilepath : null;
         }
 
         List<String> getProjectPathsToImport() {

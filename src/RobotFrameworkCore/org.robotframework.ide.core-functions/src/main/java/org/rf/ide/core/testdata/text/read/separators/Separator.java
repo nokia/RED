@@ -241,11 +241,7 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public VersionAvailabilityInfo getVersionInformation() {
-        final VersionAvailabilityInfo vai = null;
-        if (type != null) {
-            type.getVersionAvailabilityInfos();
-        }
-        return vai;
+        return null;
     }
 
     @Override

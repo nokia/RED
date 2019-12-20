@@ -23,7 +23,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 public class UserProcessController {
 
     // user responses queue containing at most 1 response from user
-    protected final BlockingQueue<ResponseWithCallback> manualUserResponse = new LinkedBlockingQueue<>(1);
+    final BlockingQueue<ResponseWithCallback> manualUserResponse = new LinkedBlockingQueue<>(1);
 
     public void executionPaused() {
         // nothing to do, override if needed
@@ -56,23 +56,35 @@ public class UserProcessController {
     }
 
     public void disconnect(final Runnable whenResponseIsSent) {
-        manualUserResponse.offer(new ResponseWithCallback(new DisconnectExecution(), whenResponseIsSent));
+        offer(new ResponseWithCallback(new DisconnectExecution(), whenResponseIsSent));
     }
 
     public void interrupt(final Runnable whenResponseIsSent) {
-        manualUserResponse.offer(new ResponseWithCallback(new InterruptExecution(), whenResponseIsSent));
+        offer(new ResponseWithCallback(new InterruptExecution(), whenResponseIsSent));
     }
 
     public void terminate(final Runnable whenResponseIsSent) {
-        manualUserResponse.offer(new ResponseWithCallback(new TerminateExecution(), whenResponseIsSent));
+        offer(new ResponseWithCallback(new TerminateExecution(), whenResponseIsSent));
     }
 
     public void pause(final Runnable whenResponseIsSent) {
-        manualUserResponse.offer(new ResponseWithCallback(new PauseExecution(), whenResponseIsSent));
+        offer(new ResponseWithCallback(new PauseExecution(), whenResponseIsSent));
     }
 
     public void resume(final Runnable whenResponseIsSent) {
-        manualUserResponse.offer(new ResponseWithCallback(new ResumeExecution(), whenResponseIsSent));
+        offer(new ResponseWithCallback(new ResumeExecution(), whenResponseIsSent));
+    }
+
+    protected final void offer(final ResponseWithCallback response) {
+        int attempt = 0;
+        while (attempt < 10) {
+            final boolean added = manualUserResponse.offer(response);
+            if (added) {
+                return;
+            }
+            attempt++;
+        }
+        throw new IllegalStateException("Unable to put reponse to agent in the responses queue");
     }
 
     static class ResponseWithCallback {
