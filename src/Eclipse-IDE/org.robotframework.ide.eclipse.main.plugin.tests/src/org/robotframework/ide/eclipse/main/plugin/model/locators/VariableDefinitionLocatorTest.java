@@ -18,10 +18,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
-import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
-import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.model.GlobalVariable;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -395,9 +393,8 @@ public class VariableDefinitionLocatorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
         final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
-        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
-                new ListRobotInternalVariable("global_list", null),
-                new DictionaryRobotInternalVariable("global_dict", null)));
+        projectHolder.setGlobalVariables(newArrayList(new GlobalVariable<>("global_scalar", null),
+                new GlobalVariable<>("global_list", null), new GlobalVariable<>("global_dict", null)));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(sourceFile, model);
@@ -412,9 +409,8 @@ public class VariableDefinitionLocatorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
         final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
-        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("global_scalar", null),
-                new ListRobotInternalVariable("global_list", null),
-                new DictionaryRobotInternalVariable("global_dict", null)));
+        projectHolder.setGlobalVariables(newArrayList(new GlobalVariable<>("global_scalar", null),
+                new GlobalVariable<>("global_list", null), new GlobalVariable<>("global_dict", null)));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(sourceFile, model);

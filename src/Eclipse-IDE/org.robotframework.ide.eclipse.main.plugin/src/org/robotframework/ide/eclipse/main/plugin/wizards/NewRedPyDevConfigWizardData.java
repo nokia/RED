@@ -120,7 +120,7 @@ class NewRedPyDevConfigWizardData {
         return requiresExport;
     }
 
-    boolean getGeventSupport() {
+    boolean hasGeventSupport() {
         return geventSupport;
     }
 

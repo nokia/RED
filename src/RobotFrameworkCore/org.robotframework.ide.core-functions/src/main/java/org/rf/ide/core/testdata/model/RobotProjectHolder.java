@@ -20,10 +20,6 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
-import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
-import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
-import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 
 public class RobotProjectHolder {
 
@@ -31,7 +27,7 @@ public class RobotProjectHolder {
 
     private RobotProjectConfig currentConfiguration;
 
-    private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
+    private final List<GlobalVariable<?>> globalVariables = new ArrayList<>();
 
     private final Map<String, String> variableMappings = new HashMap<>();
 
@@ -62,12 +58,12 @@ public class RobotProjectHolder {
         return runtimeEnvironment;
     }
 
-    public void setGlobalVariables(final List<ARobotInternalVariable<?>> variables) {
+    public void setGlobalVariables(final List<GlobalVariable<?>> variables) {
         globalVariables.clear();
         globalVariables.addAll(variables);
     }
 
-    public List<ARobotInternalVariable<?>> getGlobalVariables() {
+    public List<GlobalVariable<?>> getGlobalVariables() {
         return globalVariables;
     }
 
@@ -89,24 +85,27 @@ public class RobotProjectHolder {
         return modulesSearchPaths;
     }
 
-    private List<ARobotInternalVariable<?>> map(final Map<String, Object> varsRead) {
-        final List<ARobotInternalVariable<?>> variables = new ArrayList<>();
+    private List<GlobalVariable<?>> map(final Map<String, Object> varsRead) {
+        final List<GlobalVariable<?>> variables = new ArrayList<>();
         for (final String varName : varsRead.keySet()) {
             final Object varValue = varsRead.get(varName);
 
             if (varValue instanceof List) {
                 final List<?> value = (List<?>) varValue;
-                variables.add(new ListRobotInternalVariable(varName, value));
+                variables.add(new GlobalVariable<List<?>>(varName, value));
+
             } else if (varValue instanceof Map) {
                 final Map<String, Object> value = convert((Map<?, ?>) varValue);
-                variables.add(new DictionaryRobotInternalVariable(varName, value));
+                variables.add(new GlobalVariable<Map<String, ?>>(varName, value));
+
             } else if (varValue != null && varValue.getClass().isArray()) {
                 final List<Object> value = new ArrayList<>();
                 final Object[] array = ((Object[]) varValue);
                 value.addAll(Arrays.asList(array));
-                variables.add(new ListRobotInternalVariable(varName, value));
+                variables.add(new GlobalVariable<List<?>>(varName, value));
+
             } else {
-                variables.add(new ScalarRobotInternalVariable(varName, "" + varValue));
+                variables.add(new GlobalVariable<>(varName, "" + varValue));
             }
         }
         return variables;

@@ -61,6 +61,7 @@ import com.google.common.base.Strings;
  * This is highly customized version of org.eclipse.jface.fieldassist.ContentProposalAdapter for our
  * needs. Most of the code comes from mentioned class.
  */
+@SuppressWarnings("PMD.ExcessiveClassLength")
 public class RedContentProposalAdapter {
 
     public static final int PROPOSAL_SHOULD_INSERT = 1;

@@ -57,7 +57,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
     @VisibleForTesting
     final static List<RedXmlVersionTransition> RED_XML_TRANSITIONS = ImmutableList
-            .of(new TransitionFromVer1_0ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
+            .of(new TransitionFromVer10ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
 
     public static void init() {
         final List<RobotProject> projectsToUpdate = Arrays
@@ -257,9 +257,9 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         abstract void upgradeRedXml(final RobotProjectConfig config);
     }
 
-    private static class TransitionFromVer1_0ToVer1 extends RedXmlVersionTransition {
+    private static class TransitionFromVer10ToVer1 extends RedXmlVersionTransition {
 
-        TransitionFromVer1_0ToVer1(final String version, final boolean canBeAutoUpgraded) {
+        TransitionFromVer10ToVer1(final String version, final boolean canBeAutoUpgraded) {
             super(version, canBeAutoUpgraded);
         }
 

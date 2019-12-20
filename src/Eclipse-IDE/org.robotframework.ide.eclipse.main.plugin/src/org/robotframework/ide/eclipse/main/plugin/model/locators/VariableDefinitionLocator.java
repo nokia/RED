@@ -16,10 +16,10 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.importer.AVariableImported;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.GlobalVariable;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -276,9 +276,7 @@ public class VariableDefinitionLocator {
     private ContinueDecision locateGlobalVariables(final RobotSuiteFile startingFile,
             final VariableDetector detector) {
         final RobotProjectHolder projectHolder = startingFile.getRobotProject().getRobotProjectHolder();
-        final List<ARobotInternalVariable<?>> globalVariables = projectHolder.getGlobalVariables();
-
-        for (final ARobotInternalVariable<?> variable : globalVariables) {
+        for (final GlobalVariable<?> variable : projectHolder.getGlobalVariables()) {
             final ContinueDecision shouldContinue = detector.globalVariableDetected(variable.getName(),
                     variable.getValue());
             if (shouldContinue == ContinueDecision.STOP) {

@@ -268,7 +268,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 doc = ruleDoc.get();
             } else {
                 doc = Selections.getOptionalFirstElement(selection, RulesFile.class)
-                        .filter(f -> f != RulesFile.MISSING_SOURCE && f.getExists())
+                        .filter(f -> f != RulesFile.MISSING_SOURCE && f.isExisting())
                         .map(f -> "<p><span color=\"error\">The file '" + f.getPath() + "' does not exist</span></p>")
                         .map(text -> "<form>" + text.replaceAll("\\\n", "<br/>") + "</form>")
                         .orElse("<form></form>");
@@ -423,7 +423,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private void validateRulesFiles() {
         for (final RulesFile file : rules.keySet()) {
-            file.setExists(file == RulesFile.MISSING_SOURCE || !new File(file.getPath()).exists());
+            file.setExisting(file == RulesFile.MISSING_SOURCE || !new File(file.getPath()).exists());
         }
     }
 
@@ -568,11 +568,11 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
             return !isBuiltIn();
         }
 
-        public void setExists(final boolean exists) {
+        public void setExisting(final boolean exists) {
             this.exists = exists;
         }
 
-        public boolean getExists() {
+        public boolean isExisting() {
             return exists;
         }
 
@@ -718,7 +718,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         }
 
         private Styler getRulesFileStyler(final RulesFile rulesFile) {
-            if (rulesFile.getExists()) {
+            if (rulesFile.isExisting()) {
                 return Stylers.Common.ERROR_STYLER;
             } else if (rules.get(rulesFile).stream().anyMatch(RfLintRule::isConfigured)) {
                 return Stylers.Common.BOLD_STYLER;

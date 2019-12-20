@@ -20,8 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.model.GlobalVariable;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -242,7 +242,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final RobotProjectHolder projectHolder = suiteFile.getRobotProject().getRobotProjectHolder();
-        projectHolder.setGlobalVariables(newArrayList(new ScalarRobotInternalVariable("var", "val")));
+        projectHolder.setGlobalVariables(newArrayList(new GlobalVariable<>("var", "val")));
 
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
                 .getChildren().get(0)

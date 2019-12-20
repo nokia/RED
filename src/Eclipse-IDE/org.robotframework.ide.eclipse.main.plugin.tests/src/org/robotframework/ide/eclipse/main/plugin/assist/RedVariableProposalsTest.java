@@ -22,9 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
-import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.model.GlobalVariable;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -893,8 +892,8 @@ public class RedVariableProposalsTest {
     }
 
     private static void createGlobalVariables(final RobotProject robotProject, final String... vars) {
-        final List<ARobotInternalVariable<?>> variables = Stream.of(vars)
-                .map(v -> new ScalarRobotInternalVariable("${" + v + "}", "some_value"))
+        final List<GlobalVariable<?>> variables = Stream.of(vars)
+                .map(v -> new GlobalVariable<String>("${" + v + "}", "some_value"))
                 .collect(Collectors.toList());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setGlobalVariables(variables);
