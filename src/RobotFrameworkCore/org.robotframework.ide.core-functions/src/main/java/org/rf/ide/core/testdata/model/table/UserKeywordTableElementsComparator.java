@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
 public class UserKeywordTableElementsComparator extends AModelTypeComparator<AModelElement<UserKeyword>> {
 
-    private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+    private static final Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
 
     static {
         int startPosition = 1;

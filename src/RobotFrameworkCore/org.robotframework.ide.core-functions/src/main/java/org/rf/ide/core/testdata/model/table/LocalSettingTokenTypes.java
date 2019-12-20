@@ -21,7 +21,7 @@ import com.google.common.collect.TreeRangeMap;
 
 public class LocalSettingTokenTypes {
 
-    private final static Map<ModelType, RangeMap<Integer, RobotTokenType>> TYPES = new HashMap<>();
+    private static final Map<ModelType, RangeMap<Integer, RobotTokenType>> TYPES = new HashMap<>();
     static {
         initializeTestCaseSettingsTypes();
         initializeTaskSettingsTypes();

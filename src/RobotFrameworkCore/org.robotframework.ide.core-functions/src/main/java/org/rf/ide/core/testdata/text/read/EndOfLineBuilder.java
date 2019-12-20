@@ -141,7 +141,7 @@ public class EndOfLineBuilder {
 
     }
 
-    private static abstract class AEndOfLine implements IRobotLineElement {
+    private abstract static class AEndOfLine implements IRobotLineElement {
 
         private final int lineNumber;
 

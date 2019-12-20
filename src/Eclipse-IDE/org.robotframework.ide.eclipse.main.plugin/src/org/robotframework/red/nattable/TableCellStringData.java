@@ -102,10 +102,9 @@ public final class TableCellStringData {
                 } else {
                     startLine += lines[lineNo].length();
                     final char endChar = drawnString.charAt(startLine);
-                    if ((endChar == '\n' || endChar == '\r') &&
-                            startLine < drawnString.length() - 1 &&
-                            (drawnString.charAt(startLine + 1) == '\n' || drawnString.charAt(startLine + 1) == '\r') &&
-                            endChar != drawnString.charAt(startLine + 1)) {
+                    if ((endChar == '\n' || endChar == '\r') && startLine < drawnString.length() - 1
+                            && (drawnString.charAt(startLine + 1) == '\n' || drawnString.charAt(startLine + 1) == '\r')
+                            && endChar != drawnString.charAt(startLine + 1)) {
                         startLine += 2;
                     } else if (endChar == '\n' || endChar == '\r') {
                         startLine++;

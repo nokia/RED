@@ -120,9 +120,11 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
                 delta.addedVariables.add(incomingVariable);
             } else {
                 // has same scope, type and value
-                if (Objects.equal(incomingVariable.getScope(), variables.get(incomingVariable.getName()).getScope()) &&
-                        Objects.equal(vars.get(incomingVariable).getType(), variables.get(incomingVariable.getName()).getType()) &&
-                        Objects.equal(vars.get(incomingVariable).getValue(), variables.get(incomingVariable.getName()).getValue())) {
+                if (Objects.equal(incomingVariable.getScope(), variables.get(incomingVariable.getName()).getScope())
+                        && Objects.equal(vars.get(incomingVariable).getType(),
+                                variables.get(incomingVariable.getName()).getType())
+                        && Objects.equal(vars.get(incomingVariable).getValue(),
+                                variables.get(incomingVariable.getName()).getValue())) {
                     delta.unchangedVariables.add(incomingVariable);
                 } else {
                     delta.changedVariables.add(incomingVariable);

@@ -15,9 +15,9 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class SpecialEscapedCharactersExtractor {
 
-    private final static List<NamedSpecial> SPECIALS = NamedSpecial.expected();
+    private static final List<NamedSpecial> SPECIALS = NamedSpecial.expected();
 
-    private final static Pattern PATTERN = Pattern.compile(build(SPECIALS));
+    private static final Pattern PATTERN = Pattern.compile(build(SPECIALS));
 
 
     @VisibleForTesting

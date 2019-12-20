@@ -29,7 +29,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class HashCommentMapper implements IParsingMapper {
 
-    private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
+    private static final Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
 
     private static final List<IHashCommentMapper> COMMENT_MAPPERS = new ArrayList<>();
     static {

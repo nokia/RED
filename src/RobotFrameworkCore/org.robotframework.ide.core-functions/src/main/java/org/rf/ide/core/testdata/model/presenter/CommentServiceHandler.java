@@ -59,7 +59,7 @@ public class CommentServiceHandler {
                 final List<String> toBeConvertedToTokens = separator.splitTextFromViewBySeparator(newComment);
 
                 for (final String tok : toBeConvertedToTokens) {
-                    RobotToken cTok = new RobotToken();
+                    final RobotToken cTok = new RobotToken();
                     String commentPartText = unescape(tok, separator);
                     if (comment instanceof RobotExecutableRow<?>) {
                         if (commentPartText.trim().equals("\\")) {
@@ -113,7 +113,7 @@ public class CommentServiceHandler {
                 return splitByCriteria(text, true);
             }
 
-            private List<String> splitByCriteria(final String text, boolean shouldContainsEscape) {
+            private List<String> splitByCriteria(final String text, final boolean shouldContainsEscape) {
                 final List<String> splitted = new ArrayList<>();
 
                 final int separatorSize = getSeparatorAsText().length();
@@ -121,7 +121,7 @@ public class CommentServiceHandler {
                 final char[] chars = text.toCharArray();
                 StringBuilder current = new StringBuilder("");
 
-                for (char c : chars) {
+                for (final char c : chars) {
                     current.append(c);
 
                     if (c == ' ') {

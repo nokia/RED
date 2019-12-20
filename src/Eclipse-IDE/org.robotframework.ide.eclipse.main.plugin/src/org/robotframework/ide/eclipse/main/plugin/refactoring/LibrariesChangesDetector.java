@@ -133,7 +133,7 @@ class LibrariesChangesDetector {
         final Range changeInBeforePath = getChangeRangeInPaths(beforeSegments, afterSegments);
         final String changedNamePart = getNewNamePart(beforeSegments, afterSegments, changeInBeforePath);
 
-        List<String> name = new ArrayList<>();
+        final List<String> name = new ArrayList<>();
         for (int i = 0; i < beforeSegments.length; i++) {
             if (nameInPath.contains(i)) {
                 if (changeInBeforePath.contains(i)) {
@@ -151,7 +151,7 @@ class LibrariesChangesDetector {
         return name.stream().filter(p -> !p.isEmpty()).collect(Collectors.joining("."));
     }
 
-    private String getNewNamePart(String[] beforeSegments, String[] afterSegments, Range changeInBeforePath) {
+    private String getNewNamePart(final String[] beforeSegments, final String[] afterSegments, final Range changeInBeforePath) {
         final int lastSegmentsToRemove = beforeSegments.length - changeInBeforePath.end + 1;
         return String.join(".", Arrays.copyOfRange(afterSegments, changeInBeforePath.start,
                 afterSegments.length - lastSegmentsToRemove + 1));

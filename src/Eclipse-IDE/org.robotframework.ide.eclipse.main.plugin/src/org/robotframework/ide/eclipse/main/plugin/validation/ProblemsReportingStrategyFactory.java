@@ -24,7 +24,7 @@ public class ProblemsReportingStrategyFactory {
         return new CheckstyleReportingStrategy(false, reportFilepath, logger);
     }
 
-    static abstract class HeadlessValidationReportingStrategy extends ValidationReportingStrategy {
+    abstract static class HeadlessValidationReportingStrategy extends ValidationReportingStrategy {
 
         HeadlessValidationReportingStrategy(final boolean shouldPanic) {
             super(shouldPanic);

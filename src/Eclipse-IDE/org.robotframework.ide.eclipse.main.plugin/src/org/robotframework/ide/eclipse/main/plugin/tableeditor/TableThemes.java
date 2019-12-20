@@ -32,7 +32,7 @@ public class TableThemes {
         return ColorsManager.isDarkColor(backgroundInUse) ? new DarkTheme() : new BrightTheme();
     }
 
-    public static abstract class TableTheme {
+    public abstract static class TableTheme {
 
         public Font getFont() {
             return RedTheme.Fonts.getTablesEditorFont();

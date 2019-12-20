@@ -208,7 +208,7 @@ class SearchResultContentProvider extends TreeContentProvider {
         }
     }
 
-    private static abstract class LibraryEntity<P, S> {
+    private abstract static class LibraryEntity<P, S> {
 
         private final P parent;
 

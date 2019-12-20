@@ -47,7 +47,7 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
             final Collection<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
                     selectionLayerAccessor.getSelectedPositions());
 
-            final EditorCommand parentCommand = new EmptyCommand(); 
+            final EditorCommand parentCommand = new EmptyCommand();
             for (final EditorCommand command : detailsDeletingCommands) {
                 command.setParent(parentCommand);
                 commandsStack.execute(command);
@@ -72,11 +72,10 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
 
                 final RobotVariable variable = variables.get(cellPosition.rowPosition);
 
-                /*
-                 * if (selectionLayer.isRowPositionFullySelected(cellPosition.rowPosition)) {
-                 * varsToRemove.add(variable);
-                 * } else
-                 */if (cellPosition.columnPosition == 0) {
+                // if (selectionLayer.isRowPositionFullySelected(cellPosition.rowPosition)) {
+                // varsToRemove.add(variable);
+                // } else
+                if (cellPosition.columnPosition == 0) {
                     commands.add(new SetVariableNameCommand(variable, ""));
                 } else if (cellPosition.columnPosition == 1) {
                     commands.add(new CleanVariableValueCommand(variable));

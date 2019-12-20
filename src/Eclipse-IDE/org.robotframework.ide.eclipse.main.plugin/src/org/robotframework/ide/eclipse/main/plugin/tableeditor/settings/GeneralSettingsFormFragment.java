@@ -333,27 +333,26 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void keyReleased(final KeyEvent e) {
-                if (e.stateMask == SWT.CTRL) {
-                    final int C_KEY = 0x3;
-                    final int X_KEY = 0x18;
-                    final int Z_KEY = 0x1A;
-                    final int Y_KEY = 0x19;
+                if (e.stateMask == SWT.CTRL && e.character == 'c') {
+                    documentation.copy();
 
-                    if (e.character == C_KEY) {
-                        documentation.copy();
-                    } else if (e.character == X_KEY) {
-                        documentation.cut();
-                    } else if (e.character == Z_KEY) {
-                        updateDocumentationWithPositionPresave(
-                                getDocumentation(getSection(), hasEditDocRepresentation.get()));
-                    } else if (e.character == Y_KEY) {
-                        updateDocumentationWithPositionPresave(
-                                getDocumentation(getSection(), hasEditDocRepresentation.get()));
-                    }
+                } else if (e.stateMask == SWT.CTRL && e.character == 'x') {
+                    documentation.cut();
+
+                } else if (e.stateMask == SWT.CTRL && e.character == 'z') {
+                    updateDocumentationWithPositionPresave(
+                            getDocumentation(getSection(), hasEditDocRepresentation.get()));
+
+                } else if (e.stateMask == SWT.CTRL && e.character == 'y') {
+                    updateDocumentationWithPositionPresave(
+                            getDocumentation(getSection(), hasEditDocRepresentation.get()));
+
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
                     updateDocumentationWithPositionPresave(documentation.getText().replaceAll("\\t", "\\\\t"));
+
                 } else if (e.character == '#') {
                     updateDocumentationWithPositionPresave(escapeNotEscapedHashSigns(documentation.getText()));
+
                 } else if (e.character == SWT.SPACE) {
                     updateDocumentationWithPositionPresave(documentation.getText().replaceAll("  ", " \\\\ "));
                 }

@@ -16,7 +16,7 @@ public class ForceTags extends ATags<SettingTable> {
 
     private static final long serialVersionUID = 1L;
 
-    public ForceTags(RobotToken declaration) {
+    public ForceTags(final RobotToken declaration) {
         super(declaration);
     }
 

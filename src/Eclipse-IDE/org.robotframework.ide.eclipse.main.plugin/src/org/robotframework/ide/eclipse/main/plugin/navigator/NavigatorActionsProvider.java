@@ -49,7 +49,7 @@ public class NavigatorActionsProvider extends CommonActionProvider {
         }
     }
 
-    private void updateElements(IStructuredSelection selection) {
+    private void updateElements(final IStructuredSelection selection) {
         openAction.updateEnablement(selection);
         runSelectedTestCasesAction.updateEnablement(selection);
         debugTestCaseAction.updateEnablement(selection);

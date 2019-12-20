@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public abstract class AExecutableElementSettingsRecognizer extends ATokenRecognizer {
 
-    private final static Pattern BRACKET_EXTRACTION = Pattern.compile("(?!\\[)([^\\]])+(?!\\\\])");
+    private static final Pattern BRACKET_EXTRACTION = Pattern.compile("(?!\\[)([^\\]])+(?!\\\\])");
 
     protected AExecutableElementSettingsRecognizer(final RobotTokenType type) {
         super(build(buildVariants(type)), type);

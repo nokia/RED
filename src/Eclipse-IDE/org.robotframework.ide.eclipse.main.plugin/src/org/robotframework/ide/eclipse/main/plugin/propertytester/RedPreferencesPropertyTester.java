@@ -11,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 public class RedPreferencesPropertyTester extends PropertyTester {
 
     @Override
-    public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
         if (expectedValue instanceof Boolean) {
             return testProperty(property, ((Boolean) expectedValue).booleanValue());
         }

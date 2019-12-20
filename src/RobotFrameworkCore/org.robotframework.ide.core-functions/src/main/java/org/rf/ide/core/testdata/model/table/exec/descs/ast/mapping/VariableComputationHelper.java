@@ -14,23 +14,23 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 
 public class VariableComputationHelper {
 
-    private final static String NUMBER_PATTERN_TXT = "([+]|[-])*\\d+([.]\\d+)?\\s*";
+    private static final String NUMBER_PATTERN_TXT = "([+]|[-])*\\d+([.]\\d+)?\\s*";
 
-    private final static String COUNT_OPERATIONS = "([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])";
+    private static final String COUNT_OPERATIONS = "([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])";
 
-    private final static Pattern NUMBER_PATTERN = Pattern.compile(NUMBER_PATTERN_TXT);
+    private static final Pattern NUMBER_PATTERN = Pattern.compile(NUMBER_PATTERN_TXT);
 
-    private final static Pattern COUNT_OPERATION_PATTERN = Pattern.compile(COUNT_OPERATIONS);
+    private static final Pattern COUNT_OPERATION_PATTERN = Pattern.compile(COUNT_OPERATIONS);
 
-    private final static Pattern ILLEGAL_BRACKET_SYNTAX = Pattern
+    private static final Pattern ILLEGAL_BRACKET_SYNTAX = Pattern
             .compile("\\s*((?!" + COUNT_OPERATIONS + "| (\\[|\\()).)\\s*(\\[|\\()");
 
-    private final static Pattern NUMBER_OPERATION = Pattern
+    private static final Pattern NUMBER_OPERATION = Pattern
             .compile("^" + NUMBER_PATTERN + "(" + COUNT_OPERATIONS + NUMBER_PATTERN + ")*");
 
-    private final static String QUOTA_TEXT = "[\"](([\\\\][\"])|((?![\"]).))*[\"]";
+    private static final String QUOTA_TEXT = "[\"](([\\\\][\"])|((?![\"]).))*[\"]";
 
-    private final static Pattern TEXT_OPERATION = Pattern
+    private static final Pattern TEXT_OPERATION = Pattern
             .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTA_TEXT + ")+\\s*)+)*");
 
     public static Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
@@ -106,7 +106,7 @@ public class VariableComputationHelper {
 
     private static String validateAndRemoveBrackets(final String text) {
         final char[] chars = text.toCharArray();
-        final Stack<Character> bracketStack = new Stack<Character>();
+        final Stack<Character> bracketStack = new Stack<>();
         final StringBuilder removed = new StringBuilder();
         for (final char c : chars) {
             if (c == '(') {

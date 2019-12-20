@@ -21,7 +21,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
  */
 public class DocumentationServiceHandler {
 
-    private final static Pattern LINE_CONTINUE = Pattern.compile("^\\n\\s*[...]\\s*$");
+    private static final Pattern LINE_CONTINUE = Pattern.compile("^\\n\\s*[...]\\s*$");
 
     /**
      * Consolidate documentation text to one String for edit. The escaped characters will be
@@ -104,10 +104,10 @@ public class DocumentationServiceHandler {
     private static String unescape(final String text) {
         String newText = text;
         if (text != null) {
-            StringBuilder unescape = new StringBuilder("");
+            final StringBuilder unescape = new StringBuilder("");
 
             int nrOfEscape = 0;
-            char[] chars = text.toCharArray();
+            final char[] chars = text.toCharArray();
             for (char c : chars) {
                 if (c == '\\') {
                     unescape.append(c);
@@ -162,19 +162,19 @@ public class DocumentationServiceHandler {
                 final int numberOfLines = lines.size();
 
                 if (numberOfLines > 0) {
-                    RobotToken tok = new RobotToken();
+                    final RobotToken tok = new RobotToken();
                     tok.setText(smartTrimmedRight(lines.get(0)));
                     documentation.addDocumentationText(tok);
 
                     for (int lineNr = 1; lineNr < numberOfLines; lineNr++) {
-                        RobotToken newLine = new RobotToken();
+                        final RobotToken newLine = new RobotToken();
                         newLine.setText("\n...");
                         documentation.addDocumentationText(newLine);
 
                         final String lineText = lines.get(lineNr);
 
                         if (!lineText.isEmpty()) {
-                            RobotToken docPart = new RobotToken();
+                            final RobotToken docPart = new RobotToken();
                             docPart.setText(smartTrimmedRight(lineText));
                             documentation.addDocumentationText(docPart);
                         }
@@ -220,7 +220,7 @@ public class DocumentationServiceHandler {
             while ((line = br.readLine()) != null) {
                 lines.add(line);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // shouldn't happen is not i/o but string
         }
 

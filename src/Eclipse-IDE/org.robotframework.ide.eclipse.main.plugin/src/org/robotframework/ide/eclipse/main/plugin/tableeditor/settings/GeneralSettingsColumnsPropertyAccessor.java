@@ -17,8 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -41,7 +41,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
     }
 
     @Override
-    public Object getDataValue(Entry<String, RobotElement> rowObject, int columnIndex) {
+    public Object getDataValue(final Entry<String, RobotElement> rowObject, final int columnIndex) {
         if (rowObject != null) {
             final RobotElement robotElement = rowObject.getValue();
             RobotSetting setting = null;
@@ -62,7 +62,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
     }
 
     @Override
-    public void setDataValue(Entry<String, RobotElement> rowObject, int columnIndex, Object newValue) {
+    public void setDataValue(final Entry<String, RobotElement> rowObject, final int columnIndex, final Object newValue) {
         if (rowObject != null) {
             final String newStringValue = newValue != null ? (String) newValue : "";
             final RobotElement robotElement = rowObject.getValue();
@@ -93,20 +93,20 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
     }
 
     @Override
-    public String getColumnProperty(int columnIndex) {
+    public String getColumnProperty(final int columnIndex) {
         return properties.get(columnIndex);
     }
 
     @Override
-    public int getColumnIndex(String propertyName) {
+    public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
     }
 
-    public void setNumberOfColumns(int numberOfColumns) {
+    public void setNumberOfColumns(final int numberOfColumns) {
         this.numberOfColumns = numberOfColumns;
     }
 
-    public void setSection(RobotSettingsSection section) {
+    public void setSection(final RobotSettingsSection section) {
         this.section = section;
     }
 

@@ -13,29 +13,31 @@ import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 public class VariableStructureExtractor {
 
     public Container buildStructureTree(final String text) {
-        Container mainContainer = new Container(null);
+        final Container mainContainer = new Container(null);
 
         if (text != null) {
             Container currentContainer = mainContainer;
 
-            char[] textChars = text.toCharArray();
-            int textLength = textChars.length;
+            final char[] textChars = text.toCharArray();
+            final int textLength = textChars.length;
             for (int charIndex = 0; charIndex < textLength; charIndex++) {
-                char currentChar = textChars[charIndex];
-                ContainerElementType type = ContainerElementType
+                final char currentChar = textChars[charIndex];
+                final ContainerElementType type = ContainerElementType
                         .getTypeFor(currentChar);
-                ContainerElement element = new ContainerElement(
+                final ContainerElement element = new ContainerElement(
                         new TextPosition(text, charIndex, charIndex), type);
                 if (type.shouldOpenNewContainer()) {
-                    Container newContainer = new Container(currentContainer);
+                    final Container newContainer = new Container(currentContainer);
                     currentContainer.addElement(newContainer);
                     currentContainer = newContainer;
                     currentContainer.addElement(element);
+
                 } else if (shouldCloseContainer(type)) {
-                    Container matchingContainer = findNearestContainerToClose(
+                    final Container matchingContainer = findNearestContainerToClose(
                             type, currentContainer);
                     if (matchingContainer == null) {
                         currentContainer.addElement(element);
+
                     } else {
                         matchingContainer.addElement(element);
                         closeContainer(matchingContainer);
@@ -43,38 +45,34 @@ public class VariableStructureExtractor {
                     }
                 } else {
                     boolean wasMerged = false;
-                    List<IContainerElement> elements = currentContainer
-                            .getElements();
+                    final List<IContainerElement> elements = currentContainer.getElements();
                     if (!elements.isEmpty()) {
-                        IContainerElement lastElement = elements.get(elements
-                                .size() - 1);
-                        ContainerElementType lastType = lastElement.getType();
-                        if (lastType != null && lastType.canBeMerged()
-                                && type == lastType) {
+                        final IContainerElement lastElement = elements.get(elements.size() - 1);
+                        final ContainerElementType lastType = lastElement.getType();
+
+                        if (lastType != null && lastType.canBeMerged() && type == lastType) {
                             if (lastElement instanceof ContainerElement) {
-                                ContainerElement contElement = (ContainerElement) lastElement;
+                                final ContainerElement contElement = (ContainerElement) lastElement;
                                 contElement.increaseEndPosition();
                                 wasMerged = true;
                             }
                         }
                     }
-
                     if (!wasMerged) {
                         currentContainer.addElement(element);
                     }
                 }
             }
         }
-
         return mainContainer;
     }
 
 
     private void closeContainer(final Container container) {
         if (container != null) {
-            for (IContainerElement contElem : container.getElements()) {
+            for (final IContainerElement contElem : container.getElements()) {
                 if (contElem.isComplex()) {
-                    Container cont = (Container) contElem;
+                    final Container cont = (Container) contElem;
                     if (cont.isOpenForModification()) {
                         closeContainer(cont);
                     }
@@ -84,18 +82,14 @@ public class VariableStructureExtractor {
         }
     }
 
-
-    private Container findNearestContainerToClose(
-            final ContainerElementType type, final Container currentContainer) {
+    private Container findNearestContainerToClose(final ContainerElementType type, final Container currentContainer) {
         Container cont = null;
 
         if (currentContainer != null) {
             if (currentContainer.isOpenForModification()) {
-                for (IContainerElement contElement : currentContainer
-                        .getElements()) {
+                for (final IContainerElement contElement : currentContainer.getElements()) {
                     if (contElement.isComplex()) {
-                        cont = findNearestContainerToClose(type,
-                                (Container) contElement);
+                        cont = findNearestContainerToClose(type, (Container) contElement);
                         if (cont != null) {
                             break;
                         }
@@ -105,20 +99,18 @@ public class VariableStructureExtractor {
                 if (cont == null) {
                     if (!currentContainer.getElements().isEmpty()) {
                         if (type == ContainerElementType
-                                .getCloseContainerType(currentContainer
-                                        .getElements().get(0).getType())) {
+                                .getCloseContainerType(currentContainer.getElements().get(0).getType())) {
                             cont = currentContainer;
                         }
                     }
                 }
             }
         }
-
         return cont;
     }
 
 
-    private boolean shouldCloseContainer(ContainerElementType type) {
+    private boolean shouldCloseContainer(final ContainerElementType type) {
         return type.getCloseContainer() != null;
     }
 }

@@ -22,7 +22,7 @@ public class SettingsCommentsLabelAccumulator implements IConfigLabelAccumulator
     }
 
     @Override
-    public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
+    public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         final String label = (String) dataProvider.getDataValue(columnPosition, rowPosition);
 
         if (label.startsWith("#")) {

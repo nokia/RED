@@ -15,7 +15,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 public class VariableTableElementsComparator extends
         AModelTypeComparator<AModelElement<VariableTable>> {
 
-    private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+    private static final Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
     static {
         int startPosition = 1;
         POSITION.put(ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE,

@@ -13,7 +13,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 
 public class SettingTableElementsComparator extends AModelTypeComparator<AModelElement<SettingTable>> {
 
-    private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+    private static final Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
 
     static {
         int startPosition = 1;

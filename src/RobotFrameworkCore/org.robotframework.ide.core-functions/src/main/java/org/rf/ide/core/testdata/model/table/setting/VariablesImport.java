@@ -73,7 +73,7 @@ public class VariablesImport extends AImported {
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position - 2 <= arguments.size()) { // new argument

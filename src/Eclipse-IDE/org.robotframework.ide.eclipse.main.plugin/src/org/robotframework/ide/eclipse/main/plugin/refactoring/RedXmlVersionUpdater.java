@@ -56,7 +56,7 @@ import com.google.common.collect.ImmutableList;
 public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerResolution {
 
     @VisibleForTesting
-    final static List<RedXmlVersionTransition> RED_XML_TRANSITIONS = ImmutableList
+    static final List<RedXmlVersionTransition> RED_XML_TRANSITIONS = ImmutableList
             .of(new TransitionFromVer10ToVer1("1.0", true), new TransitionFromVer1ToVer2("1", true));
 
     public static void init() {
@@ -243,7 +243,7 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
         return SwtThread.syncEval(projectsEval);
     }
 
-    private static abstract class RedXmlVersionTransition {
+    private abstract static class RedXmlVersionTransition {
 
         final String version;
 

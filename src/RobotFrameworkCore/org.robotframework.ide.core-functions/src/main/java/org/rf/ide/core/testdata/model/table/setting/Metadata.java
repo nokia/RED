@@ -83,20 +83,20 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
     }
 
     @Override
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -141,7 +141,7 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(values, index);
     }
 }

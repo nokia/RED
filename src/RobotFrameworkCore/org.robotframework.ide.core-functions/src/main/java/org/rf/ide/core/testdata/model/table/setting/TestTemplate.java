@@ -13,8 +13,8 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
-import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -101,20 +101,20 @@ public class TestTemplate extends AModelElement<SettingTable>
     }
 
     @Override
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -149,12 +149,12 @@ public class TestTemplate extends AModelElement<SettingTable>
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(unexpectedTrashArguments, index);
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position - 2 <= unexpectedTrashArguments.size()) { // new argument

@@ -16,7 +16,7 @@ public class DefaultTags extends ATags<SettingTable> {
 
     private static final long serialVersionUID = 1L;
 
-    public DefaultTags(RobotToken declaration) {
+    public DefaultTags(final RobotToken declaration) {
         super(declaration);
     }
 

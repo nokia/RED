@@ -29,7 +29,7 @@ public class UnknownSetting extends AModelElement<SettingTable> {
 
     @Override
     public boolean isPresent() {
-        return (declaration != null);
+        return declaration != null;
     }
 
     @Override
@@ -63,12 +63,11 @@ public class UnknownSetting extends AModelElement<SettingTable> {
             tokens.add(getDeclaration());
             tokens.addAll(getTrashs());
         }
-
         return tokens;
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(trashs, index);
     }
 }

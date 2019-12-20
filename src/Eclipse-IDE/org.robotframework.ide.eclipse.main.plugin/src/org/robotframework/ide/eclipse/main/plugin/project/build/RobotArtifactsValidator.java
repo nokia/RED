@@ -46,7 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Valid
 
 public class RobotArtifactsValidator {
 
-    private final static ConcurrentHashMap<IResource, Object> VALIDATION_LOCKS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<IResource, Object> VALIDATION_LOCKS = new ConcurrentHashMap<>();
 
     private final BuildLogger logger;
 

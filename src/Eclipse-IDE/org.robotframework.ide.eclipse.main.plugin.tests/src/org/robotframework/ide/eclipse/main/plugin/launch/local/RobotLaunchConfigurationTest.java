@@ -392,7 +392,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void linkedResourcesPathsAttributeIsSetInConfig_whenLinkedResourcesExist() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
-        final Map<IResource, List<String>> linkedResources = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> linkedResources = new HashMap<>();
         final IResource resource = projectProvider.createFile("resource");
         linkedResources.put(resource, new ArrayList<>());
         robotConfig.setLinkedResourcesPaths(linkedResources);
@@ -403,7 +403,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void linkedResourcesPathsAttributeIsEmptyInConfig_whenLinkedResourcesIsEmpty() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(projectProvider.getProject());
-        final Map<IResource, List<String>> linkedResources = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> linkedResources = new HashMap<>();
         robotConfig.setLinkedResourcesPaths(linkedResources);
 
         assertThat(robotConfig.getLinkedResourcesPaths()).isEmpty();

@@ -52,8 +52,8 @@ import ca.odell.glazedlists.SortedList;
  */
 public class RedNattableLayersFactory {
 
-    public final static int ROW_HEIGHT = 22;
-    public final static int GRID_BORDER_WIDTH = 1;
+    public static final int ROW_HEIGHT = 22;
+    public static final int GRID_BORDER_WIDTH = 1;
 
     public DataLayer createDataLayer(final IDataProvider dataProvider) {
         return createDataLayer(dataProvider, new AlternatingRowConfigLabelAccumulator(),

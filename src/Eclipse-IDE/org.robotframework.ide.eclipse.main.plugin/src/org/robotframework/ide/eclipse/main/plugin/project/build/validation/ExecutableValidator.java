@@ -36,8 +36,8 @@ interface ExecutableValidator extends ModelUnitValidator {
             return new ExecutableSetupOrTeardownValidator(validationContext, additionalVariables,
                     (AKeywordBaseSetting<?>) modelElement, reporter);
 
-        } else if (modelElement instanceof LocalSetting<?> &&
-                (modelElement.getModelType() == ModelType.TASK_SETUP
+        } else if (modelElement instanceof LocalSetting<?>
+                && (modelElement.getModelType() == ModelType.TASK_SETUP
                 || modelElement.getModelType() == ModelType.TASK_TEARDOWN
                 || modelElement.getModelType() == ModelType.TEST_CASE_SETUP
                 || modelElement.getModelType() == ModelType.TEST_CASE_TEARDOWN)

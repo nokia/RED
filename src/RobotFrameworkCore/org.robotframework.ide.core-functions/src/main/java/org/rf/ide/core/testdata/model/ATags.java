@@ -69,20 +69,20 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     }
 
     @Override
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -133,13 +133,13 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(tags, index);
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
-        RobotToken tokenToInsert = new RobotToken();
+    public void insertValueAt(final String value, final int position) {
+        final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position - 1 <= tags.size()) { // new argument
             fixForTheType(tokenToInsert, getTagType());

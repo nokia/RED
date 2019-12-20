@@ -202,7 +202,7 @@ class TagsProposalsSupport {
 
     private static final class SourcedTag {
 
-        public final static String SETTINGS_SOURCE = "##SETTINGS##";
+        public static final String SETTINGS_SOURCE = "##SETTINGS##";
 
         private final String source;
 

@@ -79,12 +79,13 @@ public class ResourceImport extends AImported {
     }
 
     @Override
-    public void insertValueAt(String value, int position) {
+    public void insertValueAt(final String value, final int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position - 2 <= unexpectedTrashArguments.size()) { // new argument
             fixForTheType(tokenToInsert, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT, true);
             unexpectedTrashArguments.add(position - 2, tokenToInsert);
+
         } else if (position - 2 - unexpectedTrashArguments.size() <= getComment().size()) { // new comment part
             addCommentPartAt(position - 2 - unexpectedTrashArguments.size(), tokenToInsert);
         }

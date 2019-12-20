@@ -23,7 +23,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.debugshell.SwitchShellMo
 import org.robotframework.red.commands.DIParameterizedHandler;
 
 
-public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShellModeHandler> implements IElementUpdater{
+public class SwitchShellModeHandler extends DIParameterizedHandler<E4SwitchShellModeHandler>
+        implements IElementUpdater {
 
     public static final String COMMAND_ID = "org.robotframework.red.view.debug.switchShellMode";
     public static final String COMMAND_MODE_PARAMETER = COMMAND_ID + ".mode";

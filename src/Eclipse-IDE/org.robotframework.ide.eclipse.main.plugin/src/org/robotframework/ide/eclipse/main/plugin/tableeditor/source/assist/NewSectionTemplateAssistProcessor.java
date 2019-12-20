@@ -41,7 +41,7 @@ public class NewSectionTemplateAssistProcessor extends RedTemplateAssistProcesso
     }
 
     @Override
-    public boolean isInApplicableContentType(IDocument document, int offset) throws BadLocationException {
+    public boolean isInApplicableContentType(final IDocument document, final int offset) throws BadLocationException {
         return true;
     }
 

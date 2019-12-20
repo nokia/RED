@@ -136,7 +136,7 @@ public class MultiLineStringFieldEditor extends FieldEditor {
         this.heigthInChars = heigthInChars;
         setValidateStrategy(strategy);
         isValid = false;
-        errorMessage = JFaceResources.getString("StringFieldEditor.errorMessage");//$NON-NLS-1$
+        errorMessage = JFaceResources.getString("StringFieldEditor.errorMessage");
         createControl(parent);
     }
 
@@ -274,7 +274,7 @@ public class MultiLineStringFieldEditor extends FieldEditor {
             final GC gc = new GC(textField);
             try {
                 if (widthInChars != UNLIMITED) {
-                    final Point extent = gc.textExtent("X");//$NON-NLS-1$
+                    final Point extent = gc.textExtent("X");
                     gd.widthHint = widthInChars * extent.x;
                 } else {
                     gd.horizontalAlignment = GridData.FILL;
@@ -411,10 +411,10 @@ public class MultiLineStringFieldEditor extends FieldEditor {
                     });
                     break;
                 default:
-                    Assert.isTrue(false, "Unknown validate strategy");//$NON-NLS-1$
+                    Assert.isTrue(false, "Unknown validate strategy");
             }
             textField.addDisposeListener(event -> textField = null);
-            if (textLimit > 0) {// Only set limits above 0 - see SWT spec
+            if (textLimit > 0) { // Only set limits above 0 - see SWT spec
                 textField.setTextLimit(textLimit);
             }
         } else {

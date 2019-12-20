@@ -16,7 +16,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 public class NonEnvironmentDeclarationMapper extends DeclarationMapper {
 
     @Override
-    IElementDeclaration getPossibleVariableIdentifier(List<IElementDeclaration> mappedElements) {
+    IElementDeclaration getPossibleVariableIdentifier(final List<IElementDeclaration> mappedElements) {
         if (mappedElements != null) {
             final int numberOfMapped = mappedElements.size();
             if (numberOfMapped >= 2 && mappedElements.get(numberOfMapped - 1) instanceof VariableDeclaration) {

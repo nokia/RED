@@ -181,7 +181,7 @@ public class RobotKeywordCallTest {
             if (i != 14) {
                 assertThat(call.getLabel()).isEqualTo("kw" + i);
                 i++;
-            } else {// comment case
+            } else { // comment case
                 assertThat(call.getLabel()).isEqualTo("");
             }
         }

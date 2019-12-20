@@ -24,7 +24,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
 
         @Override
-        public List<? extends IMarkerResolution> createFixers(IMarker marker) {
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RedXmlVersionUpdater());
         }
 

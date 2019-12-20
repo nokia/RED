@@ -18,7 +18,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class VariableTableModelUpdater {
 
-    private final static List<IVariableTableElementOperation<?>> ELEMENT_OPERATIONS = newArrayList(
+    private static final List<IVariableTableElementOperation<?>> ELEMENT_OPERATIONS = newArrayList(
             new ScalarVariableModelUpdater(), new ListVariableModelUpdater(), new DictionaryVariableModelUpdater());
 
     @SuppressWarnings({ "unchecked" })

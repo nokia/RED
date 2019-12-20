@@ -235,11 +235,8 @@ public class RobotLaunchConfigurationFinder {
                     return false;
                 }
             }
-            if (toCall.size() == 0 && canCall.size() == 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return toCall.size() == 0 && canCall.size() == 0;
+
         } catch (final CoreException e) {
             return false;
         }

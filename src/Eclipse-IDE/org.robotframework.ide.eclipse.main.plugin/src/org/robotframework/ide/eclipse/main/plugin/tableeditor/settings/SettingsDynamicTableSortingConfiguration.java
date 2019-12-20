@@ -16,7 +16,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 class SettingsDynamicTableSortingConfiguration extends AbstractRegistryConfiguration {
 
     @Override
-    public void configureRegistry(IConfigRegistry configRegistry) {
+    public void configureRegistry(final IConfigRegistry configRegistry) {
         configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
                 DefaultComparator.getInstance(), DisplayMode.NORMAL,
                 ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 0);

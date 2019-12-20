@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -20,7 +21,7 @@ public class FileRegion {
 
     private FilePosition end;
 
-    public FileRegion(FilePosition start, FilePosition end) {
+    public FileRegion(final FilePosition start, final FilePosition end) {
         this.start = start;
         this.end = end;
     }
@@ -29,7 +30,7 @@ public class FileRegion {
         return start;
     }
 
-    public void setStart(FilePosition start) {
+    public void setStart(final FilePosition start) {
         this.start = start;
     }
 
@@ -37,7 +38,7 @@ public class FileRegion {
         return end;
     }
 
-    public void setEnd(FilePosition end) {
+    public void setEnd(final FilePosition end) {
         this.end = end;
     }
 
@@ -60,40 +61,26 @@ public class FileRegion {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((end == null) ? 0 : end.hashCode());
-        result = prime * result + ((start == null) ? 0 : start.hashCode());
-        return result;
+        return Objects.hash(start, end);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        FileRegion other = (FileRegion) obj;
-        if (end == null) {
-            if (other.end != null)
-                return false;
-        } else if (!end.equals(other.end))
-            return false;
-        if (start == null) {
-            if (other.start != null)
-                return false;
-        } else if (!start.equals(other.start))
-            return false;
-        return true;
+        }
+        if (obj != null && obj.getClass() == FileRegion.class) {
+            final FileRegion that = (FileRegion) obj;
+            return Objects.equals(this.start, that.start) && Objects.equals(this.end, that.end);
+        }
+        return false;
     }
 
     public static class FileRegionSplitter {
 
         public List<FileRegion> splitContinuousRegions(final List<RobotToken> tokens) {
             Collections.sort(tokens, new RobotTokenPositionComparator());
-            List<FileRegion> regions = new ArrayList<>(0);
+            final List<FileRegion> regions = new ArrayList<>(0);
 
             RobotToken lastTokenWithPosition = null;
             int lastLine = -1;
@@ -120,7 +107,7 @@ public class FileRegion {
             if (regions.isEmpty()) {
                 regions.add(new FileRegion(FilePosition.createNotSet(), FilePosition.createNotSet()));
             } else {
-                FileRegion lastRegion = regions.get(regions.size() - 1);
+                final FileRegion lastRegion = regions.get(regions.size() - 1);
                 if (lastRegion.getEnd() == null) {
                     lastRegion.setEnd(new FilePosition(lastTokenWithPosition.getLineNumber(),
                             lastTokenWithPosition.getEndColumn(), lastTokenWithPosition.getEndOffset()));

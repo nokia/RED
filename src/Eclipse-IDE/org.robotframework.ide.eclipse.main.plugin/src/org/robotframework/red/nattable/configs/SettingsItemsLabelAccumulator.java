@@ -17,7 +17,7 @@ public class SettingsItemsLabelAccumulator implements IConfigLabelAccumulator {
     public static final String SETTING_CONFIG_LABEL = "SETTING";
 
     @Override
-    public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
+    public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         if (columnPosition == 0) {
             // don't worry about inactive setting - this case would be served by another
             // method

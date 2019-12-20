@@ -22,7 +22,7 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 
 class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
 
-    private final static Map<ModelType, List<RobotTokenType>> TYPES = new HashMap<>();
+    private static final Map<ModelType, List<RobotTokenType>> TYPES = new HashMap<>();
     static {
         TYPES.put(ModelType.TEST_CASE_EXECUTABLE_ROW,
                 newArrayList(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,

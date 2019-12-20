@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 
 class LibraryAliasReservedWordProposal extends BaseAssistProposal {
 
-    private final static List<String> ARGUMENTS = ImmutableList.of("alias");
+    private static final List<String> ARGUMENTS = ImmutableList.of("alias");
 
     LibraryAliasReservedWordProposal(final ProposalMatch match) {
         super(LibraryAliasReservedWordProposals.WITH_NAME, match);

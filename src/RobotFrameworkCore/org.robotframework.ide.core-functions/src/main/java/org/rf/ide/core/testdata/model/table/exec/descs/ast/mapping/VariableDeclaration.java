@@ -16,24 +16,24 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class VariableDeclaration extends AContainerOperation {
 
-    private final static Pattern COMPUTATION_PATTERN = Pattern
+    private static final Pattern COMPUTATION_PATTERN = Pattern
             .compile("((?!\\s).)+(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])+[=]*(\\s)*((?!\\s).)+");
 
-    private final static Pattern NUMBER_PATTERN = Pattern.compile("^(//s)*([+]|[-])?(([0-9])+)([.]([0-9])+)?(//s)*$");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("^(//s)*([+]|[-])?(([0-9])+)([.]([0-9])+)?(//s)*$");
 
-    private final static Pattern BINARY_NUMBER_PATTERN = Pattern.compile("^(//s)*0[b|B](0|1)+(//s)*$");
+    private static final Pattern BINARY_NUMBER_PATTERN = Pattern.compile("^(//s)*0[b|B](0|1)+(//s)*$");
 
-    private final static Pattern OCTAL_NUMBER_PATTERN = Pattern.compile("^(//s)*0[o|O][0-8]+(//s)*$");
+    private static final Pattern OCTAL_NUMBER_PATTERN = Pattern.compile("^(//s)*0[o|O][0-8]+(//s)*$");
 
-    private final static Pattern HEX_NUMBER_PATTERN = Pattern.compile("^(//s)*0[x|X]([0-9]|[a-f]|[A-F])+(//s)*$");
+    private static final Pattern HEX_NUMBER_PATTERN = Pattern.compile("^(//s)*0[x|X]([0-9]|[a-f]|[A-F])+(//s)*$");
 
-    private final static Pattern EXPONENT_NUMBER_PATTERN = Pattern
+    private static final Pattern EXPONENT_NUMBER_PATTERN = Pattern
             .compile("^(//s)*([+]|[-])?(([0-9])+)[e|E]([+]|[-])?([0-9])+(//s)*$");
 
-    private final static Pattern PYTHON_METHOD_INVOKE_PATTERN = Pattern
+    private static final Pattern PYTHON_METHOD_INVOKE_PATTERN = Pattern
             .compile("^(//s)*([a-z]|[A-Z]).*[.].+([(].*[)])$");
 
-    private final static Pattern PYTHON_GET_INVOKE_PATTERN = Pattern.compile("^(//s)*([a-z]|[A-Z]).*[.].+$");
+    private static final Pattern PYTHON_GET_INVOKE_PATTERN = Pattern.compile("^(//s)*([a-z]|[A-Z]).*[.].+$");
 
     private IElementDeclaration levelUpElement;
 
