@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _A9XVMAiaEea9m_qlhlPmsQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/18/19 2:20 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 12/20/19 5:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -83,6 +83,9 @@ get-view "Project Explorer" | get-tree | select "new/test.robot"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
     
+    try -times 4 -delay 500 -command{
+    	get-window "Problem Occurred" 
+    }
     //check window with error
     get-window "Problem Occurred" | get-label "'Launching Robot Tests' has encountered a problem." 
         | get-property caption | equals "'Launching Robot Tests' has encountered a problem." | verify-true
