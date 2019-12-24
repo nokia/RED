@@ -129,7 +129,7 @@ public class DocumentationView implements DocumentationDisplayer {
     void markSyncBroken() {
         linkSelectionAction.switchToBrokenSync();
     }
-    
+
     @Override
     public synchronized void displayDocumentation(final DocumentationViewInput input) {
         if (Objects.equals(currentInput, input)) {
@@ -256,7 +256,7 @@ public class DocumentationView implements DocumentationDisplayer {
         }
     }
 
-    private class LinkWithSelectionAction extends Action implements IWorkbenchAction {
+    private static class LinkWithSelectionAction extends Action implements IWorkbenchAction {
 
         private static final String ID = "org.robotframework.action.views.documentation.LinkWithSelection";
 

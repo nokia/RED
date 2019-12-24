@@ -62,7 +62,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
 
     private Button pyDevDbgButton;
     private Label pyDevDbgVersionLabel;
-    
+
     private Button pythonDbgButton;
     private Label pythonDbgVersionLabel;
 
@@ -292,13 +292,13 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         }
 
         final Integer port = Ints.tryParse(clientPort.getText());
-        if (port == null || !Range.closed(1, 65_535).contains(port.intValue())) {
+        if (port == null || !Range.closed(1, 65_535).contains(port)) {
             setErrorMessageIfNoneIsSet("Port should be a an integer value between 1 and 65 535");
             setPageComplete(false);
 
             debuggingSessionSetup.setPort(null);
         } else {
-            debuggingSessionSetup.setPort(port.intValue());
+            debuggingSessionSetup.setPort(port);
         }
     }
 

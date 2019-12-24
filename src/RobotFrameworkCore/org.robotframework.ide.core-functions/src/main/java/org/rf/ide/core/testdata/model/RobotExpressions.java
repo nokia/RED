@@ -36,7 +36,7 @@ public class RobotExpressions {
             escaped.append(c);
             if (c == '\\') {
                 backslashes++;
-            } else if (c == ' ' && backslashes % 2 == 1) {
+            } else if (c == ' ' && backslashes % 2 != 0) {
                 backslashes = 0;
                 escaped.deleteCharAt(escaped.length() - 2);
             } else {

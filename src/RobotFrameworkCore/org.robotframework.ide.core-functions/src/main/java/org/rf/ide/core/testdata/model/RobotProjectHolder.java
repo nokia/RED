@@ -85,17 +85,16 @@ public class RobotProjectHolder {
         return modulesSearchPaths;
     }
 
-    private List<GlobalVariable<?>> map(final Map<String, Object> varsRead) {
+    private static List<GlobalVariable<?>> map(final Map<String, Object> varsRead) {
         final List<GlobalVariable<?>> variables = new ArrayList<>();
-        for (final String varName : varsRead.keySet()) {
-            final Object varValue = varsRead.get(varName);
-
+        varsRead.forEach((varName, varValue) -> {
             if (varValue instanceof List) {
                 final List<?> value = (List<?>) varValue;
                 variables.add(new GlobalVariable<List<?>>(varName, value));
 
             } else if (varValue instanceof Map) {
-                final Map<String, Object> value = convert((Map<?, ?>) varValue);
+                final Map<String, Object> value = new LinkedHashMap<>();
+                ((Map<?, ?>) varValue).forEach((k, v) -> value.put("" + k, v));
                 variables.add(new GlobalVariable<Map<String, ?>>(varName, value));
 
             } else if (varValue != null && varValue.getClass().isArray()) {
@@ -107,16 +106,8 @@ public class RobotProjectHolder {
             } else {
                 variables.add(new GlobalVariable<>(varName, "" + varValue));
             }
-        }
+        });
         return variables;
-    }
-
-    private Map<String, Object> convert(final Map<?, ?> m) {
-        final Map<String, Object> map = new LinkedHashMap<>();
-        for (final Object key : m.keySet()) {
-            map.put("" + key, m.get(key));
-        }
-        return map;
     }
 
     public void addParsedFile(final RobotFileOutput robotFile) {

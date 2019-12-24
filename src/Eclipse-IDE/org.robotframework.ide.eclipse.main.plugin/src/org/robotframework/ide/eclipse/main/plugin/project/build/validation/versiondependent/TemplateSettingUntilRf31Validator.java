@@ -79,7 +79,7 @@ public class TemplateSettingUntilRf31Validator extends VersionDependentModelUnit
         }
     }
 
-    private class KeywordCallInTemplateValidator extends KeywordCallValidator {
+    private static class KeywordCallInTemplateValidator extends KeywordCallValidator {
 
         private final String keywordName;
 

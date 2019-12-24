@@ -383,7 +383,7 @@ public class DebugShellView {
         }
     }
 
-    private class ShellViewViewAction extends Action implements IUpdate {
+    private static class ShellViewViewAction extends Action implements IUpdate {
 
         private final int operationCode;
 

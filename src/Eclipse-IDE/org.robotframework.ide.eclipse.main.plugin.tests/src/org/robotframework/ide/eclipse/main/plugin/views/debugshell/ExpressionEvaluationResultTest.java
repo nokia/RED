@@ -119,7 +119,7 @@ public class ExpressionEvaluationResultTest {
         assertThat(listener1.timestamp < listener3.timestamp).isTrue();
     }
 
-    private class TimeKeepingListener implements ExpressionEvaluationResultListener {
+    private static class TimeKeepingListener implements ExpressionEvaluationResultListener {
 
         private long timestamp;
 
