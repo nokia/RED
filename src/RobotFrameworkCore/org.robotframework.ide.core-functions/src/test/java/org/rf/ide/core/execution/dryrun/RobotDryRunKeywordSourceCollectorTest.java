@@ -8,7 +8,7 @@ package org.rf.ide.core.execution.dryrun;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.dryrun.JsonMessageMapper;

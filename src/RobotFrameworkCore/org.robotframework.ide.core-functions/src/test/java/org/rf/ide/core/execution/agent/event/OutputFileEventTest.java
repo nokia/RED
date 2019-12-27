@@ -7,38 +7,39 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URI;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 
 public class OutputFileEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        OutputFileEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> OutputFileEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("something", newArrayList("/file.txt"));
-        OutputFileEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> OutputFileEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("output_file", newArrayList());
-        OutputFileEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> OutputFileEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("output_file", newArrayList(new Object()));
-        OutputFileEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> OutputFileEvent.from(eventMap));
     }
 
     @Test

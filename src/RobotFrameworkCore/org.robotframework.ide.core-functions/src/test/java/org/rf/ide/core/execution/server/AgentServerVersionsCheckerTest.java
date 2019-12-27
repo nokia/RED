@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent.VersionsEventResponder;
@@ -81,7 +81,7 @@ public class AgentServerVersionsCheckerTest {
         verify(client).send(any(ProtocolVersion.class));
     }
 
-    @Test(expected = RobotAgentEventsListenerException.class)
+    @Test
     public void exceptionIsThrown_whenVersionCheckerResponseToClient() {
         final AgentServerVersionsChecker checker = new AgentServerVersionsChecker();
 
@@ -91,7 +91,8 @@ public class AgentServerVersionsCheckerTest {
         final VersionsEvent event = new VersionsEvent(responder, "cmd_line", "3.6", "3.0.2", getCurrentVersion(),
                 Optional.of(42L));
 
-        checker.handleVersions(event);
+        assertThatExceptionOfType(RobotAgentEventsListenerException.class)
+                .isThrownBy(() -> checker.handleVersions(event));
     }
 
     private static int getOlderVersion() {

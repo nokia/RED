@@ -7,7 +7,7 @@ package org.rf.ide.core.execution.agent.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VariableTypedValueTest {
 

@@ -8,7 +8,8 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.update;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -19,22 +20,18 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
 /**
  * @author wypych
  */
-public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends RobotFormatParameterizedTest {
+public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest {
 
-    public UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_update_forLoopFix() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_update_forLoopFix(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_ForWithLineContinueAndHashes");
-        final String outputFileName = convert("Output_ForWithLineContinueAndHashes");
+        final String inFileName = convert("Input_ForWithLineContinueAndHashes", format);
+        final String outputFileName = convert("Output_ForWithLineContinueAndHashes", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -43,10 +40,12 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends Robot
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void updateTheFirstExecLineWithCommentOnly_and_keywordNameInSameLine() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void updateTheFirstExecLineWithCommentOnly_and_keywordNameInSameLine(final FileFormat format)
+            throws Exception {
         // prepare
-        final String filePath = convert("InKeywordWithTheFirstCommentLineInTheNameLine");
+        final String filePath = convert("InKeywordWithTheFirstCommentLineInTheNameLine", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -57,15 +56,17 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends Robot
         ((RobotEmptyRow<UserKeyword>) userKeyword.getElements().get(0)).setEmpty(RobotToken.create("keyAdded"));
 
         // execute & verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordWithTheFirstCommentLineInTheNameLine"),
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(
+                convert("OutKeywordWithTheFirstCommentLineInTheNameLine", format),
                 modelFile);
     }
 
-    @Test
-    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword(
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert("InKeywordsWithPrettyAlign");
+        final String filePath = convert("InKeywordsWithPrettyAlign", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -76,14 +77,15 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends Robot
         userKeyword.getExecutionContext().get(0).getArguments().get(1).setText("d_new");
 
         // execute & verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign", format), modelFile);
     }
 
-    @Test
-    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater(
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert("InKeywordsWithPrettyAlign");
+        final String filePath = convert("InKeywordsWithPrettyAlign", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -96,14 +98,15 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends Robot
         execOneRow.updateToken(2, "d_new");
 
         // execute & verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign", format), modelFile);
     }
 
-    @Test
-    public void givenKeywordTableAndThenThreeEmptyLines_then_updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void givenKeywordTableAndThenThreeEmptyLines_then_updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater(
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert("InKeywordsWithPrettyAlignWithThreeEmptyLinesBefore");
+        final String filePath = convert("InKeywordsWithPrettyAlignWithThreeEmptyLinesBefore", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -117,10 +120,10 @@ public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest extends Robot
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(
-                convert("OutKeywordsWithPrettyAlignWithThreeEmptyLinesBefore"), modelFile);
+                convert("OutKeywordsWithPrettyAlignWithThreeEmptyLinesBefore", format), modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/exec/update/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/exec/update/" + fileName + "." + format.getExtension();
     }
 }

@@ -8,6 +8,7 @@ package org.rf.ide.core.execution.agent.event;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.VersionsEvent.VersionsEventResponder;
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ProtocolVersion;
@@ -30,28 +31,32 @@ import com.google.common.collect.Sets;
 
 public class VersionsEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        VersionsEvent.from(mock(AgentClient.class), eventMap);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> VersionsEvent.from(mock(AgentClient.class), eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("version", new Object());
-        VersionsEvent.from(mock(AgentClient.class), eventMap);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> VersionsEvent.from(mock(AgentClient.class), eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("version", newArrayList());
-        VersionsEvent.from(mock(AgentClient.class), eventMap);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> VersionsEvent.from(mock(AgentClient.class), eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("version", newArrayList("foo"));
-        VersionsEvent.from(mock(AgentClient.class), eventMap);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> VersionsEvent.from(mock(AgentClient.class), eventMap));
     }
 
     @Test

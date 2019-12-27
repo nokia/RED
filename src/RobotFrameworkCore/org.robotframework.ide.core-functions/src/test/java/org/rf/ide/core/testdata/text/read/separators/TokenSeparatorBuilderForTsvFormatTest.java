@@ -7,15 +7,15 @@ package org.rf.ide.core.testdata.text.read.separators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.FileFormat;
 
 public class TokenSeparatorBuilderForTsvFormatTest {
 
     private TokenSeparatorBuilder builder;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.builder = new TokenSeparatorBuilder(FileFormat.TSV);
     }

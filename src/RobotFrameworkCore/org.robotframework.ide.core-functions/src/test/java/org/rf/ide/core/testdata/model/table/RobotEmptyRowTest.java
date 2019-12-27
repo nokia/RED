@@ -8,11 +8,11 @@ package org.rf.ide.core.testdata.model.table;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -91,8 +91,8 @@ public class RobotEmptyRowTest {
         final RobotEmptyRow<TestCase> row1 = createEmptyRow(test, "\\", comment("c1", "c2"));
         final RobotEmptyRow<TestCase> row2 = createEmptyRow(test, "\\", comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row1.createToken(0));
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row2.createToken(1));
+        assertThatIllegalArgumentException().isThrownBy(() -> row1.createToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> row2.createToken(1));
     }
 
     @Test
@@ -132,8 +132,8 @@ public class RobotEmptyRowTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final RobotEmptyRow<TestCase> row = createCommentRow(test, comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, ""));
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, "\\"));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(0, ""));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(0, "\\"));
     }
 
     @Test
@@ -141,7 +141,7 @@ public class RobotEmptyRowTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final RobotEmptyRow<TestCase> row = createCommentRow(test, comment("c1", "# c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, "non-empty"));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(0, "non-empty"));
     }
 
     @Test
@@ -182,7 +182,7 @@ public class RobotEmptyRowTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final RobotEmptyRow<TestCase> row = createEmptyRow(test, "", comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, "non empty"));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(0, "non empty"));
     }
 
     @Test
@@ -284,7 +284,7 @@ public class RobotEmptyRowTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final RobotEmptyRow<TestCase> row = createEmptyRow(test, "\\", comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(1, "non-comment"));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(1, "non-comment"));
     }
 
     @Test
@@ -308,8 +308,8 @@ public class RobotEmptyRowTest {
         final RobotEmptyRow<TestCase> row1 = createCommentRow(test, comment("c1", "c2"));
         final RobotEmptyRow<TestCase> row2 = createEmptyRow(test, "\\", comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row1.deleteToken(0));
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row2.deleteToken(1));
+        assertThatIllegalArgumentException().isThrownBy(() -> row1.deleteToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> row2.deleteToken(1));
     }
 
     @Test

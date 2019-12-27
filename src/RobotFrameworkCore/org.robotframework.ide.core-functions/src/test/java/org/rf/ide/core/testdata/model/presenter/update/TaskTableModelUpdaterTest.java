@@ -8,10 +8,11 @@ package org.rf.ide.core.testdata.model.presenter.update;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -113,12 +114,13 @@ public class TaskTableModelUpdaterTest {
         assertThat(addedRow).isSameAs(task.getExecutionContext().get(0));
      }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
         final Task task = createTask();
         assertThat(task.getExecutionContext()).isEmpty();
 
-        updater.createExecutableRow(task, 2, newArrayList("some action", "a", "b", "c", "#comment"));
+        assertThatExceptionOfType(IndexOutOfBoundsException.class).isThrownBy(
+                () -> updater.createExecutableRow(task, 2, newArrayList("some action", "a", "b", "c", "#comment")));
     }
 
     @Test

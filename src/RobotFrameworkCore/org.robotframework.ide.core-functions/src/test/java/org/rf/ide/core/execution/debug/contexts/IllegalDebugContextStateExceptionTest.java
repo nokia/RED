@@ -5,7 +5,7 @@
 */
 package org.rf.ide.core.execution.debug.contexts;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class IllegalDebugContextStateExceptionTest {
 

@@ -22,10 +22,6 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreationOfThreeExecUnitsTest {
 
-    public CreationOfThreeTestCaseExecutablesWithOneStepTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames() {
         final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
@@ -73,26 +69,26 @@ public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreation
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("ExecActionAllCombinationsNoCommentLine"));
+                convert("ExecActionAllCombinationsNoCommentLine", format));
 
         return store;
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithTheFirstWithoutName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithTheFirstWithoutName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("ExecActionAllCombinationsNoCommentLineMissingTestName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingTestName", format));
 
         return store;
     }
 
-    private String convert(final String fileName) {
-        return "testCases/exec/new/threeTcs/oneExecInEachTc/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/exec/new/threeTcs/oneExecInEachTc/" + fileName + "." + format.getExtension();
     }
 }

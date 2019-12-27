@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;

@@ -7,45 +7,46 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 
 public class ResourceImportEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        ResourceImportEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ResourceImportEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("resource_import", new Object());
-        ResourceImportEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ResourceImportEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("resource_import", newArrayList());
-        ResourceImportEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ResourceImportEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("resource_import", newArrayList("_"));
-        ResourceImportEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ResourceImportEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_5() {
         final Map<String, Object> eventMap = ImmutableMap.of("resource_import", newArrayList("_", ImmutableMap.of()));
-        ResourceImportEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ResourceImportEvent.from(eventMap));
     }
 
     @Test

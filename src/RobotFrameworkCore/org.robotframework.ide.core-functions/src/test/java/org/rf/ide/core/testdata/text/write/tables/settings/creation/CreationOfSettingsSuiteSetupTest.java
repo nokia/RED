@@ -5,25 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsSuiteSetupTest {
 
-    public CreationOfSettingsSuiteSetupTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateSuiteSetup() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateSuiteSetup(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptySuiteSetupDeclarationOnly");
+        final String fileName = convert("EmptySuiteSetupDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -35,10 +32,11 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteSetup_andAddComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteSetup_andAddComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteSetupDeclarationWithCommentsOnly");
+        final String fileName = convert("SuiteSetupDeclarationWithCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -60,10 +58,11 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteSetup_andKeywordOnly() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteSetup_andKeywordOnly(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteSetupDeclarationWithKeywordOnly");
+        final String fileName = convert("SuiteSetupDeclarationWithKeywordOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -80,10 +79,11 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteSetup_andKeyword_andComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteSetup_andKeyword_andComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteSetupDeclarationWithKeywordCommentsOnly");
+        final String fileName = convert("SuiteSetupDeclarationWithKeywordCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -110,10 +110,11 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteSetup_andKeyword_andThreeArgs() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteSetup_andKeyword_andThreeArgs(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteSetupDeclarationWithKeyword3ArgsOnly");
+        final String fileName = convert("SuiteSetupDeclarationWithKeyword3ArgsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -140,10 +141,12 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteSetup_andKeyword_andThreeArgs_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteSetup_andKeyword_andThreeArgs_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("SuiteSetupDeclarationWithKeyword3ArgsAndCommentOnly");
+        final String fileName = convert("SuiteSetupDeclarationWithKeyword3ArgsAndCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -180,7 +183,7 @@ public class CreationOfSettingsSuiteSetupTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/suiteSetup/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/suiteSetup/new/" + fileName + "." + format.getExtension();
     }
 }

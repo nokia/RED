@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
+public class CreationOfTestCaseSetupTest {
 
-    public CreationOfTestCaseSetupTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetupDecOnly(final FileFormat format)
+            throws Exception {
+        test_setupDecOnly("EmptyTestSetupNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetupDecOnly() throws Exception {
-        test_setupDecOnly("EmptyTestSetupNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetupDecOnly(final FileFormat format)
+            throws Exception {
+        test_setupDecOnly("EmptyTestSetup", "TestCase", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetupDecOnly() throws Exception {
-        test_setupDecOnly("EmptyTestSetup", "TestCase");
-    }
-
-    private void test_setupDecOnly(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_setupDecOnly(final String fileNameWithoutExt, final String userTestName, final FileFormat format)
+            throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,20 +51,24 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andComment() throws Exception {
-        test_setupWithCommentOnly("EmptyTestSetupCommentNoTestName", "");
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andComment() throws Exception {
-        test_setupWithCommentOnly("EmptyTestSetupComment", "TestCase");
-    }
-
-    private void test_setupWithCommentOnly(final String fileNameWithoutExt, final String userTestName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andComment(final FileFormat format)
             throws Exception {
+        test_setupWithCommentOnly("EmptyTestSetupCommentNoTestName", "", format);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andComment(final FileFormat format)
+            throws Exception {
+        test_setupWithCommentOnly("EmptyTestSetupComment", "TestCase", format);
+    }
+
+    private void test_setupWithCommentOnly(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -84,19 +89,24 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey() throws Exception {
-        test_setupWithExec("TestSetupExecKeywordNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey(final FileFormat format)
+            throws Exception {
+        test_setupWithExec("TestSetupExecKeywordNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey() throws Exception {
-        test_setupWithExec("TestSetupExecKeyword", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey(final FileFormat format)
+            throws Exception {
+        test_setupWithExec("TestSetupExecKeyword", "TestCase", format);
     }
 
-    private void test_setupWithExec(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_setupWithExec(final String fileNameWithoutExt, final String userTestName, final FileFormat format)
+            throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -115,21 +125,24 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_andComment()
-            throws Exception {
-        test_setupWithExec_andComment("TestSetupExecKeywordAndCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_andComment("TestSetupExecKeywordAndCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_andComment() throws Exception {
-        test_setupWithExec_andComment("TestSetupExecKeywordAndComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_andComment("TestSetupExecKeywordAndComment", "TestCase", format);
     }
 
-    private void test_setupWithExec_andComment(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_setupWithExec_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -151,20 +164,24 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_and3Args() throws Exception {
-        test_setupWithExec_and3Args("TestSetupExecKeywordAnd3ArgsNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_and3Args("TestSetupExecKeywordAnd3ArgsNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_and3Args() throws Exception {
-        test_setupWithExec_and3Args("TestSetupExecKeywordAnd3Args", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_and3Args("TestSetupExecKeywordAnd3Args", "TestCase", format);
     }
 
-    private void test_setupWithExec_and3Args(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_setupWithExec_and3Args(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -186,22 +203,24 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_setupWithExec_and3Args_andComment("TestSetupExecKeywordAnd3ArgsAndCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withoutTestName_andSetup_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_and3Args_andComment("TestSetupExecKeywordAnd3ArgsAndCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_setupWithExec_and3Args_andComment("TestSetupExecKeywordAnd3ArgsAndComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestSetup_withTestName_andSetup_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_setupWithExec_and3Args_andComment("TestSetupExecKeywordAnd3ArgsAndComment", "TestCase", format);
     }
 
-    private void test_setupWithExec_and3Args_andComment(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_setupWithExec_and3Args_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -226,7 +245,7 @@ public class CreationOfTestCaseSetupTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/setting/setup/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/setting/setup/new/" + fileName + "." + format.getExtension();
     }
 }

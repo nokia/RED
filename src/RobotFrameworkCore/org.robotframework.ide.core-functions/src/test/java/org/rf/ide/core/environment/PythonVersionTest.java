@@ -8,7 +8,7 @@ package org.rf.ide.core.environment;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.PythonVersion;
 
 public class PythonVersionTest {

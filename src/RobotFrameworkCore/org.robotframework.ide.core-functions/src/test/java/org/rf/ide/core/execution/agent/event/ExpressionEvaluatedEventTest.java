@@ -7,66 +7,67 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 
 import com.google.common.collect.ImmutableMap;
 
 public class ExpressionEvaluatedEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("something",
                 newArrayList(ImmutableMap.of("result", Boolean.TRUE)));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result", newArrayList());
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result", newArrayList(new Object()));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_5() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result", newArrayList(ImmutableMap.of()));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_6() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result",
                 newArrayList(ImmutableMap.of("arg", "foo")));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_7() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result",
                 newArrayList(ImmutableMap.of("type", "ROBOT")));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_8() {
         final Map<String, Object> eventMap = ImmutableMap.of("expression_result",
                 newArrayList(ImmutableMap.of("type", "ROBOT", "id", 123)));
-        ExpressionEvaluatedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ExpressionEvaluatedEvent.from(eventMap));
     }
 
     @Test

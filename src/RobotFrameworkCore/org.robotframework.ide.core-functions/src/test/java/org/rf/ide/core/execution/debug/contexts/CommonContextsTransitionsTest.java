@@ -9,7 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;

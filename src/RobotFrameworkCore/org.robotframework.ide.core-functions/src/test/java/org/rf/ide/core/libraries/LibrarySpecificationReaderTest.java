@@ -9,28 +9,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import com.google.common.io.Files;
 
 public class LibrarySpecificationReaderTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    File tempDir;
 
     @Test
     public void testReadingIncorrectFile() throws Exception {
         assertThat(LibrarySpecificationReader.readSpecification(null)).isNotPresent();
-        assertThat(LibrarySpecificationReader.readSpecification(temporaryFolder.newFolder("folder"))).isNotPresent();
+
+        final File folder = new File(tempDir, "folder");
+        folder.mkdir();
+        assertThat(LibrarySpecificationReader.readSpecification(folder)).isNotPresent();
+
         assertThat(LibrarySpecificationReader.readSpecification(new File("not_existing_file"))).isNotPresent();
-        assertThat(LibrarySpecificationReader.readSpecification(temporaryFolder.newFile("file"))).isNotPresent();
+
+        final File file = new File(tempDir, "file");
+        file.createNewFile();
+        assertThat(LibrarySpecificationReader.readSpecification(file)).isNotPresent();
     }
 
     @Test
     public void testReadingCorrectFile() throws Exception {
-        final File file = temporaryFolder.newFile("libspec");
+        final File file = new File(tempDir, "libspec");
         final String content = "<keywordspec name=\"TestLib\" format=\"ROBOT\">"
                 + "<version>1.0</version><scope>global</scope>"
                 + "<doc>Documentation for test library ``TestLib``.</doc>"

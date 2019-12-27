@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
@@ -17,19 +18,17 @@ import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
-public class KeywordsNotChangedDumperTest extends RobotFormatParameterizedTest {
+public class KeywordsNotChangedDumperTest {
 
-    public KeywordsNotChangedDumperTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void dumpAsItIsInFile() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void dumpAsItIsInFile(final FileFormat format) throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("remainNotChanged/Keywords." + getExtension());
+        final Path inputFile = DumperTestHelper.getINSTANCE()
+                .getFile("remainNotChanged/Keywords." + format.getExtension());
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
 
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, format,
                 RobotModelTestProvider.getParser());
         final RobotFileDumper dumper = new RobotFileDumper();
         final DumpContext ctx = new DumpContext(null, false);

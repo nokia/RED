@@ -17,10 +17,6 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfTestCaseExecutableThreeStepsTest extends ACreationOfThreeExecutionRowsTest {
 
-    public CreationOfTestCaseExecutableThreeStepsTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
@@ -52,33 +48,33 @@ public class CreationOfTestCaseExecutableThreeStepsTest extends ACreationOfThree
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setThreeLinesWithoutCommentedLineCmpFile(convert("ExecActionAllCombinationsNoCommentLine"));
+        store.setThreeLinesWithoutCommentedLineCmpFile(convert("ExecActionAllCombinationsNoCommentLine", format));
         store.setThreeLinesWithCommentAndEmptyLineCmpFile(
-                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmpty"));
+                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmpty", format));
         store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
-                convert("ExecActionEmptyLineInTheMiddleCommentInFirst"));
+                convert("ExecActionEmptyLineInTheMiddleCommentInFirst", format));
 
         return store;
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeLinesWithoutCommentedLineCmpFile(
-                convert("ExecActionAllCombinationsNoCommentLineMissingTestName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingTestName", format));
         store.setThreeLinesWithCommentAndEmptyLineCmpFile(
-                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmptyWithoutTestName"));
+                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmptyWithoutTestName", format));
         store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
-                convert("ExecActionEmptyLineInTheMiddleCommentMissingTestName"));
+                convert("ExecActionEmptyLineInTheMiddleCommentMissingTestName", format));
 
         return store;
     }
 
-    private String convert(final String fileName) {
-        return "testCases/exec/new/oneTc/threeExecs/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/exec/new/oneTc/threeExecs/" + fileName + "." + format.getExtension();
     }
 }

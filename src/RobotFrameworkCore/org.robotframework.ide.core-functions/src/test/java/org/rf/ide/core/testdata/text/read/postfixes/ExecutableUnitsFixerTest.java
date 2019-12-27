@@ -9,30 +9,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class ExecutableUnitsFixerTest extends RobotFormatParameterizedTest {
+public class ExecutableUnitsFixerTest {
 
     private final ExecutableUnitsFixer execUnitFixer = new ExecutableUnitsFixer();
 
-    /**
-     * @param extension
-     * @param format
-     */
-    public ExecutableUnitsFixerTest(String extension, FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void lineContinuationIsHandled_forDoubleVariableAssignment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void lineContinuationIsHandled_forDoubleVariableAssignment(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_MultipleVariableAssignmentsLineContinuation");
+        final String inFileName = convert("Input_MultipleVariableAssignmentsLineContinuation", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -46,7 +39,7 @@ public class ExecutableUnitsFixerTest extends RobotFormatParameterizedTest {
                 RobotTokenType.VARIABLE_USAGE, RobotTokenType.ASSIGNMENT);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/exec/update/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/exec/update/" + fileName + "." + format.getExtension();
     }
 }

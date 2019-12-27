@@ -7,7 +7,8 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.update;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -17,22 +18,18 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
 /**
  * @author wypych
  */
-public class UpdateTestCaseTableWithAddingNewTest extends RobotFormatParameterizedTest {
+public class UpdateTestCaseTableWithAddingNewTest {
 
-    public UpdateTestCaseTableWithAddingNewTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_update_addingNewTestCase() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_update_addingNewTestCase(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneTestCase_andAddNewOne_withOneExecInside");
-        final String outputFileName = convert("Output_OneTestCase_andAddNewOne_withOneExecInside");
+        final String inFileName = convert("Input_OneTestCase_andAddNewOne_withOneExecInside", format);
+        final String outputFileName = convert("Output_OneTestCase_andAddNewOne_withOneExecInside", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -48,11 +45,12 @@ public class UpdateTestCaseTableWithAddingNewTest extends RobotFormatParameteriz
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_update_addingNewEmptyTestCase() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_update_addingNewEmptyTestCase(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_ThreeTestCasesAndAddingNewEmptyOne");
-        final String outputFileName = convert("Output_ThreeTestCasesAndAddingNewEmptyOne");
+        final String inFileName = convert("Input_ThreeTestCasesAndAddingNewEmptyOne", format);
+        final String outputFileName = convert("Output_ThreeTestCasesAndAddingNewEmptyOne", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -64,7 +62,7 @@ public class UpdateTestCaseTableWithAddingNewTest extends RobotFormatParameteriz
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/new/" + fileName + "." + format.getExtension();
     }
 }

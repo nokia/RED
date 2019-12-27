@@ -15,9 +15,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
@@ -35,8 +34,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class VariablesImporterTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    File tempDir;
 
     @Test
     public void importVariables_withWrongPath_shouldReturn_anEmptyList_andSetErrorMessage() throws IOException {
@@ -45,7 +44,8 @@ public class VariablesImporterTest {
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
-        final File processedFile = temporaryFolder.newFile("robot.robot");
+        final File processedFile = new File(tempDir, "robot.robot");
+        processedFile.createNewFile();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -85,8 +85,9 @@ public class VariablesImporterTest {
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
-        final File processedFile = temporaryFolder.newFile("robot.robot");
-        temporaryFolder.newFile("empty.py");
+        final File processedFile = new File(tempDir, "robot.robot");
+        processedFile.createNewFile();
+        new File(tempDir, "empty.py").createNewFile();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -126,9 +127,10 @@ public class VariablesImporterTest {
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
-        final File processedFile = temporaryFolder.newFile("importing.robot");
-        temporaryFolder.newFile("robot.py");
-        temporaryFolder.newFile("robot2.py");
+        final File processedFile = new File(tempDir, "importing.robot");
+        processedFile.createNewFile();
+        new File(tempDir, "robot.py").createNewFile();
+        new File(tempDir, "robot2.py").createNewFile();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -162,8 +164,9 @@ public class VariablesImporterTest {
         final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         when(robotProject.getRuntimeEnvironment()).thenReturn(mock(IRuntimeEnvironment.class));
 
-        final File processedFile = temporaryFolder.newFile("robot.robot");
-        temporaryFolder.newFile("robot.py");
+        final File processedFile = new File(tempDir, "robot.robot");
+        processedFile.createNewFile();
+        new File(tempDir, "robot.py").createNewFile();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);

@@ -7,46 +7,48 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 import com.google.common.collect.ImmutableMap;
 
 public class VariablesEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        VariablesEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> VariablesEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("variables", new Object());
-        VariablesEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> VariablesEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("variables", newArrayList());
-        VariablesEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> VariablesEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("variables", newArrayList("foo"));
-        VariablesEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> VariablesEvent.from(eventMap));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_5() {
         final Map<String, Object> eventMap = ImmutableMap.of("variables", newArrayList(ImmutableMap.of()));
-        VariablesEvent.from(eventMap);
+        assertThatIllegalArgumentException().isThrownBy(() -> VariablesEvent.from(eventMap));
     }
 
     @Test

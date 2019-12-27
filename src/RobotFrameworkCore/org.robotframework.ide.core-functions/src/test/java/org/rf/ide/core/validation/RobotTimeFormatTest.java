@@ -7,7 +7,7 @@ package org.rf.ide.core.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.validation.RobotTimeFormat;
 
 public class RobotTimeFormatTest {

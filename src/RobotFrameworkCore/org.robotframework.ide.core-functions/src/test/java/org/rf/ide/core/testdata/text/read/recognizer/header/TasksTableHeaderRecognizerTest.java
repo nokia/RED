@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
@@ -21,7 +21,7 @@ public class TasksTableHeaderRecognizerTest {
 
     private TasksTableHeaderRecognizer rec;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         rec = new TasksTableHeaderRecognizer();
     }

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent.VersionsEventResponder;
 

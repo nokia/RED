@@ -8,7 +8,7 @@ package org.rf.ide.core.testdata.model.table.exec.descs;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.CallArgumentsBinder.StringAsArgExtractor;

@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest {
+public class CreationOfTestCaseTimeoutTest {
 
-    public CreationOfTestCaseTimeoutTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDecOnly(
+            final FileFormat format) throws Exception {
+        test_timeoutDecOnly("EmptyTestCaseTimeoutNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyTestCaseTimeoutNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDecOnly(final FileFormat format)
+            throws Exception {
+        test_timeoutDecOnly("EmptyTestCaseTimeout", "TestCase", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyTestCaseTimeout", "TestCase");
-    }
-
-    private void test_timeoutDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_timeoutDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,22 +51,27 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withComment(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutCommentNoTestName", "");
+        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withComment(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutComment", "TestCase");
+        test_timeoutDec_withCommentOnly("EmptyTestCaseTimeoutComment", "TestCase", format);
     }
 
-    private void test_timeoutDec_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
+    private void test_timeoutDec_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format)
             throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -86,22 +92,27 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValueNoTestName", "");
+        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValueNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValue", "TestCase");
+        test_timeoutDec_withComment_andValue("EmptyTestCaseTimeoutWithValue", "TestCase", format);
     }
 
-    private void test_timeoutDec_withComment_andValue(final String fileNameWithoutExt, final String userKeywordName)
+    private void test_timeoutDec_withComment_andValue(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format)
             throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -120,22 +131,27 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndCommentNoTestName", "");
+        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndCommentNoTestName", "",
+                format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_andComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_andComment(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndComment", "TestCase");
+        test_timeoutDec_withComment_andValue_andComment("EmptyTestCaseTimeoutWithValueAndComment", "TestCase", format);
     }
 
     private void test_timeoutDec_withComment_andValue_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -157,22 +173,26 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgsNoTestName", "");
+        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgsNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs(
+            final FileFormat format)
             throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgs", "TestCase");
+        test_timeoutDec_withComment_andValue_and3MsgArgs("TestCaseTimeoutWithValueAnd3MsgArgs", "TestCase", format);
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -194,24 +214,28 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment(
+            final FileFormat format)
             throws Exception {
         test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(
-                "TestCaseTimeoutWithValueAnd3MsgArgsAndCommentNoTestName", "");
+                "TestCaseTimeoutWithValueAnd3MsgArgsAndCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment(
+            final FileFormat format)
             throws Exception {
         test_timeoutDec_withComment_andValue_and3MsgArgs_andComment("TestCaseTimeoutWithValueAnd3MsgArgsAndComment",
-                "TestCase");
+                "TestCase", format);
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -237,7 +261,7 @@ public class CreationOfTestCaseTimeoutTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/setting/timeout/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/setting/timeout/new/" + fileName + "." + format.getExtension();
     }
 }

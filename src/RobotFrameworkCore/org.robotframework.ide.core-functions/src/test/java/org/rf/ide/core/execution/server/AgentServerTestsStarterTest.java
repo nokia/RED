@@ -6,6 +6,7 @@
 package org.rf.ide.core.execution.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
@@ -116,7 +117,7 @@ public class AgentServerTestsStarterTest {
         verify(responder).initialize(TestsMode.DEBUG, true, 456);
     }
 
-    @Test(expected = RobotAgentEventsListenerException.class)
+    @Test
     public void exceptionIsThrown_whenTestsStarterIsUnableToSendInitializationResponseToClient() {
         final AgentServerTestsStarter starter = new AgentServerTestsStarter(TestsMode.RUN, 100);
 
@@ -125,6 +126,7 @@ public class AgentServerTestsStarterTest {
 
         final AgentInitializingEvent event = new AgentInitializingEvent(responder);
 
-        starter.handleAgentInitializing(event);
+        assertThatExceptionOfType(RobotAgentEventsListenerException.class)
+                .isThrownBy(() -> starter.handleAgentInitializing(event));
     }
 }

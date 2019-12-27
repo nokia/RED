@@ -6,11 +6,12 @@
 package org.rf.ide.core.execution.server.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
@@ -31,13 +32,13 @@ public class InitializeAgentTest {
                 "{\"operating_mode\":{\"mode\":\"DEBUG\",\"wait_for_start_allowance\":false,\"max_lenght\":400}}");
     }
 
-    @Test(expected = ResponseException.class)
+    @Test
     public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
         when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
 
         final InitializeAgent response = new InitializeAgent(mapper, TestsMode.RUN, false, 100);
 
-        response.toMessage();
+        assertThatExceptionOfType(ResponseException.class).isThrownBy(response::toMessage);
     }
 }

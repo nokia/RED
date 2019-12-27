@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordTeardownTest {
 
-    public CreationOfKeywordTeardownTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardownDecOnly(
+            final FileFormat format) throws Exception {
+        test_teardownDecOnly("EmptyKeywordTeardownNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardownDecOnly() throws Exception {
-        test_teardownDecOnly("EmptyKeywordTeardownNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardownDecOnly(final FileFormat format)
+            throws Exception {
+        test_teardownDecOnly("EmptyKeywordTeardown", "User Keyword", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardownDecOnly() throws Exception {
-        test_teardownDecOnly("EmptyKeywordTeardown", "User Keyword");
-    }
-
-    private void test_teardownDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_teardownDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,21 +51,24 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andComment()
-            throws Exception {
-        test_teardownWithCommentOnly("EmptyKeywordTeardownCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithCommentOnly("EmptyKeywordTeardownCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andComment() throws Exception {
-        test_teardownWithCommentOnly("EmptyKeywordTeardownComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithCommentOnly("EmptyKeywordTeardownComment", "User Keyword", format);
     }
 
-    private void test_teardownWithCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_teardownWithCommentOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -85,20 +89,24 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey()
-            throws Exception {
-        test_teardownWithExec("KeywordTeardownExecKeywordNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec("KeywordTeardownExecKeywordNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey() throws Exception {
-        test_teardownWithExec("KeywordTeardownExecKeyword", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec("KeywordTeardownExecKeyword", "User Keyword", format);
     }
 
-    private void test_teardownWithExec(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_teardownWithExec(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -117,22 +125,25 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_andComment()
-            throws Exception {
-        test_teardownWithExec_andComment("KeywordTeardownExecKeywordAndCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_andComment("KeywordTeardownExecKeywordAndCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_andComment()
-            throws Exception {
-        test_teardownWithExec_andComment("KeywordTeardownExecKeywordAndComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_andComment("KeywordTeardownExecKeywordAndComment", "User Keyword", format);
     }
 
-    private void test_teardownWithExec_andComment(final String fileNameWithoutExt, final String userKeywordName)
+    private void test_teardownWithExec_andComment(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format)
             throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -154,22 +165,24 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_and3Args()
-            throws Exception {
-        test_teardownWithExec_and3Args("KeywordTeardownExecKeywordAnd3ArgsNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args("KeywordTeardownExecKeywordAnd3ArgsNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_and3Args()
-            throws Exception {
-        test_teardownWithExec_and3Args("KeywordTeardownExecKeywordAnd3Args", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args("KeywordTeardownExecKeywordAnd3Args", "User Keyword", format);
     }
 
-    private void test_teardownWithExec_and3Args(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_teardownWithExec_and3Args(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -191,22 +204,26 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_teardownWithExec_and3Args_andComment("KeywordTeardownExecKeywordAnd3ArgsAndCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withoutKeywordName_andTeardown_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args_andComment("KeywordTeardownExecKeywordAnd3ArgsAndCommentNoKeywordName", "",
+                format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_teardownWithExec_and3Args_andComment("KeywordTeardownExecKeywordAnd3ArgsAndComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTeardown_withKeywordName_andTeardown_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args_andComment("KeywordTeardownExecKeywordAnd3ArgsAndComment", "User Keyword",
+                format);
     }
 
     private void test_teardownWithExec_and3Args_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -231,7 +248,7 @@ public class CreationOfKeywordTeardownTest extends RobotFormatParameterizedTest 
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/teardown/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/teardown/new/" + fileName + "." + format.getExtension();
     }
 }

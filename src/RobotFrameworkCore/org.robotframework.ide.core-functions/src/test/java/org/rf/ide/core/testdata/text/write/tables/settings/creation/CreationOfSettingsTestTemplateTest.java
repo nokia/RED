@@ -5,25 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsTestTemplateTest {
 
-    public CreationOfSettingsTestTemplateTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateTestTemplate() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTemplate(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyTestTemplateDeclarationOnly");
+        final String fileName = convert("EmptyTestTemplateDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -35,10 +32,11 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createTestTemplate_andAddComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTestTemplate_andAddComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("TestTemplateDeclarationWithCommentsOnly");
+        final String fileName = convert("TestTemplateDeclarationWithCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -60,10 +58,11 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createTestTemplate_withKeywordName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTestTemplate_withKeywordName(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("TestTemplateDeclarationWithKeywordOnly");
+        final String fileName = convert("TestTemplateDeclarationWithKeywordOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -80,10 +79,11 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createTestTemplate_withKeywordName_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTestTemplate_withKeywordName_andComment(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("TestTemplateDeclarationWithKeywordCommentOnly");
+        final String fileName = convert("TestTemplateDeclarationWithKeywordCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -110,10 +110,12 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createTestTemplate_withKeywordName_andThreeUnwanted() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTestTemplate_withKeywordName_andThreeUnwanted(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsOnly");
+        final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -141,10 +143,12 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createTestTemplate_withKeywordName_andThreeUnwanted_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTestTemplate_withKeywordName_andThreeUnwanted_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsCommentOnly");
+        final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -182,7 +186,7 @@ public class CreationOfSettingsTestTemplateTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/testTemplate/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/testTemplate/new/" + fileName + "." + format.getExtension();
     }
 }

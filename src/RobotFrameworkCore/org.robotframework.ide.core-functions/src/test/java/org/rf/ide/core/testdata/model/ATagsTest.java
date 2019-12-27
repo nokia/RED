@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -21,7 +21,7 @@ public class ATagsTest {
 
     private ADummyTagForKeywords testable;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.decToken = new RobotToken();
         this.testable = new ADummyTagForKeywords(decToken);

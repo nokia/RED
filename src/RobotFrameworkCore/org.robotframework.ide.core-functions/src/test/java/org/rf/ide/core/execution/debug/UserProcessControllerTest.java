@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Optional;
 import java.util.concurrent.FutureTask;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.PausingPoint;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.debug.UserProcessController.ResponseWithCallback;

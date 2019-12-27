@@ -5,25 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsForceTagsTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsForceTagsTest {
 
-    public CreationOfSettingsForceTagsTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateForceTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateForceTags(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyForceTagsDeclarationOnly");
+        final String fileName = convert("EmptyForceTagsDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -35,10 +32,11 @@ public class CreationOfSettingsForceTagsTest extends RobotFormatParameterizedTes
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateForceTagsWithThreeTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeTags(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("ForceTagsWithThreeTagsOnly");
+        final String fileName = convert("ForceTagsWithThreeTagsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -59,10 +57,11 @@ public class CreationOfSettingsForceTagsTest extends RobotFormatParameterizedTes
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateForceTagsWithThreeComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("ForceTagsWithThreeCommentOnly");
+        final String fileName = convert("ForceTagsWithThreeCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -83,10 +82,12 @@ public class CreationOfSettingsForceTagsTest extends RobotFormatParameterizedTes
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateForceTagsWithThreeCommentsAndTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeCommentsAndTags(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ForceTagsWithThreeTagsAndCommentsOnly");
+        final String fileName = convert("ForceTagsWithThreeTagsAndCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -117,7 +118,7 @@ public class CreationOfSettingsForceTagsTest extends RobotFormatParameterizedTes
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/forceTags/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/forceTags/new/" + fileName + "." + format.getExtension();
     }
 }

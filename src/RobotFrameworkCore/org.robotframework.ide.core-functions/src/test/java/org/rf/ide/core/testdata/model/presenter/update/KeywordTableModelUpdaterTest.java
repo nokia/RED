@@ -8,12 +8,14 @@ package org.rf.ide.core.testdata.model.presenter.update;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -42,7 +44,7 @@ public class KeywordTableModelUpdaterTest {
 
     private UserKeyword userKeyword;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupModel() {
         final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
         model.includeKeywordTableSection();
@@ -51,7 +53,7 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater = new KeywordTableModelUpdater();
     }
 
-    @Before
+    @BeforeEach
     public void setupKeyword() {
         userKeyword = keywordTable.createUserKeyword("UserKeyword");
     }
@@ -210,16 +212,18 @@ public class KeywordTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Return]", "arg1", "arg3", "arg4", "#new comment");
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
         assertThat(userKeyword.getExecutionContext()).isEmpty();
 
-        modelUpdater.createExecutableRow(userKeyword, 2, newArrayList("some action", "a", "b", "c", "#comment"));
+        assertThatExceptionOfType(IndexOutOfBoundsException.class).isThrownBy(() -> modelUpdater
+                .createExecutableRow(userKeyword, 2, newArrayList("some action", "a", "b", "c", "#comment")));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        modelUpdater.createSetting(null, 0, newArrayList("Setup", "a", "b", "c", "#comment"));
+        assertThatIllegalArgumentException().isThrownBy(
+                () -> modelUpdater.createSetting(null, 0, newArrayList("Setup", "a", "b", "c", "#comment")));
     }
 
     @Test

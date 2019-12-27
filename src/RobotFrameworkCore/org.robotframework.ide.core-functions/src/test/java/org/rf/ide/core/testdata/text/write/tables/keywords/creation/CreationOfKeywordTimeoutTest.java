@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordTimeoutTest {
 
-    public CreationOfKeywordTimeoutTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDecOnly(
+            final FileFormat format) throws Exception {
+        test_timeoutDecOnly("EmptyKeywordTimeoutNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyKeywordTimeoutNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDecOnly(final FileFormat format)
+            throws Exception {
+        test_timeoutDecOnly("EmptyKeywordTimeout", "User Keyword", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDecOnly() throws Exception {
-        test_timeoutDecOnly("EmptyKeywordTimeout", "User Keyword");
-    }
-
-    private void test_timeoutDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_timeoutDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,22 +51,24 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withComment()
-            throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withComment(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withComment()
-            throws Exception {
-        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withComment(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withCommentOnly("EmptyKeywordTimeoutComment", "User Keyword", format);
     }
 
-    private void test_timeoutDec_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_timeoutDec_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -86,21 +89,24 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue()
-            throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValueNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValueNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue() throws Exception {
-        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValue", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue("EmptyKeywordTimeoutWithValue", "User Keyword", format);
     }
 
-    private void test_timeoutDec_withComment_andValue(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_timeoutDec_withComment_andValue(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -119,22 +125,26 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment()
-            throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_andComment(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndCommentNoKeywordName", "",
+                format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_andComment()
-            throws Exception {
-        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_andComment(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue_andComment("EmptyKeywordTimeoutWithValueAndComment", "User Keyword",
+                format);
     }
 
     private void test_timeoutDec_withComment_andValue_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -156,22 +166,24 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs()
-            throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgsNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgsNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs()
-            throws Exception {
-        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgs", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs(
+            final FileFormat format) throws Exception {
+        test_timeoutDec_withComment_andValue_and3MsgArgs("KeywordTimeoutWithValueAnd3MsgArgs", "User Keyword", format);
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -193,24 +205,26 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment(
+            final FileFormat format) throws Exception {
         test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(
-                "KeywordTimeoutWithValueAnd3MsgArgsAndCommentNoKeywordName", "");
+                "KeywordTimeoutWithValueAnd3MsgArgsAndCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTimeout_withKeywordName_andTimeoutDec_withValue_and3MsgArgs_andComment(
+            final FileFormat format) throws Exception {
         test_timeoutDec_withComment_andValue_and3MsgArgs_andComment("KeywordTimeoutWithValueAnd3MsgArgsAndComment",
-                "User Keyword");
+                "User Keyword", format);
     }
 
     private void test_timeoutDec_withComment_andValue_and3MsgArgs_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -235,7 +249,7 @@ public class CreationOfKeywordTimeoutTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/timeout/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/timeout/new/" + fileName + "." + format.getExtension();
     }
 }

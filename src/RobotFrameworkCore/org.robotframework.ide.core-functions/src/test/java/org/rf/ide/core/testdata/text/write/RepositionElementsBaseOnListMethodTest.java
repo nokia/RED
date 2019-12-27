@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.write;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -15,8 +16,9 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -31,13 +33,14 @@ public class RepositionElementsBaseOnListMethodTest {
 
     private RobotFileDumperInheritance testable;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.testable = new RobotFileDumperInheritance();
     }
 
     @SuppressWarnings("unchecked")
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_theSecondIsNew() {
         // prepare
         final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
@@ -64,7 +67,8 @@ public class RepositionElementsBaseOnListMethodTest {
     }
 
     @SuppressWarnings("unchecked")
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_theFirstIsNew() {
         // prepare
         final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
@@ -91,7 +95,8 @@ public class RepositionElementsBaseOnListMethodTest {
     }
 
     @SuppressWarnings("unchecked")
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void twoCorrectors_inWrongPositionShouldPutInCorrectOrder_bothAreNew() {
         // prepare
         final List<AModelElement<SettingTable>> correctorsList = new ArrayList<>();
@@ -118,7 +123,8 @@ public class RepositionElementsBaseOnListMethodTest {
     }
 
     @SuppressWarnings("unchecked")
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void oneCorrector_shouldDoNothing() {
         // prepare
         final LimitedSizeList<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
@@ -141,7 +147,8 @@ public class RepositionElementsBaseOnListMethodTest {
         assertThat(correctorsList).containsOnly(correctorOne);
     }
 
-    @Test(timeout = 10000)
+    @Test
+    @Timeout(10)
     public void empty_correctors_shouldDoNothing() {
         // prepare
         final List<AModelElement<SettingTable>> srcList = new LimitedSizeList<>();
@@ -271,7 +278,7 @@ public class RepositionElementsBaseOnListMethodTest {
         }
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void test_limitedSizeList_addPos_notEnoughSpace() {
         // prepare
         final LimitedSizeList<String> p = new LimitedSizeList<>();
@@ -280,10 +287,9 @@ public class RepositionElementsBaseOnListMethodTest {
         // execute
         p.add("c");
         p.add("d");
-        p.add(1, "r");
 
-        // verify
-        assertThat(p).containsExactly("c", "d");
+        // execute & verify
+        assertThatExceptionOfType(IndexOutOfBoundsException.class).isThrownBy(() -> p.add(1, "r"));
     }
 
     @Test
@@ -301,7 +307,7 @@ public class RepositionElementsBaseOnListMethodTest {
         assertThat(p).containsExactly("c", "r", "d");
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void test_limitedSizeList_add_notEnoughSpace() {
         // prepare
         final LimitedSizeList<String> p = new LimitedSizeList<>();
@@ -309,10 +315,9 @@ public class RepositionElementsBaseOnListMethodTest {
 
         // execute
         p.add("c");
-        p.add("d");
 
-        // verify
-        assertThat(p).containsExactly("c");
+        // execute & verify
+        assertThatExceptionOfType(IndexOutOfBoundsException.class).isThrownBy(() -> p.add("d"));
     }
 
     @Test

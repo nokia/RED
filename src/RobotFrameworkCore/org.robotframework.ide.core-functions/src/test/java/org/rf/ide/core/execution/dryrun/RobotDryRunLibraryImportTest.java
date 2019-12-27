@@ -10,29 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 
-@RunWith(Parameterized.class)
 public class RobotDryRunLibraryImportTest {
 
-    private final String libName;
-
-    private final URI source;
-
-    private final DryRunLibraryType expectedType;
-
-    @Parameters(name = "${0}")
-    public static Collection<Object[]> data() throws Exception {
+    public static List<Object[]> provideTestData() throws Exception {
         return Arrays.asList(new Object[][] { { "UnknownLibrary", null, DryRunLibraryType.UNKNOWN },
                 { "UnsupportedLibrary", new URI("file:///source.txt"), DryRunLibraryType.UNKNOWN },
                 { "PythonSourceLibrary", new URI("file:///source.py"), DryRunLibraryType.PYTHON },
@@ -44,30 +34,30 @@ public class RobotDryRunLibraryImportTest {
                 { "Remote http://9.8.7.6:1234", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE } });
     }
 
-    public RobotDryRunLibraryImportTest(final String libName, final URI source, final DryRunLibraryType expectedType) {
-        this.libName = libName;
-        this.source = source;
-        this.expectedType = expectedType;
-    }
-
-    @Test
-    public void testCreatingKnown() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideTestData")
+    public void testCreatingKnown(final String libName, final URI source, final DryRunLibraryType expectedType)
+            throws Exception {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(libName, source);
         final RobotDryRunLibraryImport expectedLibImport = new RobotDryRunLibraryImport(libName, source, expectedType,
                 new HashSet<>(), DryRunLibraryImportStatus.ADDED, "");
         assertThat(libImport).has(sameFieldsAs(expectedLibImport));
     }
 
-    @Test
-    public void testCreatingUnknown() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideTestData")
+    public void testCreatingUnknown(final String libName, final URI source, final DryRunLibraryType expectedType)
+            throws Exception {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(libName);
         final RobotDryRunLibraryImport expectedLibImport = new RobotDryRunLibraryImport(libName, null,
                 DryRunLibraryType.UNKNOWN, new HashSet<>(), DryRunLibraryImportStatus.NOT_ADDED, "");
         assertThat(libImport).has(sameFieldsAs(expectedLibImport));
     }
 
-    @Test
-    public void testSettingImportersStatusAndAdditionalInfo() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideTestData")
+    public void testSettingImportersStatusAndAdditionalInfo(final String libName, final URI source,
+            final DryRunLibraryType expectedType) throws Exception {
         final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createKnown(libName, source);
         libImport.setImporters(newHashSet(new URI("file:///suite.robot"), new URI("file:///res.robot")));
         libImport.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);

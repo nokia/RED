@@ -7,7 +7,6 @@ package org.rf.ide.core.environment;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,32 +16,30 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 
 public class RobotRuntimeEnvironmentTest {
 
-    @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    static File tempDir;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws IOException {
-        folder.newFile("MoDuLe");
+        new File(tempDir, "MoDuLe").createNewFile();
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     public void moduleCanonicalPathIsReturned_evenWhenExecutorReturnsLowerCasePath() {
-        // this test only makes sense on case-insensitive platforms like windows
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
-        when(executor.getModulePath("module", searchPaths)).thenReturn(new File(folder.getRoot(), "module"));
+        when(executor.getModulePath("module", searchPaths)).thenReturn(new File(tempDir, "module"));
 
         final RobotRuntimeEnvironment env = createEnvironment(executor);
 
@@ -53,14 +50,12 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     public void moduleNameOfFileIsReturnedAsIs_whenExecutorReturnsItButItDoesNotExist() {
-        // this test only makes sense on case-insensitive platforms like windows
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
-        when(executor.getModulePath("module2", searchPaths)).thenReturn(new File(folder.getRoot(), "module2"));
+        when(executor.getModulePath("module2", searchPaths)).thenReturn(new File(tempDir, "module2"));
 
         final RobotRuntimeEnvironment env = createEnvironment(executor);
 
@@ -71,13 +66,11 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     public void modulesSearchPathsAreCanonicalized() {
-        // this test only makes sense on case-insensitive platforms like windows
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
         when(executor.getModulesSearchPaths())
-                .thenReturn(newArrayList(new File(folder.getRoot(), "module"), new File(folder.getRoot(), "module2")));
+                .thenReturn(newArrayList(new File(tempDir, "module"), new File(tempDir, "module2")));
 
         final RobotRuntimeEnvironment env = createEnvironment(executor);
 

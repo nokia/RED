@@ -6,8 +6,9 @@
 package org.rf.ide.core.environment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RobotVersionTest {
 
@@ -22,23 +23,23 @@ public class RobotVersionTest {
                 .isEqualTo(new RobotVersion(2, 9, 1)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void parsingProblem_emptyString() {
-        RobotVersion.from("      ");
+        assertThatIllegalStateException().isThrownBy(() -> RobotVersion.from("      "));
     }
 
     public void parsingProblem_nullVersion() {
         assertThat(RobotVersion.from(null)).isEqualTo(RobotVersion.UNKNOWN);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void parsingProblem_1() {
-        RobotVersion.from("1");
+        assertThatIllegalStateException().isThrownBy(() -> RobotVersion.from("1"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void parsingProblem_2() {
-        RobotVersion.from("version");
+        assertThatIllegalStateException().isThrownBy(() -> RobotVersion.from("version"));
     }
 
     @Test

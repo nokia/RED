@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.text.write;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
 

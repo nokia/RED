@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 

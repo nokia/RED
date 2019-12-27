@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -15,19 +16,15 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordDocumentationTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordDocumentationTest {
 
-    public CreationOfKeywordDocumentationTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordCaseDocumentation_withName_andThreeLinesOfDocumentation()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordCaseDocumentation_withName_andThreeLinesOfDocumentation(
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert("KeywordDocumentationWithThreeLinesCreation");
+        final String filePath = convert("KeywordDocumentationWithThreeLinesCreation", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -47,22 +44,24 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationDecOnly()
-            throws Exception {
-        test_onlyKeyDoc_decIncluded("EmptyKeywordDocumentationNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationDecOnly(
+            final FileFormat format) throws Exception {
+        test_onlyKeyDoc_decIncluded("EmptyKeywordDocumentationNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationDecOnly()
-            throws Exception {
-        test_onlyKeyDoc_decIncluded("EmptyKeywordDocumentation", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationDecOnly(
+            final FileFormat format) throws Exception {
+        test_onlyKeyDoc_decIncluded("EmptyKeywordDocumentation", "User Keyword", format);
     }
 
-    private void test_onlyKeyDoc_decIncluded(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_onlyKeyDoc_decIncluded(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -79,22 +78,24 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAndCommentOnly()
-            throws Exception {
-        test_keyDoc_withCommentOnly("KeywordDocumentationNoKeywordNameAndComment", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAndCommentOnly(
+            final FileFormat format) throws Exception {
+        test_keyDoc_withCommentOnly("KeywordDocumentationNoKeywordNameAndComment", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAndCommentOnly()
-            throws Exception {
-        test_keyDoc_withCommentOnly("KeywordDocumentationAndComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAndCommentOnly(
+            final FileFormat format) throws Exception {
+        test_keyDoc_withCommentOnly("KeywordDocumentationAndComment", "User Keyword", format);
     }
 
-    private void test_keyDoc_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_keyDoc_withCommentOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -115,22 +116,24 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3Words()
-            throws Exception {
-        test_docOnlyWith3Words("KeywordDocumentationNoKeywordNameAnd3WordsInText", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3Words(
+            final FileFormat format) throws Exception {
+        test_docOnlyWith3Words("KeywordDocumentationNoKeywordNameAnd3WordsInText", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3Words()
-            throws Exception {
-        test_docOnlyWith3Words("KeywordDocumentationAnd3WordsInText", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3Words(
+            final FileFormat format) throws Exception {
+        test_docOnlyWith3Words("KeywordDocumentationAnd3WordsInText", "User Keyword", format);
     }
 
-    private void test_docOnlyWith3Words(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_docOnlyWith3Words(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -151,22 +154,24 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3WordsAndComment()
-            throws Exception {
-        test_keyDoc_withDoc3Words_andComment("KeywordDocumentationNoKeywordNameAnd3WordsInTextAndComment", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3WordsAndComment(
+            final FileFormat format) throws Exception {
+        test_keyDoc_withDoc3Words_andComment("KeywordDocumentationNoKeywordNameAnd3WordsInTextAndComment", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3WordsAndComment()
-            throws Exception {
-        test_keyDoc_withDoc3Words_andComment("KeywordDocumentationAnd3WordsInTextAndComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3WordsAndComment(
+            final FileFormat format) throws Exception {
+        test_keyDoc_withDoc3Words_andComment("KeywordDocumentationAnd3WordsInTextAndComment", "User Keyword", format);
     }
 
-    private void test_keyDoc_withDoc3Words_andComment(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_keyDoc_withDoc3Words_andComment(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -190,7 +195,7 @@ public class CreationOfKeywordDocumentationTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/documentation/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/documentation/new/" + fileName + "." + format.getExtension();
     }
 }

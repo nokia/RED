@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.concurrent.FutureTask;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.PausedEvent.PausedEventResponder;
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ServerResponse;

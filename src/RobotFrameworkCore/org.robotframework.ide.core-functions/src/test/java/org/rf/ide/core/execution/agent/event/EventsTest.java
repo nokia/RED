@@ -7,13 +7,14 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -35,10 +36,10 @@ public class EventsTest {
         assertThat(Events.ensureListOfStrings(list)).containsExactly("a", "b", "c");
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void classCastExceptionIsThrown_whenListOfObjectsContainsSomethingDifferentThanString() {
         final List<?> list = newArrayList("a", new Object(), "c");
-        Events.ensureListOfStrings(list);
+        assertThatExceptionOfType(ClassCastException.class).isThrownBy(() -> Events.ensureListOfStrings(list));
     }
 
     @Test
@@ -54,16 +55,18 @@ public class EventsTest {
         assertThat(result.get(1)).containsEntry("1", Boolean.TRUE).containsEntry("2", "abc");
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void classCastExceptionIsThrown_whenListContainsSomethingDifferentThanMap() {
         final List<?> list = newArrayList(ImmutableMap.of("x", 1, "y", 2), "foo");
-        Events.ensureListOfOrderedMapOfStringsToObjects(list);
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> Events.ensureListOfOrderedMapOfStringsToObjects(list));
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void classCastExceptionIsThrown_whenListContainsMapWithNoStringKeys() {
         final List<?> list = newArrayList(ImmutableMap.of(1, 2, 2, 3));
-        Events.ensureListOfOrderedMapOfStringsToObjects(list);
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> Events.ensureListOfOrderedMapOfStringsToObjects(list));
     }
 
     @Test
@@ -74,11 +77,12 @@ public class EventsTest {
         assertThat(result).hasSize(2).isInstanceOf(LinkedHashMap.class);
         assertThat(result).containsKeys("x", "y").containsValues("a", 1);
     }
-    
-    @Test(expected=ClassCastException.class)
+
+    @Test
     public void classCastExceptionIsThrown_whenMapHasKeysOtherThenStrings() {
         final Map<?, ?> map = ImmutableMap.of("x", "a", new Object(), 1);
-        Events.ensureOrderedMapOfStringsToObjects(map);
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> Events.ensureOrderedMapOfStringsToObjects(map));
     }
 
     @Test
@@ -90,16 +94,18 @@ public class EventsTest {
         assertThat(result).containsKeys("x", "y").containsValues("a", "b");
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void classCastExceptionIsThrown_whenMapHasKeyOtherThenStrings() {
         final Map<?, ?> map = ImmutableMap.of("x", "a", new Object(), "b");
-        Events.ensureOrderedMapOfStringsToStrings(map);
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> Events.ensureOrderedMapOfStringsToStrings(map));
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void classCastExceptionIsThrown_whenMapHasValueOtherThenStrings() {
         final Map<?, ?> map = ImmutableMap.of("x", "a", "y", new Object());
-        Events.ensureOrderedMapOfStringsToStrings(map);
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> Events.ensureOrderedMapOfStringsToStrings(map));
     }
 
 }

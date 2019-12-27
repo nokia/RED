@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -27,7 +27,7 @@ public class UserKeywordRemoveElementsTest {
 
     private UserKeyword keyword;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final RobotFileOutput out = new RobotFileOutput(RobotVersion.from("2.9.0"));
         out.getFileModel().includeKeywordTableSection();

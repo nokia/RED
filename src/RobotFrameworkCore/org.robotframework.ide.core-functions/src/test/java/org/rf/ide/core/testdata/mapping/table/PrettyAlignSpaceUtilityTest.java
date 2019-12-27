@@ -7,8 +7,8 @@ package org.rf.ide.core.testdata.mapping.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -126,7 +126,7 @@ public class PrettyAlignSpaceUtilityTest {
         assertThat(token.getFilePosition().isSamePlace(fp)).as("got position %s", token.getFilePosition()).isTrue();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.prettyAlignExtractor = new PrettyAlignSpaceUtility();
     }

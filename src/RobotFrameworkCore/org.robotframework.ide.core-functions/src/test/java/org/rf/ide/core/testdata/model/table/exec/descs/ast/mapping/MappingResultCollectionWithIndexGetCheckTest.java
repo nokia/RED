@@ -14,25 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-@RunWith(Parameterized.class)
 public class MappingResultCollectionWithIndexGetCheckTest {
 
     private final static Pattern SPLIT_CSV_PATTERN = Pattern.compile("(?<!\\\\),");
 
-    @Parameters(name = "${0}")
-    public static Iterable<Object[]> data() throws Exception {
+    public static List<Object[]> provideTestData() throws Exception {
         final List<String> lines = Files.readAllLines(Paths.get(
                 VariableComputationHelperExtractionParameterizedTest.class.getResource("VAR_INDEX_CHECK.cvs").toURI()),
                 Charset.forName("UTF-8"));
 
-        final List<Object[]> o = new ArrayList<>(0);
+        final List<Object[]> data = new ArrayList<>();
         int lineNumber = 0;
         for (final String line : lines) {
             lineNumber++;
@@ -61,28 +57,15 @@ public class MappingResultCollectionWithIndexGetCheckTest {
             p[1] = text;
             p[2] = shouldMarkAsVariableIndex;
 
-            o.add(p);
+            data.add(p);
         }
 
-        return o;
+        return data;
     }
 
-    private final String text;
-
-    private final boolean shouldMarkAsVariableIndex;
-
-    public MappingResultCollectionWithIndexGetCheckTest(@SuppressWarnings("unused") final String testName,
-            final String text, final boolean shouldMarkAsVariableIndex) {
-        this.text = text;
-        this.shouldMarkAsVariableIndex = shouldMarkAsVariableIndex;
-    }
-
-    @Test
-    public void test() {
-        assertForText(text, shouldMarkAsVariableIndex);
-    }
-
-    private void assertForText(final String text, final boolean shouldMarkAsVariableIndex) {
+    @ParameterizedTest
+    @MethodSource("provideTestData")
+    public void test(final String testName, final String text, final boolean shouldMarkAsVariableIndex) {
         final MappingResult mappingResult = performOperationsFor(text);
         if (shouldMarkAsVariableIndex) {
             assertThat(mappingResult.isCollectionVariableElementGet()).isTrue();

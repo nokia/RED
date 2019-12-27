@@ -7,10 +7,11 @@ package org.rf.ide.core.execution.debug.contexts;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
@@ -41,7 +42,7 @@ public class ForLoopTest {
         assertThat(forLoop.getDescriptor()).isSameAs(descriptor);
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void exceptionIsThrown_whenDescriptorOfLoopHeaderIsOfWrongType() {
         final IExecutableRowDescriptor<?> descriptor = mock(IExecutableRowDescriptor.class);
 
@@ -49,7 +50,7 @@ public class ForLoopTest {
         when(loopHeader.getDescriptor()).thenReturn((IExecutableRowDescriptor) descriptor);
 
         final ForLoop forLoop = new ForLoop(loopHeader, newArrayList());
-        forLoop.getDescriptor();
+        assertThatExceptionOfType(ClassCastException.class).isThrownBy(forLoop::getDescriptor);
     }
 
     @Test

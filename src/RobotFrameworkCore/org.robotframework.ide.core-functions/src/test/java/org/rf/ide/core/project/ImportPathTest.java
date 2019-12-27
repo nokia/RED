@@ -6,11 +6,10 @@
 package org.rf.ide.core.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
-import org.junit.Test;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 public class ImportPathTest {
 
@@ -41,9 +40,8 @@ public class ImportPathTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testAbsolutePaths_unixPaths() {
-        assumeFalse(RedSystemProperties.isWindowsPlatform());
-
         assertThat(ImportPath.from("/absolute").isAbsolute()).isTrue();
         assertThat(ImportPath.from("/absolute/to/dir").isAbsolute()).isTrue();
         assertThat(ImportPath.from("/absolute/./to/dir").isAbsolute()).isTrue();
@@ -56,9 +54,8 @@ public class ImportPathTest {
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     public void testAbsolutePaths_windowsPaths() {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         assertThat(ImportPath.from("c:\\absolute").isAbsolute()).isTrue();
         assertThat(ImportPath.from("c:\\absolute\\to\\dir").isAbsolute()).isTrue();
         assertThat(ImportPath.from("c:\\absolute\\.\\to\\dir").isAbsolute()).isTrue();

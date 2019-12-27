@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.text.read.recognizer.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 /**

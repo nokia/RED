@@ -6,21 +6,21 @@
 package org.rf.ide.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EnvironmentVariableReplacerTest {
 
     @Mock
@@ -55,9 +55,9 @@ public class EnvironmentVariableReplacerTest {
 
     @Test
     public void allKnownVariablesAreReplaced() throws Exception {
-        when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.of("a"));
-        when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.of("b"));
-        when(variableAccessor.getValue("VAR_3")).thenReturn(Optional.of("c"));
+        lenient().when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.of("a"));
+        lenient().when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.of("b"));
+        lenient().when(variableAccessor.getValue("VAR_3")).thenReturn(Optional.of("c"));
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
@@ -68,11 +68,11 @@ public class EnvironmentVariableReplacerTest {
 
     @Test
     public void nestedVariablesAreReplaced() throws Exception {
-        when(variableAccessor.getValue("A")).thenReturn(Optional.of("A_VAR"));
-        when(variableAccessor.getValue("A_VAR")).thenReturn(Optional.of("xyz"));
-        when(variableAccessor.getValue("B")).thenReturn(Optional.of("B_VAR"));
-        when(variableAccessor.getValue("X_B_VAR_Y")).thenReturn(Optional.of("C_VAR"));
-        when(variableAccessor.getValue("C_VAR")).thenReturn(Optional.of("abc"));
+        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.of("A_VAR"));
+        lenient().when(variableAccessor.getValue("A_VAR")).thenReturn(Optional.of("xyz"));
+        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.of("B_VAR"));
+        lenient().when(variableAccessor.getValue("X_B_VAR_Y")).thenReturn(Optional.of("C_VAR"));
+        lenient().when(variableAccessor.getValue("C_VAR")).thenReturn(Optional.of("abc"));
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
@@ -83,10 +83,10 @@ public class EnvironmentVariableReplacerTest {
 
     @Test
     public void onlyKnownVariablesAreReplaced() throws Exception {
-        when(variableAccessor.getValue("A")).thenReturn(Optional.of("a-value"));
-        when(variableAccessor.getValue("B")).thenReturn(Optional.of("b-value"));
-        when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.empty());
-        when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.empty());
+        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.of("a-value"));
+        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.of("b-value"));
+        lenient().when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.empty());
+        lenient().when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.empty());
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
@@ -99,9 +99,9 @@ public class EnvironmentVariableReplacerTest {
 
     @Test
     public void unknownVariableIsReportedOnlyOnce() throws Exception {
-        when(variableAccessor.getValue("A")).thenReturn(Optional.empty());
-        when(variableAccessor.getValue("B")).thenReturn(Optional.empty());
-        when(variableAccessor.getValue("C")).thenReturn(Optional.empty());
+        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.empty());
+        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.empty());
+        lenient().when(variableAccessor.getValue("C")).thenReturn(Optional.empty());
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 

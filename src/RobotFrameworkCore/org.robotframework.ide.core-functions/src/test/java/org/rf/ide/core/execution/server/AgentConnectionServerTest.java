@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.execution.server;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
@@ -23,8 +25,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
@@ -32,7 +35,7 @@ import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-@Ignore("see RED-976")
+@Disabled("see RED-976")
 public class AgentConnectionServerTest {
 
     @Test
@@ -161,7 +164,7 @@ public class AgentConnectionServerTest {
         verifyNoMoreInteractions(serverStatusListener);
     }
 
-    @Test(expected = BindException.class)
+    @Test
     public void exceptionIsThrown_whenHostCannotBeReached() throws Exception {
         final String host = "123456789";
         final int port = findFreePort();
@@ -171,10 +174,10 @@ public class AgentConnectionServerTest {
         final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
         server.addStatusListener(serverStatusListener);
 
-        server.start();
+        assertThatExceptionOfType(BindException.class).isThrownBy(server::start);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenPortIsOutOfRange() throws Exception {
         final String host = "127.0.0.1";
         final int port = 65536;
@@ -184,10 +187,11 @@ public class AgentConnectionServerTest {
         final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
         server.addStatusListener(serverStatusListener);
 
-        server.start();
+        assertThatIllegalArgumentException().isThrownBy(server::start);
     }
 
-    @Test(timeout = 5_000)
+    @Test
+    @Timeout(5)
     public void deadLockDoesNotOccur_whenWaitingForServerWhichThrewExceptionDuringStarting() throws Exception {
         final String host = "123456789";
         final int port = findFreePort();

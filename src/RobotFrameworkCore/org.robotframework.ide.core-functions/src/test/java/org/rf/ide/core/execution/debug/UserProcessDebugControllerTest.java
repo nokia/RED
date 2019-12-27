@@ -8,22 +8,18 @@ package org.rf.ide.core.execution.debug;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.EnumSet;
 import java.util.Optional;
 import java.util.concurrent.FutureTask;
 
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.agent.PausingPoint;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
@@ -45,13 +41,7 @@ import org.rf.ide.core.execution.server.response.TerminateExecution;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
-@RunWith(Theories.class)
 public class UserProcessDebugControllerTest {
-
-    @DataPoints
-    public static PausingPoint[] pausingPoints() {
-        return EnumSet.allOf(PausingPoint.class).toArray(new PausingPoint[0]);
-    }
 
     @Test
     public void suspensionDataIsCleared_whenConditionHasBeenEvaluatedToFalse() {
@@ -321,11 +311,10 @@ public class UserProcessDebugControllerTest {
         verify(callback).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "START_KEYWORD" })
     public void pauseResponseIsReturned_whenThereIsAnErroneousFrameAndPauseOnErrorIsEnabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.START_KEYWORD);
-
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
@@ -342,11 +331,10 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.getSuspensionData().data).containsOnly("error msg");
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_END_KEYWORD", "END_KEYWORD" })
     public void noResponseIsReturned_whenThereIsAnErroneousFramePauseOnErrorIsEnabledButPausingPointIsAtTheEnd(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_END_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
-
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
@@ -476,11 +464,10 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.getSuspensionData()).isNull();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD" }, mode = EnumSource.Mode.EXCLUDE)
     public void noResponseIsReturned_whenThereIsABreakpointButPausingPointIsOtherThanPreStart(
             final PausingPoint point) {
-        assumeTrue(point != PausingPoint.PRE_START_KEYWORD);
-
         final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(false);
@@ -606,11 +593,10 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.getSuspensionData()).isNull();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_END_KEYWORD" }, mode = EnumSource.Mode.EXCLUDE)
     public void noResponseIsReturned_whenThereIsAKwFailBreakpointButPausingPointIsOtherThanPreEnd(
             final PausingPoint point) {
-        assumeTrue(point != PausingPoint.PRE_END_KEYWORD);
-
         final RobotBreakpoint breakpoint = mock(RobotBreakpoint.class);
         when(breakpoint.evaluateHitCount()).thenReturn(true);
         when(breakpoint.isConditionEnabled()).thenReturn(false);
@@ -631,10 +617,9 @@ public class UserProcessDebugControllerTest {
         assertThat(controller.getSuspensionData()).isNull();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "END_KEYWORD" }, mode = EnumSource.Mode.EXCLUDE)
     public void pauseResponseIsReturned_whenSteppingIntoAndNotOmittingLibKeywords(final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint != PausingPoint.END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -653,10 +638,10 @@ public class UserProcessDebugControllerTest {
         verify(whenSent).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "END_KEYWORD",
+            "PRE_END_KEYWORD" }, mode = EnumSource.Mode.EXCLUDE)
     public void pauseResponseIsReturned_whenSteppingIntoAndOmittingLibKeywords(final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint != PausingPoint.END_KEYWORD && pausingPoint != PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -695,11 +680,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_END_KEYWORD", "END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingIntoOmittingLibKeywordsButPausingPointIsAtEndKeyword(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_END_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -844,11 +828,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_END_KEYWORD", "END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingOverOnPreStartKeyword_andPausingPointIsOnEnd(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_END_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -958,11 +941,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void pauseResponseIsReturned_whenSteppingReturnAndThereIsNoMarkedFrameOnStack_steppingIntoLibEnabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -981,11 +963,10 @@ public class UserProcessDebugControllerTest {
         verify(whenSent).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void pauseResponseIsReturned_whenSteppingReturnAndThereIsNoMarkedFrameOnStack_steppingIntoLibDisabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1004,11 +985,10 @@ public class UserProcessDebugControllerTest {
         verify(whenSent).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingReturnAndThereIsMarkedFrameOnStack_steppingIntoLibEnabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1028,11 +1008,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingReturnAndThereIsMarkedFrameOnStack_steppingIntoLibDisabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1052,11 +1031,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "START_KEYWORD", "END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingReturnAtStartOrEndPausingPoint_steppingIntoLibEnabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.START_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1075,11 +1053,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "START_KEYWORD", "END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingReturnAtStartOrEndPausingPoint_steppingIntoLibDisabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.START_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1098,11 +1075,10 @@ public class UserProcessDebugControllerTest {
         verifyZeroInteractions(whenSent);
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void pauseResponseIsReturned_whenSteppingReturnAndThereIsLibraryKeywordFrameOnStack_steppingIntoLibEnabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1121,11 +1097,10 @@ public class UserProcessDebugControllerTest {
         verify(whenSent).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "PRE_START_KEYWORD", "PRE_END_KEYWORD" })
     public void noResponseIsReturned_whenSteppingReturnAndThereIsLibraryKeywordFrameOnStack_steppingIntoLibDisabled(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.PRE_END_KEYWORD);
-
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
@@ -1191,11 +1166,10 @@ public class UserProcessDebugControllerTest {
         verify(callbackWhenSent).run();
     }
 
-    @Theory
+    @ParameterizedTest
+    @EnumSource(value = PausingPoint.class, names = { "START_KEYWORD" }, mode = EnumSource.Mode.EXCLUDE)
     public void whenSteppingOverIsRequestedAndLastPointWasDifferentThanStartKeyword_resumeResponseIsQueuedAndStateOfControllerChangesToStepping(
             final PausingPoint pausingPoint) {
-        assumeTrue(pausingPoint != PausingPoint.START_KEYWORD);
-
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));

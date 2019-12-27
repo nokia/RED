@@ -8,13 +8,13 @@ package org.rf.ide.core.testdata.model.table;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.List;
 
-import org.junit.Test;
-import org.rf.ide.core.testdata.model.TemplateSetting;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -43,7 +43,7 @@ public class LocalSettingTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final LocalSetting<TestCase> setting = createSetting(test, "[Tags]", args("1", "2"), comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> setting.createToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> setting.createToken(0));
     }
 
     @Test
@@ -101,8 +101,8 @@ public class LocalSettingTest {
         final LocalSetting<TestCase> setting1 = createSetting(test, "[Tags]", args(), comment());
         final LocalSetting<TestCase> setting2 = createSetting(test, "[Tags]", args(), comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> setting1.deleteToken(0));
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> setting2.deleteToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> setting1.deleteToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> setting2.deleteToken(0));
     }
 
     @Test
@@ -204,7 +204,7 @@ public class LocalSettingTest {
         final TestCase test = new TestCase(RobotToken.create("test"));
         final LocalSetting<TestCase> setting = createSetting(test, "[Tags]", args("1", "2"), comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> setting.updateToken(0, "action"));
+        assertThatIllegalArgumentException().isThrownBy(() -> setting.updateToken(0, "action"));
     }
 
     @Test

@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -13,29 +14,27 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordArgumentsTest {
 
-    public CreationOfKeywordArgumentsTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDecOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_argsDecOnly("EmptyKeywordArgumentsNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDecOnly()
-            throws Exception {
-        test_emptyFile_argsDecOnly("EmptyKeywordArgumentsNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDecOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_argsDecOnly("EmptyKeywordArguments", "User Keyword", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDecOnly() throws Exception {
-        test_emptyFile_argsDecOnly("EmptyKeywordArguments", "User Keyword");
-    }
-
-    private void test_emptyFile_argsDecOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_emptyFile_argsDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -52,22 +51,24 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_andCommentsOnly()
-            throws Exception {
-        test_emptyFile_CommentsOnly("KeywordArgumentsWithCommentAndNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_andCommentsOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_CommentsOnly("KeywordArgumentsWithCommentAndNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_andCommentsOnly()
-            throws Exception {
-        test_emptyFile_CommentsOnly("KeywordArgumentsWithCommentOnly", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_andCommentsOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_CommentsOnly("KeywordArgumentsWithCommentOnly", "User Keyword", format);
     }
 
-    private void test_emptyFile_CommentsOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_emptyFile_CommentsOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -88,22 +89,24 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3ArgsOnly()
-            throws Exception {
-        test_emptyFile_createKeyArgs_3ArgsOnly("KeywordArgumentsWith3ArgsAndNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3ArgsOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_createKeyArgs_3ArgsOnly("KeywordArgumentsWith3ArgsAndNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3ArgsOnly()
-            throws Exception {
-        test_emptyFile_createKeyArgs_3ArgsOnly("KeywordArgumentsWith3ArgsOnly", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3ArgsOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_createKeyArgs_3ArgsOnly("KeywordArgumentsWith3ArgsOnly", "User Keyword", format);
     }
 
-    private void test_emptyFile_createKeyArgs_3ArgsOnly(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_emptyFile_createKeyArgs_3ArgsOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -124,22 +127,26 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3Args_andCommentOnly()
-            throws Exception {
-        test_emptyFile_keywordArgsCreation_plus3Args_andComment("KeywordArgumentsWith3ArgsCommentAndNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3Args_andCommentOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_keywordArgsCreation_plus3Args_andComment("KeywordArgumentsWith3ArgsCommentAndNoKeywordName", "",
+                format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3Args_andCommentOnly()
-            throws Exception {
-        test_emptyFile_keywordArgsCreation_plus3Args_andComment("KeywordArgumentsWith3ArgsCommentOnly", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3Args_andCommentOnly(
+            final FileFormat format) throws Exception {
+        test_emptyFile_keywordArgsCreation_plus3Args_andComment("KeywordArgumentsWith3ArgsCommentOnly", "User Keyword",
+                format);
     }
 
     private void test_emptyFile_keywordArgsCreation_plus3Args_andComment(final String fileNameWithoutExt,
-            final String userKeywordName) throws Exception {
+            final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -163,7 +170,7 @@ public class CreationOfKeywordArgumentsTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/arguments/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/arguments/new/" + fileName + "." + format.getExtension();
     }
 }

@@ -8,25 +8,22 @@ package org.rf.ide.core.testdata.text.write.tables.variables.creation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
+public class CreationOfListVariableTest {
 
-    public CreationOfListVariableTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyListVariableDeclarationOnly");
+        final String fileName = convert("EmptyListVariableDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -38,10 +35,11 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andComment(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationWithCommentOnly");
+        final String fileName = convert("ListVariableDeclarationWithCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -56,10 +54,11 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationAndOneValueOnly");
+        final String fileName = convert("ListVariableDeclarationAndOneValueOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -74,10 +73,12 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationAndOneValueAndCommentOnly");
+        final String fileName = convert("ListVariableDeclarationAndOneValueAndCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -95,10 +96,12 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationAnd3ValueOnly");
+        final String fileName = convert("ListVariableDeclarationAnd3ValueOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -115,10 +118,12 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationAnd3ValueAndCommentOnly");
+        final String fileName = convert("ListVariableDeclarationAnd3ValueAndCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -138,10 +143,12 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationList_withThreeValues_andLastOnlyHasValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationList_withThreeValues_andLastOnlyHasValue(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationWith2ValuesEmptyAndLastSet");
+        final String fileName = convert("ListVariableDeclarationWith2ValuesEmptyAndLastSet", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -158,10 +165,12 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationList_withThreeValues_andMiddleHasValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationList_withThreeValues_andMiddleHasValue(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("ListVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty");
+        final String fileName = convert("ListVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -178,7 +187,7 @@ public class CreationOfListVariableTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "variables/list/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "variables/list/new/" + fileName + "." + format.getExtension();
     }
 }

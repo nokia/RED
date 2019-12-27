@@ -7,7 +7,8 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -18,23 +19,19 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
 /**
  * @author wypych
  */
-public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordsWithSeparatorCheckTest {
 
-    public CreationOfKeywordsWithSeparatorCheckTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_givenKeywordTable_withOneKeywordMultilined_whenAddNewParameterToExecutable_PIPEsep_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenKeywordTable_withOneKeywordMultilined_whenAddNewParameterToExecutable_PIPEsep_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("InputOneKeywordWithExecMultiline");
-        final String outputFileName = convert("OutputOneKeywordWithExecMultiline");
+        final String inFileName = convert("InputOneKeywordWithExecMultiline", format);
+        final String outputFileName = convert("OutputOneKeywordWithExecMultiline", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -49,12 +46,13 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    @Test
-    public void test_givenKeywordTable_withOneKeyword_whenAddNewParameterToExecutable_TabulatorSep_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenKeywordTable_withOneKeyword_whenAddNewParameterToExecutable_TabulatorSep_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter");
-        final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe");
+        final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter", format);
+        final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -69,12 +67,13 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    @Test
-    public void test_givenKeywordTable_withOneKeyword_whenAddNewParameterToExecutable_PIPEsep_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenKeywordTable_withOneKeyword_whenAddNewParameterToExecutable_PIPEsep_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter");
-        final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe");
+        final String inFileName = convert("Input_OneKeyword_andOneExec_whenAddNewParameter", format);
+        final String outputFileName = convert("Output_OneKeyword_andOneExec_whenAddNewParameterPipe", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -89,12 +88,13 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    @Test
-    public void test_givenKeywordTable_withOneKeyword_whenAddNewExecutable_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenKeywordTable_withOneKeyword_whenAddNewExecutable_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneKeyword_andThenAddNewExec");
-        final String outputFileName = convert("Output_OneKeyword_andThenAddNewExec");
+        final String inFileName = convert("Input_OneKeyword_andThenAddNewExec", format);
+        final String outputFileName = convert("Output_OneKeyword_andThenAddNewExec", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -112,14 +112,15 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    @Test
-    public void test_givenEmptyKeywordTable_whenAddNewKeyword_andExecutable_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenEmptyKeywordTable_whenAddNewKeyword_andExecutable_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
         final String inFileName = convert(
-                "Input_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace");
+                "Input_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace", format);
         final String outputFileName = convert(
-                "Output_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace");
+                "Output_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -137,7 +138,7 @@ public class CreationOfKeywordsWithSeparatorCheckTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/new/" + fileName + "." + format.getExtension();
     }
 }

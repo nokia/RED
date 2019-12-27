@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;

@@ -5,25 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsMetadataTest {
 
-    public CreationOfSettingsMetadataTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateMetadataDeclarationOnly() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateMetadataDeclarationOnly(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyMetadataDeclarationOnly");
+        final String fileName = convert("EmptyMetadataDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -35,10 +32,12 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateMetadata_with_ThreeCommentTokens() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateMetadata_with_ThreeCommentTokens(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("MetadataWithThreeCommentOnly");
+        final String fileName = convert("MetadataWithThreeCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -60,10 +59,11 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_CreateMetadata_withKeyOnly() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_CreateMetadata_withKeyOnly(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("MetadataWithKeyOnly");
+        final String fileName = convert("MetadataWithKeyOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -79,10 +79,11 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_CreateMetadata_withKey_andThreeValues() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_CreateMetadata_withKey_andThreeValues(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("MetadataWithKeyAndThreeValuesOnly");
+        final String fileName = convert("MetadataWithKeyAndThreeValuesOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -108,10 +109,11 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_CreateMetadata_withKey_andComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_CreateMetadata_withKey_andComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("MetadataWithKeyAndCommentsOnly");
+        final String fileName = convert("MetadataWithKeyAndCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -137,10 +139,12 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_CreateMetadata_withKey_andThreeValuesAndComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_CreateMetadata_withKey_andThreeValuesAndComments(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("MetadataWithKeyAndThreeValuesCommentOnly");
+        final String fileName = convert("MetadataWithKeyAndThreeValuesCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -176,7 +180,7 @@ public class CreationOfSettingsMetadataTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/metadata/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/metadata/new/" + fileName + "." + format.getExtension();
     }
 }

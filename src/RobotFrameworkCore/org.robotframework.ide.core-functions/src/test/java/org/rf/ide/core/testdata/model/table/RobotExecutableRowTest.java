@@ -8,11 +8,11 @@ package org.rf.ide.core.testdata.model.table;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -265,8 +265,8 @@ public class RobotExecutableRowTest {
         final RobotExecutableRow<TestCase> row1 = createRow(test, "action", args(), comment());
         final RobotExecutableRow<TestCase> row2 = createRow(test, "action", args(), comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row1.deleteToken(0));
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row2.deleteToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> row1.deleteToken(0));
+        assertThatIllegalArgumentException().isThrownBy(() -> row2.deleteToken(0));
     }
 
     @Test
@@ -345,7 +345,7 @@ public class RobotExecutableRowTest {
         final TestCase test = createTest();
         final RobotExecutableRow<TestCase> row = createRow(test, "action", args("1", "2"), comment("c1", "c2"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> row.updateToken(0, "# action"));
+        assertThatIllegalArgumentException().isThrownBy(() -> row.updateToken(0, "# action"));
     }
 
     @Test

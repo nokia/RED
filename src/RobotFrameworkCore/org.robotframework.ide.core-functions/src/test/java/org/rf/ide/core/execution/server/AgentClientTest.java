@@ -12,7 +12,7 @@ import java.io.StringWriter;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse;
 
 public class AgentClientTest {

@@ -6,11 +6,12 @@
 package org.rf.ide.core.execution.server.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,13 +24,13 @@ public class ContinueExecutionTest {
         assertThat(new ContinueExecution().toMessage()).isEqualTo("{\"continue\":[]}");
     }
 
-    @Test(expected = ResponseException.class)
+    @Test
     public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws JsonProcessingException {
         final ObjectMapper mapper = mock(ObjectMapper.class);
         when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
 
         final ContinueExecution response = new ContinueExecution(mapper);
 
-        response.toMessage();
+        assertThatExceptionOfType(ResponseException.class).isThrownBy(response::toMessage);
     }
 }

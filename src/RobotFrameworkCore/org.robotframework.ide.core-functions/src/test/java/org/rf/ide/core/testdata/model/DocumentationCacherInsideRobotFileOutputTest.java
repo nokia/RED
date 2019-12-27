@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
@@ -42,7 +42,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
 
     private static TestCaseTable testCaseTable;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
         final Path path = getFile("presenter//DocPositionsFind.robot");
         final RobotParser parser = new RobotParser(new RobotProjectHolder(new RobotRuntimeEnvironment(null, "2.9.0")),

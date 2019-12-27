@@ -5,25 +5,23 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TaskTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsTaskTeardownTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsTaskTeardownTest {
 
-    public CreationOfSettingsTaskTeardownTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_createTaskTeardown_andKeyword_andThreeArgs_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createTaskTeardown_andKeyword_andThreeArgs_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("TaskTeardownDeclarationWithKeyword3ArgsAndCommentOnly");
+        final String fileName = convert("TaskTeardownDeclarationWithKeyword3ArgsAndCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("3.1");
 
         // test data prepare
@@ -60,7 +58,7 @@ public class CreationOfSettingsTaskTeardownTest extends RobotFormatParameterized
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/taskTeardown/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/taskTeardown/new/" + fileName + "." + format.getExtension();
     }
 }

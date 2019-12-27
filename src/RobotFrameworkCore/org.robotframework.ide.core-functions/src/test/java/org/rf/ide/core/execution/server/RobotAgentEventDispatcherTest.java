@@ -6,6 +6,7 @@
 package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.assertj.core.api.Assertions.assertThatIOException;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.PausingPoint;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
@@ -58,14 +59,14 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotAgentEventDispatcherTest {
 
-    @Test(expected = IOException.class)
+    @Test
     public void exceptionIsRethrown_whenReaderThrowsIOException() throws Exception {
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null);
 
         final BufferedReader reader = mock(BufferedReader.class);
         when(reader.readLine()).thenThrow(IOException.class);
 
-        dispatcher.runEventsLoop(reader);
+        assertThatIOException().isThrownBy(() -> dispatcher.runEventsLoop(reader));
     }
 
     @Test

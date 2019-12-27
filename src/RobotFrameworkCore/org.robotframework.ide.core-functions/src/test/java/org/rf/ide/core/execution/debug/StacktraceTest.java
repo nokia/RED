@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;

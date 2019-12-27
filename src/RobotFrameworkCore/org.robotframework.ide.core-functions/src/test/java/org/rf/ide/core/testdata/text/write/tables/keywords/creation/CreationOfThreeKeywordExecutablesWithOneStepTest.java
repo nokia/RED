@@ -22,10 +22,6 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationOfThreeExecUnitsTest {
 
-    public CreationOfThreeKeywordExecutablesWithOneStepTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames() {
         final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneKeywordInside();
@@ -73,26 +69,26 @@ public class CreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationO
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("ExecActionAllCombinationsNoCommentLine"));
+                convert("ExecActionAllCombinationsNoCommentLine", format));
 
         return store;
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithTheFirstWithoutName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithTheFirstWithoutName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("ExecActionAllCombinationsNoCommentLineMissingKeywordName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingKeywordName", format));
 
         return store;
     }
 
-    private String convert(final String fileName) {
-        return "keywords/exec/new/threeKws/oneExecInEachKw/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/exec/new/threeKws/oneExecInEachKw/" + fileName + "." + format.getExtension();
     }
 }

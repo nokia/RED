@@ -7,7 +7,8 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.update;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -16,19 +17,15 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UpdateOfTestCaseExecutableForTest extends RobotFormatParameterizedTest {
+public class UpdateOfTestCaseExecutableForTest {
 
-    public UpdateOfTestCaseExecutableForTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_update_forLoopFix() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_update_forLoopFix(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_ForWithLineContinueAndHashes");
-        final String outputFileName = convert("Output_ForWithLineContinueAndHashes");
+        final String inFileName = convert("Input_ForWithLineContinueAndHashes", format);
+        final String outputFileName = convert("Output_ForWithLineContinueAndHashes", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -37,11 +34,12 @@ public class UpdateOfTestCaseExecutableForTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_update_secondTestCaseWithCommentBetween() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_update_secondTestCaseWithCommentBetween(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_TestExecutionActionWithForCommentInside");
-        final String outputFileName = convert("Output_TestExecutionActionWithForCommentInside");
+        final String inFileName = convert("Input_TestExecutionActionWithForCommentInside", format);
+        final String outputFileName = convert("Output_TestExecutionActionWithForCommentInside", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -56,23 +54,25 @@ public class UpdateOfTestCaseExecutableForTest extends RobotFormatParameterizedT
 
     }
 
-    @Test
-    public void test_emptyFile_updateExecRowFor_andTestNameExists() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateExecRowFor_andTestNameExists(final FileFormat format) throws Exception {
         assert_emptyFile_updateExecRowFor_andTestNameNotExists("Input_TestExecutionActionWithFor",
-                "Output_TestExecutionActionWithFor");
+                "Output_TestExecutionActionWithFor", format);
     }
 
-    @Test
-    public void test_emptyFile_updateExecRowFor_andTestNameNotExists() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateExecRowFor_andTestNameNotExists(final FileFormat format) throws Exception {
         assert_emptyFile_updateExecRowFor_andTestNameNotExists("Input_TestExecutionActionWithForWithoutTestName",
-                "Output_TestExecutionActionWithForWithoutTestName");
+                "Output_TestExecutionActionWithForWithoutTestName", format);
     }
 
     private void assert_emptyFile_updateExecRowFor_andTestNameNotExists(final String inFileNameWithoutExt,
-            final String outFileNameWithoutExt) throws Exception {
+            final String outFileNameWithoutExt, final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert(inFileNameWithoutExt);
-        final String outputFileName = convert(outFileNameWithoutExt);
+        final String inFileName = convert(inFileNameWithoutExt, format);
+        final String outputFileName = convert(outFileNameWithoutExt, format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -87,7 +87,7 @@ public class UpdateOfTestCaseExecutableForTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/exec/update/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/exec/update/" + fileName + "." + format.getExtension();
     }
 }

@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -36,7 +36,7 @@ public class UserKeywordPositionCountTest {
     private final static Map<String, IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> CACHED_UNITS = new HashMap<>(
             0);
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
         // prepare
         final Path inputFile = Paths

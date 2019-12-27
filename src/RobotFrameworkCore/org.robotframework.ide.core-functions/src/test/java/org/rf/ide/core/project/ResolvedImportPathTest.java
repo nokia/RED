@@ -7,8 +7,6 @@ package org.rf.ide.core.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.net.URI;
@@ -17,8 +15,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,9 +53,8 @@ public class ResolvedImportPathTest {
     }
 
     @Test
+    @DisabledOnOs(OS.LINUX)
     public void testPathsResolution_whenResolvedPathIsRelative_inWindows() throws URISyntaxException {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final Map<String, String> parameters = Collections.emptyMap();
         final ResolvedImportPath resolvedPath = createResolved("relative/path", parameters).get();
         final URI uri = resolvedPath.resolveInRespectTo(new File("c:/some/location").toURI());
@@ -65,9 +63,8 @@ public class ResolvedImportPathTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testPathsResolution_whenResolvedPathIsRelative_inUnix() throws URISyntaxException {
-        assumeFalse(RedSystemProperties.isWindowsPlatform());
-
         final Map<String, String> parameters = Collections.emptyMap();
         final ResolvedImportPath resolvedPath = createResolved("relative/path", parameters).get();
         final URI uri = resolvedPath.resolveInRespectTo(new File("/some/location").toURI());

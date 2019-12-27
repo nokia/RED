@@ -6,6 +6,7 @@
 package org.rf.ide.core.execution.debug;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.concurrent.FutureTask;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.PausingPoint;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.Status;
@@ -66,12 +67,12 @@ public class ExecutionPauseContinueListenerTest {
 
         final ShouldContinueEventResponder responder = mock(ShouldContinueEventResponder.class);
         final ShouldContinueEvent event = new ShouldContinueEvent(responder, PausingPoint.START_KEYWORD);
-        
+
         final ExecutionPauseContinueListener listener = new ExecutionPauseContinueListener(controller);
-        
+
         listener.handleKeywordAboutToEnd(new KeywordEndedEvent("lib", "kw", null, Status.FAIL));
         listener.handleShouldContinue(event);
-        
+
         verify(controller).takeCurrentResponse(PausingPoint.START_KEYWORD, QualifiedKeywordName.create("kw", "lib"));
         assertThat(listener.getCurrentlyFailedKeyword()).isNull();
     }
@@ -79,7 +80,7 @@ public class ExecutionPauseContinueListenerTest {
     @Test
     public void listenerRespondsWithControllerResponse_whenAskedForContinuation() {
         final PauseExecution controllerResponse = new PauseExecution();
-        
+
         final UserProcessController controller = mock(UserProcessController.class);
         when(controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null))
                 .thenReturn(Optional.of(controllerResponse));
@@ -109,7 +110,7 @@ public class ExecutionPauseContinueListenerTest {
         verifyNoMoreInteractions(responder);
     }
 
-    @Test(expected = RobotAgentEventsListenerException.class)
+    @Test
     public void exceptionIsThrown_whenResponderIsUnableToResponse() {
         final UserProcessController controller = mock(UserProcessController.class);
         when(controller.takeCurrentResponse(PausingPoint.START_KEYWORD, null)).thenReturn(Optional.empty());
@@ -119,7 +120,8 @@ public class ExecutionPauseContinueListenerTest {
 
         final ShouldContinueEvent event = new ShouldContinueEvent(responder, PausingPoint.START_KEYWORD);
         final ExecutionPauseContinueListener listener = new ExecutionPauseContinueListener(controller);
-        listener.handleShouldContinue(event);
+        assertThatExceptionOfType(RobotAgentEventsListenerException.class)
+                .isThrownBy(() -> listener.handleShouldContinue(event));
     }
 
     @Test

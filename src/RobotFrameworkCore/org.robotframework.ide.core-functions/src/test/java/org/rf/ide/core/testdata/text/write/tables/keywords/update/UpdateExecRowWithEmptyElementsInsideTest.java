@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
@@ -23,22 +24,18 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
 /**
  * @author wypych
  */
-public class UpdateExecRowWithEmptyElementsInsideTest extends RobotFormatParameterizedTest {
+public class UpdateExecRowWithEmptyElementsInsideTest {
 
-    public UpdateExecRowWithEmptyElementsInsideTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_forIssueRelatedToDump() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_forIssueRelatedToDump(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneKeywordWithSpaceBeforeTestCaseHeader");
-        final String outputFileName = convert("Output_OneKeywordWithSpaceBeforeTestCaseHeader");
+        final String inFileName = convert("Input_OneKeywordWithSpaceBeforeTestCaseHeader", format);
+        final String outputFileName = convert("Output_OneKeywordWithSpaceBeforeTestCaseHeader", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -54,10 +51,11 @@ public class UpdateExecRowWithEmptyElementsInsideTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_forIssueRelatedToEndPositionCheck() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_forIssueRelatedToEndPositionCheck(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneKeywordWithSpaceBeforeTestCaseHeader");
+        final String inFileName = convert("Input_OneKeywordWithSpaceBeforeTestCaseHeader", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -79,7 +77,7 @@ public class UpdateExecRowWithEmptyElementsInsideTest extends RobotFormatParamet
         assertThat(endPositionUK.getOffset()).isEqualTo(116);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/new/" + fileName + "." + format.getExtension();
     }
 }

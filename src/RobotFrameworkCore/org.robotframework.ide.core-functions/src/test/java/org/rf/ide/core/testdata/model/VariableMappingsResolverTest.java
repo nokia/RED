@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 
 import com.google.common.collect.ImmutableMap;

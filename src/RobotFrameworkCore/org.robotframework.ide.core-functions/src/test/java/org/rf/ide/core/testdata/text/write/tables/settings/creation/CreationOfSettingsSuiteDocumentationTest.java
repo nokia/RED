@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
@@ -13,18 +14,14 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsSuiteDocumentationTest {
 
-    public CreationOfSettingsSuiteDocumentationTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateSuiteDoc() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateSuiteDoc(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptySuiteDocumentationDeclarationOnly");
+        final String fileName = convert("EmptySuiteDocumentationDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -36,10 +33,11 @@ public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteDoc_andAddComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteDoc_andAddComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteDocumentationDeclarationWithCommentsOnly");
+        final String fileName = convert("SuiteDocumentationDeclarationWithCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -61,10 +59,11 @@ public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteDoc_withText() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteDoc_withText(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteDocumentationDeclarationWithTextOnly");
+        final String fileName = convert("SuiteDocumentationDeclarationWithTextOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -86,10 +85,11 @@ public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteDoc_withMultipleLines() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteDoc_withMultipleLines(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptySuiteDocumentationThreeLines");
+        final String fileName = convert("EmptySuiteDocumentationThreeLines", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -103,10 +103,11 @@ public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_createSuiteDoc_withTextAndComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_createSuiteDoc_withTextAndComment(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("SuiteDocumentationDeclarationWithTextAndCommentOnly");
+        final String fileName = convert("SuiteDocumentationDeclarationWithTextAndCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -138,7 +139,7 @@ public class CreationOfSettingsSuiteDocumentationTest extends RobotFormatParamet
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/suiteDoc/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/suiteDoc/new/" + fileName + "." + format.getExtension();
     }
 }

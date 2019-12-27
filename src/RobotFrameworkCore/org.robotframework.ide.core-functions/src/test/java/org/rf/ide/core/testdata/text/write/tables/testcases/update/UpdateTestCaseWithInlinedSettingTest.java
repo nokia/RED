@@ -7,7 +7,8 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.update;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -16,19 +17,15 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UpdateTestCaseWithInlinedSettingTest extends RobotFormatParameterizedTest {
+public class UpdateTestCaseWithInlinedSettingTest {
 
-    public UpdateTestCaseWithInlinedSettingTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_forIssueRelatedToDump() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_forIssueRelatedToDump(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_OneTestCaseWithInlinedSetting");
-        final String outputFileName = convert("Output_OneTestCaseWithInlinedSetting");
+        final String inFileName = convert("Input_OneTestCaseWithInlinedSetting", format);
+        final String outputFileName = convert("Output_OneTestCaseWithInlinedSetting", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -43,7 +40,7 @@ public class UpdateTestCaseWithInlinedSettingTest extends RobotFormatParameteriz
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/setting/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/setting/" + fileName + "." + format.getExtension();
     }
 }

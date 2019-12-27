@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -26,7 +26,7 @@ public class RobotElementsComparatorWithPositionChangedPresaveTest {
 
     private RobotElementsComparatorWithPositionChangedPresave robotElemsCmp;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         robotElemsCmp = new RobotElementsComparatorWithPositionChangedPresave();
     }

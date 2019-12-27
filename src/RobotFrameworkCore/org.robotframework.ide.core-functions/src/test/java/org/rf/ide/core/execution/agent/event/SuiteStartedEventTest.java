@@ -8,6 +8,7 @@ package org.rf.ide.core.execution.agent.event;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.net.URI;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 
 import com.google.common.collect.ImmutableMap;
@@ -25,35 +26,35 @@ import com.google.common.collect.Sets;
 
 public class SuiteStartedEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("something",
                 newArrayList("suite", ImmutableMap.of("status", "PASS", "elapsedtime", 100, "message", "error")));
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite", new Object());
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite", newArrayList());
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_5() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite", newArrayList("suite"));
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
     @Test
@@ -81,20 +82,20 @@ public class SuiteStartedEventTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_7() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite",
                 newArrayList("suite", ImmutableMap.of("source", "/suite", "is_dir", true, "totaltests", "100", "suites",
                         newArrayList("s1", "s2"), "tests", newArrayList("t1", "t2"))));
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_8() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_suite",
                 newArrayList("suite", ImmutableMap.of("source", "/suite", "is_dir", "true", "totaltests", 42, "suites",
                         newArrayList("s1", "s2"), "tests", newArrayList("t1", "t2"))));
-        SuiteStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> SuiteStartedEvent.from(eventMap));
     }
 
     @Test

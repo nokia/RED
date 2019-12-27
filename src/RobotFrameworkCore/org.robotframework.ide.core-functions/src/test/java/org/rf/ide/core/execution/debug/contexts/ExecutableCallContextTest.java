@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;

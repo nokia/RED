@@ -8,7 +8,7 @@ package org.rf.ide.core.execution.debug.contexts;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;

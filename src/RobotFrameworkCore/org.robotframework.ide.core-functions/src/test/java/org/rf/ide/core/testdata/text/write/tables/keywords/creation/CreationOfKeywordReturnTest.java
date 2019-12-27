@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordReturnTest {
 
-    public CreationOfKeywordReturnTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturnDecOnly(final FileFormat format)
+            throws Exception {
+        test_returnDecOnly("EmptyKeywordReturnNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturnDecOnly() throws Exception {
-        test_returnDecOnly("EmptyKeywordReturnNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturnDecOnly(final FileFormat format)
+            throws Exception {
+        test_returnDecOnly("EmptyKeywordReturn", "User Keyword", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturnDecOnly() throws Exception {
-        test_returnDecOnly("EmptyKeywordReturn", "User Keyword");
-    }
-
-    private void test_returnDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_returnDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,20 +51,24 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_andComment() throws Exception {
-        test_returnWithCommentOnly("EmptyKeywordReturnNoKeywordNameComment", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_andComment(
+            final FileFormat format) throws Exception {
+        test_returnWithCommentOnly("EmptyKeywordReturnNoKeywordNameComment", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_andComment() throws Exception {
-        test_returnWithCommentOnly("EmptyKeywordReturnComment", "User Keyword");
-    }
-
-    private void test_returnWithCommentOnly(final String fileNameWithoutExt, final String userKeywordName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_andComment(final FileFormat format)
             throws Exception {
+        test_returnWithCommentOnly("EmptyKeywordReturnComment", "User Keyword", format);
+    }
+
+    private void test_returnWithCommentOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -84,20 +89,24 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_with3Values() throws Exception {
-        test_return_With3Values("KeywordReturn3ReturnsNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_with3Values(
+            final FileFormat format) throws Exception {
+        test_return_With3Values("KeywordReturn3ReturnsNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_with3Values() throws Exception {
-        test_return_With3Values("KeywordReturn3Returns", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_with3Values(
+            final FileFormat format) throws Exception {
+        test_return_With3Values("KeywordReturn3Returns", "User Keyword", format);
     }
 
-    private void test_return_With3Values(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_return_With3Values(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -118,22 +127,24 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_with3Values_andComment()
-            throws Exception {
-        test_returnWith_3ValuesAndComment("KeywordReturn3ReturnsCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withoutKeywordName_andReturn_with3Values_andComment(
+            final FileFormat format) throws Exception {
+        test_returnWith_3ValuesAndComment("KeywordReturn3ReturnsCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_with3Values_andComment()
-            throws Exception {
-        test_returnWith_3ValuesAndComment("KeywordReturn3ReturnsComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordReturn_withKeywordName_andReturn_with3Values_andComment(
+            final FileFormat format) throws Exception {
+        test_returnWith_3ValuesAndComment("KeywordReturn3ReturnsComment", "User Keyword", format);
     }
 
-    private void test_returnWith_3ValuesAndComment(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_returnWith_3ValuesAndComment(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -157,7 +168,7 @@ public class CreationOfKeywordReturnTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/return/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/return/new/" + fileName + "." + format.getExtension();
     }
 }

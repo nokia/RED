@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.debug;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
@@ -116,13 +117,14 @@ public class StackFrameTest {
         assertThat(frame2.getLoadedResources()).containsExactly(URI.create("file:///res.robot"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void loadedResourcesAreNotModifiableDirectly() {
         final StackFrameContext context = mock(StackFrameContext.class);
         final Set<URI> resources = newHashSet(URI.create("file:///res.robot"));
 
         final StackFrame frame = new StackFrame("frame", FrameCategory.SUITE, 42, context, resources);
-        frame.getLoadedResources().add(URI.create("file:///other_res.robot"));
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> frame.getLoadedResources().add(URI.create("file:///other_res.robot")));
     }
 
     @Test

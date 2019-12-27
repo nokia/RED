@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.RunCommandLineCallBuilder.RunCommandLine;

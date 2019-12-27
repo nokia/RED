@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 
 import java.net.URI;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;

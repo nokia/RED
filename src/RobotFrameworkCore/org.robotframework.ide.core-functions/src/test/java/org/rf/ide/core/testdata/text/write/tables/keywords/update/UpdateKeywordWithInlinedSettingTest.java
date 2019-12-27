@@ -7,7 +7,8 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.update;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
@@ -16,19 +17,15 @@ import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UpdateKeywordWithInlinedSettingTest extends RobotFormatParameterizedTest {
+public class UpdateKeywordWithInlinedSettingTest {
 
-    public UpdateKeywordWithInlinedSettingTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_forIssueRelatedToDump() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_forIssueRelatedToDump(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Output_OneKeywordWithInlinedSetting");
-        final String outputFileName = convert("Output_OneKeywordWithInlinedSetting");
+        final String inFileName = convert("Output_OneKeywordWithInlinedSetting", format);
+        final String outputFileName = convert("Output_OneKeywordWithInlinedSetting", format);
 
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
@@ -43,7 +40,7 @@ public class UpdateKeywordWithInlinedSettingTest extends RobotFormatParameterize
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/" + fileName + "." + format.getExtension();
     }
 }

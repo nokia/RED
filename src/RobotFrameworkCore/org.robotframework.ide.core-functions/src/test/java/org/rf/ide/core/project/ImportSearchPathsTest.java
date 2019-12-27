@@ -12,53 +12,49 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
 import org.rf.ide.core.project.ImportSearchPaths.PathRelativityPoint;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 public class ImportSearchPathsTest {
 
-    @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    static File tempDir;
 
-    private static File root;
 
     private static URI importerUri;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws IOException {
-        root = folder.getRoot();
-        importerUri = folder.newFile("importer.ext").toURI();
+        importerUri = new File(tempDir, "importer.ext").toURI();
 
-        folder.newFolder("folder");
-        Files.asCharSink(get(root, "folder", "file1.ext"), Charsets.UTF_8).write("file content");
+        final byte[] content = "file content".getBytes();
 
-        folder.newFolder("python");
-        Files.asCharSink(get(root, "python", "file2.ext"), Charsets.UTF_8).write("file content");
+        new File(tempDir, "folder").mkdir();
+        Files.write(content, new File(tempDir, "folder/file1.ext"));
 
-        folder.newFolder("user");
-        Files.asCharSink(get(root, "user", "file3.ext"), Charsets.UTF_8).write("file content");
+        new File(tempDir, "python").mkdir();
+        Files.write(content, new File(tempDir, "python/file2.ext"));
+
+        new File(tempDir, "user").mkdir();
+        Files.write(content, new File(tempDir, "user/file3.ext"));
     }
 
     @Test
     public void pathIsFoundForAbsoluteImport_1() {
-        final URI importedUri = get(root, "folder", "file1.ext").toURI();
+        final URI importedUri = new File(tempDir, "folder/file1.ext").toURI();
         final ResolvedImportPath importPath = new ResolvedImportPath(importedUri);
 
-        final PathsProvider pathsProvider = createProvider(
-                newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -73,11 +69,11 @@ public class ImportSearchPathsTest {
 
     @Test
     public void pathIsFoundForAbsoluteImport_2() {
-        final URI importedUri = get(root, "python", "file2.ext").toURI();
+        final URI importedUri = new File(tempDir, "python/file2.ext").toURI();
         final ResolvedImportPath importPath = new ResolvedImportPath(importedUri);
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -92,11 +88,11 @@ public class ImportSearchPathsTest {
 
     @Test
     public void pathIsFoundForAbsoluteImport_3() {
-        final URI importedUri = get(root, "user", "file3.ext").toURI();
+        final URI importedUri = new File(tempDir, "user/file3.ext").toURI();
         final ResolvedImportPath importPath = new ResolvedImportPath(importedUri);
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -111,11 +107,11 @@ public class ImportSearchPathsTest {
 
     @Test
     public void pathIsFoundForImportRelativeToImportingFile() throws URISyntaxException {
-        final URI importedUri = get(root, "folder", "file1.ext").toURI();
+        final URI importedUri = new File(tempDir, "folder/file1.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("folder/file1.ext")).get();
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -130,11 +126,11 @@ public class ImportSearchPathsTest {
 
     @Test
     public void pathIsFoundForImportRelativeToPythonPath() throws URISyntaxException {
-        final URI importedUri = get(root, "python", "file2.ext").toURI();
+        final URI importedUri = new File(tempDir, "python/file2.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file2.ext")).get();
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -149,11 +145,11 @@ public class ImportSearchPathsTest {
 
     @Test
     public void pathIsFoundForImportRelativeToUserPath() throws URISyntaxException {
-        final URI importedUri = get(root, "user", "file3.ext").toURI();
+        final URI importedUri = new File(tempDir, "user/file3.ext").toURI();
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file3.ext")).get();
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -170,8 +166,8 @@ public class ImportSearchPathsTest {
     public void nothingIsProvidedForNonExistingRelativeImport() throws URISyntaxException {
         final ResolvedImportPath importPath = ResolvedImportPath.from(ImportPath.from("file4.ext")).get();
 
-        final PathsProvider pathsProvider = createProvider(newArrayList(get(root, "python")),
-                newArrayList(get(root, "user")));
+        final PathsProvider pathsProvider = createProvider(newArrayList(new File(tempDir, "python")),
+                newArrayList(new File(tempDir, "user")));
         final ImportSearchPaths pathsSupport = new ImportSearchPaths(pathsProvider);
 
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
@@ -180,13 +176,6 @@ public class ImportSearchPathsTest {
         assertThat(absMarkedUri).isNotPresent();
 
         assertThat(absUri).isNotPresent();
-    }
-
-    private static File get(final File root, final String... segments) {
-        if (segments == null || segments.length == 0) {
-            return root;
-        }
-        return get(new File(root, segments[0]), Arrays.copyOfRange(segments, 1, segments.length));
     }
 
     private static PathsProvider createProvider(final List<File> pythonPaths, final List<File> userPaths) {

@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
+public class CreationOfTestCaseTagsTest {
 
-    public CreationOfTestCaseTagsTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTagsDecOnly(final FileFormat format)
+            throws Exception {
+        test_tagsDecOnly("EmptyTestCaseTagsNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTagsDecOnly() throws Exception {
-        test_tagsDecOnly("EmptyTestCaseTagsNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTagsDecOnly(final FileFormat format)
+            throws Exception {
+        test_tagsDecOnly("EmptyTestCaseTags", "TestCase", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTagsDecOnly() throws Exception {
-        test_tagsDecOnly("EmptyTestCaseTags", "TestCase");
-    }
-
-    private void test_tagsDecOnly(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_tagsDecOnly(final String fileNameWithoutExt, final String userTestName, final FileFormat format)
+            throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,19 +51,24 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_andComment() throws Exception {
-        test_tagsDec_andComment("EmptyTestCaseTagsCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_andComment(final FileFormat format)
+            throws Exception {
+        test_tagsDec_andComment("EmptyTestCaseTagsCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_andComment() throws Exception {
-        test_tagsDec_andComment("EmptyTestCaseTagsComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_andComment(final FileFormat format)
+            throws Exception {
+        test_tagsDec_andComment("EmptyTestCaseTagsComment", "TestCase", format);
     }
 
-    private void test_tagsDec_andComment(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_tagsDec_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -90,20 +96,24 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_and3Tags() throws Exception {
-        test_tags_withTagsAnd3Tags("TestCaseTagsAnd3TagsNoTestName", "");
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_and3Tags() throws Exception {
-        test_tags_withTagsAnd3Tags("TestCaseTagsAnd3Tags", "TestCase");
-    }
-
-    private void test_tags_withTagsAnd3Tags(final String fileNameWithoutExt, final String userTestName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_and3Tags(final FileFormat format)
             throws Exception {
+        test_tags_withTagsAnd3Tags("TestCaseTagsAnd3TagsNoTestName", "", format);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_and3Tags(final FileFormat format)
+            throws Exception {
+        test_tags_withTagsAnd3Tags("TestCaseTagsAnd3Tags", "TestCase", format);
+    }
+
+    private void test_tags_withTagsAnd3Tags(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -124,21 +134,24 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_and3Tags_andComment()
-            throws Exception {
-        test_tags_with3Tags_andComment("TestCaseTagsAnd3TagsCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withoutTestName_andTags_and3Tags_andComment(
+            final FileFormat format) throws Exception {
+        test_tags_with3Tags_andComment("TestCaseTagsAnd3TagsCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_and3Tags_andComment() throws Exception {
-        test_tags_with3Tags_andComment("TestCaseTagsAnd3TagsComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestCaseTags_withTestName_andTags_and3Tags_andComment(
+            final FileFormat format) throws Exception {
+        test_tags_with3Tags_andComment("TestCaseTagsAnd3TagsComment", "TestCase", format);
     }
 
-    private void test_tags_with3Tags_andComment(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_tags_with3Tags_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -163,7 +176,7 @@ public class CreationOfTestCaseTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/setting/tags/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/setting/tags/new/" + fileName + "." + format.getExtension();
     }
 }

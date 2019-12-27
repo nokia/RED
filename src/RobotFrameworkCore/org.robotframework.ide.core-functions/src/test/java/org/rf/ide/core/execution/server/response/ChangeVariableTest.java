@@ -7,11 +7,12 @@ package org.rf.ide.core.execution.server.response;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
@@ -32,7 +33,7 @@ public class ChangeVariableTest {
                 .isEqualTo("{\"change_variable\":{\"name\":\"a\",\"values\":[\"d\"],\"scope\":\"local\",\"level\":4}}");
     }
 
-    @Test(expected = ResponseException.class)
+    @Test
     public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
         when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
@@ -40,6 +41,6 @@ public class ChangeVariableTest {
         final ChangeVariable response = new ChangeVariable(mapper, "a", VariableScope.GLOBAL, 1, newArrayList("a"),
                 newArrayList("1"));
 
-        response.toMessage();
+        assertThatExceptionOfType(ResponseException.class).isThrownBy(response::toMessage);
     }
 }

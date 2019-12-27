@@ -12,7 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent.AgentInitializingEventResponder;
 import org.rf.ide.core.execution.server.AgentClient;

@@ -14,18 +14,17 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Stack;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@RunWith(Enclosed.class)
 public class ParsingStateHelperTest {
 
     private static final ParsingStateHelper helper = new ParsingStateHelper();
 
+    @Nested
     public static class IsTableInsideStateTest {
 
         private static final List<ParsingState> TABLE_INSIDE_STATES = asList(ParsingState.SETTING_TABLE_INSIDE,
@@ -46,6 +45,7 @@ public class ParsingStateHelperTest {
         }
     }
 
+    @Nested
     public static class IsTableHeaderTest {
 
         private static final List<ParsingState> TABLE_HEADER_STATES = asList(ParsingState.SETTING_TABLE_HEADER,
@@ -66,6 +66,7 @@ public class ParsingStateHelperTest {
         }
     }
 
+    @Nested
     public static class GetCurrentStateTest {
 
         @Test
@@ -86,6 +87,7 @@ public class ParsingStateHelperTest {
         }
     }
 
+    @Nested
     public static class GetStateTest {
 
         private static final List<RobotTokenType> TABLE_HEADER_TYPES = asList(RobotTokenType.KEYWORDS_TABLE_HEADER,
@@ -117,6 +119,7 @@ public class ParsingStateHelperTest {
         }
     }
 
+    @Nested
     public static class GetFirstTableHeaderStateTest {
 
         @Test
@@ -145,6 +148,7 @@ public class ParsingStateHelperTest {
         }
     }
 
+    @Nested
     public static class GetLastNotCommentStateTest {
 
         @Test

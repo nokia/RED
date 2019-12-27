@@ -9,25 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTest {
+public class CreationOfDictionaryVariableTest {
 
-    public CreationOfDictionaryVariableTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDictionaryVariable(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyDictionaryVariableDeclarationOnly");
+        final String fileName = convert("EmptyDictionaryVariableDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -39,10 +36,12 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePairs() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePairs(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("DictionaryVariableDeclarationWithThreeValuePairKeysOnly");
+        final String fileName = convert("DictionaryVariableDeclarationWithThreeValuePairKeysOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -59,10 +58,11 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationDictionary_withComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationDictionary_withComment(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("DictionaryVariableDeclarationWithCommentOnly");
+        final String fileName = convert("DictionaryVariableDeclarationWithCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -85,10 +85,12 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andComment(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("DictionaryVariableDeclarationWithCommentAndThreeKeyValuePairOnly");
+        final String fileName = convert("DictionaryVariableDeclarationWithCommentAndThreeKeyValuePairOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -114,10 +116,12 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andLastOnlyHasValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andLastOnlyHasValue(
+            final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("DictionaryVariableDeclarationWith2ValuesEmptyAndLastSet");
+        final String fileName = convert("DictionaryVariableDeclarationWith2ValuesEmptyAndLastSet", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -134,10 +138,12 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andMiddleHasValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andMiddleHasValue(
+            final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("DictionaryVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty");
+        final String fileName = convert("DictionaryVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -154,7 +160,7 @@ public class CreationOfDictionaryVariableTest extends RobotFormatParameterizedTe
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "variables/dictionary/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "variables/dictionary/new/" + fileName + "." + format.getExtension();
     }
 }

@@ -8,7 +8,7 @@ package org.rf.ide.core.testdata.formatter;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LineIndentFormatterTest {
 

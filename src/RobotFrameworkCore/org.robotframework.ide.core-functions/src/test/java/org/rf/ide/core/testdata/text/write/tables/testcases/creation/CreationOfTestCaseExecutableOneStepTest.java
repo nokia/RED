@@ -17,10 +17,6 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfTestCaseExecutableOneStepTest extends ACreationOfExecutionRowTest {
 
-    public CreationOfTestCaseExecutableOneStepTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
@@ -50,38 +46,39 @@ public class CreationOfTestCaseExecutableOneStepTest extends ACreationOfExecutio
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("ExecActionOnly"));
-        store.setActionWithCommentCmpFile(convert("ExecActionWithComment"));
-        store.setActionWithOneArgCmpFile(convert("ExecActionWithOneArg"));
-        store.setActionWithOneArgAndCommentCmpFile(convert("ExecActionWithOneArgAndComment"));
-        store.setActionWithThreeArgCmpFile(convert("ExecActionWithThreeArg"));
-        store.setActionWithThreeArgAndCommentCmpFile(convert("ExecActionWithThreeArgAndComment"));
-        store.setCommentOnlyCmpFile(convert("ExecCommentOnly"));
-        store.setEmptyLineCmpFile(convert("ExecEmptyLine"));
+        store.setActionOnlyCmpFile(convert("ExecActionOnly", format));
+        store.setActionWithCommentCmpFile(convert("ExecActionWithComment", format));
+        store.setActionWithOneArgCmpFile(convert("ExecActionWithOneArg", format));
+        store.setActionWithOneArgAndCommentCmpFile(convert("ExecActionWithOneArgAndComment", format));
+        store.setActionWithThreeArgCmpFile(convert("ExecActionWithThreeArg", format));
+        store.setActionWithThreeArgAndCommentCmpFile(convert("ExecActionWithThreeArgAndComment", format));
+        store.setCommentOnlyCmpFile(convert("ExecCommentOnly", format));
+        store.setEmptyLineCmpFile(convert("ExecEmptyLine", format));
 
         return store;
     }
 
     @Override
-    public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName() {
+    public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName(final FileFormat format) {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("ExecActionOnlyWithoutTestName"));
-        store.setActionWithCommentCmpFile(convert("ExecActionWithCommentWithoutTestName"));
-        store.setActionWithOneArgCmpFile(convert("ExecActionWithOneArgWithoutTestName"));
-        store.setActionWithOneArgAndCommentCmpFile(convert("ExecActionWithOneArgAndCommentWithoutTestName"));
-        store.setActionWithThreeArgCmpFile(convert("ExecActionWithThreeArgWithoutTestName"));
-        store.setActionWithThreeArgAndCommentCmpFile(convert("ExecActionWithThreeArgAndCommentWithoutTestName"));
-        store.setCommentOnlyCmpFile(convert("ExecCommentOnlyWithoutTestName"));
-        store.setEmptyLineCmpFile(convert("ExecEmptyLineWithoutTestName"));
+        store.setActionOnlyCmpFile(convert("ExecActionOnlyWithoutTestName", format));
+        store.setActionWithCommentCmpFile(convert("ExecActionWithCommentWithoutTestName", format));
+        store.setActionWithOneArgCmpFile(convert("ExecActionWithOneArgWithoutTestName", format));
+        store.setActionWithOneArgAndCommentCmpFile(convert("ExecActionWithOneArgAndCommentWithoutTestName", format));
+        store.setActionWithThreeArgCmpFile(convert("ExecActionWithThreeArgWithoutTestName", format));
+        store.setActionWithThreeArgAndCommentCmpFile(
+                convert("ExecActionWithThreeArgAndCommentWithoutTestName", format));
+        store.setCommentOnlyCmpFile(convert("ExecCommentOnlyWithoutTestName", format));
+        store.setEmptyLineCmpFile(convert("ExecEmptyLineWithoutTestName", format));
 
         return store;
     }
 
-    private String convert(final String fileName) {
-        return "testCases/exec/new/oneTc/oneExec/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/exec/new/oneTc/oneExec/" + fileName + "." + format.getExtension();
     }
 }

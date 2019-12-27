@@ -7,10 +7,12 @@ package org.rf.ide.core.execution.agent.event;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 
@@ -18,129 +20,129 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordStartedEventTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_2() {
         final Map<String, Object> eventMap = ImmutableMap.of("something",
                 newArrayList("foo", ImmutableMap.of("kwname", "kwName", "type", "kwType", "libname", "libName")));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_3() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword", newArrayList());
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_4() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword", newArrayList(new Object()));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_5() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword", newArrayList(ImmutableMap.of()));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_6() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword",
                 newArrayList("foo", ImmutableMap.of("kwname", "kwName", "libname", "libName")));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_7() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword",
                 newArrayList("foo", ImmutableMap.of("type", "kwType", "libname", "libName")));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_8() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword",
                 newArrayList("foo", ImmutableMap.of("kwname", "kwName", "type", "kwType")));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_9() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword",
                 newArrayList("kwName", ImmutableMap.of("type", "kwType")));
-        KeywordStartedEvent.from(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.from(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre1() {
         final Map<String, Object> eventMap = ImmutableMap.of();
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre2() {
         final Map<String, Object> eventMap = ImmutableMap.of("something",
                 newArrayList("kwName", ImmutableMap.of("type", "kwType")));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre3() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword", newArrayList());
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre4() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword", newArrayList(new Object()));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre5() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword", newArrayList(ImmutableMap.of()));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre6() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword",
                 newArrayList("foo", ImmutableMap.of("kwname", "kwName", "libname", "libName")));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre7() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword",
                 newArrayList("foo", ImmutableMap.of("type", "kwType", "libname", "libName")));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre8() {
         final Map<String, Object> eventMap = ImmutableMap.of("pre_start_keyword",
                 newArrayList("foo", ImmutableMap.of("kwname", "kwName", "type", "kwType")));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void exceptionIsThrownForWronglyConstructedJsonDictionary_pre9() {
         final Map<String, Object> eventMap = ImmutableMap.of("start_keyword",
                 newArrayList("kwName", ImmutableMap.of("type", "kwType")));
-        KeywordStartedEvent.fromPre(eventMap);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> KeywordStartedEvent.fromPre(eventMap));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetRunningKeywordOfUnknownType() {
         final KeywordStartedEvent event = new KeywordStartedEvent("kw", "unknown", "lib");
 
-        event.getRunningKeyword();
+        assertThatIllegalStateException().isThrownBy(event::getRunningKeyword);
     }
 
     @Test

@@ -14,9 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -42,8 +41,8 @@ import com.google.common.io.Files;
 
 public class RobotParserTest {
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    static File tempDir;
 
     @Test
     public void errorMessageIsReported_whenFileHasNotSupportedExtension() throws Exception {
@@ -285,7 +284,8 @@ public class RobotParserTest {
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
-        final File startFile = temporaryFolder.newFile("file.unknown");
+        final File startFile = new File(tempDir, "file.unknown");
+        startFile.createNewFile();
 
         final List<RobotFileOutput> output = parser.parse(startFile);
 
@@ -299,7 +299,7 @@ public class RobotParserTest {
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
         for (final String name : newHashSet("f.robot", "f.txt", "f.tsv")) {
-            final File startFile = temporaryFolder.newFile(name);
+            final File startFile = new File(tempDir, name);
             final String fileContent = "***Settings***";
             Files.write(fileContent.getBytes(), startFile);
 
@@ -315,7 +315,7 @@ public class RobotParserTest {
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
-        final File startFile = temporaryFolder.newFile("file.robot");
+        final File startFile = new File(tempDir, "file.robot");
         final String fileContent = "***Settings***";
         Files.write(fileContent.getBytes(), startFile);
 
@@ -336,7 +336,7 @@ public class RobotParserTest {
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
-        final File startFile = temporaryFolder.newFile("file_with_5000_lines.robot");
+        final File startFile = new File(tempDir, "file_with_5000_lines.robot");
         final String fileContent = String.join("", Collections.nCopies(5000, "abc" + System.lineSeparator()));
         Files.write(fileContent.getBytes(), startFile);
 
@@ -352,7 +352,7 @@ public class RobotParserTest {
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
-        final File startFile = temporaryFolder.newFile("file_with_4999_lines.robot");
+        final File startFile = new File(tempDir, "file_with_4999_lines.robot");
         final String fileContent = String.join("", Collections.nCopies(4999, "abc" + System.lineSeparator()));
         Files.write(fileContent.getBytes(), startFile);
 
@@ -368,13 +368,11 @@ public class RobotParserTest {
 
         final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
 
-        final File startDir = temporaryFolder.newFolder("dir_with_suites");
-        final File file1 = temporaryFolder.newFile("dir_with_suites/file1.robot");
-        final File file2 = temporaryFolder.newFile("dir_with_suites/file2.robot");
-        final File file3 = temporaryFolder.newFile("dir_with_suites/file3.robot");
-        Files.write("***Settings***".getBytes(), file1);
-        Files.write("***Keywords***".getBytes(), file2);
-        Files.write("***Test Cases***".getBytes(), file3);
+        final File startDir = new File(tempDir, "dir_with_suites");
+        startDir.mkdir();
+        Files.write("***Settings***".getBytes(), new File(tempDir, "dir_with_suites/file1.robot"));
+        Files.write("***Keywords***".getBytes(), new File(tempDir, "dir_with_suites/file2.robot"));
+        Files.write("***Test Cases***".getBytes(), new File(tempDir, "dir_with_suites/file3.robot"));
 
         final List<RobotFileOutput> output = parser.parse(startDir);
 

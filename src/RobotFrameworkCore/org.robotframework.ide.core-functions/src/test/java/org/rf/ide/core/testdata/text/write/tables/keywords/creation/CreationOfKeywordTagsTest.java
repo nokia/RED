@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
+public class CreationOfKeywordTagsTest {
 
-    public CreationOfKeywordTagsTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTagsDecOnly(final FileFormat format)
+            throws Exception {
+        test_tagsDecOnly("EmptyKeywordTagsNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTagsDecOnly() throws Exception {
-        test_tagsDecOnly("EmptyKeywordTagsNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTagsDecOnly(final FileFormat format)
+            throws Exception {
+        test_tagsDecOnly("EmptyKeywordTags", "User Keyword", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTagsDecOnly() throws Exception {
-        test_tagsDecOnly("EmptyKeywordTags", "User Keyword");
-    }
-
-    private void test_tagsDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
+    private void test_tagsDecOnly(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,20 +51,24 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_andComment() throws Exception {
-        test_tagsDec_andComment("EmptyKeywordTagsCommentNoKeywordName", "");
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_andComment() throws Exception {
-        test_tagsDec_andComment("EmptyKeywordTagsComment", "User Keyword");
-    }
-
-    private void test_tagsDec_andComment(final String fileNameWithoutExt, final String userKeywordName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_andComment(final FileFormat format)
             throws Exception {
+        test_tagsDec_andComment("EmptyKeywordTagsCommentNoKeywordName", "", format);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_andComment(final FileFormat format)
+            throws Exception {
+        test_tagsDec_andComment("EmptyKeywordTagsComment", "User Keyword", format);
+    }
+
+    private void test_tagsDec_andComment(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -84,20 +89,24 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags() throws Exception {
-        test_tags_withTagsAnd3Tags("KeywordTagsAnd3TagsNoKeywordName", "");
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags() throws Exception {
-        test_tags_withTagsAnd3Tags("KeywordTagsAnd3Tags", "User Keyword");
-    }
-
-    private void test_tags_withTagsAnd3Tags(final String fileNameWithoutExt, final String userKeywordName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags(final FileFormat format)
             throws Exception {
+        test_tags_withTagsAnd3Tags("KeywordTagsAnd3TagsNoKeywordName", "", format);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags(final FileFormat format)
+            throws Exception {
+        test_tags_withTagsAnd3Tags("KeywordTagsAnd3Tags", "User Keyword", format);
+    }
+
+    private void test_tags_withTagsAnd3Tags(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -118,22 +127,24 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags_andComment()
-            throws Exception {
-        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsCommentNoKeywordName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags_andComment(
+            final FileFormat format) throws Exception {
+        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsCommentNoKeywordName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags_andComment()
-            throws Exception {
-        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsComment", "User Keyword");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags_andComment(
+            final FileFormat format) throws Exception {
+        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsComment", "User Keyword", format);
     }
 
-    private void test_tags_with3Tags_andComment(final String fileNameWithoutExt, final String userKeywordName)
-            throws Exception {
+    private void test_tags_with3Tags_andComment(final String fileNameWithoutExt, final String userKeywordName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -157,7 +168,7 @@ public class CreationOfKeywordTagsTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "keywords/setting/tags/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "keywords/setting/tags/new/" + fileName + "." + format.getExtension();
     }
 }

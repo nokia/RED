@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.model.presenter.update.variables.DictionaryVariableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.variables.ListVariableModelUpdater;

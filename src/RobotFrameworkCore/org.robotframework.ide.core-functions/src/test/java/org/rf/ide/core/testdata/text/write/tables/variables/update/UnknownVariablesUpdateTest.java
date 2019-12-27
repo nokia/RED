@@ -8,7 +8,8 @@ package org.rf.ide.core.testdata.text.write.tables.variables.update;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -19,21 +20,18 @@ import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UnknownVariablesUpdateTest extends RobotFormatParameterizedTest {
+public class UnknownVariablesUpdateTest {
 
-    public UnknownVariablesUpdateTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_givenTestCaseAndVariableTablesWithOneVariableAndTestCase_whenUpdateUnknownAndAddNew_thenCheckIfTableIsCorrectlyDumped()
-            throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_givenTestCaseAndVariableTablesWithOneVariableAndTestCase_whenUpdateUnknownAndAddNew_thenCheckIfTableIsCorrectlyDumped(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_TestCase_and_VariableTableExists_addingAndUpdatingUnknownVariable");
+        final String inFileName = convert("Input_TestCase_and_VariableTableExists_addingAndUpdatingUnknownVariable",
+                format);
         final String outputFileName = convert(
-                "Output_TestCase_and_VariableTableExists_addingAndUpdatingUnknownVariable");
+                "Output_TestCase_and_VariableTableExists_addingAndUpdatingUnknownVariable", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -50,7 +48,7 @@ public class UnknownVariablesUpdateTest extends RobotFormatParameterizedTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "variables/unknown/update/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "variables/unknown/update/" + fileName + "." + format.getExtension();
     }
 }

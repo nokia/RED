@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.ReadyToStartEvent.ReadyToStartEventResponder;
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.StartExecution;

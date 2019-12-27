@@ -13,9 +13,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
 
@@ -29,13 +29,13 @@ public class RobotProjectConfigReaderTest {
 
     private final RobotProjectConfigReader reader = new RobotProjectConfigReader();
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
         defaultCharset = Charset.defaultCharset();
         setDefaultCharset(StandardCharsets.ISO_8859_1);
     }
 
-    @AfterClass
+    @AfterAll
     public static void teardown() throws Exception {
         setDefaultCharset(defaultCharset);
     }

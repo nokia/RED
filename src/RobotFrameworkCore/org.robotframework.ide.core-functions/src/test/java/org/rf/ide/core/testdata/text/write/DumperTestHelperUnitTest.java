@@ -7,8 +7,8 @@ package org.rf.ide.core.testdata.text.write;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
@@ -16,7 +16,7 @@ public class DumperTestHelperUnitTest {
 
     private DumperTestHelper helper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.helper = new DumperTestHelper();
     }

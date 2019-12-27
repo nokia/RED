@@ -5,25 +5,22 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfSettingsDefaultTagsTest extends RobotFormatParameterizedTest {
+public class CreationOfSettingsDefaultTagsTest {
 
-    public CreationOfSettingsDefaultTagsTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateDefaultTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDefaultTags(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("EmptyDefaultTagsDeclarationOnly");
+        final String fileName = convert("EmptyDefaultTagsDeclarationOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -35,11 +32,12 @@ public class CreationOfSettingsDefaultTagsTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeTags(final FileFormat format) throws Exception {
         // prepare
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-        final String fileName = convert("DefaultTagsWithThreeTagsOnly");
+        final String fileName = convert("DefaultTagsWithThreeTagsOnly", format);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -59,10 +57,11 @@ public class CreationOfSettingsDefaultTagsTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeComments() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeComments(final FileFormat format) throws Exception {
         // prepare
-        final String fileName = convert("DefaultTagsWithThreeCommentOnly");
+        final String fileName = convert("DefaultTagsWithThreeCommentOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -83,10 +82,12 @@ public class CreationOfSettingsDefaultTagsTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeCommentsAndTags() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeCommentsAndTags(final FileFormat format)
+            throws Exception {
         // prepare
-        final String fileName = convert("DefaultTagsWithThreeTagsAndCommentsOnly");
+        final String fileName = convert("DefaultTagsWithThreeTagsAndCommentsOnly", format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -117,7 +118,7 @@ public class CreationOfSettingsDefaultTagsTest extends RobotFormatParameterizedT
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/defaultTags/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/defaultTags/new/" + fileName + "." + format.getExtension();
     }
 }

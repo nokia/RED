@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
@@ -13,27 +14,27 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest {
+public class CreationOfTestCaseTeardownTest {
 
-    public CreationOfTestCaseTeardownTest(final String extension, final FileFormat format) {
-        super(extension, format);
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardownDecOnly(final FileFormat format)
+            throws Exception {
+        test_teardownDecOnly("EmptyTestTeardownNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardownDecOnly() throws Exception {
-        test_teardownDecOnly("EmptyTestTeardownNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardownDecOnly(final FileFormat format)
+            throws Exception {
+        test_teardownDecOnly("EmptyTestTeardown", "TestCase", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardownDecOnly() throws Exception {
-        test_teardownDecOnly("EmptyTestTeardown", "TestCase");
-    }
-
-    private void test_teardownDecOnly(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_teardownDecOnly(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -50,20 +51,24 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andComment() throws Exception {
-        test_teardownWithCommentOnly("EmptyTestTeardownCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithCommentOnly("EmptyTestTeardownCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andComment() throws Exception {
-        test_teardownWithCommentOnly("EmptyTestTeardownComment", "TestCase");
-    }
-
-    private void test_teardownWithCommentOnly(final String fileNameWithoutExt, final String userTestName)
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andComment(final FileFormat format)
             throws Exception {
+        test_teardownWithCommentOnly("EmptyTestTeardownComment", "TestCase", format);
+    }
+
+    private void test_teardownWithCommentOnly(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -84,19 +89,24 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey() throws Exception {
-        test_teardownWithExec("TestTeardownExecKeywordNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec("TestTeardownExecKeywordNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey() throws Exception {
-        test_teardownWithExec("TestTeardownExecKeyword", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey(final FileFormat format)
+            throws Exception {
+        test_teardownWithExec("TestTeardownExecKeyword", "TestCase", format);
     }
 
-    private void test_teardownWithExec(final String fileNameWithoutExt, final String userTestName) throws Exception {
+    private void test_teardownWithExec(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -115,22 +125,24 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_andComment()
-            throws Exception {
-        test_teardownWithExec_andComment("TestTeardownExecKeywordAndCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_andComment("TestTeardownExecKeywordAndCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_andComment()
-            throws Exception {
-        test_teardownWithExec_andComment("TestTeardownExecKeywordAndComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_andComment("TestTeardownExecKeywordAndComment", "TestCase", format);
     }
 
-    private void test_teardownWithExec_andComment(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_teardownWithExec_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -152,22 +164,24 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_and3Args()
-            throws Exception {
-        test_teardownWithExec_and3Args("TestTeardownExecKeywordAnd3ArgsNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args("TestTeardownExecKeywordAnd3ArgsNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_and3Args()
-            throws Exception {
-        test_teardownWithExec_and3Args("TestTeardownExecKeywordAnd3Args", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_and3Args(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args("TestTeardownExecKeywordAnd3Args", "TestCase", format);
     }
 
-    private void test_teardownWithExec_and3Args(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_teardownWithExec_and3Args(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -189,22 +203,24 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_teardownWithExec_and3Args_andComment("TestTeardownExecKeywordAnd3ArgsAndCommentNoTestName", "");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withoutTestName_andTeardown_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args_andComment("TestTeardownExecKeywordAnd3ArgsAndCommentNoTestName", "", format);
     }
 
-    @Test
-    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_and3Args_andComment()
-            throws Exception {
-        test_teardownWithExec_and3Args_andComment("TestTeardownExecKeywordAnd3ArgsAndComment", "TestCase");
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_and_thanCreateTestTeardown_withTestName_andTeardown_andExecKey_and3Args_andComment(
+            final FileFormat format) throws Exception {
+        test_teardownWithExec_and3Args_andComment("TestTeardownExecKeywordAnd3ArgsAndComment", "TestCase", format);
     }
 
-    private void test_teardownWithExec_and3Args_andComment(final String fileNameWithoutExt, final String userTestName)
-            throws Exception {
+    private void test_teardownWithExec_and3Args_andComment(final String fileNameWithoutExt, final String userTestName,
+            final FileFormat format) throws Exception {
         // prepare
-        final String filePath = convert(fileNameWithoutExt);
+        final String filePath = convert(fileNameWithoutExt, format);
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -229,7 +245,7 @@ public class CreationOfTestCaseTeardownTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "testCases/setting/teardown/new/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "testCases/setting/teardown/new/" + fileName + "." + format.getExtension();
     }
 }

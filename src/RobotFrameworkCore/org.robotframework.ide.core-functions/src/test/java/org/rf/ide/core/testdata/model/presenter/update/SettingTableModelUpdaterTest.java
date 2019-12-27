@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -43,7 +43,7 @@ public class SettingTableModelUpdaterTest {
 
     private static SettingTableModelUpdater modelUpdater;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
         model.includeSettingTableSection();

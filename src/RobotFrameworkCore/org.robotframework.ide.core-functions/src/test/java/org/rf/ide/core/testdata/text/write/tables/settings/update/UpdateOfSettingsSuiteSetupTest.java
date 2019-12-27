@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -18,19 +19,17 @@ import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 
-public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest {
+public class UpdateOfSettingsSuiteSetupTest {
 
-    public UpdateOfSettingsSuiteSetupTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
-
-    @Test
-    public void test_createArgumentOnPosition_2and3_whichNotExists_shouldReturnSingleLineSuiteSetup() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_createArgumentOnPosition_2and3_whichNotExists_shouldReturnSingleLineSuiteSetup(
+            final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition");
-        final String outputFileName = convert("Output_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition");
+        final String inFileName = convert("Input_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition", format);
+        final String outputFileName = convert("Output_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition",
+                format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getParser("2.9"));
@@ -49,11 +48,12 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_updateSuiteSetup_withSetArgumentToEmptyValue() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateSuiteSetup_withSetArgumentToEmptyValue(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove");
-        final String outputFileName = convert("Output_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove");
+        final String inFileName = convert("Input_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove", format);
+        final String outputFileName = convert("Output_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getParser("2.9"));
@@ -67,11 +67,12 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_updateSuiteSetup_andKeywordName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateSuiteSetup_andKeywordName(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_KeywordSetNoOtherElements");
-        final String outputFileName = convert("Output_KeywordSetNoOtherElements");
+        final String inFileName = convert("Input_KeywordSetNoOtherElements", format);
+        final String outputFileName = convert("Output_KeywordSetNoOtherElements", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getParser("2.9"));
@@ -85,11 +86,12 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_updateSuiteSetup_andCommentOnly() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateSuiteSetup_andCommentOnly(final FileFormat format) throws Exception {
         // prepare
-        final String inFileName = convert("Input_CommentSetNoOtherElements");
-        final String outputFileName = convert("Output_CommentSetNoOtherElements");
+        final String inFileName = convert("Input_CommentSetNoOtherElements", format);
+        final String outputFileName = convert("Output_CommentSetNoOtherElements", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getParser("2.9"));
@@ -112,39 +114,42 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    @Test
-    public void test_emptyFile_updateSuiteSetup_withKeywordExists_andCommentOnly() throws Exception {
-        // prepare
-        final String inFileName = convert("Input_KeywordExistsAndCommentSetNoOtherElements");
-        final String outputFileName = convert("Output_KeywordExistsAndCommentSetNoOtherElements");
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
-
-        // test data prepare
-        final SettingTable settingTable = modelFile.getSettingTable();
-        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
-
-        final RobotToken cm1 = new RobotToken();
-        cm1.setText("cm1");
-        final RobotToken cm2 = new RobotToken();
-        cm2.setText("cm2");
-        final RobotToken cm3 = new RobotToken();
-        cm3.setText("cm3");
-        suiteSetup.addCommentPart(cm1);
-        suiteSetup.addCommentPart(cm2);
-        suiteSetup.addCommentPart(cm3);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
-    }
-
-    @Test
-    public void test_emptyFile_updateSuiteSetup_withKeywordExists_withArgToAdd_andCommentAlreadyInside()
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateSuiteSetup_withKeywordExists_andCommentOnly(final FileFormat format)
             throws Exception {
         // prepare
-        final String inFileName = convert("Input_KeywordArgumentInDifferentLine");
-        final String outputFileName = convert("Ouput_KeywordArgumentInDifferentLine");
+        final String inFileName = convert("Input_KeywordExistsAndCommentSetNoOtherElements", format);
+        final String outputFileName = convert("Output_KeywordExistsAndCommentSetNoOtherElements", format);
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getParser("2.9"));
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
+
+        final RobotToken cm1 = new RobotToken();
+        cm1.setText("cm1");
+        final RobotToken cm2 = new RobotToken();
+        cm2.setText("cm2");
+        final RobotToken cm3 = new RobotToken();
+        cm3.setText("cm3");
+        suiteSetup.addCommentPart(cm1);
+        suiteSetup.addCommentPart(cm2);
+        suiteSetup.addCommentPart(cm3);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_emptyFile_updateSuiteSetup_withKeywordExists_withArgToAdd_andCommentAlreadyInside(final FileFormat format)
+            throws Exception {
+        // prepare
+        final String inFileName = convert("Input_KeywordArgumentInDifferentLine", format);
+        final String outputFileName = convert("Ouput_KeywordArgumentInDifferentLine", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
                 RobotModelTestProvider.getParser("2.9"));
@@ -162,7 +167,7 @@ public class UpdateOfSettingsSuiteSetupTest extends RobotFormatParameterizedTest
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
-    private String convert(final String fileName) {
-        return "settings/suiteSetup/update/" + fileName + "." + getExtension();
+    private String convert(final String fileName, final FileFormat format) {
+        return "settings/suiteSetup/update/" + fileName + "." + format.getExtension();
     }
 }

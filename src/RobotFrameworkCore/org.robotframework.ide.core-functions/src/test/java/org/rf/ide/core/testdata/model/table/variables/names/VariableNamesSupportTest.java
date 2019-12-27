@@ -13,7 +13,7 @@ import static org.rf.ide.core.testdata.model.table.variables.names.VariableNames
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariable;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariableInsideComputation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;

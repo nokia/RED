@@ -6,19 +6,20 @@
 package org.rf.ide.core.execution.debug;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
 import org.rf.ide.core.execution.debug.contexts.ExecutableCallContext;
 
 public class KeywordCallTypeTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTypeIsNotRecognized() {
-        KeywordCallType.from("some unrecognized type");
+        assertThatIllegalStateException().isThrownBy(() -> KeywordCallType.from("some unrecognized type"));
     }
 
     @Test

@@ -7,11 +7,12 @@ package org.rf.ide.core.execution.server.response;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
@@ -34,7 +35,7 @@ public class EvaluateExpressionTest {
                 .isEqualTo("{\"evaluate_expression\":{\"id\":1,\"type\":\"python\",\"expr\":[\"exit()\"]}}");
     }
 
-    @Test(expected = ResponseException.class)
+    @Test
     public void mapperJsonProcessingExceptionIsWrappedAsResponseException() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
         when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
@@ -42,6 +43,6 @@ public class EvaluateExpressionTest {
         final EvaluateExpression response = new EvaluateExpression(mapper, 1, ExpressionType.ROBOT,
                 newArrayList("a", "b"));
 
-        response.toMessage();
+        assertThatExceptionOfType(ResponseException.class).isThrownBy(response::toMessage);
     }
 }

@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
@@ -17,38 +18,36 @@ import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.RobotFormatParameterizedTest;
 import org.rf.ide.core.testdata.text.write.tables.execution.creation.ATestFilesCompareStore.InvalidTestStoreException;
 
-public abstract class ACreationOfExecutionRowTest extends RobotFormatParameterizedTest {
-
-    public ACreationOfExecutionRowTest(final String extension, final FileFormat format) {
-        super(extension, format);
-    }
+public abstract class ACreationOfExecutionRowTest {
 
     public abstract IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> getExecutableWithName();
 
     public abstract IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> getExecutableWithoutName();
 
-    public abstract TestFilesCompareStore getCompareFilesStoreForExecutableWithName();
+    public abstract TestFilesCompareStore getCompareFilesStoreForExecutableWithName(FileFormat format);
 
-    public abstract TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName();
+    public abstract TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName(FileFormat format);
 
-    @Test
-    public void test_exec_actionOnly() throws Exception {
-        assert_execAction_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_actionOnly(final FileFormat format) throws Exception {
+        assert_execAction_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_actionOnly_unitWithoutName() throws Exception {
-        assert_execAction_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_actionOnly_unitWithoutName(final FileFormat format) throws Exception {
+        assert_execAction_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName(format),
+                format);
     }
 
     private void assert_execAction_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -62,21 +61,24 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_commentOnly() throws Exception {
-        assert_execComment_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_commentOnly(final FileFormat format) throws Exception {
+        assert_execComment_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_commentOnly_unitWithoutName() throws Exception {
-        assert_execComment_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_commentOnly_unitWithoutName(final FileFormat format) throws Exception {
+        assert_execComment_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName(format),
+                format);
     }
 
     private void assert_execComment_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -97,22 +99,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_action_withCommentOnly() throws Exception {
-        assert_execAction_andComment_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withCommentOnly(final FileFormat format) throws Exception {
+        assert_execAction_andComment_template(getExecutableWithName(),
+                getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_action_withCommentOnly_unitWithoutName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withCommentOnly_unitWithoutName(final FileFormat format) throws Exception {
         assert_execAction_andComment_template(getExecutableWithoutName(),
-                getCompareFilesStoreForExecutableWithoutName());
+                getCompareFilesStoreForExecutableWithoutName(format), format);
     }
 
     private void assert_execAction_andComment_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -137,22 +142,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_action_withOneArgOnly() throws Exception {
-        assert_execAction_andOneArg_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withOneArgOnly(final FileFormat format) throws Exception {
+        assert_execAction_andOneArg_template(getExecutableWithName(),
+                getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_action_withOneArgOnly_unitWithoutName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withOneArgOnly_unitWithoutName(final FileFormat format) throws Exception {
         assert_execAction_andOneArg_template(getExecutableWithoutName(),
-                getCompareFilesStoreForExecutableWithoutName());
+                getCompareFilesStoreForExecutableWithoutName(format), format);
     }
 
     private void assert_execAction_andOneArg_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -170,23 +178,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_action_withOneArg_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withOneArg_andComment(final FileFormat format) throws Exception {
         assert_execAction_andOneArg_andComment_template(getExecutableWithName(),
-                getCompareFilesStoreForExecutableWithName());
+                getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_action_withOneArg_andComment_unitWithoutName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withOneArg_andComment_unitWithoutName(final FileFormat format) throws Exception {
         assert_execAction_andOneArg_andComment_template(getExecutableWithoutName(),
-                getCompareFilesStoreForExecutableWithoutName());
+                getCompareFilesStoreForExecutableWithoutName(format), format);
     }
 
     private void assert_execAction_andOneArg_andComment_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -215,22 +225,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_action_withThreeArgsOnly() throws Exception {
-        assert_execAction_andThreeArgs_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withThreeArgsOnly(final FileFormat format) throws Exception {
+        assert_execAction_andThreeArgs_template(getExecutableWithName(),
+                getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_action_withThreeArgsOnly_unitWithoutName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withThreeArgsOnly_unitWithoutName(final FileFormat format) throws Exception {
         assert_execAction_andThreeArgs_template(getExecutableWithoutName(),
-                getCompareFilesStoreForExecutableWithoutName());
+                getCompareFilesStoreForExecutableWithoutName(format), format);
     }
 
     private void assert_execAction_andThreeArgs_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -255,23 +268,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_action_withThreeArgs_andComment() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withThreeArgs_andComment(final FileFormat format) throws Exception {
         assert_execAction_andThreeArgs_andComment_template(getExecutableWithName(),
-                getCompareFilesStoreForExecutableWithName());
+                getCompareFilesStoreForExecutableWithName(format), format);
     }
 
-    @Test
-    public void test_exec_action_withThreeArgs_andComment_unitWithoutName() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_action_withThreeArgs_andComment_unitWithoutName(final FileFormat format) throws Exception {
         assert_execAction_andThreeArgs_andComment_template(getExecutableWithoutName(),
-                getCompareFilesStoreForExecutableWithoutName());
+                getCompareFilesStoreForExecutableWithoutName(format), format);
     }
 
     private void assert_execAction_andThreeArgs_andComment_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
 
@@ -307,21 +322,25 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
                 execUnit.getHolder().getParent().getParent());
     }
 
-    @Test
-    public void test_exec_forEmptyLine() throws Exception {
-        assert_execEmptyLine_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_forEmptyLine(final FileFormat format) throws Exception {
+        assert_execEmptyLine_template(getExecutableWithName(), getCompareFilesStoreForExecutableWithName(format),
+                format);
     }
 
-    @Test
-    public void test_exec_forEmptyLine_unitWithoutName() throws Exception {
-        assert_execEmptyLine_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName());
+    @ParameterizedTest
+    @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
+    public void test_exec_forEmptyLine_unitWithoutName(final FileFormat format) throws Exception {
+        assert_execEmptyLine_template(getExecutableWithoutName(), getCompareFilesStoreForExecutableWithoutName(format),
+                format);
     }
 
     private void assert_execEmptyLine_template(
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
-            final TestFilesCompareStore fileStore) throws Exception {
+            final TestFilesCompareStore fileStore, final FileFormat format) throws Exception {
         // prepare
-        checkEnvironment();
+        checkEnvironment(format);
         final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> robotExecutableRow = getExecUnitToModify(
                 execUnit);
         assertThat(robotExecutableRow).isNotNull();
@@ -343,13 +362,13 @@ public abstract class ACreationOfExecutionRowTest extends RobotFormatParameteriz
         return robotExecutableRow;
     }
 
-    private void checkEnvironment() throws InvalidTestStoreException {
-        final TestFilesCompareStore cmpExecWithName = getCompareFilesStoreForExecutableWithName();
+    private void checkEnvironment(final FileFormat format) throws InvalidTestStoreException {
+        final TestFilesCompareStore cmpExecWithName = getCompareFilesStoreForExecutableWithName(format);
         if (!cmpExecWithName.wasValidated()) {
             cmpExecWithName.validate();
         }
 
-        final TestFilesCompareStore cmpExecWithoutName = getCompareFilesStoreForExecutableWithoutName();
+        final TestFilesCompareStore cmpExecWithoutName = getCompareFilesStoreForExecutableWithoutName(format);
         if (!cmpExecWithoutName.wasValidated()) {
             cmpExecWithoutName.validate();
         }
