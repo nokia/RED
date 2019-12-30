@@ -9,8 +9,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -150,7 +150,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
     }
 
     @Test
@@ -185,7 +185,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
 
         projectProvider.addRobotNature();
     }
@@ -203,7 +203,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
 
         includePathInProjectConfig("suite_with_unknown_library_1.robot");
     }
@@ -339,7 +339,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(discoverer);
     }
 
     @Test

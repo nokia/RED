@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class DeleteSectionCommandTest {
                 .isInjectedInto(new DeleteSectionCommand(null))
                 .execute();
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

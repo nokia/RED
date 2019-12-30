@@ -11,8 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.function.Supplier;
@@ -44,7 +44,7 @@ public class RobotConsoleFacadeTest {
                 .withMessage("Unrecognized configuration type")
                 .withNoCause();
 
-        verifyZeroInteractions(consolesSupplier);
+        verifyNoInteractions(consolesSupplier);
     }
 
     @Test

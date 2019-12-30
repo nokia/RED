@@ -10,8 +10,8 @@ Require-Bundle: org.junit;bundle-version="4.11.0",
  org.eclipse.equinox.event
 Bundle-ClassPath: .,
  lib/assertj-core-3.14.0.jar,
- lib/mockito-core-2.23.0.jar,
- lib/objenesis-3.0.1.jar,
- lib/byte-buddy-1.9.2.jar,
- lib/byte-buddy-agent-1.9.2.jar
+ lib/mockito-core-3.2.4.jar,
+ lib/objenesis-3.1.jar,
+ lib/byte-buddy-1.10.6.jar,
+ lib/byte-buddy-agent-1.10.6.jar
 Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin.tests

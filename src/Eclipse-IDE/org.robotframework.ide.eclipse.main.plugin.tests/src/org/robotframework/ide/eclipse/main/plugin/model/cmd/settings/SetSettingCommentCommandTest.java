@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class SetSettingCommentCommandTest {
         }
         assertThat(setting.getComment()).isEqualTo(oldComment);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     private static List<RobotSetting> createSettingsKeywordCalls() {

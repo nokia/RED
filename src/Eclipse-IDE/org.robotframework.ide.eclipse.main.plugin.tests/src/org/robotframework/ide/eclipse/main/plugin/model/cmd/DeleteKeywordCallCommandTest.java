@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class DeleteKeywordCallCommandTest {
 
         assertThat(section.getChildren()).hasSize(2);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Theory
@@ -155,7 +155,7 @@ public class DeleteKeywordCallCommandTest {
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder1);
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder2);
     }
-    
+
     @Theory
     public void rowsAreProperlyRemovedAndReturnedToPreviousState_whenRemovingFromDifferentCases(
             final RobotSuiteFileSection section) {
@@ -208,7 +208,7 @@ public class DeleteKeywordCallCommandTest {
         assertThat(codeHolder2.getChildren()).hasSize(2);
         assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
-        
+
         undoCommands = new ArrayList<>();
         for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
@@ -216,7 +216,7 @@ public class DeleteKeywordCallCommandTest {
         for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
-        
+
         assertThat(codeHolder1.getChildren()).hasSize(5);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Tags");

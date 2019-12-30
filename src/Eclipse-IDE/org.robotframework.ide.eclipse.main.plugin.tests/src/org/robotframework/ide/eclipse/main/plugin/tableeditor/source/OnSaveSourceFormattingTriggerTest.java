@@ -10,8 +10,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.AfterClass;
@@ -62,8 +62,8 @@ public class OnSaveSourceFormattingTriggerTest {
         doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
-        verifyZeroInteractions(formatter);
-        verifyZeroInteractions(selectionUpdater);
+        verifyNoInteractions(formatter);
+        verifyNoInteractions(selectionUpdater);
     }
 
     @Test
@@ -78,8 +78,8 @@ public class OnSaveSourceFormattingTriggerTest {
         doReturn(formatter).when(trigger).getFormatter(suite);
         trigger.formatSourceIfRequired(Document::new, selectionUpdater, suite, new NullProgressMonitor());
 
-        verifyZeroInteractions(formatter);
-        verifyZeroInteractions(selectionUpdater);
+        verifyNoInteractions(formatter);
+        verifyNoInteractions(selectionUpdater);
     }
 
     @Test

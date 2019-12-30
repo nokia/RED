@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public class ArchiveStructureBuilderTest {
 
         builder.provideEntriesFromFile(projectProvider.createFile("module.other").getLocationURI());
 
-        verifyZeroInteractions(environment);
+        verifyNoInteractions(environment);
 
     }
 

@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isSameAs(currentSection);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

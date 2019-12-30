@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.debug.core.DebugEvent;
@@ -41,7 +41,7 @@ public class RobotConsoleParticipantTest {
         final IPageBookViewPage page = mock(IPageBookViewPage.class);
         participant.init(page, console);
 
-        verifyZeroInteractions(page);
+        verifyNoInteractions(page);
         verify(console).getProcess();
         verifyNoMoreInteractions(console);
     }
@@ -88,7 +88,7 @@ public class RobotConsoleParticipantTest {
         pauseAction.run();
 
         verify(debugTarget2).suspend();
-        verifyZeroInteractions(process);
+        verifyNoInteractions(process);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class RobotConsoleParticipantTest {
         resumeAction.run();
 
         verify(debugTarget2).resume();
-        verifyZeroInteractions(process);
+        verifyNoInteractions(process);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class RobotConsoleParticipantTest {
         interruptAction.run();
 
         verify(debugTarget2).interrupt();
-        verifyZeroInteractions(process);
+        verifyNoInteractions(process);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class RobotConsoleParticipantTest {
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isTrue();
         assertThat(interruptAction.isEnabled()).isTrue();
-        verifyZeroInteractions(debugPlugin);
+        verifyNoInteractions(debugPlugin);
     }
 
     @Test
@@ -269,7 +269,7 @@ public class RobotConsoleParticipantTest {
         assertThat(pauseAction.isEnabled()).isFalse();
         assertThat(resumeAction.isEnabled()).isTrue();
         assertThat(interruptAction.isEnabled()).isTrue();
-        verifyZeroInteractions(debugPlugin);
+        verifyNoInteractions(debugPlugin);
     }
 
     @Test
@@ -294,7 +294,7 @@ public class RobotConsoleParticipantTest {
         assertThat(pauseAction.isEnabled()).isTrue();
         assertThat(resumeAction.isEnabled()).isFalse();
         assertThat(interruptAction.isEnabled()).isTrue();
-        verifyZeroInteractions(debugPlugin);
+        verifyNoInteractions(debugPlugin);
     }
 
     public static interface IDebugConsole extends IConsole, org.eclipse.debug.ui.console.IConsole { }

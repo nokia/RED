@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.function.Supplier;
 
@@ -77,7 +77,7 @@ public class ElementsAddingEditingSupportTest {
         support.setValue("123", "val");
         support.setValue("abc", "val");
 
-        verifyZeroInteractions(viewer, creator);
+        verifyNoInteractions(viewer, creator);
     }
 
     @Test

@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -83,7 +83,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verifyNoMoreInteractions(console);
@@ -99,7 +99,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verifyNoMoreInteractions(console);
@@ -115,7 +115,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verifyNoMoreInteractions(console);
@@ -246,7 +246,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verifyNoMoreInteractions(console);
@@ -262,7 +262,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verify(console).addHyperlink(isA(ExecutionWebsiteHyperlink.class), eq(DOCUMENT_OFFSET + "Output: ".length()),
@@ -280,7 +280,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verify(console).addHyperlink(isA(ExecutionWebsiteHyperlink.class), eq(DOCUMENT_OFFSET + "Output: ".length()),
@@ -298,7 +298,7 @@ public class RobotConsolePatternsListenerTest {
         verify(document).get(DOCUMENT_OFFSET, matchedLine.length());
         verifyNoMoreInteractions(document);
 
-        verifyZeroInteractions(robotProject);
+        verifyNoInteractions(robotProject);
 
         verify(console).getDocument();
         verifyNoMoreInteractions(console);

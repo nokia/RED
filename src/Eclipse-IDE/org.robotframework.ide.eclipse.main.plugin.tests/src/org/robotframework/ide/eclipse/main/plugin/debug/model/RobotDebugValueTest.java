@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
@@ -63,7 +63,7 @@ public class RobotDebugValueTest {
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         value.visitAllVariables(visitor);
 
-        verifyZeroInteractions(visitor);
+        verifyNoInteractions(visitor);
     }
 
     @Test

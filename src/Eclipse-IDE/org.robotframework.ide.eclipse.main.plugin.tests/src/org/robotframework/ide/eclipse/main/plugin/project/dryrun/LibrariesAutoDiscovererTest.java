@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -60,8 +60,8 @@ public class LibrariesAutoDiscovererTest {
     public void discoveringIsNotStarted_whenSuiteListIsEmpty() throws Exception {
         LibrariesAutoDiscoverer.start(newArrayList(), factory);
 
-        verifyZeroInteractions(factory);
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(factory);
+        verifyNoInteractions(discoverer);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.getFile("resource.robot"));
         LibrariesAutoDiscoverer.start(newArrayList(suite1, suite2), factory);
 
-        verifyZeroInteractions(factory);
-        verifyZeroInteractions(discoverer);
+        verifyNoInteractions(factory);
+        verifyNoInteractions(discoverer);
     }
 }

@@ -6,8 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.File;
 import java.net.URI;
@@ -43,7 +43,7 @@ public class GoToFileHandlerTest {
     public void nothingIsDone_whenNodeIsNull() throws Exception {
         goToFile(null);
 
-        verifyZeroInteractions(caseSelectionConsumer);
+        verifyNoInteractions(caseSelectionConsumer);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class GoToFileHandlerTest {
         goToFile(ExecutionTreeNode.newSuiteNode(null, "null_path", null));
         goToFile(ExecutionTreeNode.newTestNode(null, "null_path", null));
 
-        verifyZeroInteractions(caseSelectionConsumer);
+        verifyNoInteractions(caseSelectionConsumer);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class GoToFileHandlerTest {
         goToFile(ExecutionTreeNode.newSuiteNode(null, "not_existing_path", new URI("file:///unknown.robot")));
         goToFile(ExecutionTreeNode.newTestNode(null, "not_existing_path", new URI("file:///unknown.robot")));
 
-        verifyZeroInteractions(caseSelectionConsumer);
+        verifyNoInteractions(caseSelectionConsumer);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class GoToFileHandlerTest {
         goToFile(ExecutionTreeNode.newSuiteNode(null, "not_linked_file", nonWorkspaceFile.toURI()));
         goToFile(ExecutionTreeNode.newTestNode(null, "not_linked_file", nonWorkspaceFile.toURI()));
 
-        verifyZeroInteractions(caseSelectionConsumer);
+        verifyNoInteractions(caseSelectionConsumer);
     }
 
     @Test

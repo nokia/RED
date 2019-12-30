@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.File;
 import java.util.function.BiConsumer;
@@ -111,7 +111,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("testlib.py");
         assertEmptySelection();
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test
@@ -132,7 +132,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("linkedLib.py");
         assertEmptySelection();
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("libspecs/outsideLib.py");
         assertEmptySelection();
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test
@@ -236,7 +236,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("testlib.py");
         assertEmptySelection();
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test
@@ -258,7 +258,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("testlib.py");
         assertSelection(1, 13, "defined_kw");
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test
@@ -270,7 +270,7 @@ public class SourceOpeningSupportTest {
 
         assertOpenedEditor("testlib.py");
         assertSelection(3, 45, "discovered_kw");
-        verifyZeroInteractions(errorHandler);
+        verifyNoInteractions(errorHandler);
     }
 
     @Test

@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.ui.IWorkbench;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class EditorTemplatePreferencePageTest {
         final EditorTemplatePreferencePage page = new EditorTemplatePreferencePage();
         page.init(workbench);
 
-        verifyZeroInteractions(workbench);
+        verifyNoInteractions(workbench);
     }
 
     @Test

@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public class LibrariesConfigUpdaterTest {
         updater.finalizeLibrariesAdding(eventBroker);
 
         assertThat(robotProject.getRobotProjectConfig().getReferencedLibraries()).isEmpty();
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

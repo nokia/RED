@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -88,7 +88,7 @@ public class DeleteReferencedLibraryHandlerTest {
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLibs, input, eventBroker);
 
-        verifyZeroInteractions(project);
+        verifyNoInteractions(project);
         verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED),
                 argThat(hasCorrectEventData(file, newArrayList(remote1, remote2))));
         assertThat(config.getRemoteLocations()).isEmpty();
@@ -116,8 +116,8 @@ public class DeleteReferencedLibraryHandlerTest {
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLocations, input, eventBroker);
 
-        verifyZeroInteractions(eventBroker);
-        verifyZeroInteractions(project);
+        verifyNoInteractions(eventBroker);
+        verifyNoInteractions(project);
         assertThat(config.getReferencedLibraries()).containsExactly(library1, library2);
     }
 
@@ -146,7 +146,7 @@ public class DeleteReferencedLibraryHandlerTest {
         final E4DeleteReferencedLibraryHandler handler = new E4DeleteReferencedLibraryHandler();
         handler.deleteReferencedLibraries(selectedLocations, input, eventBroker);
 
-        verifyZeroInteractions(project);
+        verifyNoInteractions(project);
         verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_REMOVED),
                 argThat(hasCorrectEventData(file, newArrayList(variant2, remote1))));
         assertThat(config.getReferencedLibraries()).containsExactly(library);

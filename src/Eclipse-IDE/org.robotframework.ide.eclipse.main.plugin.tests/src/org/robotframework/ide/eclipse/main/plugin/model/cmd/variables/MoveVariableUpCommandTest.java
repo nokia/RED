@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class MoveVariableUpCommandTest {
         assertThat(varSection.getChildren()).extracting(RobotElement::getName)
                 .containsExactly("scalar1", "scalar2", "list", "dict", "invalid}");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

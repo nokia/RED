@@ -7,8 +7,8 @@ package org.rf.ide.core.execution.dryrun;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -41,7 +41,7 @@ public class RobotDryRunKeywordEventListenerTest {
 
         listener.handleLibraryImport(event);
 
-        verifyZeroInteractions(kwSourceCollector);
+        verifyNoInteractions(kwSourceCollector);
         verify(libNameHandler).accept("String");
         verifyNoMoreInteractions(libNameHandler);
     }
@@ -57,7 +57,7 @@ public class RobotDryRunKeywordEventListenerTest {
 
         verify(kwSourceCollector).collectFromMessageEvent(event);
         verifyNoMoreInteractions(kwSourceCollector);
-        verifyZeroInteractions(libNameHandler);
+        verifyNoInteractions(libNameHandler);
     }
 
     @Test
@@ -72,8 +72,8 @@ public class RobotDryRunKeywordEventListenerTest {
         listener.handleMessage(new MessageEvent("msg", LogLevel.ERROR, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.FAIL, null));
 
-        verifyZeroInteractions(kwSourceCollector);
-        verifyZeroInteractions(libNameHandler);
+        verifyNoInteractions(kwSourceCollector);
+        verifyNoInteractions(libNameHandler);
     }
 
     @Test

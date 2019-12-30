@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.function.Predicate;
 
@@ -57,7 +57,7 @@ public class RobotProjectNatureTest {
         assertThat(cfgFile.getContents())
                 .hasSameContentAs(new RobotProjectConfigWriter().writeConfiguration(RobotProjectConfig.create()));
 
-        verifyZeroInteractions(shouldReplaceConfig);
+        verifyNoInteractions(shouldReplaceConfig);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class RobotProjectNatureTest {
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
         assertThat(cfgFile.exists()).isFalse();
 
-        verifyZeroInteractions(shouldRemoveConfig);
+        verifyNoInteractions(shouldRemoveConfig);
     }
 
     @Test

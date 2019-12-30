@@ -6,10 +6,10 @@
 package org.rf.ide.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -50,43 +50,43 @@ public class EnvironmentVariableReplacerTest {
             softly.assertThat(replacer.hasUnknownEnvironmentVariables("%{a}/%{b}/%{c}/file.txt")).isTrue();
             softly.assertThat(replacer.hasUnknownEnvironmentVariables("%{a%{b%{c}}}/file.txt")).isTrue();
         });
-        verifyZeroInteractions(variableAccessor);
+        verifyNoInteractions(variableAccessor);
     }
 
     @Test
     public void allKnownVariablesAreReplaced() throws Exception {
-        lenient().when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.of("a"));
-        lenient().when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.of("b"));
-        lenient().when(variableAccessor.getValue("VAR_3")).thenReturn(Optional.of("c"));
+        when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.of("a"));
+        when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.of("b"));
+        when(variableAccessor.getValue("VAR_3")).thenReturn(Optional.of("c"));
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
         assertThat(replacer.replaceKnownEnvironmentVariables("%{VAR_1}/%{VAR_2}/%{VAR_3}/file.txt"))
                 .isEqualTo("a/b/c/file.txt");
-        verifyZeroInteractions(problemHandler);
+        verifyNoInteractions(problemHandler);
     }
 
     @Test
     public void nestedVariablesAreReplaced() throws Exception {
-        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.of("A_VAR"));
-        lenient().when(variableAccessor.getValue("A_VAR")).thenReturn(Optional.of("xyz"));
-        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.of("B_VAR"));
-        lenient().when(variableAccessor.getValue("X_B_VAR_Y")).thenReturn(Optional.of("C_VAR"));
-        lenient().when(variableAccessor.getValue("C_VAR")).thenReturn(Optional.of("abc"));
+        when(variableAccessor.getValue("A")).thenReturn(Optional.of("A_VAR"));
+        when(variableAccessor.getValue("A_VAR")).thenReturn(Optional.of("xyz"));
+        when(variableAccessor.getValue("B")).thenReturn(Optional.of("B_VAR"));
+        when(variableAccessor.getValue("X_B_VAR_Y")).thenReturn(Optional.of("C_VAR"));
+        when(variableAccessor.getValue("C_VAR")).thenReturn(Optional.of("abc"));
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
         assertThat(replacer.replaceKnownEnvironmentVariables("%{%{A}}/%{%{X_%{B}_Y}}/file.txt"))
                 .isEqualTo("xyz/abc/file.txt");
-        verifyZeroInteractions(problemHandler);
+        verifyNoInteractions(problemHandler);
     }
 
     @Test
     public void onlyKnownVariablesAreReplaced() throws Exception {
-        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.of("a-value"));
-        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.of("b-value"));
-        lenient().when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.empty());
-        lenient().when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.empty());
+        when(variableAccessor.getValue("A")).thenReturn(Optional.of("a-value"));
+        when(variableAccessor.getValue("B")).thenReturn(Optional.of("b-value"));
+        when(variableAccessor.getValue("VAR_1")).thenReturn(Optional.empty());
+        when(variableAccessor.getValue("VAR_2")).thenReturn(Optional.empty());
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 
@@ -99,9 +99,9 @@ public class EnvironmentVariableReplacerTest {
 
     @Test
     public void unknownVariableIsReportedOnlyOnce() throws Exception {
-        lenient().when(variableAccessor.getValue("A")).thenReturn(Optional.empty());
-        lenient().when(variableAccessor.getValue("B")).thenReturn(Optional.empty());
-        lenient().when(variableAccessor.getValue("C")).thenReturn(Optional.empty());
+        when(variableAccessor.getValue("A")).thenReturn(Optional.empty());
+        when(variableAccessor.getValue("B")).thenReturn(Optional.empty());
+        when(variableAccessor.getValue("C")).thenReturn(Optional.empty());
 
         final EnvironmentVariableReplacer replacer = new EnvironmentVariableReplacer(variableAccessor, problemHandler);
 

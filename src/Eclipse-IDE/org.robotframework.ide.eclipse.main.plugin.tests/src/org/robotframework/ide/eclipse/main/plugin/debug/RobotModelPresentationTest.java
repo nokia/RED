@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -63,7 +63,7 @@ public class RobotModelPresentationTest {
 
         presentation.setAttribute("attr", someObject);
 
-        verifyZeroInteractions(someObject);
+        verifyNoInteractions(someObject);
         verify(presentation).setAttribute("attr", someObject);
         verifyNoMoreInteractions(presentation);
     }
@@ -73,7 +73,7 @@ public class RobotModelPresentationTest {
         final Object someObject = mock(Object.class);
 
         assertThat(presentation.getImage(someObject)).isNull();
-        verifyZeroInteractions(someObject);
+        verifyNoInteractions(someObject);
     }
 
     @Test
@@ -494,10 +494,10 @@ public class RobotModelPresentationTest {
         final IValue value = mock(IValue.class);
 
         presentation.computeDetail(value, listener);
-        
+
         verify(presentation).computeDetail(value, listener);
         verifyNoMoreInteractions(presentation);
-        verifyZeroInteractions(listener, value);
+        verifyNoInteractions(listener, value);
     }
 
     @Test
@@ -639,7 +639,7 @@ public class RobotModelPresentationTest {
         final RobotModelPresentation presentation = spy(new RobotModelPresentation());
 
         presentation.removeAnnotations(editor, thread);
-        verifyZeroInteractions(editor, thread);
+        verifyNoInteractions(editor, thread);
         verify(presentation).removeAnnotations(editor, thread);
         verifyNoMoreInteractions(presentation);
     }

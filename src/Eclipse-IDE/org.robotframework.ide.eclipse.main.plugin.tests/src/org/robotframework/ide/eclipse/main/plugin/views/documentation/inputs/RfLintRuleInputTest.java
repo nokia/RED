@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -113,6 +113,6 @@ public class RfLintRuleInputTest {
         final IWorkbenchPage page = mock(IWorkbenchPage.class);
         input.showInput(page);
 
-        verifyZeroInteractions(page);
+        verifyNoInteractions(page);
     }
 }

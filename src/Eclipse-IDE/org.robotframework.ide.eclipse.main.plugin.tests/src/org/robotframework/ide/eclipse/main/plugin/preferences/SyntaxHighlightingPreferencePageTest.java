@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class SyntaxHighlightingPreferencePageTest {
         final SyntaxHighlightingPreferencePage page = new SyntaxHighlightingPreferencePage();
         page.init(workbench);
 
-        verifyZeroInteractions(workbench);
+        verifyNoInteractions(workbench);
     }
 
     @Test

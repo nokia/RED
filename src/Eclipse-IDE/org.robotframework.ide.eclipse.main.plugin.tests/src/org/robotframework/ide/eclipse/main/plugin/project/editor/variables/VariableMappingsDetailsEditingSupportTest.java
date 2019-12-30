@@ -10,7 +10,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IFile;
@@ -41,7 +41,7 @@ public class VariableMappingsDetailsEditingSupportTest {
 
         assertThat(mapping.getName()).isEqualTo("${var}");
         assertThat(mapping.getValue()).isEqualTo("abc");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class VariableMappingsDetailsEditingSupportTest {
 
         assertThat(mapping.getName()).isEqualTo("${var}");
         assertThat(mapping.getValue()).isEqualTo("abc");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

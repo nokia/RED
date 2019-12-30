@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class CombinedAssistProcessorTest {
         final IDocument document = mock(IDocument.class);
         assertThat(processor.shouldShowProposals(document, 0, "content")).isFalse();
 
-        verifyZeroInteractions(document);
+        verifyNoInteractions(document);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CombinedAssistProcessorTest {
         final IDocument document = mock(IDocument.class);
         assertThat(processor.computeProposals(document, 0, 5, "prefix", true)).isNull();
 
-        verifyZeroInteractions(document);
+        verifyNoInteractions(document);
     }
 
     @Test

@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.console;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.ui.console.IConsole;
@@ -44,7 +44,7 @@ public class RemoveTerminatedRedSessionActionTest {
         final RemoveTerminatedRedSessionAction action = new RemoveTerminatedRedSessionAction(consoleManager, console);
         action.run();
 
-        verifyZeroInteractions(consoleManager);
+        verifyNoInteractions(consoleManager);
     }
 
     @Test

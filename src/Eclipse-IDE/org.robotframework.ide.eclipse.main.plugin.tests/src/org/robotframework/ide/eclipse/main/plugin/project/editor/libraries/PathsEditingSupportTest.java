@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -119,7 +119,7 @@ public class PathsEditingSupportTest {
         support.setValue(searchPath, "path");
 
         assertThat(searchPath.getLocation()).isEqualTo("path");
-        verifyZeroInteractions(successHandler);
+        verifyNoInteractions(successHandler);
     }
 
     @Test

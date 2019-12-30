@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class RfLintValidationPreferencePageTest {
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
         page.init(workbench);
 
-        verifyZeroInteractions(workbench);
+        verifyNoInteractions(workbench);
     }
 
     @Test

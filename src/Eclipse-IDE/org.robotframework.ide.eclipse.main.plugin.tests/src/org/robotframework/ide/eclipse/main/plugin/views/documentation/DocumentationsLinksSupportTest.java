@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class DocumentationsLinksSupportTest {
                 .createProject(projectProvider.getProject())
                 .setRobotParserComplianceVersion(new RobotVersion(3, 1));
     }
-    
+
     @Test
     public void linksSupportDoesNotHandleAboutBlankUris_1() {
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
@@ -75,7 +75,7 @@ public class DocumentationsLinksSupportTest {
         final boolean isHandled = support.changeLocationTo(URI.create("about:blank"));
 
         assertThat(isHandled).isFalse();
-        verifyZeroInteractions(browserSupport, displayer, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, displayer, outsideDisplayerCallback);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class DocumentationsLinksSupportTest {
         final boolean isHandled = support.changeLocationTo(URI.create("about:blank#some_id"));
 
         assertThat(isHandled).isFalse();
-        verifyZeroInteractions(browserSupport, displayer, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, displayer, outsideDisplayerCallback);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class DocumentationsLinksSupportTest {
                 .changeLocationTo(URI.create("library:/DocumentationsLinksSupportTest/library?show_doc=true"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(LibrarySpecificationInput.class));
     }
 
@@ -128,7 +128,7 @@ public class DocumentationsLinksSupportTest {
                         URI.create("library:/DocumentationsLinksSupportTest/library/non_existing_kw?show_doc=true"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(LibrarySpecificationInput.class));
     }
 
@@ -148,7 +148,7 @@ public class DocumentationsLinksSupportTest {
                 .changeLocationTo(URI.create("library:/DocumentationsLinksSupportTest/library/kw?show_doc=true"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(KeywordSpecificationInput.class));
     }
 
@@ -181,7 +181,7 @@ public class DocumentationsLinksSupportTest {
         final boolean isHandled = support.changeLocationTo(URI.create(file.getLocationURI() + "?show_doc=true&suite="));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(SuiteFileInput.class));
     }
 
@@ -198,7 +198,7 @@ public class DocumentationsLinksSupportTest {
                 .changeLocationTo(URI.create(file.getLocationURI() + "?show_doc=true&test=case"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(TestCaseInput.class));
     }
 
@@ -215,7 +215,7 @@ public class DocumentationsLinksSupportTest {
                 .changeLocationTo(URI.create(file.getLocationURI() + "?show_doc=true&task=task"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(TaskInput.class));
     }
 
@@ -232,7 +232,7 @@ public class DocumentationsLinksSupportTest {
                 .changeLocationTo(URI.create(file.getLocationURI() + "?show_doc=true&keyword=kw"));
 
         assertThat(isHandled).isTrue();
-        verifyZeroInteractions(browserSupport, outsideDisplayerCallback);
+        verifyNoInteractions(browserSupport, outsideDisplayerCallback);
         verify(displayer).displayDocumentation(any(KeywordDefinitionInput.class));
     }
 

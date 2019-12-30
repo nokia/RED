@@ -10,8 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -677,7 +677,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -699,7 +699,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -719,7 +719,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -740,7 +740,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.INTO, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -803,7 +803,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -825,7 +825,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -848,7 +848,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -916,7 +916,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test
@@ -938,7 +938,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.OVER, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -1005,7 +1005,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -1028,7 +1028,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -1050,7 +1050,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -1072,7 +1072,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @ParameterizedTest
@@ -1116,7 +1116,7 @@ public class UserProcessDebugControllerTest {
         assertThat(response).isEmpty();
         assertThat(controller.getSuspensionData().reason).isEqualByComparingTo(SuspendReason.STEPPING);
         assertThat(controller.getSuspensionData().data).containsOnly(SteppingMode.RETURN, whenSent);
-        verifyZeroInteractions(whenSent);
+        verifyNoInteractions(whenSent);
     }
 
     @Test

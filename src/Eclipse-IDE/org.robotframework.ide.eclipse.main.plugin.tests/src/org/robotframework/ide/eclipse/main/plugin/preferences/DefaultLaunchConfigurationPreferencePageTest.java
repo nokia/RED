@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +50,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.init(workbench);
 
-        verifyZeroInteractions(workbench);
+        verifyNoInteractions(workbench);
     }
 
     @Test

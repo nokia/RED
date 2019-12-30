@@ -9,8 +9,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
@@ -35,18 +35,18 @@ public class RobotTasksReporterTest {
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.isTasksDetectionEnabled()).thenReturn(true);
         when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
-        
+
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  Log  # comment TODO this is a task")
                 .build();
-        
+
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
         final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
-        
+
         reporter.reportTasks();
-        
-        verifyZeroInteractions(markersReporter);
+
+        verifyNoInteractions(markersReporter);
     }
 
     @Test
@@ -55,15 +55,15 @@ public class RobotTasksReporterTest {
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.isTasksDetectionEnabled()).thenReturn(true);
         when(preferences.getTaskTagsWithPriorities()).thenReturn(keywords);
-        
+
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  Log  # comment TASK this is a task")
                 .build();
-        
+
         final ValidationReportingStrategy markersReporter = mock(ValidationReportingStrategy.class);
         final RobotTasksReporter reporter = new RobotTasksReporter(model, markersReporter, preferences);
-        
+
         reporter.reportTasks();
 
         verify(markersReporter).handleTask(eq(new RobotTask(Priority.HIGH, "TASK this is a task", 3)),

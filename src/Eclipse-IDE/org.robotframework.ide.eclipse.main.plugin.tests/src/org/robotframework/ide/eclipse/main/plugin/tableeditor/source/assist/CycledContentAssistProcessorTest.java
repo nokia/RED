@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext.AssistPreferences;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.red.swt.SwtThread;
 
 public class CycledContentAssistProcessorTest {
@@ -245,8 +245,8 @@ public class CycledContentAssistProcessorTest {
         cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
-        verifyZeroInteractions(proposal);
-        verifyZeroInteractions(callback);
+        verifyNoInteractions(proposal);
+        verifyNoInteractions(callback);
     }
 
     @Test
@@ -268,7 +268,7 @@ public class CycledContentAssistProcessorTest {
 
         assertThat(runnedOperations.get()).isEqualTo(2);
 
-        verifyZeroInteractions(callback);
+        verifyNoInteractions(callback);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class CycledContentAssistProcessorTest {
 
         assertThat(runnedOperations.get()).isEqualTo(2);
 
-        verifyZeroInteractions(callback);
+        verifyNoInteractions(callback);
     }
 
     @Test
@@ -346,7 +346,7 @@ public class CycledContentAssistProcessorTest {
         final ICompletionProposal proposal = mock(ICompletionProposal.class);
         cycledProcessor.selectionChanged(proposal, true);
 
-        verifyZeroInteractions(proposal);
+        verifyNoInteractions(proposal);
         verify(cycledProcessor).selectionChanged(proposal, true);
         verifyNoMoreInteractions(cycledProcessor);
     }

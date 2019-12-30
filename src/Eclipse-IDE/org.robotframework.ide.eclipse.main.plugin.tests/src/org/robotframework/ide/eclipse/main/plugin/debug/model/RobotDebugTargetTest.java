@@ -12,8 +12,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.function.Consumer;
@@ -226,7 +226,7 @@ public class RobotDebugTargetTest {
         target.breakpointRemoved(breakpoint, delta);
         target.breakpointChanged(breakpoint, delta);
 
-        verifyZeroInteractions(breakpoint, delta);
+        verifyNoInteractions(breakpoint, delta);
 
         verify(target).breakpointAdded(any(IBreakpoint.class));
         verify(target).breakpointRemoved(any(IBreakpoint.class), any(IMarkerDelta.class));
@@ -278,7 +278,7 @@ public class RobotDebugTargetTest {
         target.setThread(thread);
         target.breakpointHit(mock(IBreakpoint.class));
 
-        verifyZeroInteractions(thread);
+        verifyNoInteractions(thread);
     }
 
     @Test
@@ -373,7 +373,7 @@ public class RobotDebugTargetTest {
 
         final ExecutionPauseReasonsListener listener = target.new ExecutionPauseReasonsListener();
         listener.pausedOnBreakpoint(mock(RobotLineBreakpoint.class));
-        
+
         verify(process).suspended();
         verify(thread).fireSuspendEvent(DebugEvent.BREAKPOINT);
         verify(thread).suspendedAt(any(RobotLineBreakpoint.class));

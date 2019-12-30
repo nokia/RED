@@ -14,8 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -104,7 +104,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, "lib.js");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed("lib.js", Optional.empty(),
                 "The path 'lib.js' should point to either .py file or python module directory.");
@@ -116,7 +116,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, "not_existing.py");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed("not_existing.py", Optional.empty(),
                 "Unable to find library under 'not_existing.py' location.");
@@ -128,7 +128,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, "{}/path_lib.py");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed(eq("{}/path_lib.py"), eq(Optional.empty()),
                 startsWith("Illegal character in path"));
@@ -140,7 +140,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, "${unknown}/path_lib.py");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed("${unknown}/path_lib.py", Optional.empty(),
                 "Unable to find library under '${unknown}/path_lib.py' location.");
@@ -206,7 +206,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, absolutePath);
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq(absolutePath),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
@@ -221,7 +221,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, absolutePath + "/");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq(absolutePath + "/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
@@ -236,7 +236,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, relativePath + "/");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectedByPath(eq(relativePath + "/"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),
@@ -251,7 +251,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByPath(suite, relativePath);
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByPathFailed(relativePath, Optional.empty(),
                 "The path 'python_path/py_module' should point to either .py file or python module directory.");
@@ -263,7 +263,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByName(suite, "not_existing");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByNameFailed(eq("not_existing"), eq(Optional.empty()),
                 startsWith("Following exception has been thrown:"));
@@ -278,7 +278,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProjectSpy, importer, detector);
         locator.locateByName(suite, "unknown");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectingByNameFailed("unknown", Optional.empty(), "Unable to find 'unknown' library.");
         verifyNoMoreInteractions(detector);
@@ -306,7 +306,7 @@ public class ReferencedLibraryLocatorTest {
         final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
         locator.locateByName(suite, "py_module");
 
-        verifyZeroInteractions(importer);
+        verifyNoInteractions(importer);
 
         verify(detector).libraryDetectedByName(eq("py_module"),
                 eq(projectProvider.getFile("python_path/py_module/__init__.py").getLocation().toFile()),

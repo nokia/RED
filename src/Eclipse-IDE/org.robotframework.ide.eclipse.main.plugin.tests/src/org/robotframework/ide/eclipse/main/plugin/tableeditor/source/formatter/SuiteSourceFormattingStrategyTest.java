@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Region;
@@ -26,7 +26,7 @@ public class SuiteSourceFormattingStrategyTest {
         final SuiteSourceFormattingStrategy strategy = new SuiteSourceFormattingStrategy(() -> formatter);
 
         assertThat(strategy.format("", false, "", null)).isNull();
-        verifyZeroInteractions(formatter);
+        verifyNoInteractions(formatter);
     }
 
     @Test

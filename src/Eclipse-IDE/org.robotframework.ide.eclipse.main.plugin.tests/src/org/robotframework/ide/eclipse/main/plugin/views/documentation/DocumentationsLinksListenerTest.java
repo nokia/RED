@@ -10,7 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -35,7 +35,7 @@ public class DocumentationsLinksListenerTest {
 
         verify(exceptionHandler)
                 .accept(argThat(isExceptionWithMessage("Syntax error in uri 'file:/path with spaces'")));
-        verifyZeroInteractions(linksSupport);
+        verifyNoInteractions(linksSupport);
         assertThat(event.doit).isFalse();
     }
 
@@ -74,7 +74,7 @@ public class DocumentationsLinksListenerTest {
 
         listener.changed(event);
 
-        verifyZeroInteractions(linksSupport, event);
+        verifyNoInteractions(linksSupport, event);
     }
 
     private static <E extends Exception> ArgumentMatcher<E> isExceptionWithMessage(final String message) {

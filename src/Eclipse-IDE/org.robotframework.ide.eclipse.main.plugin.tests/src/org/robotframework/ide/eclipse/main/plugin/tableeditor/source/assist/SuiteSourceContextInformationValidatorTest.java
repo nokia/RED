@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.ITextViewer;
@@ -41,7 +41,7 @@ public class SuiteSourceContextInformationValidatorTest {
         validator.install(contextInformation, viewer, 10);
         validator.updatePresentation(10, presentation);
 
-        verifyZeroInteractions(presentation);
+        verifyNoInteractions(presentation);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SuiteSourceContextInformationValidatorTest {
             }
         }
 
-        verifyZeroInteractions(presentation);
+        verifyNoInteractions(presentation);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class SuiteSourceContextInformationValidatorTest {
         assertThat(validator.isContextInformationValid(10)).isFalse();
         assertThat(validator.isContextInformationValid(11)).isFalse();
 
-        verifyZeroInteractions(presentation);
+        verifyNoInteractions(presentation);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SuiteSourceContextInformationValidatorTest {
         assertThat(validator.isContextInformationValid(13)).isTrue();
         assertThat(validator.isContextInformationValid(14)).isTrue();
 
-        verifyZeroInteractions(presentation);
+        verifyNoInteractions(presentation);
     }
 
 }

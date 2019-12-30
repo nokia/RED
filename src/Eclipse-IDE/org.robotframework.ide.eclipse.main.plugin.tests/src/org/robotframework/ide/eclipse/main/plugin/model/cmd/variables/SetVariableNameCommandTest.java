@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -457,7 +457,7 @@ public class SetVariableNameCommandTest {
                     .isInjectedInto(new SetVariableNameCommand(variable, variable.getActualName()));
             command.execute();
         }
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     private static List<RobotVariable> createVariables() {

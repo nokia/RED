@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,7 +43,7 @@ public class InsertCellToRightHandlerTest {
 
         new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
 
-        verifyZeroInteractions(commandsStack);
+        verifyNoInteractions(commandsStack);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class InsertCellToRightHandlerTest {
 
         new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
 
-        verifyZeroInteractions(commandsStack);
+        verifyNoInteractions(commandsStack);
     }
 
     @Test
@@ -92,6 +92,6 @@ public class InsertCellToRightHandlerTest {
 
         new E4InsertCellToRightHandler().insertCellToRight(commandsStack, editor, selection);
 
-        verifyZeroInteractions(commandsStack);
+        verifyNoInteractions(commandsStack);
     }
 }

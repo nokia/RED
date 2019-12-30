@@ -14,7 +14,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +53,7 @@ public class AgentServerTestsStarterTest {
 
         assertThat(interruptedCaught.get()).isTrue();
         verify(starter).handleAgentIsReadyToStart(any(ReadyToStartEvent.class));
-        verifyZeroInteractions(client);
+        verifyNoInteractions(client);
     }
 
     @Test

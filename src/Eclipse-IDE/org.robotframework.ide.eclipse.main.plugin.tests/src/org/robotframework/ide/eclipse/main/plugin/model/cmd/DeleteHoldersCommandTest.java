@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.name;
 
@@ -63,7 +63,7 @@ public class DeleteHoldersCommandTest {
         }
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DeleteHoldersCommandTest {
         }
         assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -225,7 +225,7 @@ public class DeleteHoldersCommandTest {
         }
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class MoveKeywordCallDownCommandTest {
         }
         assertThat(lastCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class MoveKeywordCallDownCommandTest {
         }
         assertThat(lastKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -284,7 +284,7 @@ public class MoveKeywordCallDownCommandTest {
         assertThat(sndCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
         assertThat(trdCase.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -309,7 +309,7 @@ public class MoveKeywordCallDownCommandTest {
         assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log");
         assertThat(trdKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Log1", "Log2");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -335,7 +335,7 @@ public class MoveKeywordCallDownCommandTest {
                 .containsExactly("Tags", "Documentation", "Log1", "Log2", "Setup", "Log3");
         assertThat(sndCase.getChildren()).extracting(RobotElement::getName).containsExactly("Setup", "Log");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -361,7 +361,7 @@ public class MoveKeywordCallDownCommandTest {
                 .containsExactly("Tags", "Documentation", "Log1", "Log2", "Setup", "Log3");
         assertThat(sndKeyword.getChildren()).extracting(RobotElement::getName).containsExactly("Teardown", "Log");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     private static List<RobotCase> createTestCasesWithSettings() {

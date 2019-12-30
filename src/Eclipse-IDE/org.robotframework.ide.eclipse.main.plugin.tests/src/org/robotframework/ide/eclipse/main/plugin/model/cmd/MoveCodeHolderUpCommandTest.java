@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class MoveCodeHolderUpCommandTest {
         assertThat(section.getChildren()).extracting(RobotElement::getName)
                 .containsExactly("case 1", "case 2", "case 3");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class MoveCodeHolderUpCommandTest {
         }
         assertThat(section.getChildren()).extracting(RobotElement::getName).containsExactly("kw 1", "kw 2", "kw 3");
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

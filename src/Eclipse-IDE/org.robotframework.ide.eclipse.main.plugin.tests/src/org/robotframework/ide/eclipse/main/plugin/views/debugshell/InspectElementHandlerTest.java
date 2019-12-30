@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.debugshell;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.IDocument;
@@ -27,7 +27,7 @@ public class InspectElementHandlerTest {
     @Test
     public void debugShellViewIsActivatedAndReturnedIfAlreadyOpen() {
         final DebugShellView view = mock(DebugShellView.class);
-        
+
         final DebugShellViewWrapper viewWrapper = mock(DebugShellViewWrapper.class);
         when(viewWrapper.getView()).thenReturn(view);
 
@@ -66,7 +66,7 @@ public class InspectElementHandlerTest {
 
         final DebugShellView view = mock(DebugShellView.class);
         E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(36, 0));
-        
+
         verify(view).putExpression(ExpressionType.VARIABLE, "${variable}");
     }
 
@@ -112,6 +112,6 @@ public class InspectElementHandlerTest {
         final DebugShellView view = mock(DebugShellView.class);
         E4InspectElementHandler.inspectElement(view, model, document, new TextSelection(5, 0));
 
-        verifyZeroInteractions(view);
+        verifyNoInteractions(view);
     }
 }

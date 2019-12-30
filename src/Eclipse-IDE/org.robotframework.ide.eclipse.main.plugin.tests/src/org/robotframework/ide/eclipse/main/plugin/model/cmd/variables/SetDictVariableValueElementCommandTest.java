@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class SetDictVariableValueElementCommandTest {
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{a = 1, b = 2}");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

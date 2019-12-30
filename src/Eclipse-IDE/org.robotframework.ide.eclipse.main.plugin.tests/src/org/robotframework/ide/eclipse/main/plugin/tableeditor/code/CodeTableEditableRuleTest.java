@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
@@ -26,13 +26,13 @@ public class CodeTableEditableRuleTest {
     public void cellIsNotEditable_whenModelIsReadOnly() {
         final RobotSuiteFile readOnlyModel = new RobotSuiteFileCreator().buildReadOnly();
         final IEditableRule editableRule = CodeTableEditableRule.createEditableRule(readOnlyModel);
-        
+
         final IConfigRegistry configRegistry = mock(ConfigRegistry.class);
         final ILayerCell cell = mock(ILayerCell.class);
 
         assertThat(editableRule.isEditable(cell, configRegistry)).isFalse();
 
-        verifyZeroInteractions(configRegistry);
+        verifyNoInteractions(configRegistry);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class CodeTableEditableRuleTest {
 
         assertThat(editableRule.isEditable(cell, configRegistry)).isTrue();
 
-        verifyZeroInteractions(configRegistry);
+        verifyNoInteractions(configRegistry);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class CodeTableEditableRuleTest {
 
         assertThat(editableRule.isEditable(cell, configRegistry)).isFalse();
 
-        verifyZeroInteractions(configRegistry);
+        verifyNoInteractions(configRegistry);
     }
 
 }

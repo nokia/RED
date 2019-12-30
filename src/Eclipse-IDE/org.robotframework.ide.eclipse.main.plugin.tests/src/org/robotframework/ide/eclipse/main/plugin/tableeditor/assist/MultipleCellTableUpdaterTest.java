@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -37,7 +37,7 @@ public class MultipleCellTableUpdaterTest {
                 eventBroker);
 
         assertThat(updater.shouldInsertMultipleCells(newArrayList("name"))).isFalse();
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class MultipleCellTableUpdaterTest {
                 eventBroker);
 
         assertThat(updater.shouldInsertMultipleCells(newArrayList("name", "a1", "a2", "a3"))).isFalse();
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class MultipleCellTableUpdaterTest {
 
         assertThat(updater.shouldInsertMultipleCellsWithoutColumnExceeding(newArrayList("name", "a1", "a2", "a3")))
                 .isFalse();
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class MultipleCellTableUpdaterTest {
 
         assertThat(updater.shouldInsertMultipleCellsWithoutColumnExceeding(newArrayList("name", "a1", "a2", "a3")))
                 .isTrue();
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class MultipleCellTableUpdaterTest {
         verify(dataProvider).setDataValue(0, 1, "name");
         verify(dataProvider).setDataValue(1, 1, "a1");
         verify(dataProvider).setDataValue(2, 1, "a2");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

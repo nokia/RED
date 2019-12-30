@@ -11,8 +11,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -177,7 +177,7 @@ public class ReferencedLibrariesEditingSupportTest {
         support.setValue(location, "invalid uri");
 
         assertThat(location.getUri()).isEqualTo("http://some.uri.com");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ReferencedLibrariesEditingSupportTest {
         support.setValue(location, "http://some.uri.com");
 
         assertThat(location.getUri()).isEqualTo("http://some.uri.com");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class ReferencedLibrariesEditingSupportTest {
         support.setValue(args, "1::2::3");
 
         assertThat(args.getArgsStream()).containsExactly("1", "2", "3");
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

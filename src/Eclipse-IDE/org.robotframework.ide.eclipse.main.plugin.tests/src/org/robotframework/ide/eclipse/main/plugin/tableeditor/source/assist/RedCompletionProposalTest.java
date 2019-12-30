@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 
@@ -89,7 +89,7 @@ public class RedCompletionProposalTest {
         final IDocument document = mock(IDocument.class);
         assertThat(proposal.getPrefixCompletionText(document, 0)).isEqualTo("replacement");
 
-        verifyZeroInteractions(document);
+        verifyNoInteractions(document);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class RedCompletionProposalTest {
         final IDocument document = mock(IDocument.class);
         assertThat(proposal.getPrefixCompletionStart(document, 0)).isEqualTo(42);
 
-        verifyZeroInteractions(document);
+        verifyNoInteractions(document);
     }
 
     @Test

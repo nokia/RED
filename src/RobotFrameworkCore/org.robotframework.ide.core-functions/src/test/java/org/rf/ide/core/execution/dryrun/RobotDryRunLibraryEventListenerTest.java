@@ -7,8 +7,8 @@ package org.rf.ide.core.execution.dryrun;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -58,7 +58,7 @@ public class RobotDryRunLibraryEventListenerTest {
 
         verify(libImportCollector).collectFromMessageEvent(event);
         verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(libNameHandler);
+        verifyNoInteractions(libNameHandler);
     }
 
     @Test
@@ -73,8 +73,8 @@ public class RobotDryRunLibraryEventListenerTest {
         listener.handleMessage(new MessageEvent("msg", LogLevel.ERROR, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.FAIL, null));
 
-        verifyZeroInteractions(libImportCollector);
-        verifyZeroInteractions(libNameHandler);
+        verifyNoInteractions(libImportCollector);
+        verifyNoInteractions(libNameHandler);
     }
 
     @Test

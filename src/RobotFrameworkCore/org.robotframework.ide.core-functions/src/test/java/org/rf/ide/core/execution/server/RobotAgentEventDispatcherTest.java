@@ -12,7 +12,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
@@ -89,7 +88,7 @@ public class RobotAgentEventDispatcherTest {
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleResumed();
         verify(listener).eventsProcessingFinished();
-        verifyZeroInteractions(listener);
+        verifyNoMoreInteractions(listener);
     }
 
     @Test
@@ -101,7 +100,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener).eventsProcessingFinished();
-        verifyZeroInteractions(listener);
+        verifyNoMoreInteractions(listener);
     }
 
     @Test

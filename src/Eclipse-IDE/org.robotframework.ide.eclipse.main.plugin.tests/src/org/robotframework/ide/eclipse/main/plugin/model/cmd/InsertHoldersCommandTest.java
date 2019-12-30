@@ -11,8 +11,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -61,7 +61,7 @@ public class InsertHoldersCommandTest {
         }
         assertThat(section.getChildren()).hasSize(3);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class InsertHoldersCommandTest {
         }
         assertThat(section.getChildren()).hasSize(3);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class InsertHoldersCommandTest {
         }
         assertThat(section.getChildren()).hasSize(3);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

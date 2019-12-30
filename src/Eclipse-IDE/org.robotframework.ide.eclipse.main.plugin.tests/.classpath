@@ -8,9 +8,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/assertj-core-3.14.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mockito-core-2.23.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/objenesis-3.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-1.9.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-agent-1.9.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mockito-core-3.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/objenesis-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-1.10.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-agent-1.10.6.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

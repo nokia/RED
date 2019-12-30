@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -48,7 +48,7 @@ public class SetSettingNameCommandTest {
         assertThat(libraryImport.getName()).isEqualTo("Library");
         assertThat(libraryImport.getGroup()).isEqualTo(SettingsGroup.LIBRARIES);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class SetSettingNameCommandTest {
         assertThat(resourceImport.getName()).isEqualTo("Resource");
         assertThat(resourceImport.getGroup()).isEqualTo(SettingsGroup.RESOURCES);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class SetSettingNameCommandTest {
         assertThat(variablesImport.getName()).isEqualTo("Variables");
         assertThat(variablesImport.getGroup()).isEqualTo(SettingsGroup.VARIABLES);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -81,7 +81,7 @@ public class DeletePythonPathHandlerTest {
                 newArrayList(SearchPath.create("path3"), SearchPath.create("path4")));
         handler.deleteSearchPaths(selectedPaths, input, eventBroker);
 
-        verifyZeroInteractions(eventBroker);
+        verifyNoInteractions(eventBroker);
         assertThat(config.getPythonPaths()).containsExactly(SearchPath.create("path1"), SearchPath.create("path2"));
     }
 

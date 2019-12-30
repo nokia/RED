@@ -8,7 +8,7 @@ package org.robotframework.red.nattable.edit;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.AbstractMap.SimpleEntry;
@@ -81,7 +81,7 @@ public class DefaultRedCellEditorValueValidatorTest {
 
         validator.validate(null, 0);
 
-        verifyZeroInteractions(dataProvider);
+        verifyNoInteractions(dataProvider);
     }
 
     @Test

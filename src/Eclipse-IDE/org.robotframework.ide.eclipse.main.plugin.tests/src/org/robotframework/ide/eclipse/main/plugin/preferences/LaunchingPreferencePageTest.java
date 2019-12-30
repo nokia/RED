@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class LaunchingPreferencePageTest {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
         page.init(workbench);
 
-        verifyZeroInteractions(workbench);
+        verifyNoInteractions(workbench);
     }
 
     @Test
