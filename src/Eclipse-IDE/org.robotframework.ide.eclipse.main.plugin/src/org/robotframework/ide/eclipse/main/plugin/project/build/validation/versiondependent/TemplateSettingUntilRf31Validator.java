@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Keywo
 import com.google.common.collect.Range;
 
 
-public class TemplateSettingUntilRf31Validator extends VersionDependentModelUnitValidator {
+class TemplateSettingUntilRf31Validator extends VersionDependentModelUnitValidator {
 
     private final FileValidationContext validationContext;
 

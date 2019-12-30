@@ -23,6 +23,8 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
@@ -233,6 +235,70 @@ public class VersionDependentValidatorsTest {
             return validators.getKeywordSettingsValidators(userKeyword);
         }
 
+    }
+
+    public static class TestSuiteFileValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder31() {
+            assertThat(getTestSuiteFileValidators("3.0")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getTestSuiteFileValidators("3.1")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedSuiteFileExtensionValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion312() {
+            assertThat(getTestSuiteFileValidators("3.1.2")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedSuiteFileExtensionValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion32() {
+            assertThat(getTestSuiteFileValidators("3.2")).hasSize(2)
+                    .hasOnlyElementsOfTypes(UnsupportedSuiteFileExtensionValidator.class,
+                            DeprecatedVariableCollectionElementUseValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getTestSuiteFileValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getFileValidators(null, RobotCasesSection.class);
+        }
+    }
+
+    public static class TaskSuiteFileValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder31() {
+            assertThat(getTaskSuiteFileValidators("3.0")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getTaskSuiteFileValidators("3.1")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedSuiteFileExtensionValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion312() {
+            assertThat(getTaskSuiteFileValidators("3.1.2")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedSuiteFileExtensionValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion32() {
+            assertThat(getTaskSuiteFileValidators("3.2")).hasSize(2)
+                    .hasOnlyElementsOfTypes(UnsupportedSuiteFileExtensionValidator.class,
+                            DeprecatedVariableCollectionElementUseValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getTaskSuiteFileValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getFileValidators(null, RobotTasksSection.class);
+        }
     }
 
     private static FileValidationContext prepareContext(final String version) {

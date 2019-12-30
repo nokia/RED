@@ -82,9 +82,16 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
         new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class), reporter)
                 .validate(null);
 
+        reportVersionSpecificProblems(validationContext, fileModel);
+
         checkRobotFileOutputStatus(fileModel);
 
         new RobotTasksReporter(fileModel, reporter).reportTasks();
+    }
+
+    void reportVersionSpecificProblems(final FileValidationContext validationContext, final RobotSuiteFile fileModel)
+            throws CoreException {
+        // Override if needed
     }
 
     private void checkRobotFileOutputStatus(final RobotSuiteFile fileModel) {

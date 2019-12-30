@@ -155,6 +155,30 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Variable '%s' is declared without name";
         }
+    },
+    VARIABLE_ELEMENT_OLD_USE {
+
+        @Override
+        public String getProblemDescription() {
+            return "Access to list/dictionary using index/key '%s' is deprecated since RF 3.2. Use scalar notation instead i.e: ${collection}[id/key]";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
+
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+            if (value != null) {
+                fixers.add(new ChangeToFixer("$" + value.substring(1)));
+            }
+            return fixers;
+        }
+
     };
 
     @Override

@@ -17,7 +17,7 @@ import com.google.common.collect.Range;
 
 class UnsupportedSuiteFileExtensionValidator extends DeprecatedSuiteFileExtensionValidator {
 
-    public UnsupportedSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
+    UnsupportedSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
             final Class<? extends RobotSuiteFileSection> suiteSectionClass,
             final ValidationReportingStrategy reporter) {
         super(file, fileModel, suiteSectionClass, reporter);

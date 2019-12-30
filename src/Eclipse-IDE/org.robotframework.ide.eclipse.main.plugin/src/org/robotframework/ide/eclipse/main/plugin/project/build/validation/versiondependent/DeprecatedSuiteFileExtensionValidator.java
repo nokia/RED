@@ -30,7 +30,7 @@ class DeprecatedSuiteFileExtensionValidator extends VersionDependentModelUnitVal
 
     private final ValidationReportingStrategy reporter;
 
-    public DeprecatedSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
+    DeprecatedSuiteFileExtensionValidator(final IFile file, final RobotSuiteFile fileModel,
             final Class<? extends RobotSuiteFileSection> suiteSectionClass,
             final ValidationReportingStrategy reporter) {
         this.file = file;

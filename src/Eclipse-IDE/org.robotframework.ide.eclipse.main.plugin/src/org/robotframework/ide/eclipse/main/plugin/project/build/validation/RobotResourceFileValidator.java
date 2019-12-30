@@ -26,10 +26,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.Range;
 
@@ -54,6 +56,13 @@ public class RobotResourceFileValidator extends RobotFileValidator {
 
         validateIfThereIsUnsupportedTable(unsupportedSection);
         validateIfThereAreNoForbiddenSettings(settingsSection);
+    }
+
+    @Override
+    void reportVersionSpecificProblems(final FileValidationContext validationContext, final RobotSuiteFile fileModel)
+            throws CoreException {
+        new VersionDependentValidators(validationContext, reporter).getResourceValidators(fileModel)
+                .forEach(ModelUnitValidator::validate);
     }
 
     private void validateIfThereIsUnsupportedTable(final Optional<? extends RobotSuiteFileSection> maybeSection) {

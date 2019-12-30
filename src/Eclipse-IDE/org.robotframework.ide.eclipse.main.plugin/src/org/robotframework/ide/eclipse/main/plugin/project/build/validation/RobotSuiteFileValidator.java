@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -27,18 +28,17 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     @Override
     public void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
-        reportVersionSpecificProblems(fileModel, validationContext);
-
         super.validate(fileModel, validationContext);
 
         validateIfThereAreNoForbiddenSections(fileModel);
     }
 
-    private void reportVersionSpecificProblems(final RobotSuiteFile fileModel,
-            final FileValidationContext validationContext) {
-        final VersionDependentValidators versionDependentValidators = new VersionDependentValidators(validationContext,
-                reporter);
-        versionDependentValidators.getTestSuiteFileValidators(fileModel).forEach(ModelUnitValidator::validate);
+    @Override
+    void reportVersionSpecificProblems(final FileValidationContext validationContext, final RobotSuiteFile fileModel)
+            throws CoreException {
+        new VersionDependentValidators(validationContext, reporter)
+                .getFileValidators(fileModel, RobotCasesSection.class)
+                .forEach(ModelUnitValidator::validate);
     }
 
     private void validateIfThereAreNoForbiddenSections(final RobotSuiteFile fileModel) {

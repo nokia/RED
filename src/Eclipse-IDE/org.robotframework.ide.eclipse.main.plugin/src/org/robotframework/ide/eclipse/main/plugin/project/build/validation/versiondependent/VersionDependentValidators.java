@@ -22,9 +22,8 @@ import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 
@@ -40,19 +39,20 @@ public class VersionDependentValidators {
         this.reporter = reporter;
     }
 
-    public Stream<VersionDependentModelUnitValidator> getTestSuiteFileValidators(final RobotSuiteFile fileModel) {
+    public Stream<VersionDependentModelUnitValidator> getFileValidators(final RobotSuiteFile fileModel,
+            final Class<? extends RobotSuiteFileSection> section) {
         final IFile file = validationContext.getFile();
         final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
-                new DeprecatedSuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter),
-                new UnsupportedSuiteFileExtensionValidator(file, fileModel, RobotCasesSection.class, reporter));
+                new DeprecatedSuiteFileExtensionValidator(file, fileModel, section, reporter),
+                new UnsupportedSuiteFileExtensionValidator(file, fileModel, section, reporter),
+                new DeprecatedVariableCollectionElementUseValidator(file, fileModel, reporter));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
-    public Stream<VersionDependentModelUnitValidator> getTaskSuiteFileValidators(final RobotSuiteFile fileModel) {
+    public Stream<VersionDependentModelUnitValidator> getResourceValidators(final RobotSuiteFile fileModel) {
         final IFile file = validationContext.getFile();
-        final Stream<VersionDependentModelUnitValidator> allValidators = Stream.of(
-                new DeprecatedSuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter),
-                new UnsupportedSuiteFileExtensionValidator(file, fileModel, RobotTasksSection.class, reporter));
+        final Stream<VersionDependentModelUnitValidator> allValidators = Stream
+                .of(new DeprecatedVariableCollectionElementUseValidator(file, fileModel, reporter));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
