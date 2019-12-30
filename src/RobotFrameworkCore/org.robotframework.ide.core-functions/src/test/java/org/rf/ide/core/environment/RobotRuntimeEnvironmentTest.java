@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
@@ -34,7 +34,7 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.WINDOWS)
     public void moduleCanonicalPathIsReturned_evenWhenExecutorReturnsLowerCasePath() {
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
@@ -50,7 +50,7 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.WINDOWS)
     public void moduleNameOfFileIsReturnedAsIs_whenExecutorReturnsItButItDoesNotExist() {
         final EnvironmentSearchPaths searchPaths = new EnvironmentSearchPaths();
 
@@ -66,7 +66,7 @@ public class RobotRuntimeEnvironmentTest {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.WINDOWS)
     public void modulesSearchPathsAreCanonicalized() {
         final RobotCommandExecutor executor = mock(RobotCommandExecutor.class);
         when(executor.getModulesSearchPaths())

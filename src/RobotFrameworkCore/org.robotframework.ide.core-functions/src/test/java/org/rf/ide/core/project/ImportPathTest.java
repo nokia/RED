@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 public class ImportPathTest {
@@ -54,7 +55,7 @@ public class ImportPathTest {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.WINDOWS)
     public void testAbsolutePaths_windowsPaths() {
         assertThat(ImportPath.from("c:\\absolute").isAbsolute()).isTrue();
         assertThat(ImportPath.from("c:\\absolute\\to\\dir").isAbsolute()).isTrue();

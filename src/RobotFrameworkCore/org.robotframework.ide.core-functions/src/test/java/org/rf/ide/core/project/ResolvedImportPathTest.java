@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 import com.google.common.collect.ImmutableMap;
@@ -53,7 +54,7 @@ public class ResolvedImportPathTest {
     }
 
     @Test
-    @DisabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.WINDOWS)
     public void testPathsResolution_whenResolvedPathIsRelative_inWindows() throws URISyntaxException {
         final Map<String, String> parameters = Collections.emptyMap();
         final ResolvedImportPath resolvedPath = createResolved("relative/path", parameters).get();
