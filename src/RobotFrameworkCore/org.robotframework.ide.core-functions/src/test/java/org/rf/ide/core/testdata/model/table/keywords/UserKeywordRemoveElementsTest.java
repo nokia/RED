@@ -48,7 +48,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getDocumentation()).doesNotContain(doc);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getDocumentation()).doesNotContain(doc);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getTags()).doesNotContain(tags);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getTags()).doesNotContain(tags);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getArguments()).doesNotContain(args);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getArguments()).doesNotContain(args);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getReturns()).doesNotContain(returns);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getReturns()).doesNotContain(returns);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -171,7 +171,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getTeardowns()).doesNotContain(teardowns);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getTeardowns()).doesNotContain(teardowns);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -202,7 +202,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getTimeouts()).doesNotContain(timeouts);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -218,7 +218,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getTimeouts()).doesNotContain(timeouts);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -235,7 +235,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getUnknownSettings()).doesNotContain(unknownSetting);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -251,7 +251,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getUnknownSettings()).doesNotContain(unknownSetting);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -267,7 +267,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(keyword.getExecutionContext()).doesNotContain(executionRow);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -282,7 +282,7 @@ public class UserKeywordRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(keyword.getExecutionContext()).doesNotContain(executionRow);
-        assertThat(keyword.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(keyword.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     private void addOthersToDoNotRemove(final UserKeyword uk) {

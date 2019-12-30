@@ -58,7 +58,7 @@ public class RobotElementsComparatorWithPositionChangedPresaveTest {
         // verify
         final List<RobotToken> joined = new ArrayList<>(startToks);
         joined.addAll(contToks);
-        assertThat(toks).containsOnlyElementsOf(joined);
+        assertThat(toks).hasSameElementsAs(joined);
     }
 
     @Test

@@ -43,7 +43,7 @@ public class InsertNewTaskHandlerTest {
     public void actualHandlerUsesProperE4Handler() {
         final InsertNewTaskHandler handler = new InsertNewTaskHandler();
 
-        assertThat(handler).extracting("component").hasSize(1).allMatch(c -> c instanceof E4InsertNewTaskHandler);
+        assertThat(handler).extracting("component").isInstanceOf(E4InsertNewTaskHandler.class);
     }
 
     @Test

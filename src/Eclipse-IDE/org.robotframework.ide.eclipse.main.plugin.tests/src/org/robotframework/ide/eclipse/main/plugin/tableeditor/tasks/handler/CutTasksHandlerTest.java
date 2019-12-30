@@ -44,7 +44,7 @@ public class CutTasksHandlerTest {
     public void actualHandlerUsesProperE4Handler() {
         final CutTasksHandler handler = new CutTasksHandler();
 
-        assertThat(handler).extracting("component").hasSize(1).allMatch(c -> c instanceof E4CutTasksHandler);
+        assertThat(handler).extracting("component").isInstanceOf(E4CutTasksHandler.class);
     }
 
     @Test

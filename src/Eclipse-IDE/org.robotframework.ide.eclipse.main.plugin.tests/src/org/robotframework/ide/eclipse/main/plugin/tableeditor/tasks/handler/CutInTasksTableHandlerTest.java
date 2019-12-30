@@ -60,7 +60,7 @@ public class CutInTasksTableHandlerTest {
     public void actualHandlerUsesProperE4Handler() {
         final CutInTasksTableHandler handler = new CutInTasksTableHandler();
 
-        assertThat(handler).extracting("component").hasSize(1).allMatch(c -> c instanceof E4CutInTasksTableHandler);
+        assertThat(handler).extracting("component").isInstanceOf(E4CutInTasksTableHandler.class);
     }
 
     @Test

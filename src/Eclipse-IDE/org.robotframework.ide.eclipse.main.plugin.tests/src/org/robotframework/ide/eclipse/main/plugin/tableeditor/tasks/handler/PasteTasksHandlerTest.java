@@ -50,7 +50,7 @@ public class PasteTasksHandlerTest {
     public void actualHandlerUsesProperE4Handler() {
         final PasteTasksHandler handler = new PasteTasksHandler();
 
-        assertThat(handler).extracting("component").hasSize(1).allMatch(c -> c instanceof E4PasteTasksHandler);
+        assertThat(handler).extracting("component").isInstanceOf(E4PasteTasksHandler.class);
     }
 
     @Test

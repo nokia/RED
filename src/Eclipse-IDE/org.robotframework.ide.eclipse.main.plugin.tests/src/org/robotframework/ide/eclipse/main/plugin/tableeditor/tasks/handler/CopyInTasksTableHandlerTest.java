@@ -54,7 +54,7 @@ public class CopyInTasksTableHandlerTest {
     public void actualHandlerUsesProperE4Handler() {
         final CopyInTasksTableHandler handler = new CopyInTasksTableHandler();
 
-        assertThat(handler).extracting("component").hasSize(1).allMatch(c -> c instanceof E4CopyInTasksTableHandler);
+        assertThat(handler).extracting("component").isInstanceOf(E4CopyInTasksTableHandler.class);
     }
 
     @Test

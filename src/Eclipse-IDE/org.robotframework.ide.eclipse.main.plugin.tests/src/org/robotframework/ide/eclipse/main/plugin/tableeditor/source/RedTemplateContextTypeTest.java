@@ -16,8 +16,9 @@ public class RedTemplateContextTypeTest {
     public void allGlobalVariableTemplateResolversAreDefined() throws Exception {
         final RedTemplateContextType contextType = new RedTemplateContextType();
 
-        assertThat(contextType.resolvers()).hasSize(8);
-        assertThat(contextType.resolvers()).extracting(TemplateVariableResolver::getType)
+        assertThat(contextType.resolvers()).toIterable().hasSize(8);
+        assertThat(contextType.resolvers()).toIterable()
+                .extracting(TemplateVariableResolver::getType)
                 .containsOnly("cursor", "dollar", "user", "date", "year", "time", "word_selection", "line_selection");
     }
 }

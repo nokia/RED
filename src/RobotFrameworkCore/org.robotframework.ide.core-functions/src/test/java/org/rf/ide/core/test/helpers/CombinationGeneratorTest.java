@@ -94,7 +94,7 @@ public class CombinationGeneratorTest {
         assertThat(combinationsExpected).isNotNull();
         assertThat(combinationsGet).isNotNull();
         assertThat(combinationsGet).hasSize(combinationsExpected.size());
-        assertThat(combinationsExpected).containsOnlyElementsOf(combinationsGet);
+        assertThat(combinationsExpected).hasSameElementsAs(combinationsGet);
     }
 
 

@@ -18,7 +18,7 @@ public class ProblemsReportingStrategyFactoryTest {
         final HeadlessValidationReportingStrategy strategy = ProblemsReportingStrategyFactory.checkstyleReporter("filepath", mock(Logger.class));
 
         assertThat(strategy).isInstanceOf(CheckstyleReportingStrategy.class);
-        assertThat(strategy).extracting("shouldPanic").contains(false);
+        assertThat(strategy).hasFieldOrPropertyWithValue("shouldPanic", false);
     }
 
     @Test
@@ -27,7 +27,7 @@ public class ProblemsReportingStrategyFactoryTest {
                 .checkstylePanicReporter("filepath", mock(Logger.class));
 
         assertThat(strategy).isInstanceOf(CheckstyleReportingStrategy.class);
-        assertThat(strategy).extracting("shouldPanic").contains(true);
+        assertThat(strategy).hasFieldOrPropertyWithValue("shouldPanic", true);
     }
 
 }

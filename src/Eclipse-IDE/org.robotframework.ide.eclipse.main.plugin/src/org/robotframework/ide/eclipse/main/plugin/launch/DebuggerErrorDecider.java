@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
 import org.robotframework.red.swt.SwtThread;
@@ -38,7 +38,7 @@ public class DebuggerErrorDecider implements Supplier<Boolean> {
                 @Override
                 public Boolean runCalculation() {
                     final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
-                            RedPlugin.getDefault().getWorkbench().getModalDialogShellProvider().getShell(),
+                            PlatformUI.getWorkbench().getModalDialogShellProvider().getShell(),
                             "Debugger error", null,
                             "RED debugger has entered into an erroneous state.\n\nDo you want the debugger to suspend the execution now?",
                             MessageDialog.QUESTION, new String[] { "Suspend", "Continue" }, 0, "Remember my decision",

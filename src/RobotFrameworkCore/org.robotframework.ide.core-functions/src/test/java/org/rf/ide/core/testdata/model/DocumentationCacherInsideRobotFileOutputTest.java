@@ -116,7 +116,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .getUnmodificableCacheContent();
 
         // then
-        assertThat(cache).containsOnlyElementsOf(
+        assertThat(cache).hasSameElementsAs(
                 Arrays.asList(suiteDocumentation, keyKw1Documentation.adaptTo(IDocumentationHolder.class),
                         keyKw2Documentation.adaptTo(IDocumentationHolder.class),
                         testTc1Documentation.adaptTo(IDocumentationHolder.class),

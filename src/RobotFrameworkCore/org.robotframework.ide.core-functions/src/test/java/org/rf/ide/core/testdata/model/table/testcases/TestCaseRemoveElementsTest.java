@@ -48,7 +48,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getDocumentation()).doesNotContain(doc);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getDocumentation()).doesNotContain(doc);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getTags()).doesNotContain(tags);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getTags()).doesNotContain(tags);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getSetups()).doesNotContain(setups);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getSetups()).doesNotContain(setups);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getTeardowns()).doesNotContain(teardowns);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getTeardowns()).doesNotContain(teardowns);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -168,7 +168,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getTemplates()).doesNotContain(templates);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getTemplates()).doesNotContain(templates);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getTimeouts()).doesNotContain(timeouts);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getTimeouts()).doesNotContain(timeouts);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -231,7 +231,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getUnknownSettings()).doesNotContain(unknownSetting);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getUnknownSettings()).doesNotContain(unknownSetting);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     @Test
@@ -263,9 +263,9 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isTrue();
         assertThat(testCase.getExecutionContext()).doesNotContain(executionRow);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
-    
+
     @Test
     public void forExecutableRow_whichNotExists() {
         // prepare
@@ -278,7 +278,7 @@ public class TestCaseRemoveElementsTest {
         // verify
         assertThat(state).isFalse();
         assertThat(testCase.getExecutionContext()).doesNotContain(executionRow);
-        assertThat(testCase.getElements()).containsOnlyElementsOf(elementsWhichShouldRemain);
+        assertThat(testCase.getElements()).hasSameElementsAs(elementsWhichShouldRemain);
     }
 
     private void addOthersToDoNotRemove(final TestCase testCase) {
