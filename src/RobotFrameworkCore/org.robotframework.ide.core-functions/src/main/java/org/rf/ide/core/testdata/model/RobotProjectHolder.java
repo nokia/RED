@@ -99,8 +99,7 @@ public class RobotProjectHolder {
 
             } else if (varValue != null && varValue.getClass().isArray()) {
                 final List<Object> value = new ArrayList<>();
-                final Object[] array = ((Object[]) varValue);
-                value.addAll(Arrays.asList(array));
+                value.addAll(Arrays.asList((Object[]) varValue));
                 variables.add(new GlobalVariable<List<?>>(varName, value));
 
             } else {

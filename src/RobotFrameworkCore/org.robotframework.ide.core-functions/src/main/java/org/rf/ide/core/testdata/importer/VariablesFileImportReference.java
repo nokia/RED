@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 
@@ -57,41 +56,26 @@ public class VariablesFileImportReference {
         return lastModificationEpoch;
     }
 
-    public void map(final Map<?, ?> varsRead) {
-        final Set<?> variablesNames = varsRead.keySet();
-        for (final Object varName : variablesNames) {
-            final Object varValue = varsRead.get(varName);
-            AVariableImported<?> var;
+    public void map(final Map<String, Object> varsRead) {
+        varsRead.forEach((varName, varValue) -> {
             if (varValue instanceof List) {
-                final ListVariableImported listVar = new ListVariableImported("" + varName);
-                listVar.setValue((List<?>) varValue);
-                var = listVar;
+                final List<?> value = (List<?>) varValue;
+                variables.add(new ListVariableImported(varName, value));
+
             } else if (varValue instanceof Map) {
-                final DictionaryVariableImported dictVar = new DictionaryVariableImported("" + varName);
-                dictVar.setValue(convert((Map<?, ?>) varValue));
-                var = dictVar;
+                final Map<String, Object> value = new LinkedHashMap<>();
+                ((Map<?, ?>) varValue).forEach((k, v) -> value.put("" + k, v));
+                variables.add(new DictionaryVariableImported(varName, value));
+
             } else if (varValue != null && varValue.getClass().isArray()) {
-                final ListVariableImported arrayAsList = new ListVariableImported("" + varName);
-                arrayAsList.setValue(Arrays.asList((Object[]) varValue));
-                var = arrayAsList;
+                final List<Object> value = new ArrayList<>();
+                value.addAll(Arrays.asList((Object[]) varValue));
+                variables.add(new ListVariableImported(varName, value));
+
             } else {
-                final ScalarVariableImported scalarVar = new ScalarVariableImported("" + varName);
-                if (scalarVar != null) {
-                    scalarVar.setValue("" + varValue);
-                }
-                var = scalarVar;
+                variables.add(new ScalarVariableImported(varName, "" + varValue));
             }
-
-            variables.add(var);
-        }
-    }
-
-    private Map<String, Object> convert(final Map<?, ?> m) {
-        final Map<String, Object> map = new LinkedHashMap<>();
-        for (final Object key : m.keySet()) {
-            map.put((String) key, m.get(key));
-        }
-        return map;
+        });
     }
 
     public VariablesFileImportReference copy(final VariablesImport importDeclaration) {

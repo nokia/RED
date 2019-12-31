@@ -9,11 +9,9 @@ import java.util.Map;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
+public class DictionaryVariableImported extends AVariableImported<Map<String, ?>> {
 
-public class DictionaryVariableImported extends
-        AVariableImported<Map<String, ?>> {
-
-    public DictionaryVariableImported(final String name) {
-        super(name, VariableType.DICTIONARY);
+    public DictionaryVariableImported(final String name, final Map<String, ?> value) {
+        super(name, value, VariableType.DICTIONARY);
     }
 }

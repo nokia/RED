@@ -9,10 +9,9 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
-
 public class ListVariableImported extends AVariableImported<List<?>> {
 
-    public ListVariableImported(final String name) {
-        super(name, VariableType.LIST);
+    public ListVariableImported(final String name, final List<?> value) {
+        super(name, value, VariableType.LIST);
     }
 }

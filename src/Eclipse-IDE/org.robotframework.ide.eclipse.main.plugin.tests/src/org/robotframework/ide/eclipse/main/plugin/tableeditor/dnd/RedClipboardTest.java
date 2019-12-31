@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +44,9 @@ public class RedClipboardTest {
         clipboard.dispose();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToInsertSomeUnregisteredTypeOfData() {
-        new RedClipboard().insertContent(Integer.valueOf(42));
+        assertThatIllegalStateException().isThrownBy(() -> new RedClipboard().insertContent(42));
     }
 
     @Test

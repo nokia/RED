@@ -183,7 +183,7 @@ public class KeywordSearcher {
             final int o1Length = (o1 != null) ? o1.length() : 0;
             final int o2Length = (o2 != null) ? o2.length() : 0;
 
-            return -(Integer.compare(o1Length, o2Length)); // desc order
+            return Integer.compare(o2Length, o1Length); // desc order
         }
     }
 }

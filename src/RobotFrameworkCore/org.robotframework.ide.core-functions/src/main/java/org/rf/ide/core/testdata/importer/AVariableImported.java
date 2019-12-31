@@ -27,8 +27,9 @@ public abstract class AVariableImported<T> implements IVariableHolder {
 
     private T value;
 
-    public AVariableImported(final String name, final VariableType type) {
+    public AVariableImported(final String name, final T value, final VariableType type) {
         this.type = type;
+        this.value = value;
         if (shouldWrapName(name, type)) {
             final String corrected = correctName(name);
             this.name = corrected;

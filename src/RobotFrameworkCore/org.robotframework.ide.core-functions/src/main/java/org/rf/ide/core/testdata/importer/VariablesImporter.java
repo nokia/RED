@@ -94,7 +94,7 @@ public class VariablesImporter {
 
                     if (varImportRef == null) {
                         // could not find import reference in project, so will ask interpreter
-                        Map<?, ?> variablesFromFile = new HashMap<>();
+                        Map<String, Object> variablesFromFile = new HashMap<>();
                         try {
                             final List<String> pythonPaths = pathsProvider.provideUserSearchPaths()
                                     .stream()
