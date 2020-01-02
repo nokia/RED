@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -22,14 +23,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
 public class DeleteSectionCommandTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenNullSectionIsGivenForRemoval() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
-        ContextInjector.prepareContext()
+        assertThatIllegalStateException().isThrownBy(() -> ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new DeleteSectionCommand(null))
-                .execute();
+                .execute());
 
         verifyNoInteractions(eventBroker);
     }

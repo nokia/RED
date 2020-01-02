@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -432,14 +433,16 @@ public class AssistProposalsTest {
         assertThat(proposal.getDescription()).isEqualTo("Creates fresh dictionary variable");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void cannotCreateNewInvalidVariableProposalProperties() {
-        AssistProposals.createNewVariableProposal(VariableType.INVALID);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> AssistProposals.createNewVariableProposal(VariableType.INVALID));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void cannotCreateNewEnvironmentalVariableProposalProperties() {
-        AssistProposals.createNewVariableProposal(VariableType.ENVIRONMENT);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> AssistProposals.createNewVariableProposal(VariableType.ENVIRONMENT));
     }
 
     @Test

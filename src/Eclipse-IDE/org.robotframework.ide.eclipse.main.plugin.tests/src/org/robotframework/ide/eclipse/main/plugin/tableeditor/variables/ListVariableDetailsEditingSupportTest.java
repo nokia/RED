@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -28,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 
 public class ListVariableDetailsEditingSupportTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenTryingToGetInputOfDictionary() {
         final RobotVariablesSection section = createVariables();
 
@@ -37,7 +38,7 @@ public class ListVariableDetailsEditingSupportTest {
         final ListVariableDetailsEditingSupport support = new ListVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getInput(0, 3);
+        assertThatIllegalStateException().isThrownBy(() -> support.getInput(0, 3));
     }
 
     @Test
@@ -86,7 +87,7 @@ public class ListVariableDetailsEditingSupportTest {
         assertThat(input.get(0).getText()).isEqualTo("0");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void itIsIllegalToGetDetailElementsWhenInputWasNotTakenFirst() {
         final RobotVariablesSection section = createVariables();
 
@@ -95,7 +96,7 @@ public class ListVariableDetailsEditingSupportTest {
         final ListVariableDetailsEditingSupport support = new ListVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getDetailElements();
+        assertThatIllegalStateException().isThrownBy(() -> support.getDetailElements());
     }
 
     @Test

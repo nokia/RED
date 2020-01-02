@@ -6,6 +6,7 @@
 package org.robotframework.red.nattable.edit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
@@ -36,22 +37,24 @@ public class VariableNameRedCellEditorValidatorTest {
         testable.validate(varName, 0);
     }
 
-    @Test(expected = CellEditorValueValidationException.class)
+    @Test
     public void test_logicExecution_shouldBeSimpleErrorThrown_fromSuperClass() {
         // given
         final String varName = "  d";
 
-        // when
-        testable.validate(varName, 0);
+        // when then
+        assertThatExceptionOfType(CellEditorValueValidationException.class)
+                .isThrownBy(() -> testable.validate(varName, 0));
     }
 
-    @Test(expected = CellEditorValueValidationException.class)
+    @Test
     public void test_logicExecution_shouldBeSimpleErrorThrown_fromCurrentClass() {
         // given
         final String varName = "";
 
-        // when
-        testable.validate(varName, 0);
+        // when then
+        assertThatExceptionOfType(CellEditorValueValidationException.class)
+                .isThrownBy(() -> testable.validate(varName, 0));
     }
 
     @Test

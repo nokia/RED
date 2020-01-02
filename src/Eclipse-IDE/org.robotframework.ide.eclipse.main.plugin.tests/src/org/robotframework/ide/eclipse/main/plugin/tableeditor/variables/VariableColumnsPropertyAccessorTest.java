@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -78,18 +79,18 @@ public class VariableColumnsPropertyAccessorTest {
         assertThat(accessor.getDataValue(variables.get(4), 2)).isEqualTo("# comment 5");
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToGetValueForNonExisitingColumn_1() {
+    @Test
+    public void exceptionIsThrown_whenTryingToGetValueForNonExistingColumn_1() {
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(
                 mock(RobotEditorCommandsStack.class));
-        accessor.getDataValue(mock(RobotVariable.class), 3);
+        assertThatIllegalStateException().isThrownBy(() -> accessor.getDataValue(mock(RobotVariable.class), 3));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToGetValueForNonExisitingColumn_2() {
+    @Test
+    public void exceptionIsThrown_whenTryingToGetValueForNonExistingColumn_2() {
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(
                 mock(RobotEditorCommandsStack.class));
-        accessor.getDataValue(mock(RobotVariable.class), -1);
+        assertThatIllegalStateException().isThrownBy(() -> accessor.getDataValue(mock(RobotVariable.class), -1));
     }
 
     @Test
@@ -183,18 +184,20 @@ public class VariableColumnsPropertyAccessorTest {
         verify(stack, times(5)).execute(isA(SetVariableCommentCommand.class));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToSetValueInNonExisitingColumn_1() {
+    @Test
+    public void exceptionIsThrown_whenTryingToSetValueInNonExistingColumn_1() {
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(
                 mock(RobotEditorCommandsStack.class));
-        accessor.setDataValue(mock(RobotVariable.class), 3, "value");
+        assertThatIllegalStateException()
+                .isThrownBy(() -> accessor.setDataValue(mock(RobotVariable.class), 3, "value"));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToSetValueInNonExisitingColumn_2() {
+    @Test
+    public void exceptionIsThrown_whenTryingToSetValueInNonExistingColumn_2() {
         final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(
                 mock(RobotEditorCommandsStack.class));
-        accessor.setDataValue(mock(RobotVariable.class), -1, "value");
+        assertThatIllegalStateException()
+                .isThrownBy(() -> accessor.setDataValue(mock(RobotVariable.class), -1, "value"));
     }
 
     private static List<RobotVariable> createVariablesForTest() {

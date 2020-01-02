@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -203,11 +204,12 @@ public class SuitesToRunCompositeTest {
         assertThat(elements).isEqualTo(new Object[] { "abc", "def", "ghi" });
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void whenContentProviderIsAskedForElementsOfNotAList_exceptionIsThrown() {
         final CheckboxTreeViewerContentProvider provider = new CheckboxTreeViewerContentProvider();
 
-        provider.getElements(new Object[] { "abc", "def", "ghi" });
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> provider.getElements(new Object[] { "abc", "def", "ghi" }));
     }
 
     @Test

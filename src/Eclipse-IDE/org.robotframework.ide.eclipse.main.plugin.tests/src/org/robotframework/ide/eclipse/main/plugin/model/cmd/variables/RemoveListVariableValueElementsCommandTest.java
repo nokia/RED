@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -32,13 +33,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 
 public class RemoveListVariableValueElementsCommandTest {
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToRemoveElementsFromDictionary() {
         final RobotVariable variable = createVariables().get(3);
 
         final RemoveListVariableValueElementsCommand command = new RemoveListVariableValueElementsCommand(variable,
                 newArrayList(new RobotToken()));
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
     @Test

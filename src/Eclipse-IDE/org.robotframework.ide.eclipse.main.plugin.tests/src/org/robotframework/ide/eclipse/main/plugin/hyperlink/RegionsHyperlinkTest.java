@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,7 +85,7 @@ public class RegionsHyperlinkTest {
         assertThat(textControl.getSelectionText()).isEqualTo("fff");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetLineOfInvalidOffset() throws Exception {
         final int targetOffset = -10;
 
@@ -95,6 +96,7 @@ public class RegionsHyperlinkTest {
         when(textViewer.getDocument()).thenReturn(document);
 
         final RegionsHyperlink link = new RegionsHyperlink(textViewer, new Region(20, 50), new Region(targetOffset, 3));
-        link.open();
+
+        assertThatIllegalArgumentException().isThrownBy(link::open);
     }
 }

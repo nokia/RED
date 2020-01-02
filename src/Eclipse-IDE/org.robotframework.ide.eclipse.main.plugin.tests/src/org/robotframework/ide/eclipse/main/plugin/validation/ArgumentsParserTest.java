@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
 
@@ -15,18 +16,20 @@ import org.robotframework.ide.eclipse.main.plugin.validation.ArgumentsParser.Inv
 
 public class ArgumentsParserTest {
 
-    @Test(expected = InvalidArgumentsProvidedException.class)
+    @Test
     public void exceptionIsThrown_whenThereAreNoArgumentsProvided() {
         final ArgumentsParser parser = new ArgumentsParser();
 
-        parser.parseArguments(new ArrayList<>());
+        assertThatExceptionOfType(InvalidArgumentsProvidedException.class)
+                .isThrownBy(() -> parser.parseArguments(new ArrayList<>()));
     }
 
-    @Test(expected = InvalidArgumentsProvidedException.class)
+    @Test
     public void exceptionIsThrown_whenUnrecognizedSwitchIsProvided() {
         final ArgumentsParser parser = new ArgumentsParser();
 
-        parser.parseArguments(newArrayList("-something"));
+        assertThatExceptionOfType(InvalidArgumentsProvidedException.class)
+                .isThrownBy(() -> parser.parseArguments(newArrayList("-something")));
     }
 
     @Test

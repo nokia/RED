@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -31,24 +33,28 @@ import org.robotframework.red.jface.viewers.Stylers;
 
 public class RedCompletionProposalTest {
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullCannotBePassedAsReplacementString() {
-        new RedCompletionProposal(null, 0, 0, 0, 0, 0, null, false, null, true, new ArrayList<Runnable>(), null, false);
+        assertThatNullPointerException().isThrownBy(() -> new RedCompletionProposal(null, 0, 0, 0, 0, 0, null, false,
+                null, true, new ArrayList<Runnable>(), null, false));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void negativeNumberCannotBePassedAsReplacementOffset() {
-        new RedCompletionProposal("", -10, 0, 0, 0, 0, null, false, null, true, new ArrayList<Runnable>(), null, false);
+        assertThatIllegalStateException().isThrownBy(() -> new RedCompletionProposal("", -10, 0, 0, 0, 0, null, false,
+                null, true, new ArrayList<Runnable>(), null, false));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void negativeNumberCannotBePassedAsReplacementLength() {
-        new RedCompletionProposal("", 0, -10, 0, 0, 0, null, false, null, true, new ArrayList<Runnable>(), null, false);
+        assertThatIllegalStateException().isThrownBy(() -> new RedCompletionProposal("", 0, -10, 0, 0, 0, null, false,
+                null, true, new ArrayList<Runnable>(), null, false));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void negativeNumberCannotBePassedAsCursorPosition() {
-        new RedCompletionProposal("", 0, 0, 0, -50, 0, null, false, null, true, new ArrayList<Runnable>(), null, false);
+        assertThatIllegalStateException().isThrownBy(() -> new RedCompletionProposal("", 0, 0, 0, -50, 0, null, false,
+                null, true, new ArrayList<Runnable>(), null, false));
     }
 
     @Test

@@ -6,6 +6,9 @@
 package org.robotframework.red.viewers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,7 +43,7 @@ public class ViewersTest {
 
         final TableViewer viewer = new TableViewer(shellProvider.getShell());
         Viewers.boundViewerWithContext(viewer, site, "contextId");
-        
+
         viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
 
         verify(contextService, times(1)).activateContext("contextId");
@@ -85,7 +88,7 @@ public class ViewersTest {
         assertThat(Viewers.createOrderIndexToPositionIndex(viewer, 2)).isEqualTo(1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenGettingPositionFromNonExistingOrderIndex() {
         final TreeViewer viewer = new TreeViewer(shellProvider.getShell());
 
@@ -95,18 +98,18 @@ public class ViewersTest {
         // swapping order
         viewer.getTree().setColumnOrder(new int[] { 1, 0 });
 
-        Viewers.createOrderIndexToPositionIndex(viewer, 2);
+        assertThatIllegalArgumentException().isThrownBy(() -> Viewers.createOrderIndexToPositionIndex(viewer, 2));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetPositionFromNullViewer() {
-        Viewers.createOrderIndexToPositionIndex(null, 2);
+        assertThatIllegalStateException().isThrownBy(() -> Viewers.createOrderIndexToPositionIndex(null, 2));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetPositionFromUnknownViewerType() {
         final ColumnViewer viewer = mock(ColumnViewer.class);
-        Viewers.createOrderIndexToPositionIndex(viewer, 2);
+        assertThatIllegalStateException().isThrownBy(() -> Viewers.createOrderIndexToPositionIndex(viewer, 2));
     }
 
     @Test
@@ -125,7 +128,7 @@ public class ViewersTest {
         assertThat(Viewers.positionIndexToCreateOrderIndex(viewer, 2)).isEqualTo(0);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void exceptionIsThrown_whenGettingOrderIndexFromNonExistingPosition() {
         final TableViewer viewer = new TableViewer(shellProvider.getShell());
 
@@ -135,17 +138,18 @@ public class ViewersTest {
         // swapping order
         viewer.getTable().setColumnOrder(new int[] { 1, 0 });
 
-        Viewers.positionIndexToCreateOrderIndex(viewer, 2);
+        assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                .isThrownBy(() -> Viewers.positionIndexToCreateOrderIndex(viewer, 2));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetCreateIndexFromNullViewer() {
-        Viewers.positionIndexToCreateOrderIndex(null, 2);
+        assertThatIllegalStateException().isThrownBy(() -> Viewers.positionIndexToCreateOrderIndex(null, 2));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToGetCreateIndexFromUnknownViewerType() {
         final ColumnViewer viewer = mock(ColumnViewer.class);
-        Viewers.positionIndexToCreateOrderIndex(viewer, 2);
+        assertThatIllegalStateException().isThrownBy(() -> Viewers.positionIndexToCreateOrderIndex(viewer, 2));
     }
 }

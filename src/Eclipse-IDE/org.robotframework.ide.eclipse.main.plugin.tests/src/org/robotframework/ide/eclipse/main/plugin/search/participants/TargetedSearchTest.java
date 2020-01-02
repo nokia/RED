@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.search.participants;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -66,7 +67,7 @@ public class TargetedSearchTest {
         verify(targetedSearch, times(3)).locateMatchesInRobotFile(any(RobotSuiteFile.class));
     }
 
-    @Test(expected = OperationCanceledException.class)
+    @Test
     public void whenTargetSearchWasCancelledWhenRunWithFiles_searchIsNotContinued() {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
         monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
@@ -75,7 +76,9 @@ public class TargetedSearchTest {
                 projectProvider.getFile("file2.robot"), projectProvider.getFile("file3.robot"));
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
-        targetedSearch.run(monitor, LinkedHashMultimap.create(), files);
+
+        assertThatExceptionOfType(OperationCanceledException.class)
+                .isThrownBy(() -> targetedSearch.run(monitor, LinkedHashMultimap.create(), files));
     }
 
     @Test
@@ -108,7 +111,7 @@ public class TargetedSearchTest {
         verify(targetedSearch, never()).locateMatchesInRobotFile(any(RobotSuiteFile.class));
     }
 
-    @Test(expected = OperationCanceledException.class)
+    @Test
     public void whenTargetSearchWasCancelledWhenRunWithLibraries_searchIsNotContinued() {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
         monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
@@ -117,7 +120,9 @@ public class TargetedSearchTest {
         libraries.put(projectProvider.getProject(), new LibrarySpecification());
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
-        targetedSearch.run(monitor, libraries, new HashSet<IFile>());
+
+        assertThatExceptionOfType(OperationCanceledException.class)
+                .isThrownBy(() -> targetedSearch.run(monitor, libraries, new HashSet<IFile>()));
     }
 
     private static TargetedSearch createTargetedSearch(final SearchPattern pattern, final SearchResult result) {

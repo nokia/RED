@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -23,25 +24,31 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 
 public class SetScalarValueCommandTest {
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_1() {
         final RobotVariable variable = createVariablesForTest().get(3);
 
-        new SetScalarValueCommand(variable, "42").execute();
+        final SetScalarValueCommand command = new SetScalarValueCommand(variable, "42");
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_2() {
         final RobotVariable variable = createVariablesForTest().get(4);
 
-        new SetScalarValueCommand(variable, "42").execute();
+        final SetScalarValueCommand command = new SetScalarValueCommand(variable, "42");
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToSetValueToNonScalarVariable_3() {
         final RobotVariable variable = createVariablesForTest().get(5);
 
-        new SetScalarValueCommand(variable, "42").execute();
+        final SetScalarValueCommand command = new SetScalarValueCommand(variable, "42");
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
     @Test

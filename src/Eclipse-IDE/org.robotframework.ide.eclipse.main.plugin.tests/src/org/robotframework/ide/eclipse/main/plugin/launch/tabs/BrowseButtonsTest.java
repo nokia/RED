@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
 import org.rf.ide.core.RedSystemProperties;
@@ -13,12 +15,19 @@ import org.rf.ide.core.RedSystemProperties;
 public class BrowseButtonsTest {
 
     @Test
-    public void systemDependentExecutableFileExtensionsAreRetrieved() {
-        final String[] expectedScriptExtensions = RedSystemProperties.isWindowsPlatform()
-                ? new String[] { "*.bat;*.com;*.exe", "*.*" }
-                : new String[] { "*.sh", "*.*" };
-        assertThat(BrowseButtons.getSystemDependentExecutableFileExtensions())
-                .containsExactly(expectedScriptExtensions);
+    public void executableFileExtensionsAreRetrieved_forWindows() {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final String[] extensions = BrowseButtons.getSystemDependentExecutableFileExtensions();
+        assertThat(extensions).containsExactly("*.bat;*.com;*.exe", "*.*");
+    }
+
+    @Test
+    public void executableFileExtensionsAreRetrieved_forLinux() {
+        assumeFalse(RedSystemProperties.isWindowsPlatform());
+
+        final String[] extensions = BrowseButtons.getSystemDependentExecutableFileExtensions();
+        assertThat(extensions).containsExactly("*.sh", "*.*");
     }
 
 }

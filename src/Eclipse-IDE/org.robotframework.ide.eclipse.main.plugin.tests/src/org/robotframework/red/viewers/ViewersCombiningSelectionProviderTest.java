@@ -6,6 +6,7 @@
 package org.robotframework.red.viewers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +28,10 @@ public class ViewersCombiningSelectionProviderTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void npeIsThrown_whenTryingToCreateProviderFromNullArray() {
         final TableViewer[] viewers = null;
-        new ViewersCombiningSelectionProvider(viewers);
+        assertThatNullPointerException().isThrownBy(() -> new ViewersCombiningSelectionProvider(viewers));
     }
 
     @Test
@@ -103,7 +104,7 @@ public class ViewersCombiningSelectionProviderTest {
         viewer2.setSelection(newSelection("viewer2_y"));
 
         viewer1.getTable().notifyListeners(SWT.FocusIn, new Event());
-        
+
         assertThat(provider.getSelection()).isEqualTo(newSelection("viewer1_a"));
     }
 

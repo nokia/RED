@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -28,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 
 public class DictVariableDetailsEditingSupportTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenTryingToGetInputOfScalar_1() {
         final RobotVariablesSection section = createVariables();
 
@@ -37,10 +38,10 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getInput(0, 0);
+        assertThatIllegalStateException().isThrownBy(() -> support.getInput(0, 0));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenTryingToGetInputOfScalar_2() {
         final RobotVariablesSection section = createVariables();
 
@@ -49,10 +50,10 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getInput(0, 1);
+        assertThatIllegalStateException().isThrownBy(() -> support.getInput(0, 1));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenTryingToGetInputOfList() {
         final RobotVariablesSection section = createVariables();
 
@@ -61,10 +62,10 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getInput(0, 2);
+        assertThatIllegalStateException().isThrownBy(() -> support.getInput(0, 2));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrownWhenTryingToGetInputOfInvalid() {
         final RobotVariablesSection section = createVariables();
 
@@ -73,7 +74,7 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getInput(0, 4);
+        assertThatIllegalStateException().isThrownBy(() -> support.getInput(0, 4));
     }
 
     @Test
@@ -92,7 +93,7 @@ public class DictVariableDetailsEditingSupportTest {
         assertThat(input.get(2).getRaw().getText()).isEqualTo("c=3");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void itIsIllegalToGetDetailElementsWhenInputWasNotTakenFirst() {
         final RobotVariablesSection section = createVariables();
 
@@ -101,7 +102,7 @@ public class DictVariableDetailsEditingSupportTest {
         final DictVariableDetailsEditingSupport support = new DictVariableDetailsEditingSupport(mock(TableTheme.class),
                 dataProvider, commandsStack);
 
-        support.getDetailElements();
+        assertThatIllegalStateException().isThrownBy(() -> support.getDetailElements());
     }
 
     @Test

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -29,13 +30,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 
 public class MoveListVariableValueElementsCommandTest {
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToMoveElementsInDictionary() {
         final RobotVariable variable = createVariables().get(3);
 
         final MoveListVariableValueElementsCommand command = new MoveListVariableValueElementsCommand(variable,
                 newArrayList(new RobotToken()), MoveDirection.UP);
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
     @Test

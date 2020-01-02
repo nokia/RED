@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -109,14 +111,11 @@ public class CreateResourceFileFixerTest {
 
     @Test
     public void testGetValidPathToCreate_whenIllegalCharactersPath() throws Exception {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "illeg*l/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        if (RedSystemProperties.isWindowsPlatform()) {
-            assertThat(path).isNotPresent();
-        } else {
-            assertThat(path).hasValueSatisfying(
-                    equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/illeg*l/res.robot"));
-        }
+        assertThat(path).isNotPresent();
     }
 
     @Test
@@ -143,9 +142,21 @@ public class CreateResourceFileFixerTest {
     }
 
     @Test
-    public void testGetValidPathToCreate_whenAbsolutePathFromAnotherSystem() throws Exception {
-        final String anotherSystemWorkspace = RedSystemProperties.isWindowsPlatform() ? workspaceDir.substring(2)
-                : "D:" + workspaceDir;
+    public void testGetValidPathToCreate_whenAbsolutePathFromAnotherSystem_forWindows() throws Exception {
+        assumeTrue(RedSystemProperties.isWindowsPlatform());
+
+        final String anotherSystemWorkspace = workspaceDir.substring(2);
+        marker.setAttribute(AdditionalMarkerAttributes.PATH,
+                anotherSystemWorkspace + "/" + projectProvider.getProject().getName() + "/res.robot");
+        final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
+        assertThat(path).isNotPresent();
+    }
+
+    @Test
+    public void testGetValidPathToCreate_whenAbsolutePathFromAnotherSystem_forLinux() throws Exception {
+        assumeFalse(RedSystemProperties.isWindowsPlatform());
+
+        final String anotherSystemWorkspace = "D:" + workspaceDir;
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
                 anotherSystemWorkspace + "/" + projectProvider.getProject().getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);

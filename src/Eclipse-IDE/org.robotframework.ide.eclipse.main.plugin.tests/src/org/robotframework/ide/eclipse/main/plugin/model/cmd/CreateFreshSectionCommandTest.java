@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,14 +35,16 @@ public class CreateFreshSectionCommandTest {
         eventBroker = mock(IEventBroker.class);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToCreateUnknownSection() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
 
-        ContextInjector.prepareContext()
+        assertThatIllegalStateException().isThrownBy(() -> ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new CreateFreshSectionCommand(model, "invalid"))
-                .execute();
+                .execute());
+
+        verifyNoInteractions(eventBroker);
     }
 
     @Test

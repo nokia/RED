@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -28,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.Comm
 
 public class MoveDictVariableValueElementsCommandTest {
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToMoveElementsInsideScalar_1() {
         final RobotVariable variable = createVariables().get(0);
 
@@ -36,10 +37,11 @@ public class MoveDictVariableValueElementsCommandTest {
                 new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToMoveElementsInsideScalar_2() {
         final RobotVariable variable = createVariables().get(1);
 
@@ -47,10 +49,11 @@ public class MoveDictVariableValueElementsCommandTest {
                 new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToMoveElementsInsideList() {
         final RobotVariable variable = createVariables().get(2);
 
@@ -58,10 +61,11 @@ public class MoveDictVariableValueElementsCommandTest {
                 new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToMoveElementsInsideInvalid() {
         final RobotVariable variable = createVariables().get(4);
 
@@ -69,7 +73,8 @@ public class MoveDictVariableValueElementsCommandTest {
                 new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
-        command.execute();
+
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(command::execute);
     }
 
     @Test

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.jface.viewers.Viewer;
@@ -49,9 +50,10 @@ public class RobotElementsSorterTest {
         assertThat(sorter.category(mock(RobotVariable.class))).isZero();
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void itsAnErrorToCompareObjectsOtherThanRobotElements() {
-        sorter.compare(mock(Viewer.class), "abc", "def");
+        assertThatExceptionOfType(ClassCastException.class)
+                .isThrownBy(() -> sorter.compare(mock(Viewer.class), "abc", "def"));
     }
 
     @Test

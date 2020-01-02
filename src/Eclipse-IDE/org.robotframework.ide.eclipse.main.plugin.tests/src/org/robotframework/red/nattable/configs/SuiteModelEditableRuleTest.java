@@ -6,6 +6,7 @@
 package org.robotframework.red.nattable.configs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -21,11 +22,12 @@ import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
 public class SuiteModelEditableRuleTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void ruleCannotBeAskedForEditabilityUsingIndexes() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
         final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
-        rule.isEditable(1, 1);
+
+        assertThatIllegalStateException().isThrownBy(() -> rule.isEditable(1, 1));
     }
 
     @Test

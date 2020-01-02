@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,16 +43,18 @@ public class LaunchConfigurationsWrappersTest {
         assertThat(wrapper).isExactlyInstanceOf(RemoteRobotLaunchConfiguration.class);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenCreatingWrapperForUnknownConfigurationType() throws Exception {
         final ILaunchConfiguration config = createConfigurationMock("unknown");
-        LaunchConfigurationsWrappers.robotLaunchConfiguration(config);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> LaunchConfigurationsWrappers.robotLaunchConfiguration(config));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void exceptionIsThrown_whenCreatingWrapperForProblematicConfiguration() throws Exception {
         final ILaunchConfiguration config = createExceptionsThrowingConfigurationMock();
-        LaunchConfigurationsWrappers.robotLaunchConfiguration(config);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> LaunchConfigurationsWrappers.robotLaunchConfiguration(config));
     }
 
     @Test
@@ -91,7 +95,7 @@ public class LaunchConfigurationsWrappersTest {
         assertThat(robotProcess.getLaunch()).isSameAs(launch);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenCreatingProcessForUnknownConfigurationType() throws Exception {
         final ILaunchConfiguration config = createConfigurationMock("unknown");
         final ILaunch launch = mock(ILaunch.class);
@@ -103,10 +107,12 @@ public class LaunchConfigurationsWrappersTest {
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
-        processFactory.newProcess(launch, process, "name", new HashMap<>());
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> processFactory.newProcess(launch, process, "name", new HashMap<>()));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenCreatingProcessForProblematicConfiguration() throws Exception {
         final ILaunchConfiguration config = createExceptionsThrowingConfigurationMock();
         final ILaunch launch = mock(ILaunch.class);
@@ -118,7 +124,9 @@ public class LaunchConfigurationsWrappersTest {
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
-        processFactory.newProcess(launch, process, "name", new HashMap<>());
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> processFactory.newProcess(launch, process, "name", new HashMap<>()));
     }
 
     private ILaunchConfiguration createConfigurationMock(final String id) throws CoreException {

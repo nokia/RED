@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -40,12 +41,13 @@ public class RedTokensStoreTest {
         verify(doc1, times(1)).addParseListener(any(IRobotDocumentParsingListener.class));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionIsThrown_whenTryingToInstallStoreForDocumentWhenItAlreadyHaveOne() {
         final RedTokensStore store = new RedTokensStore();
 
         store.installFor(mock(RobotDocument.class));
-        store.installFor(mock(RobotDocument.class));
+
+        assertThatIllegalStateException().isThrownBy(() -> store.installFor(mock(RobotDocument.class)));
     }
 
     @Test
@@ -152,7 +154,7 @@ public class RedTokensStoreTest {
                 new PositionedTextToken(new Token("t2"), 1, 2), new PositionedTextToken(new Token("t3"), 3, 3),
                 new PositionedTextToken(new Token("t4"), 6, 4), new PositionedTextToken(new Token("marker"), 10, 0),
                 new PositionedTextToken(new Token("t5"), 10, 5));
-        
+
         for (final List<PositionedTextToken> permutation : Collections2.permutations(positions)) {
             final RedTokensStore store = new RedTokensStore();
             for (final PositionedTextToken positionedToken : permutation) {
@@ -188,7 +190,7 @@ public class RedTokensStoreTest {
     }
 
     @Test
-    public void whenTokenIsInsertedAtOffsetOfAlreadyExistingEmptyToken_itIsAddedProperlyAndNoExcetpionIsThrown() {
+    public void whenTokenIsInsertedAtOffsetOfAlreadyExistingEmptyToken_itIsAddedProperlyAndNoExceptionIsThrown() {
         final RedTokensStore store = new RedTokensStore();
         store.insert(10, 0, new Token("marker"));
         store.insert(10, 3, new Token("t"));
@@ -199,7 +201,7 @@ public class RedTokensStoreTest {
     }
 
     @Test
-    public void whenEmptyTokenIsInsertedAtOffsetOfAlreadyExistingToken_itIsAddedProperlyAndNoExcetpionIsThrown() {
+    public void whenEmptyTokenIsInsertedAtOffsetOfAlreadyExistingToken_itIsAddedProperlyAndNoExceptionIsThrown() {
         final RedTokensStore store = new RedTokensStore();
         store.insert(10, 3, new Token("t"));
         store.insert(10, 0, new Token("marker"));
