@@ -9,29 +9,29 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 
 public class RobotDryRunLibraryImportTest {
 
-    public static List<Object[]> provideTestData() throws Exception {
-        return Arrays.asList(new Object[][] { { "UnknownLibrary", null, DryRunLibraryType.UNKNOWN },
-                { "UnsupportedLibrary", new URI("file:///source.txt"), DryRunLibraryType.UNKNOWN },
-                { "PythonSourceLibrary", new URI("file:///source.py"), DryRunLibraryType.PYTHON },
-                { "JavaSourceLibrary", new URI("file:///source.java"), DryRunLibraryType.JAVA },
-                { "JarSourceLibrary", new URI("file:///source.jar"), DryRunLibraryType.JAVA },
-                { "JarUpperSourceLibrary", new URI("file:///SOURCE.JAR"), DryRunLibraryType.JAVA },
-                { "ClassSourceLibrary", new URI("file:///source.class"), DryRunLibraryType.JAVA },
-                { "Remote", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE },
-                { "Remote http://9.8.7.6:1234", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE } });
+    private static Stream<Arguments> provideTestData() throws Exception {
+        return Stream.of(Arguments.of("UnknownLibrary", null, DryRunLibraryType.UNKNOWN),
+                Arguments.of("UnsupportedLibrary", new URI("file:///source.txt"), DryRunLibraryType.UNKNOWN),
+                Arguments.of("PythonSourceLibrary", new URI("file:///source.py"), DryRunLibraryType.PYTHON),
+                Arguments.of("JavaSourceLibrary", new URI("file:///source.java"), DryRunLibraryType.JAVA),
+                Arguments.of("JarSourceLibrary", new URI("file:///source.jar"), DryRunLibraryType.JAVA),
+                Arguments.of("JarUpperSourceLibrary", new URI("file:///SOURCE.JAR"), DryRunLibraryType.JAVA),
+                Arguments.of("ClassSourceLibrary", new URI("file:///source.class"), DryRunLibraryType.JAVA),
+                Arguments.of("Remote", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE),
+                Arguments.of("Remote http://9.8.7.6:1234", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE));
     }
 
     @ParameterizedTest
