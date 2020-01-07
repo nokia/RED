@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _o-zggNaZEee1ReYWE7p2AA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/20/19 4:41 PM
+Save-Time: 1/7/20 11:32 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -117,7 +117,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
 //console color
 with [get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1] {
     get-property backgroundColor | equals "#2F2F2F" | verify-true
-    get-property foregroundColor | equals "#AAAAAA" | verify-true   //gray
+    get-property foregroundColor | equals "#CCCCCC" | verify-true   //gray
 }
 
 //views
@@ -138,7 +138,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 with [get-view Outline | get-tree] {
     get-property backgroundColor | equals "#2F2F2F" | verify-true
-    get-property foregroundColor | equals "#AAAAAA" | verify-true
+    get-property foregroundColor | equals "#CCCCCC" | verify-true
 }
 
 //go to tC table 
@@ -251,4 +251,5 @@ with [get-window Preferences] {
     get-button "Restore Defaults" | click
     get-button "Apply and Close" | click
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
