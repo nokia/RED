@@ -333,17 +333,17 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void keyReleased(final KeyEvent e) {
-                if (e.stateMask == SWT.CTRL && e.character == 'c') {
+                if (e.stateMask == SWT.CTRL && e.keyCode == 'c') {
                     documentation.copy();
 
-                } else if (e.stateMask == SWT.CTRL && e.character == 'x') {
+                } else if (e.stateMask == SWT.CTRL && e.keyCode == 'x') {
                     documentation.cut();
 
-                } else if (e.stateMask == SWT.CTRL && e.character == 'z') {
+                } else if (e.stateMask == SWT.CTRL && e.keyCode == 'z') {
                     updateDocumentationWithPositionPresave(
                             getDocumentation(getSection(), hasEditDocRepresentation.get()));
 
-                } else if (e.stateMask == SWT.CTRL && e.character == 'y') {
+                } else if (e.stateMask == SWT.CTRL && e.keyCode == 'y') {
                     updateDocumentationWithPositionPresave(
                             getDocumentation(getSection(), hasEditDocRepresentation.get()));
 
@@ -353,7 +353,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 } else if (e.character == '#') {
                     updateDocumentationWithPositionPresave(escapeNotEscapedHashSigns(documentation.getText()));
 
-                } else if (e.character == SWT.SPACE) {
+                } else if (e.keyCode == SWT.SPACE) {
                     updateDocumentationWithPositionPresave(documentation.getText().replaceAll("  ", " \\\\ "));
                 }
             }
