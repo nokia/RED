@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _GRUFABtrEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/11/19 3:15 PM
+Save-Time: 1/8/20 11:35 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -171,7 +171,7 @@ if [$robot_version | matches "Robot Framework 3\.1.*"]{
 	// use QF from Problems view
 	wait-for-warnings -amount 1
 
-	wait 2000
+	wait 3000
 	get-view Problems | get-tree | select "Warnings (1 item)/The name of template keyword is written in multiple cells" 
 	    | get-menu -path "Quick Fix" | click
 	    
