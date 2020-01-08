@@ -25,7 +25,7 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.rflint.RfLintRuleConfiguration;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;

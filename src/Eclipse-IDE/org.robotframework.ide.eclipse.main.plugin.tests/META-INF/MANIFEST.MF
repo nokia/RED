@@ -7,6 +7,7 @@ Fragment-Host: org.robotframework.ide.eclipse.main.plugin;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Nokia Solutions and Networks
 Require-Bundle: org.junit;bundle-version="4.11.0",
+ org.junit.jupiter.api,
  org.eclipse.equinox.event
 Bundle-ClassPath: .,
  lib/assertj-core-3.14.0.jar,

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -46,7 +46,7 @@ public class RedThemeTest {
                 .filter(f -> f.getType().isAssignableFrom(String.class))
                 .filter(f -> f.getName().endsWith("_COLOR"))
                 .collect(Collectors.toList());
-        final List<String> colorIds = new ArrayList<String>();
+        final List<String> colorIds = new ArrayList<>();
         for (final Field field : redColorNameFields) {
             field.setAccessible(true);
             final String id = (String) field.get(new RedTheme());

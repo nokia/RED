@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<jacoco.version>0.8.2</jacoco.version>
+		<jacoco.version>0.8.5</jacoco.version>
 		<org.junit.jupiter.version>5.5.2</org.junit.jupiter.version>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<skip.unit.tests>false</skip.unit.tests>
