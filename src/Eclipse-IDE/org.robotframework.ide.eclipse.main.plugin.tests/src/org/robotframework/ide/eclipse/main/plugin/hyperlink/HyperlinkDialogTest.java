@@ -18,18 +18,21 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class HyperlinkDialogTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void afterOpeningDialogPresentsTableWithGivenHyperlinks() {
@@ -45,7 +48,7 @@ public class HyperlinkDialogTest {
 
         final List<RedHyperlink> hyperlinks = newArrayList(link1, link2);
 
-        final HyperlinkDialog dialog = new HyperlinkDialog(shellProvider.getShell(), "name", hyperlinks);
+        final HyperlinkDialog dialog = new HyperlinkDialog(shell, "name", hyperlinks);
         dialog.open();
 
 
@@ -78,7 +81,7 @@ public class HyperlinkDialogTest {
 
         final List<RedHyperlink> hyperlinks = newArrayList(link1, link2);
 
-        final HyperlinkDialog dialog = new HyperlinkDialog(shellProvider.getShell(), "name", hyperlinks);
+        final HyperlinkDialog dialog = new HyperlinkDialog(shell, "name", hyperlinks);
         dialog.open();
 
         final Table table = (Table) dialog.getFocusControl();

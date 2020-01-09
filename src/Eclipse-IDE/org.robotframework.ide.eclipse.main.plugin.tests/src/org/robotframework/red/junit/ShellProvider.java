@@ -10,12 +10,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
 /**
  * JUnit Rule which handles creation of new shell, its opening, closing and disposing.
  * 
  * @author Michal Anglart
+ * @deprecated Use {@link FreshShell} annotation with {@link FreshShellExtension}
+ *             extension due to move to JUnit 5
  */
+@Deprecated
 public class ShellProvider implements TestRule {
 
     private Shell shell;

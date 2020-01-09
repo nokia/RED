@@ -7,26 +7,27 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.red.junit.PreferenceUpdater;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.IntegerPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
 
+@ExtendWith(PreferencesExtension.class)
 public class ExecutionMessagesStoreTest {
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     private ExecutionMessagesStore store;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         store = new ExecutionMessagesStore();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         store.dispose();
     }
@@ -70,11 +71,10 @@ public class ExecutionMessagesStoreTest {
         assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
+    @BooleanPreference(key = RedPreferences.LIMIT_MSG_LOG_OUTPUT, value = true)
+    @IntegerPreference(key = RedPreferences.LIMIT_MSG_LOG_LENGTH, value = 5)
     @Test
     public void storeOnlyRemembersLastCharacters_whenCharactersLimitIsSet() {
-        preferenceUpdater.setValue(RedPreferences.LIMIT_MSG_LOG_OUTPUT, true);
-        preferenceUpdater.setValue(RedPreferences.LIMIT_MSG_LOG_LENGTH, 5);
-
         store.open();
         store.append("message");
 
@@ -83,7 +83,7 @@ public class ExecutionMessagesStoreTest {
         store.append("1");
         assertThat(store.getMessage()).isEqualTo("sage1");
 
-        preferenceUpdater.setValue(RedPreferences.LIMIT_MSG_LOG_LENGTH, 3);
+        RedPlugin.getDefault().getPreferenceStore().setValue(RedPreferences.LIMIT_MSG_LOG_LENGTH, 3);
         assertThat(store.getMessage()).isEqualTo("sage1");
 
         store.append("2");

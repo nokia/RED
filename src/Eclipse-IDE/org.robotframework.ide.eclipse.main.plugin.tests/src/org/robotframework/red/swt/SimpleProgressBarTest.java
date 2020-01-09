@@ -9,19 +9,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withinPercentage;
 
 import org.eclipse.swt.graphics.RGB;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SimpleProgressBarTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void newlyCreatedProgressBarHaveZeroProgressAndBarOfBackgroundColor() {
-        final SimpleProgressBar bar = new SimpleProgressBar(shellProvider.getShell());
+        final SimpleProgressBar bar = new SimpleProgressBar(shell);
         bar.setBackground(ColorsManager.getColor(100, 110, 120));
 
         assertThat(bar.getProgress()).isCloseTo(0.0, withinPercentage(0.001));
@@ -30,7 +33,7 @@ public class SimpleProgressBarTest {
 
     @Test
     public void progressBarChangesBarColorAsRequested() {
-        final SimpleProgressBar bar = new SimpleProgressBar(shellProvider.getShell());
+        final SimpleProgressBar bar = new SimpleProgressBar(shell);
         bar.setBarColor(ColorsManager.getColor(200, 190, 180));
 
         assertThat(bar.getBarColor().getRGB()).isEqualTo(new RGB(200, 190, 180));
@@ -38,10 +41,9 @@ public class SimpleProgressBarTest {
 
     @Test
     public void progressBarHaveProperProgress_whenProgressIsReported() {
-        final SimpleProgressBar bar = new SimpleProgressBar(shellProvider.getShell());
+        final SimpleProgressBar bar = new SimpleProgressBar(shell);
         bar.setProgress(4, 10);
 
         assertThat(bar.getProgress()).isCloseTo(0.4, withinPercentage(0.001));
     }
-
 }

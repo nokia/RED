@@ -18,19 +18,21 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
 import com.google.common.base.Joiner;
 
+@ExtendWith(FreshShellExtension.class)
 public class RegionsHyperlinkTest {
 
-    @ClassRule
-    public static ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void testRegionsHyperlinkProperties_1() {
@@ -64,7 +66,6 @@ public class RegionsHyperlinkTest {
 
     @Test
     public void testIfDestinationRegionIsCorrectlySelected() throws Exception {
-        final Shell shell = shellProvider.getShell();
         final StyledText textControl = new StyledText(shell, SWT.MULTI);
         textControl.setText(Joiner.on('\n').join(newArrayList("aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc", "dddddddddd",
                 "eeeeeeeeee", "ffffffffff", "gggggggggg", "hhhhhhhhhh")));

@@ -8,23 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.red.junit.PreferenceUpdater;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
 
+@ExtendWith(PreferencesExtension.class)
 public class RedPreferencesPropertyTesterTest {
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     private final RedPreferencesPropertyTester tester = new RedPreferencesPropertyTester();
 
+    @BooleanPreference(key = RedPreferences.TURN_OFF_VALIDATION, value = true)
     @Test
     public void trueIsReturned_whenValidationIsTurnedOff() {
-        preferenceUpdater.setValue(RedPreferences.TURN_OFF_VALIDATION, true);
-
         final RobotFormEditor editor = mock(RobotFormEditor.class);
         final boolean testResult = tester.test(editor, "isValidationTurnedOff", null, true);
 

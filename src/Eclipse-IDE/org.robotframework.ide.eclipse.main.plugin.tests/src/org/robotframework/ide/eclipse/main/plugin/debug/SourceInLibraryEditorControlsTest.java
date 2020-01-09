@@ -12,27 +12,28 @@ import java.util.List;
 
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInput.SourceOfStackFrameInLibrary;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SourceInLibraryEditorControlsTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void controlsAreConstructedProperly() {
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceInLibraryEditorControls controls = new SourceInLibraryEditorControls(mock(IWorkbenchPage.class));
@@ -52,7 +53,6 @@ public class SourceInLibraryEditorControlsTest {
         final SourceInLibraryEditorInput input = new SourceInLibraryEditorInput(
                 new SourceOfStackFrameInLibrary("kw", null));
 
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceInLibraryEditorControls controls = new SourceInLibraryEditorControls(mock(IWorkbenchPage.class));
@@ -68,7 +68,6 @@ public class SourceInLibraryEditorControlsTest {
 
     @Test
     public void controlsAreDisposedProperly() {
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceInLibraryEditorControls controls = new SourceInLibraryEditorControls(mock(IWorkbenchPage.class));

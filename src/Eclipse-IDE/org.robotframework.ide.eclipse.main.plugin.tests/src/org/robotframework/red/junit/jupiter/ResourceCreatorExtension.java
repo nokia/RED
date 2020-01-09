@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.red.junit;
+package org.robotframework.red.junit.jupiter;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -13,17 +13,18 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.robotframework.red.junit.jupiter.ResourceCreatorExtension;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
- * @deprecated Use {@link ResourceCreatorExtension} due to move to JUnit 5
+ * JUnit Jupiter extension which allows to create resources which will be removed
+ * after each test. Should be used directly using {@link RegisterExtension} mechanism.
+ * 
  * @author anglart
  */
-@Deprecated
-public class ResourceCreator implements TestRule {
+public class ResourceCreatorExtension implements Extension, AfterEachCallback {
 
     private final List<IResource> createdResources = new ArrayList<>();
 
@@ -43,19 +44,10 @@ public class ResourceCreator implements TestRule {
     }
 
     @Override
-    public Statement apply(final Statement base, final Description description) {
-        return new Statement() {
-
-            @Override
-            public void evaluate() throws Throwable {
-                try {
-                    base.evaluate();
-                } finally {
-                    for (final IResource resource : createdResources) {
-                        resource.delete(true, null);
-                    }
-                }
-            }
-        };
+    public void afterEach(final ExtensionContext context) throws Exception {
+        for (final IResource resource : createdResources) {
+            resource.delete(true, null);
+        }
+        createdResources.clear();
     }
 }

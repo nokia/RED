@@ -16,22 +16,23 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.debug.RedDebuggerAssistantEditorWrapper.RedDebuggerAssistantEditorInput;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SourceNotFoundEditorControlsTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Composite shell;
 
     @Test
     public void controlsAreConstructedProperly() {
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceNotFoundEditorControls controls = new SourceNotFoundEditorControls();
@@ -52,7 +53,6 @@ public class SourceNotFoundEditorControlsTest {
         when(input.getTitleImageDescriptor()).thenReturn(RedImages.getElementImage());
         when(input.getDetailedInformation()).thenReturn("info");
 
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceNotFoundEditorControls controls = new SourceNotFoundEditorControls();
@@ -70,7 +70,6 @@ public class SourceNotFoundEditorControlsTest {
 
     @Test
     public void controlsAreDisposedProperly() {
-        final Composite shell = shellProvider.getShell();
         shell.setLayout(new FillLayout());
 
         final SourceNotFoundEditorControls controls = new SourceNotFoundEditorControls();

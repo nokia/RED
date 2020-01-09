@@ -13,7 +13,13 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
 
+/**
+ * @deprecated Use XPreference annotations family with {@link PreferencesExtension} extension due to
+ *             move to JUnit 5
+ */
+@Deprecated
 public class PreferenceUpdater implements TestRule {
 
     private final Set<String> preferenceNames = new HashSet<>();
