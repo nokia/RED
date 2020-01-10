@@ -149,7 +149,7 @@ def _modify_source_path_for_jar_files(source, jar_part):
 def _collect_children_paths(suites, source):
     child_paths = []
     if os.path.isdir(source):
-        cache = _prepare_names_dictionary_slow_py2(source) if sys.version_info < (3, 5, 0) else _prepare_names_dictionary(source)
+        cache = _prepare_names_dictionary_slow_py2(source) if sys.version_info < (3, 6, 0) else _prepare_names_dictionary(source)
         for suite in suites:
             candidates = cache[suite] if suite in cache else []
             child_paths.append(candidates.pop(0) if len(candidates) > 0 else None)
