@@ -16,9 +16,8 @@ import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -36,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockR
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-@RunWith(Enclosed.class)
 public class KeywordCallArgumentsValidatorTest {
 
     static final String[] ALL = new String[] { "cause", "start", "end", "message" };
@@ -53,6 +51,7 @@ public class KeywordCallArgumentsValidatorTest {
     private static final ArgumentProblem UNEXPECTED_PROBLEM = ArgumentProblem.UNEXPECTED_NAMED_ARGUMENT;
     private static final ArgumentProblem COLLECTION_WARNING = ArgumentProblem.COLLECTION_ARGUMENT_SHOULD_PROVIDE_ARGS;
 
+    @Nested
     public static class InvalidDescriptorsTest {
 
         private final List<RobotKeywordCall> calls = newArrayList(call("1"), call("1", "2"), call("a=1", "b=2"),
@@ -171,6 +170,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class NoArgsTest {
 
         private final ArgumentsDescriptor zeroArgs = createDescriptor();
@@ -265,6 +265,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class OnlyRequiredArgsTest {
 
         private final ArgumentsDescriptor oneArg = createDescriptor("a");
@@ -461,6 +462,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class OnlyDefaultArgsTest {
 
         private final ArgumentsDescriptor oneArg = createDescriptor("a=1");
@@ -663,6 +665,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class OnlyVarargTest {
 
         private final ArgumentsDescriptor desc = createDescriptor("*vararg");
@@ -752,6 +755,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class OnlyKwargTest {
 
         private final ArgumentsDescriptor desc = createDescriptor("**kwargs");
@@ -832,6 +836,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsRequiredAndOptionalTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("a", "b=2");
@@ -1030,6 +1035,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsRequiredAndVarargTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("a", "*vararg");
@@ -1197,6 +1203,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsRequiredAndKwargTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("a", "**kwarg");
@@ -1373,6 +1380,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsOptionalAndVarargsTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("a=1", "*vararg");
@@ -1519,6 +1527,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsOptionalAndKwargsTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("a=1", "**kwarg");
@@ -1665,6 +1674,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class TwoArgsVarargsAndKwargsTest {
 
         private final ArgumentsDescriptor twoArgs = createDescriptor("*vararg", "**kwarg");
@@ -1731,6 +1741,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class ThreeArgsRequiredOptionalAndVarargsTest {
 
         private final ArgumentsDescriptor threeArgs = createDescriptor("a", "b=2", "*vararg");
@@ -1918,6 +1929,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class ThreeArgsRequiredOptionalAndKwargsTest {
 
         private final ArgumentsDescriptor threeArgs = createDescriptor("a", "b=2", "**kwarg");
@@ -2112,6 +2124,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class ThreeArgsRequiredVarargsAndKwargsTest {
 
         private final ArgumentsDescriptor threeArgs = createDescriptor("a", "*vararg", "**kwarg");
@@ -2296,6 +2309,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class ThreeArgsOptionalVarargsAndKwargsTest {
 
         private final ArgumentsDescriptor threeArgs = createDescriptor("a=1", "*vararg", "**kwarg");
@@ -2419,6 +2433,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class FourArgsRequiredOptionalVarargsAndKwargsTest {
 
         private final ArgumentsDescriptor fourArgs = createDescriptor("a", "b=2", "*vararg", "**kwarg");
@@ -2601,6 +2616,7 @@ public class KeywordCallArgumentsValidatorTest {
         }
     }
 
+    @Nested
     public static class KeywordOnlyArgumentsInRf31Test {
 
         private final ArgumentsDescriptor desc_kw_only = createDescriptor("a", "b=2", "*", "d=4", "e");

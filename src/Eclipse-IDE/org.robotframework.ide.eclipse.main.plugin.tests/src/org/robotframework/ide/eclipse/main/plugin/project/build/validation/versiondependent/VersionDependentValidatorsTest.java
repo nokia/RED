@@ -12,9 +12,8 @@ import static org.mockito.Mockito.when;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -27,9 +26,9 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
-@RunWith(Enclosed.class)
 public class VersionDependentValidatorsTest {
 
+    @Nested
     public static class GeneralSettingsTableValidatorsTest {
 
         @Test
@@ -78,6 +77,7 @@ public class VersionDependentValidatorsTest {
 
     }
 
+    @Nested
     public static class KeywordTableValidatorsTest {
 
         @Test
@@ -108,6 +108,7 @@ public class VersionDependentValidatorsTest {
 
     }
 
+    @Nested
     public static class TestCaseSettingsValidatorsTest {
 
         @Test
@@ -151,6 +152,7 @@ public class VersionDependentValidatorsTest {
 
     }
 
+    @Nested
     public static class TaskSettingsValidatorsTest {
 
         @Test
@@ -192,6 +194,7 @@ public class VersionDependentValidatorsTest {
 
     }
 
+    @Nested
     public static class KeywordSettingsValidatorsTest {
 
         @Test
