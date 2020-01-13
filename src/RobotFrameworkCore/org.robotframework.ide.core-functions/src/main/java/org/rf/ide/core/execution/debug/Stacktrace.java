@@ -54,24 +54,36 @@ public class Stacktrace implements Iterable<StackFrame> {
     }
 
     StackFrame findParentFrame(final StackFrame frame) {
+        return findNextFrame(frames.descendingIterator(), frame);
+    }
+
+    private StackFrame findChildFrame(final StackFrame frame) {
+        return findNextFrame(frames.iterator(), frame);
+    }
+
+    private StackFrame findNextFrame(final Iterator<StackFrame> iterator, final StackFrame frame) {
         StackFrame previous = null;
-        final Iterator<StackFrame> iterator = frames.descendingIterator();
         while (iterator.hasNext()) {
             final StackFrame f = iterator.next();
             if (f == frame) {
-                break;
+                return previous;
             }
             previous = f;
         }
-        return previous;
+        return null;
     }
 
-    Optional<URI> getCurrentPath() {
-        return peekCurrentFrame().flatMap(StackFrame::getCurrentSourcePath);
-    }
-
-    Optional<URI> getContextPath() {
-        return peekCurrentFrame().flatMap(StackFrame::getContextPath);
+    Optional<URI> getPath(final boolean isSetupOrTeardown) {
+        final Optional<StackFrame> suiteFrame = getFirstFrameSatisfying(StackFrame::isSuiteContext);
+        if (suiteFrame.isPresent()) {
+            final StackFrame childFrame = findChildFrame(suiteFrame.get());
+            if (childFrame != null && !childFrame.isTestContext() || childFrame == null && isSetupOrTeardown) {
+                return suiteFrame.get().getCurrentSourcePath();
+            } else {
+                return suiteFrame.get().getContextPath();
+            }
+        }
+        return Optional.empty();
     }
 
     public boolean isEmpty() {

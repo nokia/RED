@@ -192,55 +192,64 @@ public class StacktraceTest {
     }
 
     @Test
-    public void currentPathIsTakenFromTopFrame_nothingIsReturnedIfContextHaveNoPathAssociated() {
+    public void pathIsTakenFromSuiteFrame_nothingIsReturnedWhenStacktraceIsEmpty() {
         final Stacktrace stack = new Stacktrace();
 
-        final StackFrameContext context1 = mock(StackFrameContext.class);
-        final StackFrameContext context2 = mock(StackFrameContext.class);
-
-        when(context1.getAssociatedPath()).thenReturn(Optional.of(URI.create("file:///suite1.robot")));
-        when(context2.getAssociatedPath()).thenReturn(Optional.empty());
-
-        stack.push(frame(context1));
-        stack.push(frame(context2));
-
-        assertThat(stack.getCurrentPath()).isEmpty();
+        assertThat(stack.getPath(true)).isEmpty();
+        assertThat(stack.getPath(false)).isEmpty();
     }
 
     @Test
-    public void currentPathIsTakenFromTopFrame_associatedPathIsReturned() {
+    public void pathIsTakenFromSuiteFrame_nothingIsReturnedIfSuiteFrameHaveNoPathAssociated() {
         final Stacktrace stack = new Stacktrace();
 
-        final StackFrameContext context1 = mock(StackFrameContext.class);
-        final StackFrameContext context2 = mock(StackFrameContext.class);
+        stack.push(frame(FrameCategory.SUITE, URI.create("file:///suite1.robot")));
+        stack.push(frame(FrameCategory.SUITE, null));
 
-        when(context1.getAssociatedPath()).thenReturn(Optional.of(URI.create("file:///suite1.robot")));
-        when(context2.getAssociatedPath()).thenReturn(Optional.of(URI.create("file:///suite2.robot")));
-
-        stack.push(frame(context1));
-        stack.push(frame(context2));
-
-        assertThat(stack.getCurrentPath()).contains(URI.create("file:///suite2.robot"));
+        assertThat(stack.getPath(false)).isEmpty();
     }
 
     @Test
-    public void contextPathIsTakenFromTopFrame_nothingIsReturnedIfFrameHaveNoContextPath() {
+    public void pathIsTakenFromSuiteFrame_associatedPathIsReturned() {
         final Stacktrace stack = new Stacktrace();
 
-        stack.push(frame(URI.create("file:///suite1.robot")));
-        stack.push(frame());
+        stack.push(frame(FrameCategory.SUITE, URI.create("file:///suite1.robot")));
+        stack.push(frame(FrameCategory.SUITE, URI.create("file:///suite2.robot")));
 
-        assertThat(stack.getContextPath()).isEmpty();
+        assertThat(stack.getPath(false)).contains(URI.create("file:///suite2.robot"));
     }
 
     @Test
-    public void contextPathIsTakenFromTopFrame_frameContextPathIsReturned() {
+    public void pathIsTakenFromSuiteFrame_associatedPathIsReturnedWhenInResourceFile() {
         final Stacktrace stack = new Stacktrace();
 
-        stack.push(frame(URI.create("file:///suite1.robot")));
-        stack.push(frame(URI.create("file:///suite1.robot")));
+        stack.push(frame(FrameCategory.SUITE, URI.create("file:///suite.robot")));
+        stack.push(frame(FrameCategory.TEST, URI.create("file:///suite.robot")));
+        stack.push(frame(FrameCategory.KEYWORD, URI.create("file:///resource.robot")));
 
-        assertThat(stack.getContextPath()).contains(URI.create("file:///suite1.robot"));
+        assertThat(stack.getPath(false)).contains(URI.create("file:///suite.robot"));
+    }
+
+    @Test
+    public void pathIsTakenFromSuiteFrame_associatedPathIsReturnedFromContextWhenSuiteSetupOrTeardownIsStarting() {
+        final Stacktrace stack = new Stacktrace();
+
+        stack.push(frame(FrameCategory.SUITE, context(URI.create("file:///suite/__init__.robot")),
+                URI.create("file:///suite")));
+
+        assertThat(stack.getPath(true)).contains(URI.create("file:///suite/__init__.robot"));
+    }
+
+    @Test
+    public void pathIsTakenFromSuiteFrame_associatedPathIsReturnedFromContextWhenInsideSuiteSetupOrTeardown() {
+        final Stacktrace stack = new Stacktrace();
+
+        stack.push(frame(FrameCategory.SUITE, context(URI.create("file:///suite/__init__.robot")),
+                URI.create("file:///suite")));
+        stack.push(frame(FrameCategory.KEYWORD, URI.create("file:///suite/__init__.robot")));
+        stack.push(frame(FrameCategory.KEYWORD, URI.create("file:///resource.robot")));
+
+        assertThat(stack.getPath(false)).contains(URI.create("file:///suite/__init__.robot"));
     }
 
     @Test
@@ -533,22 +542,33 @@ public class StacktraceTest {
     }
 
     private static StackFrame frame(final String name) {
-        return new StackFrame(name, FrameCategory.KEYWORD, 0, mock(StackFrameContext.class));
-    }
-
-    private static StackFrame frame(final StackFrameContext context) {
-        return new StackFrame("frame", FrameCategory.KEYWORD, 0, context);
+        return new StackFrame(name, FrameCategory.KEYWORD, 0, context());
     }
 
     private static StackFrame frame(final FrameCategory category) {
-        return new StackFrame("frame", category, 0, mock(StackFrameContext.class));
+        return new StackFrame("frame", category, 0, context());
     }
 
     private static StackFrame frame(final FrameCategory category, final int level) {
-        return new StackFrame("frame", category, level, mock(StackFrameContext.class));
+        return new StackFrame("frame", category, level, context());
     }
 
-    private static StackFrame frame(final URI contextPath) {
-        return new StackFrame("frame", FrameCategory.KEYWORD, 0, mock(StackFrameContext.class), () -> contextPath);
+    private static StackFrame frame(final FrameCategory category, final URI framePath) {
+        return frame(category, context(framePath), framePath);
+    }
+
+    private static StackFrame frame(final FrameCategory category, final StackFrameContext context,
+            final URI framePath) {
+        return new StackFrame("frame", category, 0, context, () -> framePath);
+    }
+
+    private static StackFrameContext context() {
+        return context(null);
+    }
+
+    private static StackFrameContext context(final URI contextPath) {
+        final StackFrameContext context = mock(StackFrameContext.class);
+        when(context.getAssociatedPath()).thenReturn(Optional.ofNullable(contextPath));
+        return context;
     }
 }

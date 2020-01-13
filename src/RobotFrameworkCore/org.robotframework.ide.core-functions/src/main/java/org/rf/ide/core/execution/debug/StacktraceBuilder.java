@@ -27,11 +27,11 @@ import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
+import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.execution.debug.contexts.ForLoopContext;
 import org.rf.ide.core.execution.debug.contexts.ForLoopIterationContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
-import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -70,7 +70,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleSuiteStarted(final SuiteStartedEvent event) {
-        final URI currentPath = stacktrace.getContextPath().orElse(null);
+        final URI currentPath = stacktrace.getPath(false).orElse(null);
         final String suiteName = event.getName();
         final URI suitePath = event.getPath();
         final boolean suiteIsDirectory = event.isDirectory();
@@ -87,7 +87,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final String testName = event.getName();
         final Optional<String> template = event.getTemplate();
 
-        final URI path = stacktrace.getContextPath().orElse(null);
+        final URI path = stacktrace.getPath(false).orElse(null);
         final CaseContext context = locator.findContextForCase(testName, path, template);
         stacktrace.push(new StackFrame(testName, FrameCategory.TEST, stacktrace.size(), context));
     }
@@ -106,11 +106,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final String libraryName = event.getLibraryName();
         final RunningKeyword keyword = keywordsTypesFixer.keywordStarted(event.getRunningKeyword());
 
-        final boolean isSuiteSetupTeardown = (keyword.isSetup() || keyword.isTeardown())
-                && stacktrace.hasCategoryOnTop(FrameCategory.SUITE);
-        final URI currentSuitePath = isSuiteSetupTeardown
-                ? stacktrace.getCurrentPath().orElse(null)
-                : stacktrace.getContextPath().orElse(null);
+        final URI currentSuitePath = stacktrace.getPath(keyword.isSetup() || keyword.isTeardown()).orElse(null);
         
         final String frameNamePrefix;
         final FrameCategory category;
@@ -138,14 +134,12 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
                     .getFirstFrameSatisfying(StackFrame::isSuiteContext)
                     .get()
                     .getLoadedResources();
-            final KeywordContext kwContext = locator.findContextForKeyword(libraryName, keywordName, currentSuitePath,
-                    currentResources);
-            context = kwContext;
+            context = locator.findContextForKeyword(libraryName, keywordName, currentSuitePath, currentResources);
             category = FrameCategory.KEYWORD;
 
             // library keyword have to point to variables taken from lowest test or suite if test
             // does not exist
-            level = kwContext.isLibraryKeywordContext()
+            level = ((KeywordContext) context).isLibraryKeywordContext()
                     ? stacktrace.getFirstFrameSatisfying(or(StackFrame::isTestContext, StackFrame::isSuiteContext))
                             .map(StackFrame::getLevel)
                             .get()
