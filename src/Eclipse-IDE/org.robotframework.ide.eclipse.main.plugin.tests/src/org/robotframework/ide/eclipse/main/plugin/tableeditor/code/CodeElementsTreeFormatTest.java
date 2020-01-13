@@ -15,14 +15,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -35,18 +35,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
 
-@RunWith(Theories.class)
 public class CodeElementsTreeFormatTest {
 
-    @DataPoints
-    public static Object[] elements() {
-        final Object[] elements = new Object[2];
-        elements[0] = createCases();
-        elements[1] = createKeywordDefinitions();
-        return elements;
+    private static Stream<Arguments> provideTestData() throws Exception {
+        return Stream.of(Arguments.of(createCases()), Arguments.of(createKeywordDefinitions()));
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void pathForCodeHoldingElement_consistOnlyOfThisElement(final List<RobotCodeHoldingElement<?>> codeHolders) {
         final CodeElementsTreeFormat format = new CodeElementsTreeFormat();
 
@@ -58,7 +54,8 @@ public class CodeElementsTreeFormatTest {
         }
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void pathForKeywordCall_consistParentCodeHolderAndKeywordCallItself(
             final List<RobotCodeHoldingElement<?>> codeHolders) {
         final CodeElementsTreeFormat format = new CodeElementsTreeFormat();
@@ -73,7 +70,8 @@ public class CodeElementsTreeFormatTest {
         }
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void pathForNestedAddingTokens_consistOfTokenParentAndTokenItself(
             final List<RobotCodeHoldingElement<?>> codeHolders) {
         final CodeElementsTreeFormat format = new CodeElementsTreeFormat();

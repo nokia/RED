@@ -9,39 +9,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
-@RunWith(Theories.class)
 public class RedNattableDataProvidersFactoryTest {
 
-    @DataPoints
-    public static int[] indexes = new int[] { 0, 1, 2, 5, 10, 100, 1000 };
-
-    @DataPoints
-    public static String[][] labels = new String[][] { new String[] { "a", "b" }, new String[] { "a", "", "", "c" },
-            new String[] { "a" }, };
-
-    @Theory
-    public void rowHeadersContainsOnlyEmptyString(final int column, final int row) {
+    @Test
+    public void rowHeadersContainsOnlyEmptyString() {
         final RedNattableDataProvidersFactory factory = new RedNattableDataProvidersFactory();
+        final int[] indexes = new int[] { 0, 1, 2, 5, 10, 100, 1000 };
 
         final IDataProvider provider = factory.createRowHeaderDataProvider(mock(IDataProvider.class));
-        assertThat(provider.getDataValue(column, row)).isEqualTo("");
+
+        for (int columnIndex = 0; columnIndex < indexes.length; columnIndex++) {
+            for (int rowIndex = 0; rowIndex < indexes.length; rowIndex++) {
+                assertThat(provider.getDataValue(indexes[columnIndex], indexes[rowIndex])).isEqualTo("");
+            }
+        }
     }
 
-    @Theory
-    public void columnHeadersContainsGivenLabels(final String[] labels) {
+    @Test
+    public void columnHeadersContainsGivenLabels() {
         final RedNattableDataProvidersFactory factory = new RedNattableDataProvidersFactory();
+        final String[][] headerLabels = new String[][] { new String[] { "a", "b" }, new String[] { "a", "", "", "c" },
+                new String[] { "a" }, };
 
-        final IDataProvider provider = factory.createColumnHeaderDataProvider(labels);
+        for (final String[] labels : headerLabels) {
+            final IDataProvider provider = factory.createColumnHeaderDataProvider(labels);
 
-        int column = 0;
-        for (final String label : labels) {
-            assertThat(provider.getDataValue(column, 0)).isEqualTo(label);
-            column++;
+            for (int columnIndex = 0; columnIndex < labels.length; columnIndex++) {
+                assertThat(provider.getDataValue(columnIndex, 0)).isEqualTo(labels[columnIndex]);
+            }
         }
     }
 }

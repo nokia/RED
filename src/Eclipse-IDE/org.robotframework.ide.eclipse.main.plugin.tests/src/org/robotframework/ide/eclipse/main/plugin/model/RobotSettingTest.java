@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +14,9 @@ import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
 public class RobotSettingTest {
@@ -96,10 +96,9 @@ public class RobotSettingTest {
         assertThat(RobotSetting.specPathsMatches(absolute, libIPath)).isFalse();
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     public void pathMatches_specificationWithPoKeMoNLibraryPath_onWindows() {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final String libPath = "PaTh/To/LiB.py";
         IPath absolute = ResourcesPlugin.getWorkspace().getRoot().getLocation();
         absolute = absolute.append("path/to/lib.py");

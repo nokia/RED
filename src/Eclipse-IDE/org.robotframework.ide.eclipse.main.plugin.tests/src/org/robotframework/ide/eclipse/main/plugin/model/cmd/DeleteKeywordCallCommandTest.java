@@ -14,12 +14,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
@@ -35,19 +35,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-@RunWith(Theories.class)
 public class DeleteKeywordCallCommandTest {
 
-    @DataPoints
-    public static RobotSuiteFileSection[] elements() {
+    private static Stream<Arguments> provideTestData() throws Exception {
         final RobotSuiteFile model = createModel();
-        final RobotSuiteFileSection[] elements = new RobotSuiteFileSection[2];
-        elements[0] = model.findSection(RobotCasesSection.class).get();
-        elements[1] = model.findSection(RobotKeywordsSection.class).get();
-        return elements;
+        return Stream.of(Arguments.of(model.findSection(RobotCasesSection.class).get()),
+                Arguments.of(model.findSection(RobotKeywordsSection.class).get()));
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void nothingHappens_whenThereAreNoCallsToRemove(final RobotSuiteFileSection section) {
         final List<RobotKeywordCall> callsToRemove = newArrayList();
 
@@ -62,7 +59,8 @@ public class DeleteKeywordCallCommandTest {
         verifyNoInteractions(eventBroker);
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void settingsAreProperlyRemoved_whenRemovingRowsFromSingleCase(final RobotSuiteFileSection section) {
         final RobotCodeHoldingElement<?> codeHolder = (RobotCodeHoldingElement<?>) section.getChildren().get(1);
 
@@ -89,7 +87,8 @@ public class DeleteKeywordCallCommandTest {
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void executableRowsAreProperlyRemoved_whenRemovingRowsFromSingleCase(final RobotSuiteFileSection section) {
         final RobotCodeHoldingElement<?> codeHolder = (RobotCodeHoldingElement<?>) section.getChildren().get(0);
 
@@ -115,7 +114,8 @@ public class DeleteKeywordCallCommandTest {
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void rowsAreProperlyRemoved_whenRemovingFromDifferentCases(final RobotSuiteFileSection section) {
         final RobotCodeHoldingElement<?> codeHolder1 = (RobotCodeHoldingElement<?>) section.getChildren().get(0);
         final RobotCodeHoldingElement<?> codeHolder2 = (RobotCodeHoldingElement<?>) section.getChildren().get(1);
@@ -156,7 +156,8 @@ public class DeleteKeywordCallCommandTest {
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder2);
     }
 
-    @Theory
+    @ParameterizedTest
+    @MethodSource("provideTestData")
     public void rowsAreProperlyRemovedAndReturnedToPreviousState_whenRemovingFromDifferentCases(
             final RobotSuiteFileSection section) {
         final RobotCodeHoldingElement<?> codeHolder1 = (RobotCodeHoldingElement<?>) section.getChildren().get(0);

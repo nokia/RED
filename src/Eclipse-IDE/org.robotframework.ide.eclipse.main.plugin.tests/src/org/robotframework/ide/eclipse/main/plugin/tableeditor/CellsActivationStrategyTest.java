@@ -6,8 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
@@ -15,38 +13,24 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RedActivationStrategy;
 
-
-@RunWith(Theories.class)
 public class CellsActivationStrategyTest {
 
-    @DataPoints
-    public static char[] characters() {
-        final char[] chars = new char[256];
-        for (int i = 0; i < 256; i++) {
-            chars[i] = (char) i;
-        }
-        return chars;
-    }
-
-    @Theory
-    public void whenAnyPrintableCharIsTypedIn_editorShouldBeActivatedAndKeyEventCannotBePropagatedFurther(
-            final Character character) {
-        assumeTrue(' ' <= character.charValue() && character.charValue() <= '~');
-
+    @Test
+    public void whenAnyPrintableCharIsTypedIn_editorShouldBeActivatedAndKeyEventCannotBePropagatedFurther() {
         final RedActivationStrategy activationSupport = new RedActivationStrategy(null);
-        
-        final KeyEvent keyEvent = createKeyEvent(character.charValue());
-        final ColumnViewerEditorActivationEvent event = createEditorActivationEvent(keyEvent);
 
-        assertThat(activationSupport.isEditorActivationEvent(event)).isTrue();
-        assertThat(keyEvent.doit).isFalse();
+        for (char character = 0; character < 256; character++) {
+            if (' ' <= character && character <= '~') {
+                final KeyEvent keyEvent = createKeyEvent(character);
+                final ColumnViewerEditorActivationEvent event = createEditorActivationEvent(keyEvent);
+
+                assertThat(activationSupport.isEditorActivationEvent(event)).isTrue();
+                assertThat(keyEvent.doit).isFalse();
+            }
+        }
     }
 
     @Test
@@ -60,18 +44,19 @@ public class CellsActivationStrategyTest {
         assertThat(keyEvent.doit).isFalse();
     }
 
-    @Theory
-    public void whenNonPrintableCharOrNonCRIsTypedIn_editorShouldNotActivateAndKeyEventIsPropagated(
-            final Character character) {
-        assumeFalse(character == '\r' || ' ' <= character.charValue() && character.charValue() <= '~');
-
+    @Test
+    public void whenNonPrintableCharOrNonCRIsTypedIn_editorShouldNotActivateAndKeyEventIsPropagated() {
         final RedActivationStrategy activationSupport = new RedActivationStrategy(null);
 
-        final KeyEvent keyEvent = createKeyEvent(character);
-        final ColumnViewerEditorActivationEvent event = createEditorActivationEvent(keyEvent);
+        for (char character = 0; character < 256; character++) {
+            if (character != '\r' && (' ' > character || character > '~')) {
+                final KeyEvent keyEvent = createKeyEvent(character);
+                final ColumnViewerEditorActivationEvent event = createEditorActivationEvent(keyEvent);
 
-        assertThat(activationSupport.isEditorActivationEvent(event)).isFalse();
-        assertThat(keyEvent.doit).isTrue();
+                assertThat(activationSupport.isEditorActivationEvent(event)).isFalse();
+                assertThat(keyEvent.doit).isTrue();
+            }
+        }
     }
 
     private static ColumnViewerEditorActivationEvent createEditorActivationEvent(final KeyEvent keyEvent) {

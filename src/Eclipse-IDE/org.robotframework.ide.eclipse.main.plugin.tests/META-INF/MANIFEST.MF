@@ -16,7 +16,10 @@ Bundle-ClassPath: .,
  lib/byte-buddy-agent-1.10.6.jar
 Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin.tests
 Import-Package: org.junit.jupiter.api;version="5.0.3",
+ org.junit.jupiter.api.condition;version="5.0.3",
  org.junit.jupiter.api.extension;version="5.0.3",
  org.junit.jupiter.engine.execution;version="5.0.3",
+ org.junit.jupiter.params;version="5.0.3",
+ org.junit.jupiter.params.provider;version="5.0.3",
  org.junit.platform.commons;version="1.0.3",
  org.junit.platform.commons.support;version="1.0.3"
