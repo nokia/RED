@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _o-zggNaZEee1ReYWE7p2AA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/13/20 11:19 AM
+Save-Time: 1/13/20 3:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -206,7 +206,7 @@ wait-for-loading-red-xml -editor_name "DarkThemeProject/red.xml"
 
 with [get-editor "DarkThemeProject/red.xml"] {
     with [get-section "Robot framework" | get-table] {
-        get-property backgroundColor | equals [os-specific -linuxValue "#313538" -windowsValue "#2F2F2F"]  | verify-true
+        get-property backgroundColor | equals [get-by-os -win "#2F2F2F" -linux "#313538"] | verify-true
         get-property foregroundColor | equals "#CCCCCC" | verify-true
     }
     //sections
@@ -220,12 +220,12 @@ with [get-editor "DarkThemeProject/red.xml"] {
      get-section "Libraries" | get-tree| get-property foregroundColor | equals "#DDDDDD" |  verify-true
     with [get-section Paths] {
         with [get-table] {
-            get-property backgroundColor | equals [os-specific -linuxValue "#313538" -windowsValue "#2F2F2F"] | verify-true
+            get-property backgroundColor | equals [get-by-os -win "#2F2F2F" -linux "#313538"]| verify-true
             get-property foregroundColor | equals "#CCCCCC" | verify-true
         }
         //paths
         with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
-            get-property backgroundColor | equals [os-specific -linuxValue "#313538" -windowsValue "#2F2F2F"]  | verify-true
+            get-property backgroundColor | equals [get-by-os -win "#2F2F2F" -linux "#313538"] | verify-true
             get-property foregroundColor | equals "#CCCCCC" | verify-true
         }
     }
