@@ -7,19 +7,22 @@ package org.robotframework.red.jface.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class RegexValidatedMultilineStringFieldEditorTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void stateIsValid_whenGivenValueMatchesRegex() {
         final RegexValidatedMultilineStringFieldEditor editor = new RegexValidatedMultilineStringFieldEditor("foo",
-                "label", 10, 5, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, "[^\t]*", shellProvider.getShell());
+                "label", 10, 5, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, "[^\t]*", shell);
 
         editor.getTextControl().setText("abc");
         assertThat(editor.checkState()).isTrue();
@@ -34,7 +37,7 @@ public class RegexValidatedMultilineStringFieldEditorTest {
     @Test
     public void stateIsInvalid_whenGivenValueDoesNotMatchRegex() {
         final RegexValidatedMultilineStringFieldEditor editor = new RegexValidatedMultilineStringFieldEditor("foo",
-                "label", 10, 5, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, "[^\t]*", shellProvider.getShell());
+                "label", 10, 5, MultiLineStringFieldEditor.VALIDATE_ON_KEY_STROKE, "[^\t]*", shell);
 
         editor.getTextControl().setText("\t\t\t");
         assertThat(editor.checkState()).isFalse();

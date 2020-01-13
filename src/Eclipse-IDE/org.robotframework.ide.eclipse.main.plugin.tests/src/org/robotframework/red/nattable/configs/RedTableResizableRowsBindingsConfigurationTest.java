@@ -15,7 +15,7 @@ import org.eclipse.nebula.widgets.nattable.resize.action.RowResizeCursorAction;
 import org.eclipse.nebula.widgets.nattable.resize.event.RowResizeEventMatcher;
 import org.eclipse.nebula.widgets.nattable.resize.mode.RowResizeDragMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RedTableResizableRowsBindingsConfigurationTest {
 

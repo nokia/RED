@@ -22,17 +22,20 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class ViewersTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void contextIsActivated_whenViewerWithBoundedContextGetsFocused() {
@@ -41,7 +44,7 @@ public class ViewersTest {
         final IWorkbenchSite site = mock(IWorkbenchSite.class);
         when(site.getService(IContextService.class)).thenReturn(contextService);
 
-        final TableViewer viewer = new TableViewer(shellProvider.getShell());
+        final TableViewer viewer = new TableViewer(shell);
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
         viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
@@ -59,8 +62,8 @@ public class ViewersTest {
         final IWorkbenchSite site = mock(IWorkbenchSite.class);
         when(site.getService(IContextService.class)).thenReturn(contextService).thenReturn(contextService);
 
-        final ColumnViewer viewer = new TreeViewer(shellProvider.getShell());
-        final Label label = new Label(shellProvider.getShell(), SWT.NONE);
+        final ColumnViewer viewer = new TreeViewer(shell);
+        final Label label = new Label(shell, SWT.NONE);
 
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
@@ -74,7 +77,7 @@ public class ViewersTest {
 
     @Test
     public void creationIndexIsReturnedFromPosition_forViewerWithSwappedColumns() {
-        final TreeViewer viewer = new TreeViewer(shellProvider.getShell());
+        final TreeViewer viewer = new TreeViewer(shell);
 
         new TreeViewerColumn(viewer, SWT.NONE);
         new TreeViewerColumn(viewer, SWT.NONE);
@@ -90,7 +93,7 @@ public class ViewersTest {
 
     @Test
     public void exceptionIsThrown_whenGettingPositionFromNonExistingOrderIndex() {
-        final TreeViewer viewer = new TreeViewer(shellProvider.getShell());
+        final TreeViewer viewer = new TreeViewer(shell);
 
         new TreeViewerColumn(viewer, SWT.NONE);
         new TreeViewerColumn(viewer, SWT.NONE);
@@ -114,7 +117,7 @@ public class ViewersTest {
 
     @Test
     public void positionIsReturnedFromCreationIndex_forViewerWithSwappedColumns() {
-        final TableViewer viewer = new TableViewer(shellProvider.getShell());
+        final TableViewer viewer = new TableViewer(shell);
 
         new TableViewerColumn(viewer, SWT.NONE);
         new TableViewerColumn(viewer, SWT.NONE);
@@ -130,7 +133,7 @@ public class ViewersTest {
 
     @Test
     public void exceptionIsThrown_whenGettingOrderIndexFromNonExistingPosition() {
-        final TableViewer viewer = new TableViewer(shellProvider.getShell());
+        final TableViewer viewer = new TableViewer(shell);
 
         new TableViewerColumn(viewer, SWT.NONE);
         new TableViewerColumn(viewer, SWT.NONE);

@@ -9,18 +9,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FontsManagerTest {
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         FontsManager.clearFonts();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         FontsManager.clearFonts();
     }

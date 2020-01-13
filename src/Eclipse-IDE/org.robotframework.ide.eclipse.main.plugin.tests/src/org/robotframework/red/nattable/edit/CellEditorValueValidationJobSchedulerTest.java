@@ -9,31 +9,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorValueValidationException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(FreshShellExtension.class)
 public class CellEditorValueValidationJobSchedulerTest {
 
-    @Rule
-    public ShellProvider shell = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
-    @Mock
     private CellEditorValueValidator<Object> validator;
 
     private CellEditorValueValidationJobScheduler<Object> validationJobScheduler;
 
-    @Before
+    @SuppressWarnings("unchecked")
+    @BeforeEach
     public void setUp() {
+        validator = mock(CellEditorValueValidator.class);
         validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 

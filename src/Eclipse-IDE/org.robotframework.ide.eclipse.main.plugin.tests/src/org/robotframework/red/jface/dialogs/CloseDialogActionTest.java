@@ -8,18 +8,19 @@ package org.robotframework.red.jface.dialogs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class CloseDialogActionTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void theShellIsClosedWhenActionRuns() {
-        final Shell shell = shellProvider.getShell();
         final CloseDialogAction actionToTest = new CloseDialogAction(shell, null);
 
         assertThat(shell.isDisposed()).isFalse();

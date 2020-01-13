@@ -21,34 +21,33 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.robotframework.red.junit.ShellProvider;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
 /**
  * @author wypych
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(FreshShellExtension.class)
 public class CellEditorValueValidationListenerTest {
 
-    @Rule
-    public ShellProvider shell = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
-    @Mock
     private Control control;
 
     private CellEditorValueValidationJobScheduler<Object> validationJobScheduler;
 
     private CellEditorValueValidationJobScheduler<Object>.CellEditorValueValidationListener cellValidationListener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final Composite composite = mock(Composite.class);
         when(composite.toDisplay(anyInt(), anyInt())).thenReturn(new Point(0, 0));
+        control = mock(Control.class);
         when(control.getShell()).thenReturn(shell.getShell());
         when(control.getParent()).thenReturn(composite);
         when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));

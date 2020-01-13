@@ -15,19 +15,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
 @SuppressWarnings("restriction")
+@ExtendWith(FreshShellExtension.class)
 public class RobotPopupDialogTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void whenDialogIsCreated_theParentCompositeHasFillLayoutAndControlsAreCreated() {
-        final RobotPopupDialog dialog = prepareDialogToTest(shellProvider.getShell());
+        final RobotPopupDialog dialog = prepareDialogToTest(shell);
         dialog.open();
 
         final Shell shell = dialog.getShell();

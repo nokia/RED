@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.swt.graphics.Color;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 

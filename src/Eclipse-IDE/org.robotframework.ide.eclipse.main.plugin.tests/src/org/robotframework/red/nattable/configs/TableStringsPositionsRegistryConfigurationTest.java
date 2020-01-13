@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
 import org.robotframework.red.nattable.TableCellsStrings;
 

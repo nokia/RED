@@ -8,7 +8,7 @@ package org.robotframework.red.nattable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.graphics.Point;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TableCellsStringsTest {
 

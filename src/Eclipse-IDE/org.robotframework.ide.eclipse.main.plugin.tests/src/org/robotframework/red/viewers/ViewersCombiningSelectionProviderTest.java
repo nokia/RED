@@ -19,14 +19,18 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+
+@ExtendWith(FreshShellExtension.class)
 public class ViewersCombiningSelectionProviderTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void npeIsThrown_whenTryingToCreateProviderFromNullArray() {
@@ -36,8 +40,8 @@ public class ViewersCombiningSelectionProviderTest {
 
     @Test
     public void selectionListenerIsInformed_whenSelectionInAnyViewerChanges() {
-        final TableViewer viewer1 = createViewer(shellProvider.getShell(), "viewer1_a", "viewer1_b");
-        final TableViewer viewer2 = createViewer(shellProvider.getShell(), "viewer2_x", "viewer2_y");
+        final TableViewer viewer1 = createViewer(shell, "viewer1_a", "viewer1_b");
+        final TableViewer viewer2 = createViewer(shell, "viewer2_x", "viewer2_y");
         final ViewersCombiningSelectionProvider provider = new ViewersCombiningSelectionProvider(viewer1, viewer2);
 
         final List<String> allSelected = new ArrayList<>();
@@ -63,8 +67,8 @@ public class ViewersCombiningSelectionProviderTest {
 
     @Test
     public void whenSelectionIsSet_itIsChangedInActiveViewer() {
-        final TableViewer viewer1 = createViewer(shellProvider.getShell(), "viewer1_a", "viewer1_b");
-        final TableViewer viewer2 = createViewer(shellProvider.getShell(), "viewer2_x", "viewer2_y");
+        final TableViewer viewer1 = createViewer(shell, "viewer1_a", "viewer1_b");
+        final TableViewer viewer2 = createViewer(shell, "viewer2_x", "viewer2_y");
         final ViewersCombiningSelectionProvider provider = new ViewersCombiningSelectionProvider(viewer1, viewer2);
 
         provider.setSelection(newSelection("viewer1_a"));
@@ -81,8 +85,8 @@ public class ViewersCombiningSelectionProviderTest {
 
     @Test
     public void whenThereIsNoActiveViewer_selectionIsEmpty() {
-        final TableViewer viewer1 = createViewer(shellProvider.getShell(), "viewer1_a", "viewer1_b");
-        final TableViewer viewer2 = createViewer(shellProvider.getShell(), "viewer2_x", "viewer2_y");
+        final TableViewer viewer1 = createViewer(shell, "viewer1_a", "viewer1_b");
+        final TableViewer viewer2 = createViewer(shell, "viewer2_x", "viewer2_y");
         final ViewersCombiningSelectionProvider provider = new ViewersCombiningSelectionProvider(viewer1, viewer2);
 
         viewer1.setSelection(newSelection());
@@ -96,8 +100,8 @@ public class ViewersCombiningSelectionProviderTest {
 
     @Test
     public void selectionFromFocusedViewerIsReturned_1() {
-        final TableViewer viewer1 = createViewer(shellProvider.getShell(), "viewer1_a", "viewer1_b");
-        final TableViewer viewer2 = createViewer(shellProvider.getShell(), "viewer2_x", "viewer2_y");
+        final TableViewer viewer1 = createViewer(shell, "viewer1_a", "viewer1_b");
+        final TableViewer viewer2 = createViewer(shell, "viewer2_x", "viewer2_y");
         final ViewersCombiningSelectionProvider provider = new ViewersCombiningSelectionProvider(viewer1, viewer2);
 
         viewer1.setSelection(newSelection("viewer1_a"));
@@ -110,8 +114,8 @@ public class ViewersCombiningSelectionProviderTest {
 
     @Test
     public void selectionFromFocusedViewerIsReturned_2() {
-        final TableViewer viewer1 = createViewer(shellProvider.getShell(), "viewer1_a", "viewer1_b");
-        final TableViewer viewer2 = createViewer(shellProvider.getShell(), "viewer2_x", "viewer2_y");
+        final TableViewer viewer1 = createViewer(shell, "viewer1_a", "viewer1_b");
+        final TableViewer viewer2 = createViewer(shell, "viewer2_x", "viewer2_y");
         final ViewersCombiningSelectionProvider provider = new ViewersCombiningSelectionProvider(viewer1, viewer2);
 
         viewer1.setSelection(newSelection("viewer1_a"));

@@ -8,18 +8,21 @@ package org.robotframework.red.jface.preferences;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class RegexStringFieldEditorTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void stateIsValid_whenGivenValueIsCorrectRegexPattern() {
-        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shellProvider.getShell());
+        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shell);
 
         for (final String pattern : newHashSet("abc", "\\w+", "[\\w\\$@&{}]+")) {
             editor.getTextControl().setText(pattern);
@@ -29,7 +32,7 @@ public class RegexStringFieldEditorTest {
 
     @Test
     public void stateIsInvalid_whenGivenValueIsIncorrectRegexPattern() {
-        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shellProvider.getShell());
+        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shell);
 
         for (final String pattern : newHashSet("abc{", "{}", "+w")) {
             editor.getTextControl().setText(pattern);
@@ -39,7 +42,7 @@ public class RegexStringFieldEditorTest {
 
     @Test
     public void stateIsValid_whenGivenValueIsEmpty_andEmptyStringsAreAllowed() {
-        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shellProvider.getShell());
+        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shell);
         editor.setEmptyStringAllowed(true);
 
         editor.getTextControl().setText("");
@@ -48,7 +51,7 @@ public class RegexStringFieldEditorTest {
 
     @Test
     public void stateIsInvalid_whenGivenValueIsEmpty_andEmptyStringsAreNotAllowed() {
-        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shellProvider.getShell());
+        final RegexStringFieldEditor editor = new RegexStringFieldEditor("foo", "label", shell);
         editor.setEmptyStringAllowed(false);
 
         editor.getTextControl().setText("");

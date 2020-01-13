@@ -22,8 +22,8 @@ import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -42,7 +42,7 @@ public class ActionNamesStyleConfigurationTest {
 
     private final RedPreferences preferences = mock(RedPreferences.class);
 
-    @Before
+    @BeforeEach
     public void before() {
         when(preferences.getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL))
                 .thenReturn(new ColoringPreference(new RGB(1, 2, 3), SWT.BOLD));

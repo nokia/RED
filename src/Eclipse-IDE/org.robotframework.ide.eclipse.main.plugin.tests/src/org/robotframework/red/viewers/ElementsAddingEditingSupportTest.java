@@ -18,19 +18,20 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class ElementsAddingEditingSupportTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void columnShiftIsZero() {
-        final Shell shell = shellProvider.getShell();
         final ElementsAddingEditingSupport support = createSupport(createViewer(shell, "abc", "def"), null);
 
         assertThat(support.getColumnShift()).isEqualTo(0);
@@ -38,7 +39,6 @@ public class ElementsAddingEditingSupportTest {
 
     @Test
     public void itIsAlwaysPossibleToEdit() {
-        final Shell shell = shellProvider.getShell();
         final ElementsAddingEditingSupport support = createSupport(createViewer(shell, "abc", "def"), null);
 
         assertThat(support.canEdit(null)).isTrue();
@@ -49,7 +49,6 @@ public class ElementsAddingEditingSupportTest {
 
     @Test
     public void thereAreNoCellEditorsForArbitraryObjects() {
-        final Shell shell = shellProvider.getShell();
         final ElementsAddingEditingSupport support = createSupport(createViewer(shell, "abc", "def"), null);
 
         assertThat(support.getCellEditor(null)).isNull();
@@ -60,7 +59,6 @@ public class ElementsAddingEditingSupportTest {
 
     @Test
     public void whenElementAddingTokenIsGiven_alwaysDeactivatingCellEditorIsReturned() {
-        final Shell shell = shellProvider.getShell();
         final ElementsAddingEditingSupport support = createSupport(createViewer(shell, "abc", "def"), null);
 
         assertThat(support.getCellEditor(new ElementAddingToken("element", true)))
@@ -82,8 +80,6 @@ public class ElementsAddingEditingSupportTest {
 
     @Test
     public void whenEditingElementAddingToken_newElementIsCreated() {
-        final Shell shell = shellProvider.getShell();
-
         final Supplier<?> creator = mock(Supplier.class);
         final ElementsAddingEditingSupport support = createSupport(createViewer(shell, "abc", "def"), creator);
 

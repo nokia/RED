@@ -10,18 +10,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ColorsManagerTest {
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         ColorsManager.disposeColors();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         ColorsManager.disposeColors();
     }

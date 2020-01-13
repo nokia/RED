@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorValueValidationException;
 
 /**
@@ -23,7 +23,7 @@ public class VariableNameRedCellEditorValidatorTest {
 
     private VariableNameRedCellEditorValidator testable;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.testable = new VariableNameRedCellEditorValidator(mock(IRowDataProvider.class));
     }

@@ -12,17 +12,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.jface.wizards.JobWizardPage.MonitoredJobFunction;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.swt.SwtThread;
 
+@ExtendWith(FreshShellExtension.class)
 public class JobWizardPageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shellProvider;
 
     @Test
     public void progressBarIsCreatedButNotVisible_whenNewPageIsConstructed() {

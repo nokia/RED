@@ -7,7 +7,7 @@ package org.robotframework.services.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.event.Event;
 
 import com.google.common.collect.ImmutableMap;

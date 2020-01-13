@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AddingElementLabelAccumulatorTest {
 

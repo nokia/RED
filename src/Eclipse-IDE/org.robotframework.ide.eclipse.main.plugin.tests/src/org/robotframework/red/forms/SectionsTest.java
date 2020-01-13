@@ -23,25 +23,27 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SectionsTest {
 
     private static RedFormToolkit toolkit;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() {
         toolkit = new RedFormToolkit(Display.getDefault());
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         toolkit.dispose();
         toolkit = null;
@@ -49,7 +51,7 @@ public class SectionsTest {
 
     @Test
     public void whenOneSectionIsMaximized_theOthersAreMinimized() {
-        final List<Section> sections = prepareSections(shellProvider.getShell(), 3);
+        final List<Section> sections = prepareSections(shell, 3);
 
         assertThat(sections.get(0).isExpanded()).isTrue();
         assertThat(sections.get(1).isExpanded()).isTrue();
@@ -64,7 +66,7 @@ public class SectionsTest {
 
     @Test
     public void whenMaximizingPossibillityIsInstalled_theSectionHasToolbarButton() {
-        final List<Section> sections = prepareSections(shellProvider.getShell(), 2);
+        final List<Section> sections = prepareSections(shell, 2);
 
         Sections.installMaximazingPossibility(sections.get(1));
 
@@ -78,7 +80,7 @@ public class SectionsTest {
 
     @Test
     public void whenMaximizingButtonIsClicked_theSectionIsMaximizedAndOtherAreMinimized() {
-        final List<Section> sections = prepareSections(shellProvider.getShell(), 3);
+        final List<Section> sections = prepareSections(shell, 3);
 
         Sections.installMaximazingPossibility(sections.get(1));
 
@@ -96,7 +98,7 @@ public class SectionsTest {
 
     @Test
     public void cellGrabbingIsProperlyUpdatedOnExpansionChange_whenSuchFeatureIsInstalled() {
-        final List<Section> sections = prepareSections(shellProvider.getShell(), 1);
+        final List<Section> sections = prepareSections(shell, 1);
 
         Sections.switchGridCellGrabbingOnExpansion(sections.get(0));
         final GridData gridData = (GridData) sections.get(0).getLayoutData();
@@ -121,7 +123,7 @@ public class SectionsTest {
     private Event createKeyEvent() {
         final Event keyEvent = new Event();
         keyEvent.character = '\r';
-        return keyEvent; 
+        return keyEvent;
     }
 
     private static List<Section> prepareSections(final Shell shell, final int noOfSections) {

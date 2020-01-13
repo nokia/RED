@@ -8,8 +8,8 @@ package org.robotframework.red.nattable.configs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author lwlodarc
@@ -20,7 +20,7 @@ public class VariablesInNamesLabelAccumulatorTest {
     private LabelStack labels;
     private VariablesInNamesLabelAccumulator labelAccumulator;
 
-    @Before
+    @BeforeEach
     public void cleanData() {
         labels = new LabelStack();
         labelAccumulator = new VariablesInNamesLabelAccumulator();

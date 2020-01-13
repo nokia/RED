@@ -20,7 +20,7 @@ import org.eclipse.nebula.widgets.nattable.resize.mode.ColumnResizeDragMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellEditorMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration.RedKeyEditAction;
 import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration.RedKeyEventMatcher;
 

@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -34,7 +34,7 @@ public class SpecialItemsLabelAccumulatorTest {
     private final RobotSuiteFile model = createModel();
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void cleanData() {
         dataProvider = mock(IRowDataProvider.class);
         labels = new LabelStack();

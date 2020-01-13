@@ -8,19 +8,19 @@ package org.robotframework.red.graphics;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class ImagesManagerTest {
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         ImagesManager.disposeImages();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         ImagesManager.disposeImages();
     }

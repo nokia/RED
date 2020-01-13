@@ -12,18 +12,20 @@ import java.util.stream.Stream;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class ProgressMonitorDialogWithConsoleTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    public Shell shell;
 
     @Test
     public void dialogHasStyledTextControl() {
-        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shellProvider.getShell());
+        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shell);
         dialog.open();
 
         final Shell shell = dialog.getShell();
@@ -34,7 +36,7 @@ public class ProgressMonitorDialogWithConsoleTest {
 
     @Test
     public void dialogIsClosedWhenOperationFinishes() throws Exception {
-        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shellProvider.getShell());
+        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shell);
         dialog.open();
 
         final Shell shell = dialog.getShell();
@@ -46,7 +48,7 @@ public class ProgressMonitorDialogWithConsoleTest {
     
     @Test
     public void dialogIsNotClosedWhenOperationMarksItCannotBeClosed_butIsClosedWhenDoneAgain() throws Exception {
-        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shellProvider.getShell());
+        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shell);
         dialog.open();
 
         final Shell shell = dialog.getShell();
@@ -60,7 +62,7 @@ public class ProgressMonitorDialogWithConsoleTest {
 
     @Test
     public void dialogHasTheTextGeneratedByScheduledOperation() throws Exception {
-        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shellProvider.getShell());
+        final ProgressMonitorDialogWithConsole dialog = new ProgressMonitorDialogWithConsole(shell);
         dialog.open();
 
         final Shell shell = dialog.getShell();

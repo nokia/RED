@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SelectionsTest {
 
