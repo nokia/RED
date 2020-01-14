@@ -81,7 +81,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
                     RobotTokenType.SETTING_TASK_TIMEOUT_DECLARATION).forEach(type -> {
                         final String correct = type.getTheMostCorrectOneRepresentation(robotVersion)
                                 .getRepresentation();
-                        final String word = createUpperLowerCaseWordWithSpacesInside(correct);
+                        final String word = createUpperLowerCaseWordWithSpacesInside(correct.replaceAll("\\s", ""));
                         final Pattern pattern = Pattern.compile("[ ]?(" + word + "[\\s]*:" + "|" + word + ")");
                         nameMapping.put(pattern, type);
                     });

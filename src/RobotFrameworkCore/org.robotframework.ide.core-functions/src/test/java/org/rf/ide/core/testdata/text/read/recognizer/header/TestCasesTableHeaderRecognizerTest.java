@@ -265,9 +265,16 @@ public class TestCasesTableHeaderRecognizerTest {
     }
 
     @Test
+    public void test_check_TestCase_withMissingSpace() {
+        final StringBuilder text = new StringBuilder("*** TestCase ***");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+    }
+
+    @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern())
-                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*" + ATokenRecognizer.createUpperLowerCaseWord("Test") + "([\\s]+)?("
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*" + ATokenRecognizer.createUpperLowerCaseWord("Test") + "([\\s]+)("
                         + ATokenRecognizer.createUpperLowerCaseWord("Cases") + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Case") + ")([\\s]*[*])*");
     }

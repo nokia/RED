@@ -99,16 +99,16 @@ public class GeneralSettingsProblemTest {
                 .put("Li brar y", "Library")
                 .put("Res ou rce", "Resource")
                 .put("Vari ables", "Variables")
-                .put("S uite Setu p", "Suite Setup")
+                .put("S uiteSetu p", "Suite Setup")
                 .put("Suite T e a rdown", "Suite Teardown")
                 .put("Test Setu p", "Test Setup")
                 .put("T est Teard own", "Test Teardown")
-                .put("Test Te mpl ate", "Test Template")
+                .put("TestTe mpl ate", "Test Template")
                 .put("Test Time o u t", "Test Timeout")
                 .put("T a s k Setup", "Task Setup")
                 .put("T ask Teard ow n", "Task Teardown")
                 .put("Task Te m plate", "Task Template")
-                .put("Ta sk Time out", "Task Timeout")
+                .put("Ta skTime out", "Task Timeout")
                 .build();
         mapping.forEach((name, replacement) -> {
             final IMarker marker = mock(IMarker.class);
