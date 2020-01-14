@@ -237,6 +237,7 @@ public class VersionDependentValidatorsTest {
 
     }
 
+    @Nested
     public static class TestSuiteFileValidatorsTest {
 
         @Test
@@ -269,6 +270,7 @@ public class VersionDependentValidatorsTest {
         }
     }
 
+    @Nested
     public static class TaskSuiteFileValidatorsTest {
 
         @Test
