@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesElementsLabelAccumulator;
 
 /**
  * @author lwlodarc
@@ -23,21 +25,38 @@ public class VariablesInNamesLabelAccumulatorTest {
     @BeforeEach
     public void cleanData() {
         labels = new LabelStack();
-        labelAccumulator = new VariablesInNamesLabelAccumulator();
+        labelAccumulator = new VariablesInNamesLabelAccumulator(() -> new RobotVersion(3, 1));
     }
 
     @Test
     public void labelIsAdded_forName() {
         labels.addLabel(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL);
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
-        assertThat(labels.getLabels())
-                .containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL,
-                        VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL);
+        assertThat(labels.getLabels()).containsExactly(ActionNamesLabelAccumulator.ACTION_NAME_CONFIG_LABEL,
+                VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL);
     }
 
     @Test
     public void labelIsNotAdded_forNonName() {
         labelAccumulator.accumulateConfigLabels(labels, 0, 0);
         assertThat(labels.getLabels()).isEmpty();
+    }
+
+    @Test
+    public void labelIsNotAddedForCaseName_whenVersionIsOlderThan32() {
+        labels.addLabel(CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+
+        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
+        assertThat(labels.getLabels()).containsExactly(CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+    }
+
+    @Test
+    public void labelIsAddedForCaseName_whenVersionIsNewerThan32() {
+        labelAccumulator = new VariablesInNamesLabelAccumulator(() -> new RobotVersion(3, 2));
+        labels.addLabel(CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+
+        labelAccumulator.accumulateConfigLabels(labels, 0, 0);
+        assertThat(labels.getLabels()).containsExactly(CasesElementsLabelAccumulator.CASE_CONFIG_LABEL,
+                VariablesInNamesLabelAccumulator.POSSIBLE_VARIABLES_IN_NAMES_CONFIG_LABEL);
     }
 }

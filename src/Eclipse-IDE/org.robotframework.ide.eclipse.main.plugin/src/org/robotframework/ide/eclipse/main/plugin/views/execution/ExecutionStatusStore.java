@@ -148,10 +148,10 @@ public class ExecutionStatusStore implements IDisposable {
         isDirty = true;
     }
 
-    protected void testStarted(final String testName) {
+    protected void testStarted(final String testName, final String resolvedTestName) {
         Preconditions.checkArgument(isOpen);
 
-        final ExecutionTreeNode currentTestNode = currentNode.getTestOrCreateIfMissing(testName);
+        final ExecutionTreeNode currentTestNode = currentNode.getTestOrCreateIfMissing(testName, resolvedTestName);
         currentTestNode.setStatus(Status.RUNNING);
 
         this.currentNode = currentTestNode;

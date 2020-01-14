@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
@@ -51,7 +51,7 @@ public class ExecutionMessagesTrackerTest {
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.eventsProcessingAboutToStart();
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "tc", "test_case", null));
 
         assertThat(store.getMessage()).isEqualTo("Starting test: test_case\n");
     }
@@ -61,7 +61,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "tc", "test_case", null));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
@@ -76,7 +76,7 @@ public class ExecutionMessagesTrackerTest {
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.eventsProcessingAboutToStart();
-        tracker.handleTestEnded(new TestEndedEvent("tc", "test_case", 100, Status.PASS, ""));
+        tracker.handleTestEnded(new TestEndedEvent("tc", "tc", "test_case", 100, Status.PASS, ""));
 
         assertThat(store.getMessage()).isEqualTo("Ending test: test_case\n\n");
     }
@@ -86,7 +86,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestEnded(new TestEndedEvent("tc", "test_case", 100, Status.PASS, ""));
+        tracker.handleTestEnded(new TestEndedEvent("tc", "tc", "test_case", 100, Status.PASS, ""));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);

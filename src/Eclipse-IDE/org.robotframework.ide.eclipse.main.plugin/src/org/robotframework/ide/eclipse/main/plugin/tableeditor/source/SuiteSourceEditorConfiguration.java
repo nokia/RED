@@ -67,11 +67,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Keyw
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LocalAssignQuickAssistProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewKeywordTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewSectionTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTaskTemplateAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.NewTestTemplateAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LocalAssignQuickAssistProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
@@ -79,14 +79,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Temp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CodeHolderNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule.ITodoTaskToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallInSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordCallOverridingRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedCachingScanner;
@@ -97,7 +96,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.S
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsTemplateRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensInNestedExecsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
@@ -537,7 +535,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new CaseNameRule(definition), new TestCaseSettingsRule(setting),
+                CodeHolderNameRule.forTest(definition, variable), new TestCaseSettingsRule(setting),
                 callOverridder.apply(new SettingsTemplateRule(call, variable)),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin,
                         library, quote, variable)),
@@ -547,7 +545,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new TaskNameRule(definition), new TaskSettingsRule(setting),
+                CodeHolderNameRule.forTask(definition, variable), new TaskSettingsRule(setting),
                 callOverridder.apply(new SettingsTemplateRule(call, variable)),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin,
                         library, quote, variable)),
@@ -556,7 +554,7 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new VariableUsageRule(variable), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
+                CodeHolderNameRule.forKeyword(definition, variable), new KeywordSettingsRule(setting),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, library,
                         quote, variable)),
                 callOverridder

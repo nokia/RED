@@ -111,6 +111,47 @@ public class VersionDependentValidatorsTest {
     }
 
     @Nested
+    public static class TestValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder30() {
+            assertThat(getTestCaseValidators("2.9")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getTestCaseValidators("3.0.4")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getTestCaseValidators("3.1")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion32() {
+            assertThat(getTestCaseValidators("3.2")).hasSize(1)
+                    .hasOnlyElementsOfTypes(VariableUsageInTokenValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion33() {
+            assertThat(getTestCaseValidators("3.3")).hasSize(1)
+                    .hasOnlyElementsOfTypes(VariableUsageInTokenValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getTestCaseValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            final TestCase testCase = mock(TestCase.class);
+            final TestCaseTable testCaseTable = mock(TestCaseTable.class);
+            final RobotFile robotFile = mock(RobotFile.class);
+            when(testCase.getParent()).thenReturn(testCaseTable);
+            when(testCaseTable.getParent()).thenReturn(robotFile);
+            return validators.getTestCaseValidators(testCase);
+        }
+    }
+
+    @Nested
     public static class TestCaseSettingsValidatorsTest {
 
         @Test
@@ -152,6 +193,46 @@ public class VersionDependentValidatorsTest {
             return validators.getTestCaseSettingsValidators(testCase);
         }
 
+    }
+
+    @Nested
+    public static class TaskValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder30() {
+            assertThat(getTaskValidators("2.9")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion30() {
+            assertThat(getTaskValidators("3.0.4")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion31() {
+            assertThat(getTaskValidators("3.1")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion32() {
+            assertThat(getTaskValidators("3.2")).hasSize(1)
+                    .hasOnlyElementsOfTypes(VariableUsageInTokenValidator.class);
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion33() {
+            assertThat(getTaskValidators("3.3")).hasSize(1).hasOnlyElementsOfTypes(VariableUsageInTokenValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getTaskValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            final Task task = mock(Task.class);
+            final TaskTable taskTable = mock(TaskTable.class);
+            final RobotFile robotFile = mock(RobotFile.class);
+            when(task.getParent()).thenReturn(taskTable);
+            when(taskTable.getParent()).thenReturn(robotFile);
+            return validators.getTaskValidators(task);
+        }
     }
 
     @Nested

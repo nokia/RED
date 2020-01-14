@@ -5,12 +5,13 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -25,12 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 public class TokensSource {
 
     static List<RobotToken> createTokens() {
-        final List<RobotLine> lines = createTokensInLines();
-        final List<RobotToken> tokens = new ArrayList<>();
-        for (final RobotLine line : lines) {
-            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
-        }
-        return tokens;
+        return createTokensInLines().stream().flatMap(RobotLine::tokensStream).collect(toList());
     }
 
     static List<RobotLine> createTokensInLines() {
@@ -102,6 +98,84 @@ public class TokensSource {
                 .appendLine("Test Setup  general_setting_call  def  # comment")
                 .appendLine("Test Teardown  general_setting_call  def  # comment")
                 .appendLine("Test Timeout  abc  def  # comment")
+                .appendLine("UnkownSetting  abc  def  # comment")
+                .build();
+        return model.getLinkedElement().getFileContent();
+    }
+
+    static List<RobotToken> createRpaTokens() {
+        return createRpaTokensInLines().stream().flatMap(RobotLine::tokensStream).collect(toList());
+    }
+
+    static List<RobotLine> createRpaTokensInLines() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendLine("*** Tasks ***")
+                .appendLine("task 1")
+                .appendLine("  [Documentation]  abc  def  # comment")
+                .appendLine("  [Tags]  t1  t2  # comment")
+                .appendLine("  [Setup]  tc_setting_call  a1  a2  # comment")
+                .appendLine("  [Teardown]  tc_setting_call  a1  a2  #comment")
+                .appendLine("  [Timeout]  10  a  b  c  # comment")
+                .appendLine("  [UnkownTcSetting]  a  b  c  # comment")
+                .appendLine("  call  arg  ${x}  # comment   comment")
+                .appendLine("task 2")
+                .appendLine("  call  arg  ${x}  # comment   comment")
+                .appendLine("  given gherkin_call  # comment")
+                .appendLine("  when then gherkin_call  # comment")
+                .appendLine("  ${var_asgn}=  given gherkin_call  # comment")
+                .appendLine("  call  given arg  # comment")
+                .appendLine("*Keywords")
+                .appendLine("userkw 1")
+                .appendLine("  [arguments]  ${a}  # comment")
+                .appendLine("  [documentation]  abc  def  # comment")
+                .appendLine("  [tags]  t1  t2  # comment")
+                .appendLine("  [teardown]  kw_setting_call  a1  a2  #comment")
+                .appendLine("  [timeout]  10  a  b  c  # comment")
+                .appendLine("  [unkownKwSetting]  a  b  c  # comment")
+                .appendLine("  [return]  a  b  c  # comment")
+                .appendLine("  call  arg  ${x}  # comment   comment")
+                .appendLine("  ${var_asgn}=  call  arg  ${x}  # comment   comment")
+                .appendLine("  ${var_asgn}  call  arg  ${x}  # comment   comment")
+                .appendLine("  ${var_asgn_1}  ${var_asgn_2}=  call  arg  ${x}  # comment   comment")
+                .appendLine("  ${var_asgn_1}  ${var_asgn_2}  call  arg  ${x}  # comment   comment")
+                .appendLine("  :FOR  ${i}  IN RANGE  10")
+                .appendLine("  \\  call  arg  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn}=  call  AND  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn}  call  arg  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn_1}  ${var_asgn_2}=  call  ELSE  ${x}  # comment   comment")
+                .appendLine("  \\  ${var_asgn_1}  ${var_asgn_2}  call  arg  ${x}  # comment   comment")
+                .appendLine("  \\  given gherkin_call  # comment")
+                .appendLine("  \\  when then gherkin_call  # comment")
+                .appendLine("  \\  ${var_asgn}=  given gherkin_call  # comment")
+                .appendLine("  \\  call  given arg  # comment")
+                .appendLine("userkw 2")
+                .appendLine("  [arguments]  ${b}  # comment")
+                .appendLine("  call  arg  ${x}  # comment   comment")
+                .appendLine("  given gherkin_call  # comment")
+                .appendLine("  when then gherkin_call  # comment")
+                .appendLine("  ${var_asgn}=  given gherkin_call  # comment")
+                .appendLine("  call  given arg  # comment")
+                .appendLine("* * * Variables * * *")
+                .appendLine("${var_def_1}  1  # comment")
+                .appendLine("${var_def_2}  1  2  3  # comment")
+                .appendLine("@{var_def_3}  1  2  3  # comment")
+                .appendLine("&{var_def_4}  k1=v1  k2=v2  # comment")
+                .appendLine("{var_def_5}  1  2  3  # comment")
+                .appendLine("*** unknown section ***")
+                .appendLine("some stuff")
+                .appendLine("*** Settings ***")
+                .appendLine("Documentation  abc  def  # comment")
+                .appendLine("Library  abc  def  # comment")
+                .appendLine("Library  abc  WITH NAME  def  # comment")
+                .appendLine("Resource  abc  def  # comment")
+                .appendLine("Variables  abc  def  # comment")
+                .appendLine("Metadata  abc  def  # comment")
+                .appendLine("Force Tags  abc  def  # comment")
+                .appendLine("Default Tags  abc  def  # comment")
+                .appendLine("Suite Setup  general_setting_call  def  # comment")
+                .appendLine("Suite Teardown  general_setting_call  def  # comment")
+                .appendLine("Task Setup  general_setting_call  def  # comment")
+                .appendLine("Task Teardown  general_setting_call  def  # comment")
+                .appendLine("Task Timeout  abc  def  # comment")
                 .appendLine("UnkownSetting  abc  def  # comment")
                 .build();
         return model.getLinkedElement().getFileContent();

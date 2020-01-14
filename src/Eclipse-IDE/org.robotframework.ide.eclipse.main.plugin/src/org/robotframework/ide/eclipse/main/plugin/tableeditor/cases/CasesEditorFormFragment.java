@@ -233,7 +233,8 @@ class CasesEditorFormFragment implements ISectionFormFragment {
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator());
+                new VariablesInNamesLabelAccumulator(
+                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());

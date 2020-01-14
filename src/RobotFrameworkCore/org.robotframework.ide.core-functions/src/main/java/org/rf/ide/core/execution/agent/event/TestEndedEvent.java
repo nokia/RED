@@ -17,6 +17,7 @@ public final class TestEndedEvent {
         final List<?> arguments = (List<?>) eventMap.get("end_test");
         final String name = (String) arguments.get(0);
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+        final String originalName = (String) attributes.get("originalname");
         final String longName = (String) attributes.get("longname");
         final Integer elapsedTime = (Integer) attributes.get("elapsedtime");
         final String errorMessage = (String) attributes.get("message");
@@ -26,11 +27,22 @@ public final class TestEndedEvent {
             throw new IllegalArgumentException(
                     "Test ended event should have long name, status, elapsed time and message attributes");
         }
-        return new TestEndedEvent(name, longName, elapsedTime, Status.valueOf(testStatus), errorMessage);
+
+        if (originalName == null) {
+            // for RF < 3.2 this is always true
+            return new TestEndedEvent(name, name, longName, elapsedTime, Status.valueOf(testStatus), errorMessage);
+        } else {
+            // name is always resolved in RF >= 3.2, originalname holds the name with parameters
+            // (possibly)
+            return new TestEndedEvent(originalName, name, longName, elapsedTime, Status.valueOf(testStatus),
+                    errorMessage);
+        }
     }
 
 
     private final String name;
+
+    private final String resolvedName;
 
     private final String longName;
 
@@ -40,9 +52,11 @@ public final class TestEndedEvent {
 
     private final String errorMessage;
 
-    public TestEndedEvent(final String name, final String longName, final int elapsedTime, final Status testStatus,
-            final String errorMessage) {
+
+    public TestEndedEvent(final String name, final String resolvedName, final String longName, final int elapsedTime,
+            final Status testStatus, final String errorMessage) {
         this.name = name;
+        this.resolvedName = resolvedName;
         this.longName = longName;
         this.elapsedTime = elapsedTime;
         this.testStatus = testStatus;
@@ -51,6 +65,10 @@ public final class TestEndedEvent {
 
     public String getName() {
         return name;
+    }
+
+    public String getResolvedName() {
+        return resolvedName;
     }
 
     public String getLongName() {
@@ -73,15 +91,15 @@ public final class TestEndedEvent {
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == TestEndedEvent.class) {
             final TestEndedEvent that = (TestEndedEvent) obj;
-            return this.name.equals(that.name) && this.longName.equals(that.longName)
-                    && this.elapsedTime == that.elapsedTime && this.testStatus == that.testStatus
-                    && this.errorMessage.equals(that.errorMessage);
+            return this.name.equals(that.name) && Objects.equals(this.resolvedName, that.resolvedName)
+                    && this.longName.equals(that.longName) && this.elapsedTime == that.elapsedTime
+                    && this.testStatus == that.testStatus && this.errorMessage.equals(that.errorMessage);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, longName, elapsedTime, testStatus, errorMessage);
+        return Objects.hash(name, resolvedName, longName, elapsedTime, testStatus, errorMessage);
     }
 }

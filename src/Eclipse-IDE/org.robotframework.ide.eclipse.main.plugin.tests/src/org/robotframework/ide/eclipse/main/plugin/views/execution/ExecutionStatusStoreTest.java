@@ -271,7 +271,7 @@ public class ExecutionStatusStoreTest {
         store.open();
         store.setCurrent(currentSuite);
 
-        store.testStarted("test");
+        store.testStarted("test", "resolvedTest");
 
         assertThat(test.getStatus()).isEqualTo(Optional.of(Status.RUNNING));
         assertThat(store.getCurrentTest()).isEqualTo(1);
@@ -286,7 +286,7 @@ public class ExecutionStatusStoreTest {
         store.open();
         store.setCurrent(currentSuite);
 
-        store.testStarted("test");
+        store.testStarted("test", "resolvedTest");
         assertThat(store.checkDirtyAndReset()).isTrue();
         assertThat(store.checkDirtyAndReset()).isFalse();
     }

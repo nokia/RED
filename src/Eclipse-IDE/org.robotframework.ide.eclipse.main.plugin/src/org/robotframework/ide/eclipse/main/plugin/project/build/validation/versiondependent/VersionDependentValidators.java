@@ -27,6 +27,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 
+import com.google.common.collect.Range;
+
 public class VersionDependentValidators {
 
     private final FileValidationContext validationContext;
@@ -127,6 +129,14 @@ public class VersionDependentValidators {
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
+    public Stream<VersionDependentModelUnitValidator> getTestCaseValidators(final TestCase testCase) {
+        final Range<RobotVersion> varInTestNameApplicableVersion = Range.atLeast(new RobotVersion(3, 2));
+        return Stream
+                .<VersionDependentModelUnitValidator> of(new VariableUsageInTokenValidator(validationContext,
+                        varInTestNameApplicableVersion, testCase.getName(), reporter))
+                .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
     public Stream<VersionDependentModelUnitValidator> getTestCaseSettingsValidators(final TestCase testCase) {
         final String settingDuplDetail = getDuplicatedSettingDetailInfo();
         final IFile file = validationContext.getFile();
@@ -152,6 +162,14 @@ public class VersionDependentValidators {
                 new SingleValuedSettingsHaveMultipleValuesProvidedValidator<>(file, testCase::getTemplates, reporter,
                         ". No template will be used in this test unless defined in suite settings"));
         return allValidators.filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
+    }
+
+    public Stream<VersionDependentModelUnitValidator> getTaskValidators(final Task task) {
+        final Range<RobotVersion> varInTaskApplicableVersion = Range.atLeast(new RobotVersion(3, 2));
+        return Stream
+                .<VersionDependentModelUnitValidator> of(new VariableUsageInTokenValidator(validationContext,
+                        varInTaskApplicableVersion, task.getName(), reporter))
+                .filter(validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
     public Stream<VersionDependentModelUnitValidator> getTaskSettingsValidators(final Task task) {

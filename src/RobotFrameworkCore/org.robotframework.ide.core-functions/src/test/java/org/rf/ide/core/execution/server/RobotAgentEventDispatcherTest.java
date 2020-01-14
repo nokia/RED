@@ -319,7 +319,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleTestStarted(new TestStartedEvent("test", "suite-a-b-test", ""));
+        verify(listener).handleTestStarted(new TestStartedEvent("test", "test", "suite-a-b-test", ""));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
@@ -338,7 +338,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingAboutToStart();
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleTestEnded(new TestEndedEvent("test", "suite-a-b-test", 10, Status.FAIL, "msg"));
+        verify(listener).handleTestEnded(new TestEndedEvent("test", "test", "suite-a-b-test", 10, Status.FAIL, "msg"));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

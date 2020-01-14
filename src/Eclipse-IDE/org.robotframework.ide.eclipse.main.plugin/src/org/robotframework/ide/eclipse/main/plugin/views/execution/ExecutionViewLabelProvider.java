@@ -63,7 +63,11 @@ class ExecutionViewLabelProvider extends RedCommonLabelProvider {
             label.append("]", bracketStyler);
             label.append(" ");
         }
-        label.append(node.getName());
+        if (node.getResolvedName() != null) {
+            label.append(node.getResolvedName());
+        } else {
+            label.append(node.getName());
+        }
 
         final int time = node.getElapsedTime();
         if (time >= 0) {

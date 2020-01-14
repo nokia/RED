@@ -29,13 +29,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.Variables
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
-class UnknownVariables {
+public class UnknownVariables {
 
     private final FileValidationContext validationContext;
 
     private final ValidationReportingStrategy reporter;
 
-    UnknownVariables(final FileValidationContext validationContext, final ValidationReportingStrategy reporter) {
+    public UnknownVariables(final FileValidationContext validationContext, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.reporter = reporter;
     }
@@ -49,7 +49,7 @@ class UnknownVariables {
                 && !VariableNamesSupport.isDefinedVariableInsideComputation(declaration, definedVariables);
     }
 
-    void reportUnknownVars(final RobotToken token) {
+    public void reportUnknownVars(final RobotToken token) {
         reportUnknownVars(newArrayList(token));
     }
 

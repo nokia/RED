@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TasksProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.RangeSet;
@@ -34,23 +35,30 @@ class TaskValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
     private final ValidationReportingStrategy reporter;
+    private final VersionDependentValidators versionDependentValidators;
 
     private final Task task;
 
     TaskValidator(final FileValidationContext validationContext, final Task task,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
-        this.task = task;
         this.reporter = reporter;
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
+        this.task = task;
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) {
+        reportVersionSpecificProblems();
         reportEmptyNamesOfTask();
         reportEmptyTask();
 
         validateSettings();
         validateKeywordsAndVariablesUsages();
+    }
+
+    private void reportVersionSpecificProblems() {
+        versionDependentValidators.getTaskValidators(task).forEach(ModelUnitValidator::validate);
     }
 
     private void reportEmptyNamesOfTask() {

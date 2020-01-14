@@ -36,6 +36,7 @@ public class ExecutionTreeNode {
     private DynamicFlag dynamic;
 
     private final String name;
+    private String resolvedName;
     private URI path;
     private final ElementKind kind;
     private int numberOfTests;
@@ -114,8 +115,8 @@ public class ExecutionTreeNode {
             ensureIsProperlyOrdered(suites, suiteNode);
             return suiteNode;
         }
-        final ExecutionTreeNode newNode = new ExecutionTreeNode(this, ElementKind.SUITE, name, null, DynamicFlag.ADDED,
-                totalTestsInSuite);
+        final ExecutionTreeNode newNode = new ExecutionTreeNode(this, ElementKind.SUITE, name, null,
+                DynamicFlag.ADDED, totalTestsInSuite);
         addChildren(newNode);
         ensureIsProperlyOrdered(suites, newNode);
         updateNumberOfTests(totalTestsInSuite);
@@ -123,7 +124,7 @@ public class ExecutionTreeNode {
         return newNode;
     }
 
-    public ExecutionTreeNode getTestOrCreateIfMissing(final String name) {
+    public ExecutionTreeNode getTestOrCreateIfMissing(final String name, final String resolvedTestName) {
         final ExecutionTreeNode testNode = tests.stream()
                 .filter(n -> n.status == null)
                 .filter(n -> n.getName().equals(name))
@@ -131,10 +132,12 @@ public class ExecutionTreeNode {
                 .orElse(null);
         if (testNode != null) {
             ensureIsProperlyOrdered(tests, testNode);
+            testNode.resolvedName = resolvedTestName;
             return testNode;
         }
-        final ExecutionTreeNode newNode = new ExecutionTreeNode(this, ElementKind.TEST, name, path, DynamicFlag.ADDED,
-                1);
+        final ExecutionTreeNode newNode = new ExecutionTreeNode(this, ElementKind.TEST, resolvedTestName, path,
+                DynamicFlag.ADDED, 1);
+        newNode.resolvedName = resolvedTestName;
         addChildren(newNode);
         ensureIsProperlyOrdered(tests, newNode);
         updateNumberOfTests(1);
@@ -189,6 +192,10 @@ public class ExecutionTreeNode {
 
     public String getName() {
         return name;
+    }
+
+    public String getResolvedName() {
+        return resolvedName;
     }
 
     public void setPath(final URI path) {

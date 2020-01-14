@@ -93,12 +93,13 @@ public class TestEndedEventTest {
     }
 
     @Test
-    public void eventIsProperlyConstructed() {
+    public void eventIsProperlyConstructed_whenThereIsNoOriginalName() {
         final Map<String, Object> eventMap = ImmutableMap.of("end_test", newArrayList("test",
                 ImmutableMap.of("longname", "s.test", "status", "PASS", "elapsedtime", 100, "message", "error")));
         final TestEndedEvent event = TestEndedEvent.from(eventMap);
 
         assertThat(event.getName()).isEqualTo("test");
+        assertThat(event.getResolvedName()).isEqualTo("test");
         assertThat(event.getLongName()).isEqualTo("s.test");
         assertThat(event.getStatus()).isEqualTo(Status.PASS);
         assertThat(event.getElapsedTime()).isEqualTo(100);
@@ -106,39 +107,77 @@ public class TestEndedEventTest {
     }
 
     @Test
-    public void equalsTests() {
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.FAIL, "error"))
-                .isEqualTo(new TestEndedEvent("test", "s.test", 100, Status.FAIL, "error"));
+    public void eventIsProperlyConstructed_whenThereIsOriginalName_1() {
+        final Map<String, Object> eventMap = ImmutableMap.of("end_test",
+                newArrayList("test", ImmutableMap.of("longname", "s.test", "status", "PASS", "elapsedtime", 100,
+                        "message", "error", "originalname", "test")));
+        final TestEndedEvent event = TestEndedEvent.from(eventMap);
 
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test1", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test1", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test1", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test1", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 200, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 200, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.FAIL, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.FAIL, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, "error"));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, "error"))
-                .isNotEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, ""));
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, "")).isNotEqualTo(new Object());
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, "")).isNotEqualTo(null);
+        assertThat(event.getName()).isEqualTo("test");
+        assertThat(event.getResolvedName()).isEqualTo("test");
+        assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getStatus()).isEqualTo(Status.PASS);
+        assertThat(event.getElapsedTime()).isEqualTo(100);
+        assertThat(event.getErrorMessage()).isEqualTo("error");
+    }
+
+    @Test
+    public void eventIsProperlyConstructed_whenThereIsOriginalName_2() {
+        final Map<String, Object> eventMap = ImmutableMap.of("end_test",
+                newArrayList("test 1", ImmutableMap.of("longname", "s.test 1", "status", "PASS", "elapsedtime", 100,
+                        "message", "error", "originalname", "test ${var}")));
+        final TestEndedEvent event = TestEndedEvent.from(eventMap);
+
+        assertThat(event.getName()).isEqualTo("test ${var}");
+        assertThat(event.getResolvedName()).isEqualTo("test 1");
+        assertThat(event.getLongName()).isEqualTo("s.test 1");
+        assertThat(event.getStatus()).isEqualTo(Status.PASS);
+        assertThat(event.getElapsedTime()).isEqualTo(100);
+        assertThat(event.getErrorMessage()).isEqualTo("error");
+    }
+
+    @Test
+    public void equalsTests() {
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.FAIL, "error"))
+                .isEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.FAIL, "error"));
+        assertThat(new TestEndedEvent("test", null, "s.test", 100, Status.PASS, ""))
+                .isEqualTo(new TestEndedEvent("test", null, "s.test", 100, Status.PASS, ""));
+
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test1", "test1", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test1", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test1", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test1", "test1", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test1", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test1", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 200, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 200, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.FAIL, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.FAIL, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "error"));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "error"))
+                .isNotEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, ""));
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "")).isNotEqualTo(new Object());
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "")).isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
-        assertThat(new TestEndedEvent("test", "s.test", 100, Status.PASS, "").hashCode())
-                .isEqualTo(new TestEndedEvent("test", "s.test", 100, Status.PASS, "").hashCode());
+        assertThat(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "").hashCode())
+                .isEqualTo(new TestEndedEvent("test", "test", "s.test", 100, Status.PASS, "").hashCode());
+        assertThat(new TestEndedEvent("test", null, "s.test", 100, Status.PASS, "").hashCode())
+                .isEqualTo(new TestEndedEvent("test", null, "s.test", 100, Status.PASS, "").hashCode());
     }
 }

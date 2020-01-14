@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.RangeSet;
@@ -34,23 +35,30 @@ class TestCaseValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
     private final ValidationReportingStrategy reporter;
+    private final VersionDependentValidators versionDependentValidators;
 
     private final TestCase testCase;
 
     TestCaseValidator(final FileValidationContext validationContext, final TestCase testCase,
             final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
-        this.testCase = testCase;
         this.reporter = reporter;
+        this.versionDependentValidators = new VersionDependentValidators(validationContext, reporter);
+        this.testCase = testCase;
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) {
+        reportVersionSpecificProblems();
         reportEmptyNamesOfCase();
         reportEmptyCase();
 
         validateSettings();
         validateKeywordsAndVariablesUsages();
+    }
+
+    private void reportVersionSpecificProblems() {
+        versionDependentValidators.getTestCaseValidators(testCase).forEach(ModelUnitValidator::validate);
     }
 
     private void reportEmptyNamesOfCase() {

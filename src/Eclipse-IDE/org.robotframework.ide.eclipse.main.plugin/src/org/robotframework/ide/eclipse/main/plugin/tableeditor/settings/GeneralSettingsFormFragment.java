@@ -547,7 +547,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 new SpecialItemsLabelAccumulator(rowObjectProvider),
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator());
+                new VariablesInNamesLabelAccumulator(
+                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);

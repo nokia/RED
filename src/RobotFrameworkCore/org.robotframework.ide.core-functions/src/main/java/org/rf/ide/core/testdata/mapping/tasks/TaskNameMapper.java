@@ -46,9 +46,7 @@ public class TaskNameMapper implements IParsingMapper {
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
 
-        final List<IRobotTokenType> types = rt.getTypes();
-        types.remove(RobotTokenType.UNKNOWN);
-        types.add(0, RobotTokenType.TASK_NAME);
+        setTokenTypes(robotFileOutput.getRobotVersion(), rt);
         rt.setText(text);
 
         final TaskTable taskTable = robotFileOutput.getFileModel().getTasksTable();
@@ -56,5 +54,18 @@ public class TaskNameMapper implements IParsingMapper {
 
         processingState.push(ParsingState.TASK_DECLARATION);
         return rt;
+    }
+
+    private void setTokenTypes(final RobotVersion robotVersion, final RobotToken rt) {
+        if (robotVersion.isOlderThan(new RobotVersion(3, 2))) {
+            // until 3.2 a name of a task is plain text, so we're clearing other types (especially
+            // variables)
+            rt.setType(RobotTokenType.TASK_NAME);
+        } else {
+            // from 3.2 there can be variables in task name
+            final List<IRobotTokenType> types = rt.getTypes();
+            types.remove(RobotTokenType.UNKNOWN);
+            types.add(0, RobotTokenType.TASK_NAME);
+        }
     }
 }

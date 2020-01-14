@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.RGB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -28,6 +28,15 @@ public class ExecutionViewLabelProviderTest {
         final StyledString label = labelProvider.getStyledText(node);
         assertThat(label.getString()).isEqualTo("Suite");
         assertThat(label.getStyleRanges()).isEmpty();
+    }
+
+    @Test
+    public void nodeWithResolvedName_hasResolvedNameInLabel() {
+        final ExecutionTreeNode node = ExecutionTreeNode.newSuiteNode(null, "Suite", null);
+        final ExecutionTreeNode testNode = node.getTestOrCreateIfMissing("test ${x}", "test 1");
+
+        final StyledString label = labelProvider.getStyledText(testNode);
+        assertThat(label.getString()).isEqualTo("[+] test 1");
     }
 
     @Test

@@ -44,7 +44,7 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     @Override
     public void handleTestStarted(final TestStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.testStarted(event.getName()));
+                store -> store.testStarted(event.getName(), event.getResolvedName()));
     }
 
     @Override

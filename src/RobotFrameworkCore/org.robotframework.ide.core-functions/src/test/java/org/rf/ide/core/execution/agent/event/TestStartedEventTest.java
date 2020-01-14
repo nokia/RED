@@ -62,8 +62,9 @@ public class TestStartedEventTest {
         final TestStartedEvent event = TestStartedEvent.from(eventMap);
 
         assertThat(event.getName()).isEqualTo("test");
-        assertThat(event.getTemplate()).contains("kw");
+        assertThat(event.getResolvedName()).isEqualTo("test");
         assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getTemplate()).contains("kw");
     }
 
     @Test
@@ -73,8 +74,9 @@ public class TestStartedEventTest {
         final TestStartedEvent event = TestStartedEvent.from(eventMap);
 
         assertThat(event.getName()).isEqualTo("test");
-        assertThat(event.getTemplate()).isEmpty();
+        assertThat(event.getResolvedName()).isEqualTo("test");
         assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getTemplate()).isEmpty();
     }
 
     @Test
@@ -84,39 +86,85 @@ public class TestStartedEventTest {
         final TestStartedEvent event = TestStartedEvent.from(eventMap);
 
         assertThat(event.getName()).isEqualTo("test");
-        assertThat(event.getTemplate()).isEmpty();
+        assertThat(event.getResolvedName()).isEqualTo("test");
         assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getTemplate()).isEmpty();
+    }
+
+    @Test
+    public void eventIsProperlyConstructed_whenThereIsNoOriginalName() {
+        final Map<String, Object> eventMap = ImmutableMap.of("start_test",
+                newArrayList("test", ImmutableMap.of("longname", "s.test")));
+        final TestStartedEvent event = TestStartedEvent.from(eventMap);
+
+        assertThat(event.getName()).isEqualTo("test");
+        assertThat(event.getResolvedName()).isEqualTo("test");
+        assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getTemplate()).isEmpty();
+    }
+
+    @Test
+    public void eventIsProperlyConstructed_whenThereIsOriginalName_1() {
+        final Map<String, Object> eventMap = ImmutableMap.of("start_test",
+                newArrayList("test", ImmutableMap.of("longname", "s.test", "originalname", "test")));
+        final TestStartedEvent event = TestStartedEvent.from(eventMap);
+
+        assertThat(event.getName()).isEqualTo("test");
+        assertThat(event.getResolvedName()).isEqualTo("test");
+        assertThat(event.getLongName()).isEqualTo("s.test");
+        assertThat(event.getTemplate()).isEmpty();
+    }
+
+    @Test
+    public void eventIsProperlyConstructed_whenThereIsOriginalName_2() {
+        final Map<String, Object> eventMap = ImmutableMap.of("start_test",
+                newArrayList("test 1", ImmutableMap.of("longname", "s.test 1", "originalname", "test ${var}")));
+        final TestStartedEvent event = TestStartedEvent.from(eventMap);
+
+        assertThat(event.getName()).isEqualTo("test ${var}");
+        assertThat(event.getResolvedName()).isEqualTo("test 1");
+        assertThat(event.getLongName()).isEqualTo("s.test 1");
+        assertThat(event.getTemplate()).isEmpty();
     }
 
     @Test
     public void equalsTests() {
-        assertThat(new TestStartedEvent("test", "s.test", "template"))
-                .isEqualTo(new TestStartedEvent("test", "s.test", "template"));
-        assertThat(new TestStartedEvent("test", "s.test", "")).isEqualTo(new TestStartedEvent("test", "s.test", ""));
-        assertThat(new TestStartedEvent("test", "s.test", null))
-                .isEqualTo(new TestStartedEvent("test", "s.test", null));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template"))
+                .isEqualTo(new TestStartedEvent("test", "test", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", ""))
+                .isEqualTo(new TestStartedEvent("test", "test", "s.test", ""));
+        assertThat(new TestStartedEvent("test", "test", "s.test", null))
+                .isEqualTo(new TestStartedEvent("test", "test", "s.test", null));
+        assertThat(new TestStartedEvent("test", null, "s.test", null))
+                .isEqualTo(new TestStartedEvent("test", null, "s.test", null));
 
-        assertThat(new TestStartedEvent("test", "s.test", "template"))
-                .isNotEqualTo(new TestStartedEvent("test1", "s.test", "template"));
-        assertThat(new TestStartedEvent("test1", "s.test", "template"))
-                .isNotEqualTo(new TestStartedEvent("test", "s.test", "template"));
-        assertThat(new TestStartedEvent("test", "s.test", "template"))
-                .isNotEqualTo(new TestStartedEvent("test", "s.test1", "template"));
-        assertThat(new TestStartedEvent("test", "s.test1", "template"))
-                .isNotEqualTo(new TestStartedEvent("test", "s.test", "template"));
-        assertThat(new TestStartedEvent("test", "s.test", "template"))
-                .isNotEqualTo(new TestStartedEvent("test", "s.test", "template1"));
-        assertThat(new TestStartedEvent("test", "s.test", "template1"))
-                .isNotEqualTo(new TestStartedEvent("test", "s.test", "template"));
-        assertThat(new TestStartedEvent("test", "s.test", "template")).isNotEqualTo(new Object());
-        assertThat(new TestStartedEvent("test", "s.test", "template")).isNotEqualTo(null);
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test1", "test1", "s.test", "template"));
+        assertThat(new TestStartedEvent("test1", "test1", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test1", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test1", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test1", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test1", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test", "template1"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template1"))
+                .isNotEqualTo(new TestStartedEvent("test", "test", "s.test", "template"));
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template")).isNotEqualTo(new Object());
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template")).isNotEqualTo(null);
     }
 
     @Test
     public void hashCodeTests() {
-        assertThat(new TestStartedEvent("test", "s.test", "template").hashCode())
-                .isEqualTo(new TestStartedEvent("test", "s.test", "template").hashCode());
-        assertThat(new TestStartedEvent("test", "s.test", null).hashCode())
-                .isEqualTo(new TestStartedEvent("test", "s.test", null).hashCode());
+        assertThat(new TestStartedEvent("test", "test", "s.test", "template").hashCode())
+                .isEqualTo(new TestStartedEvent("test", "test", "s.test", "template").hashCode());
+        assertThat(new TestStartedEvent("test", "test", "s.test", null).hashCode())
+                .isEqualTo(new TestStartedEvent("test", "test", "s.test", null).hashCode());
+        assertThat(new TestStartedEvent("test", null, "s.test", null).hashCode())
+                .isEqualTo(new TestStartedEvent("test", null, "s.test", null).hashCode());
     }
 }

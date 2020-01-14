@@ -145,7 +145,7 @@ public class StacktraceBuilderTest {
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, mock(StackFrameContext.class)));
 
         final StacktraceBuilder builder = new StacktraceBuilder(stack, locator, new RobotBreakpointSupplier());
-        builder.handleTestStarted(new TestStartedEvent("test", "Suite.Test", null));
+        builder.handleTestStarted(new TestStartedEvent("test", "test", "Suite.Test", null));
 
         assertThat(stack.size()).isEqualTo(2);
         final StackFrame frame = stack.peekCurrentFrame().get();
@@ -155,7 +155,7 @@ public class StacktraceBuilderTest {
         assertThat(frame.isTestContext()).isTrue();
         assertThat(frame.getLevel()).isEqualTo(1);
 
-        builder.handleTestEnded(new TestEndedEvent("test", "Suite.Test", 100, Status.PASS, ""));
+        builder.handleTestEnded(new TestEndedEvent("test", "test", "Suite.Test", 100, Status.PASS, ""));
         assertThat(stack.size()).isEqualTo(1);
     }
 

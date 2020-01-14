@@ -22,18 +22,16 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CodeHolderNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordCallOverridingRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensInNestedExecsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SpecialTokensRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TaskSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
@@ -57,19 +55,19 @@ public class SuiteSourceEditorConfigurationTest {
                         rules -> haveExactTypes(rules, SectionHeaderRule.class, CommentRule.class,
                                 MatchEverythingRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
-                        rules -> haveExactTypes(rules, SectionHeaderRule.class, CaseNameRule.class,
+                        rules -> haveExactTypes(rules, SectionHeaderRule.class, CodeHolderNameRule.class,
                                 TestCaseSettingsRule.class, KeywordCallOverridingRule.class,
                                 KeywordCallOverridingRule.class, KeywordCallOverridingRule.class,
                                 SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
                                 SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.TASKS_SECTION,
-                        rules -> haveExactTypes(rules, SectionHeaderRule.class, TaskNameRule.class,
+                        rules -> haveExactTypes(rules, SectionHeaderRule.class, CodeHolderNameRule.class,
                                 TaskSettingsRule.class, KeywordCallOverridingRule.class,
                                 KeywordCallOverridingRule.class, KeywordCallOverridingRule.class,
                                 SpecialTokensInNestedExecsRule.class, CommentRule.class, VariableUsageRule.class,
                                 SpecialTokensRule.class))
                 .hasEntrySatisfying(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                        rules -> haveExactTypes(rules, SectionHeaderRule.class, KeywordNameRule.class,
+                        rules -> haveExactTypes(rules, SectionHeaderRule.class, CodeHolderNameRule.class,
                                 KeywordSettingsRule.class, KeywordCallOverridingRule.class,
                                 KeywordCallOverridingRule.class, SpecialTokensInNestedExecsRule.class,
                                 CommentRule.class, VariableUsageRule.class, SpecialTokensRule.class))

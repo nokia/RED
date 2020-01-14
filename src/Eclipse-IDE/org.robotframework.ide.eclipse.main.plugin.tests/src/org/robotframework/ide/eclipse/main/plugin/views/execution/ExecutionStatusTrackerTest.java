@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
@@ -99,9 +99,9 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest", null));
+        tracker.handleTestStarted(new TestStartedEvent("test", "resolvedTest", "teeeeest", null));
 
-        verify(store).testStarted("test");
+        verify(store).testStarted("test", "resolvedTest");
         verifyNoMoreInteractions(store);
     }
 
@@ -113,7 +113,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestEnded(new TestEndedEvent("test", "teeeeest", 100, Status.FAIL, "error"));
+        tracker.handleTestEnded(new TestEndedEvent("test", "resolvedTest", "teeeeest", 100, Status.FAIL, "error"));
 
         verify(store).testEnded(100, Status.FAIL, "error");
         verifyNoMoreInteractions(store);

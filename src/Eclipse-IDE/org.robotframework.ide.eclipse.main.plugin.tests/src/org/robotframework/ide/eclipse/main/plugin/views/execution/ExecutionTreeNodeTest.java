@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.DynamicFlag;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
@@ -270,13 +270,14 @@ public class ExecutionTreeNodeTest {
     public void existingTestNodeChildIsReturned_whenItExists() {
         final ExecutionTreeNode parent = ExecutionTreeNode.newSuiteNode(null, "parent", null);
         parent.setNumberOfTests(3);
-        final ExecutionTreeNode test1 = ExecutionTreeNode.newTestNode(parent, "t1", null);
+        final ExecutionTreeNode test1 = ExecutionTreeNode.newTestNode(parent, "t${x}", null);
         final ExecutionTreeNode test2 = ExecutionTreeNode.newTestNode(parent, "t2", null);
         final ExecutionTreeNode test3 = ExecutionTreeNode.newTestNode(parent, "t3", null);
         parent.addChildren(test1, test2, test3);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t1");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t${x}", "t1");
         assertThat(found).isSameAs(test1);
+        assertThat(found.getResolvedName()).isEqualTo("t1");
         assertThat(parent.getChildren()).containsExactly(test1, test2, test3);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.NONE);
         assertThat(test1.getDynamic()).isEqualTo(DynamicFlag.NONE);
@@ -297,7 +298,7 @@ public class ExecutionTreeNodeTest {
         final ExecutionTreeNode test2 = ExecutionTreeNode.newTestNode(parent, "test", null);
         parent.addChildren(test1, test2);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("test");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("test", "test");
         assertThat(found).isSameAs(test2);
         assertThat(parent.getChildren()).containsExactly(test1, test2);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.NONE);
@@ -317,7 +318,7 @@ public class ExecutionTreeNodeTest {
         final ExecutionTreeNode test3 = ExecutionTreeNode.newTestNode(parent, "t3", null);
         parent.addChildren(test1, test2, test3);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t2");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t2", "t2");
         assertThat(found).isSameAs(test2);
         assertThat(parent.getChildren()).containsExactly(test2, test1, test3);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.OTHER);
@@ -340,7 +341,7 @@ public class ExecutionTreeNodeTest {
         final ExecutionTreeNode test3 = ExecutionTreeNode.newTestNode(parent, "t3", null);
         parent.addChildren(test1, test2, test3);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t3");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t3", "t3");
         assertThat(found).isSameAs(test3);
         assertThat(parent.getChildren()).containsExactly(test1, test3, test2);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.OTHER);
@@ -362,8 +363,9 @@ public class ExecutionTreeNodeTest {
         final ExecutionTreeNode test3 = ExecutionTreeNode.newTestNode(parent, "t3", null);
         parent.addChildren(test1, test2, test3);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t4");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t$x}", "t4");
         assertThat(found).isNotIn(test1, test2, test3);
+        assertThat(found.getResolvedName()).isEqualTo("t4");
         assertThat(parent.getChildren()).containsExactly(found, test1, test2, test3);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.OTHER);
         assertThat(found.getDynamic()).isEqualTo(DynamicFlag.ADDED);
@@ -387,7 +389,7 @@ public class ExecutionTreeNodeTest {
         final ExecutionTreeNode test3 = ExecutionTreeNode.newTestNode(parent, "t3", null);
         parent.addChildren(test1, test2, test3);
 
-        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t4");
+        final ExecutionTreeNode found = parent.getTestOrCreateIfMissing("t4", "t4");
         assertThat(found).isNotIn(test1, test2, test3);
         assertThat(parent.getChildren()).containsExactly(test1, found, test2, test3);
         assertThat(parent.getDynamic()).isEqualTo(DynamicFlag.OTHER);
