@@ -8,21 +8,23 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -39,29 +41,29 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteFileMarkersListenerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileMarkersListenerTest.class);
+    @Project(useRobotNature = true, createDefaultRedXml = true)
+    static IProject project;
 
     private static RobotSuiteFile varsSuiteModel;
     private static RobotSuiteFile settingsSuiteModel;
     private static RobotSuiteFile casesSuiteModel;
     private static RobotSuiteFile keywordsSuiteModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         switchAutobuilding(false);
-        projectProvider.configure();
-        projectProvider.addRobotNature();
 
-        projectProvider.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+        project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
 
         final RobotModel robotModel = new RobotModel();
 
-        final IFile varsFile = projectProvider.createFile("vars.robot",
+        final IFile varsFile = createFile(project, "vars.robot",
                 "*** Test Cases ***",
                 "*** Variables ***",
                 "${var}  1",
@@ -70,7 +72,7 @@ public class SuiteFileMarkersListenerTest {
                 "{var}  4",
                 "{var}  4");
         varsSuiteModel = robotModel.createSuiteFile(varsFile);
-        final IFile settingsFile = projectProvider.createFile("settings.robot",
+        final IFile settingsFile = createFile(project, "settings.robot",
                 "*** Test Cases ***",
                 "*** Settings ***",
                 "Documentation  doc",
@@ -78,7 +80,7 @@ public class SuiteFileMarkersListenerTest {
                 "Suite Teardown",
                 "Test Template  unknown  1  2");
         settingsSuiteModel = robotModel.createSuiteFile(settingsFile);
-        final IFile casesFile = projectProvider.createFile("cases.robot",
+        final IFile casesFile = createFile(project, "cases.robot",
                 "*** Test Cases ***",
                 "case1",
                 "  Log  1",
@@ -91,7 +93,7 @@ public class SuiteFileMarkersListenerTest {
                 "  [Arguments]  ${x}",
                 "  [Return]  ${x}");
         casesSuiteModel = robotModel.createSuiteFile(casesFile);
-        final IFile keywordsFile = projectProvider.createFile("keywords.robot",
+        final IFile keywordsFile = createFile(project, "keywords.robot",
                 "*** Test Cases ***",
                 "*** Keywords ***",
                 "kw1",
@@ -114,7 +116,7 @@ public class SuiteFileMarkersListenerTest {
         RobotArtifactsValidator.revalidate(keywordsSuiteModel).join();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() throws Exception {
         switchAutobuilding(true);
     }

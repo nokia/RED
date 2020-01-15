@@ -29,7 +29,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class SourceNotFoundEditorControlsTest {
 
     @FreshShell
-    public Composite shell;
+    Composite shell;
 
     @Test
     public void controlsAreConstructedProperly() {

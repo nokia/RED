@@ -9,11 +9,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+@Deprecated
 public class RunConfigurationProvider implements TestRule {
 
     private final String typeId;
@@ -46,7 +48,8 @@ public class RunConfigurationProvider implements TestRule {
     }
 
     public ILaunchConfiguration create(final String name) throws CoreException {
-        return getType().newInstance(null, name);
+        final ILaunchConfigurationWorkingCopy cfg = getType().newInstance(null, name);
+        return cfg;
     }
 
     public ILaunchConfigurationType getType() throws CoreException {

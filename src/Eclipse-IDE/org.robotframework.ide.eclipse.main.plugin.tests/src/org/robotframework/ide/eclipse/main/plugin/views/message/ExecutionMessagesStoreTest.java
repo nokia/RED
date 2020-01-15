@@ -11,14 +11,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.jupiter.BooleanPreference;
 import org.robotframework.red.junit.jupiter.IntegerPreference;
+import org.robotframework.red.junit.jupiter.Managed;
 import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
 
 @ExtendWith(PreferencesExtension.class)
 public class ExecutionMessagesStoreTest {
+
+    @Managed
+    PreferencesUpdater updater;
 
     private ExecutionMessagesStore store;
 
@@ -83,7 +87,7 @@ public class ExecutionMessagesStoreTest {
         store.append("1");
         assertThat(store.getMessage()).isEqualTo("sage1");
 
-        RedPlugin.getDefault().getPreferenceStore().setValue(RedPreferences.LIMIT_MSG_LOG_LENGTH, 3);
+        updater.setValue(RedPreferences.LIMIT_MSG_LOG_LENGTH, 3);
         assertThat(store.getMessage()).isEqualTo("sage1");
 
         store.append("2");

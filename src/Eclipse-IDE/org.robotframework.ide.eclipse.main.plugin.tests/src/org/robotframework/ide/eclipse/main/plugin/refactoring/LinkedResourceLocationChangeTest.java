@@ -15,38 +15,26 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
+@ExtendWith(ProjectExtension.class)
 public class LinkedResourceLocationChangeTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            LinkedResourceLocationChangeTest.class);
+    @TempDir
+    public static File tempFolder;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createDir("directory");
-    }
+    @Project(dirs = { "directory" }, cleanUpAfterEach = true)
+    public static StatefulProject project;
 
     @Test
     public void checkChangeName() {
-        final IWorkspace workspace = projectProvider.getProject().getWorkspace();
+        final IWorkspace workspace = project.getWorkspace();
 
         final LinkedResourceLocationChange change = new LinkedResourceLocationChange(workspace);
 
@@ -56,11 +44,12 @@ public class LinkedResourceLocationChangeTest {
 
     @Test
     public void linkedResourceLocationsAreRefreshed_whenChangeIsPerformed() throws Exception {
-        final IWorkspace workspace = projectProvider.getProject().getWorkspace();
-        final File nonWorkspaceFile = tempFolder.newFile("linkedRes.robot");
-        resourceCreator.createLink(nonWorkspaceFile.toURI(), projectProvider.getFile(nonWorkspaceFile.getName()));
+        final IWorkspace workspace = project.getWorkspace();
+        final File nonWorkspaceFile = new File(tempFolder, "linkedRes.robot");
+        nonWorkspaceFile.createNewFile();
+        project.createFileLink(nonWorkspaceFile.getName(), nonWorkspaceFile.toURI());
 
-        assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(projectProvider.getFile("linkedRes.robot"));
+        assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(project.getFile("linkedRes.robot"));
 
         moveResource("linkedRes.robot",
                 new Path("/LinkedResourceLocationChangeTest/directory").append(nonWorkspaceFile.getName()));
@@ -73,8 +62,7 @@ public class LinkedResourceLocationChangeTest {
         final Change undoOperation = change.perform(null);
         change.getLocationsUpdateJob().join();
 
-        assertThat(findResource(workspace, nonWorkspaceFile))
-                .isEqualTo(projectProvider.getFile("directory/linkedRes.robot"));
+        assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(project.getFile("directory/linkedRes.robot"));
 
         moveResource("directory/linkedRes.robot",
                 new Path("/LinkedResourceLocationChangeTest").append(nonWorkspaceFile.getName()));
@@ -84,7 +72,7 @@ public class LinkedResourceLocationChangeTest {
         undoOperation.perform(null);
         ((LinkedResourceLocationChange) undoOperation).getLocationsUpdateJob().join();
 
-        assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(projectProvider.getFile("linkedRes.robot"));
+        assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(project.getFile("linkedRes.robot"));
     }
 
     private IResource findResource(final IWorkspace workspace, final File file) {
@@ -93,6 +81,6 @@ public class LinkedResourceLocationChangeTest {
     }
 
     private void moveResource(final String sourcePath, final IPath destination) throws CoreException {
-        projectProvider.getFile(sourcePath).move(destination, IResource.KEEP_HISTORY | IResource.SHALLOW, null);
+        project.getFile(sourcePath).move(destination, IResource.KEEP_HISTORY | IResource.SHALLOW, null);
     }
 }

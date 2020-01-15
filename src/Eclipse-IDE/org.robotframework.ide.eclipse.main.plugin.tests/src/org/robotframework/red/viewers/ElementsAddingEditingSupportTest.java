@@ -28,7 +28,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class ElementsAddingEditingSupportTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void columnShiftIsZero() {

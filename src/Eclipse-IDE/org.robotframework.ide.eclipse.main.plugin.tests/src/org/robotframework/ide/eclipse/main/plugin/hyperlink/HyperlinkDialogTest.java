@@ -32,7 +32,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class HyperlinkDialogTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void afterOpeningDialogPresentsTableWithGivenHyperlinks() {

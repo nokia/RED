@@ -24,11 +24,10 @@ import org.robotframework.red.swt.SwtThread;
 public class JobWizardPageTest {
 
     @FreshShell
-    public Shell shellProvider;
+    Shell shell;
 
     @Test
     public void progressBarIsCreatedButNotVisible_whenNewPageIsConstructed() {
-        final Shell shell = shellProvider.getShell();
         createPage(shell);
 
         final ProgressBar progressBar = Controls.getControls(shell, ProgressBar.class).get(0);
@@ -37,7 +36,6 @@ public class JobWizardPageTest {
 
     @Test
     public void progressBarIsVisible_whenThereIsAnOperationScheduled() throws Exception {
-        final Shell shell = shellProvider.getShell();
         final JobWizardPage page = createPage(shell);
 
         final AtomicBoolean isVisible = new AtomicBoolean(false);

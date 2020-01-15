@@ -25,7 +25,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class RobotPopupDialogTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void whenDialogIsCreated_theParentCompositeHasFillLayoutAndControlsAreCreated() {

@@ -17,7 +17,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class RegexValidatedStringFieldEditorTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void stateIsValid_whenGivenValueMatchesRegex() {

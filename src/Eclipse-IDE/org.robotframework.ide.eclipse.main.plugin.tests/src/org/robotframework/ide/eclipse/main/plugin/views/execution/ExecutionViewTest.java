@@ -38,7 +38,7 @@ import org.robotframework.red.swt.SimpleProgressBar;
 public class ExecutionViewTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     private final IMenuService menuService = mock(IMenuService.class);
     private final IViewPart part = mock(IViewPart.class);

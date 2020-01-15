@@ -25,7 +25,7 @@ import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorV
 public class CellEditorValueValidationJobSchedulerTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     private CellEditorValueValidator<Object> validator;
 
@@ -40,7 +40,7 @@ public class CellEditorValueValidationJobSchedulerTest {
 
     @Test
     public void validationJobIsCancelled_whenEditorCanBeClosed() throws Exception {
-        final Text text = new Text(shell.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         validationJobScheduler.armRevalidationOn(text, 1);
         text.setText("x");
 
@@ -52,7 +52,7 @@ public class CellEditorValueValidationJobSchedulerTest {
     public void validationJobIsNotCancelled_whenEditorCanNotBeClosed() throws Exception {
         doThrow(CellEditorValueValidationException.class).when(validator).validate(any(), anyInt());
 
-        final Text text = new Text(shell.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         validationJobScheduler.armRevalidationOn(text, 1);
         text.setText("x");
 

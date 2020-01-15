@@ -35,7 +35,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class ViewersTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void contextIsActivated_whenViewerWithBoundedContextGetsFocused() {

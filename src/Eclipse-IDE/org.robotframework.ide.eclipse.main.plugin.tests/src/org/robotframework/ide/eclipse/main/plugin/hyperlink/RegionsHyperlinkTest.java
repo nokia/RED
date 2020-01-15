@@ -32,7 +32,7 @@ import com.google.common.base.Joiner;
 public class RegionsHyperlinkTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void testRegionsHyperlinkProperties_1() {

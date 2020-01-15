@@ -12,17 +12,18 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
 
+@ExtendWith(LaunchConfigExtension.class)
 public class RerunHandlerTest {
 
-    @Rule
-    public RunConfigurationProvider robotRunConfigurationProvider = new RunConfigurationProvider(
-            RobotLaunchConfiguration.TYPE_ID);
+    @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchConfig;
 
     @Test
     public void coreExceptionIsThrown_whenConfigurationIsNull() throws Exception {
@@ -38,7 +39,7 @@ public class RerunHandlerTest {
 
     @Test
     public void coreExceptionIsThrown_whenConfigurationDoesNotExist() throws Exception {
-        final ILaunchConfiguration configuration = createConfigurationSpy();
+        final ILaunchConfiguration configuration = spy(launchConfig);
         when(configuration.exists()).thenReturn(false);
 
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
@@ -51,16 +52,11 @@ public class RerunHandlerTest {
 
     @Test
     public void configurationForTestsRerunIsReturned_whenExists() throws Exception {
-        final ILaunchConfiguration configuration = createConfigurationSpy();
+        final ILaunchConfiguration configuration = spy(launchConfig);
         when(configuration.exists()).thenReturn(true);
 
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
 
         assertThat(RerunHandler.E4ShowFailedOnlyHandler.getConfig(launch)).isSameAs(configuration);
     }
-
-    private ILaunchConfiguration createConfigurationSpy() throws CoreException {
-        return spy(robotRunConfigurationProvider.create("robot"));
-    }
-
 }

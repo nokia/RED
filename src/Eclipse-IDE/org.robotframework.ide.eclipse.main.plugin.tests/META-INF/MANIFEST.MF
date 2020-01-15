@@ -18,6 +18,7 @@ Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin.tests
 Import-Package: org.junit.jupiter.api,
  org.junit.jupiter.api.condition,
  org.junit.jupiter.api.extension,
+ org.junit.jupiter.api.io,
  org.junit.jupiter.engine.execution,
  org.junit.jupiter.params,
  org.junit.jupiter.params.provider,

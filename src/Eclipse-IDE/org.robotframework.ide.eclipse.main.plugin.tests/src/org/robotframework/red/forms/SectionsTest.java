@@ -36,7 +36,7 @@ public class SectionsTest {
     private static RedFormToolkit toolkit;
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @BeforeAll
     public static void beforeSuite() {

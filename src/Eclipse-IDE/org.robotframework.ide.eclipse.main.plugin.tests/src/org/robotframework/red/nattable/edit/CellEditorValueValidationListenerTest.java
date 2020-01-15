@@ -35,7 +35,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class CellEditorValueValidationListenerTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     private Control control;
 
@@ -48,7 +48,7 @@ public class CellEditorValueValidationListenerTest {
         final Composite composite = mock(Composite.class);
         when(composite.toDisplay(anyInt(), anyInt())).thenReturn(new Point(0, 0));
         control = mock(Control.class);
-        when(control.getShell()).thenReturn(shell.getShell());
+        when(control.getShell()).thenReturn(shell);
         when(control.getParent()).thenReturn(composite);
         when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));
         validationJobScheduler = new CellEditorValueValidationJobScheduler<>(null);

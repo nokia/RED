@@ -19,32 +19,46 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 /**
  * <p>
- * JUnit Jupiter extension used to manipulate RED preferences. This extension should
+ * This extension is used to manipulate RED preferences. This extension should
  * be used together with {@link StringPreference}, {@link IntegerPreference} or
- * {@link BooleanPreference} annotation or directly when created with {@link RegisterExtension}. The
+ * {@link BooleanPreference} annotations. The
  * annotations can be used on methods in order to set preferences before the test. After test is
- * executed the changed preferences will be reverted to default. When using directly with
- * {@link RegisterExtension} it is possible to use one of setValue methods to change the preference
- * during test execution. After the test the value will reverted.
+ * executed the changed preferences will be reverted to default.
+ * </p>
+ * <p>
+ * Additionally fields of types {@link PreferencesUpdater} annotated with {@link Managed} will be
+ * injected
+ * in order to manipulate preferences inside the test. After test will end also those preferences
+ * will be
+ * reverted to default.
+ * </p>
  * 
  * @author anglart
  */
-public class PreferencesExtension implements Extension, BeforeEachCallback, AfterEachCallback {
+public class PreferencesExtension extends ManagedStateExtension
+        implements Extension, BeforeEachCallback, AfterEachCallback {
 
     private static final Namespace RED_NAMESPACE = Namespace.create("red");
     private static final String NAMES = "prefs.names";
 
-    private final IPreferenceStore preferenceStore = RedPlugin.getDefault().getPreferenceStore();
+    @Override
+    protected Class<? extends ManagedState> getManagedStateClass() {
+        return PreferencesUpdater.class;
+    }
 
-    private final Set<String> preferenceNames = new HashSet<>();
+    @Override
+    protected ManagedState createManagedState() {
+        return new PreferencesUpdater(RedPlugin.getDefault().getPreferenceStore());
+    }
 
     @Override
     public void beforeEach(final ExtensionContext context) throws Exception {
+        final IPreferenceStore preferenceStore = RedPlugin.getDefault().getPreferenceStore();
+
         final Method method = context.getRequiredTestMethod();
 
         final Set<String> names = new HashSet<>();
@@ -69,27 +83,10 @@ public class PreferencesExtension implements Extension, BeforeEachCallback, Afte
 
     @Override
     public void afterEach(final ExtensionContext context) throws Exception {
+        super.afterEach(context);
+
         for (final Object name : (Set<?>) context.getStore(RED_NAMESPACE).get(NAMES)) {
-            preferenceNames.add((String) name);
+            RedPlugin.getDefault().getPreferenceStore().setToDefault((String) name);
         }
-        for (final String name : preferenceNames) {
-            preferenceStore.setToDefault(name);
-        }
-        preferenceNames.clear();
-    }
-
-    public void setValue(final String name, final String value) {
-        preferenceStore.setValue(name, value);
-        preferenceNames.add(name);
-    }
-
-    public void setValue(final String name, final int value) {
-        preferenceStore.setValue(name, value);
-        preferenceNames.add(name);
-    }
-
-    public void setValue(final String name, final boolean value) {
-        preferenceStore.setValue(name, value);
-        preferenceNames.add(name);
     }
 }

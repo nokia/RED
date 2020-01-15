@@ -30,7 +30,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class ViewersCombiningSelectionProviderTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void npeIsThrown_whenTryingToCreateProviderFromNullArray() {

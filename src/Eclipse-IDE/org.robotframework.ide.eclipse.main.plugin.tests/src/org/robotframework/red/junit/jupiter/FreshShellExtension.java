@@ -8,8 +8,6 @@ package org.robotframework.red.junit.jupiter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -24,7 +22,6 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.platform.commons.support.ModifierSupport;
 
 /**
  * <p>
@@ -55,19 +52,21 @@ public class FreshShellExtension implements Extension, BeforeAllCallback, Before
 
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception {
-        initFields(context.getRequiredTestClass(), ModifierSupport::isStatic, createAndSetNewShell(null));
+        FieldsSupport.handleFields(context.getRequiredTestClass(), true, FreshShell.class,
+                createAndSetNewShell(null));
     }
 
     @Override
     public void beforeEach(final ExtensionContext context) throws Exception {
         final Object testInstance = context.getRequiredTestInstance();
-        initFields(testInstance.getClass(), ModifierSupport::isNotStatic, createAndSetNewShell(testInstance));
+        FieldsSupport.handleFields(testInstance.getClass(), false, FreshShell.class,
+                createAndSetNewShell(testInstance));
     }
 
     @Override
     public void afterEach(final ExtensionContext context) throws Exception {
         final Object testInstance = context.getRequiredTestInstance();
-        initFields(testInstance.getClass(), ModifierSupport::isNotStatic, disposeOldShell(testInstance));
+        FieldsSupport.handleFields(testInstance.getClass(), false, FreshShell.class, disposeOldShell(testInstance));
         
         final Object shell = context.getStore(RED_NAMESPACE).get(SHELL_PARAM);
         if (shell instanceof Shell && !(((Shell) shell).isDisposed())) {
@@ -78,7 +77,7 @@ public class FreshShellExtension implements Extension, BeforeAllCallback, Before
 
     @Override
     public void afterAll(final ExtensionContext context) throws Exception {
-        initFields(context.getRequiredTestClass(), ModifierSupport::isStatic, disposeOldShell(null));
+        FieldsSupport.handleFields(context.getRequiredTestClass(), true, FreshShell.class, disposeOldShell(null));
     }
 
     @Override
@@ -134,21 +133,10 @@ public class FreshShellExtension implements Extension, BeforeAllCallback, Before
                 if (shell instanceof Shell && !(((Shell) shell).isDisposed())) {
                     ((Shell) shell).close();
                     ((Shell) shell).dispose();
-                    field.set(instance, null);
                 }
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 // can't happen
             }
         };
-    }
-
-    private static void initFields(final Class<? extends Object> testClass, final Predicate<Field> staticPredicate,
-            final Consumer<Field> fieldSetter) {
-        Stream.of(testClass.getFields())
-                .filter(ModifierSupport::isPublic)
-                .filter(ModifierSupport::isNotFinal)
-                .filter(staticPredicate)
-                .filter(field -> field.getDeclaredAnnotation(FreshShell.class) != null)
-                .forEach(fieldSetter);
     }
 }

@@ -26,7 +26,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -35,6 +34,7 @@ import com.google.common.io.CharStreams;
 /**
  * @author Michal Anglart
  */
+@Deprecated
 public class ProjectProvider implements TestRule {
 
     private final String projectName;
@@ -51,20 +51,6 @@ public class ProjectProvider implements TestRule {
 
     public IProject getProject() {
         return project;
-    }
-
-    /**
-     * Configures the project to have robot nature. Use wisely since this adds builder
-     * to the project, so in some situations project building/validation can start.
-     *
-     * @throws CoreException
-     */
-    public void addRobotNature() throws CoreException {
-        RobotProjectNature.addRobotNature(project, null, p -> true);
-    }
-
-    public void removeRobotNature() throws CoreException {
-        RobotProjectNature.removeRobotNature(project, null, p -> true);
     }
 
     public void configure() throws IOException, CoreException {

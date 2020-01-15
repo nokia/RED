@@ -17,7 +17,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class CloseDialogActionTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void theShellIsClosedWhenActionRuns() {

@@ -21,7 +21,7 @@ import org.robotframework.red.junit.jupiter.FreshShellExtension;
 public class ProgressMonitorDialogWithConsoleTest {
 
     @FreshShell
-    public Shell shell;
+    Shell shell;
 
     @Test
     public void dialogHasStyledTextControl() {

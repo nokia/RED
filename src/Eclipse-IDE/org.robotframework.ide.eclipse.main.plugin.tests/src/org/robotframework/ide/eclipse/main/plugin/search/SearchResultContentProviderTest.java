@@ -11,6 +11,8 @@ import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +22,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.search.ui.ISearchResult;
 import org.eclipse.search.ui.text.Match;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -33,33 +34,25 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.KeywordWithParent;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.LibraryWithParent;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResultContentProvider.Libs;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SearchResultContentProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SearchResultContentProviderTest.class);
+    @Project(dirs = { "a", "a/b", "a/c", "x" }, files = { "a/file.txt", "a/b/file.txt" })
+    static IProject project;
 
     private static RobotModel model = new RobotModel();
 
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createFile("a/file.txt");
-        projectProvider.createDir("a/b");
-        projectProvider.createDir("a/c");
-        projectProvider.createFile("a/b/file.txt");
-        projectProvider.createDir("x");
-    }
-
-    @Before
+    @BeforeEach
     public void beforeTest() {
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(new HashMap<>());
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         model = null;
     }
@@ -109,7 +102,7 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.getElements(result)).containsExactly(projectProvider.getProject());
+        assertThat(provider.getElements(result)).containsExactly(project);
     }
 
     @Test
@@ -120,15 +113,14 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getProject())).isTrue();
-        assertThat(provider.getChildren(projectProvider.getProject())).containsExactly(projectProvider.getDir("a"));
+        assertThat(provider.hasChildren(project)).isTrue();
+        assertThat(provider.getChildren(project)).containsExactly(getDir(project, "a"));
     }
 
     @Test
     public void projectChildrenAreLibsElementIfThereIsALibraryDocMatch() {
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib");
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         final Map<LibraryDescriptor, LibrarySpecification> libs = new HashMap<>();
         libs.put(LibraryDescriptor.ofStandardLibrary("StdLib"), libSpec);
@@ -141,8 +133,8 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getProject())).isTrue();
-        final Object[] children = provider.getChildren(projectProvider.getProject());
+        assertThat(provider.hasChildren(project)).isTrue();
+        final Object[] children = provider.getChildren(project);
         assertThat(children).hasSize(1);
         assertThat(children[0]).isInstanceOf(Libs.class);
     }
@@ -153,7 +145,6 @@ public class SearchResultContentProviderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib", kwSpec,
                 KeywordSpecification.create("kw2"));
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec));
 
@@ -163,8 +154,8 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getProject())).isTrue();
-        final Object[] children = provider.getChildren(projectProvider.getProject());
+        assertThat(provider.hasChildren(project)).isTrue();
+        final Object[] children = provider.getChildren(project);
         assertThat(children).hasSize(1);
         assertThat(children[0]).isInstanceOf(Libs.class);
     }
@@ -177,8 +168,8 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getDir("a"))).isTrue();
-        assertThat(provider.getChildren(projectProvider.getDir("a"))).containsExactly(projectProvider.getDir("a/b"));
+        assertThat(provider.hasChildren(getDir(project, "a"))).isTrue();
+        assertThat(provider.getChildren(getDir(project, "a"))).containsExactly(getDir(project, "a/b"));
     }
 
     @Test
@@ -189,9 +180,9 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getDir("a/b"))).isTrue();
-        assertThat(provider.getChildren(projectProvider.getDir("a/b")))
-                .containsExactly(projectProvider.getFile("a/b/file.txt"));
+        assertThat(provider.hasChildren(getDir(project, "a/b"))).isTrue();
+        assertThat(provider.getChildren(getDir(project, "a/b")))
+                .containsExactly(getFile(project, "a/b/file.txt"));
     }
 
     @Test
@@ -207,15 +198,14 @@ public class SearchResultContentProviderTest {
         final SearchResultContentProvider provider = new SearchResultContentProvider();
         provider.inputChanged(null, null, result);
 
-        assertThat(provider.hasChildren(projectProvider.getFile("a/b/file.txt"))).isTrue();
-        assertThat(provider.getChildren(projectProvider.getFile("a/b/file.txt"))).containsExactly(match1, match2);
+        assertThat(provider.hasChildren(getFile(project, "a/b/file.txt"))).isTrue();
+        assertThat(provider.getChildren(getFile(project, "a/b/file.txt"))).containsExactly(match1, match2);
     }
 
     @Test
     public void libsElementChildrenAreOnlyLibrariesWithMatches_1() {
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib");
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec, LibrarySpecification.create("OtherStdLib")));
 
@@ -238,7 +228,6 @@ public class SearchResultContentProviderTest {
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw1");
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib", kwSpec);
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec, LibrarySpecification.create("OtherStdLib")));
 
@@ -261,7 +250,6 @@ public class SearchResultContentProviderTest {
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw1");
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib", kwSpec);
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec));
 
@@ -287,7 +275,6 @@ public class SearchResultContentProviderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib", kwSpec,
                 KeywordSpecification.create("kw2"));
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec));
 
@@ -311,7 +298,6 @@ public class SearchResultContentProviderTest {
         final LibrarySpecification libSpec = LibrarySpecification.create("StdLib", kwSpec,
                 KeywordSpecification.create("kw2"));
 
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibsMap(libSpec));
 
@@ -333,7 +319,6 @@ public class SearchResultContentProviderTest {
 
     @Test
     public void parentTest() {
-        final IProject project = projectProvider.getProject();
         final Libs libs = new Libs(project);
         final LibraryWithParent libElement = new LibraryWithParent(libs, new LibrarySpecification(), newArrayList());
         final KeywordWithParent kwElement = new KeywordWithParent(libElement, new KeywordSpecification(),
@@ -341,10 +326,10 @@ public class SearchResultContentProviderTest {
 
         final SearchResultContentProvider provider = new SearchResultContentProvider();
 
-        assertThat(provider.getParent(projectProvider.getFile("a/b/file.txt")))
-                .isEqualTo(projectProvider.getDir("a/b"));
-        assertThat(provider.getParent(projectProvider.getDir("a/b"))).isEqualTo(projectProvider.getDir("a"));
-        assertThat(provider.getParent(projectProvider.getDir("a"))).isEqualTo(project);
+        assertThat(provider.getParent(getFile(project, "a/b/file.txt")))
+                .isEqualTo(getDir(project, "a/b"));
+        assertThat(provider.getParent(getDir(project, "a/b"))).isEqualTo(getDir(project, "a"));
+        assertThat(provider.getParent(getDir(project, "a"))).isEqualTo(project);
         assertThat(provider.getParent(libs)).isEqualTo(project);
         assertThat(provider.getParent(libElement)).isSameAs(libs);
         assertThat(provider.getParent(kwElement)).isSameAs(libElement);
@@ -362,7 +347,7 @@ public class SearchResultContentProviderTest {
     }
 
     private static Match matchForFile(final String path) {
-        final IFile file = projectProvider.getFile(path);
+        final IFile file = getFile(project, path);
 
         final Match fileMatch = mock(Match.class);
         when(fileMatch.getElement()).thenReturn(file);
