@@ -63,6 +63,8 @@ public class HyperlinkDialogTest {
         assertThat(tableItem2.getImage()).isSameAs(ImagesManager.getImage(RedImages.getGoToImage()));
         assertThat(tableItem2.getText()).isEqualTo("snd_link");
 
+        dialog.close();
+
         verify(link1, never()).open();
         verify(link2, never()).open();
     }

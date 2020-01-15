@@ -5,23 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
+import java.util.stream.Stream;
+
 import org.assertj.core.api.Condition;
 import org.eclipse.swt.widgets.Shell;
 
 class Conditions {
 
     static Condition<? super Shell[]> shellWithText(final String text) {
-        return new Condition<Shell[]>() {
-
-            @Override
-            public boolean matches(final Shell[] shells) {
-                for (final Shell shell : shells) {
-                    if (shell.getText().equals(text)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
+        return new Condition<>(shells -> Stream.of(shells).anyMatch(s -> s.getText().equals(text)),
+                "Shell with text '" + text + "'");
     }
 }
