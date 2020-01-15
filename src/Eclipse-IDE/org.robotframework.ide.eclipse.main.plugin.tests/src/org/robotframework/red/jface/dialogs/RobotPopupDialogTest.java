@@ -44,6 +44,8 @@ public class RobotPopupDialogTest {
         assertThat(((Label) internalParent.getChildren()[0]).getText()).isEqualTo("test label");
 
         assertThat(((Label) internalParent.getChildren()[0])).isSameAs(dialog.getFocusControl());
+
+        dialog.close();
     }
 
     private static RobotPopupDialog prepareDialogToTest(final Shell shell) {
