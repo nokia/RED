@@ -384,6 +384,26 @@ public class VersionDependentValidatorsTest {
         }
     }
 
+    @Nested
+    public static class ResourceFileValidatorsTest {
+
+        @Test
+        public void properValidatorsAreReturnedForVersionUnder32() {
+            assertThat(getResourceValidators("3.0")).isEmpty();
+        }
+
+        @Test
+        public void properValidatorsAreReturnedForVersion32() {
+            assertThat(getResourceValidators("3.2")).hasSize(1)
+                    .hasOnlyElementsOfTypes(DeprecatedVariableCollectionElementUseValidator.class);
+        }
+
+        private Stream<VersionDependentModelUnitValidator> getResourceValidators(final String version) {
+            final VersionDependentValidators validators = new VersionDependentValidators(prepareContext(version), null);
+            return validators.getResourceValidators(null);
+        }
+    }
+
     private static FileValidationContext prepareContext(final String version) {
         final ValidationContext context = new ValidationContext(null, null, RobotVersion.from(version), null, null);
         return new FileValidationContext(context, mock(IFile.class));
