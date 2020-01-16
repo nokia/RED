@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yUzRgCkuEemgl9-Lt8nhYA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 10/17/19 11:18 AM
+Save-Time: 1/16/20 2:31 PM
 Testcase-Type: ecl
 Verifications: _J6DFsClJEemgl9-Lt8nhYA,_DEcqYClKEemgl9-Lt8nhYA,_c678cM17EemGNoL7xvShiw
 
@@ -152,6 +152,7 @@ with [get-editor "test_first.robot" | get-tab-folder] {
 // open file with all settings
 get-view "Project Explorer" | get-tree | select "MyProject/all_settings.robot" | double-click
 get-editor "all_settings.robot" | get-tab-folder | get-tab-item Tasks | click
+wait 200
 get-view Outline | get-tree | select "all_settings.robot/Tasks/task 1/log" | click
 wait 200
 
