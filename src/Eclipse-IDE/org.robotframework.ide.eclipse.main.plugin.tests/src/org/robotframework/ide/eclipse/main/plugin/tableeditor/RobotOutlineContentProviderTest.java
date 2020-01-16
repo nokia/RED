@@ -8,8 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -23,12 +24,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class RobotOutlineContentProviderTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void sectionsAreDisplayed() {
@@ -237,7 +240,7 @@ public class RobotOutlineContentProviderTest {
     }
 
     private void setInput(final RobotOutlineContentProvider provider, final RobotSuiteFile suite) {
-        final TreeViewer viewer = new TreeViewer(shellProvider.getShell());
+        final TreeViewer viewer = new TreeViewer(shell);
         viewer.setContentProvider(provider);
         viewer.setInput(new Object[] { suite });
     }

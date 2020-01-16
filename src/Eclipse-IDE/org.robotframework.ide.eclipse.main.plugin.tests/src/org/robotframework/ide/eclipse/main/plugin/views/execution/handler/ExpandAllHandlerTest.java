@@ -11,20 +11,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExpandAllHandler.E4ExpandAllHandler;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.viewers.TestViewer;
 import org.robotframework.red.viewers.TestViewer.Node;
 
 @SuppressWarnings("restriction")
+@ExtendWith(FreshShellExtension.class)
 public class ExpandAllHandlerTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void viewerNodesAreExpanded() {
@@ -32,7 +35,7 @@ public class ExpandAllHandlerTest {
         
         final ExecutionViewWrapper viewWrapper = mock(ExecutionViewWrapper.class);
         final ExecutionView view = mock(ExecutionView.class);
-        final TreeViewer viewer = TestViewer.create(shellProvider.getShell());
+        final TreeViewer viewer = TestViewer.create(shell);
         viewer.setInput(newArrayList(tree));
 
         when(viewWrapper.getComponent()).thenReturn(view);

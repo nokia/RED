@@ -8,14 +8,17 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -31,31 +34,29 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.VariableFileLocationsProposalsProvider;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class ImportsProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            ImportsProposalsProviderTest.class);
+    @Project(files = { "a_res.robot", "b_res.robot", "a_vars.py", "b_vars.py" })
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite.robot", "*** Test Cases ***");
-        projectProvider.createFile("a_res.robot");
-        projectProvider.createFile("b_res.robot");
-        projectProvider.createFile("a_vars.py");
-        projectProvider.createFile("b_vars.py");
+        createFile(project, "suite.robot", "*** Test Cases ***");
     }
 
     @Test
     public void thereAreNoResourcesProposalsProvided_whenNothingMatchesToCurrentInput() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
@@ -71,7 +72,7 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoResourcesProposalsProvided_whenInAnyColumnNotAResourceSetting() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
@@ -88,7 +89,7 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoResourcesProposalsProvided_whenInColumnOtherThanFirstOfResourceSetting() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
@@ -109,10 +110,10 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreResourcesProposalsProvided_whenInFirstColumnOfResourceSetting() {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("a_bc");
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
@@ -130,7 +131,7 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenNothingMatchesToCurrentInput() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
@@ -146,7 +147,7 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenInAnyColumnNotAVariablesSetting() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
@@ -163,7 +164,7 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenInColumnOtherThanFirstOfVariablesSetting() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
@@ -184,10 +185,10 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreVariablesProposalsProvided_whenInFirstColumnOfVariablesSetting() {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("a_bc");
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
                 new VariablesImport(RobotToken.create("Variables")));
@@ -207,8 +208,8 @@ public class ImportsProposalsProviderTest {
     @Test
     public void thereAreNoLibrariesProposalsProvided_whenNothingMatchesCurrentInput() {
         final RobotModel robotModel = new RobotModel();
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
@@ -226,8 +227,8 @@ public class ImportsProposalsProviderTest {
     @Test
     public void thereAreNoLibrariesAsWellAsFilesProposalsProvided_whenInFirstOfNonLibrarySetting() {
         final RobotModel robotModel = new RobotModel();
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
@@ -244,8 +245,8 @@ public class ImportsProposalsProviderTest {
     @Test
     public void thereAreNoLibrariesAsWellAsFilesProposalsProvided_whenInColumnOtherThanFirstOfLibrarySetting() {
         final RobotModel robotModel = new RobotModel();
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
@@ -267,12 +268,12 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreLibrariesAsWellAsFilesProposalsProvided_whenInFirstColumnOfLibrarySetting() {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("abc");
 
         final RobotModel robotModel = new RobotModel();
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 

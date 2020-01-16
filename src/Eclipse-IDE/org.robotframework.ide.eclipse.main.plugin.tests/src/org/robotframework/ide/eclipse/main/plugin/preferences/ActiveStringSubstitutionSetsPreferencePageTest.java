@@ -18,21 +18,26 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Managed;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@ExtendWith({ FreshShellExtension.class, PreferencesExtension.class })
 public class ActiveStringSubstitutionSetsPreferencePageTest {
 
     private static final IStringVariableManager VARIABLE_MANAGER = VariablesPlugin.getDefault()
@@ -43,18 +48,18 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
             VARIABLE_MANAGER.newValueVariable("b", "", false, "0"),
             VARIABLE_MANAGER.newValueVariable("c", "", false, "0") };
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Managed
+    PreferencesUpdater prefsUpdater;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws CoreException {
         VARIABLE_MANAGER.addVariables(CUSTOM_VARIABLES);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         VARIABLE_MANAGER.removeVariables(CUSTOM_VARIABLES);
     }
@@ -72,9 +77,9 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     @Test
     public void singleTreeIsPlacedAtThePage() {
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
-        final List<Tree> trees = Controls.getControls(shellProvider.getShell(), Tree.class);
+        final List<Tree> trees = Controls.getControls(shell, Tree.class);
         assertThat(trees).hasSize(1);
     }
 
@@ -89,11 +94,11 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
         input.get("set 2").add(newArrayList("a", "4"));
         input.get("set 2").add(newArrayList("c", "6"));
 
-        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
-        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
+        prefsUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
+        prefsUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
 
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final Tree tree = getSetsTree();
         assertThat(tree.getItemCount()).isEqualTo(3);
@@ -132,11 +137,11 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
         input.get("set 2").add(newArrayList("a", "4"));
         input.get("set 2").add(newArrayList("c", "6"));
 
-        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
-        preferenceUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
+        prefsUpdater.setValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
+        prefsUpdater.setValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 2");
 
         final ActiveStringSubstitutionSetsPreferencePage page = new ActiveStringSubstitutionSetsPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         assertNotEmptyValues();
         assertNotEmptyPreferences();
@@ -171,6 +176,6 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     }
 
     private Tree getSetsTree() {
-        return (Tree) Controls.findControlSatisfying(shellProvider.getShell(), c -> c instanceof Tree).get();
+        return (Tree) Controls.findControlSatisfying(shell, c -> c instanceof Tree).get();
     }
 }

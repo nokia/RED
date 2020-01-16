@@ -16,19 +16,22 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class ProjectCompositeTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void projectComposite_inputSettingTest() {
-        final ProjectComposite composite = new ProjectComposite(shellProvider.getShell(), mock(ModifyListener.class));
+        final ProjectComposite composite = new ProjectComposite(shell, mock(ModifyListener.class));
         composite.setInput("  someProject ");
 
         assertThat(projectText(composite)).is(enabled());
@@ -48,7 +51,7 @@ public class ProjectCompositeTest {
             }
         };
 
-        final ProjectComposite composite = new ProjectComposite(shellProvider.getShell(), listener);
+        final ProjectComposite composite = new ProjectComposite(shell, listener);
 
         projectText(composite).setText("selected");
 

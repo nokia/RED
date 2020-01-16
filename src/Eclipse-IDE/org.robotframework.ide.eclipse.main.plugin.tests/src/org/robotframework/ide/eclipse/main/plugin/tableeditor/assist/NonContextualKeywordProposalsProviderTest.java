@@ -6,47 +6,49 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class NonContextualKeywordProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(NonContextualKeywordProposalsProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @FreshShell
+    Shell shell;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("keywords_with_args_suite.robot",
+        createFile(project, "keywords_with_args_suite.robot",
                 "*** Keywords ***",
                 "kw_no_args",
                 "kw_with_args",
                 "  [Arguments]  ${arg1}  ${arg2}");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
@@ -54,7 +56,7 @@ public class NonContextualKeywordProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_args_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_args_suite.robot"));
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 
@@ -64,11 +66,11 @@ public class NonContextualKeywordProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("foo");
 
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_args_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_args_suite.robot"));
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 
@@ -82,7 +84,7 @@ public class NonContextualKeywordProposalsProviderTest {
     @Test
     public void thereAreNoOperationsToPerformAfterAccepting() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_args_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_args_suite.robot"));
         final NonContextualKeywordProposalsProvider provider = new NonContextualKeywordProposalsProvider(
                 () -> suiteFile);
 

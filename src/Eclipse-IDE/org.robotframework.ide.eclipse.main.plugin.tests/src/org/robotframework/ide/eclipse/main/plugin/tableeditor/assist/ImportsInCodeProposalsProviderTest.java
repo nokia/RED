@@ -9,18 +9,21 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -28,48 +31,51 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class ImportsInCodeProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeProposalsProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Resource  ares.robot",
                 "Resource  bres.robot");
-        projectProvider.createFile("non_kw_based_settings.robot",
+        createFile(project, "non_kw_based_settings.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Documentation]",
                 "  [Tags]",
                 "  [Timeout]");
-        projectProvider.createFile("kw_based_settings.robot",
+        createFile(project, "kw_based_settings.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Setup]",
                 "  [Teardown]",
                 "  [Template]");
-        projectProvider.createFile("with_template.robot",
+        createFile(project, "with_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Template]  Some Kw",
                 "  Log  message",
                 "  Kw Call  ",
                 "  ");
-        projectProvider.createFile("without_template.robot",
+        createFile(project, "without_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Template]  NONE",
@@ -78,7 +84,7 @@ public class ImportsInCodeProposalsProviderTest {
                 "  ");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
@@ -86,7 +92,7 @@ public class ImportsInCodeProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
+                .createSuiteFile(getFile(project, "non_kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -104,7 +110,7 @@ public class ImportsInCodeProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenSettingIsKeywordBased() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -122,7 +128,7 @@ public class ImportsInCodeProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvidedInCode_whenTemplateIsUsed() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("with_template.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "with_template.robot"));
         final List<RobotKeywordCall> nonSetting = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -143,7 +149,7 @@ public class ImportsInCodeProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvidedInCode_whenTemplateIsNotUsed() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("without_template.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "without_template.robot"));
         final List<RobotKeywordCall> nonSetting = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -164,7 +170,7 @@ public class ImportsInCodeProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentInput() throws Exception {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile, dataProvider);
@@ -176,10 +182,10 @@ public class ImportsInCodeProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("abc");
 
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile, dataProvider);

@@ -16,20 +16,23 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class AdditionalArgumentsCompositeTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void additionalArgumentsComposite_inputSettingTest() {
-        final AdditionalArgumentsComposite composite = new AdditionalArgumentsComposite(shellProvider.getShell(),
+        final AdditionalArgumentsComposite composite = new AdditionalArgumentsComposite(shell,
                 mock(ModifyListener.class));
         composite.setInput(" arg1 arg2 ");
 
@@ -45,8 +48,7 @@ public class AdditionalArgumentsCompositeTest {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
         final ModifyListener listener = e -> listenerWasCalled.set(true);
 
-        final AdditionalArgumentsComposite composite = new AdditionalArgumentsComposite(shellProvider.getShell(),
-                listener);
+        final AdditionalArgumentsComposite composite = new AdditionalArgumentsComposite(shell, listener);
 
         argumentsText(composite).setText("arg");
 

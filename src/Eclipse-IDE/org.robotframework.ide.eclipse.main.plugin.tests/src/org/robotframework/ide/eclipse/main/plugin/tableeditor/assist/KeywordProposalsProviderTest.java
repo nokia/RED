@@ -9,6 +9,8 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,14 +18,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -38,41 +41,42 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libra
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class, FreshShellExtension.class })
 public class KeywordProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @FreshShell
+    Shell shell;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("local_keywords_suite.robot",
+        createFile(project, "local_keywords_suite.robot",
                 "*** Keywords ***",
                 "kw1",
                 "kw2");
-        projectProvider.createFile("imported_keywords_suite.robot",
+        createFile(project, "imported_keywords_suite.robot",
                 "*** Settings ***",
                 "Library  LibImported");
-        projectProvider.createFile("keywords_with_args_suite.robot",
+        createFile(project, "keywords_with_args_suite.robot",
                 "*** Keywords ***",
                 "kw_no_args",
                 "kw_with_args",
                 "  [Arguments]  ${arg1}  ${arg2}");
-        projectProvider.createFile("keywords_with_args_in_setting_suite.robot",
+        createFile(project, "keywords_with_args_in_setting_suite.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Setup]",
@@ -82,30 +86,30 @@ public class KeywordProposalsProviderTest {
                 "kw_no_args",
                 "kw_with_args",
                 "  [Arguments]  ${arg1}  ${arg2}");
-        projectProvider.createFile("keywords_with_embedded_args_suite.robot",
+        createFile(project, "keywords_with_embedded_args_suite.robot",
                 "*** Keywords ***",
                 "kw_no_arg",
                 "kw_with_${arg}");
-        projectProvider.createFile("non_kw_based_settings.robot",
+        createFile(project, "non_kw_based_settings.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Documentation]",
                 "  [Tags]",
                 "  [Timeout]");
-        projectProvider.createFile("kw_based_settings.robot",
+        createFile(project, "kw_based_settings.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Setup]",
                 "  [Teardown]",
                 "  [Template]");
-        projectProvider.createFile("with_template.robot",
+        createFile(project, "with_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Template]  Some Kw",
                 "  Log  message",
                 "  Kw Call  ",
                 "  ");
-        projectProvider.createFile("without_template.robot",
+        createFile(project, "without_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Template]  NONE",
@@ -114,7 +118,7 @@ public class KeywordProposalsProviderTest {
                 "  ");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
@@ -122,7 +126,7 @@ public class KeywordProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
+                .createSuiteFile(getFile(project, "non_kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -140,7 +144,7 @@ public class KeywordProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenSettingIsKeywordBased() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -158,7 +162,7 @@ public class KeywordProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvidedInCode_whenTemplateIsUsed() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("with_template.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "with_template.robot"));
         final List<RobotKeywordCall> nonSettings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -179,7 +183,7 @@ public class KeywordProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvidedInCode_whenTemplateIsNotUsed() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("without_template.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "without_template.robot"));
         final List<RobotKeywordCall> nonSettings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -201,7 +205,7 @@ public class KeywordProposalsProviderTest {
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
+                .createSuiteFile(getFile(project, "local_keywords_suite.robot"));
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
@@ -212,11 +216,11 @@ public class KeywordProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("foo");
 
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
+                .createSuiteFile(getFile(project, "local_keywords_suite.robot"));
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
@@ -228,19 +232,18 @@ public class KeywordProposalsProviderTest {
         assertThat(text.getText()).isEqualTo("kw1");
     }
 
+    @BooleanPreference(key = RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, value = true)
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
-
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new LinkedHashMap<>();
         refLibs.putAll(Libraries.createRefLib("LibImported", "kw1", "kw2"));
         refLibs.putAll(Libraries.createRefLib("LibNotImported", "kw3", "kw4"));
 
-        final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
-        project.setReferencedLibraries(refLibs);
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        robotProject.setReferencedLibraries(refLibs);
 
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("imported_keywords_suite.robot"));
+                .createSuiteFile(getFile(project, "imported_keywords_suite.robot"));
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
@@ -261,7 +264,7 @@ public class KeywordProposalsProviderTest {
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArguments() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_args_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_args_suite.robot"));
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 
@@ -279,7 +282,7 @@ public class KeywordProposalsProviderTest {
     public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndKeywordBasedSettingIsNotTemplate()
             throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_args_in_setting_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_args_in_setting_suite.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -310,7 +313,7 @@ public class KeywordProposalsProviderTest {
     @Test
     public void keywordsWithEmbeddedArgumentsShouldBeInsertedWithoutCommitting() throws Exception {
         final RobotSuiteFile suiteFile = robotModel
-                .createSuiteFile(projectProvider.getFile("keywords_with_embedded_args_suite.robot"));
+                .createSuiteFile(getFile(project, "keywords_with_embedded_args_suite.robot"));
         final IRowDataProvider<Object> dataProvider = prepareDataProvider(new ArrayList<>());
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile, dataProvider);
 

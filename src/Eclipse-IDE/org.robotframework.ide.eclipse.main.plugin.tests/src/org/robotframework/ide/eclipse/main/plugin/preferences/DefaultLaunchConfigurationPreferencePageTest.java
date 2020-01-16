@@ -21,27 +21,32 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.jface.preferences.ParameterizedFilePathStringFieldEditor;
 import org.robotframework.red.jface.preferences.RegexValidatedMultilineStringFieldEditor;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Managed;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@ExtendWith({ FreshShellExtension.class, PreferencesExtension.class })
 public class DefaultLaunchConfigurationPreferencePageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Managed
+    PreferencesUpdater prefsUpdater;
 
     @Test
     public void initDoesNothing() {
@@ -56,7 +61,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
     @Test
     public void checkIfEditorsForAllLaunchConfigurationPreferencesAreDefined() throws Exception {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(7);
@@ -79,7 +84,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
     @Test
     public void checkIfExportClientScriptButtonIsDefined() throws Exception {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final boolean buttonFound = Controls.getControls((Composite) page.getControl(), Button.class)
                 .stream()
@@ -95,11 +100,11 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         input.put("VAR_2", "1234");
         input.put("EMPTY_VAR", "");
 
-        preferenceUpdater.setValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES,
+        prefsUpdater.setValue(RedPreferences.LAUNCH_ENVIRONMENT_VARIABLES,
                 new ObjectMapper().writeValueAsString(input));
 
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final Table table = Controls.getControls((Composite) page.getControl(), Table.class).get(0);
 

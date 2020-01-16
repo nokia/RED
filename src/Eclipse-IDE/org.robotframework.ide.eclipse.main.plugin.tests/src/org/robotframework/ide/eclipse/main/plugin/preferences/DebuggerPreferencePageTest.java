@@ -18,16 +18,19 @@ import java.util.Map;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class DebuggerPreferencePageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void initDoesNothing() {
@@ -42,7 +45,7 @@ public class DebuggerPreferencePageTest {
     @Test
     public void checkIfAllBooleanEditorsAreDefined() throws Exception {
         final DebuggerPreferencePage page = new DebuggerPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(2);

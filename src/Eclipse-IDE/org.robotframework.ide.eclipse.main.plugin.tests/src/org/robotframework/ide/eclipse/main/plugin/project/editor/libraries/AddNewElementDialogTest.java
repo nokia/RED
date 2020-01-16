@@ -17,16 +17,18 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.swt.SwtThread;
 
+@ExtendWith(FreshShellExtension.class)
 public class AddNewElementDialogTest {
 
-    @Rule
-    public ShellProvider shell = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void theDialogHaveProperlyCreatedAndFilledControls() throws Exception {

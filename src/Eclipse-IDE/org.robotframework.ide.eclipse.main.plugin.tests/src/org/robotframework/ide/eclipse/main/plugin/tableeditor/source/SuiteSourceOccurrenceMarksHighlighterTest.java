@@ -14,16 +14,19 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SuiteSourceOccurrenceMarksHighlighterTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void thereAreNoAnnotations_whenHighlighterIsInstalled() {
@@ -163,7 +166,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
     }
 
     private SourceViewer prepareViewer(final MockAnnotationModel annotationModel) {
-        final StyledText sourceWidget = new StyledText(shellProvider.getShell(), SWT.MULTI);
+        final StyledText sourceWidget = new StyledText(shell, SWT.MULTI);
         final SourceViewer viewer = mock(SourceViewer.class);
         when(viewer.getTextWidget()).thenReturn(sourceWidget);
         when(viewer.getAnnotationModel()).thenReturn(annotationModel);

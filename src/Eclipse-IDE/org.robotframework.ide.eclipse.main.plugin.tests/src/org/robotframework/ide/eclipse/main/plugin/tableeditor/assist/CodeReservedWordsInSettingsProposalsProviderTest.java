@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -16,14 +18,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -35,26 +38,28 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class CodeReservedWordsInSettingsProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            CodeReservedWordsInSettingsProposalsProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Library  DateTime",
                 "Resource  res.robot",
@@ -65,14 +70,14 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
                 "  log");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsNotInSettings() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> !(element instanceof RobotSetting))
@@ -92,7 +97,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsButColumnIsBeforeThird() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotSetting)
@@ -112,7 +117,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButInputDoesNotMatch() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotSetting)
@@ -130,7 +135,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButNotLibrarySetting() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotSetting)
@@ -151,7 +156,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotSetting)
@@ -160,7 +165,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
         final CodeReservedWordsInSettingsProposalsProvider provider = new CodeReservedWordsInSettingsProposalsProvider(
                 null, dataProvider);
 
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("with");
 
         final AssistantContext context = new NatTableAssistantContext(2, 0);
@@ -174,7 +179,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
 
     @Test
     public void thereIsWithNameProposalProvided_whenInAtLeastThirdColumnAndCurrentSettingIsLibrary() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotSetting)
@@ -187,7 +192,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
             if (column < 2) { // we only test for at least third column
                 continue;
             }
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText("with xyz");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);
@@ -214,7 +219,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
             if (column != 1) { // we only test for exactly second column
                 continue;
             }
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText("note");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);
@@ -262,7 +267,7 @@ public class CodeReservedWordsInSettingsProposalsProviderTest {
         final IRowDataProvider<Object> dataProvider = mock(IRowDataProvider.class);
         when(dataProvider.getColumnCount()).thenReturn(20);
         when(dataProvider.getDataValue(anyInt(), anyInt())).thenReturn("");
-        final Entry<String, Object> entry = new SimpleEntry<String, Object>(setting.getName(), setting);
+        final Entry<String, Object> entry = new SimpleEntry<>(setting.getName(), setting);
         when(dataProvider.getRowObject(anyInt())).thenReturn(entry);
         return dataProvider;
     }

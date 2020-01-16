@@ -24,20 +24,23 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.swt.StyledTextWrapper;
 
+@ExtendWith(FreshShellExtension.class)
 public class SuiteSourceEditorFoldingSupportTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void sectionsPositionsAreProperlyCalculated() {
@@ -120,7 +123,7 @@ public class SuiteSourceEditorFoldingSupportTest {
 
     @Test
     public void allAnnotationsAreAddedInitially() {
-        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shell, SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -135,7 +138,7 @@ public class SuiteSourceEditorFoldingSupportTest {
 
     @Test
     public void whenNoFoldingPositionAppearsOrDisappears_theAnnotationsAreSendAsChanged() {
-        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shell, SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -153,7 +156,7 @@ public class SuiteSourceEditorFoldingSupportTest {
 
     @Test
     public void whenNewFoldingPositionAppears_itIsSendAsAddedWhileOtherAreChanged() {
-        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shell, SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -171,7 +174,7 @@ public class SuiteSourceEditorFoldingSupportTest {
 
     @Test
     public void whenFoldingPositionDisappears_itIsSendAsRemovedWhileOtherAreChanged() {
-        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shell, SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -189,7 +192,7 @@ public class SuiteSourceEditorFoldingSupportTest {
 
     @Test
     public void whenFoldingPositionIsChanged_ItIsRemovedAndNewIsAdded() {
-        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shell, SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -213,7 +216,7 @@ public class SuiteSourceEditorFoldingSupportTest {
     @Test
     public void textViewerRevealsSelection_whenAnnotationModelIsUpdated() {
         final StyledTextWrapper textControl = spy(
-                new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE)));
+                new StyledTextWrapper(new StyledText(shell, SWT.NONE)));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,

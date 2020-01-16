@@ -12,16 +12,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.swt.SwtThread;
 
+@ExtendWith(FreshShellExtension.class)
 public class PathEntryDialogTest {
 
-    @Rule
-    public ShellProvider shell = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void entryDialogProperlyGeneratesSearchPaths_whenPathsAreProvidedInTextBox() throws Exception {
@@ -30,7 +33,7 @@ public class PathEntryDialogTest {
 
         final Thread guiChangesRequestingThread = new Thread(() -> {
             SwtThread.asyncExec(() -> {
-                dialog.set(new PathEntryDialog(shell.getShell()));
+                dialog.set(new PathEntryDialog(shell));
                 dialog.get().open();
                 finished.set(true);
             });
@@ -44,7 +47,7 @@ public class PathEntryDialogTest {
 
         while (!finished.get()) {
             Thread.sleep(100);
-            while (shell.getShell().getDisplay().readAndDispatch()) {
+            while (shell.getDisplay().readAndDispatch()) {
                 // handle all events coming to UI
             }
         }

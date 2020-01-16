@@ -17,25 +17,30 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.viewers.ElementAddingToken;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(FreshShellExtension.class)
 public class PathsEditingSupportTest {
 
-    @Rule
-    public ShellProvider shell = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
-    @Mock
     private Consumer<SearchPath> successHandler;
+
+    @SuppressWarnings("unchecked")
+    @BeforeEach
+    public void beforeTest() {
+        successHandler = mock(Consumer.class);
+    }
 
     @Test
     public void editingPossibilityTest() {
@@ -53,7 +58,7 @@ public class PathsEditingSupportTest {
     public void textCellEditorIsReturnedForSearchPath() {
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
-        when(viewer.getControl()).thenReturn(shell.getShell());
+        when(viewer.getControl()).thenReturn(shell);
         when(viewer.getColumnViewerEditor()).thenReturn(mock(ColumnViewerEditor.class));
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
@@ -66,7 +71,7 @@ public class PathsEditingSupportTest {
     public void alwaysDeactivatingCellEditorIsReturnedForAddingToken() {
         final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
-        when(viewer.getControl()).thenReturn(shell.getShell());
+        when(viewer.getControl()).thenReturn(shell);
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, successHandler);
 
@@ -131,7 +136,7 @@ public class PathsEditingSupportTest {
             return null;
         };
         final ColumnViewer viewer = mock(ColumnViewer.class);
-        when(viewer.getControl()).thenReturn(shell.getShell());
+        when(viewer.getControl()).thenReturn(shell);
 
         final ElementAddingToken addingToken = new ElementAddingToken("search path", true);
 

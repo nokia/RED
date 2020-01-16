@@ -8,27 +8,29 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.StringPreference;
 
 
+@ExtendWith({ FreshShellExtension.class, PreferencesExtension.class })
 public class TasksPreferencePageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void thereIsAnEnablementButtonAndATableForTagsPlacedAtThePage() {
         final TasksPreferencePage page = new TasksPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final Table table = getTable();
         assertThat(table).isNotNull();
@@ -38,24 +40,22 @@ public class TasksPreferencePageTest {
         assertThat(button.getText()).isEqualTo("Enable tasks detection");
     }
 
+    @BooleanPreference(key = RedPreferences.TASKS_DETECTION_ENABLED, value = true)
     @Test
     public void buttonHasSelection_whenTasksDetectionIsEnabled() {
-        preferenceUpdater.setValue(RedPreferences.TASKS_DETECTION_ENABLED, Boolean.TRUE.toString());
-
         final TasksPreferencePage page = new TasksPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final Button button = getEnablementButton();
         assertThat(button.getSelection()).isTrue();
     }
 
+    @StringPreference(key = RedPreferences.TASKS_TAGS, value = "X;Y;Z")
+    @StringPreference(key = RedPreferences.TASKS_PRIORITIES, value = "LOW;NORMAL;HIGH")
     @Test
     public void tableDisplaysAllTheTasksTags() {
-        preferenceUpdater.setValue(RedPreferences.TASKS_TAGS, "X;Y;Z");
-        preferenceUpdater.setValue(RedPreferences.TASKS_PRIORITIES, "LOW;NORMAL;HIGH");
-
         final TasksPreferencePage page = new TasksPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final Table table = getTable();
         assertThat(table.getItemCount()).isEqualTo(4);
@@ -68,10 +68,10 @@ public class TasksPreferencePageTest {
     }
 
     private Button getEnablementButton() {
-        return Controls.getControls(shellProvider.getShell(), Button.class).get(0);
+        return Controls.getControls(shell, Button.class).get(0);
     }
 
     private Table getTable() {
-        return Controls.getControls(shellProvider.getShell(), Table.class).get(0);
+        return Controls.getControls(shell, Table.class).get(0);
     }
 }

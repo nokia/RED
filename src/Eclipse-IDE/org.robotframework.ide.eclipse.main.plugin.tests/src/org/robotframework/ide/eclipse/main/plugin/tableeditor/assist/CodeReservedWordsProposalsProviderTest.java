@@ -9,19 +9,22 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -33,26 +36,28 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class CodeReservedWordsProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            CodeReservedWordsProposalsProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  [documentation]",
@@ -65,14 +70,14 @@ public class CodeReservedWordsProposalsProviderTest {
                 "  log");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsNotKeywordCall() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> !(element instanceof RobotKeywordCall))
@@ -92,7 +97,7 @@ public class CodeReservedWordsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsKeywordCallButColumnIsDifferentThanFirst() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotKeywordCall)
@@ -115,7 +120,7 @@ public class CodeReservedWordsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsKeywordCallAndColumnIsFirstOneButInputDoesNotMatch() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotKeywordCall)
@@ -133,7 +138,7 @@ public class CodeReservedWordsProposalsProviderTest {
 
     @Test
     public void thereIsForProposalProvided_whenInFirstColumnAndCurrentInputMatchesToForWord() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotKeywordCall)
@@ -143,7 +148,7 @@ public class CodeReservedWordsProposalsProviderTest {
                 dataProvider);
 
         for (int row = 0; row < elements.size(); row++) {
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText(":fx");
 
             final AssistantContext context = new NatTableAssistantContext(0, row);
@@ -159,7 +164,7 @@ public class CodeReservedWordsProposalsProviderTest {
 
     @Test
     public void thereIsBddKeywordProposalProvided_whenInFirstColumnAndCurrentInputMatchesToGivenWord() {
-        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final List<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> element instanceof RobotKeywordCall)
@@ -169,7 +174,7 @@ public class CodeReservedWordsProposalsProviderTest {
                 dataProvider);
 
         for (int row = 0; row < elements.size(); row++) {
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText("Gib");
 
             final AssistantContext context = new NatTableAssistantContext(0, row);
@@ -197,7 +202,7 @@ public class CodeReservedWordsProposalsProviderTest {
             if (column < 2) { // we only test for at least third column
                 continue;
             }
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText("in rxyz");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);
@@ -224,7 +229,7 @@ public class CodeReservedWordsProposalsProviderTest {
             if (column != 1) { // we only test for exactly second column
                 continue;
             }
-            final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+            final Text text = new Text(shell, SWT.SINGLE);
             text.setText("note");
 
             final AssistantContext context = new NatTableAssistantContext(column, 0);

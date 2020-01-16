@@ -8,19 +8,22 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
+@ExtendWith(FreshShellExtension.class)
 public class SettingProposalsProviderTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void thereAreNoTestCaseSettingProposalsProvided_whenColumnIsDifferentThanFirst() {
@@ -47,7 +50,7 @@ public class SettingProposalsProviderTest {
 
     @Test
     public void thereAreTestCaseProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("[dx");
 
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.TEST_CASE);
@@ -86,7 +89,7 @@ public class SettingProposalsProviderTest {
     @Test
     public void thereAreKeywordSettingsProposalsProvided_whenInputIsMatchingAndProperContentIsInserted()
             throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("cut");
 
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.KEYWORD);
@@ -125,7 +128,7 @@ public class SettingProposalsProviderTest {
     @Test
     public void thereAreGeneralSettingsProposalsProvided_whenInputIsMatchingAndProperContentIsInserted()
             throws Exception {
-        final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
+        final Text text = new Text(shell, SWT.SINGLE);
         text.setText("cut");
 
         final SettingProposalsProvider provider = new SettingProposalsProvider(null, SettingTarget.GENERAL_TESTS);

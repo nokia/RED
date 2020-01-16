@@ -11,6 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -22,10 +25,10 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -39,90 +42,90 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposi
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.TestCaseLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class SuitesToRunCompositeTest {
 
-    private static final String PROJECT_NAME = SuitesToRunCompositeTest.class.getSimpleName();
+    @Project(dirs = { "nested" })
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @FreshShell
+    Shell shell;
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("tests1.robot", "*** Test Cases ***", "test1", "test2", "test3");
-        projectProvider.createFile("tests2.robot", "*** Test Cases ***", "test4", "test5", "test6");
-        projectProvider.createFile("tasks.robot", "*** Tasks ***", "task1", "task2", "task3");
-        projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2", "kw3");
-        projectProvider.createDir("nested");
+        createFile(project, "tests1.robot", "*** Test Cases ***", "test1", "test2", "test3");
+        createFile(project, "tests2.robot", "*** Test Cases ***", "test4", "test5", "test6");
+        createFile(project, "tasks.robot", "*** Tasks ***", "task1", "task2", "task3");
+        createFile(project, "res.robot", "*** Keywords ***", "kw1", "kw2", "kw3");
 
-        RedPlugin.getModelManager()
-                .createProject(projectProvider.getProject())
-                .setRobotParserComplianceVersion(new RobotVersion(3, 1));
+        RedPlugin.getModelManager().createProject(project).setRobotParserComplianceVersion(new RobotVersion(3, 1));
     }
 
     @Test
     public void emptyResultIsReturned_whenNoInputIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
         assertThat(composite.extractSuitesToRun()).isEmpty();
     }
 
     @Test
     public void singleSuiteWithNoTestsIsReturned_whenAllTestsAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3")),
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3")),
                 newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tests1.robot", newArrayList());
     }
 
     @Test
     public void singleSuiteWithSelectedTestsIsReturned_whenNotAllTestsAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2")), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tests1.robot", newArrayList("test1", "test2")),
+                newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1)
                 .containsEntry("tests1.robot", newArrayList("test1", "test2"));
     }
 
     @Test
     public void singleSuiteWithNoTasksIsReturned_whenAllTasksAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tasks.robot", newArrayList("task1", "task2", "task3")),
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tasks.robot", newArrayList("task1", "task2", "task3")),
                 newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tasks.robot", newArrayList());
     }
 
     @Test
     public void singleSuiteWithSelectedTasksIsReturned_whenNotAllTasksAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tasks.robot", newArrayList("task1", "task2")), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tasks.robot", newArrayList("task1", "task2")),
+                newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1)
                 .containsEntry("tasks.robot", newArrayList("task1", "task2"));
     }
 
     @Test
     public void singleResourceFileIsReturned_whenResourceIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("res.robot", newArrayList()), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("res.robot", newArrayList()), newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("res.robot", newArrayList());
     }
 
     @Test
     public void suiteFolderIsReturned_whenFolderIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("nested", newArrayList()), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("nested", newArrayList()), newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("nested", newArrayList());
     }
 
     @Test
     public void suiteFolderAndSuiteWithNoTestsAreReturned_whenFolderAndSuiteWithAllTestsAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME,
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(),
                 ImmutableMap.of("nested", newArrayList(), "tests1.robot", newArrayList("test1", "test2", "test3")),
                 newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(2)
@@ -132,29 +135,29 @@ public class SuitesToRunCompositeTest {
 
     @Test
     public void emptyResultIsReturned_whenEmptyProjectNameIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
         composite.setInput("", ImmutableMap.of("tests1.robot", newArrayList()), newHashSet());
         assertThat(composite.extractSuitesToRun()).isEmpty();
     }
 
     @Test
     public void singleSuiteWithNotExistingTestIsReturned_whenNotExistingTestIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("other")), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tests1.robot", newArrayList("other")), newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("tests1.robot", newArrayList("other"));
     }
 
     @Test
     public void singleNotExistingSuiteIsReturned_whenNotExistingSuiteIsSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("other.robot", newArrayList()), newHashSet());
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("other.robot", newArrayList()), newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(1).containsEntry("other.robot", newArrayList());
     }
 
     @Test
     public void twoSuitesWithSelectedTestsAreReturned_whenNotAllTestsAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME,
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(),
                 ImmutableMap.of("tests1.robot", newArrayList("test1", "test2"), "tests2.robot", newArrayList("test3")),
                 newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(2)
@@ -164,8 +167,8 @@ public class SuitesToRunCompositeTest {
 
     @Test
     public void twoSuitesWithNoTestsAreReturned_whenAllTestsAreSelected() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME, ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3"),
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(), ImmutableMap.of("tests1.robot", newArrayList("test1", "test2", "test3"),
                 "tests2.robot", newArrayList("test4", "test5", "test6")), newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(2)
                 .containsEntry("tests1.robot", newArrayList())
@@ -174,8 +177,8 @@ public class SuitesToRunCompositeTest {
 
     @Test
     public void allSuitesAndTestsAreSelectedAndDeselectedCorrectly() throws Exception {
-        final SuitesToRunComposite composite = new SuitesToRunComposite(shellProvider.getShell(), () -> {});
-        composite.setInput(PROJECT_NAME,
+        final SuitesToRunComposite composite = new SuitesToRunComposite(shell, () -> {});
+        composite.setInput(project.getName(),
                 ImmutableMap.of("tests1.robot", newArrayList("test1"), "tests2.robot", newArrayList("test4", "test5")),
                 newHashSet());
         assertThat(composite.extractSuitesToRun()).hasSize(2)
@@ -544,7 +547,7 @@ public class SuitesToRunCompositeTest {
     public void whenBrowseSuitesSorterIsAskedForCategory_ZeroIsReturnedForFolders() throws Exception {
         final BrowseSuitesViewerSorter sorter = new BrowseSuitesViewerSorter();
 
-        final IFolder folder = projectProvider.getDir("nested");
+        final IFolder folder = getDir(project, "nested");
 
         assertThat(sorter.category(folder)).isEqualTo(0);
     }
@@ -553,16 +556,14 @@ public class SuitesToRunCompositeTest {
     public void whenBrowseSuitesSorterIsAskedForCategory_OneIsReturnedForFiles() throws Exception {
         final BrowseSuitesViewerSorter sorter = new BrowseSuitesViewerSorter();
 
-        final IFile file = projectProvider.getFile("tasks.robot");
+        final IFile file = getFile(project, "tasks.robot");
 
         assertThat(sorter.category(file)).isEqualTo(1);
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_TrueIsReturnedForProjectWithSameName() throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
-
-        final IProject project = projectProvider.getProject();
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
         assertThat(filter.select(mock(Viewer.class), null, project)).isTrue();
     }
@@ -571,53 +572,51 @@ public class SuitesToRunCompositeTest {
     public void whenBrowseSuitesFilterIsAskedForSelect_FalseIsReturnedForProjectWithDifferentName() throws Exception {
         final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter("OTHER_PROJECT");
 
-        final IProject project = projectProvider.getProject();
-
         assertThat(filter.select(mock(Viewer.class), null, project)).isFalse();
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_TrueIsReturnedForFoldersOtherThanLibspecFolder()
             throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
-        final IFolder folder = projectProvider.getDir("nested");
+        final IFolder folder = getDir(project, "nested");
 
         assertThat(filter.select(mock(Viewer.class), null, folder)).isTrue();
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_FalseIsReturnedForLibspecFolder() throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
-        final IFolder folder = LibspecsFolder.get(projectProvider.getProject()).getResource();
+        final IFolder folder = LibspecsFolder.get(project).getResource();
 
         assertThat(filter.select(mock(Viewer.class), null, folder)).isFalse();
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_TrueIsReturnedForFileWithTests() throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
-        final IFile file = projectProvider.getFile("tests1.robot");
+        final IFile file = getFile(project, "tests1.robot");
 
         assertThat(filter.select(mock(Viewer.class), null, file)).isTrue();
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_TrueIsReturnedForFileWithTasks() throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
-        final IFile file = projectProvider.getFile("tasks.robot");
+        final IFile file = getFile(project, "tasks.robot");
 
         assertThat(filter.select(mock(Viewer.class), null, file)).isTrue();
     }
 
     @Test
     public void whenBrowseSuitesFilterIsAskedForSelect_FalseIsReturnedForFileWithoutCases() throws Exception {
-        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(PROJECT_NAME);
+        final BrowseSuitesViewerFilter filter = new BrowseSuitesViewerFilter(project.getName());
 
-        final IFile file = projectProvider.getFile("res.robot");
+        final IFile file = getFile(project, "res.robot");
 
         assertThat(filter.select(mock(Viewer.class), null, file)).isFalse();
     }

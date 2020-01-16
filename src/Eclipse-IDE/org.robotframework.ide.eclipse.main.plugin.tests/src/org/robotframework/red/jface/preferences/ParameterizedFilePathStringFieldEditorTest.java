@@ -6,33 +6,30 @@
 package org.robotframework.red.jface.preferences;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ShellProvider;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, FreshShellExtension.class })
 public class ParameterizedFilePathStringFieldEditorTest {
 
-    private static final String PROJECT_NAME = ParameterizedFilePathStringFieldEditorTest.class.getSimpleName();
+    @Project(files = { "existing_file.txt" })
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("existing_file.txt");
-    }
+    @FreshShell
+    Shell shell;
 
     @Test
     public void stateIsValid_whenFilePathIsEmpty() {
         final ParameterizedFilePathStringFieldEditor editor = new ParameterizedFilePathStringFieldEditor("foo", "label",
-                shellProvider.getShell());
+                shell);
 
         editor.getTextControl().setText("");
         assertThat(editor.checkState()).isTrue();
@@ -41,31 +38,31 @@ public class ParameterizedFilePathStringFieldEditorTest {
     @Test
     public void stateIsValid_whenFileExists() {
         final ParameterizedFilePathStringFieldEditor editor = new ParameterizedFilePathStringFieldEditor("foo", "label",
-                shellProvider.getShell());
+                shell);
 
-        editor.getTextControl().setText(projectProvider.getFile("existing_file.txt").getLocation().toOSString());
+        editor.getTextControl().setText(getFile(project, "existing_file.txt").getLocation().toOSString());
         assertThat(editor.checkState()).isTrue();
 
-        editor.getTextControl().setText("${workspace_loc:/" + PROJECT_NAME + "/existing_file.txt}");
+        editor.getTextControl().setText("${workspace_loc:/" + project.getName() + "/existing_file.txt}");
         assertThat(editor.checkState()).isTrue();
     }
 
     @Test
     public void stateIsInvalid_whenFileDoesNotExist() {
         final ParameterizedFilePathStringFieldEditor editor = new ParameterizedFilePathStringFieldEditor("foo", "label",
-                shellProvider.getShell());
+                shell);
 
         editor.getTextControl().setText("not_existing_file.txt");
         assertThat(editor.checkState()).isFalse();
 
-        editor.getTextControl().setText("${workspace_loc:/" + PROJECT_NAME + "/not_existing_file.txt}");
+        editor.getTextControl().setText("${workspace_loc:/" + project.getName() + "/not_existing_file.txt}");
         assertThat(editor.checkState()).isFalse();
     }
 
     @Test
     public void valueIsInsertedIntoEditor() {
         final ParameterizedFilePathStringFieldEditor editor = new ParameterizedFilePathStringFieldEditor("foo", "label",
-                shellProvider.getShell());
+                shell);
 
         editor.getTextControl().setText("some_file.txt");
         editor.getTextControl().setSelection(5, 9);

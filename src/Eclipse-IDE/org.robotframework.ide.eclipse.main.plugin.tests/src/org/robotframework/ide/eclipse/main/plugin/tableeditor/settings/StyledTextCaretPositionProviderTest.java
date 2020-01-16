@@ -15,22 +15,35 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
 /**
  * @author wypych
  */
+@ExtendWith(FreshShellExtension.class)
 public class StyledTextCaretPositionProviderTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     private StyledText styledText;
 
-    private Shell shell;
+    @BeforeEach
+    public void setUp() {
+        shell.setText("StyledTextCaretPositionProviderTest - Test");
+        shell.setLayout(new GridLayout());
+        styledText = new StyledText(shell, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        styledText.setLayoutData(new GridData(GridData.FILL_BOTH));
+        final Font font = new Font(shell.getDisplay(), "Arial", 10, SWT.NORMAL);
+        styledText.setFont(font);
+
+        shell.setSize(360, 120);
+        shell.open();
+    }
 
     @Test
     public void test_windowsEOLsHandling_whenUserClickOnEndOfLineAtFirstLine_shouldReturnCorrectPosition()
@@ -98,19 +111,5 @@ public class StyledTextCaretPositionProviderTest {
         // characters are 10 pixels
         assertThat(justFewPointsAfterTheThirdLineBegin).isEqualTo(offsetOfThirdLine);
         assertThat(theEndOfTheLine).isEqualTo(offsetOfThirdLine + styledText.getLine(3).length());
-    }
-
-    @Before
-    public void setUp() {
-        shell = shellProvider.getShell();
-        shell.setText("StyledTextCaretPositionProviderTest - Test");
-        shell.setLayout(new GridLayout());
-        styledText = new StyledText(shell, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-        styledText.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final Font font = new Font(shell.getDisplay(), "Arial", 10, SWT.NORMAL);
-        styledText.setFont(font);
-
-        shell.setSize(360, 120);
-        shell.open();
     }
 }

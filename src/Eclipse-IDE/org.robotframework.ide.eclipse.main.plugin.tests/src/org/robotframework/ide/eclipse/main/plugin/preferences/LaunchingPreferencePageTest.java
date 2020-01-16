@@ -14,16 +14,19 @@ import java.util.List;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class LaunchingPreferencePageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void initDoesNothing() {
@@ -38,7 +41,7 @@ public class LaunchingPreferencePageTest {
     @Test
     public void checkIfAllBooleanEditorsAreDefined() throws Exception {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<BooleanFieldEditor> editors = FieldEditorPreferencePageHelper.getEditorsOfType(page,
                 BooleanFieldEditor.class);
@@ -53,7 +56,7 @@ public class LaunchingPreferencePageTest {
     @Test
     public void checkIfAllIntegerEditorsAreDefined() throws Exception {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<IntegerFieldEditor> editors = FieldEditorPreferencePageHelper.getEditorsOfType(page,
                 IntegerFieldEditor.class);

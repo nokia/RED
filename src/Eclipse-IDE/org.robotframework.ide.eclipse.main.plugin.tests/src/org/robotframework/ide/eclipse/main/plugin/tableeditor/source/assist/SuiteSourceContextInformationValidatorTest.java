@@ -16,19 +16,20 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ShellProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class SuiteSourceContextInformationValidatorTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     // this behavior is subject to change maybe
     @Test
     public void presentationIsNotUpdated() {
-        final Shell shell = shellProvider.getShell();
         final StyledText textWidget = new StyledText(shell, SWT.SINGLE);
         textWidget.setText("some content of widget");
 
@@ -46,7 +47,6 @@ public class SuiteSourceContextInformationValidatorTest {
 
     @Test
     public void contextInformationIsInvalid_whenInDifferentLine() {
-        final Shell shell = shellProvider.getShell();
         final StyledText textWidget = new StyledText(shell, SWT.SINGLE);
         textWidget.setText("line\nline\nline\nline\nline\n");
 
@@ -69,7 +69,6 @@ public class SuiteSourceContextInformationValidatorTest {
 
     @Test
     public void contextInformationIsInvalid_whenInSameLineButBeforeInstalledPosition() {
-        final Shell shell = shellProvider.getShell();
         final StyledText textWidget = new StyledText(shell, SWT.SINGLE);
         textWidget.setText("line\nline\nline\nline\nline\n");
 
@@ -89,7 +88,6 @@ public class SuiteSourceContextInformationValidatorTest {
 
     @Test
     public void contextInformationIsValid_whenInSameLineButAfterInstalledPosition() {
-        final Shell shell = shellProvider.getShell();
         final StyledText textWidget = new StyledText(shell, SWT.SINGLE);
         textWidget.setText("line\nline\nline\nline\nline\n");
 

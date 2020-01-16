@@ -23,21 +23,24 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class TagsCompositeTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void whenCompositeIsCreated_itHasNoTagsControls() {
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport());
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport());
 
         assertThat(composite).has(noTagControls());
         assertThat(composite.getInput()).isEmpty();
@@ -45,7 +48,7 @@ public class TagsCompositeTest {
 
     @Test
     public void whenCompositeHasInputProvided_tagsControlsAreCreated() {
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport());
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport());
         composite.setInput(newArrayList("tag1", "tag2", "tag3"));
 
         assertThat(composite).has(tagControls("tag1", "tag2", "tag3"));
@@ -54,7 +57,7 @@ public class TagsCompositeTest {
 
     @Test
     public void whenInputChanges_tagsControlsAreRecreated() {
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport());
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport());
         composite.setInput(newArrayList("tag1", "tag2", "tag3"));
         composite.setInput(newArrayList("tag3", "tag4", "tag5"));
 
@@ -65,7 +68,7 @@ public class TagsCompositeTest {
     @Test
     public void whenTagIsAddedUsingButton_tagControlIsCreatedAndListenerGetsNotified() {
         final TagsListener listener = mock(TagsListener.class);
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport(),
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport(),
                 listener);
         composite.setInput(newArrayList("tag1", "tag2"));
 
@@ -81,7 +84,7 @@ public class TagsCompositeTest {
     @Test
     public void whenTagIsAddedUsingEnterKeyPress_tagControlIsCreatedAndListenerGetsNotified() {
         final TagsListener listener = mock(TagsListener.class);
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport(),
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport(),
                 listener);
         composite.setInput(newArrayList("tag1", "tag2"));
 
@@ -99,7 +102,7 @@ public class TagsCompositeTest {
     @Test
     public void whenAlreadyExistingTagIsAdded_tagControlAreNotChanged() {
         final TagsListener listener = mock(TagsListener.class);
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport(),
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport(),
                 listener);
         composite.setInput(newArrayList("tag1", "tag2"));
 
@@ -115,7 +118,7 @@ public class TagsCompositeTest {
     @Test
     public void whenEmptyStringIsAdded_tagControlAreNotChanged() {
         final TagsListener listener = mock(TagsListener.class);
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport(),
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport(),
                 listener);
         composite.setInput(newArrayList("tag1", "tag2"));
 
@@ -131,7 +134,7 @@ public class TagsCompositeTest {
     @Test
     public void whenTagIsRemoved_tagControlIsDisposedAndListenerGetsNotified() {
         final TagsListener listener = mock(TagsListener.class);
-        final TagsComposite composite = new TagsComposite(shellProvider.getShell(), new TagsProposalsSupport(),
+        final TagsComposite composite = new TagsComposite(shell, new TagsProposalsSupport(),
                 listener);
         composite.setInput(newArrayList("tag1", "tag2", "tag3"));
 

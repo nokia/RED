@@ -19,17 +19,20 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class CodeFormatterPreferencesPageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void initDoesNothing() {
@@ -44,7 +47,7 @@ public class CodeFormatterPreferencesPageTest {
     @Test
     public void editorsForCodeFormatterPreferencesAreDefined_byDefault() throws Exception {
         final CodeFormatterPreferencePage page = new CodeFormatterPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(7);

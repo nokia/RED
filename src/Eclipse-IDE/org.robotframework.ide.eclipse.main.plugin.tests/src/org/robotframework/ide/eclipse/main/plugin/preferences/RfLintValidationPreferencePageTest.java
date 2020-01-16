@@ -12,24 +12,25 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.Controls;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.StringPreference;
 
+@ExtendWith({ FreshShellExtension.class, PreferencesExtension.class })
 public class RfLintValidationPreferencePageTest {
 
-    @Rule
-    public ShellProvider shellProvider = new ShellProvider();
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void initDoesNothing() {
@@ -44,7 +45,7 @@ public class RfLintValidationPreferencePageTest {
     @Test
     public void singleTreeIsPlacedAtThePage() {
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<Tree> tables = getTrees();
         assertThat(tables).hasSize(1);
@@ -53,32 +54,30 @@ public class RfLintValidationPreferencePageTest {
     @Test
     public void oneTextFieldIsPlacedAtThePage() {
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         final List<Text> textFields = getTextFields();
         assertThat(textFields).hasSize(1);
     }
 
+    @StringPreference(key = RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, value = "custom arguments")
     @Test
     public void additionalArgumentsFieldDisplaysCustomArguments() {
-        preferenceUpdater.setValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
-
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         assertThat(getAdditionalArgumentsField().getText()).isEqualTo("custom arguments");
     }
 
+    @StringPreference(key = RedPreferences.RFLINT_RULES_FILES, value = "/path/to/fst.py;/path/to/snd.py")
+    @StringPreference(key = RedPreferences.RFLINT_RULES_CONFIG_NAMES, value = "Rule1;Rule2")
+    @StringPreference(key = RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, value = "WARNING;ERROR")
+    @StringPreference(key = RedPreferences.RFLINT_RULES_CONFIG_ARGS, value = ";100")
+    @StringPreference(key = RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, value = "custom arguments")
     @Test
     public void valuesAndPreferencesAreCorrectlyUpdated() {
-        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_FILES, "/path/to/fst.py;/path/to/snd.py");
-        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "Rule1;Rule2");
-        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "WARNING;ERROR");
-        preferenceUpdater.setValue(RedPreferences.RFLINT_RULES_CONFIG_ARGS, ";100");
-        preferenceUpdater.setValue(RedPreferences.RFLINT_ADDITIONAL_ARGUMENTS, "custom arguments");
-
         final RfLintValidationPreferencePage page = new RfLintValidationPreferencePage();
-        page.createControl(shellProvider.getShell());
+        page.createControl(shell);
 
         assertNotEmptyValues();
         assertNotEmptyPreferences();
@@ -121,7 +120,7 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Tree> getTrees() {
-        return Controls.getControlsStream(shellProvider.getShell())
+        return Controls.getControlsStream(shell)
                 .filter(c -> c instanceof Tree)
                 .map(c -> Tree.class.cast(c))
                 .collect(toList());
@@ -132,7 +131,7 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Text> getTextFields() {
-        return Controls.getControlsStream(shellProvider.getShell())
+        return Controls.getControlsStream(shell)
                 .filter(c -> c instanceof Text)
                 .map(c -> Text.class.cast(c))
                 .collect(toList());

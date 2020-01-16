@@ -14,8 +14,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
@@ -27,12 +26,8 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ShellProvider;
 
 public class InstalledRobotsEnvironmentsLabelProviderTest {
-
-    @ClassRule
-    public static ShellProvider shellProvider = new ShellProvider();
 
     @Test
     public void testGettingForeground_forInvalidPythonInstallation() throws Exception {

@@ -8,23 +8,26 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.widgets.Display;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.swt.widgets.Shell;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
-import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.junit.jupiter.FreshShell;
+import org.robotframework.red.junit.jupiter.FreshShellExtension;
 
+@ExtendWith(FreshShellExtension.class)
 public class MessageLogViewTest {
 
-    @Rule
-    public final ShellProvider shellProvider = new ShellProvider();
+    @FreshShell
+    Shell shell;
 
     @Test
     public void messageLogViewIsEmptyAfterConstruction_whenThereWereNoLaunchesSoFar() {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         assertThat(view.getTextControl().getText()).isEmpty();
     }
@@ -52,7 +55,7 @@ public class MessageLogViewTest {
         executionService.testExecutionEnded(launch2);
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         execAllAwaitingMessages();
 
@@ -74,7 +77,7 @@ public class MessageLogViewTest {
 
         // open view after first execution has ended
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         execAllAwaitingMessages();
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
@@ -92,7 +95,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         final Thread executionThread = new Thread(() -> {
             final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
@@ -111,7 +114,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         assertThat(view.getTextControl().getWordWrap()).isFalse();
     }
@@ -121,7 +124,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         view.toggleWordsWrapping();
 
@@ -133,7 +136,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shellProvider.getShell());
+        view.postConstruct(shell);
 
         view.toggleWordsWrapping();
         view.toggleWordsWrapping();
