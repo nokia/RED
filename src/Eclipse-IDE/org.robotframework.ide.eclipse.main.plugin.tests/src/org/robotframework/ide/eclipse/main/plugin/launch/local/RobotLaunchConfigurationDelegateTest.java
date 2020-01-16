@@ -8,31 +8,31 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate.ConsoleData;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, LaunchConfigExtension.class })
 public class RobotLaunchConfigurationDelegateTest {
 
-    private static final String PROJECT_NAME = RobotLaunchConfigurationDelegateTest.class.getSimpleName();
+    @Project
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchCfg;
 
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RobotLaunchConfiguration.TYPE_ID);
-
-    @Test()
+    @Test
     public void pathToExecutableAndUnknownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setExecutableFilePath("some/path/to/script");
 
         final ConsoleData consoleData = RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig,
@@ -42,9 +42,9 @@ public class RobotLaunchConfigurationDelegateTest {
         assertThat(consoleData.getSuiteExecutorVersion()).isEqualTo("<unknown>");
     }
 
-    @Test()
+    @Test
     public void pathToPythonAndKnownRobotVersionAreUsed_whenPathToExecutableIsNotSet() throws Exception {
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setExecutableFilePath("");
 
         final ConsoleData consoleData = RobotLaunchConfigurationDelegate.ConsoleData.create(robotConfig,
@@ -55,8 +55,7 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
         robotConfig.fillDefaults();
         robotConfig.setProjectName(projectName);
         return robotConfig;
@@ -64,12 +63,11 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test
     public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
         robotConfig.fillDefaults();
-        robotConfig.setProjectName(PROJECT_NAME);
+        robotConfig.setProjectName(project.getName());
 
-        final ILaunchConfigurationWorkingCopy launchCopy = configuration.getWorkingCopy();
+        final ILaunchConfigurationWorkingCopy launchCopy = launchCfg.getWorkingCopy();
         launchCopy.setAttribute("Version of configuration", "invalid");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();

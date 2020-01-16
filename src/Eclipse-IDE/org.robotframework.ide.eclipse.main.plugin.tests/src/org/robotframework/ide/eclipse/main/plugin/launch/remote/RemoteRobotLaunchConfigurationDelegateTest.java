@@ -10,27 +10,27 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
 
+@ExtendWith(LaunchConfigExtension.class)
 public class RemoteRobotLaunchConfigurationDelegateTest {
 
     private static final String PROJECT_NAME = RemoteRobotLaunchConfigurationDelegateTest.class.getSimpleName();
 
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RemoteRobotLaunchConfiguration.TYPE_ID);
+    @LaunchConfig(typeId = RemoteRobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchCfg;
 
     @Test
     public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
-        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
+        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(launchCfg);
         robotConfig.fillDefaults();
         robotConfig.setProjectName(PROJECT_NAME);
 
-        final ILaunchConfigurationWorkingCopy launchCopy = configuration.getWorkingCopy();
+        final ILaunchConfigurationWorkingCopy launchCopy = launchCfg.getWorkingCopy();
         launchCopy.setAttribute("Version of configuration", "invalid");
 
         final RemoteRobotLaunchConfigurationDelegate launchDelegate = new RemoteRobotLaunchConfigurationDelegate();
@@ -44,5 +44,4 @@ public class RemoteRobotLaunchConfigurationDelegateTest {
                         RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION, "invalid")
                 .withNoCause();
     }
-
 }

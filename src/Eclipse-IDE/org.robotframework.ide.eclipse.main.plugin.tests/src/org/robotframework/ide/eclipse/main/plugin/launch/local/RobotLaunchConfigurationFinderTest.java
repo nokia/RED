@@ -17,42 +17,55 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.eclipse.debug.core.ILaunchManager;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotLaunchConfigurationFinderTest {
-
-    private static final List<String> RESOURCE_NAMES = asList("Resource1.fake", "Resource2.fake", "Resource3.fake");
 
     private static final List<String> TEST_CASES = asList("t1", "t3");
 
-    private static List<IResource> resources;
+    private static List<IResource> resources = new ArrayList<>();
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
+    @Project(files = { "Resource1.fake", "Resource2.fake", "Resource3.fake" })
+    static IProject project;
 
-    // this rule is needed for cleaning saved configurations
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RobotLaunchConfiguration.TYPE_ID);
-
-    @BeforeClass
+    @BeforeAll
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
         resources = new ArrayList<>();
-        for (final String name : RESOURCE_NAMES) {
-            resources.add(projectProvider.createFile(name, ""));
+        project.accept(res -> {
+            if (res.getType() == IResource.FILE && "fake".equals(res.getFileExtension())) {
+                resources.add(res);
+            }
+            return true;
+        });
+    }
+
+    @AfterEach
+    public void afterTest() throws CoreException {
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType type = launchManager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        for (final ILaunchConfiguration config : launchManager.getLaunchConfigurations(type)) {
+            config.delete();
         }
-        // This line does not affect runtime, but is necessary for using breakpoints when debugging
-        // this class
-        // Class.forName("org.eclipse.debug.core.ILaunchConfigurationWorkingCopy");
+    }
+
+    @AfterAll
+    public static void afterSuite() {
+        resources = null;
     }
 
     @Test
@@ -107,8 +120,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void configurationIsReturned_whenThereIsValidConfigurationForProject() throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final List<IResource> resources = asList(res);
+        final List<IResource> resources = asList(project);
         final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
 
@@ -118,8 +130,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void nullConfigurationIsReturned_whenThereIsNoConfigurationForThisProject() throws CoreException {
-        final IResource res = projectProvider.getProject();
-        List<IResource> resources = asList(res);
+        List<IResource> resources = asList(project);
         createDefault(resources);
         final IProject anotherProject = ResourcesPlugin.getWorkspace().getRoot().getProject("Another one");
         if (anotherProject.exists()) {
@@ -138,9 +149,8 @@ public class RobotLaunchConfigurationFinderTest {
     @Test
     public void configurationForProjectForSelectedTestCasesIsReturned_whenThereIsValidConfiguration()
             throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final List<IResource> resources = asList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(res, TEST_CASES);
+        final List<IResource> resources = asList(project);
+        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(project, TEST_CASES);
         final ILaunchConfigurationWorkingCopy configTemp = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationForSelectedTestCases(resources);
         assertThat(configTemp).isNull();
@@ -171,8 +181,7 @@ public class RobotLaunchConfigurationFinderTest {
     @Test
     public void configurationForProjectExceptSelectedTestCasesIsReturned_whenThereIsValidConfiguration()
             throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final List<IResource> resources = asList(res);
+        final List<IResource> resources = asList(project);
         final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationExceptSelectedTestCases(resources);
@@ -184,9 +193,8 @@ public class RobotLaunchConfigurationFinderTest {
     @Test
     public void configurationForSelectedTestCasesIsReturned_whenThereIsOnlyConfigurationForSelectedTestCases()
             throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final List<IResource> resources = asList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(res, TEST_CASES);
+        final List<IResource> resources = asList(project);
+        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(project, TEST_CASES);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
@@ -254,9 +262,8 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void defaultConfigurationReturned_whenThereIsOnlyConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final List<IResource> resources = asList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(res, TEST_CASES);
+        final List<IResource> resources = asList(project);
+        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(project, TEST_CASES);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
@@ -282,8 +289,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void defaultConfigurationReturned_whenThereIsNoConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(res, TEST_CASES);
+        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(project, TEST_CASES);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
                 .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
         final ILaunchConfigurationWorkingCopy defaultConfig = RobotLaunchConfiguration
@@ -294,8 +300,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void configurationReturned_whenThereIsApplicableConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res = projectProvider.getProject();
-        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(res, TEST_CASES);
+        final Map<IResource, List<String>> resourcesToTestCases = ImmutableMap.of(project, TEST_CASES);
         final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration
                 .prepareForSelectedTestCases(resourcesToTestCases);
         new RobotLaunchConfiguration(config).setInterpreterArguments("custom");

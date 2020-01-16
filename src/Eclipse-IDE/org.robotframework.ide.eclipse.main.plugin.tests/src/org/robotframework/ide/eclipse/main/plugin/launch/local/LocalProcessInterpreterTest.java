@@ -15,11 +15,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
@@ -30,27 +30,27 @@ import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, LaunchConfigExtension.class })
 public class LocalProcessInterpreterTest {
 
-    private static final String PROJECT_NAME = LocalProcessInterpreterTest.class.getSimpleName();
+    @Project
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchCfg;
 
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RobotLaunchConfiguration.TYPE_ID);
-
-    @Test()
+    @Test
     public void pythonExecNameAndKnownRobotVersionAreUsed_whenExistingInterpreterIsUsed() throws Exception {
         assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
 
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setUsingInterpreterFromProject(false);
         robotConfig.setInterpreter(SuiteExecutor.Python);
 
@@ -61,13 +61,13 @@ public class LocalProcessInterpreterTest {
         assertThat(interpreter.getVersion()).isNotEqualTo("<unknown>");
     }
 
-    @Test()
+    @Test
     public void coreExceptionIsThrown_whenNotExistingInterpreterIsUsed() throws Exception {
         assumeFalse(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.PyPy).isPresent());
 
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setUsingInterpreterFromProject(false);
         robotConfig.setInterpreter(SuiteExecutor.PyPy);
 
@@ -78,12 +78,12 @@ public class LocalProcessInterpreterTest {
                 .withNoCause();
     }
 
-    @Test()
+    @Test
     public void defaultPythonExecNameAndUnknownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setExecutableFilePath("some/path/to/script");
         robotConfig.setUsingInterpreterFromProject(true);
 
@@ -94,14 +94,14 @@ public class LocalProcessInterpreterTest {
         assertThat(interpreter.getVersion()).isEqualTo("<unknown>");
     }
 
-    @Test()
+    @Test
     public void selectedPythonExecNameAndKnownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
         assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
 
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setExecutableFilePath("some/path/to/script");
         robotConfig.setUsingInterpreterFromProject(false);
         robotConfig.setInterpreter(SuiteExecutor.Python);
@@ -112,17 +112,18 @@ public class LocalProcessInterpreterTest {
         assertThat(interpreter.getPath()).isEqualTo(SuiteExecutor.Python.executableName());
         assertThat(interpreter.getVersion()).isNotEqualTo("<unknown>");
     }
-    @Test()
+
+    @Test
     public void pythonExecNameAndKnownRobotVersionAreUsed_whenProjectInterpreterIsUsed()
             throws Exception {
         final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
         when(pythonInstallation.listFiles()).thenReturn(new File[] {});
         when(pythonInstallation.getInterpreter()).thenReturn(SuiteExecutor.IronPython);
         final IRuntimeEnvironment environment = new RobotRuntimeEnvironment(pythonInstallation, "RF 3");
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setUsingInterpreterFromProject(true);
 
         final LocalProcessInterpreter interpreter = LocalProcessInterpreter.create(robotConfig, robotProject);
@@ -132,28 +133,28 @@ public class LocalProcessInterpreterTest {
         assertThat(interpreter.getVersion()).isEqualTo("RF 3");
     }
 
-    @Test()
+    @Test
     public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsNullEnvironment() throws Exception {
         final IRuntimeEnvironment environment = new NullRuntimeEnvironment();
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> LocalProcessInterpreter.create(robotConfig, robotProject))
-                .withMessage("There is no active runtime environment for project '%s'", PROJECT_NAME)
+                .withMessage("There is no active runtime environment for project '%s'", project.getName())
                 .withNoCause();
     }
 
-    @Test()
+    @Test
     public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsInvalidPythonEnvironment() throws Exception {
         final File location = new File("some/path");
         final IRuntimeEnvironment environment = new InvalidPythonRuntimeEnvironment(location);
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> LocalProcessInterpreter.create(robotConfig, robotProject))
@@ -161,15 +162,15 @@ public class LocalProcessInterpreterTest {
                 .withNoCause();
     }
 
-    @Test()
+    @Test
     public void coreExceptionIsThrown_whenActiveRuntimeEnvironmentIsInvalidRobotEnvironment() throws Exception {
         final PythonInstallationDirectory pythonInstallation = mock(PythonInstallationDirectory.class);
         when(pythonInstallation.getAbsolutePath()).thenReturn(new File("some/path/to/python").getAbsolutePath());
         final IRuntimeEnvironment environment = new MissingRobotRuntimeEnvironment(pythonInstallation);
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> LocalProcessInterpreter.create(robotConfig, robotProject))
@@ -179,8 +180,7 @@ public class LocalProcessInterpreterTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
         robotConfig.fillDefaults();
         robotConfig.setProjectName(projectName);
         return robotConfig;

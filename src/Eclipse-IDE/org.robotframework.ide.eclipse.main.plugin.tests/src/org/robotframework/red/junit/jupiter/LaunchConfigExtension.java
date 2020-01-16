@@ -86,8 +86,8 @@ public class LaunchConfigExtension implements Extension, BeforeAllCallback, Befo
         return field -> {
             try {
                 final Object launchCfg = field.get(instance);
-                if (launchCfg instanceof ILaunchConfigurationWorkingCopy) {
-                    ((ILaunchConfigurationWorkingCopy) launchCfg).delete();
+                if (launchCfg instanceof ILaunchConfiguration) {
+                    ((ILaunchConfiguration) launchCfg).delete();
                 }
             } catch (final CoreException | IllegalArgumentException | IllegalAccessException e) {
             }

@@ -92,6 +92,11 @@ public class ProjectExtension
         return createFile(getFile(project, filePath), lines);
     }
 
+    public static IFolder createDir(final IProject project, final String filePath)
+            throws IOException, CoreException {
+        return createDir(getDir(project, filePath));
+    }
+
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception {
         FieldsSupport.handleFields(context.getRequiredTestClass(), true, Project.class,
@@ -233,6 +238,11 @@ public class ProjectExtension
         }
         file.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
         return file;
+    }
+
+    private static IFolder createDir(final IFolder directory) throws CoreException {
+        directory.create(true, true, null);
+        return directory;
     }
 
     private static Consumer<Field> deleteProject(final Object instance) {

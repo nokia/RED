@@ -7,29 +7,39 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationFinderTest;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.eclipse.debug.core.ILaunchManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RemoteRobotLaunchConfigurationFinderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
+    @Project
+    static IProject project;
 
-    // this rule is needed for cleaning saved configurations
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RemoteRobotLaunchConfiguration.TYPE_ID);
+    @AfterEach
+    public void afterTest() throws CoreException {
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType type = launchManager
+                .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID);
+        for (final ILaunchConfiguration config : launchManager.getLaunchConfigurations(type)) {
+            config.delete();
+        }
+    }
 
     @Test
     public void configurationReturned_whenThereIsExactlySameConfiguration() throws CoreException {
         final ILaunchConfigurationWorkingCopy configuration = RemoteRobotLaunchConfiguration
-                .prepareDefault(projectProvider.getProject());
+                .prepareDefault(project);
         new RemoteRobotLaunchConfiguration(configuration).setAgentConnectionHostValue("fakehost");
         configuration.doSave();
         final ILaunchConfigurationWorkingCopy foundConfig = RemoteRobotLaunchConfigurationFinder
@@ -41,7 +51,7 @@ public class RemoteRobotLaunchConfigurationFinderTest {
     @Test
     public void nullReturned_whenThereIsNoConfiguration() throws CoreException {
         final ILaunchConfigurationWorkingCopy configuration = RemoteRobotLaunchConfiguration
-                .prepareDefault(projectProvider.getProject());
+                .prepareDefault(project);
         final ILaunchConfigurationWorkingCopy foundConfig = RemoteRobotLaunchConfigurationFinder
                 .findSameAs(configuration);
 
@@ -51,11 +61,11 @@ public class RemoteRobotLaunchConfigurationFinderTest {
     @Test
     public void nullReturned_whenThereIsDifferentConfiguration() throws CoreException {
         final ILaunchConfigurationWorkingCopy configuration = RemoteRobotLaunchConfiguration
-                .prepareDefault(projectProvider.getProject());
+                .prepareDefault(project);
         new RemoteRobotLaunchConfiguration(configuration).setAgentConnectionHostValue("fakehost");
         configuration.doSave();
         final ILaunchConfigurationWorkingCopy foundConfig = RemoteRobotLaunchConfigurationFinder
-                .findSameAs(RemoteRobotLaunchConfiguration.prepareDefault(projectProvider.getProject()));
+                .findSameAs(RemoteRobotLaunchConfiguration.prepareDefault(project));
 
         assertThat(foundConfig).isNull();
     }
