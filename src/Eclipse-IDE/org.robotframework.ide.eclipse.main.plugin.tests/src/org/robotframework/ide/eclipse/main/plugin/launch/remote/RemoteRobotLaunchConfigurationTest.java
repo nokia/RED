@@ -8,37 +8,42 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.IntegerPreference;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
+import org.robotframework.red.junit.jupiter.Managed;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.StringPreference;
 
+@ExtendWith({ ProjectExtension.class, LaunchConfigExtension.class, PreferencesExtension.class })
 public class RemoteRobotLaunchConfigurationTest {
 
-    private static final String PROJECT_NAME = RemoteRobotLaunchConfigurationTest.class.getSimpleName();
+    @Project
+    IProject project;
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @LaunchConfig(typeId = RemoteRobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchConfig;
 
-    @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
-            RemoteRobotLaunchConfiguration.TYPE_ID);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Managed
+    PreferencesUpdater prefsUpdater;
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationPrepared() throws CoreException {
         final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration
-                .prepareDefault(projectProvider.getProject());
+                .prepareDefault(project);
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
 
-        assertThat(config.getType()).isEqualTo(runConfigurationProvider.getType());
-        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
+        assertThat(robotConfig.getProjectName()).isEqualTo(project.getName());
         assertThat(robotConfig.isUsingRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
@@ -66,18 +71,16 @@ public class RemoteRobotLaunchConfigurationTest {
                 .isEqualTo(RemoteRobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
     }
 
+    @StringPreference(key = RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, value = "some.host.com.pl")
+    @IntegerPreference(key = RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, value = 12345)
+    @IntegerPreference(key = RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, value = 666)
     @Test
     public void defaultConfigurationObtained_whenDefaultValuesAreDefinedInPreferences() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "some.host.com.pl");
-        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, 12345);
-        preferenceUpdater.setValue(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, 666);
-
         final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration
-                .prepareDefault(projectProvider.getProject());
+                .prepareDefault(project);
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
 
-        assertThat(config.getType()).isEqualTo(runConfigurationProvider.getType());
-        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
+        assertThat(robotConfig.getProjectName()).isEqualTo(project.getName());
         assertThat(robotConfig.isUsingRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("some.host.com.pl");
         assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(12345);
@@ -190,7 +193,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.getProject()).isEqualTo(projectProvider.getProject());
+        assertThat(robotConfig.getProject()).isEqualTo(project);
     }
 
     @Test
@@ -205,12 +208,12 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
-        projectProvider.getProject().close(null);
+        project.close(null);
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getProject)
-                .withMessage("Project '%s' is currently closed", PROJECT_NAME)
+                .withMessage("Project '%s' is currently closed", project.getName())
                 .withNoCause();
     }
 
@@ -225,7 +228,6 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     private RemoteRobotLaunchConfiguration getDefaultRemoteRobotLaunchConfiguration() throws CoreException {
-        return new RemoteRobotLaunchConfiguration(
-                RemoteRobotLaunchConfiguration.prepareDefault(projectProvider.getProject()));
+        return new RemoteRobotLaunchConfiguration(RemoteRobotLaunchConfiguration.prepareDefault(project));
     }
 }

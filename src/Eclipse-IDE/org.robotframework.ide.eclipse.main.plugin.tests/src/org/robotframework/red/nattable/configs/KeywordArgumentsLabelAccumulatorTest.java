@@ -12,17 +12,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLib;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -37,22 +39,26 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.KeywordUsagesFinder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Managed;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class KeywordArgumentsLabelAccumulatorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordArgumentsLabelAccumulatorTest.class);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @Managed
+    PreferencesUpdater prefsUpdater;
+
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.robot",
+        createFile(project, "file.robot",
                 "*** Test Cases ***",
                 "case",
                 "  ",
@@ -65,7 +71,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 "  Unknown  1  2",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("for_loop.robot",
+        createFile(project, "for_loop.robot",
                 "*** Test Cases ***",
                 "case",
                 "  FOR  ${element}  IN ENUMERATE  1  2  3",
@@ -73,28 +79,28 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 "  END",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("vars.robot",
+        createFile(project, "vars.robot",
                 "*** Test Cases ***",
                 "case",
                 "  ${x}=",
                 "  ${y}=  Limited Args  1",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("template.robot",
+        createFile(project, "template.robot",
                 "*** Test Cases ***",
                 "case",
                 "  [Template]  Limited Args",
                 "  1  2  3  4",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("settings.robot",
+        createFile(project, "settings.robot",
                 "*** Test Cases ***",
                 "case",
                 "  [Setup]  NONE",
                 "  [Teardown]  Limited Args  1  2",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("nested.robot",
+        createFile(project, "nested.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Run Keyword",
@@ -112,7 +118,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 "  [Teardown]  Repeat Keyword  5  Limited Args  1",
                 "*** Settings ***",
                 "Library  UserLib");
-        projectProvider.createFile("embedded.robot",
+        createFile(project, "embedded.robot",
                 "*** Test Cases ***",
                 "case",
                 "  My ${x} Kw ${y} Xyz",
@@ -122,7 +128,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 "  Log Many  ${a}  ${b} ");
 
         robotModel = RedPlugin.getModelManager().getModel();
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setReferencedLibraries(createRefLib("UserLib", KeywordSpecification.create("Empty Args"),
                 KeywordSpecification.create("Limited Args", "a", "b", "c", "d=10", "e=20"),
@@ -134,26 +140,24 @@ public class KeywordArgumentsLabelAccumulatorTest {
                 KeywordSpecification.create("Run Keywords", "*kws"),
                 KeywordSpecification.create("Repeat Keyword", "repeat", "name", "*args"),
                 KeywordSpecification.create("Wait Until Keyword Succeeds", "retry", "interval", "name", "*args")));
-
-        projectProvider.configure();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
         robotModel = null;
     }
 
-    @Before
+    @BeforeEach
     public void before() {
-        preferenceUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, true);
+        prefsUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, true);
     }
 
     @Test
     public void labelsAreNotAdded_whenColoringIsDisabledInPreferences() {
-        preferenceUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, false);
+        prefsUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, false);
 
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -168,7 +172,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forFirstColumn() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -181,7 +185,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forCaseDefinitionLine() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotCase robotCase = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -194,7 +198,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forEmptyLine() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -209,7 +213,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forEmptyLineWithComment() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -224,7 +228,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forUnknownKeyword() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -239,7 +243,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forKeywordWithoutArguments() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -255,7 +259,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forKeywordWithLimitedArgumentList() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -275,7 +279,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forKeywordWithUnlimitedArgumentList() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -295,7 +299,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forKeywordWithLimitedArgument_eventForNotEmptyOptionalArguments() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -315,7 +319,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forCellsWithComments() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -335,7 +339,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forLoopDeclaration() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("for_loop.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "for_loop.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -350,7 +354,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forLoopEnd() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("for_loop.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "for_loop.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -365,7 +369,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forLoopBody() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("for_loop.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "for_loop.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -385,7 +389,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forEmptyVariableDeclaration() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("vars.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "vars.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -400,7 +404,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNotEmptyVariableDeclaration() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("vars.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "vars.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -420,7 +424,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forTemplateSettingRow() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("template.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "template.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -435,7 +439,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forTemplateBodyRow() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("template.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "template.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -450,7 +454,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forDisabledKeywordBasedSetting() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("settings.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "settings.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -465,7 +469,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEnabledKeywordBasedSettings() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("settings.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "settings.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -485,7 +489,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEmptyNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -507,7 +511,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNotEmptyNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -529,7 +533,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNotEmptyNestedKeywordWithOmittedTokensCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -551,7 +555,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forRunKeywordsCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -577,7 +581,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forRunKeywordIfElseCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -605,7 +609,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forIncorrectRunKeywordIfElseCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -627,7 +631,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forMultipleNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -649,7 +653,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forVarAssignmentWithNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -671,7 +675,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNestedKeywordCallInLoopBody() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -693,7 +697,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEmptyNestedKeywordCallInKeywordBasedSetting() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -715,7 +719,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNotEmptyNestedKeywordCallInKeywordBasedSetting() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -737,7 +741,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEmbeddedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("embedded.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "embedded.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -753,7 +757,7 @@ public class KeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEmbeddedKeywordCallInKeywordBasedSetting() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("embedded.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "embedded.robot"));
         final RobotKeywordCall call = file.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()

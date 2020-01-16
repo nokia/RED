@@ -14,22 +14,24 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -44,16 +46,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class KeywordCallsAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordCallsAssistProcessorTest.class);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Project
+    static IProject project;
 
     private static RobotModel robotModel;
 
@@ -61,13 +63,13 @@ public class KeywordCallsAssistProcessorTest {
 
     private static IFile suiteWithTemplate;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2");
+        createFile(project, "res.robot", "*** Keywords ***", "kw1", "kw2");
 
-        suite = projectProvider.createFile("suite.robot",
+        suite = createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  ",
@@ -80,7 +82,7 @@ public class KeywordCallsAssistProcessorTest {
                 "keyword",
                 "*** Settings ***",
                 "Resource  res.robot");
-        suiteWithTemplate = projectProvider.createFile("with_template.robot",
+        suiteWithTemplate = createFile(project, "with_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  Kw Call  ",
@@ -92,7 +94,7 @@ public class KeywordCallsAssistProcessorTest {
                 "Test Template  Some Kw");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         robotModel = null;
         suite = null;
@@ -329,12 +331,11 @@ public class KeywordCallsAssistProcessorTest {
                 .containsOnly(new Region(109, 4), new Region(115, 4));
     }
 
+    @BooleanPreference(key = RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, value = true)
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
-
-        final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
-        project.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        robotProject.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
 
         final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
@@ -353,7 +354,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndKeywordBasedSettingIsNotTemplate()
             throws Exception {
-        final IFile suite = projectProvider.createFile("keywords_with_args_in_setting_suite.robot",
+        final IFile suite = createFile(project, "keywords_with_args_in_setting_suite.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  [Setup]  ",
@@ -406,7 +407,7 @@ public class KeywordCallsAssistProcessorTest {
 
     private ITextViewer createViewer(final IFile file, final String contentType) throws BadLocationException {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(file)));
+        final IDocument document = spy(new Document(getFileContent(file)));
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(anyInt())).thenReturn(contentType);
         return viewer;

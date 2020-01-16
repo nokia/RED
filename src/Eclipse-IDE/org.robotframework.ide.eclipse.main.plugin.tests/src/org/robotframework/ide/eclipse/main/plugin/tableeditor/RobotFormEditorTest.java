@@ -6,85 +6,82 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.Editors;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class RobotFormEditorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotFormEditorTest.class);
+    @Project(dirs = { "test_A", "test_A/test_B" })
+    static IProject project;
 
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
-        projectProvider.createFile("suite.robot", "*** Settings ***");
-        projectProvider.createDir("test_A");
-        projectProvider.createFile("test_A/suite.robot", "*** Settings ***");
-        projectProvider.createDir("test_A/test_B");
-        projectProvider.createFile("test_A/test_B/suite.robot", "*** Settings ***");
+        createFile(project, "suite.robot", "*** Settings ***");
+        createFile(project, "test_A/suite.robot", "*** Settings ***");
+        createFile(project, "test_A/test_B/suite.robot", "*** Settings ***");
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         Editors.closeAll();
     }
 
     @Test
     public void byDefaultEditorPartNameIsNotPrefixedWithProjectName() throws Exception {
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("suite.robot");
     }
 
+    @BooleanPreference(key = RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, value = true)
     @Test
     public void editorPartNameIsPrefixedWithProjectName_whenParentDirectoryNamePreferenceIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, true);
-
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("RobotFormEditorTest/suite.robot");
     }
 
     @Test
     public void byDefaultEditorPartNameIsNotPrefixedWithDirectoryName() throws Exception {
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("test_A/suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "test_A/suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("suite.robot");
     }
 
+    @BooleanPreference(key = RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, value = true)
     @Test
     public void editorPartNameIsPrefixedWithDirectoryName_whenParentDirectoryNamePreferenceIsEnabled()
             throws Exception {
-        preferenceUpdater.setValue(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, true);
-
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("test_A/suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "test_A/suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("test_A/suite.robot");
     }
 
     @Test
     public void byDefaultEditorPartNameIsNotPrefixedWithNestedDirectoryName() throws Exception {
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("test_A/test_B/suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "test_A/test_B/suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("suite.robot");
     }
 
+    @BooleanPreference(key = RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, value = true)
     @Test
     public void editorPartNameIsPrefixedWithNestedDirectoryName_whenParentDirectoryNamePreferenceIsEnabled()
             throws Exception {
-        preferenceUpdater.setValue(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, true);
-
-        final RobotFormEditor editor = Editors.openInRobotEditor(projectProvider.getFile("test_A/test_B/suite.robot"));
+        final RobotFormEditor editor = Editors.openInRobotEditor(getFile(project, "test_A/test_B/suite.robot"));
 
         assertThat(editor.getPartName()).isEqualTo("test_B/suite.robot");
     }

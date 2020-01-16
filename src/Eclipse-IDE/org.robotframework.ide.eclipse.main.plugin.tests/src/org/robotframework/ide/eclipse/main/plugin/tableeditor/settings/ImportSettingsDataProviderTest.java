@@ -6,23 +6,25 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.IntegerPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class ImportSettingsDataProviderTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(ImportSettingsDataProviderTest.class);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Project
+    static IProject project;
 
     private final ImportSettingsDataProvider dataProvider = new ImportSettingsDataProvider(null, null);
 
@@ -75,10 +77,9 @@ public class ImportSettingsDataProviderTest {
         assertThat(dataProvider.getColumnCount()).isEqualTo(12);
     }
 
+    @IntegerPreference(key = RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, value = 15)
     @Test
     public void columnsAreCountedCorrectly_whenMinimalArgumentsColumnsFieldIsChangedInPreferences() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 15);
-
         dataProvider.setInput(createSettingsSection("*** Settings ***",
                 "Variables    a    b    c"));
 
@@ -86,7 +87,7 @@ public class ImportSettingsDataProviderTest {
     }
 
     private RobotSettingsSection createSettingsSection(final String... lines) throws Exception {
-        final IFile file = projectProvider.createFile("__init__.robot", lines);
+        final IFile file = createFile(project, "__init__.robot", lines);
         final RobotModel model = new RobotModel();
         return model.createSuiteFile(file).findSection(RobotSettingsSection.class).get();
     }

@@ -12,19 +12,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLib;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -37,22 +39,26 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.KeywordUsagesFinder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Managed;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.PreferencesUpdater;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SettingsKeywordArgumentsLabelAccumulatorTest.class);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @Managed
+    PreferencesUpdater prefsUpdater;
+
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("resource.robot",
+        createFile(project, "resource.robot",
                 "*** Settings ***",
                 "Test Template  Limited Args",
                 "Suite Setup",
@@ -60,7 +66,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
                 "Test Setup  Limited Args  1  2  #comment",
                 "Test Teardown  Limited Args  1  2",
                 "Library  UserLib");
-        projectProvider.createFile("nested.robot",
+        createFile(project, "nested.robot",
                 "*** Settings ***",
                 "Suite Setup  Run Keyword",
                 "Suite Teardown  Wait Until Keyword Succeeds  1  2  Limited Args  1",
@@ -69,7 +75,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
                 "Library  UserLib");
 
         robotModel = RedPlugin.getModelManager().getModel();
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
 
         robotProject.setReferencedLibraries(
                 createRefLib("UserLib", KeywordSpecification.create("Limited Args", "a", "b", "c", "d=10", "e=20")));
@@ -80,26 +86,24 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
                 KeywordSpecification.create("Run Keywords", "*kws"),
                 KeywordSpecification.create("Repeat Keyword", "repeat", "name", "*args"),
                 KeywordSpecification.create("Wait Until Keyword Succeeds", "retry", "interval", "name", "*args")));
-
-        projectProvider.configure();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
         robotModel = null;
     }
 
-    @Before
+    @BeforeEach
     public void before() {
-        preferenceUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, true);
+        prefsUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, true);
     }
 
     @Test
     public void labelsAreNotAdded_whenColoringIsDisabledInPreferences() {
-        preferenceUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, false);
+        prefsUpdater.setValue(RedPreferences.KEYWORD_ARGUMENTS_CELL_COLORING, false);
 
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -113,7 +117,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forFirstTwoColumns() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -126,7 +130,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_forCommentColumn() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -138,7 +142,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_whenSettingIsNull() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final Entry<String, RobotSetting> entry = new SimpleEntry<>("Setting", null);
 
         for (int column = 2; column < 9; column++) {
@@ -148,7 +152,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_whenSettingIsNotSetupOrTeardown() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -162,7 +166,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_whenSettingIsDisabled() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -176,7 +180,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreNotAdded_whenSettingIsUnknown() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -190,7 +194,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forKeywordWithLimitedArgumentList() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "resource.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -208,7 +212,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forEmptyNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -226,7 +230,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forNotEmptyNestedKeywordCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -244,7 +248,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forRunKeywordsCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()
@@ -262,7 +266,7 @@ public class SettingsKeywordArgumentsLabelAccumulatorTest {
 
     @Test
     public void labelsAreAdded_forRunKeywordIfCall() {
-        final RobotSuiteFile file = robotModel.createSuiteFile(projectProvider.getFile("nested.robot"));
+        final RobotSuiteFile file = robotModel.createSuiteFile(getFile(project, "nested.robot"));
         final RobotSetting setting = (RobotSetting) file.findSection(RobotSettingsSection.class)
                 .get()
                 .getChildren()

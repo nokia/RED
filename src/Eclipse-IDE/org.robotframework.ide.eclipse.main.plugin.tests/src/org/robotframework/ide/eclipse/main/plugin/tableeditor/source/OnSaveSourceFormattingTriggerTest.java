@@ -12,48 +12,33 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SourceDocumentFormatter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter.SuiteSourceEditorSelectionFixer;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class OnSaveSourceFormattingTriggerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(OnSaveSourceFormattingTriggerTest.class);
+    @Project(files = { "suite.robot", "suite.tsv" })
+    static IProject project;
 
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
-
-    private static RobotModel model = new RobotModel();
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite.robot");
-        projectProvider.createFile("suite.tsv");
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        model = null;
-    }
-
+    @BooleanPreference(key = RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, value = false)
     @Test
     public void formattingIsNotStarted_whenItIsDisabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
-
-        final RobotSuiteFile suite = spy(model.createSuiteFile(projectProvider.getFile("suite.robot")));
+        final RobotSuiteFile suite = spy(new RobotModel().createSuiteFile(getFile(project, "suite.robot")));
 
         final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
@@ -66,11 +51,10 @@ public class OnSaveSourceFormattingTriggerTest {
         verifyNoInteractions(selectionUpdater);
     }
 
+    @BooleanPreference(key = RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, value = true)
     @Test
     public void formattingIsNotStarted_whenSourceFileHasTsvExtension() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
-
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.tsv"));
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(getFile(project, "suite.tsv"));
         final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
@@ -82,11 +66,10 @@ public class OnSaveSourceFormattingTriggerTest {
         verifyNoInteractions(selectionUpdater);
     }
 
+    @BooleanPreference(key = RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, value = true)
     @Test
     public void formattingIsStartedForWholeDocument_whenItIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
-
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
         final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);
 
@@ -101,12 +84,11 @@ public class OnSaveSourceFormattingTriggerTest {
         verifyNoMoreInteractions(selectionUpdater);
     }
 
+    @BooleanPreference(key = RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, value = true)
+    @BooleanPreference(key = RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, value = true)
     @Test
     public void formattingIsStartedForChangedLines_whenItIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, true);
-
-        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suite = new RobotModel().createSuiteFile(getFile(project, "suite.robot"));
         final SourceDocumentFormatter formatter = mock(SourceDocumentFormatter.class);
 
         final SuiteSourceEditorSelectionFixer selectionUpdater = mock(SuiteSourceEditorSelectionFixer.class);

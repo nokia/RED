@@ -8,7 +8,10 @@ package org.robotframework.red.junit.jupiter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
@@ -31,6 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.io.CharStreams;
 
 
 public class ProjectExtension
@@ -68,6 +73,18 @@ public class ProjectExtension
 
     public static IFile getFile(final IProject project, final String filePath) {
         return project.getFile(Path.fromPortableString(filePath));
+    }
+
+    public static List<String> getFileContent(final IProject project, final String filePath) {
+        return getFileContent(getFile(project, filePath));
+    }
+
+    public static List<String> getFileContent(final IFile file) {
+        try (final InputStream stream = file.getContents()) {
+            return Splitter.on('\n').splitToList(CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8)));
+        } catch (IOException | CoreException e) {
+            return new ArrayList<>();
+        }
     }
 
     public static IFile createFile(final IProject project, final String filePath, final String... lines)

@@ -14,19 +14,21 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -39,29 +41,28 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class KeywordCallsInSettingsAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            KeywordCallsInSettingsAssistProcessorTest.class);
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @Project
+    static IProject project;
 
     private static RobotModel robotModel;
 
     private static IFile suite;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("res.robot", "*** Keywords ***", "kw");
+        createFile(project, "res.robot", "*** Keywords ***", "kw");
 
-        suite = projectProvider.createFile("suite.robot",
+        suite = createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "Suite Setup     abc  def  ghi",
@@ -78,7 +79,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                 "keyword");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         robotModel = null;
         suite = null;
@@ -107,7 +108,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 53;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
@@ -126,7 +127,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 37;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -145,7 +146,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 58;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -164,7 +165,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 203;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -183,7 +184,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 233;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -202,7 +203,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 263;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -221,7 +222,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 293;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -240,7 +241,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 53;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -280,7 +281,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 83;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -320,7 +321,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 113;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -360,7 +361,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 143;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -400,7 +401,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 173;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -440,7 +441,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         final int offset = 54;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -463,17 +464,16 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                         "Metadata        abc  def  ghi", "*** Keywords ***", "akeyword", "keyword"));
     }
 
+    @BooleanPreference(key = RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, value = true)
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
-
-        final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
-        project.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        robotProject.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
 
         final int offset = 53;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -494,7 +494,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForKeywordsWithArgumentsAndSettingIsNotTemplate()
             throws Exception {
-        final IFile suite = projectProvider.createFile("kw_based_settings_with_keywords_with_args.robot",
+        final IFile suite = createFile(project, "kw_based_settings_with_keywords_with_args.robot",
                 "*** Settings ***",
                 "Suite Setup  ",
                 "Suite Teardown  ",
@@ -507,7 +507,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                 "  [Arguments]  ${arg1}  ${arg2}");
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(suite)));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(anyInt())).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);

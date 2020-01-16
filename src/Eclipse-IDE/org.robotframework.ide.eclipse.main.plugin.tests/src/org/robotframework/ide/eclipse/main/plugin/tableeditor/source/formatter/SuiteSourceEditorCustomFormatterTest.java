@@ -15,41 +15,40 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentRewriteSession;
 import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentRewriteSessionListener;
 import org.eclipse.jface.text.Region;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
-import org.robotframework.red.junit.PreferenceUpdater;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.IntegerPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.StringPreference;
 
+@ExtendWith({ ProjectExtension.class, PreferencesExtension.class })
 public class SuiteSourceEditorCustomFormatterTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteSourceEditorCustomFormatterTest.class);
+    @Project
+    static IProject project;
 
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
-
-
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = false)
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = false)
     @Test
     public void documentIsNotChanged_whenFormatterPreferencesAreDisabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, false);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third  line  ", "  other  line   ");
@@ -62,13 +61,12 @@ public class SuiteSourceEditorCustomFormatterTest {
         verify(documentSpy, never()).replace(anyInt(), anyInt(), anyString());
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 2)
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void documentIsNotChanged_whenFormatterPreferencesAreEnabledButContentIsNotChanged() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first  line", "second  line", "", "");
@@ -81,10 +79,9 @@ public class SuiteSourceEditorCustomFormatterTest {
         verify(documentSpy, never()).replace(anyInt(), anyInt(), anyString());
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void givenRegionIsFormatted() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third  line  ", "  other  line   ");
@@ -94,10 +91,9 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document).isEqualTo(new Document("first ", "second", "  third  line", "  other  line"));
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void givenLinesAreFormatted() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new ExtendedDocument("first ", "second   ", "  third  line  ", "  other  line   ");
@@ -107,10 +103,9 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document).isEqualTo(new ExtendedDocument("first", "second   ", "  third  line  ", "  other  line"));
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void givenLinesAreFormatted_whenDocumentContainsSingleLineWithoutDelimiter() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new ExtendedDocument("last   ");
@@ -120,10 +115,9 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document).isEqualTo(new ExtendedDocument("last"));
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void givenLinesAreFormatted_whenRewriteSessionIsNotStarted() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new Document("first ", "second   ", "  third ");
@@ -133,12 +127,11 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document).isEqualTo(new Document("first", "second", "  third "));
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "DYNAMIC")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 4)
     @Test
     public void givenLinesAreFormattedTogether_whenTheyAreConsecutive() throws BadLocationException {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.DYNAMIC.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
         final Document document = new Document("a  b  c  d", "efghijk  lmnopqr", "s  t");
@@ -148,10 +141,9 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document).isEqualTo(new Document("a  b  c  d", "efghijk    lmnopqr", "s          t"));
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void linesAreRightTrimmed() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -161,12 +153,11 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document.get()).isEqualTo("case\n\n  Keyword  123\n   [Return]   456\n");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 4)
     @Test
     public void separatorLengthsAreAdjusted_whenConstantSeparatorTypeIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -176,12 +167,11 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document.get()).isEqualTo("    Keyword    123    \n    OtherKeyword    456\n");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "DYNAMIC")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 4)
     @Test
     public void separatorLengthsAreAdjusted_whenDynamicSeparatorTypeIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.DYNAMIC.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 4);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -191,12 +181,11 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document.get()).isEqualTo("    Keyword         123    \n    OtherKeyword    456\n");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 2)
     @Test
     public void allTabsAreReplacedWithSpaces_whenSeparatorAdjustmentIsEnabled() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -206,13 +195,12 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document.get()).isEqualTo("  Keyword  123  \n  Next  line");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 3)
+    @BooleanPreference(key = RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, value = true)
     @Test
     public void separatorLengthsAreAdjustedAndLinesAreRightTrimmed() throws Exception {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 3);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_RIGHT_TRIM_ENABLED, true);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -222,12 +210,11 @@ public class SuiteSourceEditorCustomFormatterTest {
         assertThat(document.get()).isEqualTo("case\n\n   Keyword   123\n   [Return]   456\n");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 2)
     @Test
     public void newStyleFORLoopBodyIsIndented_whenInSameColumnAsForDeclaration() throws BadLocationException {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -245,12 +232,11 @@ public class SuiteSourceEditorCustomFormatterTest {
                 "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n    Log  ${x}\n    kw  1  2  3\n  END\n  kw  1  2  3");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = true)
+    @StringPreference(key = RedPreferences.FORMATTER_SEPARATOR_TYPE, value = "CONSTANT")
+    @IntegerPreference(key = RedPreferences.FORMATTER_SEPARATOR_LENGTH, value = 2)
     @Test
     public void newStyleFORLoopBodyIsNotIndented_whenInColumnGreaterThanForDeclaration() throws BadLocationException {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, true);
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_TYPE, FormattingSeparatorType.CONSTANT.name());
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_LENGTH, 2);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -268,11 +254,10 @@ public class SuiteSourceEditorCustomFormatterTest {
                 "*** Test Cases ***\ncase\n  FOR  ${x}  IN RANGE  10\n    Log  ${x}\n    kw  1  2  3\n  END\n  kw  1  2  3");
     }
 
+    @BooleanPreference(key = RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, value = false)
     @Test
     public void newStyleFORLoopBodyIsNotIndented_whenInSameColumnAsForDeclarationAndSeparatorAdjustmentPreferenceIsNotEnabled()
             throws BadLocationException {
-        preferenceUpdater.setValue(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
-
         final SuiteSourceEditorCustomFormatter formatter = new SuiteSourceEditorCustomFormatter(
                 RedPlugin.getDefault().getPreferences());
 
@@ -291,7 +276,7 @@ public class SuiteSourceEditorCustomFormatterTest {
     }
 
     private static RobotDocument robotDocument(final String... lines) {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 1));
         final File file = new File("file.robot");
