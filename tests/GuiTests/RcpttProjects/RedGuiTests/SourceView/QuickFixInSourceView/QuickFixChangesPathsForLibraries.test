@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TkwYoPCWEeePD6aU90_GvA
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/4/19 5:11 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/16/20 2:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -123,6 +123,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 6 13
     key-type BackSpace -times 3
     key-type "M1+s"
+    wait 500
     key-type "M1+1"
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {

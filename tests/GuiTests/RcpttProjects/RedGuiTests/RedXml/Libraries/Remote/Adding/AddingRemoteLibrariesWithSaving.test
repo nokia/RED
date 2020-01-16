@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _a7l9oLkNEeWzJthH3JoEWQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 11:20 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/16/20 2:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -58,7 +58,7 @@ wait 300
 //save
 get-button "Save \((Ctrl|M1)\+S\)" | click
 
-
+wait-for-progress-view-to-disappear -times 10 -delay 1000
 //wait for one path to be red
 try -times 10 -delay 1000 -command{
 	with [get-editor "RobotProject/red.xml" | get-section Libraries | get-tree] {
