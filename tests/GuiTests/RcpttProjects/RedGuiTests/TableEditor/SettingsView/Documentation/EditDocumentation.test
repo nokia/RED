@@ -6,8 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z5QR0P4LEeSvjNrJkS7N6Q
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/16/19 3:30 PM
-Tags: Unstable
+Save-Time: 1/17/20 11:09 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -24,28 +23,26 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
     get-link "Section is not yet defined, do you want to create it?" | click
-    wait 2000
+    wait 1000
     
     with [get-section General | get-editbox [$doc_editbox_selector]] {
  		click
  		set-focus
         type-text "This is documentation."
-        wait 5000
+        wait 1000
 		get-property text | equals "This is documentation." | verify-true
-		wait 2000
+		wait 1000
     }
 	
 	key-type "M1+s"
-	wait 3000
-	get-tab-folder |    get-tab-item Source | click
 	wait 1000
+	get-tab-folder |    get-tab-item Source | click
+	wait 500
 	get-tab-folder |    get-tab-item Settings | click
 }
-
-wait 1000
 //close editor
 with [get-editor "TestFile.robot"] {
-    wait 3000 // wait for documentation update
+    wait 1000 // wait for documentation update
     close
 }
 
@@ -88,7 +85,6 @@ with [get-editor "tab.tsv"] {
 get-editor "tab.tsv" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Documentation\tTSV documentation\n"
     + "*** Test Cases ***" | verify-true
-    
     
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
