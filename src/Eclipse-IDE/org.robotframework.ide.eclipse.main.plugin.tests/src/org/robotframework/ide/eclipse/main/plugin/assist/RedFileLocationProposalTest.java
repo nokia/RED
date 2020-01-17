@@ -6,34 +6,29 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.red.jface.viewers.Stylers;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.Range;
 
+@ExtendWith(ProjectExtension.class)
 public class RedFileLocationProposalTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedFileLocationProposalTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws IOException, CoreException {
-        projectProvider.createFile("file.txt");
-    }
+    @Project(files = { "file.txt" })
+    static IProject project;
 
     @Test
     public void testProposalWithEmptyContentAndEmptyMatch() {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final RedFileLocationProposal proposal = new RedFileLocationProposal("", "label", file, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEmpty();
@@ -47,7 +42,7 @@ public class RedFileLocationProposalTest {
 
     @Test
     public void testProposalWithNonEmptyContentAndEmptyMatch() {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final RedFileLocationProposal proposal = new RedFileLocationProposal("content", "label", file,
                 ProposalMatch.EMPTY);
 
@@ -63,7 +58,7 @@ public class RedFileLocationProposalTest {
 
     @Test
     public void testProposalWithNonEmptyContentAndNonEmptyMatch() {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final RedFileLocationProposal proposal = new RedFileLocationProposal("content", "label", file,
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 6)));
 

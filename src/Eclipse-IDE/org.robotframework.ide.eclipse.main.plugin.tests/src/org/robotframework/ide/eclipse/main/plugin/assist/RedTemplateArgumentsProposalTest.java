@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 

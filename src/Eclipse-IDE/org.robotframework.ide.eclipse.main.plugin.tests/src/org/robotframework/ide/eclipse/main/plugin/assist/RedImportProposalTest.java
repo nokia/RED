@@ -12,7 +12,7 @@ import java.util.EnumSet;
 
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.jface.viewers.Stylers;

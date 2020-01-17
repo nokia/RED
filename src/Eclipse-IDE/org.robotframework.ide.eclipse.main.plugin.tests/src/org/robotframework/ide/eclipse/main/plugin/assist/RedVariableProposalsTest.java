@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.firstProposalContaining;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.GlobalVariable;
@@ -33,37 +35,38 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedVariableProposalsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedVariableProposalsTest.class);
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     private RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("res.robot",
+        createFile(project, "res.robot",
                 "*** Variables ***",
                 "${a_res_var}  1",
                 "${b_res_var}  2",
                 "${c_res_var}  3");
-        projectProvider.configure();
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         robotModel = new RobotModel();
     }
 
     @Test
     public void noGlobalVariablesAreProvided_whenTheyAreMatchedButGlobalVarPredicateIsAlwaysFalse() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -75,11 +78,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void noGlobalVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -92,11 +95,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyGlobalVariablesSatisfyingPredicateAreProvided_evenWhenAllAreMatchedButPredicateIsSelective()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -108,11 +111,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyGlobalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -124,11 +127,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyGlobalVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "other_glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
@@ -140,11 +143,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allGlobalVariablesAreProvided_whenTheyAreMatchedAndGlobalVarPredicateIsAlwaysTrue() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -157,11 +160,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allGlobalVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -175,11 +178,11 @@ public class RedVariableProposalsTest {
     @Test
     public void noGlobalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -191,11 +194,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyGlobalVarFileVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -208,11 +211,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyGlobalVarFileVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "other_glb_var_file_2");
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
@@ -225,11 +228,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allGlobalVarFileVariablesAreProvided_whenTheyAreMatchedAndGlobalVarPredicateIsAlwaysTrue()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -243,11 +246,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allGlobalVarFileVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
@@ -262,11 +265,11 @@ public class RedVariableProposalsTest {
     @Test
     public void noLocalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Variables  vars.py",
                 "*** Test Cases ***");
@@ -282,11 +285,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyLocalVarFileVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Variables  vars.py",
                 "*** Test Cases ***");
@@ -303,11 +306,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVarFileVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Variables  vars.py",
                 "*** Test Cases ***");
@@ -323,11 +326,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVarFileVariablesAreProvided_whenTheyAreMatched() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Variables  vars.py",
                 "*** Test Cases ***");
@@ -344,11 +347,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allLocalVarFileVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Variables  vars.py",
                 "*** Test Cases ***");
@@ -366,11 +369,11 @@ public class RedVariableProposalsTest {
     @Test
     public void noLocalVarTableVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "*** Variables ***",
                 "${a_vt}  1",
@@ -388,11 +391,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyLocalVarTableVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "*** Variables ***",
                 "${a_vt}  1",
@@ -412,11 +415,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVarTableVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "*** Variables ***",
                 "${a_vt}  1",
@@ -434,11 +437,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVarTableVariablesAreProvided_whenTheyAreMatched() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "*** Variables ***",
                 "${a_vt}  1",
@@ -457,11 +460,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allLocalVarTableVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "*** Variables ***",
                 "${a_vt}  1",
@@ -480,11 +483,11 @@ public class RedVariableProposalsTest {
     @Test
     public void noResourceVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Test Cases ***");
@@ -499,11 +502,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyResourceVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Test Cases ***");
@@ -518,11 +521,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyResourceVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Test Cases ***");
@@ -537,11 +540,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allResourceVariablesAreProvided_whenTheyAreMatched() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Test Cases ***");
@@ -558,11 +561,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allResourceVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Test Cases ***");
@@ -579,11 +582,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void noLocalVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -603,11 +606,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed_usingOffset()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -627,11 +630,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed_usingElement()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -653,11 +656,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher_usingOffset()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -677,11 +680,11 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyLocalVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher_usingElement()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -702,11 +705,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnOffset_whenTheyAreMatched_1() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -726,11 +729,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnElement_whenTheyAreMatched_1() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -752,11 +755,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnOffset_whenTheyAreMatched_2() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -776,11 +779,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnElement_whenTheyAreMatched_2() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -802,11 +805,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnOffset_whenTheyAreMatched_3() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -825,11 +828,11 @@ public class RedVariableProposalsTest {
 
     @Test
     public void allLocalVariablesAreProvidedDependingOnElement_whenTheyAreMatched_3() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -851,11 +854,11 @@ public class RedVariableProposalsTest {
     @Test
     public void allLocalVariablesAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = createFile(project, "file.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${a_arg}  ${b_arg}",
@@ -876,12 +879,19 @@ public class RedVariableProposalsTest {
 
     @Test
     public void onlyValidLocalVariablesAreProvided_whenDefaultMatcherIsUsed() throws Exception {
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
 
-        final IFile file = projectProvider.createFile("file.robot", "*** Settings ***", "*** Variables ***",
-                "${scalar}  1", "@{list}  1  2  3", "&{dict}  k=v", "^{invalid}  abc", "other", "*** Test Cases ***");
+        final IFile file = createFile(project, "file.robot",
+                "*** Settings ***",
+                "*** Variables ***",
+                "${scalar}  1",
+                "@{list}  1  2  3",
+                "&{dict}  k=v",
+                "^{invalid}  abc",
+                "other",
+                "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,

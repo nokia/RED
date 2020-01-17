@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.red.jface.viewers.Stylers;
 
 import com.google.common.collect.Range;

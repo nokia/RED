@@ -16,7 +16,7 @@ import java.util.EnumSet;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Charsets;

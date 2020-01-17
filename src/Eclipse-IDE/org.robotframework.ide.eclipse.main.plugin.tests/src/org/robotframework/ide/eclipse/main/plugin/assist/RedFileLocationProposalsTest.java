@@ -8,49 +8,42 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedFileLocationProposalsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedFileLocationProposalsTest.class);
+    @Project(dirs = { "dir1", "dir2" }, files = { "dir1/res1.robot", "dir1/lib1.py", "dir1/vars1.py", "dir1/vars1.yml",
+            "dir2/res2.robot", "dir2/lib2.py", "dir2/vars2.py", "dir2/vars2.yaml" })
+    static IProject project;
 
     private static RobotSuiteFile suiteFile;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir("dir1");
-        projectProvider.createDir("dir2");
+        createFile(project, "dir2/tests.robot", "*** Test Cases ***");
 
-        projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
-        projectProvider.createFile("dir1/lib1.py");
-        projectProvider.createFile("dir1/vars1.py");
-        projectProvider.createFile("dir1/vars1.yml");
-        projectProvider.createFile("dir2/lib2.py");
-        projectProvider.createFile("dir2/vars2.py");
-        projectProvider.createFile("dir2/vars2.yaml");
-        projectProvider.createFile("dir2/res2.robot", "*** Variables ***");
-        projectProvider.createFile("dir2/tests.robot", "*** Test Cases ***");
-
-        final IFile file = projectProvider.createFile("importing_file.robot", "*** Test Cases ***");
-        suiteFile = new RobotModel().createSuiteFile(file);
+        suiteFile = new RobotModel().createSuiteFile(createFile(project, "importing_file.robot", "*** Test Cases ***"));
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         suiteFile.dispose();
         suiteFile = null;

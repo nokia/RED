@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.ui.IWorkbench;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EditorTemplatePreferencePageTest {
 

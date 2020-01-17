@@ -11,7 +11,7 @@ import java.util.Objects;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
 import org.robotframework.red.jface.viewers.Stylers;

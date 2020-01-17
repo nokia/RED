@@ -10,17 +10,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.firstProposalContaining;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.core.resources.IFile;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.libraries.SitePackagesLibraries;
@@ -28,31 +29,32 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 
+@ExtendWith(ProjectExtension.class)
 public class RedLibraryProposalsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedLibraryProposalsTest.class);
+    @Project(files = { "file.robot" })
+    static IProject project;
 
     private static RobotSuiteFile suiteFile;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         final RobotModel robotModel = new RobotModel();
 
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLibs("StdLib"));
         robotProject.setReferencedLibraries(Libraries.createRefLibs("TestLib"));
 
-        final IFile file = projectProvider.createFile("file.robot", "");
-        suiteFile = robotModel.createSuiteFile(file);
+        suiteFile = robotModel.createSuiteFile(getFile(project, "file.robot"));
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         suiteFile.dispose();
         suiteFile = null;

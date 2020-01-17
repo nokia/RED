@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,12 +20,13 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -41,24 +45,26 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class AssistProposalsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(AssistProposalsTest.class);
+    @Project
+    static IProject project;
 
     private static IFile file;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("res.robot",
+        createFile(project, "res.robot",
                 "*** Keywords ***",
                 "kw1",
                 "  Log  1",
                 "kw2",
                 "  Log  2");
-        file = projectProvider.createFile("suite.robot",
+        file = createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
                 "*** Keywords ***",
@@ -70,7 +76,7 @@ public class AssistProposalsTest {
                 "  Log  20");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         file = null;
     }
@@ -226,8 +232,8 @@ public class AssistProposalsTest {
 
     @Test
     public void verifyFileLocationProposalPropertiesMadeFromOneFileToAnother() throws CoreException, IOException {
-        final IFolder dir = projectProvider.createDir("dir");
-        final IFile toFile = projectProvider.createFile("dir/file.txt");
+        final IFolder dir = createDir(project, "dir");
+        final IFile toFile = createFile(project, "dir/file.txt");
 
         final RedFileLocationProposal proposal = AssistProposals.createFileLocationProposal(file, toFile,
                 ProposalMatch.EMPTY);
@@ -497,7 +503,7 @@ public class AssistProposalsTest {
     @Test
     public void byLabelsCamelCaseAndPrefixedFirstWithDefaultScopeOrderComparatorProperlySortsProposalsFromDifferentScopes() {
         final List<RobotKeywordDefinition> localKws = getUserKeywords(file);
-        final List<RobotKeywordDefinition> resourceKws = getUserKeywords(projectProvider.getFile("res.robot"));
+        final List<RobotKeywordDefinition> resourceKws = getUserKeywords(getFile(project, "res.robot"));
 
         final List<RedKeywordProposal> proposals = newArrayList(
                 kwProposal(localKws.get(0), KeywordScope.LOCAL),

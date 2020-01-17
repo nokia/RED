@@ -10,7 +10,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixes
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 
 public class RedSettingProposalsTest {

@@ -6,37 +6,32 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ImportedFilesTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ImportedFilesTest.class);
+    @Project(dirs = { "dir1", "dir1_1", "dir2" }, files = { "res.robot", "dir1/res1.robot", "dir1_1/lib.py",
+            "dir1_1/vars.py", "dir1_1/vars1.yml", "dir1_1/vars2.yaml", "dir2/res2.robot" })
+    static IProject project;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir("dir1");
-        projectProvider.createDir("dir1_1");
-        projectProvider.createDir("dir2");
-
-        projectProvider.createFile("res.robot");
-        projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
-        projectProvider.createFile("dir1_1/lib.py");
-        projectProvider.createFile("dir1_1/vars.py");
-        projectProvider.createFile("dir1_1/vars1.yml");
-        projectProvider.createFile("dir1_1/vars2.yaml");
-        projectProvider.createFile("dir2/res2.robot", "*** Variables ***");
-        projectProvider.createFile("dir2/tests.robot", "*** Test Cases ***");
+        createFile(project, "dir2/tests.robot", "*** Test Cases ***");
     }
 
     @Test
@@ -47,19 +42,19 @@ public class ImportedFilesTest {
 
     @Test
     public void resourceFilesAreProperlyProvided_1() {
-        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("res.robot"));
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(getFile(project, "res.robot"));
         assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res1.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_2() {
-        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir1/res1.robot"));
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(getFile(project, "dir1/res1.robot"));
         assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_3() {
-        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir2/res2.robot"));
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(getFile(project, "dir2/res2.robot"));
         assertThat(resourceFiles).extracting(IFile::getName).containsOnly("res.robot", "res1.robot");
     }
 
@@ -72,7 +67,7 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorGivesPrecedenceForPathsInGivenProjectOverPathsFromDifferentProjects() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(project, "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/Other/file.txt")).isNegative();
         assertThat(compare(comparator, "/Other/file.txt", "/ImportedFilesTest/file.txt")).isPositive();
@@ -80,7 +75,7 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorGivesPrecedenceForShorterPathsInSameProject() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(project, "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/ImportedFilesTest/dir/file.txt")).isNegative();
         assertThat(compare(comparator, "/ImportedFilesTest/dir/file.txt", "/ImportedFilesTest/file.txt")).isPositive();
@@ -88,7 +83,7 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorGivesPrecedenceForPathWithSecondSegmentStartingFromPrefixInSameProject() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "xyz");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(project, "xyz");
 
         assertThat(compare(comparator, "ImportedFilesTest/xyz_file.txt", "ImportedFilesTest/file_xyz.txt"))
                 .isNegative();
@@ -102,7 +97,7 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorGivesPrecedenceForPathWhichFirstDifferentSegmentIsLexicographicallySmaller() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(project, "");
 
         assertThat(compare(comparator, "/ImportedFilesTest/bc/d.txt", "/ImportedFilesTest/bd/d.txt")).isNegative();
         assertThat(compare(comparator, "/ImportedFilesTest/bd/d.txt", "/ImportedFilesTest/bc/d.txt")).isPositive();
@@ -110,7 +105,7 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorReturnZeroForSamePaths() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(project, "");
 
         assertThat(compare(comparator, "/ImportedFilesTest", "/ImportedFilesTest")).isZero();
         assertThat(compare(comparator, "/ImportedFilesTest/bc", "/ImportedFilesTest/bc")).isZero();

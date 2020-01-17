@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.ProposalMatchers.substringMatcher;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 
 import com.google.common.collect.Range;
