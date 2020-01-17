@@ -6,36 +6,41 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteFileSourceRegionHyperlinkTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(FileHyperlinkTest.class);
+    @Project
+    static IProject project;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("f.robot", "*** Test Cases ***");
+        createFile(project, "f.robot", "*** Test Cases ***");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
     }
@@ -78,11 +83,11 @@ public class SuiteFileSourceRegionHyperlinkTest {
 
         assertThat(page.getEditorReferences()).isEmpty();
 
-        final RobotSuiteFile sourceModel = new RobotModel().createSuiteFile(projectProvider.getFile("f.robot"));
+        final RobotSuiteFile sourceModel = new RobotModel().createSuiteFile(getFile(project, "f.robot"));
         final SuiteFileSourceRegionHyperlink link = new SuiteFileSourceRegionHyperlink(new Region(20, 10), sourceModel,
                 new Region(9, 5));
         link.open();
-                
+
         assertThat(page.getEditorReferences()).hasSize(1);
         final IEditorPart editor = page.getEditorReferences()[0].getEditor(true);
         assertThat(editor).isInstanceOf(RobotFormEditor.class);

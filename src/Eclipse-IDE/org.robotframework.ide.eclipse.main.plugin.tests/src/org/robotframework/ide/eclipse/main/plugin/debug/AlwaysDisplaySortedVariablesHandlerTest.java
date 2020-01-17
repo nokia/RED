@@ -19,14 +19,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.menus.UIElement;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler.E4AlwaysDisplayVariablesSortedHandler;
 import org.robotframework.red.viewers.TestViewer;
 
 public class AlwaysDisplaySortedVariablesHandlerTest {
 
-    @After
+    @AfterEach
     public void afterTest() {
         final PersistentState state = provideSortingState();
         state.setValue(false);

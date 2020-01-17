@@ -12,13 +12,13 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class RobotKeywordFailBreakpointTest {
 
-    @After
-    public void after() throws CoreException {
+    @AfterEach
+    public void afterTest() throws CoreException {
         ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(RobotKeywordFailBreakpoint.MARKER_ID, true, 1);
     }
 

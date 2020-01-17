@@ -15,7 +15,7 @@ import java.util.Random;
 
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RemoveAllTerminatedRedSessionsActionTest {

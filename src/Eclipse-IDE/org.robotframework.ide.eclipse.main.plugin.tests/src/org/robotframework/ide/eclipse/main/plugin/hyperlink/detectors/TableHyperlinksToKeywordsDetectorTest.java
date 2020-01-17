@@ -8,18 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -38,36 +41,32 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 @SuppressWarnings("unchecked")
+@ExtendWith(ProjectExtension.class)
 public class TableHyperlinksToKeywordsDetectorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TableHyperlinksToKeywordsDetectorTest.class);
+    @Project(files = { "testlib.py" })
+    static IProject project;
 
     private static LibrarySpecification libSpec;
 
     private static Map<LibraryDescriptor, LibrarySpecification> refLibs;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.robot", "*** Keywords ***", "res_kw", "  log  10");
+        createFile(project, "file.robot", "*** Keywords ***", "res_kw", "  log  10");
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
-                projectProvider.getProject().getName() + "/testlib.py"));
+                project.getName() + "/testlib.py"));
 
-        projectProvider.createFile("testlib.py");
-        projectProvider.configure(config);
+        configure(project, config);
 
         refLibs = Libraries.createRefLib("testlib", "lib_kw");
         libSpec = refLibs.values().iterator().next();
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        libSpec = null;
     }
 
     @Test
@@ -84,7 +83,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInKeywordsTable() throws Exception {
         final String labelWithKeyword = "kw1";
-        final IFile file = projectProvider.createFile("f0.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f0.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -106,7 +105,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInResourceFile() throws Exception {
         final String labelWithKeyword = "kw1";
-        final IFile file = projectProvider.createFile("f1.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f1.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -128,7 +127,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenKeywordIsNotLocatedInLibrary() throws Exception {
         final String labelWithKeyword = "some_kw";
-        final IFile file = projectProvider.createFile("f2.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f2.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -154,7 +153,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInKeywordsTable() throws Exception {
         final String labelWithKeyword = "kw1";
-        final IFile file = projectProvider.createFile("f3.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f3.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Keywords ***", "kw1");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -184,11 +183,11 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInResourceFile() throws Exception {
         final String labelWithKeyword = "res_kw";
-        final IFile file = projectProvider.createFile("f4.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f4.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Resource  file.robot");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
-        final RobotSuiteFile resSuiteFile = model.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile resSuiteFile = model.createSuiteFile(getFile(project, "file.robot"));
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class)
                 .get()
                 .getChildren()
@@ -218,7 +217,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void hyperlinksAreProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsEnabled() throws Exception {
         final String labelWithKeyword = "lib_kw";
-        final IFile file = projectProvider.createFile("f5.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f5.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -255,7 +254,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     public void onlyDocumentationHyperlinkIsProvided_whenKeywordIsLocatedInLibraryAndLibraryHyperlinkingIsDisabled()
             throws Exception {
         final String labelWithKeyword = "lib_kw";
-        final IFile file = projectProvider.createFile("f5.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f5.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Settings ***", "Library  testlib");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -287,7 +286,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
 
     @Test
     public void hyperlinksAreProvided_whenKeywordIsUsedInGherkinStyle() throws Exception {
-        final IFile file = projectProvider.createFile("f6.robot", "*** Test Cases ***", "case", "  given kw",
+        final IFile file = createFile(project, "f6.robot", "*** Test Cases ***", "case", "  given kw",
                 "  and kw", "  but kw", "  when kw", "  then kw", "*** Keywords ***", "kw");
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
@@ -322,7 +321,7 @@ public class TableHyperlinksToKeywordsDetectorTest {
     @Test
     public void multipleHyperlinksAreProvided_whenKeywordIsDefinedMultipleTimes() throws Exception {
         final String labelWithKeyword = "res_kw";
-        final IFile file = projectProvider.createFile("f7.robot", "*** Test Cases ***", "case",
+        final IFile file = createFile(project, "f7.robot", "*** Test Cases ***", "case",
                 "  " + labelWithKeyword + "  ${x}", "*** Keywords ***", "res_kw", "*** Settings ***",
                 "Resource  file.robot");
         final RobotModel model = new RobotModel();

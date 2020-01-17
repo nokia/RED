@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.swt.graphics.RGB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RedSessionConsoleTest {
@@ -23,11 +23,11 @@ public class RedSessionConsoleTest {
         assertThat(console.getName()).isEqualTo("console");
         assertThat(console.getImageDescriptor()).isEqualTo(RedImages.getRobotImage());
         assertThat(console.getProcess()).isSameAs(process);
-        
+
         assertThat(console.getStdOutStream()).isNull();
         assertThat(console.getStdErrStream()).isNull();
     }
-    
+
     @Test
     public void initializedConsoleHasUsualOutStreamAndActivatingErrStreamInRed() {
         final RedSessionConsole console = new RedSessionConsole("console", mock(Process.class));
@@ -41,7 +41,7 @@ public class RedSessionConsoleTest {
         assertThat(console.getStdErrStream().isActivateOnWrite()).isTrue();
         assertThat(console.getStdErrStream().getColor().getRGB()).isEqualTo(new RGB(255, 0, 0));
     }
-    
+
     @Test
     public void itIsPossibleToChangeOnWriteActivationInOutAndErrStreams() {
         final RedSessionConsole console = new RedSessionConsole("console", mock(Process.class));

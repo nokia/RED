@@ -16,7 +16,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.IPageBookViewPage;
 import org.eclipse.ui.part.IPageSite;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RedSessionConsoleParticipantTest {
 

@@ -9,38 +9,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class FileHyperlinkTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(FileHyperlinkTest.class);
+    @Project(files = { "file.txt" })
+    static IProject project;
 
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.txt", "");
-    }
-
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
     }
 
     @Test
     public void testFileHyperlinkProperties() {
-        final FileHyperlink link = new FileHyperlink(new Region(20, 50), projectProvider.getFile("file.txt"),
+        final FileHyperlink link = new FileHyperlink(new Region(20, 50), getFile(project, "file.txt"),
                 "Link label", null);
         assertThat(link.getTypeLabel()).isNull();
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 50));
@@ -55,15 +53,15 @@ public class FileHyperlinkTest {
 
         @SuppressWarnings("unchecked")
         final Consumer<IFile> operation = mock(Consumer.class);
-        final FileHyperlink link = new FileHyperlink(new Region(20, 50), projectProvider.getFile("file.txt"),
-                "Link label", operation);
+        final FileHyperlink link = new FileHyperlink(new Region(20, 50), getFile(project, "file.txt"), "Link label",
+                operation);
         link.open();
 
         assertThat(page.getEditorReferences()).hasSize(1);
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("file.txt"));
+        assertThat(editorInput.getFile()).isEqualTo(getFile(project, "file.txt"));
 
-        verify(operation).accept(eq(projectProvider.getFile("file.txt")));
+        verify(operation).accept(eq(getFile(project, "file.txt")));
     }
 
 }

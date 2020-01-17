@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RemoveTerminatedRedSessionActionTest {

@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.text.Region;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;

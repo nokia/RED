@@ -9,42 +9,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SourceHyperlinksToFilesDetectorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SourceHyperlinksToFilesDetectorTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.robot", "");
-        projectProvider.createFile("vars.py", "");
-        projectProvider.createFile("lib.class", "");
-        projectProvider.createFile("unhandled.txt", "");
-        projectProvider.createDir("directory");
-        projectProvider.createFile("directory/file.robot", "");
-    }
+    @Project(dirs = { "directory" }, files = { "file.robot", "vars.py", "lib.class", "unhandled.txt",
+            "directory/file.robot" })
+    static IProject project;
 
     @Test
     public void noHyperlinksAreProvided_whenRegionsIsOutsideOfFile() throws Exception {
-        final IFile file = projectProvider.createFile("f0.robot",
+        final IFile file = createFile(project, "f0.robot",
                 "*** Settings ***",
                 "Resource  file.robot  arg1  arg2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(projectProvider.getFileContent(file));
+        final Document document = new Document(getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -72,7 +67,7 @@ public class SourceHyperlinksToFilesDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenAbsolutePathPointsToDirectory() throws Exception {
-        final String absPath = projectProvider.getProject().getLocation().append("directory/").toString();
+        final String absPath = project.getLocation().append("directory/").toString();
         assertThat(detect("f4.robot", "Library", absPath)).isNull();
     }
 
@@ -83,18 +78,18 @@ public class SourceHyperlinksToFilesDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_whenAbsolutePathPointsNonExistingFile() throws Exception {
-        final String absPath = projectProvider.getProject().getLocation()
+        final String absPath = project.getLocation()
                 .append("directory/non_existing.robot").toString();
         assertThat(detect("f6.robot", "Resource", absPath)).isNull();
     }
 
     @Test
     public void noHyperlinksAreProvided_whenRegionOutsidePathIsChosen() throws Exception {
-        final IFile file = projectProvider.createFile("f7.robot",
+        final IFile file = createFile(project, "f7.robot",
                 "*** Settings ***",
                 "Resource  file.robot  arg1  arg2");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(projectProvider.getFileContent(file));
+        final Document document = new Document(getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -112,12 +107,12 @@ public class SourceHyperlinksToFilesDetectorTest {
 
     @Test
     public void noHyperlinksAreProvided_forOtherElements() throws Exception {
-        final IFile file = projectProvider.createFile("f9.robot",
+        final IFile file = createFile(project, "f9.robot",
                 "*** Keywords ***",
                 "kw",
                 "  Log  file.robot");
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(projectProvider.getFileContent(file));
+        final Document document = new Document(getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);
@@ -147,10 +142,10 @@ public class SourceHyperlinksToFilesDetectorTest {
 
     private static IHyperlink[] detect(final String filePath, final String settingName, final String path)
             throws Exception {
-        final IFile file = projectProvider.createFile(filePath, "*** Settings ***",
+        final IFile file = createFile(project, filePath, "*** Settings ***",
                 settingName + "  " + path);
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
-        final Document document = new Document(projectProvider.getFileContent(file));
+        final Document document = new Document(getFileContent(file));
 
         final ITextViewer textViewer = mock(ITextViewer.class);
         when(textViewer.getDocument()).thenReturn(document);

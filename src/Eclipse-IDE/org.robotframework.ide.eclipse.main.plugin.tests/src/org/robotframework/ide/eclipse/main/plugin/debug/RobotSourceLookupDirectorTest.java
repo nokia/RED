@@ -11,42 +11,28 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInput.SourceOfStackFrameInLibrary;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceNotFoundEditorInput.SourceOfStackFrameNotFound;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotSourceLookupDirectorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotSourceLookupDirectorTest.class);
-
-    @SuppressWarnings("unused")
-    private static RobotModel robotModel;
-
-    @BeforeClass
-    public static void beforeTest() throws Exception {
-        robotModel = RedPlugin.getModelManager().getModel();
-    }
-
-    @AfterClass
-    public static void afterTest() {
-        RedPlugin.getModelManager().dispose();
-        robotModel = null;
-    }
+    @Project
+    static IProject project;
 
     @Test
     public void nothingHappens_whenParticipantsShouldBeInitialized() {
@@ -59,8 +45,8 @@ public class RobotSourceLookupDirectorTest {
 
     @Test
     public void fileIsReturned_whenSourceOfFrameIsFound() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
-        
+        final IFile file = createFile(project, "suite.robot");
+
         final RobotStackFrame frame = mock(RobotStackFrame.class);
         when(frame.getPath()).thenReturn(Optional.of(file.getLocationURI()));
 

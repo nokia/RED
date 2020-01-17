@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RedSessionProcessListenerTest {
 

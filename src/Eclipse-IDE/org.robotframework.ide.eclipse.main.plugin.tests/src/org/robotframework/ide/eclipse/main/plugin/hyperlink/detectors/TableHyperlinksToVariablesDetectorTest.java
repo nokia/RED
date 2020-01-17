@@ -10,15 +10,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.GlobalVariable;
@@ -37,20 +40,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
 @SuppressWarnings("unchecked")
+@ExtendWith(ProjectExtension.class)
 public class TableHyperlinksToVariablesDetectorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TableHyperlinksToVariablesDetectorTest.class);
+    @Project
+    static IProject project;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.robot", "*** Variables ***", "${res_var}  20");
+        createFile(project, "file.robot", "*** Variables ***", "${res_var}  20");
     }
 
     @Test
@@ -66,7 +71,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenGivenLocationIsNotOverVariable() throws Exception {
         final String labelWithVar = "abc${var}def";
-        final IFile file = projectProvider.createFile("f1.robot",
+        final IFile file = createFile(project, "f1.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -93,7 +98,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenVariableIsLocallyDefinedInOtherCodeEntity() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f2.robot",
+        final IFile file = createFile(project, "f2.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -115,7 +120,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenVariableIsLocallyDefinedAfterGivenLocation() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f3.robot",
+        final IFile file = createFile(project, "f3.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -135,7 +140,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenVariableIsNotLocatedInVariablesTable() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f4.robot",
+        final IFile file = createFile(project, "f4.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -156,7 +161,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenVariableIsNotLocatedInResourceImport() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f5.robot",
+        final IFile file = createFile(project, "f5.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -179,7 +184,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProvided_whenVariableIsDefinedInVariablesImport() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f6.robot",
+        final IFile file = createFile(project, "f6.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  Log  " + labelWithVar,
@@ -210,7 +215,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinksAreProbided_whenVariableIsDefinedInProjectVarFiles() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f7.robot",
+        final IFile file = createFile(project, "f7.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  Log  " + labelWithVar);
@@ -235,7 +240,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void noHyperlinkIsProvided_whenVariableIsGlobal() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f8.robot",
+        final IFile file = createFile(project, "f8.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  Log  " + labelWithVar);
@@ -258,7 +263,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forLocallyDefinedVariableInTestCase() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f9.robot",
+        final IFile file = createFile(project, "f9.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  ${var}=  call",
@@ -278,7 +283,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("f9.robot"));
+                .isEqualTo(getFile(project, "f9.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(calls.get(0));
     }
@@ -286,7 +291,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forLocallyDefinedVariableInKeyword() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f10.robot",
+        final IFile file = createFile(project, "f10.robot",
                 "*** Keywords ***",
                 "kw",
                 "  ${var}=  call",
@@ -306,7 +311,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("f10.robot"));
+                .isEqualTo(getFile(project, "f10.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(calls.get(0));
     }
@@ -314,7 +319,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forLocallyDefinedVariableInKeywordArguments() throws Exception {
         final String labelWithVar = "${arg}";
-        final IFile file = projectProvider.createFile("f11.robot",
+        final IFile file = createFile(project, "f11.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Arguments]  ${var}  ${arg}",
@@ -333,7 +338,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("f11.robot"));
+                .isEqualTo(getFile(project, "f11.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(keywords.get(0));
     }
@@ -341,7 +346,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forLocallyDefinedVariableInKeywordEmbeddedArguments() throws Exception {
         final String labelWithVar = "${arg}";
-        final IFile file = projectProvider.createFile("f12.robot",
+        final IFile file = createFile(project, "f12.robot",
                 "*** Keywords ***",
                 "kw ${arg} name",
                 "  Log  " + labelWithVar);
@@ -359,7 +364,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("f12.robot"));
+                .isEqualTo(getFile(project, "f12.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(keywords.get(0));
     }
@@ -367,7 +372,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forVariablesDefinedInVariableTable() throws Exception {
         final String labelWithVar = "${var}";
-        final IFile file = projectProvider.createFile("f13.robot",
+        final IFile file = createFile(project, "f13.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -390,7 +395,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("f13.robot"));
+                .isEqualTo(getFile(project, "f13.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(destinationVariable);
     }
@@ -398,7 +403,7 @@ public class TableHyperlinksToVariablesDetectorTest {
     @Test
     public void hyperlinksAreProvided_forVariablesDefinedInResourcesImport() throws Exception {
         final String labelWithVar = "${res_var}";
-        final IFile file = projectProvider.createFile("f14.robot",
+        final IFile file = createFile(project, "f14.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  " + labelWithVar,
@@ -409,7 +414,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final RobotKeywordCall element = suiteFile.findSection(RobotCasesSection.class).get()
                 .getChildren().get(0)
                 .getChildren().get(0);
-        final RobotSuiteFile destSuiteFile = model.createSuiteFile(projectProvider.getFile("file.robot"));
+        final RobotSuiteFile destSuiteFile = model.createSuiteFile(getFile(project, "file.robot"));
         final RobotVariable destinationVariable = destSuiteFile.findSection(RobotVariablesSection.class).get()
                 .getChildren().get(0);
 
@@ -421,7 +426,7 @@ public class TableHyperlinksToVariablesDetectorTest {
 
         assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
-                .isEqualTo(projectProvider.getFile("file.robot"));
+                .isEqualTo(getFile(project, "file.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
                 .isSameAs(destinationVariable);
     }

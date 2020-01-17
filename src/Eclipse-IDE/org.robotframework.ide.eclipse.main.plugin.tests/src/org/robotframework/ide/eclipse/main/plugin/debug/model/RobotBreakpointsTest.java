@@ -10,65 +10,63 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.net.URI;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotBreakpointsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotLineBreakpointTest.class);
-
-    private static IFile file;
+    @Project
+    static IProject project;
 
     private final IBreakpointManager breakpointManager = mock(IBreakpointManager.class);
 
     private final RobotBreakpoints breakpoints = new RobotBreakpoints(breakpointManager);
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  10");
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         reset(breakpointManager);
     }
 
-    @After
-    public void after() throws CoreException {
-        file.deleteMarkers(RobotLineBreakpoint.MARKER_ID, true, 1);
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        file = null;
+    @AfterEach
+    public void afterTest() throws CoreException {
+        getFile(project, "suite.robot").deleteMarkers(RobotLineBreakpoint.MARKER_ID, true, 1);
     }
 
     @Test
     public void lineBreakpointForLineAndUriIsProperlyReturned() throws Exception {
+        final IFile file = getFile(project, "suite.robot");
         final IMarker marker = createMarker(file, true);
         marker.setAttribute(IMarker.LINE_NUMBER, 42);
-        
+
         final RobotLineBreakpoint bp = new RobotLineBreakpoint(marker);
         when(breakpointManager.isEnabled()).thenReturn(true);
         when(breakpointManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID)).thenReturn(new IBreakpoint[] { bp });
@@ -79,6 +77,7 @@ public class RobotBreakpointsTest {
 
     @Test
     public void lineBreakpointIsNotFoundIfItIsDisabled() throws Exception {
+        final IFile file = getFile(project, "suite.robot");
         final IMarker marker = createMarker(file, false);
         marker.setAttribute(IMarker.LINE_NUMBER, 42);
 
@@ -92,6 +91,7 @@ public class RobotBreakpointsTest {
 
     @Test
     public void lineBreakpointIsNotFoundIfItHasOtherLine() throws Exception {
+        final IFile file = getFile(project, "suite.robot");
         final IMarker marker = createMarker(file, true);
         marker.setAttribute(IMarker.LINE_NUMBER, 43);
 
@@ -105,7 +105,7 @@ public class RobotBreakpointsTest {
 
     @Test
     public void lineBreakpointIsNotFoundIfItHasOtherSource() throws Exception {
-        final IMarker marker = createMarker(file, true);
+        final IMarker marker = createMarker(getFile(project, "suite.robot"), true);
         marker.setAttribute(IMarker.LINE_NUMBER, 42);
 
         final RobotLineBreakpoint bp = new RobotLineBreakpoint(marker);
@@ -119,6 +119,7 @@ public class RobotBreakpointsTest {
 
     @Test
     public void lineBreakpointIsNotFoundIfBreakpointsAreGloballyDisabled() throws Exception {
+        final IFile file = getFile(project, "suite.robot");
         final IMarker marker = createMarker(file, true);
         marker.setAttribute(IMarker.LINE_NUMBER, 42);
 

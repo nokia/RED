@@ -8,45 +8,42 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotLineBreakpointTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotLineBreakpointTest.class);
+    @Project
+    static IProject project;
 
-    private static IFile file;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "case",
                 "  Log  10");
     }
 
-    @After
+    @AfterEach
     public void after() throws CoreException {
-        file.deleteMarkers(RobotLineBreakpoint.MARKER_ID, true, 1);
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        file = null;
+        getFile(project, "suite.robot").deleteMarkers(RobotLineBreakpoint.MARKER_ID, true, 1);
     }
 
     @Test
     public void checkPropertiesOfNewlyCreatedBreakpoint() throws CoreException {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
 
         assertThat(breakpoint.isEnabled()).isTrue();
         assertThat(breakpoint.getLocation()).isEqualTo("suite.robot");
@@ -83,7 +80,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void isHitCountEnabledIsSetProperly() throws CoreException {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
 
         breakpoint.setHitCountEnabled(false);
         assertThat(breakpoint.isHitCountEnabled()).isFalse();
@@ -104,7 +101,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void hitCountIsSetProperly() throws CoreException {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
 
         breakpoint.setHitCount(10);
         assertThat(breakpoint.getHitCount()).isEqualTo(10);
@@ -128,7 +125,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void isConditionEnabledIsSetProperly() throws CoreException {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
 
         breakpoint.setConditionEnabled(false);
         assertThat(breakpoint.isConditionEnabled()).isFalse();
@@ -149,7 +146,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void conditionIsSetProperly() throws CoreException {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
 
         breakpoint.setCondition("cond");
         assertThat(breakpoint.getConditionExpression()).isEqualTo("cond");
@@ -163,6 +160,8 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void breakpointLabelTest() throws CoreException {
+        final IFile file = getFile(project, "suite.robot");
+
         final RobotLineBreakpoint bp1 = new RobotLineBreakpoint(file, 3);
         assertThat(bp1.getLabel()).isEqualTo("suite.robot [line: 3]");
 
@@ -194,7 +193,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void hitCountIsAlwaysSatisfied_whenHitCountIsDisabled() throws Exception {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
         breakpoint.setHitCountEnabled(false);
 
         for (int i = 0; i < 20; i++) {
@@ -204,7 +203,7 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void hitCountIsSatisfied_whenItIsBeingHitForTheGivenTime() throws Exception {
-        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(getFile(project, "suite.robot"), 3);
         breakpoint.setHitCountEnabled(true);
         breakpoint.setHitCount(10);
 
@@ -218,6 +217,8 @@ public class RobotLineBreakpointTest {
 
     @Test
     public void breakpointDisabledBySatisfiedCountAreReenabled() throws Exception {
+        final IFile file = getFile(project, "suite.robot");
+
         final RobotLineBreakpoint breakpoint1 = new RobotLineBreakpoint(file, 2);
         breakpoint1.setHitCountEnabled(true);
         breakpoint1.setHitCount(10);

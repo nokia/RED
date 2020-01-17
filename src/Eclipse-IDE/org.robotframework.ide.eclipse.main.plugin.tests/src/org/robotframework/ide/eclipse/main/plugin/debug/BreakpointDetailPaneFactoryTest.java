@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotKeywordFailBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 

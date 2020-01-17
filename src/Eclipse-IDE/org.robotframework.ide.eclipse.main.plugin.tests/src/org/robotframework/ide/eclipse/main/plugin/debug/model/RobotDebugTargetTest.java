@@ -24,7 +24,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.ILineBreakpoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.execution.debug.StackFrameVariable;

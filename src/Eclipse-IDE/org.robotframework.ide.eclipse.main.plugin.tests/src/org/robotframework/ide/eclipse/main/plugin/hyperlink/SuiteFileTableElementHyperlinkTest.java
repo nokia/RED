@@ -7,16 +7,19 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -28,28 +31,29 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteFileTableElementHyperlinkTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileTableElementHyperlinkTest.class);
+    @Project
+    static IProject project;
 
     private static RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        // FIXME : this shouldn't use global model; there should be a way to inject own model
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("f.robot",
+        createFile(project, "f.robot",
                 "*** Test Cases ***",
                 "tc1",
                 "tc2",
                 "  Log  a");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
         RedPlugin.getModelManager().dispose();
@@ -79,7 +83,7 @@ public class SuiteFileTableElementHyperlinkTest {
 
         assertThat(page.getEditorReferences()).isEmpty();
 
-        final RobotSuiteFile sourceModel = robotModel.createSuiteFile(projectProvider.getFile("f.robot"));
+        final RobotSuiteFile sourceModel = robotModel.createSuiteFile(getFile(project, "f.robot"));
         final RobotCase testCase = sourceModel.findSection(RobotCasesSection.class).get().getChildren().get(1);
 
         final SuiteFileTableElementHyperlink link = new SuiteFileTableElementHyperlink(new Region(20, 10), sourceModel,

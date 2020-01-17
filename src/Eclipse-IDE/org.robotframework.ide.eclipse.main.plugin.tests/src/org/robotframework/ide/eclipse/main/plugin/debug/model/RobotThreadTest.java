@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import java.util.stream.Stream;
 
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.execution.debug.Stacktrace;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
