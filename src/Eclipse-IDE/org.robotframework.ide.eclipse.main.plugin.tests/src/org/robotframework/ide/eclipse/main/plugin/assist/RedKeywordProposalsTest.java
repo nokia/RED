@@ -11,6 +11,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPr
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.firstProposalContaining;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -53,6 +55,13 @@ public class RedKeywordProposalsTest {
                 "a_res_kw1",
                 "b_res_kw2",
                 "c_res_kw3");
+        createFile(project, "file_with_kw_conflict.robot",
+                "*** Settings ***",
+                "Library  LibA",
+                "Library  LibB",
+                "Library  LibC",
+                "Library  LibD",
+                "*** Test Cases ***");
     }
 
     @BeforeEach
@@ -828,5 +837,117 @@ public class RedKeywordProposalsTest {
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("unknown");
         assertThat(bestMatch).isNotPresent();
+    }
+
+    @Test
+    public void bestMatchingKeywordIsFirstFoundInScopeWhenConflictExists() throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b", "c")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibA"));
+    }
+
+    @StringPreference(key = RedPreferences.ASSISTANT_MATCHING_KEYWORD, value = "MIN_REQUIRED_ARGS")
+    @Test
+    public void bestMatchingKeywordIsKeywordWithMinimumRequiredArgumentsWhenConflictExists() throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b", "c")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibC"));
+    }
+
+    @StringPreference(key = RedPreferences.ASSISTANT_MATCHING_KEYWORD, value = "MAX_REQUIRED_ARGS")
+    @Test
+    public void bestMatchingKeywordIsKeywordWithMaximumRequiredArgumentsWhenConflictExists() throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b", "c")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibB"));
+    }
+
+    @Test
+    public void bestMatchingKeywordIsFirstFoundInScopeWhenConflictExistsAndRequiredArgumentSizeIsEqual()
+            throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b=1", "c=2")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b=1")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a", "b=1", "*args")));
+        refLibs.putAll(Libraries.createRefLib("LibD", KeywordSpecification.create("Keyword", "a", "**kwargs")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibA"));
+    }
+
+    @StringPreference(key = RedPreferences.ASSISTANT_MATCHING_KEYWORD, value = "MIN_REQUIRED_ARGS")
+    @Test
+    public void bestMatchingKeywordIsKeywordWithMinimumOptionalArgumentsWhenConflictExistsAndRequiredArgumentSizeIsEqual()
+            throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b=1", "c=2")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b=1")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a", "b=1", "*args")));
+        refLibs.putAll(Libraries.createRefLib("LibD", KeywordSpecification.create("Keyword", "a", "**kwargs")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibB"));
+    }
+
+    @StringPreference(key = RedPreferences.ASSISTANT_MATCHING_KEYWORD, value = "MAX_REQUIRED_ARGS")
+    @Test
+    public void bestMatchingKeywordIsKeywordWithMaximumOptionalArgumentsWhenConflictExistsAndRequiredArgumentSizeIsEqual()
+            throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(project);
+        final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
+        refLibs.putAll(Libraries.createRefLib("LibA", KeywordSpecification.create("Keyword", "a", "b=1", "c=2")));
+        refLibs.putAll(Libraries.createRefLib("LibB", KeywordSpecification.create("Keyword", "a", "b=1")));
+        refLibs.putAll(Libraries.createRefLib("LibC", KeywordSpecification.create("Keyword", "a", "b=1", "*args")));
+        refLibs.putAll(Libraries.createRefLib("LibD", KeywordSpecification.create("Keyword", "a", "**kwargs")));
+        robotProject.setReferencedLibraries(refLibs);
+
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(getFile(project, "file_with_kw_conflict.robot"));
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("Keyword");
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("LibC"));
     }
 }

@@ -50,7 +50,7 @@ public class ContentAssistPreferencePageTest {
         page.createControl(shell);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(7);
+        assertThat(editors).hasSize(8);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
@@ -64,6 +64,6 @@ public class ContentAssistPreferencePageTest {
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS));
         assertThat(namesGroupedByType).hasEntrySatisfying(ComboBoxFieldEditor.class,
                 names -> assertThat(names).containsOnly(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION,
-                        RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE));
+                        RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, RedPreferences.ASSISTANT_MATCHING_KEYWORD));
     }
 }

@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FormatterType;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.MatchingKeywordStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
@@ -111,6 +112,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION, LibraryPrefixStrategy.AUTOMATIC.name());
         preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, false);
         preferences.put(RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, LinkedModeStrategy.EXIT_ON_LAST.name());
+        preferences.put(RedPreferences.ASSISTANT_MATCHING_KEYWORD, MatchingKeywordStrategy.FIRST_FOUND.name());
     }
 
     private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {

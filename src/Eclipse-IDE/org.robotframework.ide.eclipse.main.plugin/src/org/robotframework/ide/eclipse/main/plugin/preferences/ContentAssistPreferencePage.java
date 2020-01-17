@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LibraryPrefixStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrategy;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.MatchingKeywordStrategy;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
 public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
@@ -145,6 +146,11 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
                 RedPreferences.ASSISTANT_LINKED_ARGUMENTS_MODE, "After pressing Tab in arguments edition mode", "", 5,
                 createArgumentsLinkedModeLabelsAndValues(), keywordsGroup);
         addField(argumentsLinkedModeEditor);
+
+        final ComboBoxFieldEditor keywordMatchingEditor = new ComboBoxFieldEditor(
+                RedPreferences.ASSISTANT_MATCHING_KEYWORD, "Ambiguous keyword finding strategy", "", 5,
+                createMatchingKeywordStrategyLabelsAndValues(), keywordsGroup);
+        addField(keywordMatchingEditor);
     }
 
     private String[][] createLibraryPrefixLabelsAndValues() {
@@ -156,6 +162,12 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
     private String[][] createArgumentsLinkedModeLabelsAndValues() {
         return new String[][] { new String[] { "cycle between arguments", LinkedModeStrategy.CYCLE.name() },
                 new String[] { "exit on last argument", LinkedModeStrategy.EXIT_ON_LAST.name() } };
+    }
+
+    private String[][] createMatchingKeywordStrategyLabelsAndValues() {
+        return new String[][] { new String[] { "first found", MatchingKeywordStrategy.FIRST_FOUND.name() },
+                new String[] { "minimum required arguments", MatchingKeywordStrategy.MIN_REQUIRED_ARGS.name() },
+                new String[] { "maximum required arguments", MatchingKeywordStrategy.MAX_REQUIRED_ARGS.name() } };
     }
 
     @Override

@@ -81,6 +81,7 @@ public class RedPreferences {
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION = "red.editor.assistant.keywordPrefixAutoAddition";
     public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
     public static final String ASSISTANT_LINKED_ARGUMENTS_MODE = "red.editor.assistant.linkedArgumentsMode";
+    public static final String ASSISTANT_MATCHING_KEYWORD = "red.editor.assistant.matchingKeyword";
 
     public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
@@ -280,6 +281,10 @@ public class RedPreferences {
 
     public LinkedModeStrategy getAssistantLinkedArgumentsMode() {
         return LinkedModeStrategy.valueOf(store.getString(ASSISTANT_LINKED_ARGUMENTS_MODE));
+    }
+
+    public MatchingKeywordStrategy getAssistantMatchingKeyword() {
+        return MatchingKeywordStrategy.valueOf(store.getString(ASSISTANT_MATCHING_KEYWORD));
     }
 
     public boolean isCustomFormatterUsed() {
@@ -687,6 +692,12 @@ public class RedPreferences {
     public enum LinkedModeStrategy {
         CYCLE,
         EXIT_ON_LAST
+    }
+
+    public enum MatchingKeywordStrategy {
+        FIRST_FOUND,
+        MIN_REQUIRED_ARGS,
+        MAX_REQUIRED_ARGS
     }
 
     public enum FormatterType {

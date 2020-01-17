@@ -23,6 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
@@ -45,6 +46,22 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 public class RedKeywordProposals {
+
+    private static final Comparator<KeywordEntity> BY_ARGUMENT_SIZE = (kw1, kw2) -> {
+        final ArgumentsDescriptor desc1 = kw1.getArgumentsDescriptor();
+        final ArgumentsDescriptor desc2 = kw2.getArgumentsDescriptor();
+
+        final int result = Integer.compare(desc1.getRequiredArguments().size(), desc2.getRequiredArguments().size());
+        if (result != 0) {
+            return result;
+        }
+
+        if (desc1.getPossibleNumberOfArguments().encloses(desc2.getPossibleNumberOfArguments())) {
+            return 1;
+        } else {
+            return -1;
+        }
+    };
 
     private final RobotModel model;
 
@@ -105,11 +122,23 @@ public class RedKeywordProposals {
                 .getPossibleKeywords(keywordName, false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
-            for (final KeywordEntity keyword : keywords.get(scope)) {
-                return Optional.of((RedKeywordProposal) keyword);
+            final List<KeywordEntity> keywordsFromScope = keywords.get(scope);
+            if (!keywordsFromScope.isEmpty()) {
+                return findBestMatchingKeyword(keywordsFromScope).map(RedKeywordProposal.class::cast);
             }
         }
         return Optional.empty();
+    }
+
+    private Optional<KeywordEntity> findBestMatchingKeyword(final List<KeywordEntity> keywords) {
+        switch (RedPlugin.getDefault().getPreferences().getAssistantMatchingKeyword()) {
+            case MIN_REQUIRED_ARGS:
+                return keywords.stream().min(BY_ARGUMENT_SIZE);
+            case MAX_REQUIRED_ARGS:
+                return keywords.stream().max(BY_ARGUMENT_SIZE);
+            default:
+                return keywords.stream().findFirst();
+        }
     }
 
     public AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite) {

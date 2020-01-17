@@ -223,7 +223,7 @@ public enum ProblemCategory {
     },
     AMBIGUOUS_KEYWORD(
             ProblemCategoryType.RUNTIME,
-            "Ambigous keyword call",
+            "Ambiguous keyword call",
             "Occurs when called keyword is defined in multiple places in same scope. Running this would fail in "
                     + "runtime unless this problem is mitigated with other means (e.g. setting library search order with"
                     + "'BuiltIn.Set Library Search Order' keyword.") {
