@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DefaultContentAssistProcessorTest {
 

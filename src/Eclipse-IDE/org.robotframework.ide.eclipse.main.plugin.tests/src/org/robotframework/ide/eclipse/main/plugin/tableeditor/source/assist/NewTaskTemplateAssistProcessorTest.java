@@ -12,34 +12,37 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class NewTaskTemplateAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(NewTaskTemplateAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
-    private static IFile suite;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        suite = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Settings ***",
                 "setting",
                 "*** Tasks ***",
@@ -53,7 +56,7 @@ public class NewTaskTemplateAssistProcessorTest {
     @Test
     public void newTaskTemplateProcessorIsValidForTasksSection() throws Exception {
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TASKS_SECTION);
     }
@@ -61,14 +64,14 @@ public class NewTaskTemplateAssistProcessorTest {
     @Test
     public void newTaskTemplateProcessorHasTitleDefined() throws Exception {
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void newTaskTemplateProcessorHasContextTypeDefined() throws Exception {
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         assertThat(processor.getContextTypeId()).isEqualTo(RedTemplateContextType.NEW_TASK_CONTEXT_TYPE);
     }
 
@@ -76,7 +79,7 @@ public class NewTaskTemplateAssistProcessorTest {
     public void noProposalsAreProvided_whenNotInApplicableContentType() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(17)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -84,7 +87,7 @@ public class NewTaskTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 17);
 
         assertThat(proposals).isEmpty();
@@ -94,7 +97,7 @@ public class NewTaskTemplateAssistProcessorTest {
     public void proposalsAreProvided_whenPrefixIsEmptyAndRegionOffsetIsSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(44)).thenReturn(SuiteSourcePartitionScanner.TASKS_SECTION);
@@ -102,7 +105,7 @@ public class NewTaskTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 44);
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(ImagesManager.getImage(RedImages.getTemplateImage())));
@@ -127,7 +130,7 @@ public class NewTaskTemplateAssistProcessorTest {
     public void noProposalsAreProvided_whenPrefixIsEmptyAndRegionOffsetIsNotSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(46)).thenReturn(SuiteSourcePartitionScanner.TASKS_SECTION);
@@ -135,7 +138,7 @@ public class NewTaskTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 46);
 
         assertThat(proposals).isEmpty();
@@ -145,7 +148,7 @@ public class NewTaskTemplateAssistProcessorTest {
     public void proposalsAreProvided_whenPrefixIsNotEmptyAndRegionOffsetIsSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(60)).thenReturn(SuiteSourcePartitionScanner.TASKS_SECTION);
@@ -153,7 +156,7 @@ public class NewTaskTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 60);
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(ImagesManager.getImage(RedImages.getTemplateImage())));
@@ -178,7 +181,7 @@ public class NewTaskTemplateAssistProcessorTest {
     public void noProposalsAreProvided_whenPrefixIsNotEmptyAndRegionOffsetIsNotSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(65)).thenReturn(SuiteSourcePartitionScanner.TASKS_SECTION);
@@ -186,7 +189,7 @@ public class NewTaskTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final NewTaskTemplateAssistProcessor processor = new NewTaskTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 65);
 
         assertThat(proposals).isEmpty();

@@ -8,39 +8,39 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedXmlForNavigatorPropertyTesterTest {
 
-    private static final String PROJECT_NAME = RedXmlForNavigatorPropertyTesterTest.class.getSimpleName();
+    @Project(dirs = { "excluded_dir", "included_dir", ".hidden_dir" },
+            files = { "excluded_dir/file.robot", "included_dir/file.robot" })
+    static IProject configuredProject;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @ClassRule
-    public static ProjectProvider notConfiguredProjectProvider = new ProjectProvider(PROJECT_NAME + "NoConfig");
+    @Project(nameSuffix = "NoConfig", files = { "file.robot" })
+    static IProject notConfiguredProject;
 
     private final RedXmlForNavigatorPropertyTester tester = new RedXmlForNavigatorPropertyTester();
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir("excluded_dir");
-        projectProvider.createDir("included_dir");
-        projectProvider.createDir(".hidden_dir");
-        projectProvider.createFile("excluded_dir/file.robot");
-        projectProvider.createFile("included_dir/file.robot");
-
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("excluded_dir");
-        projectProvider.configure(config);
+        configure(configuredProject, config);
 
-        notConfiguredProjectProvider.createFile("file.robot");
+        createFile(notConfiguredProject, "file.robot");
     }
 
     @Test
@@ -67,101 +67,101 @@ public class RedXmlForNavigatorPropertyTesterTest {
 
     @Test
     public void testIsApplicableProperty() {
-        assertThat(isApplicable(projectProvider.getFile("excluded_dir/file.robot"), true)).isTrue();
-        assertThat(isApplicable(projectProvider.getFile("excluded_dir/file.robot"), false)).isFalse();
+        assertThat(isApplicable(getFile(configuredProject, "excluded_dir/file.robot"), true)).isTrue();
+        assertThat(isApplicable(getFile(configuredProject, "excluded_dir/file.robot"), false)).isFalse();
 
-        assertThat(isApplicable(notConfiguredProjectProvider.getFile("file.robot"), true)).isFalse();
-        assertThat(isApplicable(notConfiguredProjectProvider.getFile("file.robot"), false)).isTrue();
+        assertThat(isApplicable(getFile(notConfiguredProject, "file.robot"), true)).isFalse();
+        assertThat(isApplicable(getFile(notConfiguredProject, "file.robot"), false)).isTrue();
     }
 
     @Test
     public void testIsExcludedProperty() {
-        assertThat(isExcluded(projectProvider.getDir("excluded_dir"), true)).isTrue();
-        assertThat(isExcluded(projectProvider.getDir("excluded_dir"), false)).isFalse();
+        assertThat(isExcluded(getDir(configuredProject, "excluded_dir"), true)).isTrue();
+        assertThat(isExcluded(getDir(configuredProject, "excluded_dir"), false)).isFalse();
 
-        assertThat(isExcluded(projectProvider.getDir("included_dir"), true)).isFalse();
-        assertThat(isExcluded(projectProvider.getDir("included_dir"), false)).isTrue();
+        assertThat(isExcluded(getDir(configuredProject, "included_dir"), true)).isFalse();
+        assertThat(isExcluded(getDir(configuredProject, "included_dir"), false)).isTrue();
 
-        assertThat(isExcluded(projectProvider.getFile("excluded_dir/file.robot"), true)).isFalse();
-        assertThat(isExcluded(projectProvider.getFile("excluded_dir/file.robot"), false)).isTrue();
+        assertThat(isExcluded(getFile(configuredProject, "excluded_dir/file.robot"), true)).isFalse();
+        assertThat(isExcluded(getFile(configuredProject, "excluded_dir/file.robot"), false)).isTrue();
 
-        assertThat(isExcluded(projectProvider.getProject(), true)).isFalse();
-        assertThat(isExcluded(projectProvider.getProject(), false)).isTrue();
+        assertThat(isExcluded(configuredProject, true)).isFalse();
+        assertThat(isExcluded(configuredProject, false)).isTrue();
     }
 
     @Test
     public void testIsInternalFolderProperty() {
-        assertThat(isInternalFolder(projectProvider.getDir("excluded_dir"), true)).isTrue();
-        assertThat(isInternalFolder(projectProvider.getDir("excluded_dir"), false)).isFalse();
+        assertThat(isInternalFolder(getDir(configuredProject, "excluded_dir"), true)).isTrue();
+        assertThat(isInternalFolder(getDir(configuredProject, "excluded_dir"), false)).isFalse();
 
-        assertThat(isInternalFolder(projectProvider.getDir("included_dir"), true)).isTrue();
-        assertThat(isInternalFolder(projectProvider.getDir("included_dir"), false)).isFalse();
+        assertThat(isInternalFolder(getDir(configuredProject, "included_dir"), true)).isTrue();
+        assertThat(isInternalFolder(getDir(configuredProject, "included_dir"), false)).isFalse();
 
-        assertThat(isInternalFolder(projectProvider.getFile("excluded_dir/file.robot"), true)).isFalse();
-        assertThat(isInternalFolder(projectProvider.getFile("excluded_dir/file.robot"), false)).isTrue();
+        assertThat(isInternalFolder(getFile(configuredProject, "excluded_dir/file.robot"), true)).isFalse();
+        assertThat(isInternalFolder(getFile(configuredProject, "excluded_dir/file.robot"), false)).isTrue();
 
-        assertThat(isInternalFolder(projectProvider.getProject(), true)).isFalse();
-        assertThat(isInternalFolder(projectProvider.getProject(), false)).isTrue();
+        assertThat(isInternalFolder(configuredProject, true)).isFalse();
+        assertThat(isInternalFolder(configuredProject, false)).isTrue();
     }
 
     @Test
     public void testIsFileProperty() {
-        assertThat(isFile(projectProvider.getDir("excluded_dir"), false)).isTrue();
-        assertThat(isFile(projectProvider.getDir("excluded_dir"), true)).isFalse();
+        assertThat(isFile(getDir(configuredProject, "excluded_dir"), false)).isTrue();
+        assertThat(isFile(getDir(configuredProject, "excluded_dir"), true)).isFalse();
 
-        assertThat(isFile(projectProvider.getDir("included_dir"), false)).isTrue();
-        assertThat(isFile(projectProvider.getDir("included_dir"), true)).isFalse();
+        assertThat(isFile(getDir(configuredProject, "included_dir"), false)).isTrue();
+        assertThat(isFile(getDir(configuredProject, "included_dir"), true)).isFalse();
 
-        assertThat(isFile(projectProvider.getFile("excluded_dir/file.robot"), true)).isTrue();
-        assertThat(isFile(projectProvider.getFile("excluded_dir/file.robot"), false)).isFalse();
+        assertThat(isFile(getFile(configuredProject, "excluded_dir/file.robot"), true)).isTrue();
+        assertThat(isFile(getFile(configuredProject, "excluded_dir/file.robot"), false)).isFalse();
 
-        assertThat(isFile(projectProvider.getProject(), true)).isFalse();
-        assertThat(isFile(projectProvider.getProject(), false)).isTrue();
+        assertThat(isFile(configuredProject, true)).isFalse();
+        assertThat(isFile(configuredProject, false)).isTrue();
     }
 
     @Test
     public void testIsExcludedViaInheritanceProperty() {
-        assertThat(isExcludedViaInheritance(projectProvider.getDir("excluded_dir"), false)).isTrue();
-        assertThat(isExcludedViaInheritance(projectProvider.getDir("excluded_dir"), true)).isFalse();
+        assertThat(isExcludedViaInheritance(getDir(configuredProject, "excluded_dir"), false)).isTrue();
+        assertThat(isExcludedViaInheritance(getDir(configuredProject, "excluded_dir"), true)).isFalse();
 
-        assertThat(isExcludedViaInheritance(projectProvider.getDir("included_dir"), false)).isTrue();
-        assertThat(isExcludedViaInheritance(projectProvider.getDir("included_dir"), true)).isFalse();
+        assertThat(isExcludedViaInheritance(getDir(configuredProject, "included_dir"), false)).isTrue();
+        assertThat(isExcludedViaInheritance(getDir(configuredProject, "included_dir"), true)).isFalse();
 
-        assertThat(isExcludedViaInheritance(projectProvider.getFile("excluded_dir/file.robot"), true)).isTrue();
-        assertThat(isExcludedViaInheritance(projectProvider.getFile("excluded_dir/file.robot"), false)).isFalse();
+        assertThat(isExcludedViaInheritance(getFile(configuredProject, "excluded_dir/file.robot"), true)).isTrue();
+        assertThat(isExcludedViaInheritance(getFile(configuredProject, "excluded_dir/file.robot"), false)).isFalse();
 
-        assertThat(isExcludedViaInheritance(projectProvider.getFile("included_dir/file.robot"), true)).isFalse();
-        assertThat(isExcludedViaInheritance(projectProvider.getFile("included_dir/file.robot"), false)).isTrue();
+        assertThat(isExcludedViaInheritance(getFile(configuredProject, "included_dir/file.robot"), true)).isFalse();
+        assertThat(isExcludedViaInheritance(getFile(configuredProject, "included_dir/file.robot"), false)).isTrue();
 
-        assertThat(isExcludedViaInheritance(projectProvider.getProject(), true)).isFalse();
-        assertThat(isExcludedViaInheritance(projectProvider.getProject(), false)).isTrue();
+        assertThat(isExcludedViaInheritance(configuredProject, true)).isFalse();
+        assertThat(isExcludedViaInheritance(configuredProject, false)).isTrue();
     }
 
     @Test
     public void testIsProjectProperty() {
-        assertThat(isProject(projectProvider.getProject(), true)).isTrue();
-        assertThat(isProject(projectProvider.getProject(), false)).isFalse();
+        assertThat(isProject(configuredProject, true)).isTrue();
+        assertThat(isProject(configuredProject, false)).isFalse();
 
-        assertThat(isProject(projectProvider.getDir("included_dir"), false)).isTrue();
-        assertThat(isProject(projectProvider.getDir("included_dir"), true)).isFalse();
+        assertThat(isProject(getDir(configuredProject, "included_dir"), false)).isTrue();
+        assertThat(isProject(getDir(configuredProject, "included_dir"), true)).isFalse();
 
-        assertThat(isProject(projectProvider.getFile("excluded_dir/file.robot"), true)).isFalse();
-        assertThat(isProject(projectProvider.getFile("excluded_dir/file.robot"), false)).isTrue();
+        assertThat(isProject(getFile(configuredProject, "excluded_dir/file.robot"), true)).isFalse();
+        assertThat(isProject(getFile(configuredProject, "excluded_dir/file.robot"), false)).isTrue();
     }
 
     @Test
     public void testIsHiddenProperty() {
-        assertThat(isHidden(projectProvider.getDir(".hidden_dir"), true)).isTrue();
-        assertThat(isHidden(projectProvider.getDir(".hidden_dir"), false)).isFalse();
+        assertThat(isHidden(getDir(configuredProject, ".hidden_dir"), true)).isTrue();
+        assertThat(isHidden(getDir(configuredProject, ".hidden_dir"), false)).isFalse();
 
-        assertThat(isHidden(projectProvider.getProject(), true)).isFalse();
-        assertThat(isHidden(projectProvider.getProject(), false)).isTrue();
+        assertThat(isHidden(configuredProject, true)).isFalse();
+        assertThat(isHidden(configuredProject, false)).isTrue();
 
-        assertThat(isHidden(projectProvider.getDir("included_dir"), true)).isFalse();
-        assertThat(isHidden(projectProvider.getDir("included_dir"), false)).isTrue();
+        assertThat(isHidden(getDir(configuredProject, "included_dir"), true)).isFalse();
+        assertThat(isHidden(getDir(configuredProject, "included_dir"), false)).isTrue();
 
-        assertThat(isHidden(projectProvider.getFile("excluded_dir/file.robot"), true)).isFalse();
-        assertThat(isHidden(projectProvider.getFile("excluded_dir/file.robot"), false)).isTrue();
+        assertThat(isHidden(getFile(configuredProject, "excluded_dir/file.robot"), true)).isFalse();
+        assertThat(isHidden(getFile(configuredProject, "excluded_dir/file.robot"), false)).isTrue();
     }
 
     private boolean isApplicable(final IResource element, final boolean expected) {

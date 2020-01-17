@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationsLinksSupport.UnableToOpenUriException;
 

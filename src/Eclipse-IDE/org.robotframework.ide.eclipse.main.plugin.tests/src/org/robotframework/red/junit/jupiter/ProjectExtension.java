@@ -142,6 +142,7 @@ public class ProjectExtension
             if (projectName.isEmpty()) {
                 projectName = field.getDeclaringClass().getSimpleName();
             }
+            projectName += projectAnnotation.nameSuffix();
             final String[] directoryPaths = projectAnnotation.dirs();
             final String[] filePaths = projectAnnotation.files();
             final boolean createRedXml = projectAnnotation.createDefaultRedXml();

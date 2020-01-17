@@ -7,9 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.search.participants;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.search.ui.text.Match;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -18,12 +19,14 @@ import org.robotframework.ide.eclipse.main.plugin.search.LibraryDocumentationMat
 import org.robotframework.ide.eclipse.main.plugin.search.MatchesGroupingElement;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchPattern;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResult;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class DocumentationSearchTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(DocumentationSearchTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void noMatchesAreReported_whenLibraryDocumentationDoesNotHaveGivenPattern() {
@@ -34,7 +37,7 @@ public class DocumentationSearchTest {
         final LibrarySpecification librarySpecification = new LibrarySpecification();
         librarySpecification.setDocumentation("this is documentation version 1 of some library");
 
-        documentationSearch.locateMatchesInLibrarySpecification(projectProvider.getProject(), librarySpecification);
+        documentationSearch.locateMatchesInLibrarySpecification(project, librarySpecification);
 
         assertThat(result.getMatchCount()).isEqualTo(0);
     }
@@ -48,12 +51,12 @@ public class DocumentationSearchTest {
         final LibrarySpecification librarySpecification = new LibrarySpecification();
         librarySpecification.setDocumentation("this is documentation version 1 of some library");
 
-        documentationSearch.locateMatchesInLibrarySpecification(projectProvider.getProject(), librarySpecification);
+        documentationSearch.locateMatchesInLibrarySpecification(project, librarySpecification);
 
         assertThat(result.getMatchCount()).isEqualTo(1);
 
         final Match[] matches = result
-                .getMatches(new MatchesGroupingElement(projectProvider.getProject(), librarySpecification));
+                .getMatches(new MatchesGroupingElement(project, librarySpecification));
 
         assertThat(matches.length).isEqualTo(1);
 
@@ -71,12 +74,12 @@ public class DocumentationSearchTest {
         final LibrarySpecification librarySpecification = new LibrarySpecification();
         librarySpecification.setDocumentation("this is documentation version 1 of some library");
 
-        documentationSearch.locateMatchesInLibrarySpecification(projectProvider.getProject(), librarySpecification);
+        documentationSearch.locateMatchesInLibrarySpecification(project, librarySpecification);
 
         assertThat(result.getMatchCount()).isEqualTo(2);
 
         final Match[] matches = result
-                .getMatches(new MatchesGroupingElement(projectProvider.getProject(), librarySpecification));
+                .getMatches(new MatchesGroupingElement(project, librarySpecification));
 
         assertThat(matches.length).isEqualTo(2);
 
@@ -100,7 +103,7 @@ public class DocumentationSearchTest {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.getKeywords().add(kwSpec);
 
-        documentationSearch.locateMatchesInKeywordSpecification(projectProvider.getProject(), libSpec, kwSpec);
+        documentationSearch.locateMatchesInKeywordSpecification(project, libSpec, kwSpec);
 
         assertThat(result.getMatchCount()).isEqualTo(0);
     }
@@ -116,12 +119,11 @@ public class DocumentationSearchTest {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.getKeywords().add(kwSpec);
 
-        documentationSearch.locateMatchesInKeywordSpecification(projectProvider.getProject(), libSpec, kwSpec);
+        documentationSearch.locateMatchesInKeywordSpecification(project, libSpec, kwSpec);
 
         assertThat(result.getMatchCount()).isEqualTo(1);
 
-        final Match[] matches = result
-                .getMatches(new MatchesGroupingElement(projectProvider.getProject(), libSpec, kwSpec));
+        final Match[] matches = result.getMatches(new MatchesGroupingElement(project, libSpec, kwSpec));
 
         assertThat(matches.length).isEqualTo(1);
 
@@ -141,12 +143,11 @@ public class DocumentationSearchTest {
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.getKeywords().add(kwSpec);
 
-        documentationSearch.locateMatchesInKeywordSpecification(projectProvider.getProject(), libSpec, kwSpec);
+        documentationSearch.locateMatchesInKeywordSpecification(project, libSpec, kwSpec);
 
         assertThat(result.getMatchCount()).isEqualTo(2);
 
-        final Match[] matches = result
-                .getMatches(new MatchesGroupingElement(projectProvider.getProject(), libSpec, kwSpec));
+        final Match[] matches = result.getMatches(new MatchesGroupingElement(project, libSpec, kwSpec));
 
         assertThat(matches.length).isEqualTo(2);
         assertThat(matches[0]).isInstanceOf(KeywordDocumentationMatch.class);

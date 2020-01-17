@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.NullChange;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ChangesTest {
 

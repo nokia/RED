@@ -6,14 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Optional;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -21,29 +23,27 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 
+@ExtendWith(ProjectExtension.class)
 public class LibraryLocationFinderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibraryLocationFinderTest.class);
+    @Project(dirs = { "modOuter", "modOuter/modInner" },
+            files = { "LibClass.py", "modOuter/__init__.py", "modOuter/modInner/__init__.py",
+                    "modOuter/modInner/ModLib.py" })
+    static IProject project;
 
     private static RobotProject robotProject;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        projectProvider.createFile("LibClass.py");
-        projectProvider.createDir("modOuter");
-        projectProvider.createDir("modOuter/modInner");
-        projectProvider.createFile("modOuter/__init__.py");
-        projectProvider.createFile("modOuter/modInner/__init__.py");
-        projectProvider.createFile("modOuter/modInner/ModLib.py");
+        robotProject = new RobotModel().createRobotProject(project);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() throws Exception {
         robotProject.clearConfiguration();
     }
@@ -73,7 +73,7 @@ public class LibraryLocationFinderTest {
     @Test
     public void testIfPathIsFound_forReferenceLibrary() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass",
-                projectProvider.getProject().getName() + "/LibClass.py");
+                project.getName() + "/LibClass.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass");
@@ -84,13 +84,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
-                path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
+                path -> assertThat(path).isEqualTo(getFile(project, "LibClass.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryWithQualifiedName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass.LibClass",
-                projectProvider.getProject().getName() + "/LibClass.py");
+                project.getName() + "/LibClass.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.LibClass");
@@ -101,13 +101,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
-                path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
+                path -> assertThat(path).isEqualTo(getFile(project, "LibClass.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryWithQualifiedNameAndDifferentClassName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "LibClass.OtherClass",
-                projectProvider.getProject().getName() + "/LibClass.py");
+                project.getName() + "/LibClass.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("LibClass.OtherClass");
@@ -118,13 +118,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
-                path -> assertThat(path).isEqualTo(projectProvider.getFile("LibClass.py").getLocation()));
+                path -> assertThat(path).isEqualTo(getFile(project, "LibClass.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter",
-                projectProvider.getProject().getName() + "/modOuter/__init__.py");
+                project.getName() + "/modOuter/__init__.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter");
@@ -135,13 +135,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(
-                path -> assertThat(path).isEqualTo(projectProvider.getFile("modOuter/__init__.py").getLocation()));
+                path -> assertThat(path).isEqualTo(getFile(project, "modOuter/__init__.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryNestedModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner",
-                projectProvider.getProject().getName() + "/modOuter/modInner/__init__.py");
+                project.getName() + "/modOuter/modInner/__init__.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner");
@@ -152,13 +152,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
-                .isEqualTo(projectProvider.getFile("modOuter/modInner/__init__.py").getLocation()));
+                .isEqualTo(getFile(project, "modOuter/modInner/__init__.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryFromModule() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner.ModLib",
-                projectProvider.getProject().getName() + "/modOuter/modInner/ModLib.py");
+                project.getName() + "/modOuter/modInner/ModLib.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib");
@@ -169,13 +169,13 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
-                .isEqualTo(projectProvider.getFile("modOuter/modInner/ModLib.py").getLocation()));
+                .isEqualTo(getFile(project, "modOuter/modInner/ModLib.py").getLocation()));
     }
 
     @Test
     public void testIfPathIsFound_forReferenceLibraryFromModuleWithQualifiedName() throws Exception {
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "modOuter.modInner.ModLib.ModLib",
-                projectProvider.getProject().getName() + "/modOuter/modInner/ModLib.py");
+                project.getName() + "/modOuter/modInner/ModLib.py");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         final LibrarySpecification libSpec = LibrarySpecification.create("modOuter.modInner.ModLib.ModLib");
@@ -186,7 +186,7 @@ public class LibraryLocationFinderTest {
         final Optional<IPath> location = LibraryLocationFinder.findPath(robotProject, libSpec);
 
         assertThat(location).hasValueSatisfying(path -> assertThat(path)
-                .isEqualTo(projectProvider.getFile("modOuter/modInner/ModLib.py").getLocation()));
+                .isEqualTo(getFile(project, "modOuter/modInner/ModLib.py").getLocation()));
     }
 
 }

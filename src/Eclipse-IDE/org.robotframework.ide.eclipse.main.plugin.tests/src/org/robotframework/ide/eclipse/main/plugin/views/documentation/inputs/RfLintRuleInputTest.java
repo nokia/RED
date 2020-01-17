@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.ui.IWorkbenchPage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 

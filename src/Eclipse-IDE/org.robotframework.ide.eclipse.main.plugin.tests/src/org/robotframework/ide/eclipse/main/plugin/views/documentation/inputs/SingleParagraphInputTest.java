@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import java.util.function.Supplier;
 
 import org.eclipse.ui.IWorkbenchPage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 

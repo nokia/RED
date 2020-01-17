@@ -14,8 +14,8 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.IUniqueIndexLayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SelectionLayerAccessorTest {
 
@@ -25,7 +25,7 @@ public class SelectionLayerAccessorTest {
     private IRowDataProvider<Object> dataProvider;
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void prepareSelection() {
         when(uniqueIndexLayer.getColumnCount()).thenReturn(5);
         when(uniqueIndexLayer.getRowCount()).thenReturn(5);

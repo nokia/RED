@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.jface.commands.PersistentState;
 import org.eclipse.jface.menus.TextState;
 import org.eclipse.ui.commands.ICommandService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.views.debugshell.SwitchShellModeHandler.E4SwitchShellModeHandler;
 

@@ -6,35 +6,39 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.After;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.Editors;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ImportLibraryTableFixerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ImportLibraryTableFixerTest.class);
+    @Project
+    static IProject project;
 
-    private final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+    private final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
-    @After
+    @AfterEach
     public void after() {
         Editors.closeAll();
     }
 
     @Test
     public void libraryImportIsAdded_whenSettingsSectionDoesNotExist() throws Exception {
-        final IFile suiteFile = projectProvider.createFile("suite.robot");
+        final IFile suiteFile = createFile(project, "suite.robot");
         Editors.openInRobotEditor(suiteFile);
 
         final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
@@ -51,7 +55,7 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenEmptySettingsSectionExists() throws Exception {
-        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***");
+        final IFile suiteFile = createFile(project, "suite.robot", "*** Settings ***");
         Editors.openInRobotEditor(suiteFile);
 
         final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
@@ -67,7 +71,7 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenNotEmptySettingsSectionExists() throws Exception {
-        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  SomeLib");
+        final IFile suiteFile = createFile(project, "suite.robot", "*** Settings ***", "Library  SomeLib");
         Editors.openInRobotEditor(suiteFile);
 
         final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
@@ -86,7 +90,7 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenSeveralSettingsSectionsExist() throws Exception {
-        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  FirstLib",
+        final IFile suiteFile = createFile(project, "suite.robot", "*** Settings ***", "Library  FirstLib",
                 "*** Settings ***", "Library  SecondLib");
         Editors.openInRobotEditor(suiteFile);
 

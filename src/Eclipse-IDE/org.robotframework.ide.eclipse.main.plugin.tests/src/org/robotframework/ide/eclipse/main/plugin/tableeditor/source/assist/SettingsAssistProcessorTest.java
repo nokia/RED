@@ -13,15 +13,17 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -29,12 +31,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SettingsAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SettingsAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void settingsProcessorIsValidOnlyForVariablesSection() {
@@ -72,7 +76,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 25;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  keyword  argument");
 
-        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -92,7 +96,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 27;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  ");
 
-        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -121,7 +125,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  [T");
 
-        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -147,7 +151,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 26;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  ");
 
-        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));
@@ -176,7 +180,7 @@ public class SettingsAssistProcessorTest {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  [Te");
 
-        final IFile file = projectProvider.createFile("1.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "1.robot", lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(new Document(lines));

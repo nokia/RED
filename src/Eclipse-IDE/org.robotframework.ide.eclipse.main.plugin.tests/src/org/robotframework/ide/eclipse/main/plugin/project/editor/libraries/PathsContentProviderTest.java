@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.viewers.ElementAddingToken;

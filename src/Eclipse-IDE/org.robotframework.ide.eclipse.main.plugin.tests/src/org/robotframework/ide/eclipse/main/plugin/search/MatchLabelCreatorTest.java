@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.StyledString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MatchLabelCreatorTest {
 

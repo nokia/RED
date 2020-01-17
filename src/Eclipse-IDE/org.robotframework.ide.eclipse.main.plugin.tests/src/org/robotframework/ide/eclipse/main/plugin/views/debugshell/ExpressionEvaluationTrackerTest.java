@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Optional;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.ExpressionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.PausedEvent;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;

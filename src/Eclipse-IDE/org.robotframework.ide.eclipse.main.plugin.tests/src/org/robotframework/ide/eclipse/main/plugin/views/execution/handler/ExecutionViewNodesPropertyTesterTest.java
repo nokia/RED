@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
 
 public class ExecutionViewNodesPropertyTesterTest {

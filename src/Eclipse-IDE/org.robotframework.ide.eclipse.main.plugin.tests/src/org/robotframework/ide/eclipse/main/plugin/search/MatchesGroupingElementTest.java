@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MatchesGroupingElementTest {
 

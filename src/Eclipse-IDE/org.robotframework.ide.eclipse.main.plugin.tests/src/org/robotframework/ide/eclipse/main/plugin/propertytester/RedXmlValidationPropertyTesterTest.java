@@ -8,25 +8,23 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedXmlValidationPropertyTesterTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedXmlValidationPropertyTesterTest.class);
+    @Project(dirs = { "dir" }, files = { "file" })
+    static IProject project;
 
     private final RedXmlValidationPropertyTester tester = new RedXmlValidationPropertyTester();
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createDir("dir");
-        projectProvider.createFile("file");
-    }
 
     @Test
     public void exceptionIsThrown_whenReceiverIsNotProjectTreeElement() {
@@ -64,8 +62,8 @@ public class RedXmlValidationPropertyTesterTest {
 
     @Test
     public void testIsInternalFolderProperty() {
-        final ProjectTreeElement folderElement = new ProjectTreeElement(projectProvider.getDir("dir"), false);
-        final ProjectTreeElement nonFolderElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
+        final ProjectTreeElement folderElement = new ProjectTreeElement(getDir(project, "dir"), false);
+        final ProjectTreeElement nonFolderElement = new ProjectTreeElement(getFile(project, "file"), false);
 
         assertThat(isInternalFolder(folderElement, true)).isTrue();
         assertThat(isInternalFolder(folderElement, false)).isFalse();
@@ -76,8 +74,8 @@ public class RedXmlValidationPropertyTesterTest {
 
     @Test
     public void testIsFileProperty() {
-        final ProjectTreeElement fileElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
-        final ProjectTreeElement notFileElement = new ProjectTreeElement(projectProvider.getDir("dir"), false);
+        final ProjectTreeElement fileElement = new ProjectTreeElement(getFile(project, "file"), false);
+        final ProjectTreeElement notFileElement = new ProjectTreeElement(getDir(project, "dir"), false);
 
         assertThat(isFile(fileElement, true)).isTrue();
         assertThat(isFile(fileElement, false)).isFalse();
@@ -113,8 +111,8 @@ public class RedXmlValidationPropertyTesterTest {
 
     @Test
     public void testIsProjectProperty() {
-        final ProjectTreeElement projectElement = new ProjectTreeElement(projectProvider.getProject(), false);
-        final ProjectTreeElement notProjectElement = new ProjectTreeElement(projectProvider.getFile("file"), false);
+        final ProjectTreeElement projectElement = new ProjectTreeElement(project, false);
+        final ProjectTreeElement notProjectElement = new ProjectTreeElement(getFile(project, "file"), false);
 
         assertThat(isProject(projectElement, true)).isTrue();
         assertThat(isProject(projectElement, false)).isFalse();

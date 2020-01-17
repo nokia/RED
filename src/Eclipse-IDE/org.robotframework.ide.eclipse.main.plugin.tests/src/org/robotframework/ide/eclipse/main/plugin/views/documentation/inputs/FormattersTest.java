@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Optional;
 
 import org.eclipse.swt.graphics.RGB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class FormattersTest {

@@ -10,34 +10,43 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 
+@ExtendWith(ProjectExtension.class)
 public class CodeReservedWordsTableEditConfigurationTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(CodeReservedWordsTableEditConfigurationTest.class);
+    @Project
+    static IProject project;
 
-    private static RobotModel robotModel;
+    private RobotModel robotModel;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        robotModel = new RobotModel();
+        createFile(project, "suite.robot", "*** Test Cases ***");
+    }
 
-        projectProvider.createFile("suite.robot", "*** Test Cases ***");
+    @BeforeEach
+    public void beforeTest() {
+        robotModel = new RobotModel();
     }
 
     @SuppressWarnings("unchecked")
@@ -45,7 +54,7 @@ public class CodeReservedWordsTableEditConfigurationTest {
     public void configurationCheck() {
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
 
         final CodeReservedWordsTableEditConfiguration configuration = new CodeReservedWordsTableEditConfiguration(model,
                 mock(IRowDataProvider.class), SettingTarget.TEST_CASE, true);

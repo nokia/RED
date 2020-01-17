@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TreeLayerAccessorTest {
 
@@ -26,7 +26,7 @@ public class TreeLayerAccessorTest {
 
     private TreeLayer treeLayer;
 
-    @Before
+    @BeforeEach
     public void setup() {
         treeLayer = mock(TreeLayer.class);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);

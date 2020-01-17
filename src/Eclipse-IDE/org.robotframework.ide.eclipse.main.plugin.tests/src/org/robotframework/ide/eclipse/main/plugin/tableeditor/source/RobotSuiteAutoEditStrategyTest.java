@@ -11,25 +11,28 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.DocumentCommand;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteAutoEditStrategy.EditStrategyPreferences;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotSuiteAutoEditStrategyTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotSuiteAutoEditStrategyTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void separatorIsInserted_whenTabWasOriginallyRequestedInsideCellRegion_andJumpOfModeIsDisabled() {
@@ -644,7 +647,7 @@ public class RobotSuiteAutoEditStrategyTest {
 
 
     private static RobotDocument newDocument(final String... lines) {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 1));
         final File file = new File("file.robot");

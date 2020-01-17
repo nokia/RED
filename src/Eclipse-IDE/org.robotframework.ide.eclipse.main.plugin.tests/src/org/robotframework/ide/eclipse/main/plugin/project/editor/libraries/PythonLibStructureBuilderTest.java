@@ -7,8 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.File;
 import java.net.URI;
@@ -16,13 +18,11 @@ import java.util.Collection;
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -31,31 +31,32 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(ProjectExtension.class)
 public class PythonLibStructureBuilderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PythonLibStructureBuilderTest.class);
+    @Project(files = { "module.py" })
+    static IProject project;
 
-    @Mock
     private IRuntimeEnvironment environment;
 
     private RobotProjectConfig config;
 
     private URI moduleLocation;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
+        environment = mock(IRuntimeEnvironment.class);
         config = new RobotProjectConfig();
-        moduleLocation = projectProvider.createFile("module.py").getLocationURI();
+        moduleLocation = getFile(project, "module.py").getLocationURI();
     }
 
     @Test
     public void testGettingPythonClassesFromModule() throws Exception {
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
-                projectProvider.getProject());
+                project);
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -65,7 +66,7 @@ public class PythonLibStructureBuilderTest {
     @Test
     public void testGettingAllPythonClassesFromModule() throws Exception {
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
-                projectProvider.getProject());
+                project);
 
         builder.provideAllEntriesFromFile(moduleLocation);
 
@@ -79,12 +80,12 @@ public class PythonLibStructureBuilderTest {
         config.addClassPath(SearchPath.create("path3"));
 
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
-                projectProvider.getProject());
+                project);
 
         builder.provideEntriesFromFile(moduleLocation);
 
         verify(environment).getClassesFromModule(new File(moduleLocation),
-                new RedEclipseProjectConfig(projectProvider.getProject(), config)
+                new RedEclipseProjectConfig(project, config)
                         .createAdditionalEnvironmentSearchPaths());
     }
 
@@ -95,7 +96,7 @@ public class PythonLibStructureBuilderTest {
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
 
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
-                projectProvider.getProject());
+                project);
 
         final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation);
 
@@ -110,7 +111,7 @@ public class PythonLibStructureBuilderTest {
                         "module.OtherClassName", "module.OtherClassName.OtherClassName"));
 
         final PythonLibStructureBuilder builder = new PythonLibStructureBuilder(environment, config,
-                projectProvider.getProject());
+                project);
 
         final Collection<ILibraryClass> classes = builder.provideAllEntriesFromFile(moduleLocation);
 
@@ -137,45 +138,45 @@ public class PythonLibStructureBuilderTest {
     @Test
     public void referenceLibraryIsCreatedForPythonFile() throws Exception {
         final ILibraryClass libClass = new PythonClass("libName");
-        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final IPath projectLocation = project.getLocation();
         final String fullLibraryPath = projectLocation.append("folder/libName.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "libName",
-                projectProvider.getProject().getName() + "/folder/libName.py")));
+                project.getName() + "/folder/libName.py")));
     }
 
     @Test
     public void referenceLibraryIsCreatedForPythonFile_withQualifiedName() throws Exception {
         final ILibraryClass libClass = new PythonClass("nameA.nameB.libName");
-        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final IPath projectLocation = project.getLocation();
         final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/libName.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.libName",
-                projectProvider.getProject().getName() + "/folder/nameA/nameB/libName.py")));
+                project.getName() + "/folder/nameA/nameB/libName.py")));
     }
 
     @Test
     public void referenceLibraryIsCreatedForPythonModule() throws Exception {
         final ILibraryClass libClass = new PythonClass("moduleName");
-        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final IPath projectLocation = project.getLocation();
         final String fullLibraryPath = projectLocation.append("folder/moduleName/__init__.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "moduleName",
-                projectProvider.getProject().getName() + "/folder/moduleName/__init__.py")));
+                project.getName() + "/folder/moduleName/__init__.py")));
     }
 
     @Test
     public void referenceLibraryIsCreatedForPythonModule_withQualifiedName() throws Exception {
         final ILibraryClass libClass = new PythonClass("nameA.nameB.moduleName");
-        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final IPath projectLocation = project.getLocation();
         final String fullLibraryPath = projectLocation.append("folder/nameA/nameB/moduleName/__init__.py").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.PYTHON, "nameA.nameB.moduleName",
-                projectProvider.getProject().getName() + "/folder/nameA/nameB/moduleName/__init__.py")));
+                project.getName() + "/folder/nameA/nameB/moduleName/__init__.py")));
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {

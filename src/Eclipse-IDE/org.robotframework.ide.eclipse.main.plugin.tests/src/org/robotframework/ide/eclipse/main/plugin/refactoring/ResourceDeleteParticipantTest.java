@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ResourceDeleteParticipantTest {
 

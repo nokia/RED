@@ -38,6 +38,13 @@ public @interface Project {
     String name() default "";
 
     /**
+     * Defines the suffix for the name. Useful if need to use couple project with automatic name
+     * 
+     * @return
+     */
+    String nameSuffix() default "";
+
+    /**
      * Defines paths to directories which should be created after project is created
      * 
      * @return

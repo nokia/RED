@@ -12,59 +12,50 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ResourcesImportAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ResourcesImportAssistProcessorTest.class);
+    @Project(dirs = { "dir1", "dir1_1", "dir2" }, files = { "dir1_1/lib.py", "dir1_1/vars.py" })
+    static IProject project;
 
-    private static IFile importingFile;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir("dir1");
-        projectProvider.createDir("dir1_1");
-        projectProvider.createDir("dir2");
-
-        importingFile = projectProvider.createFile("importing_file.robot",
+        createFile(project, "importing_file.robot",
                 "*** Settings ***",
                 "Library   cell",
                 "Resource  ",
                 "Resource  cell1  cell2",
                 "Resource  dir1cell");
-        projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
-        projectProvider.createFile("dir1_1/lib.py");
-        projectProvider.createFile("dir1_1/vars.py");
-        projectProvider.createFile("dir2/res2.robot", "*** Variables ***");
-        projectProvider.createFile("dir2/tests.robot", "*** Test Cases ***");
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        importingFile = null;
+        createFile(project, "dir1/res1.robot", "*** Variables ***");
+        createFile(project, "dir2/res2.robot", "*** Variables ***");
+        createFile(project, "dir2/tests.robot", "*** Test Cases ***");
     }
 
     @Test
     public void resourcesImportsProcessorIsValidOnlyForSettingsSection() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
@@ -72,7 +63,7 @@ public class ResourcesImportAssistProcessorTest {
 
     @Test
     public void resourcesImportsProcessorHasTitleDefined() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
@@ -82,12 +73,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 42;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -100,12 +92,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 27;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -118,12 +111,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 60;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -136,12 +130,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 42;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -161,12 +156,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 76;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -186,12 +182,13 @@ public class ResourcesImportAssistProcessorTest {
         final int offset = 80;
 
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(importingFile)));
+        final IDocument document = spy(
+                new Document(getFileContent(project, "importing_file.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(getFile(project, "importing_file.robot"));
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);

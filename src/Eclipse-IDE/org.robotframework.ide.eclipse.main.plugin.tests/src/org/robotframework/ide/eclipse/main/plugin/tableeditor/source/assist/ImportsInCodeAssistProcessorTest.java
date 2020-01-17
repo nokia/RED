@@ -14,18 +14,22 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.activatingAssistantAfterAccept;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -34,27 +38,25 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ImportsInCodeAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
     private static RobotModel robotModel;
 
-    private static IFile suite;
-
-    private static IFile suiteWithTemplate;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
 
-        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = robotModel.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLibs("Lib1", "Lib2", "Lib3"));
 
-        suite = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Library  Lib1",
                 "Library  Lib3",
@@ -67,7 +69,7 @@ public class ImportsInCodeAssistProcessorTest {
                 "  acb  lkj",
                 "  [Teardown]  ",
                 "  [Tags]  ");
-        suiteWithTemplate = projectProvider.createFile("with_template.robot",
+        createFile(project, "with_template.robot",
                 "*** Test Cases ***",
                 "tc",
                 "  Kw Call  ",
@@ -79,15 +81,14 @@ public class ImportsInCodeAssistProcessorTest {
                 "Test Template  Some Kw");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         robotModel = null;
-        suite = null;
     }
 
     @Test
     public void importsInCodeProcessorIsValidOnlyForKeywordsOrCasesSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
@@ -96,16 +97,17 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void importsInCodeProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void noProposalsAreProvided_whenInSectionDifferentThanKeywords() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 115);
@@ -115,9 +117,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenInFirstCellOfExecutionLine() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 116);
@@ -127,9 +130,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenSettingIsNotKeywordBased() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 158);
@@ -139,9 +143,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void allProposalsAreProvided_whenSettingIsKeywordBased() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 147);
@@ -170,9 +175,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenTemplateIsUsed() throws Exception {
-        final ITextViewer viewer = createViewer(suiteWithTemplate, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "with_template.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suiteWithTemplate);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "with_template.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 33);
@@ -182,9 +188,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void allProposalsAreProvided_whenAtTheEndExecutionLine() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 115);
@@ -212,9 +219,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void allProposalsAreProvided_whenAtTheCellBeginInExecutionLine() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 118);
@@ -242,9 +250,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void onlyMatchingProposalsAreProvided_whenInsideTheCellInExecutionLine_1() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 119);
@@ -261,9 +270,10 @@ public class ImportsInCodeAssistProcessorTest {
 
     @Test
     public void onlyMatchingProposalsAreProvided_whenInsideTheCellInExecutionLine_2() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 130);
@@ -284,7 +294,7 @@ public class ImportsInCodeAssistProcessorTest {
 
     private ITextViewer createViewer(final IFile file, final String contentType) throws BadLocationException {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(file)));
+        final IDocument document = spy(new Document(getFileContent(file)));
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(anyInt())).thenReturn(contentType);
         return viewer;

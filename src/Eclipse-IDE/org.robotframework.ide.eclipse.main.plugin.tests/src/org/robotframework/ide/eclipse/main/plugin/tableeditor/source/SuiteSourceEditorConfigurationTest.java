@@ -7,16 +7,18 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -36,12 +38,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteSourceEditorConfigurationTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteSourceEditorConfigurationTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void coloringRulesAreCreated() throws Exception {
@@ -111,7 +115,7 @@ public class SuiteSourceEditorConfigurationTest {
 
     @Test
     public void hyperlinkDetectorsAreEnabled_forFilesFromProject() {
-        final IFile file = projectProvider.getFile("suite.robot");
+        final IFile file = getFile(project, "suite.robot");
         final RobotProject robotProject = new RobotModel().createRobotProject(file.getProject());
         final RobotSuiteFile fileModel = new RobotSuiteFile(robotProject, file);
         final SuiteSourceEditor editor = ContextInjector.prepareContext()

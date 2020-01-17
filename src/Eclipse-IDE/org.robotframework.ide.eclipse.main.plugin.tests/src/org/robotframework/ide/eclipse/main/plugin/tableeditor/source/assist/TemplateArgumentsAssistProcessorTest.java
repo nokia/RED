@@ -13,20 +13,24 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -36,24 +40,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class TemplateArgumentsAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TemplateArgumentsAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
     private static RobotModel robotModel;
 
-    private static IFile suite;
-
-    private static IFile suiteWithEmbedded;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
 
-        projectProvider.createFile("res.robot",
+        createFile(project, "res.robot",
                 "*** Keywords ***",
                 "Simple Keyword Name",
                 "  [Arguments]  ${a1}  ${a2}  ${a3}",
@@ -61,7 +63,7 @@ public class TemplateArgumentsAssistProcessorTest {
                 "Embedded ${x1} Keyword ${x2} Name",
                 "  Log Many  ${x1}  ${x2}");
 
-        suite = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "case 1",
                 "  [Template]  Simple Keyword Name",
@@ -75,7 +77,7 @@ public class TemplateArgumentsAssistProcessorTest {
                 "*** Settings ***",
                 "Resource  res.robot");
 
-        suiteWithEmbedded = projectProvider.createFile("suite_embedded.robot",
+        createFile(project, "suite_embedded.robot",
                 "*** Test Cases ***",
                 "case 1",
                 "  [Template]  Embedded ${x1} Keyword ${x2} Name",
@@ -89,16 +91,15 @@ public class TemplateArgumentsAssistProcessorTest {
                 "Resource  res.robot");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         robotModel = null;
-        suite = null;
         RedPlugin.getModelManager().dispose();
     }
 
     @Test
     public void templateArgumentsProcessorIsValidOnlyForTestCasesOrTasksSections() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
@@ -107,16 +108,17 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void templateArgumentsProcessorHasTitleDefined() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void noProposalsAreProvided_whenInSectionDifferentThanTestCasesOrTasks() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.KEYWORDS_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 26);
@@ -126,9 +128,10 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenInFirstCellOfExecutionLine() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 60);
@@ -138,9 +141,10 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenExecutionLineIsNotEmpty() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 65);
@@ -150,9 +154,10 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void noProposalsAreProvided_whenTemplateIsNotSpecified() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 109);
@@ -162,9 +167,10 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void proposalsAreProvided_whenInsideEmptyLineOfTestCaseWithTemplate() throws Exception {
-        final ITextViewer viewer = createViewer(suite, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 62);
@@ -181,9 +187,10 @@ public class TemplateArgumentsAssistProcessorTest {
     @Test
     public void proposalsAreProvided_whenInsideEmptyLineOfTestCaseWithTemplateWithEmbeddedArguments_1()
             throws Exception {
-        final ITextViewer viewer = createViewer(suiteWithEmbedded, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite_embedded.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suiteWithEmbedded);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite_embedded.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 76);
@@ -201,9 +208,10 @@ public class TemplateArgumentsAssistProcessorTest {
     @Test
     public void proposalsAreProvided_whenInsideEmptyLineOfTestCaseWithTemplateWithEmbeddedArguments_2()
             throws Exception {
-        final ITextViewer viewer = createViewer(suiteWithEmbedded, SuiteSourcePartitionScanner.TEST_CASES_SECTION);
+        final ITextViewer viewer = createViewer(getFile(project, "suite_embedded.robot"),
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
-        final RobotSuiteFile model = robotModel.createSuiteFile(suiteWithEmbedded);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite_embedded.robot"));
         final TemplateArgumentsAssistProcessor processor = new TemplateArgumentsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 149);
@@ -220,7 +228,7 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfEmbeddedKeyword_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedTemplateArgumentsProposal proposal = createTemplateArgumentsProposal(
                 "keyword ${a} with ${bb} args ${ccc}", "a", "bb", "ccc");
@@ -231,7 +239,7 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithoutArguments_areEmpty() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedTemplateArgumentsProposal proposal = createTemplateArgumentsProposal("keyword");
 
@@ -241,7 +249,7 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithSingleArgument_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedTemplateArgumentsProposal proposal = createTemplateArgumentsProposal("keyword", "a");
 
@@ -251,7 +259,7 @@ public class TemplateArgumentsAssistProcessorTest {
 
     @Test
     public void regionsForLiveEditOfRegularKeywordWithManyArgument_areProperlyCalculated() {
-        final RobotSuiteFile model = robotModel.createSuiteFile(suite);
+        final RobotSuiteFile model = robotModel.createSuiteFile(getFile(project, "suite.robot"));
         final int separatorLength = createAssistant(model).getSeparatorToFollow().length();
         final RedTemplateArgumentsProposal proposal = createTemplateArgumentsProposal("keyword", "a", "bb", "ccc");
 
@@ -272,7 +280,7 @@ public class TemplateArgumentsAssistProcessorTest {
 
     private ITextViewer createViewer(final IFile file, final String contentType) throws BadLocationException {
         final ITextViewer viewer = mock(ITextViewer.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(file)));
+        final IDocument document = spy(new Document(getFileContent(file)));
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(anyInt())).thenReturn(contentType);
         return viewer;

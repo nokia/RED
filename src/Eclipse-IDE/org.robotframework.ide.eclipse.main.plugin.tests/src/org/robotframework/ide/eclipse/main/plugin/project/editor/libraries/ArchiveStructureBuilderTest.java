@@ -7,9 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,13 +23,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.assertj.core.api.Condition;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -35,30 +36,31 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ArchiveStructureBuilder.JavaClass;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(ProjectExtension.class)
 public class ArchiveStructureBuilderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ArchiveStructureBuilderTest.class);
+    @Project(files = { "module.jar" })
+    static IProject project;
 
-    @Mock
     private IRuntimeEnvironment environment;
 
     private RobotProjectConfig config;
 
     private URI moduleLocation;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         config = new RobotProjectConfig();
-        moduleLocation = projectProvider.createFile("module.jar").getLocationURI();
+        environment = mock(IRuntimeEnvironment.class);
+        moduleLocation = getFile(project, "module.jar").getLocationURI();
     }
 
     @Test
     public void testGettingPythonClassesFromJarByPath() throws Exception {
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -67,7 +69,7 @@ public class ArchiveStructureBuilderTest {
 
     @Test
     public void testGettingPythonClassesFromJarByFile() throws Exception {
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
         builder.provideEntriesFromFile(moduleLocation);
 
@@ -76,9 +78,9 @@ public class ArchiveStructureBuilderTest {
 
     @Test
     public void notJarFilesAreNotProcessed() throws Exception {
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
-        builder.provideEntriesFromFile(projectProvider.createFile("module.other").getLocationURI());
+        builder.provideEntriesFromFile(createFile(project, "module.other").getLocationURI());
 
         verifyNoInteractions(environment);
 
@@ -90,18 +92,18 @@ public class ArchiveStructureBuilderTest {
         config.addPythonPath(SearchPath.create("path2"));
         config.addClassPath(SearchPath.create("path3"));
 
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
         builder.provideEntriesFromFile(moduleLocation);
 
         verify(environment).getClassesFromModule(new File(moduleLocation),
-                new RedEclipseProjectConfig(projectProvider.getProject(), config)
+                new RedEclipseProjectConfig(project, config)
                         .createAdditionalEnvironmentSearchPaths());
     }
 
     @Test
     public void javaEntriesFromArchiveFileAreProvidedWithCorrectNameAndType() throws Exception {
-        final File jarFile = projectProvider.createFile("lib.jar").getLocation().toFile();
+        final File jarFile = createFile(project, "lib.jar").getLocation().toFile();
         try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(jarFile))) {
             zipStream.putNextEntry(new ZipEntry("JavaClass.class"));
             zipStream.putNextEntry(new ZipEntry("A/JavaClass.class"));
@@ -109,7 +111,7 @@ public class ArchiveStructureBuilderTest {
             zipStream.putNextEntry(new ZipEntry("file.txt"));
         }
 
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
         final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(jarFile.toURI());
 
@@ -124,7 +126,7 @@ public class ArchiveStructureBuilderTest {
         when(environment.getClassesFromModule(new File(moduleLocation), new EnvironmentSearchPaths()))
                 .thenReturn(newArrayList("module", "module.ClassName", "module.ClassName.ClassName"));
 
-        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, projectProvider.getProject());
+        final ArchiveStructureBuilder builder = new ArchiveStructureBuilder(environment, config, project);
 
         final Collection<ILibraryClass> classes = builder.provideEntriesFromFile(moduleLocation);
 
@@ -143,12 +145,12 @@ public class ArchiveStructureBuilderTest {
     @Test
     public void referenceLibraryIsCreated() throws Exception {
         final ILibraryClass libClass = new JavaClass("Java.ClassName");
-        final IPath projectLocation = projectProvider.getProject().getLocation();
+        final IPath projectLocation = project.getLocation();
         final String fullLibraryPath = projectLocation.append("path/to/file.jar").toOSString();
         final ReferencedLibrary lib = libClass.toReferencedLibrary(fullLibraryPath);
 
         assertThat(lib).has(sameFieldsAs(ReferencedLibrary.create(LibraryType.JAVA, "Java.ClassName",
-                projectProvider.getProject().getName() + "/path/to/file.jar")));
+                project.getName() + "/path/to/file.jar")));
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {

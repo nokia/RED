@@ -13,8 +13,11 @@ import static org.mockito.Mockito.withSettings;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -26,26 +29,26 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RedTemplateContextType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class KeywordCallTemplateAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordCallTemplateAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
-    private static IFile suite;
-
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        suite = projectProvider.createFile("suite.robot",
+        createFile(project, "suite.robot",
                 "*** Settings ***",
                 "setting",
                 "*** Test Cases ***",
@@ -60,7 +63,7 @@ public class KeywordCallTemplateAssistProcessorTest {
     @Test
     public void keywordCallTemplateProcessorIsValidForRobotSections() throws Exception {
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
 
         assertThat(processor.getApplicableContentTypes()).containsExactly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.TASKS_SECTION,
@@ -70,14 +73,14 @@ public class KeywordCallTemplateAssistProcessorTest {
     @Test
     public void keywordCallTemplateProcessorHasTitleDefined() throws Exception {
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
     @Test
     public void keywordCallTemplateProcessorHasContextTypeDefined() throws Exception {
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         assertThat(processor.getContextTypeId()).isEqualTo(RedTemplateContextType.KEYWORD_CALL_CONTEXT_TYPE);
     }
 
@@ -85,7 +88,7 @@ public class KeywordCallTemplateAssistProcessorTest {
     public void noProposalsAreProvided_whenPrefixIsEmptyAndRegionOffsetIsSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(49)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
@@ -93,7 +96,7 @@ public class KeywordCallTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 49);
 
         assertThat(proposals).isEmpty();
@@ -105,7 +108,7 @@ public class KeywordCallTemplateAssistProcessorTest {
                 withSettings().extraInterfaces(ITextViewerExtension.class, ITextViewerExtension2.class,
                         IPostSelectionProvider.class));
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
         final StyledText widget = mock(StyledText.class);
         final Shell shell = mock(Shell.class);
 
@@ -120,7 +123,7 @@ public class KeywordCallTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 51);
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(ImagesManager.getImage(RedImages.getTemplateImage())));
@@ -143,7 +146,7 @@ public class KeywordCallTemplateAssistProcessorTest {
     public void noProposalsAreProvided_whenPrefixIsNotEmptyAndRegionOffsetIsSameAsLineOffset() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
 
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(65)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
@@ -151,7 +154,7 @@ public class KeywordCallTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 65);
 
         assertThat(proposals).isEmpty();
@@ -162,7 +165,7 @@ public class KeywordCallTemplateAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class, withSettings().extraInterfaces(ITextViewerExtension.class,
                 ITextViewerExtension2.class, IPostSelectionProvider.class));
         final ISelectionProvider selectionProvider = mock(ISelectionProvider.class);
-        final IDocument document = spy(new Document(projectProvider.getFileContent(suite)));
+        final IDocument document = spy(new Document(getFileContent(project, "suite.robot")));
         final StyledText widget = mock(StyledText.class);
         final Shell shell = mock(Shell.class);
 
@@ -177,7 +180,7 @@ public class KeywordCallTemplateAssistProcessorTest {
         when(selectionProvider.getSelection()).thenReturn(mock(ITextSelection.class));
 
         final KeywordCallTemplateAssistProcessor processor = new KeywordCallTemplateAssistProcessor(
-                createAssistant(suite));
+                createAssistant(getFile(project, "suite.robot")));
         final ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 83);
 
         assertThat(proposals).hasSize(1).are(proposalWithImage(ImagesManager.getImage(RedImages.getTemplateImage())));

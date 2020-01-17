@@ -9,20 +9,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedSourceDoubleClickStrategyTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedSourceDoubleClickStrategyTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void partOfCellIsHighlighted_whenThereIsVariableInCell_1() throws InterruptedException {
@@ -75,7 +78,7 @@ public class RedSourceDoubleClickStrategyTest {
     }
 
     private static RobotDocument createDocument(final String... lines) {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 1));
         final File file = new File("file.robot");

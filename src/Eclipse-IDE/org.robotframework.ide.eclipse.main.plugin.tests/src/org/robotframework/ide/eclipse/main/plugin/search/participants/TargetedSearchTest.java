@@ -13,6 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,9 +21,8 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ProgressMonitorMock;
@@ -30,29 +30,24 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchPattern;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchResult;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
+@ExtendWith(ProjectExtension.class)
 public class TargetedSearchTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TargetedSearchTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file1.robot", "line");
-        projectProvider.createFile("file2.robot", "line");
-        projectProvider.createFile("file3.robot", "line");
-    }
+    @Project(files = { "file1.robot", "file2.robot", "file3.robot" })
+    static IProject project;
 
     @Test
     public void whenTargetSearchIsRunWithFiles_properMethodForLocatingMatchesIsCalled() {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
 
-        final Set<IFile> files = newHashSet(projectProvider.getFile("file1.robot"),
-                projectProvider.getFile("file2.robot"), projectProvider.getFile("file3.robot"));
+        final Set<IFile> files = newHashSet(getFile(project, "file1.robot"), getFile(project, "file2.robot"),
+                getFile(project, "file3.robot"));
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
         targetedSearch.run(monitor, LinkedHashMultimap.create(), files);
@@ -72,8 +67,8 @@ public class TargetedSearchTest {
         final ProgressMonitorMock monitor = new ProgressMonitorMock();
         monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
 
-        final Set<IFile> files = newHashSet(projectProvider.getFile("file1.robot"),
-                projectProvider.getFile("file2.robot"), projectProvider.getFile("file3.robot"));
+        final Set<IFile> files = newHashSet(getFile(project, "file1.robot"), getFile(project, "file2.robot"),
+                getFile(project, "file3.robot"));
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
 
@@ -95,8 +90,8 @@ public class TargetedSearchTest {
         lib2.getKeywords().add(new KeywordSpecification());
         lib2.getKeywords().add(new KeywordSpecification());
         final Multimap<IProject, LibrarySpecification> libraries = LinkedHashMultimap.create();
-        libraries.put(projectProvider.getProject(), lib1);
-        libraries.put(projectProvider.getProject(), lib2);
+        libraries.put(project, lib1);
+        libraries.put(project, lib2);
         final Set<IFile> files = new HashSet<>();
 
         targetedSearch.run(monitor, libraries, files);
@@ -117,7 +112,7 @@ public class TargetedSearchTest {
         monitor.performWhenTaskBegins(() -> monitor.setCanceled(true));
 
         final Multimap<IProject, LibrarySpecification> libraries = LinkedHashMultimap.create();
-        libraries.put(projectProvider.getProject(), new LibrarySpecification());
+        libraries.put(project, new LibrarySpecification());
 
         final TargetedSearch targetedSearch = createTargetedSearch(new SearchPattern("doc"), new SearchResult(null));
 

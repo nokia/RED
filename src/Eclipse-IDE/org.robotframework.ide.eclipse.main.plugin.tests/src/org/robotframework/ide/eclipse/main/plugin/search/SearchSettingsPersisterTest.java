@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchFor;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchLimitation;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchTarget;

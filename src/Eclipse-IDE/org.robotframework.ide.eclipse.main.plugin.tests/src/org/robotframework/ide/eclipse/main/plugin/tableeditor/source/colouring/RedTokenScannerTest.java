@@ -15,11 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -28,20 +29,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.LineElement;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedTokenScannerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedTokenScannerTest.class);
+    @Project
+    static IProject project;
 
     private static RobotDocument document;
 
     private final RedTokensQueueBuilder queueBuilder = new RedTokensQueueBuilder();
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotParser parser = new RobotParser(robotProject.getRobotProjectHolder(), new RobotVersion(3, 0));
         final File file = new File("file.robot");

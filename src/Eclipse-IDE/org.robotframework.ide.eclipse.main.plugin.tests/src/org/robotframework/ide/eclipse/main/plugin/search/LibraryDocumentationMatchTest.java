@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.StyledString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 

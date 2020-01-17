@@ -7,19 +7,18 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
@@ -33,22 +32,23 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.viewers.ElementAddingToken;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(ProjectExtension.class)
 public class PathsLabelProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PathsLabelProviderTest.class);
+    @Project
+    static IProject project;
 
-    @Mock
     private RedProjectEditorInput editorInput;
 
     private PathsLabelProvider provider;
 
-    @Before
+    @BeforeEach
     public void before() {
+        editorInput = mock(RedProjectEditorInput.class);
         provider = new PathsLabelProvider("VAR", editorInput);
     }
 
@@ -146,29 +146,28 @@ public class PathsLabelProviderTest {
     public void whenCustomSearchPathIsGiven_nonDecoratedTooltipTextIsReturned() {
         final SearchPath searchPath = SearchPath.create("path");
         when(editorInput.getProblemsFor(searchPath)).thenReturn(new ArrayList<>());
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
         final RobotProjectConfig robotProjectConfig = RobotProjectConfig.create();
         robotProjectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
         when(editorInput.getRobotProject()).thenReturn(robotProject);
         when(editorInput.getProjectConfiguration()).thenReturn(robotProjectConfig);
 
         assertThat(provider.getToolTipText(searchPath))
-                .isEqualTo(projectProvider.getProject().getLocation().append("path").toFile().getPath());
+                .isEqualTo(project.getLocation().append("path").toFile().getPath());
     }
 
     @Test
     public void whenSystemPathIsGiven_decoratedTooltipTextIsReturned() {
         final SearchPath searchPath = SearchPath.create("path", true);
         when(editorInput.getProblemsFor(searchPath)).thenReturn(new ArrayList<>());
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
         final RobotProjectConfig robotProjectConfig = RobotProjectConfig.create();
         robotProjectConfig.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
         when(editorInput.getRobotProject()).thenReturn(robotProject);
         when(editorInput.getProjectConfiguration()).thenReturn(robotProjectConfig);
 
-        assertThat(provider.getToolTipText(searchPath))
-                .isEqualTo(projectProvider.getProject().getLocation().append("path").toFile().getPath()
-                        + " [already defined in VAR variable]");
+        assertThat(provider.getToolTipText(searchPath)).isEqualTo(
+                project.getLocation().append("path").toFile().getPath() + " [already defined in VAR variable]");
     }
 
     @Test

@@ -6,30 +6,34 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.base.Charsets;
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteSourceEditorDifferenceFinderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteSourceEditorDifferenceFinderTest.class);
+    @Project(files = { "file.txt" })
+    static IProject project;
 
     private static IFile file;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile("file.txt");
+        file = getFile(project, "file.txt");
     }
 
     @Test
