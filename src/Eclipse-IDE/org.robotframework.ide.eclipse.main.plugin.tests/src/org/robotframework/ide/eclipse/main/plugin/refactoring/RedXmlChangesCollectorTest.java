@@ -6,49 +6,45 @@
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ui.IEditorPart;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.red.junit.Editors;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedXmlChangesCollectorTest {
 
-    private static final String PROJECT_NAME = RedXmlChangesCollectorTest.class.getSimpleName();
+    @Project(dirs = { "a", "a/b", "c" })
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createDir("a/b");
-        projectProvider.createDir("c");
-    }
-
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a");
         config.addExcludedPath("a/b");
         config.addExcludedPath("c");
-        projectProvider.configure(config);
+        configure(project, config);
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         Editors.closeAll();
     }
@@ -56,13 +52,13 @@ public class RedXmlChangesCollectorTest {
     @Test
     public void whenBothProjectEditorAndTextEditorAreOpened_theChangesAreOnlyGatheredForProjectEditor()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile("red.xml");
+        final IFile redXmlFile = getFile(project, "red.xml");
 
         final IEditorPart textEditor = Editors.openInTextEditor(redXmlFile);
         final IEditorPart projectEditor = Editors.openInProjectEditor(redXmlFile);
 
-        final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.of(new Path(PROJECT_NAME + "/moved")));
+        final Optional<Change> change = new RedXmlChangesCollector().collect(getDir(project, "a"),
+                Optional.of(new Path(project.getName() + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -74,12 +70,12 @@ public class RedXmlChangesCollectorTest {
     @Test
     public void whenProjectEditorIsOpenedButTextEditorIsNot_theChangesAreOnlyGatheredForProjectEditor()
             throws Exception {
-        final IFile redXmlFile = projectProvider.getFile("red.xml");
+        final IFile redXmlFile = getFile(project, "red.xml");
 
         final IEditorPart projectEditor = Editors.openInProjectEditor(redXmlFile);
 
-        final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.of(new Path(PROJECT_NAME + "/moved")));
+        final Optional<Change> change = new RedXmlChangesCollector().collect(getDir(project, "a"),
+                Optional.of(new Path(project.getName() + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -89,12 +85,12 @@ public class RedXmlChangesCollectorTest {
 
     @Test
     public void whenTextEditorIsOpenedButProjectEditorIsNot_theChangesAreOnlyGatheredForTextEditor() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile("red.xml");
+        final IFile redXmlFile = getFile(project, "red.xml");
 
         final IEditorPart textEditor = Editors.openInTextEditor(redXmlFile);
 
-        final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.of(new Path(PROJECT_NAME + "/moved")));
+        final Optional<Change> change = new RedXmlChangesCollector().collect(getDir(project, "a"),
+                Optional.of(new Path(project.getName() + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 
@@ -104,11 +100,11 @@ public class RedXmlChangesCollectorTest {
 
     @Test
     public void whenNoEditorIsOpened_theChangesAreMadeDirectlyInFile() throws Exception {
-        final IFile redXmlFile = projectProvider.getFile("red.xml");
+        final IFile redXmlFile = getFile(project, "red.xml");
         assertThat(Editors.isAnyEditorOpened()).isFalse();
 
-        final Optional<Change> change = new RedXmlChangesCollector().collect(projectProvider.getDir("a"),
-                Optional.of(new Path(PROJECT_NAME + "/moved")));
+        final Optional<Change> change = new RedXmlChangesCollector().collect(getDir(project, "a"),
+                Optional.of(new Path(project.getName() + "/moved")));
 
         change.get().perform(new NullProgressMonitor());
 

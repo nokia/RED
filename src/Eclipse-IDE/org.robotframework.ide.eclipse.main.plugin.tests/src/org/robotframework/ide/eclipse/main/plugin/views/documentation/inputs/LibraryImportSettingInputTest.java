@@ -11,15 +11,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -27,31 +29,29 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class LibraryImportSettingInputTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(LibraryImportSettingInputTest.class);
+    @Project
+    static IProject project;
 
-    private static RobotModel model = new RobotModel();
+    private RobotModel model;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        model = new RobotModel();
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(Libraries.createRefLib("lib", "Lib Kw 1", "Lib Kw 2"));
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
-        model.createSuiteFile(projectProvider.getFile("suite.robot")).dispose();
-    }
-
-    @AfterClass
-    public static void afterSuite() {
-        model = null;
+        model.createSuiteFile(getFile(project, "suite.robot")).dispose();
     }
 
     @Test
@@ -119,7 +119,7 @@ public class LibraryImportSettingInputTest {
     }
 
     private RobotSetting createLibraryImportSetting(final String libraryNameOrPath) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Library  " + libraryNameOrPath);
         return (RobotSetting) model.createSuiteFile(file)

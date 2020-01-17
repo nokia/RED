@@ -11,17 +11,20 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExecutionEnvironment;
@@ -30,18 +33,20 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class VariablesInShellAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(VariablesInShellAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
     private static IFile suite;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        suite = projectProvider.createFile("suite.robot",
+        suite = createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "*** Variables ***",
                 "${x}",
@@ -50,10 +55,10 @@ public class VariablesInShellAssistProcessorTest {
         // skipping global variables
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.setExecutionEnvironment(ExecutionEnvironment.create("", null));
-        projectProvider.configure(config);
+        configure(project, config);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         suite = null;
     }

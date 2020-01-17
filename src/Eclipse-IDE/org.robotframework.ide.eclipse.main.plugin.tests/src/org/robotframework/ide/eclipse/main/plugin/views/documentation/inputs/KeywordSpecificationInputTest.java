@@ -15,9 +15,10 @@ import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -25,17 +26,19 @@ import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class KeywordSpecificationInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordSpecificationInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properLibraryDocUriIsProvidedForInput() throws URISyntaxException {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw");
         final LibrarySpecification libSpec = LibrarySpecification.create("library", kwSpec);
@@ -47,14 +50,14 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void theInputContainsGivenSpecification() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw");
         final LibrarySpecification libSpec = LibrarySpecification.create("library", kwSpec);
         final KeywordSpecificationInput input = new KeywordSpecificationInput(robotProject, libSpec, kwSpec);
 
         assertThat(input.contains("library")).isFalse();
-        assertThat(input.contains(projectProvider.getProject())).isFalse();
+        assertThat(input.contains(project)).isFalse();
         assertThat(input.contains(libSpec)).isFalse();
         assertThat(input.contains(kwSpec)).isTrue();
     }
@@ -64,7 +67,7 @@ public class KeywordSpecificationInputTest {
         final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw");
         kwSpec.setArguments(newArrayList("a", "b=10"));
@@ -84,7 +87,7 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void properRawDocumentationIsReturnedForLibrary() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw");
         kwSpec.setArguments(newArrayList("a", "b=10"));
@@ -103,7 +106,7 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void nothingHappensWhenTryingToShowTheInput() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec = KeywordSpecification.create("kw");
         final LibrarySpecification libSpec = LibrarySpecification.create("library", kwSpec);
@@ -117,7 +120,7 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void twoInputsAreEqual_whenProjectIsSameAndSpecificationsAreEqual() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec1 = KeywordSpecification.create("kw");
         kwSpec1.setArguments(newArrayList("a", "b=10"));
@@ -148,7 +151,7 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void twoInputsAreNotEqual_whenProjectIsDifferent() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec1 = KeywordSpecification.create("kw");
         kwSpec1.setArguments(newArrayList("a", "b=10"));
@@ -179,7 +182,7 @@ public class KeywordSpecificationInputTest {
 
     @Test
     public void twoInputsAreNotEqual_whenSpecificationsAreDifferent() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final KeywordSpecification kwSpec1 = KeywordSpecification.create("kw");
         kwSpec1.setArguments(newArrayList("a", "b=10"));

@@ -16,12 +16,15 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ResourceRenameParticipantTest {
 
     public static ProjectProvider projectProvider = new ProjectProvider(ResourceRenameParticipantTest.class);

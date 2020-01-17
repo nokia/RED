@@ -11,34 +11,32 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ExcludedPathModifyChangeTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ExcludedPathModifyChangeTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     @Test
     public void checkChangeName() {
         final ExcludedPath excludedPathToModify = ExcludedPath.create("a/b/c");
         final ExcludedPath modifiedPath = ExcludedPath.create("d/e/f/b/c");
 
-        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
+        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(getFile(project, "red.xml"),
                 excludedPathToModify, modifiedPath);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will change to 'd/e/f/b/c'");
@@ -54,7 +52,7 @@ public class ExcludedPathModifyChangeTest {
         final ExcludedPath modifiedPath = ExcludedPath.create("d/e/f/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(projectProvider.getFile("red.xml"),
+        final ExcludedPathModifyChange change = new ExcludedPathModifyChange(getFile(project, "red.xml"),
                 excludedPathToModify, modifiedPath, eventBroker);
 
         change.initializeValidationData(null);

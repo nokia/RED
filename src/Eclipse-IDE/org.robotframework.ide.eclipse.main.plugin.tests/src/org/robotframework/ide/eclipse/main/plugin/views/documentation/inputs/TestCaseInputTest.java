@@ -10,22 +10,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class TestCaseInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TestCaseInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properTestCaseDocUriIsProvidedForInput() throws Exception {
@@ -110,7 +114,7 @@ public class TestCaseInputTest {
     }
 
     private static RobotCase createTest(final String testName) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 testName,
                 "  call  arg");
@@ -118,7 +122,7 @@ public class TestCaseInputTest {
     }
 
     private static RobotCase createTemplatedTest(final String testName, final String template) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 testName,
                 "  [Template]  " + template,

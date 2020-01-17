@@ -8,25 +8,30 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedXmlVersionUpdaterTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RedXmlVersionUpdaterTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void testAutoupdateIsNotPossible_forUnknownVersion() {
-        RobotProjectConfig configFile = new RobotProjectConfig();
+        final RobotProjectConfig configFile = new RobotProjectConfig();
         configFile.setVersion("unknown");
-        RobotProject robotProject = mock(RobotProject.class);
+        final RobotProject robotProject = mock(RobotProject.class);
         when(robotProject.getRobotProjectConfig()).thenReturn(configFile);
 
         assertThat(RedXmlVersionUpdater.isAutoUpdatePossible(robotProject)).isFalse();
@@ -34,9 +39,9 @@ public class RedXmlVersionUpdaterTest {
 
     @Test
     public void testAutoupdateIsPossible_forOldestVersion() {
-        RobotProjectConfig configFile = new RobotProjectConfig();
+        final RobotProjectConfig configFile = new RobotProjectConfig();
         configFile.setVersion("1.0");
-        RobotProject robotProject = mock(RobotProject.class);
+        final RobotProject robotProject = mock(RobotProject.class);
         when(robotProject.getRobotProjectConfig()).thenReturn(configFile);
 
         assertThat(RedXmlVersionUpdater.isAutoUpdatePossible(robotProject)).isTrue();
@@ -44,8 +49,8 @@ public class RedXmlVersionUpdaterTest {
 
     @Test
     public void testAutoupdateIsNotPossible_forCurrentVersion() {
-        RobotProjectConfig configFile = RobotProjectConfig.create();
-        RobotProject robotProject = mock(RobotProject.class);
+        final RobotProjectConfig configFile = RobotProjectConfig.create();
+        final RobotProject robotProject = mock(RobotProject.class);
         when(robotProject.getRobotProjectConfig()).thenReturn(configFile);
 
         assertThat(RedXmlVersionUpdater.isAutoUpdatePossible(robotProject)).isFalse();
@@ -55,14 +60,14 @@ public class RedXmlVersionUpdaterTest {
     public void testExecuteRedXmlUpdate_updatedRedXmlProperly() throws Exception {
         final String projectName = RedXmlVersionUpdaterTest.class.getSimpleName();
 
-        projectProvider.createDir("path");
-        projectProvider.createDir("path/to");
-        projectProvider.createFile("path/to/__init__.py", "#init content here");
-        projectProvider.createFile("path/to/library.py", "#library content here");
-        projectProvider.createFile("path/to/lib.py", "class WithClassInside:", "def print_sth(self):",
+        createDir(project, "path");
+        createDir(project, "path/to");
+        createFile(project, "path/to/__init__.py", "#init content here");
+        createFile(project, "path/to/library.py", "#library content here");
+        createFile(project, "path/to/lib.py", "class WithClassInside:", "def print_sth(self):",
                 "       print(\"sth\")");
 
-        RobotProjectConfig configFile = new RobotProjectConfig();
+        final RobotProjectConfig configFile = new RobotProjectConfig();
         configFile.setVersion("1.0");
         configFile.addReferencedLibrary(
                 ReferencedLibrary.create(LibraryType.PYTHON, "library", projectName + "/path/to"));
@@ -88,7 +93,7 @@ public class RedXmlVersionUpdaterTest {
         // without properly implemented RedXmlVersionTransition.
         // Add one for your version then recofigure this test if needed
         // in case of non-numeric version or multiple aliases.
-        int currentVersion = Integer.parseInt(RobotProjectConfig.CURRENT_VERSION);
+        final int currentVersion = Integer.parseInt(RobotProjectConfig.CURRENT_VERSION);
         assertThat(currentVersion).isEqualTo(RedXmlVersionUpdater.RED_XML_TRANSITIONS.size());
     }
 

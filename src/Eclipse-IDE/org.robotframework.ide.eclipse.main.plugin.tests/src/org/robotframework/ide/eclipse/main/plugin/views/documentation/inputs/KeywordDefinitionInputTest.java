@@ -11,24 +11,27 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
-
+@ExtendWith(ProjectExtension.class)
 public class KeywordDefinitionInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordDefinitionInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properKeywordDocUriIsProvidedForInput() throws Exception {
@@ -80,7 +83,7 @@ public class KeywordDefinitionInputTest {
     }
 
     private static RobotKeywordDefinition createKeyword(final String keywordName) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Keywords ***",
                 keywordName,
                 "  call  arg");
@@ -90,7 +93,7 @@ public class KeywordDefinitionInputTest {
 
     private static RobotKeywordDefinition createKeyword(final String keywordName, final List<String> arguments)
             throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Keywords ***",
                 keywordName,
                 "  [Arguments]  " + String.join("  ", arguments),

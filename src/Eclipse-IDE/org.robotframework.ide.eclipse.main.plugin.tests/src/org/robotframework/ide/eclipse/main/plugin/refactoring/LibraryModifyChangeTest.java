@@ -11,38 +11,36 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class LibraryModifyChangeTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibraryModifyChangeTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     @Test
     public void checkChangeName() {
         final ReferencedLibrary libraryToModify = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
         final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y");
 
-        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile("red.xml"),
+        final LibraryModifyChange change = new LibraryModifyChange(getFile(project, "red.xml"),
                 libraryToModify, modifiedLibrary);
 
         assertThat(change.getName()).isEqualTo("The library 'c' (a/b) will be changed to 'd' (x/y)");
@@ -58,7 +56,7 @@ public class LibraryModifyChangeTest {
         final ReferencedLibrary modifiedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, "d", "x/y");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final LibraryModifyChange change = new LibraryModifyChange(projectProvider.getFile("red.xml"),
+        final LibraryModifyChange change = new LibraryModifyChange(getFile(project, "red.xml"),
                 libraryToModify, modifiedLibrary, eventBroker);
 
         change.initializeValidationData(null);

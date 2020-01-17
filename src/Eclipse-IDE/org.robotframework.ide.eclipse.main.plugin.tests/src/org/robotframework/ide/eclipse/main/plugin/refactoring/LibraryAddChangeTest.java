@@ -11,38 +11,36 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class LibraryAddChangeTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibraryAddChangeTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     @Test
     public void checkChangeName() {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ReferencedLibrary libraryToAdd = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
 
-        final LibraryAddChange change = new LibraryAddChange(projectProvider.getFile("red.xml"), config,
+        final LibraryAddChange change = new LibraryAddChange(getFile(project, "red.xml"), config,
                 libraryToAdd);
 
         assertThat(change.getName()).isEqualTo("The library 'c' (a/b) will be added");
@@ -55,7 +53,7 @@ public class LibraryAddChangeTest {
         final ReferencedLibrary libraryToAdd = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final LibraryAddChange change = new LibraryAddChange(projectProvider.getFile("red.xml"), config,
+        final LibraryAddChange change = new LibraryAddChange(getFile(project, "red.xml"), config,
                 libraryToAdd, eventBroker);
 
         change.initializeValidationData(null);

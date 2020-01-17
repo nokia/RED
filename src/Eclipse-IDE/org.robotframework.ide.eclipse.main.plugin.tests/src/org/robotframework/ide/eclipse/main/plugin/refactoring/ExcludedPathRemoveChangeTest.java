@@ -11,34 +11,32 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ExcludedPathRemoveChangeTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ExcludedPathRemoveChangeTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     @Test
     public void checkChangeName() {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
-        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
+        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(getFile(project, "red.xml"), config,
                 excludedPathToAdd);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will be removed");
@@ -53,7 +51,7 @@ public class ExcludedPathRemoveChangeTest {
         final ExcludedPath excludedPathToRemove = config.getExcludedPaths().get(0);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(projectProvider.getFile("red.xml"), config,
+        final ExcludedPathRemoveChange change = new ExcludedPathRemoveChange(getFile(project, "red.xml"), config,
                 excludedPathToRemove, eventBroker);
 
         change.initializeValidationData(null);

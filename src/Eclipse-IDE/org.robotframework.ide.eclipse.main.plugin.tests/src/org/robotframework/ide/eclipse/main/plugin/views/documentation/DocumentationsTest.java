@@ -6,12 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -40,13 +42,15 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Tas
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput.TaskOnSettingInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput.TestCaseOnSettingInput;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class DocumentationsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(DocumentationsTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void suiteFileInputIsFoundForRobotSuiteFile() throws Exception {
@@ -75,8 +79,8 @@ public class DocumentationsTest {
 
     @Test
     public void suiteFileInputIsFoundForResourceSettingImport() throws Exception {
-        projectProvider.createFile("res.robot");
-        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource  res.robot");
+        createFile(project, "res.robot");
+        final IFile suiteFile = createFile(project, "suite.robot", "*** Settings ***", "Resource  res.robot");
         final RobotSuiteFile suite = RedPlugin.getModelManager().createSuiteFile(suiteFile);
 
         final RobotSetting setting = (RobotSetting) suite.findSection(RobotSettingsSection.class)
@@ -92,7 +96,7 @@ public class DocumentationsTest {
 
     @Test
     public void noInputIsFoundForResourceSettingImport_whenImportedFileDoesNotExist() throws Exception {
-        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***",
+        final IFile suiteFile = createFile(project, "suite.robot", "*** Settings ***",
                 "Resource  non_existing.robot");
         final RobotSuiteFile suite = RedPlugin.getModelManager().createSuiteFile(suiteFile);
 

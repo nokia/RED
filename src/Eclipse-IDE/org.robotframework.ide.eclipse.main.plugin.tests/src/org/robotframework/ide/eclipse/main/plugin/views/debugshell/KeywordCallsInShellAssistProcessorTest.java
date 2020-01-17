@@ -11,47 +11,50 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.applyToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessorTest;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class KeywordCallsInShellAssistProcessorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordCallsAssistProcessorTest.class);
+    @Project
+    static IProject project;
 
     private static IFile suite;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("res.robot",
+        createFile(project, "res.robot",
                 "*** Keywords ***",
                 "kw1",
                 "kw2",
                 "  [Arguments]  ${x}");
-        suite = projectProvider.createFile("suite.robot",
+        suite = createFile(project, "suite.robot",
                 "*** Test Cases ***",
                 "*** Settings ***",
                 "Resource  res.robot");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         suite = null;
     }

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
@@ -89,7 +90,12 @@ public class ProjectExtension
 
     public static IFile createFile(final IProject project, final String filePath, final String... lines)
             throws IOException, CoreException {
-        return createFile(getFile(project, filePath), lines);
+        return createFile(getFile(project, filePath), EndOfLineTypes.LF, lines);
+    }
+
+    public static IFile createFile(final IProject project, final String filePath, final EndOfLineTypes eolType,
+            final String... lines) throws IOException, CoreException {
+        return createFile(getFile(project, filePath), eolType, lines);
     }
 
     public static IFolder createDir(final IProject project, final String filePath)
@@ -224,8 +230,10 @@ public class ProjectExtension
         }
     }
 
-    private static IFile createFile(final IFile file, final String... lines) throws IOException, CoreException {
-        try (InputStream source = new ByteArrayInputStream(String.join("\n", lines).getBytes(Charsets.UTF_8))) {
+    private static IFile createFile(final IFile file, final EndOfLineTypes eolType, final String... lines)
+            throws IOException, CoreException {
+        try (InputStream source = new ByteArrayInputStream(
+                String.join(eolType.getRepresentation().get(0), lines).getBytes(Charsets.UTF_8))) {
             return createFile(file, source);
         }
     }

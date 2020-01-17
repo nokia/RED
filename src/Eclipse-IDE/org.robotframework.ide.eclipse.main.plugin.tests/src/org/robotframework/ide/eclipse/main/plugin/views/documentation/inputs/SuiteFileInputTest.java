@@ -11,24 +11,28 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class SuiteFileInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properSuiteDocUriIsProvidedForInput() throws Exception {
@@ -88,7 +92,7 @@ public class SuiteFileInputTest {
                 "*** Keywords ***");
         lines.addAll(Arrays.asList(keywords));
 
-        final IFile file = projectProvider.createFile("suite.robot", lines.toArray(new String[0]));
+        final IFile file = createFile(project, "suite.robot", lines.toArray(new String[0]));
         return new RobotModel().createSuiteFile(file);
     }
 }

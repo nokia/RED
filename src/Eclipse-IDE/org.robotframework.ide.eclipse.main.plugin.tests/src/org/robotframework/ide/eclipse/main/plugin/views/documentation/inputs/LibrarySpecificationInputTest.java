@@ -15,9 +15,10 @@ import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.KeywordSpecification;
@@ -25,17 +26,19 @@ import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class LibrarySpecificationInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibrarySpecificationInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properLibraryDocUriIsProvidedForInput() throws URISyntaxException {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library");
         final LibrarySpecificationInput input = new LibrarySpecificationInput(robotProject, specification);
@@ -46,13 +49,13 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void theInputContainsGivenProjectAndSpecification() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library");
         final LibrarySpecificationInput input = new LibrarySpecificationInput(robotProject, specification);
 
         assertThat(input.contains("library")).isFalse();
-        assertThat(input.contains(projectProvider.getProject())).isTrue();
+        assertThat(input.contains(project)).isTrue();
         assertThat(input.contains(specification)).isTrue();
     }
 
@@ -61,7 +64,7 @@ public class LibrarySpecificationInputTest {
         final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
@@ -89,7 +92,7 @@ public class LibrarySpecificationInputTest {
         final IRuntimeEnvironment env = mock(IRuntimeEnvironment.class);
         when(env.createHtmlDoc(any(String.class), eq(DocFormat.ROBOT))).thenReturn("doc");
 
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
@@ -115,7 +118,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void properRawDocumentationIsReturnedForLibrary() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
@@ -136,7 +139,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void nothingHappensWhenTryingToShowTheInput() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification = LibrarySpecification.create("library");
         final LibrarySpecificationInput input = new LibrarySpecificationInput(robotProject, specification);
@@ -149,7 +152,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void twoInputsAreEqual_whenProjectIsSameAndSpecificationsAreEqual() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
@@ -176,7 +179,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void twoInputsAreNotEqual_whenProjectIsDifferent() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
@@ -203,7 +206,7 @@ public class LibrarySpecificationInputTest {
 
     @Test
     public void twoInputsAreNotEqual_whenSpecificationsAreDifferent() {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));

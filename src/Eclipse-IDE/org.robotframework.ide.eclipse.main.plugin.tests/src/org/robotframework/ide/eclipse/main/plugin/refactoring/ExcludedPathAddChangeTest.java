@@ -11,34 +11,32 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class ExcludedPathAddChangeTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(ExcludedPathAddChangeTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
     @Test
     public void checkChangeName() {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
-        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
+        final ExcludedPathAddChange change = new ExcludedPathAddChange(getFile(project, "red.xml"),
                 config, excludedPathToAdd);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will be added");
@@ -51,7 +49,7 @@ public class ExcludedPathAddChangeTest {
         final ExcludedPath excludedPathToAdd = ExcludedPath.create("a/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final ExcludedPathAddChange change = new ExcludedPathAddChange(projectProvider.getFile("red.xml"),
+        final ExcludedPathAddChange change = new ExcludedPathAddChange(getFile(project, "red.xml"),
                 config, excludedPathToAdd, eventBroker);
 
         change.initializeValidationData(null);

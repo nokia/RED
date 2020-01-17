@@ -9,30 +9,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.WorkspaceFileUri.FileConsumer;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 
+@ExtendWith(ProjectExtension.class)
 public class WorkspaceFileUriTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(WorkspaceFileUriTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws IOException, CoreException {
-        projectProvider.createFile("file.txt");
-    }
+    @Project(files = { "file.txt" })
+    static IProject project;
 
     @Test
     public void isFileUriTests() {
@@ -71,7 +67,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void fileUriIsCreatedFromFileLocation() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createFileUri(file);
 
         assertThat(uri).isEqualTo(file.getLocationURI());
@@ -80,7 +76,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void docOfSuiteUriIsCreatedFromFileLocation_withAdditionalSuiteArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowSuiteDocUri(file);
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -89,7 +85,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void sourceOfSuiteUriIsCreatedFromFileLocation_withAdditionalSuiteArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowSuiteSourceUri(file);
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -98,7 +94,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void docOfKeywordUriIsCreatedFromFileLocation_withAdditionalKeywordNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowKeywordDocUri(file, "kw");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -107,7 +103,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void sourceOfKeywordUriIsCreatedFromFileLocation_withAdditionalKeywordNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowKeywordSourceUri(file, "kw");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -116,7 +112,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void docOfTestCaseUriIsCreatedFromFileLocation_withAdditionalCaseNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowCaseDocUri(file, "case");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -125,7 +121,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void sourceOfTestCaseUriIsCreatedFromFileLocation_withAdditionalCaseNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowCaseSourceUri(file, "case");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -134,7 +130,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void docOfTaskUriIsCreatedFromFileLocation_withAdditionalTaskNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowTaskDocUri(file, "t");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -143,7 +139,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void sourceOfTaskUriIsCreatedFromFileLocation_withAdditionalTaskNameArgument() throws Exception {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
         final URI uri = WorkspaceFileUri.createShowTaskSourceUri(file, "t");
 
         assertThat(uri.getPath()).isEqualTo(file.getLocationURI().getPath());
@@ -152,7 +148,7 @@ public class WorkspaceFileUriTest {
 
     @Test
     public void whenWorkspaceFileUriIsBeingOpen_theFileWillBeSearchedAndPassedToConsumerWithQueryArguments_1() {
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
 
         final FileConsumer fileConsumer = mock(FileConsumer.class);
         final WorkspaceFileUri wsFileUri = new WorkspaceFileUri(

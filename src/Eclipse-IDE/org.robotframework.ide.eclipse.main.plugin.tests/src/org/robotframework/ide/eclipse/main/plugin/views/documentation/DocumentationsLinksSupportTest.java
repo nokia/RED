@@ -11,17 +11,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.net.URI;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -34,34 +37,36 @@ import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.Lib
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SuiteFileInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TaskInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.TestCaseInput;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class DocumentationsLinksSupportTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(DocumentationsLinksSupportTest.class);
+    @Project
+    static IProject project;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite_with_doc.robot",
+        createFile(project, "suite_with_doc.robot",
                 "*** Settings ***",
                 "Documentation  doc");
-        projectProvider.createFile("test_with_doc.robot",
+        createFile(project, "test_with_doc.robot",
                 "*** Test Cases ***",
                 "case",
                 "  [Documentation]  doc");
-        projectProvider.createFile("task_with_doc.robot",
+        createFile(project, "task_with_doc.robot",
                 "*** Tasks ***",
                 "task",
                 "  [Documentation]  doc");
-        projectProvider.createFile("keyword_with_doc.robot",
+        createFile(project, "keyword_with_doc.robot",
                 "*** Keywords ***",
                 "kw",
                 "  [Documentation]  doc");
 
         RedPlugin.getModelManager()
-                .createProject(projectProvider.getProject())
+                .createProject(project)
                 .setRobotParserComplianceVersion(new RobotVersion(3, 1));
     }
 
@@ -93,8 +98,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfLibrary_whenMovingToLibraryDocUri() {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(
-                projectProvider.getProject());
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("library", "kw"));
         robotProject.setReferencedLibraries(new HashMap<>());
 
@@ -113,8 +117,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfLibrary_whenMovingToNonExistingKeywordButInKnownLibraryDocUri() {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(
-                projectProvider.getProject());
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("library", "kw"));
         robotProject.setReferencedLibraries(new HashMap<>());
 
@@ -134,8 +137,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfLibraryKeyword_whenMovingToKnownKeyword() {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(
-                projectProvider.getProject());
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("library", "kw"));
         robotProject.setReferencedLibraries(new HashMap<>());
 
@@ -154,8 +156,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void exceptionIsThrown_whenTryingToOpenDocumentationOfMissingLibrary() {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(
-                projectProvider.getProject());
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("library", "kw"));
         robotProject.setReferencedLibraries(new HashMap<>());
 
@@ -171,7 +172,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfSuite_whenMovingToExistingFileDoc() {
-        final IFile file = projectProvider.getFile("suite_with_doc.robot");
+        final IFile file = getFile(project, "suite_with_doc.robot");
 
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
         final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
@@ -187,7 +188,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfTestCase_whenMovingToExistingFileTestDoc() {
-        final IFile file = projectProvider.getFile("test_with_doc.robot");
+        final IFile file = getFile(project, "test_with_doc.robot");
 
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
         final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
@@ -204,7 +205,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfTask_whenMovingToExistingFileTaskDoc() {
-        final IFile file = projectProvider.getFile("task_with_doc.robot");
+        final IFile file = getFile(project, "task_with_doc.robot");
 
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
         final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
@@ -221,7 +222,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void displayerIsAskedToDisplayDocumentationOfKeyword_whenMovingToExistingFileKeywordDoc() {
-        final IFile file = projectProvider.getFile("keyword_with_doc.robot");
+        final IFile file = getFile(project, "keyword_with_doc.robot");
 
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
         final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);
@@ -290,7 +291,7 @@ public class DocumentationsLinksSupportTest {
 
     @Test
     public void exceptionIsThrown_whenTryingToOpenDocumentation_butQueryParamIsMissing() {
-        final IFile file = projectProvider.getFile("suite_with_doc.robot");
+        final IFile file = getFile(project, "suite_with_doc.robot");
 
         final IWorkbenchBrowserSupport browserSupport = mock(IWorkbenchBrowserSupport.class);
         final DocumentationDisplayer displayer = mock(DocumentationDisplayer.class);

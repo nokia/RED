@@ -14,21 +14,24 @@ import static org.mockito.Mockito.verify;
 import java.net.URI;
 import java.util.Optional;
 
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.LibraryUri.SpecificationsConsumer;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class LibraryUriTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibraryUriTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void isLibraryDocUriTests() {
@@ -85,7 +88,7 @@ public class LibraryUriTest {
     @Test
     public void whenLibraryUriIsBeingOpen_theProjectIsSearchedAndPassedToConsumerWithQueryArguments_1() {
         final RobotModel model = new RobotModel();
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "std_kw"));
         robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "ref kw"));
 
@@ -102,7 +105,7 @@ public class LibraryUriTest {
     @Test
     public void whenLibraryUriIsBeingOpen_theProjectIsSearchedAndPassedToConsumerWithQueryArguments_2() {
         final RobotModel model = new RobotModel();
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "std_kw"));
         robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "ref kw"));
 
@@ -119,7 +122,7 @@ public class LibraryUriTest {
     @Test
     public void whenLibraryUriIsBeingOpen_theProjectIsSearchedAndPassedToConsumerWithQueryArguments_3() {
         final RobotModel model = new RobotModel();
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "std_kw"));
         robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "ref kw"));
 
@@ -135,7 +138,7 @@ public class LibraryUriTest {
     @Test
     public void whenLibraryUriIsBeingOpen_theProjectIsSearchedAndPassedToConsumerWithQueryArguments_4() {
         final RobotModel model = new RobotModel();
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "std_kw"));
         robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "ref kw"));
 
@@ -150,7 +153,7 @@ public class LibraryUriTest {
     @Test
     public void whenLibraryUriIsBeingOpen_theProjectIsSearchedAndPassedToConsumerWithQueryArguments_5() {
         final RobotModel model = new RobotModel();
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "std_kw"));
         robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "ref kw"));
 

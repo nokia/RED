@@ -7,30 +7,29 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
-import com.google.common.base.Charsets;
-
+@ExtendWith(ProjectExtension.class)
 public class TextOperationsTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TextOperationsTest.class.getSimpleName());
+    @Project
+    static IProject project;
 
     @Test
     public void singleLineRegionIsProperlyTranslated_whenFileWithLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\nline2\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", "line1", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(2, 1), new FilePosition(2, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);
@@ -40,8 +39,7 @@ public class TextOperationsTest {
 
     @Test
     public void multilineRegionIsProperlyTranslated_whenFileWithLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\nline2\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", "line1", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(1, 2), new FilePosition(3, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);
@@ -51,8 +49,7 @@ public class TextOperationsTest {
 
     @Test
     public void singleLineRegionIsProperlyTranslated_whenFileWithCrLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\r\nline2\r\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", EndOfLineTypes.CRLF, "line1", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(2, 1), new FilePosition(2, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);
@@ -62,8 +59,7 @@ public class TextOperationsTest {
 
     @Test
     public void multilineRegionIsProperlyTranslated_whenFileWithCrLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\r\nline2\r\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", EndOfLineTypes.CRLF, "line1", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(1, 2), new FilePosition(3, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);
@@ -73,8 +69,7 @@ public class TextOperationsTest {
 
     @Test
     public void singleLineRegionIsProperlyTranslated_whenFileWithMixedCrAndCrLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\r\nline2\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", EndOfLineTypes.CRLF, "line1", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(2, 1), new FilePosition(2, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);
@@ -84,8 +79,7 @@ public class TextOperationsTest {
 
     @Test
     public void multilineRegionIsProperlyTranslated_whenFileWithMixedCrAndCrLfsOnlyIsGiven() throws Exception {
-        final InputStream stream = new ByteArrayInputStream("line1\r\nline2\nline3".getBytes(Charsets.UTF_8));
-        final IFile file = projectProvider.createFile("file.txt", stream);
+        final IFile file = createFile(project, "file.txt", EndOfLineTypes.LF, "line1\r", "line2", "line3");
 
         final FileRegion region = new FileRegion(new FilePosition(1, 2), new FilePosition(3, 4));
         final FileRegion affectedRegion = TextOperations.getAffectedRegion(region, file);

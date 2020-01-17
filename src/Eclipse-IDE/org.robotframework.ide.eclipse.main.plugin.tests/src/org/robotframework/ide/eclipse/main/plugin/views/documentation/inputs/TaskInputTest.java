@@ -10,23 +10,27 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTask;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotTasksSection;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 
+@ExtendWith(ProjectExtension.class)
 public class TaskInputTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(TaskInputTest.class);
+    @Project
+    static IProject project;
 
     @Test
     public void properTaskDocUriIsProvidedForInput() throws Exception {
@@ -111,23 +115,23 @@ public class TaskInputTest {
     }
 
     private static RobotTask createTask(final String testName) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Tasks ***",
                 testName,
                 "  call  arg");
         final RobotModel model = new RobotModel();
-        model.createRobotProject(projectProvider.getProject()).setRobotParserComplianceVersion(new RobotVersion(3, 1));
+        model.createRobotProject(project).setRobotParserComplianceVersion(new RobotVersion(3, 1));
         return model.createSuiteFile(file).findSection(RobotTasksSection.class).get().getChildren().get(0);
     }
 
     private static RobotTask createTemplatedTask(final String testName, final String template) throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Tasks ***",
                 testName,
                 "  [Template]  " + template,
                 "  x  y");
         final RobotModel model = new RobotModel();
-        model.createRobotProject(projectProvider.getProject()).setRobotParserComplianceVersion(new RobotVersion(3, 1));
+        model.createRobotProject(project).setRobotParserComplianceVersion(new RobotVersion(3, 1));
         return model.createSuiteFile(file).findSection(RobotTasksSection.class).get().getChildren().get(0);
     }
 }
