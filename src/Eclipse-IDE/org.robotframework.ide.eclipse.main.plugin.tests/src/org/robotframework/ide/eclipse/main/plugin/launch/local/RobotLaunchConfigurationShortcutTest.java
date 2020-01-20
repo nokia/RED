@@ -8,11 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -22,28 +21,19 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotLaunchConfigurationShortcutTest {
 
-    private static IProject project;
-
-    private static IResource resource;
-
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
-
-    @BeforeClass
-    public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
-        project = projectProvider.getProject();
-        resource = projectProvider.createFile("Resource1.fake", "");
-    }
+    @Project(files = { "Resource1.fake" })
+    static IProject project;
 
     @Test
     public void nullReturned_whenSelectionIsEmpty() {
@@ -57,7 +47,8 @@ public class RobotLaunchConfigurationShortcutTest {
     @Test
     public void configurationReturned_whenResourceSelected() throws CoreException {
         final RobotLaunchConfigurationShortcut shortcut = new RobotLaunchConfigurationShortcut();
-        final IStructuredSelection selection = new StructuredSelection(Arrays.asList(resource));
+        final IStructuredSelection selection = new StructuredSelection(
+                Arrays.asList(getFile(project, "Resource1.fake")));
         final ILaunchConfiguration[] configs = shortcut.getLaunchConfigurations(selection);
 
         assertThat(configs).isNotNull();
@@ -72,7 +63,7 @@ public class RobotLaunchConfigurationShortcutTest {
         final RobotLaunchConfigurationShortcut shortcut = new RobotLaunchConfigurationShortcut();
         final RobotCase rtc = mock(RobotCase.class);
         final RobotProject robotProject = mock(RobotProject.class);
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, (IFile) resource);
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, getFile(project, "Resource1.fake"));
         when(robotProject.getProject()).thenReturn(project);
         when(rtc.getSuiteFile()).thenReturn(robotFile);
         final IStructuredSelection selection = new StructuredSelection(rtc);
@@ -119,7 +110,7 @@ public class RobotLaunchConfigurationShortcutTest {
         final IEditorPart editorPart = mock(IEditorPart.class);
         final FileEditorInput editorInput = mock(FileEditorInput.class);
         when(editorPart.getEditorInput()).thenReturn(editorInput);
-        when(editorInput.getFile()).thenReturn((IFile) resource);
+        when(editorInput.getFile()).thenReturn(getFile(project, "Resource1.fake"));
         final ILaunchConfiguration[] configs = shortcut.getLaunchConfigurations(editorPart);
 
         assertThat(configs).isNotNull();
@@ -135,7 +126,7 @@ public class RobotLaunchConfigurationShortcutTest {
         final IEditorPart editorPart = mock(IEditorPart.class);
         final FileEditorInput editorInput = mock(FileEditorInput.class);
         when(editorPart.getEditorInput()).thenReturn(editorInput);
-        when(editorInput.getFile()).thenReturn((IFile) resource);
+        when(editorInput.getFile()).thenReturn(getFile(project, "Resource1.fake"));
         final ILaunchConfiguration[] configs1 = shortcut.getLaunchConfigurations(editorPart);
         ((ILaunchConfigurationWorkingCopy) configs1[0]).doSave();
         final ILaunchConfiguration[] configs2 = shortcut.getLaunchConfigurations(editorPart);

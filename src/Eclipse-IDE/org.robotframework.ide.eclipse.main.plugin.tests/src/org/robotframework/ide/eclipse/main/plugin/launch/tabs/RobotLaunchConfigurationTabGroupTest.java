@@ -13,7 +13,7 @@ import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RobotLaunchConfigurationTabGroupTest {
 

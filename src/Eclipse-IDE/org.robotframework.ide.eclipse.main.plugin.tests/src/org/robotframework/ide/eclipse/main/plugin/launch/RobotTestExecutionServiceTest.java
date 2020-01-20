@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ui.services.IDisposable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 

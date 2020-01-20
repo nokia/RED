@@ -7,16 +7,17 @@ package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.GlobalVariable;
@@ -34,24 +35,21 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ObjectArrays;
 
+@ExtendWith(ProjectExtension.class)
 public class VariableDefinitionLocatorTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(VariableDefinitionLocatorTest.class);
-
-    @Before
-    public void beforeTest() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(createDefaultRedXml = true)
+    IProject project;
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_1() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -61,7 +59,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_2() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -71,7 +69,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -81,7 +79,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInKeywordArgumentsSettingAreLocatedByOffset() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -92,7 +90,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInKeywordArgumentsSettingAreLocatedByOffset_onlyUntilDetectorWantsToContinue()
             throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -102,7 +100,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInEmbeddedKeywordNameAreLocatedByOffset() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -113,7 +111,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInEmbeddedKeywordNameAreLocatedByOffset_onlyUntilDetectorWantsToContinue()
             throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -123,7 +121,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByElement_1() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -142,7 +140,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByElement_2() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -161,7 +159,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByElement_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
+        final IFile file = createFile(project, "resource.robot", createTestCasesSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -180,7 +178,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInKeywordArgumentsSettingAreLocatedByElement() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -200,7 +198,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInKeywordArgumentsSettingAreLocatedByElement_onlyUntilDetectorWantsToContinue()
             throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -219,7 +217,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInEmbeddedKeywordNameAreLocatedByElement() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -239,7 +237,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInEmbeddedKeywordNameAreLocatedByElement_onlyUntilDetectorWantsToContinue()
             throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createKeywordsSection());
+        final IFile file = createFile(project, "resource.robot", createKeywordsSection());
 
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
@@ -258,7 +256,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void locallyDefinedVariablesAreLocated() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createVariablesSection("1"));
+        final IFile file = createFile(project, "resource.robot", createVariablesSection("1"));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -268,7 +266,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void locallyDefinedVariablesAreLocated_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("resource.robot", createVariablesSection("1"));
+        final IFile file = createFile(project, "resource.robot", createVariablesSection("1"));
 
         final Set<String> visitedVars = new HashSet<>();
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(file, new RobotModel());
@@ -279,8 +277,8 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInResourceFilesAreLocated() throws Exception {
-        projectProvider.createFile("resource.robot", createVariablesSection("1"));
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot",
+        createFile(project, "resource.robot", createVariablesSection("1"));
+        final IFile sourceFile = createFile(project, "importingFile.robot",
                 createResourceImportSettingsSection("resource.robot"));
 
         final Set<String> visitedVars = new HashSet<>();
@@ -291,8 +289,8 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInResourceFilesAreLocated_onlyUntilDetectorWantsToContinue() throws Exception {
-        projectProvider.createFile("resource.robot", createVariablesSection("1"));
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot",
+        createFile(project, "resource.robot", createVariablesSection("1"));
+        final IFile sourceFile = createFile(project, "importingFile.robot",
                 createResourceImportSettingsSection("resource.robot"));
 
         final Set<String> visitedVars = new HashSet<>();
@@ -303,7 +301,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInVariablesFilesAreLocated() throws Exception {
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot",
+        final IFile sourceFile = createFile(project, "importingFile.robot",
                 createVariablesImportSettingsSection("vars.py"));
 
         final RobotModel model = new RobotModel();
@@ -327,7 +325,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInVariablesFilesAreLocated_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot",
+        final IFile sourceFile = createFile(project, "importingFile.robot",
                 createVariablesImportSettingsSection("vars.py"));
 
         final RobotModel model = new RobotModel();
@@ -351,7 +349,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void variablesDefinedInGlobalVariablesFilesLinkedInRedXmlAreLocated() throws IOException, CoreException {
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot", "");
+        final IFile sourceFile = createFile(project, "importingFile.robot", "");
 
         final RobotModel model = new RobotModel();
         final RobotProject robotProject = model.createRobotProject(sourceFile.getProject());
@@ -370,7 +368,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInGlobalVariablesFilesLinkedInRedXmlAreLocated_onlyUntilDetectorWantsToContinue()
             throws IOException, CoreException {
-        final IFile sourceFile = projectProvider.createFile("importingFile.robot", "");
+        final IFile sourceFile = createFile(project, "importingFile.robot", "");
 
         final RobotModel model = new RobotModel();
         final RobotProject robotProject = model.createRobotProject(sourceFile.getProject());
@@ -388,7 +386,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void globalVariablesAreLocated() throws Exception {
-        final IFile sourceFile = projectProvider.createFile("source.robot", "");
+        final IFile sourceFile = createFile(project, "source.robot", "");
 
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
@@ -404,7 +402,7 @@ public class VariableDefinitionLocatorTest {
 
     @Test
     public void globalVariablesAreLocated_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile sourceFile = projectProvider.createFile("source.robot", "");
+        final IFile sourceFile = createFile(project, "source.robot", "");
 
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
@@ -422,11 +420,11 @@ public class VariableDefinitionLocatorTest {
     public void variablesAreImportedProperly_whenResourcesAreImportingThemselvesInLoop() throws Exception {
 
         // those files imports forms a cycle
-        final IFile sourceFile = projectProvider.createFile("res1.robot", ObjectArrays
+        final IFile sourceFile = createFile(project, "res1.robot", ObjectArrays
                 .concat(createVariablesSection("1"), createResourceImportSettingsSection("res2.robot"), String.class));
-        projectProvider.createFile("res2.robot", ObjectArrays.concat(createVariablesSection("2"),
+        createFile(project, "res2.robot", ObjectArrays.concat(createVariablesSection("2"),
                 createResourceImportSettingsSection("res3.robot"), String.class));
-        projectProvider.createFile("res3.robot", ObjectArrays.concat(createVariablesSection("3"),
+        createFile(project, "res3.robot", ObjectArrays.concat(createVariablesSection("3"),
                 createResourceImportSettingsSection("res1.robot"), String.class));
 
         final Set<String> visitedVars = new HashSet<>();

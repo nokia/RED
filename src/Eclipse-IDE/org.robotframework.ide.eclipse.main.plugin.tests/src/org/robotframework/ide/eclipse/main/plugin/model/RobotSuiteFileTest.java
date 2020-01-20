@@ -12,60 +12,52 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLibs;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRemoteLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLibs;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotSuiteFileTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotSuiteFileTest.class);
+    @Project(createDefaultRedXml = true, dirs = { "res", "res/a", "res/a/b", "res/a/b/c" }, files = { "res/res1.robot",
+            "res/a/res2.robot", "res/a/b/res3.robot", "res/a/b/c/res4.robot" })
+    static IProject project;
 
     private RobotModel robotModel;
 
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-        projectProvider.createDir("res");
-        projectProvider.createDir("res/a");
-        projectProvider.createDir("res/a/b");
-        projectProvider.createDir("res/a/b/c");
-        projectProvider.createFile("res/res1.robot");
-        projectProvider.createFile("res/a/res2.robot");
-        projectProvider.createFile("res/a/b/res3.robot");
-        projectProvider.createFile("res/a/b/c/res4.robot");
-    }
-
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         robotModel = new RobotModel();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         robotModel = null;
     }
 
     @Test
     public void librarySpecsAreReturned_whenSuiteImportsLibrariesByName() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Library",
                 "Library  Collections",
@@ -84,7 +76,7 @@ public class RobotSuiteFileTest {
 
     @Test
     public void librarySpecsAreReturned_whenSuiteImportsMultipleDifferentRemoteLibraries() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot",
+        final IFile file = createFile(project, "suite.robot",
                 "*** Settings ***",
                 "Library  Remote  http://1.2.3.4/mylib",
                 "Library  Remote  http://5.6.7.8/mylib2");
@@ -123,8 +115,7 @@ public class RobotSuiteFileTest {
         final RobotSuiteFile suiteFile = createSuiteFile("res/test.robot", importSection);
 
         final List<IResource> files = suiteFile.getImportedResources();
-        assertThat(files).containsExactly(projectProvider.getFile("res/res1.robot"),
-                projectProvider.getFile("res/a/res2.robot"));
+        assertThat(files).containsExactly(getFile(project, "res/res1.robot"), getFile(project, "res/a/res2.robot"));
     }
 
     @Test
@@ -133,8 +124,8 @@ public class RobotSuiteFileTest {
         final RobotSuiteFile suiteFile = createSuiteFile("res/test.robot", importSection);
 
         final List<IResource> files = suiteFile.getImportedResources();
-        assertThat(files).containsExactly(projectProvider.getFile("res/a/res2.robot"),
-                projectProvider.getFile("res/res1.robot"), projectProvider.getFile("res/a/b/res3.robot"));
+        assertThat(files).containsExactly(getFile(project, "res/a/res2.robot"), getFile(project, "res/res1.robot"),
+                getFile(project, "res/a/b/res3.robot"));
     }
 
     @Test
@@ -143,17 +134,17 @@ public class RobotSuiteFileTest {
         final RobotSuiteFile suiteFile = createSuiteFile("res/test.robot", importSection);
 
         final List<IResource> files = suiteFile.getImportedResources();
-        assertThat(files).containsExactly(projectProvider.getFile("res/res1.robot"));
+        assertThat(files).containsExactly(getFile(project, "res/res1.robot"));
     }
 
     @Test
     public void resourcesAreReturned_whenAbsoluteImportPathIsUsed() throws Exception {
         final String[] importSection = createResourceImportSection(
-                projectProvider.getProject().getLocation().toString() + "/res/a/res2.robot");
+                project.getLocation().toString() + "/res/a/res2.robot");
         final RobotSuiteFile suiteFile = createSuiteFile("res/test.robot", importSection);
 
         final List<IResource> files = suiteFile.getImportedResources();
-        assertThat(files).containsExactly(projectProvider.getFile("res/a/res2.robot"));
+        assertThat(files).containsExactly(getFile(project, "res/a/res2.robot"));
     }
 
     @Test
@@ -163,14 +154,13 @@ public class RobotSuiteFileTest {
         final RobotSuiteFile suiteFile = createSuiteFile("res/a/b/test.robot", importSection);
 
         final List<IResource> files = suiteFile.getImportedResources();
-        assertThat(files).containsExactly(projectProvider.getFile("res/res1.robot"),
-                projectProvider.getFile("res/a/res2.robot"), projectProvider.getFile("res/a/b/res3.robot"),
-                projectProvider.getFile("res/a/b/c/res4.robot"));
+        assertThat(files).containsExactly(getFile(project, "res/res1.robot"), getFile(project, "res/a/res2.robot"),
+                getFile(project, "res/a/b/res3.robot"), getFile(project, "res/a/b/c/res4.robot"));
     }
 
     @Test
     public void robotEnvironmentIsReturned() throws Exception {
-        final IFile file = projectProvider.getFile("res/res1.robot");
+        final IFile file = getFile(project, "res/res1.robot");
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
         assertThat(suiteFile.getRuntimeEnvironment()).isExactlyInstanceOf(RobotRuntimeEnvironment.class);
@@ -178,7 +168,7 @@ public class RobotSuiteFileTest {
 
     @Test
     public void robotParserFileIsReturned_whenLocationIsNotNull() throws Exception {
-        final IFile file = projectProvider.getFile("res/res1.robot");
+        final IFile file = getFile(project, "res/res1.robot");
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         final RobotSuiteFile suiteFile = new RobotSuiteFile(robotProject, file);
         assertThat(suiteFile.getRobotParserFile()).hasName("res1.robot");
@@ -205,7 +195,7 @@ public class RobotSuiteFileTest {
 
     private static RobotSuiteFile createSuiteFile(final String filePath, final String... lines)
             throws IOException, CoreException {
-        final IFile sourceFile = projectProvider.createFile(filePath, lines);
+        final IFile sourceFile = createFile(project, filePath, lines);
         return new RobotModel().createSuiteFile(sourceFile);
     }
 }

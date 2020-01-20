@@ -7,29 +7,35 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotSuiteFileCollectorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotSuiteFileCollectorTest.class);
+    @Project
+    static IProject project;
 
     private static RobotModel model;
 
@@ -49,30 +55,30 @@ public class RobotSuiteFileCollectorTest {
 
     private static IFile notRobotFile;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
         model = RedPlugin.getModelManager().getModel();
 
-        topLevelDirectory = projectProvider.createDir("dir1");
-        nestedDirectory = projectProvider.createDir("dir1/dir2");
+        topLevelDirectory = createDir(project, "dir1");
+        nestedDirectory = createDir(project, "dir1/dir2");
 
-        topLevelFile = model.createSuiteFile(projectProvider.createFile("file1.robot", "*** Keywords ***"));
-        initFile = model.createSuiteFile(projectProvider.createFile("dir1/__init__.robot", "*** Settings ***"));
-        tsvFile = model.createSuiteFile(projectProvider.createFile("dir1/file2.tsv", "*** Keywords ***"));
-        txtFile = model.createSuiteFile(projectProvider.createFile("dir1/file3.txt", "*** Test Cases ***"));
-        robotFile = model.createSuiteFile(projectProvider.createFile("dir1/dir2/file4.robot", "*** Test Cases ***"));
+        topLevelFile = model.createSuiteFile(createFile(project, "file1.robot", "*** Keywords ***"));
+        initFile = model.createSuiteFile(createFile(project, "dir1/__init__.robot", "*** Settings ***"));
+        tsvFile = model.createSuiteFile(createFile(project, "dir1/file2.tsv", "*** Keywords ***"));
+        txtFile = model.createSuiteFile(createFile(project, "dir1/file3.txt", "*** Test Cases ***"));
+        robotFile = model.createSuiteFile(createFile(project, "dir1/dir2/file4.robot", "*** Test Cases ***"));
 
-        notRobotFile = projectProvider.createFile("lib.py", "def kw():", "  pass");
+        notRobotFile = createFile(project, "lib.py", "def kw():", "  pass");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         RedPlugin.getModelManager().dispose();
     }
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
-        projectProvider.configure();
+        configure(project);
     }
 
     @Test
@@ -91,7 +97,7 @@ public class RobotSuiteFileCollectorTest {
 
     @Test
     public void allFilesFromProjectShouldBeCollected() throws Exception {
-        final List<RobotSuiteFile> suites = collectSuites(projectProvider.getProject());
+        final List<RobotSuiteFile> suites = collectSuites(project);
 
         assertThat(suites).containsExactly(initFile, robotFile, tsvFile, txtFile, topLevelFile);
     }
@@ -119,8 +125,7 @@ public class RobotSuiteFileCollectorTest {
 
     @Test
     public void excludedFilesShouldBeIgnored() throws Exception {
-        final RobotProjectConfig config = model.createRobotProject(projectProvider.getProject())
-                .getRobotProjectConfig();
+        final RobotProjectConfig config = model.createRobotProject(project).getRobotProjectConfig();
         config.addExcludedPath("dir1");
 
         final List<RobotSuiteFile> suites = collectSuites(topLevelDirectory, topLevelFile.getFile());

@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -44,7 +44,7 @@ public class InsertKeywordCallsCommandTest {
 
     private IEventBroker eventBroker;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         eventBroker = mock(IEventBroker.class);
     }

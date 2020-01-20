@@ -22,18 +22,20 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RobotConsoleFacadeTest {
 
-    @Mock
     private Supplier<IConsole[]> consolesSupplier;
+
+    @SuppressWarnings("unchecked")
+    @BeforeEach
+    public void beforeTest() throws Exception {
+        consolesSupplier = mock(Supplier.class);
+    }
 
     @Test
     public void exceptionIsThrown_whenRobotLaunchConfigurationCannotBeCreated() throws Exception {

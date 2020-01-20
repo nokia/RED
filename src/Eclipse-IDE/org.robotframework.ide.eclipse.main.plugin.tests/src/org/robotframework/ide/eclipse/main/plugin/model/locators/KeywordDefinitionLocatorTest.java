@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.locators;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries.createStdLib;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,10 +17,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -28,28 +30,30 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class KeywordDefinitionLocatorTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordDefinitionLocatorTest.class);
+    @Project
+    IProject project;
 
     private RobotModel robotModel;
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         RedPlugin.getModelManager().dispose();
     }
 
     @Test
     public void libraryKeywordsFromDefinitionAreDetected() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLib("StdLib", "kw1", "kw2"));
@@ -63,7 +67,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsFromDefinitionAreDetected_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLib("StdLib", "kw1", "kw2"));
@@ -77,7 +81,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void localKeywordsAreDetected() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot", "*** Keywords ***", "localKw1", "localKw2");
+        final IFile file = createFile(project, "suite.robot", "*** Keywords ***", "localKw1", "localKw2");
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
@@ -87,7 +91,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void localKeywordsAreDetected_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot", "*** Keywords ***", "localKw1", "localKw2");
+        final IFile file = createFile(project, "suite.robot", "*** Keywords ***", "localKw1", "localKw2");
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
@@ -97,10 +101,10 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void localKeywordsAreDetected_whenKeywordISDefinedInImportedResources() throws Exception {
-        projectProvider.createFile("res1.robot", "*** Keywords ***", "res1Kw1", "res1Kw2", "*** Settings ***",
+        createFile(project, "res1.robot", "*** Keywords ***", "res1Kw1", "res1Kw2", "*** Settings ***",
                 "Resource  res2.robot");
-        projectProvider.createFile("res2.robot", "*** Keywords ***", "res2Kw1", "res2Kw2");
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource  res1.robot");
+        createFile(project, "res2.robot", "*** Keywords ***", "res2Kw1", "res2Kw2");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource  res1.robot");
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
@@ -111,7 +115,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreDetected() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  StdLib",
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Library  StdLib",
                 "Library  RefLib");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
@@ -126,7 +130,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreDetected_whenLibraryIsAccessibleWithoutImport() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLib("BuiltIn", "Log", "Log Many"));
@@ -140,9 +144,9 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreDetected_whenLibraryIsImportedInImportedResources() throws Exception {
-        projectProvider.createFile("res1.robot", "*** Settings ***", "Library  StdLib", "Resource  res2.robot");
-        projectProvider.createFile("res2.robot", "*** Settings ***", "Library  RefLib");
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource  res1.robot");
+        createFile(project, "res1.robot", "*** Settings ***", "Library  StdLib", "Resource  res2.robot");
+        createFile(project, "res2.robot", "*** Settings ***", "Library  RefLib");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource  res1.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLib("StdLib", "kw1", "kw2"));
@@ -156,7 +160,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreDetected_onlyUntilDetectorWantsToContinue() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  StdLib",
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Library  StdLib",
                 "Library  RefLib");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
@@ -171,7 +175,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreNotDetected_whenLibraryIsNotAccessible() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(createStdLib("StdLib", "kw1", "kw2"));
@@ -185,7 +189,7 @@ public class KeywordDefinitionLocatorTest {
 
     @Test
     public void libraryKeywordsAreDetected_whenLibraryIsNotAccessibleButImportIsEnabled() throws Exception {
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
 
         final RobotProject robotProject = robotModel.createRobotProject(file.getProject());
         robotProject.setStandardLibraries(new HashMap<>());

@@ -19,9 +19,9 @@ import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
@@ -38,12 +38,12 @@ public class RedStringVariablesManagerTest {
             VARIABLE_MANAGER.newValueVariable("b", "", false, "1"),
             VARIABLE_MANAGER.newValueVariable("c", "", false, "2") };
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws CoreException {
         VARIABLE_MANAGER.addVariables(CUSTOM_VARIABLES);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterSuite() {
         VARIABLE_MANAGER.removeVariables(CUSTOM_VARIABLES);
 
@@ -87,7 +87,7 @@ public class RedStringVariablesManagerTest {
         final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
         store.putValue(RedPreferences.STRING_VARIABLES_SETS, new ObjectMapper().writeValueAsString(input));
         store.putValue(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "set 1");
-        
+
         final RedStringVariablesManager manager = new RedStringVariablesManager(VARIABLE_MANAGER,
                 RedPlugin.getDefault().getPreferences());
 

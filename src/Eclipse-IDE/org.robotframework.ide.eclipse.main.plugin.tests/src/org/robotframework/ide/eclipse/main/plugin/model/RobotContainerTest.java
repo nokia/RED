@@ -6,21 +6,26 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import org.eclipse.core.resources.IProject;
-import org.junit.Rule;
-import org.junit.Test;
-import org.robotframework.red.junit.ProjectProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotContainerTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(RobotContainerTest.class);
+    @Project
+    IProject project;
 
     @Test
     public void emptyResultIsReturned_whenInitFileDoesNotExist() throws Exception {
-        projectProvider.createDir("inner");
-        projectProvider.createFile("test.robot");
+        createDir(project, "inner");
+        createFile(project, "test.robot");
 
         final RobotContainer container = createContainer();
 
@@ -29,49 +34,48 @@ public class RobotContainerTest {
 
     @Test
     public void correctRobotInitFileModelIsReturned() throws Exception {
-        projectProvider.createFile("__init__.robot");
-        projectProvider.createFile("__init__.tsv");
-        projectProvider.createFile("__init__.txt");
+        createFile(project, "__init__.robot");
+        createFile(project, "__init__.tsv");
+        createFile(project, "__init__.txt");
 
         final RobotContainer container = createContainer();
 
         assertThat(container.getInitFileModel()).hasValueSatisfying(
-                file -> assertThat(file.getFile()).isEqualTo(projectProvider.getFile("__init__.robot")));
+                file -> assertThat(file.getFile()).isEqualTo(getFile(project, "__init__.robot")));
     }
 
     @Test
     public void correctTsvInitFileModelIsReturned() throws Exception {
-        projectProvider.createFile("__init__.tsv");
-        projectProvider.createFile("__init__.txt");
+        createFile(project, "__init__.tsv");
+        createFile(project, "__init__.txt");
 
         final RobotContainer container = createContainer();
 
         assertThat(container.getInitFileModel()).hasValueSatisfying(
-                file -> assertThat(file.getFile()).isEqualTo(projectProvider.getFile("__init__.tsv")));
+                file -> assertThat(file.getFile()).isEqualTo(getFile(project, "__init__.tsv")));
     }
 
     @Test
     public void correctTxtInitFileModelIsReturned() throws Exception {
-        projectProvider.createFile("__init__.txt");
+        createFile(project, "__init__.txt");
 
         final RobotContainer container = createContainer();
 
         assertThat(container.getInitFileModel()).hasValueSatisfying(
-                file -> assertThat(file.getFile()).isEqualTo(projectProvider.getFile("__init__.txt")));
+                file -> assertThat(file.getFile()).isEqualTo(getFile(project, "__init__.txt")));
     }
 
     @Test
     public void correctInitFileModelIsReturned_whenFileNameIsInUpperCase() throws Exception {
-        projectProvider.createFile("__INIT__.robot");
+        createFile(project, "__INIT__.robot");
 
         final RobotContainer container = createContainer();
 
         assertThat(container.getInitFileModel()).hasValueSatisfying(
-                file -> assertThat(file.getFile()).isEqualTo(projectProvider.getFile("__INIT__.robot")));
+                file -> assertThat(file.getFile()).isEqualTo(getFile(project, "__INIT__.robot")));
     }
 
     private RobotContainer createContainer() {
-        final IProject project = projectProvider.getProject();
         final RobotProject robotProject = new RobotModel().createRobotProject(project);
         return new RobotContainer(robotProject, project) {
             // nothing to implement

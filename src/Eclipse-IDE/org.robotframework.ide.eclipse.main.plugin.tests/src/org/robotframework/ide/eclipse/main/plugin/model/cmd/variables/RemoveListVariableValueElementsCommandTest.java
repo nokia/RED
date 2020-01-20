@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;

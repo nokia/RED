@@ -12,7 +12,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RemoteRobotLaunchConfigurationTabGroupTest {
 

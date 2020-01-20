@@ -14,8 +14,8 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noChildren;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -39,7 +39,7 @@ public class CreateFreshHolderCommandTest {
 
     private IEventBroker eventBroker;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         eventBroker = mock(IEventBroker.class);
     }

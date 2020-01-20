@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,9 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
@@ -29,22 +31,22 @@ import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RunRfLintHandlerTest {
 
-    private static final String PROJECT_NAME = RunRfLintHandlerTest.class.getSimpleName();
-
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @Project
+    static IProject project;
 
     private static IFile suite;
 
     private static RfLintIntegrationServer server;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        suite = projectProvider.createFile("suite.robot");
+        suite = createFile(project, "suite.robot");
         server = mock(RfLintIntegrationServer.class);
         when(server.getHost()).thenReturn("1.2.3.4");
         when(server.getPort()).thenReturn(1234);
@@ -59,7 +61,7 @@ public class RunRfLintHandlerTest {
 
         RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
 
-        verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
+        verify(environment).runRfLint("1.2.3.4", 1234, project.getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),
                 new ArrayList<>());
     }
@@ -77,7 +79,7 @@ public class RunRfLintHandlerTest {
 
         RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences, rules);
 
-        verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
+        verify(environment).runRfLint("1.2.3.4", 1234, project.getLocation().toFile(),
                 newArrayList("x", "x/y", "x/y/z"), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),
                 new ArrayList<>());
     }
@@ -106,7 +108,7 @@ public class RunRfLintHandlerTest {
         configuredRules.add(new RfLintRule("z", RfLintViolationSeverity.IGNORE, "", "3",
                 new RfLintRuleConfiguration(RfLintViolationSeverity.ERROR, "4")));
 
-        verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
+        verify(environment).runRfLint("1.2.3.4", 1234, project.getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), configuredRules, new ArrayList<>(), new ArrayList<>());
     }
 
@@ -115,14 +117,14 @@ public class RunRfLintHandlerTest {
         final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
-        final List<String> ruleFiles = newArrayList(projectProvider.createFile("rule1.py").getLocation().toOSString(),
-                projectProvider.createFile("rule2.py").getLocation().toOSString());
+        final List<String> ruleFiles = newArrayList(createFile(project, "rule1.py").getLocation().toOSString(),
+                createFile(project, "rule2.py").getLocation().toOSString());
         when(preferences.getRfLintRulesFiles()).thenReturn(ruleFiles);
 
         RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences,
                 new HashMap<>());
 
-        verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
+        verify(environment).runRfLint("1.2.3.4", 1234, project.getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), ruleFiles, new ArrayList<>());
     }
 
@@ -131,21 +133,21 @@ public class RunRfLintHandlerTest {
         final IRuntimeEnvironment environment = mock(IRuntimeEnvironment.class);
         final RobotProject robotProject = createRobotProjectSpy(environment, new RobotProjectConfig());
         final RedPreferences preferences = mock(RedPreferences.class);
-        final IFile argFile = projectProvider.createFile("argfile.arg");
+        final IFile argFile = createFile(project, "argfile.arg");
         when(preferences.getRfLintAdditionalArguments())
-                .thenReturn("arg ${var} -A ${workspace_loc:/" + PROJECT_NAME + "/" + argFile.getName() + "}");
+                .thenReturn("arg ${var} -A ${workspace_loc:/" + project.getName() + "/" + argFile.getName() + "}");
 
         RunRfLintHandler.E4RunRfLintHandler.runRfLint(environment, robotProject, suite, server, preferences,
                 new HashMap<>());
 
-        verify(environment).runRfLint("1.2.3.4", 1234, projectProvider.getProject().getLocation().toFile(),
+        verify(environment).runRfLint("1.2.3.4", 1234, project.getLocation().toFile(),
                 new ArrayList<>(), suite.getLocation().toFile(), new ArrayList<>(), new ArrayList<>(),
                 newArrayList("arg", "${var}", "-A", argFile.getLocation().toOSString()));
     }
 
     private RobotProject createRobotProjectSpy(final IRuntimeEnvironment environment,
             final RobotProjectConfig projectConfig) {
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
         when(robotProject.getRobotProjectConfig()).thenReturn(projectConfig);
         return robotProject;

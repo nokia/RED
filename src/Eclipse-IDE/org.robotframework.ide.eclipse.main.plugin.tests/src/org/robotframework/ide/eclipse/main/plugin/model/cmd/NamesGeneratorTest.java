@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.NamedElement;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.ParentElement;
 

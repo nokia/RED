@@ -16,8 +16,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -40,7 +40,7 @@ public class InsertHoldersCommandTest {
 
     private IEventBroker eventBroker;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         eventBroker = mock(IEventBroker.class);
     }

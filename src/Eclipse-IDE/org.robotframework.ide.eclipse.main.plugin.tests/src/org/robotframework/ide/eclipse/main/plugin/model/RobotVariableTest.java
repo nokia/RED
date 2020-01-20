@@ -13,7 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.RobotVariableCond
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
 public class RobotVariableTest {

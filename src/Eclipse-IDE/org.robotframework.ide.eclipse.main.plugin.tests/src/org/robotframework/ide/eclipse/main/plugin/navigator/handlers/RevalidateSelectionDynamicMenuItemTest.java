@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.action.IContributionItem;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RevalidateSelectionDynamicMenuItemTest {
 

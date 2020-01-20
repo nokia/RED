@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 public class RobotSuiteStreamFileTest {
 

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -18,40 +19,36 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener.ExecutionArtifactsHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener.ExecutionWebsiteHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RobotConsolePatternsListenerTest {
 
     private static final int DOCUMENT_OFFSET = 123;
 
-    @Mock
     private IDocument document;
 
-    @Mock
     private RobotProject robotProject;
 
-    @Mock
     private TextConsole console;
 
     private RobotConsolePatternsListener listener;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
+        document = mock(IDocument.class);
+        robotProject = mock(RobotProject.class);
+        console = mock(TextConsole.class);
         when(console.getDocument()).thenReturn(document);
         listener = new RobotConsolePatternsListener(robotProject);
         listener.connect(console);
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         listener.disconnect();
         listener = null;

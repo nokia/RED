@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;

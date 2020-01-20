@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.WrappedResource;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;

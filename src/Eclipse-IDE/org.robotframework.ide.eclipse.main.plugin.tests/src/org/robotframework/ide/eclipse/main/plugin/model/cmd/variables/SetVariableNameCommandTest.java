@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
