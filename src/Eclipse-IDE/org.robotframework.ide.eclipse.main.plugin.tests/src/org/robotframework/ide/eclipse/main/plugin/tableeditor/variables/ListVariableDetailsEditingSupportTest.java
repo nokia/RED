@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

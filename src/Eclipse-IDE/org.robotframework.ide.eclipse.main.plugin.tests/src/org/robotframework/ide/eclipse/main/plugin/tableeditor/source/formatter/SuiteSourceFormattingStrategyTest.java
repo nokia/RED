@@ -15,7 +15,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.formatter.FormattingContext;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
 public class SuiteSourceFormattingStrategyTest {

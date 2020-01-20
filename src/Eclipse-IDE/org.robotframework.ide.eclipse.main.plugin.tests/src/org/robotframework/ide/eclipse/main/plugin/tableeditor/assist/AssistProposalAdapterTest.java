@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;

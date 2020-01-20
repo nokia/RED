@@ -12,7 +12,7 @@ import java.util.List;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleCommentHandler.E4ToggleCommentHandler;
 

@@ -15,7 +15,7 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;

@@ -19,7 +19,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 import org.robotframework.red.jface.text.rules.IRedTokenScanner;

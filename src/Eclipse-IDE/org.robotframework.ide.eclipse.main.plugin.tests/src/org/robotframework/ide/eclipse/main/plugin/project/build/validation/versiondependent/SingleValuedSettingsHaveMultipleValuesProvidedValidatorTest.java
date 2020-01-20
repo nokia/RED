@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.LocalSetting;

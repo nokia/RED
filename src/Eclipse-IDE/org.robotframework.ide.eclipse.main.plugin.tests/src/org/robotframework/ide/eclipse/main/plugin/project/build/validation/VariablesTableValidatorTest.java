@@ -13,7 +13,7 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

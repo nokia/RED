@@ -15,7 +15,7 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
 public class ImportTypesStyleConfigurationTest {

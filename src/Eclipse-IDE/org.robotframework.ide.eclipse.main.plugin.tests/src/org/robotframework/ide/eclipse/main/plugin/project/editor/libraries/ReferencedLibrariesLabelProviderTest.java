@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -14,11 +15,8 @@ import java.util.ArrayList;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
@@ -33,16 +31,15 @@ import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ReferencedLibrariesLabelProviderTest {
 
-    @Mock
     private RedProjectEditorInput editorInput;
 
     private ReferencedLibrariesLabelProvider provider;
 
-    @Before
+    @BeforeEach
     public void before() {
+        editorInput = mock(RedProjectEditorInput.class);
         provider = new ReferencedLibrariesLabelProvider(editorInput);
     }
 

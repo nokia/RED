@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.tasks.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.tasks.Task;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;

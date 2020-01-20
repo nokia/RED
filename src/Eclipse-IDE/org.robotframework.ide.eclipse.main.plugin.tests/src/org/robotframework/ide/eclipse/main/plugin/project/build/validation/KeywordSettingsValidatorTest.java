@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.validation.ProblemPosition;

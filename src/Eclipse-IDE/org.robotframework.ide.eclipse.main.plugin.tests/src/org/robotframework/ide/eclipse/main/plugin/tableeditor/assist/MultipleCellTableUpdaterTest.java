@@ -16,18 +16,19 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MultipleCellTableUpdaterTest {
 
-    @Mock
     private IEventBroker eventBroker;
+
+    @BeforeEach
+    public void beforTest() {
+        eventBroker = mock(IEventBroker.class);
+    }
 
     @Test
     public void valuesShouldNotBeInserted_whenArgumentsAreEmpty() throws Exception {

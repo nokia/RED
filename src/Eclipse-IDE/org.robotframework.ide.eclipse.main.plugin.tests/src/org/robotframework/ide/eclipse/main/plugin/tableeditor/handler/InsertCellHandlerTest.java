@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;

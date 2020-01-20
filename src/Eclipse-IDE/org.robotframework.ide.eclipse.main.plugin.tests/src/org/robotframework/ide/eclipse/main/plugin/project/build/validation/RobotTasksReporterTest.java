@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;

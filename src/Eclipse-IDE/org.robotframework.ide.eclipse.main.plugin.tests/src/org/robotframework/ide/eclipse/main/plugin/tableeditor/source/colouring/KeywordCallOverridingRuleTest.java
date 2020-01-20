@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;

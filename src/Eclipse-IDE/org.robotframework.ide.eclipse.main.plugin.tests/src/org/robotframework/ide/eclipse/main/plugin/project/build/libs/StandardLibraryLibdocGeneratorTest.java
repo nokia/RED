@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;

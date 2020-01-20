@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -33,12 +33,12 @@ public class RedClipboardTest {
 
     private RedClipboard clipboard;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         clipboard = new RedClipboard(Display.getCurrent());
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         clipboard.clear();
         clipboard.dispose();

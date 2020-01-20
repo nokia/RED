@@ -18,7 +18,7 @@ import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.widgets.Display;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
 public class CasesElementsStyleConfigurationTest {

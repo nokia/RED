@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 
 import com.google.common.collect.Range;

@@ -19,7 +19,7 @@ import java.util.List;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.rules.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument.IRobotDocumentParsingListener;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;

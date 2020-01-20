@@ -22,7 +22,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.console.IConsoleConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogView;
 

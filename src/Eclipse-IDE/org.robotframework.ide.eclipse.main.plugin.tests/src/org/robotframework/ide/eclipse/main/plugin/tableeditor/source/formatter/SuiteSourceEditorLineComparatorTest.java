@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.formatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
 public class SuiteSourceEditorLineComparatorTest {

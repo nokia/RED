@@ -11,7 +11,7 @@ import static org.robotframework.ide.eclipse.main.plugin.project.build.validatio
 import static org.robotframework.ide.eclipse.main.plugin.project.build.validation.KeywordCallArgumentsValidatorTest.problem;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.KeywordCallArgumentsValidatorTest.ValidationStep;

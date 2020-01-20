@@ -12,7 +12,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colo
 import java.util.Deque;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.LineElement;

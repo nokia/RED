@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.LocalSetting;

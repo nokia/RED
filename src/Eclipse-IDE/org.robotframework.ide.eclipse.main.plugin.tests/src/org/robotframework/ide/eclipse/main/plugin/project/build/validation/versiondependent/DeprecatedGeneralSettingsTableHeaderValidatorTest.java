@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.validation.ProblemPosition;

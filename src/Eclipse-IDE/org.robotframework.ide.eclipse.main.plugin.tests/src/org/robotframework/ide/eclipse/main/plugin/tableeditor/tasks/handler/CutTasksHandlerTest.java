@@ -13,8 +13,8 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.RedClipboardMock;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -34,7 +34,7 @@ public class CutTasksHandlerTest {
 
     private final RobotEditorCommandsStack commandsStack = new RobotEditorCommandsStack();
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         clipboard = new RedClipboardMock();
         commandsStack.clear();

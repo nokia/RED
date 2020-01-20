@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;

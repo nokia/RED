@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;

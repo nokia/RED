@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.RedClipboardMock;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -31,7 +31,7 @@ public class CopyCasesHandlerTest {
 
     private RedClipboardMock clipboard;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         clipboard = new RedClipboardMock();
     }

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.IntStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 

@@ -13,7 +13,7 @@ import static org.robotframework.ide.eclipse.main.plugin.project.build.validatio
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.TemplateSetting;

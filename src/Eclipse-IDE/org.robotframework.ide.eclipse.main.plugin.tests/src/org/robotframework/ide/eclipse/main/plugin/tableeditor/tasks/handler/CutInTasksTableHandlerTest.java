@@ -20,8 +20,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.RedClipboardMock;
@@ -50,7 +50,7 @@ public class CutInTasksTableHandlerTest {
 
     private RedClipboardMock clipboard;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         clipboard = new RedClipboardMock();
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);

@@ -21,7 +21,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.project.RobotProjectConfig;

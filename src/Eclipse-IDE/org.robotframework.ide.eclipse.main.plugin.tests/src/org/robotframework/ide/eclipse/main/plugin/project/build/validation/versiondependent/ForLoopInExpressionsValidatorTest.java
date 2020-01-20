@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
@@ -26,7 +26,7 @@ public class ForLoopInExpressionsValidatorTest {
 
     private MockReporter reporter;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         reporter = new MockReporter();
     }

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandAllHandler.E4ExpandAllHandler;
 import org.robotframework.red.jface.text.ProjectionViewerWrapper;
 

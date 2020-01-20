@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
 public class SuiteSourceEditorSelectionFixerTest {

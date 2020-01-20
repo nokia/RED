@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;

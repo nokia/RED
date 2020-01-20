@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -30,7 +30,7 @@ public class KeywordCallsTableValuesChangingCommandsCollectorTest {
 
     private final KeywordCallsTableValuesChangingCommandsCollector collector = new KeywordCallsTableValuesChangingCommandsCollector();
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         eventBroker = mock(IEventBroker.class);
     }

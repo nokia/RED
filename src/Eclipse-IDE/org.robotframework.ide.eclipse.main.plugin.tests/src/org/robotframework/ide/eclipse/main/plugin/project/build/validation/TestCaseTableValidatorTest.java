@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;

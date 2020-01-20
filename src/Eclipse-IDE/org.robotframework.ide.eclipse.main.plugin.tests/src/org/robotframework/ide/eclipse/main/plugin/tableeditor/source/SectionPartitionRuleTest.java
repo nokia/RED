@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SectionPartitionRule.Section;
 
 public class SectionPartitionRuleTest {

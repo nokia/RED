@@ -16,7 +16,7 @@ import org.eclipse.nebula.widgets.nattable.config.NullComparator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VariablesTableSortingConfigurationTest {
 
