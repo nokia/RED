@@ -14,40 +14,38 @@ import java.io.File;
 import java.net.URI;
 import java.util.Optional;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler.E4RerunFailedHandler;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
-import org.robotframework.red.junit.RunConfigurationProvider;
+import org.robotframework.red.junit.jupiter.LaunchConfig;
+import org.robotframework.red.junit.jupiter.LaunchConfigExtension;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
 import com.google.common.collect.ImmutableMap;
+
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class, LaunchConfigExtension.class })
 public class RerunFailedHandlerTest {
 
-    private static final String PROJECT_NAME = RerunFailedHandlerTest.class.getSimpleName();
+    @Project(dirs = { "dir", "dir/dir" }, cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
+    ILaunchConfiguration launchCfg;
 
-    @Rule
-    public RunConfigurationProvider robotRunConfigurationProvider = new RunConfigurationProvider(
-            RobotLaunchConfiguration.TYPE_ID);
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    public File tempFolder;
 
     @Test
     public void coreExceptionIsThrown_whenConfigurationIsNull() throws Exception {
@@ -81,7 +79,7 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
+        robotConfig.setProjectName(project.getName());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", null);
@@ -107,8 +105,8 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
-        projectProvider.createFile("suite.robot");
+        robotConfig.setProjectName(project.getName());
+        project.createFile("suite.robot");
 
         final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
 
@@ -125,10 +123,8 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
-        projectProvider.createDir("dir");
-        projectProvider.createDir("dir/dir");
-        projectProvider.createFile("dir/dir/suite.robot");
+        robotConfig.setProjectName(project.getName());
+        project.createFile("dir/dir/suite.robot");
 
         final ExecutionStatusStore store = createExecutionStatusStore("/dir/dir/suite.robot");
 
@@ -145,11 +141,10 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
+        robotConfig.setProjectName(project.getName());
 
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
+        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         final ExecutionStatusStore store = createExecutionStatusStore("/linkedSuite.robot");
 
@@ -167,11 +162,10 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
+        robotConfig.setProjectName(project.getName());
 
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
-        final IFile linkedSuite = projectProvider.getFile("dir/linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
+        project.createFileLink("dir/linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         final ExecutionStatusStore store = createExecutionStatusStore("/dir/linkedSuite.robot");
 
@@ -190,8 +184,8 @@ public class RerunFailedHandlerTest {
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(projectProvider.getProject().getName());
-        projectProvider.createFile("suite.robot");
+        robotConfig.setProjectName(project.getName());
+        project.createFile("suite.robot");
 
         final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
 
@@ -202,7 +196,7 @@ public class RerunFailedHandlerTest {
     }
 
     private ILaunchConfigurationWorkingCopy createConfigurationSpy() throws CoreException {
-        return spy(robotRunConfigurationProvider.create("robot").getWorkingCopy());
+        return spy(launchCfg.getWorkingCopy());
     }
 
     private ExecutionStatusStore createExecutionStatusStore(final String suitePath) {
@@ -210,8 +204,7 @@ public class RerunFailedHandlerTest {
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", null);
         final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", null);
         test.setStatus(Status.FAIL);
-        suite.setPath(
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + suitePath));
+        suite.setPath(URI.create("file://" + project.getLocation().toPortableString() + suitePath));
         suite.addChildren(test);
         root.addChildren(suite);
 

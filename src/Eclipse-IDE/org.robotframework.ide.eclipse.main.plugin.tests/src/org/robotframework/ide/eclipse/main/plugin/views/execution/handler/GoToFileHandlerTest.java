@@ -5,39 +5,45 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.File;
 import java.net.URI;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class GoToFileHandlerTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(GoToFileHandlerTest.class);
+    @Project
+    IProject project;
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    File tempFolder;
 
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
-
-    @Mock
     private BiConsumer<IFile, String> caseSelectionConsumer;
+
+    @SuppressWarnings("unchecked")
+    @BeforeEach
+    public void beforeTest() {
+        caseSelectionConsumer = mock(BiConsumer.class);
+    }
 
     @Test
     public void nothingIsDone_whenNodeIsNull() throws Exception {
@@ -64,7 +70,7 @@ public class GoToFileHandlerTest {
 
     @Test
     public void nothingIsDone_whenNodePathIsNotFromWorkspace() throws Exception {
-        final File nonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
 
         goToFile(ExecutionTreeNode.newSuiteNode(null, "not_linked_file", nonWorkspaceFile.toURI()));
         goToFile(ExecutionTreeNode.newTestNode(null, "not_linked_file", nonWorkspaceFile.toURI()));
@@ -74,7 +80,7 @@ public class GoToFileHandlerTest {
 
     @Test
     public void caseIsOpened_whenNodePathPointsToProjectFile() throws Exception {
-        final IFile suite = projectProvider.createFile("suite.robot");
+        final IFile suite = createFile(project, "suite.robot");
 
         goToFile(ExecutionTreeNode.newSuiteNode(null, "project_file", suite.getLocationURI()));
 
@@ -84,9 +90,9 @@ public class GoToFileHandlerTest {
 
     @Test
     public void caseIsOpened_whenNodePathPointsToLinkedFile() throws Exception {
-        final File nonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(nonWorkspaceFile.toURI(), linkedSuite);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
+        final IFile linkedSuite = getFile(project, "linkedSuite.robot");
+        linkedSuite.createLink(nonWorkspaceFile.toURI(), IResource.REPLACE, null);
 
         goToFile(ExecutionTreeNode.newSuiteNode(null, "linked_file", nonWorkspaceFile.toURI()));
 

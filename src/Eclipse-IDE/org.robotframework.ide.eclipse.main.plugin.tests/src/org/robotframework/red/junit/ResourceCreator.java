@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.robotframework.red.junit.jupiter.ResourceCreatorExtension;
 
 /**
  * @deprecated Use {@link ResourceCreatorExtension} due to move to JUnit 5

@@ -42,7 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 public class PreferencesExtension extends ManagedStateExtension
         implements Extension, BeforeEachCallback, AfterEachCallback {
 
-    private static final Namespace RED_NAMESPACE = Namespace.create("red");
+    private static final Namespace NAMESPACE = Namespace.create(PreferencesExtension.class);
     private static final String NAMES = "prefs.names";
 
     @Override
@@ -78,14 +78,14 @@ public class PreferencesExtension extends ManagedStateExtension
         booleanMap.forEach(preferenceStore::setValue);
         names.addAll(booleanMap.keySet());
         
-        context.getStore(RED_NAMESPACE).put(NAMES, names);
+        context.getStore(NAMESPACE).put(NAMES, names);
     }
 
     @Override
     public void afterEach(final ExtensionContext context) throws Exception {
         super.afterEach(context);
 
-        for (final Object name : (Set<?>) context.getStore(RED_NAMESPACE).get(NAMES)) {
+        for (final Object name : (Set<?>) context.getStore(NAMESPACE).get(NAMES)) {
             RedPlugin.getDefault().getPreferenceStore().setToDefault((String) name);
         }
     }

@@ -25,11 +25,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -39,18 +38,18 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVari
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.PreferenceUpdater;
+import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
+@ExtendWith({ PreferencesExtension.class, RedTempDirectory.class })
 public class LibrariesWatchHandlerTest {
 
-    @ClassRule
-    public static TemporaryFolder testFolder = new TemporaryFolder();
-
-    @Rule
-    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+    @TempDir
+    public static File tempFolder;
 
     private static final String PYTHON_LIBRARY_NAME = "libTest";
 
@@ -76,16 +75,17 @@ public class LibrariesWatchHandlerTest {
 
     private static File javaLibraryFile = null;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws IOException {
-        pythonLibraryFile = testFolder.newFile(PYTHON_LIBRARY_FILE_NAME);
-        pythonModuleLibraryFolder = testFolder.newFolder(PYTHON_MODULE_LIBRARY_NAME);
-        pythonModuleLibraryInitFile = testFolder
-                .newFile(PYTHON_MODULE_LIBRARY_NAME + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
-        pythonModuleLibraryFile = testFolder
-                .newFile(PYTHON_MODULE_LIBRARY_NAME + File.separator + PYTHON_MODULE_LIBRARY_FILE_NAME);
-        testFolder.newFile(PYTHON_MODULE_LIBRARY_NAME + File.separator + "someFileInModule.txt");
-        javaLibraryFile = testFolder.newFile(JAVA_LIBRARY_FILE_NAME);
+        pythonLibraryFile = RedTempDirectory.createNewFile(tempFolder, PYTHON_LIBRARY_FILE_NAME);
+        pythonModuleLibraryFolder = RedTempDirectory.createNewDir(tempFolder, PYTHON_MODULE_LIBRARY_NAME);
+        pythonModuleLibraryInitFile = RedTempDirectory.createNewFile(tempFolder,
+                PYTHON_MODULE_LIBRARY_NAME + File.separator + PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
+        pythonModuleLibraryFile = RedTempDirectory.createNewFile(tempFolder,
+                PYTHON_MODULE_LIBRARY_NAME + File.separator + PYTHON_MODULE_LIBRARY_FILE_NAME);
+        RedTempDirectory.createNewFile(tempFolder,
+                PYTHON_MODULE_LIBRARY_NAME + File.separator + "someFileInModule.txt");
+        javaLibraryFile = RedTempDirectory.createNewFile(tempFolder, JAVA_LIBRARY_FILE_NAME);
     }
 
     @Test
@@ -281,10 +281,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(librariesWatchHandler.getLibrarySpecifications().asMap()).isEmpty();
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = true)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabled() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
-
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -308,10 +307,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = true)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndLibraryIsModule() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
-
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -342,10 +340,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = true)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndDuplicatedTasksAreRemoved() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
-
         final IProject project = createNewProjectMock(true);
         final RobotProject robotProject = createNewRobotProject(project);
         final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
@@ -373,10 +370,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(librariesWatchHandler.getRebuildTasksQueueSize()).isEqualTo(0);
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = false)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabled() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
-
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -404,10 +400,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(libSpec2.isModified()).isTrue();
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = false)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndDuplicatedEventsAreHandled() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
-
         final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
@@ -437,10 +432,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(libSpec2.isModified()).isTrue();
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = false)
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndLibraryIsModule() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
-
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -462,10 +456,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(libSpec.isModified()).isTrue();
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = false)
     @Test
     public void testRemoveDirtySpecs() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, false);
-
         final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryInitFile.getPath(), LibraryType.PYTHON);
         final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -490,10 +483,9 @@ public class LibrariesWatchHandlerTest {
         assertThat(librariesWatchHandler.isLibSpecDirty(libSpec)).isFalse();
     }
 
+    @BooleanPreference(key = RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, value = true)
     @Test
     public void testHandleModifyEvent_whenProjectNotExists() {
-        preferenceUpdater.setValue(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
-
         final IProject project = createNewProjectMock(false);
         final RobotProject robotProject = createNewRobotProject(project);
 

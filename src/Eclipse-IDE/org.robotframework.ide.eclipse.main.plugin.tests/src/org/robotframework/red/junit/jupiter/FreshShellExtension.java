@@ -47,7 +47,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 public class FreshShellExtension implements Extension, BeforeAllCallback, BeforeEachCallback, AfterEachCallback,
         AfterAllCallback, ParameterResolver {
 
-    private static final Namespace RED_NAMESPACE = Namespace.create("red");
+    private static final Namespace NAMESPACE = Namespace.create(FreshShellExtension.class);
     private static final String SHELL_PARAM = "shell.param";
 
     @Override
@@ -68,10 +68,10 @@ public class FreshShellExtension implements Extension, BeforeAllCallback, Before
         final Object testInstance = context.getRequiredTestInstance();
         FieldsSupport.handleFields(testInstance.getClass(), false, FreshShell.class, disposeOldShell(testInstance));
         
-        final Object shell = context.getStore(RED_NAMESPACE).get(SHELL_PARAM);
-        if (shell instanceof Shell && !(((Shell) shell).isDisposed())) {
-            ((Shell) shell).close();
-            ((Shell) shell).dispose();
+        final Shell shell = context.getStore(NAMESPACE).get(SHELL_PARAM, Shell.class);
+        if (shell != null && !shell.isDisposed()) {
+            shell.close();
+            shell.dispose();
         }
     }
 
@@ -100,7 +100,7 @@ public class FreshShellExtension implements Extension, BeforeAllCallback, Before
         final Shell shell = new Shell(Display.getDefault());
         shell.open();
 
-        extensionContext.getStore(RED_NAMESPACE).put(SHELL_PARAM, shell);
+        extensionContext.getStore(NAMESPACE).put(SHELL_PARAM, shell);
         return shell;
     }
 

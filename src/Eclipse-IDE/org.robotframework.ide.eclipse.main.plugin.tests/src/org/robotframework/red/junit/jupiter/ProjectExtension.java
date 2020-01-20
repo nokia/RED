@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
@@ -42,7 +43,7 @@ import com.google.common.io.CharStreams;
 public class ProjectExtension
         implements Extension, BeforeAllCallback, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
-    private static final Namespace RED_NAMESPACE = Namespace.create("red");
+    private static final Namespace NAMESPACE = Namespace.create(ProjectExtension.class);
 
     private static final String PROJECT_PARAM = "project.state";
 
@@ -118,18 +119,15 @@ public class ProjectExtension
     public void beforeEach(final ExtensionContext context) throws Exception {
         final Object testInstance = context.getRequiredTestInstance();
 
-        FieldsSupport.handleFields(testInstance.getClass(), true, Project.class,
-                storeStaticStates(context, testInstance));
         FieldsSupport.handleFields(testInstance.getClass(), false, Project.class,
                 createAndSetNewProject(context, testInstance));
     }
 
     @Override
     public void afterEach(final ExtensionContext context) throws Exception {
-        final Object testInstance = context.getRequiredTestInstance();
+        cleanUpAfterTest(context);
 
-        FieldsSupport.handleFields(testInstance.getClass(), true, Project.class,
-                cleanUpStaticStates(context, testInstance));
+        final Object testInstance = context.getRequiredTestInstance();
         FieldsSupport.handleFields(testInstance.getClass(), false, Project.class, deleteProject(testInstance));
     }
 
@@ -172,9 +170,10 @@ public class ProjectExtension
                     field.set(testInstance, project);
 
                 } else if (field.getType() == StatefulProject.class) {
-                    final StatefulProject statefulProject = new StatefulProject(project);
+                    final StatefulProject statefulProject = new StatefulProject(project,
+                            projectAnnotation.cleanUpAfterEach());
                     field.set(testInstance, statefulProject);
-                    context.getStore(RED_NAMESPACE).put(PROJECT_PARAM, statefulProject);
+                    context.getStore(NAMESPACE).put(createStoreKey(context), statefulProject);
                 }
 
             } catch (CoreException | IllegalArgumentException | IllegalAccessException | IOException e) {
@@ -188,38 +187,27 @@ public class ProjectExtension
         };
     }
 
-    private static Consumer<Field> storeStaticStates(final ExtensionContext context, final Object testInstance) {
-        return field -> {
-            assertSupportedType("field", field.getType());
-
-            final Project projectAnnotation = field.getAnnotation(Project.class);
-            try {
-                final Object obj = field.get(testInstance);
-                if (obj instanceof StatefulProject && projectAnnotation.cleanUpAfterEach()) {
-                    context.getStore(RED_NAMESPACE).put(PROJECT_PARAM, obj);
-                }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                return;
-            }
-        };
+    private static void cleanUpAfterTest(final ExtensionContext context) {
+        final Store store = context.getStore(NAMESPACE);
+        
+        final String staticLevelKey = PROJECT_PARAM + ":" + context.getRequiredTestClass().getSimpleName();
+        final String testLevelKey = PROJECT_PARAM + ":" + context.getRequiredTestClass().getSimpleName() + "#"
+                + context.getRequiredTestMethod().getName();
+        
+        final StatefulProject staticLevelProject = store.get(staticLevelKey, StatefulProject.class);
+        if (staticLevelProject != null) {
+            staticLevelProject.cleanUp();
+        }
+        final StatefulProject testLevelProject = store.get(testLevelKey, StatefulProject.class);
+        if (testLevelProject != null) {
+            testLevelProject.cleanUp();
+        }
     }
 
-    private Consumer<Field> cleanUpStaticStates(final ExtensionContext context, final Object testInstance) {
-        return field -> {
-            assertSupportedType("field", field.getType());
-
-            final Project projectAnnotation = field.getAnnotation(Project.class);
-            try {
-                final Object obj = field.get(testInstance);
-                if (obj instanceof StatefulProject && projectAnnotation.cleanUpAfterEach()) {
-                    final StatefulProject statefulProject = (StatefulProject) context.getStore(RED_NAMESPACE)
-                            .get(PROJECT_PARAM);
-                    statefulProject.cleanUp();
-                }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                return;
-            }
-        };
+    private static String createStoreKey(final ExtensionContext context) {
+        final String className = context.getRequiredTestClass().getSimpleName();
+        return PROJECT_PARAM + ":"
+                + context.getTestMethod().map(method -> className + "#" + method.getName()).orElse(className);
     }
 
     private static void createDirectories(final IProject project, final String[] directoryPaths) throws CoreException {
@@ -267,7 +255,6 @@ public class ProjectExtension
                     project = ((StatefulProject) project).getProject();
                 }
                 if (project instanceof IProject && ((IProject) project).exists()) {
-                    ((IProject) project).refreshLocal(IResource.DEPTH_INFINITE, null);
                     ((IProject) project).delete(true, null);
                 }
             } catch (IllegalArgumentException | IllegalAccessException | CoreException e) {

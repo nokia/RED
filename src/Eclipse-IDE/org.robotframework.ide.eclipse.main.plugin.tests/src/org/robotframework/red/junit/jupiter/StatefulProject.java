@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.project.RobotProjectConfig;
 
@@ -28,8 +29,11 @@ public class StatefulProject {
 
     private final List<IResource> createdResources;
 
-    StatefulProject(final IProject project) {
+    private final boolean cleanUpAfterEachTest;
+
+    StatefulProject(final IProject project, final boolean cleanUpAfterEachTest) {
         this.project = project;
+        this.cleanUpAfterEachTest = cleanUpAfterEachTest;
         this.createdResources = new ArrayList<>();
     }
 
@@ -43,6 +47,10 @@ public class StatefulProject {
 
     public IWorkspace getWorkspace() {
         return project.getWorkspace();
+    }
+
+    public IPath getLocation() {
+        return project.getLocation();
     }
 
     public IFolder getDir(final String filePath) {
@@ -62,6 +70,17 @@ public class StatefulProject {
         final IFile file = ProjectExtension.createFile(project, filePath, lines);
         if (mode == CleanMode.TEMPORAL) {
             createdResources.add(file);
+        }
+    }
+
+    public void createDir(final String filePath) throws IOException, CoreException {
+        createDir(CleanMode.TEMPORAL, filePath);
+    }
+
+    public void createDir(final CleanMode mode, final String filePath) throws IOException, CoreException {
+        final IFolder folder = ProjectExtension.createDir(project, filePath);
+        if (mode == CleanMode.TEMPORAL) {
+            createdResources.add(folder);
         }
     }
 
@@ -130,13 +149,15 @@ public class StatefulProject {
     }
 
     public void cleanUp() {
-        for (final IResource resource : createdResources) {
-            try {
-                resource.delete(true, null);
-            } catch (final CoreException e) {
+        if (cleanUpAfterEachTest) {
+            for (final IResource resource : createdResources) {
+                try {
+                    resource.delete(true, null);
+                } catch (final CoreException e) {
+                }
             }
+            createdResources.clear();
         }
-        createdResources.clear();
     }
 
     public static enum CleanMode {
