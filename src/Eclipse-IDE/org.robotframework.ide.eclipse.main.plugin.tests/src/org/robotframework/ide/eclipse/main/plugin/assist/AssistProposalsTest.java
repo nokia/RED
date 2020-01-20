@@ -301,7 +301,7 @@ public class AssistProposalsTest {
     @Test
     public void verifyForLoopsReservedWordsProposalProperties() {
         final ForLoopReservedWordProposal proposal = AssistProposals.createForLoopReservedWordProposal("word",
-                ProposalMatch.EMPTY);
+                ProposalMatch.EMPTY, false);
         assertThat(proposal.getContent()).isEqualTo("word");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isNull();

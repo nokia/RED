@@ -5,15 +5,25 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import static org.robotframework.red.jface.viewers.Stylers.mixingStyler;
+
 import java.util.Optional;
 
+import org.eclipse.jface.viewers.StyledString;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.DocumentationViewInput;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.inputs.SingleParagraphInput;
+import org.robotframework.red.jface.viewers.Stylers;
+
+import com.google.common.collect.Range;
 
 class ForLoopReservedWordProposal extends BaseAssistProposal {
 
-    ForLoopReservedWordProposal(final String word, final ProposalMatch match) {
+    private boolean isDeprecated;
+
+    ForLoopReservedWordProposal(final String word, final ProposalMatch match, final boolean isDeprecated) {
         super(word, match);
+
+        this.isDeprecated = isDeprecated;
     }
 
     @Override
@@ -29,5 +39,19 @@ class ForLoopReservedWordProposal extends BaseAssistProposal {
     @Override
     public DocumentationViewInput getDocumentationInput() {
         return new SingleParagraphInput(this::getDescription);
+    }
+    
+    @Override
+    public StyledString getStyledLabel() {
+        final StyledString label = isDeprecated ? new StyledString(getLabel(), Stylers.Common.STRIKEOUT_STYLER)
+                : new StyledString(getLabel());
+        for (final Range<Integer> matchingRange : match) {
+            final int length = Math.min(matchingRange.upperEndpoint() - matchingRange.lowerEndpoint(),
+                    label.length() - matchingRange.lowerEndpoint());
+            label.setStyle(matchingRange.lowerEndpoint(), length,
+                    isDeprecated ? mixingStyler(Stylers.Common.STRIKEOUT_STYLER, Stylers.Common.MATCH_DECORATION_STYLER)
+                            : Stylers.Common.MATCH_DECORATION_STYLER);
+        }
+        return label;
     }
 }

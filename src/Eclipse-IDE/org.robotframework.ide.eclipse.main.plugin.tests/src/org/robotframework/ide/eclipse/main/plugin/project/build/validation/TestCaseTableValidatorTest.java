@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -167,8 +168,10 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
-    public void forWithInconsistentNameIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+    public void forWithInconsistentNameIsReported_forRF31() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
                 .appendLine("test")
                 .appendLine("  : FOR    ${x}    IN RANGE    1")
                 .appendLine("  \\  kw")
@@ -180,7 +183,7 @@ public class TestCaseTableValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(
                 newStdLibraryKeyword("BuiltIn", "kw", new Path("/suite.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
+        final FileValidationContext context = prepareContext(accessibleKws, version);
 
         final Collection<Problem> problems = validate(context, file);
         assertThat(problems).containsOnly(
@@ -190,6 +193,58 @@ public class TestCaseTableValidatorTest {
                         new ProblemPosition(5, Range.closed(67, 71))),
                 new Problem(KeywordsProblem.FOR_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION,
                         new ProblemPosition(7, Range.closed(107, 113))));
+    }
+
+    @Test
+    public void deprecatedForIsReported_forRF32() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 2);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  :FOR    ${x}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .appendLine("  :for    ${y}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .appendLine("  :F O R    ${z}    IN RANGE    1")
+                .appendLine("  \\  kw")
+                .appendLine("  FOR    ${z}    IN RANGE    1")
+                .appendLine("  \\  kw").build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newStdLibraryKeyword("BuiltIn", "kw", new Path("/suite.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws, version);
+        context.getVersion();
+
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).containsOnly(
+                new Problem(KeywordsProblem.DEPRECATED_FOR,
+                        new ProblemPosition(3, Range.closed(26, 30))),
+                new Problem(KeywordsProblem.DEPRECATED_FOR,
+                        new ProblemPosition(5, Range.closed(66, 70))),
+                new Problem(KeywordsProblem.DEPRECATED_FOR,
+                        new ProblemPosition(7, Range.closed(106, 112))),
+                new Problem(KeywordsProblem.DEPRECATED_FOR,
+                        new ProblemPosition(9, Range.closed(148, 151))));
+    }
+
+    @Test
+    public void deprecatedForIsNotReported_forRF32() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 2);
+        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  FOR    ${x}    IN RANGE    1")
+                .appendLine("    kw")
+                .appendLine("  END").build();
+
+
+        final List<KeywordEntity> accessibleKws = newArrayList(
+                newStdLibraryKeyword("BuiltIn", "kw", new Path("/suite.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws, version);
+        context.getVersion();
+
+        final Collection<Problem> problems = validate(context, file);
+        assertThat(problems).isEmpty();
     }
 
     @Test

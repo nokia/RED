@@ -359,22 +359,26 @@ public class DocumentUtilities {
         }
     }
 
-    public static Optional<IRegion> getSnippet(final IDocument document, final int offset,
-            final int noOfLinesBeforeAndAfter) {
-        if (noOfLinesBeforeAndAfter < 0) {
+    public static Optional<IRegion> getSnippet(final IDocument document, final int offset, final int numberOfLines) {
+        if (numberOfLines < 0) {
             return Optional.empty();
         }
         try {
             final int line = document.getLineOfOffset(offset);
-            final int firstLine = Math.max(0, line - noOfLinesBeforeAndAfter);
-            final int lastLine = Math.min(document.getNumberOfLines() - 1, line + noOfLinesBeforeAndAfter);
+            final int firstLine = Math.max(0, line - numberOfLines);
+            final int lastLine = Math.min(document.getNumberOfLines() - 1, line + numberOfLines);
 
+            final IRegion lineRegion = document.getLineInformation(line);
             final IRegion firstLineRegion = document.getLineInformation(firstLine);
             final IRegion lastLineRegion = document.getLineInformation(lastLine);
 
-            return Optional.of(new Region(firstLineRegion.getOffset(),
-                    lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
-
+            if (numberOfLines <= 2) {
+                return Optional.of(new Region(firstLineRegion.getOffset(),
+                        lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
+            } else {
+                return Optional.of(new Region(lineRegion.getOffset(),
+                        lastLineRegion.getOffset() + lastLineRegion.getLength() - lineRegion.getOffset()));
+            }
         } catch (final BadLocationException e) {
             return Optional.empty();
         }

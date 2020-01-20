@@ -73,7 +73,7 @@ public class ForLoopReservedWordsProposals {
                     .map(Optional::get)
                     .findFirst()
                     .ifPresent(match -> proposals
-                            .add(AssistProposals.createForLoopReservedWordProposal(FOR_LOOP_1, match)));
+                            .add(AssistProposals.createForLoopReservedWordProposal(FOR_LOOP_1, match, true)));
         }
         proposals.addAll(generateProposalsFrom(NEW_FOR_LOOP_LITERALS, userContent));
         proposals.addAll(generateProposalsFrom(LOOP_ELEMENTS, userContent));
@@ -90,7 +90,7 @@ public class ForLoopReservedWordsProposals {
             if (predicateWordHasToSatisfy.test(word)) {
                 final Optional<ProposalMatch> match = matcher.matches(userContent, word);
                 if (match.isPresent()) {
-                    proposals.add(AssistProposals.createForLoopReservedWordProposal(word, match.get()));
+                    proposals.add(AssistProposals.createForLoopReservedWordProposal(word, match.get(), false));
                 }
             }
         }

@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.keywords.KeywordPostconditi
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ConvertDeprecatedForLoopFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
@@ -462,6 +463,29 @@ public enum KeywordsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final String canonical = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
             return newArrayList(new ChangeToFixer(canonical));
+        }
+    },
+    DEPRECATED_FOR {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "For loop usage is deprecated. Use current for loop syntax instead.";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final int regionLength = marker.getAttribute(AdditionalMarkerAttributes.VALUE, -1);
+            return newArrayList(new ConvertDeprecatedForLoopFixer(regionLength));
         }
     },
     FOR_IS_EMPTY {

@@ -39,6 +39,19 @@ public class KeywordsProblemTest {
     }
 
     @Test
+    public void forUsedInDeprecatedWay_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, "")).thenReturn("15");
+
+        final KeywordsProblem problem = KeywordsProblem.DEPRECATED_FOR;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel)
+                .containsExactly("Convert to current FOR loop syntax");
+    }
+
+    @Test
     public void keywordFromNestedLibrary_hasResolutionAndProvidesFixer() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("myLib");

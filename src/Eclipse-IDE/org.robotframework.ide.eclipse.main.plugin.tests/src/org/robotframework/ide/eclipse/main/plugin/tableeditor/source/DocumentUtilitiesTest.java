@@ -181,4 +181,15 @@ public class DocumentUtilitiesTest {
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
                 .isEqualTo("line2\nline3\nline4\nline5");
     }
+
+    @Test
+    public void snippetContainsOnlySelectedLinesWhenNumberOfLinesIsGreaterThanTwo() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5", "line6", "line7");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 7, 4);
+
+        assertThat(snippet.isPresent()).isTrue();
+        assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
+                .isEqualTo("line2\nline3\nline4\nline5\nline6");
+    }
 }

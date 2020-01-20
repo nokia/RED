@@ -114,8 +114,9 @@ public class AssistProposals {
         return new GherkinReservedWordProposal(word, match);
     }
 
-    static ForLoopReservedWordProposal createForLoopReservedWordProposal(final String word, final ProposalMatch match) {
-        return new ForLoopReservedWordProposal(word, match);
+    static ForLoopReservedWordProposal createForLoopReservedWordProposal(final String word, final ProposalMatch match,
+            final boolean isDeprecated) {
+        return new ForLoopReservedWordProposal(word, match, isDeprecated);
     }
 
     static LibraryAliasReservedWordProposal createLibraryAliasReservedWordProposal(final ProposalMatch match) {
