@@ -224,8 +224,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new SpecialItemsLabelAccumulator(rowObjectProvider),
                 new SettingsItemsLabelAccumulator(),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator(
-                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
+                new VariablesInNamesLabelAccumulator(fileModel::getRobotParserComplianceVersion));
         final GlazedListsEventLayer<RobotSetting> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);

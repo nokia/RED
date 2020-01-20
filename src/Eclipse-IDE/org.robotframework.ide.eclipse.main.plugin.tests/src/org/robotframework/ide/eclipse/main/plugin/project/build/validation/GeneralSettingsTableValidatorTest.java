@@ -58,7 +58,8 @@ public class GeneralSettingsTableValidatorTest {
 
     @Test
     public void emptySettingsAreReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Test Setup")
                 .appendLine("Task Teardown")
                 .appendLine("Documentation")
@@ -69,7 +70,7 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Task Timeout")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final FileValidationContext context = prepareContext(version);
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).contains(
@@ -141,11 +142,12 @@ public class GeneralSettingsTableValidatorTest {
 
     @Test
     public void undeclaredVariableAndKeywordInTaskSetupAreReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Task Setup  kw  ${var}")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final FileValidationContext context = prepareContext(version);
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).containsOnly(
@@ -155,11 +157,12 @@ public class GeneralSettingsTableValidatorTest {
 
     @Test
     public void undeclaredVariableAndKeywordInTaskTeardownAreReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Task Teardown  kw  ${var}")
                 .build();
 
-        final FileValidationContext context = prepareContext();
+        final FileValidationContext context = prepareContext(version);
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).containsOnly(
@@ -226,7 +229,8 @@ public class GeneralSettingsTableValidatorTest {
         final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("setup"),
                 newBuiltInKeyword("teardown"), newBuiltInKeyword("template"));
 
-        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("*** Settings ***")
                 .appendLine("Task Setup    setup")
                 .appendLine("Task Teardown    teardown")
@@ -234,7 +238,7 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Task Timeout    1")
                 .build();
 
-        final FileValidationContext context = prepareContext(accessibleKws);
+        final FileValidationContext context = prepareContext(accessibleKws, version);
         final Collection<Problem> problems = validate(context, file);
 
         assertThat(problems).containsOnly(
@@ -450,8 +454,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void documentSettingIsNotReported_whenRobotIsOld() throws CoreException {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Document  doc")
                 .build();
 
@@ -464,8 +467,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void documentSettingIsReportedToBeDeprecated_whenRobotIs30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Document  doc")
                 .build();
 
@@ -480,8 +482,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void documentSettingIsUnknown_whenRobotIs31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Document  doc")
                 .build();
 
@@ -495,8 +496,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void outdatedSetupAndTeardownSyntaxAreNotReported_whenRobotIsOld() throws CoreException {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Suite Precondition  kw")
                 .appendLine("Suite Postcondition  kw")
                 .appendLine("Test Precondition  kw")
@@ -513,8 +513,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void outdatedSetupAndTeardownSyntaxAreReportedToBeDeprecated_whenRobotIs30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Suite Precondition  kw")
                 .appendLine("Suite Postcondition  kw")
                 .appendLine("Test Precondition  kw")
@@ -538,8 +537,7 @@ public class GeneralSettingsTableValidatorTest {
     @Test
     public void outdatedSetupAndTeardownSettingsAreUnknown_whenRobotIs31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile file = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Settings ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
                 .appendLine("Suite Precondition  kw")
                 .appendLine("Suite Postcondition  kw")
                 .appendLine("Test Precondition  kw")

@@ -78,13 +78,14 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedTagsAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Tags]    tag1")
                 .appendLine("  [Tags]    tag2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 32))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 49))));
@@ -133,13 +134,14 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedDocumentationsAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Documentation]    tag1")
                 .appendLine("  [Documentation]    tag2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 41))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(52, 67))));
@@ -148,8 +150,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void documentSettingIsNotReported_inOlderRobot() throws CoreException {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -161,8 +162,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void documentSettingIsReportedAsDeprecated_inRf30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -175,8 +175,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void documentSettingIsNotRecognized_inRf31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -215,13 +214,14 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedTimeoutsAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Timeout]    1")
                 .appendLine("  [Timeout]    2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 35))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 52))));
@@ -307,7 +307,8 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedTemplatesAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Template]    kw1")
                 .appendLine("  [Template]    kw1")
@@ -315,7 +316,7 @@ public class TestCaseSettingsValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw1", new Path("/res.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
@@ -409,7 +410,8 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedSetupsAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Setup]    keyword")
                 .appendLine("  [Setup]    keyword")
@@ -417,7 +419,7 @@ public class TestCaseSettingsValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/res.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 33))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(47, 54))));
@@ -426,8 +428,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void preconditionSettingIsNotReported_inOlderRobot() throws CoreException {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Precondition]    keyword")
                 .build();
@@ -441,8 +442,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void preconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Precondition]    keyword")
                 .build();
@@ -458,8 +458,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void preconditionSettingIsNotRecognizedInRf31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Precondition]    keyword")
                 .build();
@@ -501,7 +500,9 @@ public class TestCaseSettingsValidatorTest {
 
     @Test
     public void duplicatedTeardownsAreReportedInRf3() throws CoreException {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version)
+                .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Teardown]    keyword")
                 .appendLine("  [Teardown]    keyword")
@@ -509,7 +510,7 @@ public class TestCaseSettingsValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/res.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(50, 60))));
@@ -518,8 +519,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void postconditionSettingIsNotReported_forOlderRobot() throws CoreException {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
@@ -533,8 +533,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void postconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
@@ -549,8 +548,7 @@ public class TestCaseSettingsValidatorTest {
     @Test
     public void postconditionSettingIsNotRecognized_inRf31() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Test Cases ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Postcondition]    keyword")
                 .build();

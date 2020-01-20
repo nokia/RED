@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -45,6 +46,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
@@ -406,8 +408,13 @@ public class RobotFormEditor extends FormEditor {
             final IStorage storage = input.getAdapter(IStorage.class);
             try (InputStream stream = storage.getContents()) {
                 final String content = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+                final String projectName = storage.getFullPath().segment(0);
+                final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+                final RobotVersion version = RedPlugin.getModelManager()
+                        .createProject(project)
+                        .getRobotParserComplianceVersion();
                 return new RobotSuiteStreamFile(storage.getName(), storage.getFullPath(), content,
-                        storage.isReadOnly());
+                        storage.isReadOnly(), version);
             } catch (final CoreException | IOException e) {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }

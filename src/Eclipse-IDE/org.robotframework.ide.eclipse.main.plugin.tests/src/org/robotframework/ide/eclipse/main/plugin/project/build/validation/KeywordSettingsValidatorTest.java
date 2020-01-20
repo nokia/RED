@@ -69,13 +69,14 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void duplicatedReturnsAreReported_inRf30() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]    1")
                 .appendLine("  [Return]    2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 35))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(43, 51))));
@@ -83,36 +84,39 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void emptyTagsSettingIsReported() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(KeywordsProblem.EMPTY_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 33))));
     }
 
     @Test
     public void nothingIsReported_whenThereIsATagDefined() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]    tag")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).isEmpty();
     }
 
     @Test
     public void duplicatedTagsAreReportedInRf3() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]    tag1")
                 .appendLine("  [Tags]    tag2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
@@ -120,12 +124,13 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void undeclaredVariableInTagsIsReported() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Tags]  ${var}")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(35, 41))));
     }
@@ -155,13 +160,14 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void duplicatedDocumentationsAreReportedInRf3() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Documentation]    doc1")
                 .appendLine("  [Documentation]    doc2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 42))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(53, 68))));
@@ -170,8 +176,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void documentSettingIsNotReported_inOlderRobot() {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -183,8 +188,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void documentSettingIsReportedAsDeprecated_inRf3() {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -197,8 +201,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void documentSettingIsNotRecognized_inRf31() {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Document]    doc1")
                 .build();
@@ -233,13 +236,14 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void duplicatedTimeoutsAreReportedInRf3() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Timeout]    1")
                 .appendLine("  [Timeout]    2")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(27, 36))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(44, 53))));
@@ -307,7 +311,8 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void duplicatedTeardownsAreReportedInRf3() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Teardown]    keyword")
                 .appendLine("  [Teardown]    keyword")
@@ -315,7 +320,7 @@ public class KeywordSettingsValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
 
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(22, 32))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
@@ -324,8 +329,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void postconditionSettingIsNotRecognized_inOlderRobot() {
         final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
@@ -340,8 +344,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void postconditionSettingIsReportedAsDeprecated_inRf30() {
         final RobotVersion version = new RobotVersion(3, 0);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
@@ -356,8 +359,7 @@ public class KeywordSettingsValidatorTest {
     @Test
     public void postconditionSettingIsNotRecognized_inRf31() {
         final RobotVersion version = new RobotVersion(3, 1);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  [Postcondition]    keyword")
                 .build();
@@ -423,14 +425,15 @@ public class KeywordSettingsValidatorTest {
 
     @Test
     public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings_inRf3() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+        final RobotVersion version = new RobotVersion(3, 0);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Keywords ***")
                 .appendLine("keyword ${x:\\d+} rest of name")
                 .appendLine("  [Arguments]  ${a}  ${x}")
                 .appendLine("  [Arguments]  ${x}  ${b}")
                 .appendLine("  [Return]  10")
                 .build();
 
-        final Collection<Problem> problems = validate(prepareContext(new RobotVersion(3, 0)), fileModel);
+        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(49, 60))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(75, 86))),

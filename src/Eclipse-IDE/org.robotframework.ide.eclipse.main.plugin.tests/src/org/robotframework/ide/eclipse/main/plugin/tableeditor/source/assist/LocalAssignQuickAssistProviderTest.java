@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -31,7 +32,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "*** Test Cases ***",
                 "test",
                 "  keyword  1  2  3");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final IQuickAssistInvocationContext invocationContext = new InvocationContext(document, 20);
 
@@ -49,7 +50,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "  FOR  ${i}  IN RANGE  10",
                 "    keyword  1  2  3",
                 "  END");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
@@ -68,7 +69,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "*** Test Cases ***",
                 "test",
                 "  \\  # comment");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
@@ -87,7 +88,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "*** Test Cases ***",
                 "test",
                 "  [Setup]  Log  1  2  3");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
@@ -106,7 +107,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "*** Test Cases ***",
                 "test",
                 "  keyword  1  2  3");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
@@ -132,7 +133,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "*** Test Cases ***",
                 "test",
                 "  ${x}=  keyword  1  2  3");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);
@@ -159,7 +160,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "test",
                 "  :FOR  ${i}  IN RANGE  10",
                 "  \\  keyword  1  2  3");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(1);
@@ -190,7 +191,7 @@ public class LocalAssignQuickAssistProviderTest {
                 "  FOR  ${i}  IN RANGE  10",
                 "    keyword  1  2  3",
                 "  END");
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendDocumentContent(document).build();
+        final RobotSuiteFile model = buildModel(document);
 
         final RobotKeywordCall call = model.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(1);
@@ -211,6 +212,10 @@ public class LocalAssignQuickAssistProviderTest {
                                 "    @{var}    keyword  1  2  3", "  END"),
                         new Document("*** Test Cases ***", "test", "  FOR  ${i}  IN RANGE  10",
                                 "    &{var}    keyword  1  2  3", "  END"));
+    }
+
+    private RobotSuiteFile buildModel(final Document document) {
+        return new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendDocumentContent(document).build();
     }
 
     private static class InvocationContext implements IQuickAssistInvocationContext {

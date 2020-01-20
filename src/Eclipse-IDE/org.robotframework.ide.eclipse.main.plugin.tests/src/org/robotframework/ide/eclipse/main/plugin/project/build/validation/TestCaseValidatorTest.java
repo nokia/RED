@@ -1443,7 +1443,8 @@ public class TestCaseValidatorTest {
 
     @Test
     public void nothingIsReported_whenTemplateIsUsedInForLoop() {
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotVersion version = new RobotVersion(3, 1);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
                 .appendLine("templated case")
                 .appendLine("  [Template]  kw")
                 .appendLine("  FOR  ${index}  IN RANGE  10")
@@ -1454,7 +1455,7 @@ public class TestCaseValidatorTest {
 
         final List<KeywordEntity> accessibleKws = newArrayList(
                 newResourceKeyword("kw", new Path("/res.robot"), "arg1", "arg2", "arg3"));
-        final FileValidationContext context = prepareContext(accessibleKws, RobotVersion.from("3.1"));
+        final FileValidationContext context = prepareContext(accessibleKws, version);
 
         assertThat(problemsOf(context, fileModel)).isEmpty();
     }

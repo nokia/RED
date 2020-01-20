@@ -168,8 +168,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator(
-                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
+                new VariablesInNamesLabelAccumulator(fileModel::getRobotParserComplianceVersion));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
                 dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);

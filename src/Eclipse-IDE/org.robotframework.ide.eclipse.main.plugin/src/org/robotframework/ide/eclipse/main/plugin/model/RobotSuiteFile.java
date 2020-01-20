@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -328,6 +329,11 @@ public class RobotSuiteFile extends RobotProjectElement implements RobotFileInte
     public RobotParser createRobotParser() {
         final RobotProject robotProject = getRobotProject();
         return new RobotParser(robotProject.getRobotProjectHolder(), robotProject.getRobotParserComplianceVersion());
+    }
+
+    public RobotVersion getRobotParserComplianceVersion() {
+        final RobotProject robotProject = getRobotProject();
+        return robotProject.getRobotParserComplianceVersion();
     }
 
     public File getRobotParserFile() {

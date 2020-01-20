@@ -232,8 +232,7 @@ class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new NestedExecsSpecialTokensLabelAccumulator(dataProvider),
                 new SpecialItemsLabelAccumulator(dataProvider::getRowObject),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator(
-                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
+                new VariablesInNamesLabelAccumulator(fileModel::getRobotParserComplianceVersion));
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());

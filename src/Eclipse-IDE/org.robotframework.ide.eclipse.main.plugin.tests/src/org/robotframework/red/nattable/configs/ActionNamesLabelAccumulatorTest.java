@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -340,7 +341,7 @@ public class ActionNamesLabelAccumulatorTest {
     }
 
     private static RobotSuiteFile createModelWithForLoop() {
-        return new RobotSuiteFileCreator()
+        return new RobotSuiteFileCreator(new RobotVersion(3, 1))
                 .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  FOR  ${index}  IN RANGE  3")
@@ -349,7 +350,7 @@ public class ActionNamesLabelAccumulatorTest {
     }
 
     private static RobotSuiteFile createModelWithForLoopWithEnd() {
-        return new RobotSuiteFileCreator()
+        return new RobotSuiteFileCreator(new RobotVersion(3, 1))
                 .appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  FOR  ${index}  IN RANGE  3")

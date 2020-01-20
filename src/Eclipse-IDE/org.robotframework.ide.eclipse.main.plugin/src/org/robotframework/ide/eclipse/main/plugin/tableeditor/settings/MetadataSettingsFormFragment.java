@@ -221,8 +221,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                 new AddingElementLabelAccumulator(dataProvider),
                 new SettingsCommentsLabelAccumulator(dataProvider),
                 new VariablesInElementsLabelAccumulator(),
-                new VariablesInNamesLabelAccumulator(
-                        () -> fileModel.getRobotProject().getRobotParserComplianceVersion()));
+                new VariablesInNamesLabelAccumulator(fileModel::getRobotParserComplianceVersion));
         final GlazedListsEventLayer<RobotSetting> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);

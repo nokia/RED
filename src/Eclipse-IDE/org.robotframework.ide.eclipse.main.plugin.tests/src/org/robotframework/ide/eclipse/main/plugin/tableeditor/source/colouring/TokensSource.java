@@ -243,7 +243,7 @@ public class TokensSource {
     }
 
     static List<RobotLine> createTokensOfNoneAwareSettings() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotSuiteFile model = new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendLine("*** Test Cases ***")
                 .appendLine("case 1")
                 .appendLine("  [Documentation]  NONE")
                 .appendLine("  [Tags]  NONE")
@@ -294,7 +294,7 @@ public class TokensSource {
     }
 
     static List<RobotLine> createTokensOfTemplatedCases() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+        final RobotSuiteFile model = new RobotSuiteFileCreator(new RobotVersion(3, 1)).appendLine("*** Test Cases ***")
                 .appendLine("case 1")
                 .appendLine("  [Template]  tc_setting_template  tc_setting_template_arg1  tc_setting_template_arg2  # comment")
                 .appendLine("  arg1  arg2  # comment   comment")

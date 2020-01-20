@@ -14,7 +14,6 @@ import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 public class RobotSuiteStreamFile extends RobotSuiteFile {
@@ -27,14 +26,16 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     private final boolean readOnly;
 
-    private RobotVersion version;
+    private final RobotVersion version;
 
-    public RobotSuiteStreamFile(final String name, final IPath path, final String content, final boolean readOnly) {
+    public RobotSuiteStreamFile(final String name, final IPath path, final String content, final boolean readOnly,
+            final RobotVersion version) {
         super(null, null);
         this.name = name;
         this.path = path;
         this.content = content;
         this.readOnly = readOnly;
+        this.version = version;
     }
 
     @Override
@@ -73,8 +74,8 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     public RobotParser createRobotParser() {
-        final IRuntimeEnvironment env = RedPlugin.getDefault().getActiveRobotInstallation();
-        return new RobotParser(new RobotProjectHolder(env), version == null ? env.getRobotVersion() : version);
+        final RobotProjectHolder robotProject = new RobotProjectHolder(getRuntimeEnvironment());
+        return new RobotParser(robotProject, version);
     }
 
     @Override
@@ -100,8 +101,9 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         return name;
     }
 
-    public void setRobotVersion(final RobotVersion version) {
-        this.version = version;
+    @Override
+    public RobotVersion getRobotParserComplianceVersion() {
+        return version;
     }
 
     @Override

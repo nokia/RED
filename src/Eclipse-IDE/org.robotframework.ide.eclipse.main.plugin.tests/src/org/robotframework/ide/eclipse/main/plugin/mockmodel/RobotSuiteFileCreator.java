@@ -25,7 +25,7 @@ public class RobotSuiteFileCreator {
     private RobotVersion version;
 
     public RobotSuiteFileCreator() {
-        this(null);
+        this(RobotVersion.UNKNOWN);
     }
 
     public RobotSuiteFileCreator(final RobotVersion version) {
@@ -76,10 +76,8 @@ public class RobotSuiteFileCreator {
 
     private RobotSuiteFile buildModel(final String filename, final boolean readOnly) {
         final String content = getContent();
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, new Path(filename), content, readOnly);
-        if (version != null) {
-            model.setRobotVersion(version);
-        }
+        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, new Path(filename), content, readOnly,
+                version);
         model.reparseEverything(content);
         return model;
     }
