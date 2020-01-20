@@ -63,6 +63,8 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
     static class VariableFileCreator implements Supplier<ReferencedVariableFile> {
 
+        private static final String[] VAR_FILE_EXTENSIONS = new String[] { "*.py;*.yaml;*.yml", "*.*" };
+
         private final Shell shell;
 
         private final RedProjectEditorInput editorInput;
@@ -98,7 +100,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
         private List<ReferencedVariableFile> selectVariableFiles() {
             final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
-            dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+            dialog.setFilterExtensions(VAR_FILE_EXTENSIONS);
             dialog.setFilterPath(editorInput.getRobotProject().getProject().getLocation().toPortableString());
 
             final List<ReferencedVariableFile> variableFiles = new ArrayList<>();
@@ -117,7 +119,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
         private ReferencedVariableFile modifyExisting(final ReferencedVariableFile varFile) {
             final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
-            dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
+            dialog.setFilterExtensions(VAR_FILE_EXTENSIONS);
             final IPath startingPath = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(varFile.getPath()))
                     .removeLastSegments(1);
