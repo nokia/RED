@@ -18,39 +18,42 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.eclipse.ui.PartInitException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.Editors;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class LibrariesConfigUpdaterTest {
 
     private static final ReferencedLibrary LIB_1 = ReferencedLibrary.create(LibraryType.PYTHON, "x", "y");
 
     private static final ReferencedLibrary LIB_2 = ReferencedLibrary.create(LibraryType.JAVA, "a", "b");
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(LibrariesConfigUpdaterTest.class);
+    @Project(createDefaultRedXml = true)
+    IProject project;
 
     private RobotProject robotProject;
 
     private IEventBroker eventBroker;
 
-    @Before
-    public void before() throws Exception {
-        projectProvider.configure();
-        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+    @BeforeEach
+    public void before() {
+        robotProject = new RobotModel().createRobotProject(project);
         eventBroker = mock(IEventBroker.class);
     }
 
     @Test
-    public void testIfNoLibrariesAreAdded() throws Exception {
+    public void testIfNoLibrariesAreAdded() {
         final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         updater.finalizeLibrariesAdding(eventBroker);
@@ -60,7 +63,7 @@ public class LibrariesConfigUpdaterTest {
     }
 
     @Test
-    public void testIfLibrariesAreAdded_whenConfigIsClosed() throws Exception {
+    public void testIfLibrariesAreAdded_whenConfigIsClosed() {
         final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs = Arrays.asList(LIB_1, LIB_2);
@@ -74,7 +77,7 @@ public class LibrariesConfigUpdaterTest {
     }
 
     @Test
-    public void testIfLibrariesAreAdded_whenConfigIsOpened() throws Exception {
+    public void testIfLibrariesAreAdded_whenConfigIsOpened() throws PartInitException {
         Editors.openInProjectEditor(robotProject.getConfigurationFile());
         final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
@@ -89,7 +92,7 @@ public class LibrariesConfigUpdaterTest {
     }
 
     @Test
-    public void testIfAllLibrariesAreAdded() throws Exception {
+    public void testIfAllLibrariesAreAdded() {
         final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs1 = Collections.singletonList(LIB_1);
@@ -107,7 +110,7 @@ public class LibrariesConfigUpdaterTest {
     }
 
     @Test
-    public void testIfLibrariesAreAddedOnlyOnce() throws Exception {
+    public void testIfLibrariesAreAddedOnlyOnce() {
         final LibrariesConfigUpdater updater = LibrariesConfigUpdater.createFor(robotProject);
 
         final List<ReferencedLibrary> libs = Collections.singletonList(LIB_1);

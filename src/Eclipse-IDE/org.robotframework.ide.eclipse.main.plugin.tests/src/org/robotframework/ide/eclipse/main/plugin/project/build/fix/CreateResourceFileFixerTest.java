@@ -6,29 +6,33 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class CreateResourceFileFixerTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(CreateResourceFileFixerTest.class);
+    @Project(dirs = { "dir1", "dir1/dir2", "dir1/dir2/dir3" })
+    static IProject project;
 
     private static RobotSuiteFile topLevelFile;
 
@@ -36,14 +40,9 @@ public class CreateResourceFileFixerTest {
 
     private static IMarker marker;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createDir("dir1");
-        projectProvider.createDir("dir1/dir2");
-        projectProvider.createDir("dir1/dir2/dir3");
-
-        topLevelFile = new RobotModel()
-                .createSuiteFile(projectProvider.createFile("dir1/file1.robot", "*** Keywords ***"));
+        topLevelFile = new RobotModel().createSuiteFile(createFile(project, "dir1/file1.robot", "*** Keywords ***"));
 
         marker = topLevelFile.getFile().createMarker(RedPlugin.PLUGIN_ID);
         workspaceDir = marker.getResource().getWorkspace().getRoot().getLocation().toPortableString();
@@ -90,7 +89,7 @@ public class CreateResourceFileFixerTest {
     @Test
     public void testGetValidPathToCreate_whenRelativeAndLegalBackToProjectPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
-                "../../" + projectProvider.getProject().getName() + "/res.robot");
+                "../../" + project.getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/res.robot"));
     }
@@ -109,10 +108,9 @@ public class CreateResourceFileFixerTest {
         assertThat(path).isNotPresent();
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     public void testGetValidPathToCreate_whenIllegalCharactersPath() throws Exception {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "illeg*l/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).isNotPresent();
@@ -121,7 +119,7 @@ public class CreateResourceFileFixerTest {
     @Test
     public void testGetValidPathToCreate_whenAbsoluteAndValidPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
-                workspaceDir + "/" + projectProvider.getProject().getName() + "/res.robot");
+                workspaceDir + "/" + project.getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/res.robot"));
     }
@@ -129,7 +127,7 @@ public class CreateResourceFileFixerTest {
     @Test
     public void testGetValidPathToCreate_whenAbsoluteAndInWorkspaceNonCanonicalPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
-                workspaceDir + "/" + projectProvider.getProject().getName() + "/dir1/../dir1/res.robot");
+                workspaceDir + "/" + project.getName() + "/dir1/../dir1/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/res.robot"));
     }
@@ -141,24 +139,22 @@ public class CreateResourceFileFixerTest {
         assertThat(path).isNotPresent();
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     public void testGetValidPathToCreate_whenAbsolutePathFromAnotherSystem_forWindows() throws Exception {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final String anotherSystemWorkspace = workspaceDir.substring(2);
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
-                anotherSystemWorkspace + "/" + projectProvider.getProject().getName() + "/res.robot");
+                anotherSystemWorkspace + "/" + project.getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).isNotPresent();
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void testGetValidPathToCreate_whenAbsolutePathFromAnotherSystem_forLinux() throws Exception {
-        assumeFalse(RedSystemProperties.isWindowsPlatform());
-
         final String anotherSystemWorkspace = "D:" + workspaceDir;
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
-                anotherSystemWorkspace + "/" + projectProvider.getProject().getName() + "/res.robot");
+                anotherSystemWorkspace + "/" + project.getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
         assertThat(path).isNotPresent();
     }

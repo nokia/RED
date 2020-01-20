@@ -14,9 +14,8 @@ import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -25,22 +24,14 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class RedEclipseProjectConfigTest {
 
-    private static final String PROJECT_NAME = RedEclipseProjectConfigTest.class.getSimpleName();
-
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    private static IProject project;
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        project = projectProvider.getProject();
-        projectProvider.createFile("resource.txt");
-    }
+    @Project(files = { "resource.txt" })
+    static IProject project;
 
     @Test
     public void absolutePathIsResolved() throws Exception {
@@ -48,7 +39,7 @@ public class RedEclipseProjectConfigTest {
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig);
 
-        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create(PROJECT_NAME + "/file.txt")))
+        assertThat(redConfig.resolveToAbsolutePath(SearchPath.create(project.getName() + "/file.txt")))
                 .isEqualTo(project.getLocation().append("file.txt"));
     }
 
@@ -148,13 +139,14 @@ public class RedEclipseProjectConfigTest {
         projectConfig.addPythonPath(SearchPath.create("%{KNOWN_2}/%{FOLDER}"));
         projectConfig.addPythonPath(SearchPath.create("folder1"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib1", PROJECT_NAME + "/lib1.jar"));
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib1", project.getName() + "/lib1.jar"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", PROJECT_NAME + "/lib2.jar"));
+                ReferencedLibrary.create(LibraryType.JAVA, "JavaLib2", project.getName() + "/lib2.jar"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", PROJECT_NAME + "/folder1/PyLib1.py"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib1", project.getName() + "/folder1/PyLib1.py"));
         projectConfig.addReferencedLibrary(
-                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2", PROJECT_NAME + "/folder2/PyLib2/__init__.py"));
+                ReferencedLibrary.create(LibraryType.PYTHON, "PyLib2",
+                        project.getName() + "/folder2/PyLib2/__init__.py"));
 
         final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(project, projectConfig, variableAccessor);
 
@@ -165,7 +157,7 @@ public class RedEclipseProjectConfigTest {
     }
 
     private static String absolutePath(final String... projectRelativeParts) {
-        final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
+        final String projectAbsPath = project.getLocation().toOSString();
         return projectAbsPath + File.separator + String.join(File.separator, projectRelativeParts);
     }
 }

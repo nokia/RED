@@ -6,13 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -25,20 +28,22 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.Range;
 
+@ExtendWith(ProjectExtension.class)
 public class RobotFileValidatorCheckBuildMessagesTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(RobotFileValidatorCheckBuildMessagesTest.class);
+    @Project
+    static IProject project;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("error.py", "syntax");
-        projectProvider.createFile("suite.robot");
-        projectProvider.createFile("suite_with_vars.robot", "***Settings***", "Variables  error.py");
+        createFile(project, "error.py", "syntax");
+        createFile(project, "suite.robot");
+        createFile(project, "suite_with_vars.robot", "***Settings***", "Variables  error.py");
     }
 
     @Test
@@ -121,7 +126,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
             final BuildMessage... messages) {
         final ValidationContext context = createValidationContext(new RobotModel(), new BuildLogger());
 
-        final IFile file = projectProvider.getFile(filePath);
+        final IFile file = getFile(project, filePath);
         final RobotSuiteFile fileModel = context.getModel().createSuiteFile(file);
         fileModel.parse();
 
@@ -139,7 +144,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     }
 
     private static ValidationContext createValidationContext(final RobotModel model, final BuildLogger logger) {
-        return new ValidationContext(model.createRobotProject(projectProvider.getProject()), logger);
+        return new ValidationContext(model.createRobotProject(project), logger);
     }
 
     private static BuildMessage createBuildWarnMessage() {

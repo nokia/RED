@@ -13,12 +13,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -26,22 +27,18 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.SimpleLibrariesAutoDiscoverer;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class AddLibraryToRedXmlFixerTest {
 
-    private static final String PROJECT_NAME = AddLibraryToRedXmlFixerTest.class.getSimpleName();
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @Project(nameSuffix = "NoConfig")
+    static IProject notConfiguredProject;
 
-    @ClassRule
-    public static ProjectProvider notConfiguredProjectProvider = new ProjectProvider(PROJECT_NAME + "NoConfig");
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
 
     @Test
     public void autodiscovererIsStarted_whenLibraryIsNotFound() throws Exception {
@@ -49,7 +46,7 @@ public class AddLibraryToRedXmlFixerTest {
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
 
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
         final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
         final AddLibraryToRedXmlFixer fixer = new AddLibraryToRedXmlFixer("UnknownPythonLibrary", false, factory);
         fixer.asContentProposal(marker).apply(null);
@@ -68,7 +65,7 @@ public class AddLibraryToRedXmlFixerTest {
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
 
-        final IFile file = notConfiguredProjectProvider.createFile("suite.robot");
+        final IFile file = createFile(notConfiguredProject, "suite.robot");
         final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
         final AddLibraryToRedXmlFixer fixer = new AddLibraryToRedXmlFixer("UnknownPythonLibrary", false, factory);
         fixer.asContentProposal(marker).apply(null);

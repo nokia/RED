@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,31 +15,27 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IMarkerResolution;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
+@ExtendWith(ProjectExtension.class)
 public class AttributesAugmentingReportingStrategyTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            AttributesAugmentingReportingStrategyTest.class);
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("file.txt", "");
-    }
+    @Project(files = "file.txt")
+    static IProject project;
 
     @Test
     public void additionalAttributesAreAppendedToCreatedMarker() throws CoreException {
@@ -46,7 +43,7 @@ public class AttributesAugmentingReportingStrategyTest {
         final ValidationReportingStrategy augmentingReportingStrategy = AttributesAugmentingReportingStrategy
                 .create(ValidationReportingStrategy.reportOnly(), additionalMarkerAttributes);
 
-        final IFile file = projectProvider.getFile("file.txt");
+        final IFile file = getFile(project, "file.txt");
 
         final RobotProblem problem = RobotProblem.causedBy(new ProblemCause());
 

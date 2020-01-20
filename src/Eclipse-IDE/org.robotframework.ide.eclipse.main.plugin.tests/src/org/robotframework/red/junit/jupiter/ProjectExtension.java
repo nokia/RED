@@ -98,6 +98,11 @@ public class ProjectExtension
         return createFile(getFile(project, filePath), eolType, lines);
     }
 
+    public static void createFile(final IProject project, final String filePath, final InputStream inputStream)
+            throws IOException, CoreException {
+        createFile(getFile(project, filePath), inputStream);
+    }
+
     public static IFolder createDir(final IProject project, final String filePath)
             throws IOException, CoreException {
         return createDir(getDir(project, filePath));

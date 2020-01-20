@@ -7,53 +7,49 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.eclipse.core.resources.IProject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExecutionEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(ProjectExtension.class)
 public class LibrariesAutoDiscovererTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererTest.class);
+    @Project(files = { "suite.robot", "resource.robot" })
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider secondProjectProvider = new ProjectProvider("SECOND_PROJECT");
+    @Project(name = "SECOND_PROJECT", files = { "secondSuite.robot" })
+    static IProject secondProject;
 
-    @Mock
     private DiscovererFactory factory;
 
-    @Mock
     private LibrariesAutoDiscoverer discoverer;
 
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.createFile("suite.robot");
-        projectProvider.createFile("resource.robot");
-        secondProjectProvider.createFile("secondSuite.robot");
-    }
+    @BeforeEach
+    public void beforeTest() throws Exception {
+        configure(project);
+        factory = mock(DiscovererFactory.class);
+        discoverer = mock(LibrariesAutoDiscoverer.class);
 
-    @Before
-    public void before() throws Exception {
-        projectProvider.configure();
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
     }
 
     @Test
@@ -67,11 +63,11 @@ public class LibrariesAutoDiscovererTest {
     @Test
     public void discoveringIsStartedOnlyOnce_whenSuitesFromSingleProjectAreProvided() throws Exception {
         final RobotModel model = new RobotModel();
-        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile suite1 = model.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(getFile(project, "resource.robot"));
         LibrariesAutoDiscoverer.start(newArrayList(suite1, suite2), factory);
 
-        verify(factory).create(model.createRobotProject(projectProvider.getProject()), newArrayList(suite1, suite2));
+        verify(factory).create(model.createRobotProject(project), newArrayList(suite1, suite2));
         verifyNoMoreInteractions(factory);
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -80,11 +76,11 @@ public class LibrariesAutoDiscovererTest {
     @Test
     public void discoveringIsStartedOnlyOnce_whenSuitesFromSeveralProjectsAreProvided() throws Exception {
         final RobotModel model = new RobotModel();
-        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotSuiteFile suite2 = model.createSuiteFile(secondProjectProvider.getFile("secondSuite.robot"));
+        final RobotSuiteFile suite1 = model.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(getFile(secondProject, "secondSuite.robot"));
         LibrariesAutoDiscoverer.start(newArrayList(suite1, suite2), factory);
 
-        verify(factory).create(model.createRobotProject(projectProvider.getProject()), newArrayList(suite1));
+        verify(factory).create(model.createRobotProject(project), newArrayList(suite1));
         verifyNoMoreInteractions(factory);
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
@@ -94,11 +90,11 @@ public class LibrariesAutoDiscovererTest {
     public void discoveringIsNotStarted_whenRuntimeEnvironmentIsInvalid() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.setExecutionEnvironment(ExecutionEnvironment.create("", null));
-        projectProvider.configure(config);
+        configure(project, config);
 
         final RobotModel model = new RobotModel();
-        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.getFile("resource.robot"));
+        final RobotSuiteFile suite1 = model.createSuiteFile(getFile(project, "suite.robot"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(getFile(project, "resource.robot"));
         LibrariesAutoDiscoverer.start(newArrayList(suite1, suite2), factory);
 
         verifyNoInteractions(factory);

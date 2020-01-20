@@ -6,38 +6,34 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IMarkerResolution;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+@ExtendWith(ProjectExtension.class)
 public class AddRemoteLibraryToRedXmlFixerTest {
 
-    private static final String PROJECT_NAME = AddRemoteLibraryToRedXmlFixerTest.class.getSimpleName();
+    @Project(createDefaultRedXml = true)
+    static IProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @ClassRule
-    public static ProjectProvider notConfiguredProjectProvider = new ProjectProvider(PROJECT_NAME + "NoConfig");
-
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
-        projectProvider.configure();
-    }
+    @Project(nameSuffix = "NoConfig")
+    static IProject notConfiguredProject;
 
     @Test
     public void addRemoteLibraryFromQuickFix_whenRemoteLocationIsNotAddedToRedXml() throws Exception {
         final String path = "http://127.0.0.1:9000";
-        final IFile file = projectProvider.createFile("suite.robot");
+        final IFile file = createFile(project, "suite.robot");
         final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
         final AddRemoteLibraryToRedXmlFixer fixer = new AddRemoteLibraryToRedXmlFixer(path);
         fixer.asContentProposal(marker).apply(null);
@@ -53,7 +49,7 @@ public class AddRemoteLibraryToRedXmlFixerTest {
     @Test
     public void addRemoteLibraryFromQuickFix_whenConfigurationFileDoesNotExist() throws Exception {
         final String path = "http://127.0.0.1:9000";
-        final IFile file = notConfiguredProjectProvider.createFile("suite.robot");
+        final IFile file = createFile(notConfiguredProject, "suite.robot");
         final IMarker marker = file.createMarker(RedPlugin.PLUGIN_ID);
         final AddRemoteLibraryToRedXmlFixer fixer = new AddRemoteLibraryToRedXmlFixer(path);
         fixer.asContentProposal(marker).apply(null);

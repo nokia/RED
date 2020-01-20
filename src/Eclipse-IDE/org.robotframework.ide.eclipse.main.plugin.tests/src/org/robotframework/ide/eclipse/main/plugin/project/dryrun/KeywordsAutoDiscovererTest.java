@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.configure;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +18,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -29,22 +33,22 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVari
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
 
 import com.google.common.collect.ImmutableMap;
 
+@ExtendWith(ProjectExtension.class)
 public class KeywordsAutoDiscovererTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordsAutoDiscovererTest.class);
+    @Project(dirs = { "libs" })
+    static IProject project;
 
     private static RobotProject robotProject;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-
-        projectProvider.createDir("libs");
+        robotProject = new RobotModel().createRobotProject(project);
     }
 
     @Test
@@ -103,7 +107,7 @@ public class KeywordsAutoDiscovererTest {
     @Test
     public void testKeywordsDefinedWithSignatureDecorator() throws Exception {
         try (InputStream inputStream = this.getClass().getResourceAsStream("Decorator.py")) {
-            projectProvider.createFile("libs/Decorator.py", inputStream);
+            createFile(project, "libs/Decorator.py", inputStream);
         }
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("SignatureDecorated",
@@ -170,7 +174,7 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsFromClassHierarchy() throws Exception {
-        projectProvider.createFile("libs/Parent.py",
+        createFile(project, "libs/Parent.py",
                 "class Parent:",
                 "  def parent_kw(self, arg):",
                 "    pass");
@@ -192,7 +196,7 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsFromImportedLibraries() throws Exception {
-        projectProvider.createFile("libs/External.py",
+        createFile(project, "libs/External.py",
                 "def ex_kw(args):",
                 "  pass");
         final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
@@ -212,7 +216,7 @@ public class KeywordsAutoDiscovererTest {
 
     private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String... lines)
             throws IOException, CoreException {
-        final IFile sourceFile = projectProvider.createFile("libs/" + name + ".py", lines);
+        final IFile sourceFile = createFile(project, "libs/" + name + ".py", lines);
 
         final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, name,
                 sourceFile.getFullPath().makeRelative().toPortableString());
@@ -226,7 +230,7 @@ public class KeywordsAutoDiscovererTest {
         for (final ReferencedLibrary referencedLibrary : libraries.keySet()) {
             config.addReferencedLibrary(referencedLibrary);
         }
-        projectProvider.configure(config);
+        configure(project, config);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(libraries.entrySet().stream().collect(
                         toMap(entry -> LibraryDescriptor.ofReferencedLibrary(entry.getKey(),
@@ -236,8 +240,7 @@ public class KeywordsAutoDiscovererTest {
     private Consumer<RobotDryRunKeywordSource> equalSource(final String expectedFilePath, final int expectedLine,
             final int expectedOffset, final int expectedLength) {
         return kwSource -> {
-            assertThat(kwSource.getFilePath())
-                    .isEqualTo(projectProvider.getFile(expectedFilePath).getLocation().toOSString());
+            assertThat(kwSource.getFilePath()).isEqualTo(getFile(project, expectedFilePath).getLocation().toOSString());
             assertThat(kwSource.getLine()).isEqualTo(expectedLine);
             assertThat(kwSource.getOffset()).isEqualTo(expectedOffset);
             assertThat(kwSource.getLength()).isEqualTo(expectedLength);

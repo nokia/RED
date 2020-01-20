@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.IDocument;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 
 public class ChangeToFixerTest {
