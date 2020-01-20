@@ -1,14 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _coOFwNFJEeiVJ52Mq2lwog
+Contexts: _coOFwNFJEeiVJ52Mq2lwog,_hb89IDvxEeiDC73Fvf4wHA
 Element-Name: DocumentationForAnnotationFunction
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HYGA8NFSEei8hricfexH0g
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 4/8/19 1:53 PM
-Tags: notTestable
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/20/20 3:26 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -21,21 +20,10 @@ Run this test for Python 3.0
 Content-Type: text/ecl
 Entry-Name: .content
 
-//open prefernece and change to Python 3.
-get-preferences-menu | click
-with [get-window Preferences] {
-    with [get-tree] {
-        select "Robot Framework" | double-click
-        select "Robot Framework/Installed frameworks"
-    }
-    with [get-table] {
-        get-item -path "Robot Framework .*\(Python 3.*\)"| check
-    }
-    get-button "Apply and Close" | click
-    get-window "Rebuild required" | get-button OK | click
-}
+//test for python 3
 
 //add kw from CA
+get-view "Project Explorer" | get-tree | select "Annotation/TestFile.robot" | double-click
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 5
     key-type "NUMPAD_ENTER" "\\u000D"
@@ -103,25 +91,25 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     
 
 get-view "Project Explorer" | get-tree 
-    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Div With Return Annot" 
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs\\/many_functions.py \\(8\\)/Div With Return Annot" 
     | double-click
-    
     
 check-documentation-view -kw_name "Div With Return Annot"  -project_name "Annotation" -library "many_functions"  
 	-arguments "\[a: the dividend, b: the divisor \(must be different than 0\)\]"  -spec   "Divide a by b"
 	
 get-view "Project Explorer" | get-tree 
-    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Fun With Arg2" 
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs\\/many_functions.py \\(8\\)/Fun With Arg2" 
     | double-click
     
 check-documentation-view -kw_name "Fun With Arg2"  -project_name "Annotation" -library "many_functions"  
 	-arguments "\[\*args: list of unnamed arguments, \*\*kwargs: dict of named arguments\]"  -spec  "args and kwargs" 	
 	
 get-view "Project Explorer" | get-tree 
-    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs \\(8\\)/Div" | double-click
+    | select "Annotation/Robot Referenced libraries/many_functions Annotation\\/libs\\/many_functions.py \\(8\\)/Div" 
+    | double-click
 
 check-documentation-view -kw_name "Div"  -project_name "Annotation" -library "many_functions"  
 	-arguments "\[a: \{.*type.*class .*float.*help.*the dividend.*\}, b: \{.*type.*class .*float.*help.*the divisor \(must be different than 0\).*\}\]"  
 	-spec  "Divide a by b"
-	    	
+	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

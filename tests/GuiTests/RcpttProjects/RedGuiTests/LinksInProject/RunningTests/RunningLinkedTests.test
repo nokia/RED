@@ -6,9 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _NFAlcOmFEeibRqo1Bs_dDA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/18/18 11:50 AM
-Tags: notTestable
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/20/20 2:13 PM
 Testcase-Type: ecl
 Verifications: _OFT48OmSEeibRqo1Bs_dDA
 
