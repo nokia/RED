@@ -25,7 +25,10 @@ Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor</a></code> in <b>Tab
 <br><br><img src="images/table_preferences.png"> <br><br>
 
 <h3>Keyword argument highlighting</h3>
-<p>RED allows to automatically color required, optional and redundant keyword arguments cells in any of table editors.</p><br>
+<p>RED allows to automatically color required, optional and redundant keyword arguments cells in any of table editors.<br><br>
+Ambiguous keyword finding strategy (<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
+Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor -&gt; Content Assist</a></code>) is used here when keyword name conflict exists.
+</p><br>
 
 <h3>Default number of columns in table editors</h3>
 <p>To make table editors tidy, RED creates predefined numbers of columns.</p><br>
@@ -34,7 +37,7 @@ Window -&gt; Preferences -&gt; Robot Framework -&gt; Editor</a></code> in <b>Tab
 <p>Too long cell content can be cut or wrapped.</p><br>
 
 <h3>Enter key - what to do after Enter key press during cell edition</h3>
-<p>Enter key type can behave in two ways in RED while editing cell in any of table editors.<bR>
+<p>Enter key type can behave in two ways in RED while editing cell in any of table editors.<br>
 By default, pressing Enter will close cell editor and move cursor to next cell to the right. If the cell is last one in the row (for instance in the comment cell), pressing Enter will move cursor to next row.<br>
 Additionally it can be configured that Enter will close cell editor and cursor will stay on current cell.<br>
 <b>Hint:</b> by pressing Shift+Enter, cursor will move backwards.</p>
