@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _OyDWIBxfEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/21/20 12:35 PM
+Save-Time: 1/21/20 12:36 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -42,7 +42,7 @@ proc "add-jython-to-interpereters" [val open_preferences_menu True]{
 	}
 	get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
 	// add jython to preference
-	set-dialog-result Folder [os-specific -windowsValue "C:\\jython\\bin" -linuxValue ""]
+	set-dialog-result Folder [os-specific -windowsValue "C:\\jython\\bin" -linuxValue $jython_path]
 	with [get-window Preferences] {
 	    get-button "Add..." | click
 	    get-button "Apply and Close" | click
