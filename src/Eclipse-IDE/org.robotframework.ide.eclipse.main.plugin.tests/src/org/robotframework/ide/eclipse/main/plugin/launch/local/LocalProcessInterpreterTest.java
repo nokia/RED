@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -19,12 +17,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
-import org.rf.ide.core.environment.PythonInstallationDirectoryFinder;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
@@ -46,8 +45,6 @@ public class LocalProcessInterpreterTest {
 
     @Test
     public void pythonExecNameAndKnownRobotVersionAreUsed_whenExistingInterpreterIsUsed() throws Exception {
-        assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
-
         final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
@@ -61,20 +58,19 @@ public class LocalProcessInterpreterTest {
         assertThat(interpreter.getVersion()).isNotEqualTo("<unknown>");
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     public void coreExceptionIsThrown_whenNotExistingInterpreterIsUsed() throws Exception {
-        assumeFalse(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.PyPy).isPresent());
-
         final RobotProject robotProject = new RobotModel().createRobotProject(project);
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(project.getName());
         robotConfig.setUsingInterpreterFromProject(false);
-        robotConfig.setInterpreter(SuiteExecutor.PyPy);
+        robotConfig.setInterpreter(SuiteExecutor.Python2);
 
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> LocalProcessInterpreter.create(robotConfig, robotProject))
                 .withMessage("There is no %s interpreter in system PATH environment variable",
-                        SuiteExecutor.PyPy.name())
+                        SuiteExecutor.Python2.name())
                 .withNoCause();
     }
 
@@ -96,8 +92,6 @@ public class LocalProcessInterpreterTest {
 
     @Test
     public void selectedPythonExecNameAndKnownRobotVersionAreUsed_whenPathToExecutableIsSet() throws Exception {
-        assumeTrue(PythonInstallationDirectoryFinder.whereIsPythonInterpreter(SuiteExecutor.Python).isPresent());
-
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(project));
         when(robotProject.getRuntimeEnvironment()).thenReturn(new NullRuntimeEnvironment());
 
