@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,11 +20,12 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -42,17 +45,18 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Libraries;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class RobotProjectConfigFileValidatorTest {
 
-    private static final String PROJECT_NAME = RobotProjectConfigFileValidatorTest.class.getSimpleName();
+    @Project
+    IProject project;
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    File tempFolder;
 
     private RobotModel model;
 
@@ -60,13 +64,13 @@ public class RobotProjectConfigFileValidatorTest {
 
     private MockReporter reporter;
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         reporter = new MockReporter();
         model = new RobotModel();
         validator = createValidator(SuiteExecutor.Python, mock(SystemVariableAccessor.class));
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(new HashMap<>());
         robotProject.setReferencedLibraries(new HashMap<>());
     }
@@ -77,7 +81,7 @@ public class RobotProjectConfigFileValidatorTest {
         when(context.getModel()).thenReturn(model);
         when(context.getExecutorInUse()).thenReturn(executor);
         final IFile file = mock(IFile.class);
-        when(file.getProject()).thenReturn(projectProvider.getProject());
+        when(file.getProject()).thenReturn(project);
         return new RobotProjectConfigFileValidator(context, file, reporter, variableAccessor);
     }
 
@@ -159,7 +163,7 @@ public class RobotProjectConfigFileValidatorTest {
         final Map<LibraryDescriptor, LibrarySpecification> stdLibs = Libraries.createStdLib("StdLib1", new String[0]);
         stdLibs.put(LibraryDescriptor.ofStandardLibrary("StdLib2"), null);
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibs);
 
         final RobotProjectConfig config = RobotProjectConfig.create();
@@ -182,7 +186,7 @@ public class RobotProjectConfigFileValidatorTest {
         final Map<LibraryDescriptor, LibrarySpecification> stdLibs = new HashMap<>();
         stdLibs.put(LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(path)), null);
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         robotProject.setStandardLibraries(stdLibs);
         robotProject.setReferencedLibraries(new HashMap<>());
 
@@ -207,7 +211,7 @@ public class RobotProjectConfigFileValidatorTest {
         final ReferencedLibrary refLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "ref", "");
         final ReferencedLibrary refLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "missing", "");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib1, variant), LibrarySpecification.create("ref"));
@@ -233,11 +237,11 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibraryFileDoesNotExist_missingFileIsReported() throws Exception {
-        projectProvider.createDir("libs");
+        createDir(project, "libs");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
-                PROJECT_NAME + "/libs/notExisting.py");
+                project.getName() + "/libs/notExisting.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
@@ -260,12 +264,12 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenLibraryFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
-        projectProvider.createDir("libs");
-        projectProvider.createFile("libs/pyLib.py");
+        createDir(project, "libs");
+        createFile(project, "libs/pyLib.py");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
-                projectProvider.getProject().getLocation() + "/libs/pyLib.py");
+                project.getLocation() + "/libs/pyLib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
@@ -289,11 +293,11 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenLibraryDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
-        projectProvider.createDir("libs");
+        createDir(project, "libs");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, "pyLib",
-                projectProvider.getProject().getLocation() + "/libs/notExisting.xml");
+                project.getLocation() + "/libs/notExisting.xml");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("pyLib"));
@@ -317,12 +321,12 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryFileIsImportedFromJarFile_nothingIsReported() throws Exception {
-        projectProvider.createDir("libs");
-        projectProvider.createFile("libs/JavaLib.jar");
+        createDir(project, "libs");
+        createFile(project, "libs/JavaLib.jar");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
-                PROJECT_NAME + "/libs/JavaLib.jar");
+                project.getName() + "/libs/JavaLib.jar");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
@@ -345,12 +349,12 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryFileIsImportedFromZipFile_nothingIsReported() throws Exception {
-        projectProvider.createDir("libs");
-        projectProvider.createFile("libs/JavaLib.zip");
+        createDir(project, "libs");
+        createFile(project, "libs/JavaLib.zip");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
-                PROJECT_NAME + "/libs/JavaLib.zip");
+                project.getName() + "/libs/JavaLib.zip");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
@@ -373,12 +377,12 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryIsNotImportedFromJarOrZipFile_notJarOrZipFileWarningIsReported() throws Exception {
-        projectProvider.createDir("libs");
-        projectProvider.createFile("libs/JavaLib.tar");
+        createDir(project, "libs");
+        createFile(project, "libs/JavaLib.tar");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
-                PROJECT_NAME + "/libs/JavaLib.tar");
+                project.getName() + "/libs/JavaLib.tar");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
@@ -402,12 +406,12 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenJavaLibraryFileIsUsedWithoutPythonExecutor_nonJavaEnvironmentWarningIsReported() throws Exception {
-        projectProvider.createDir("libs");
-        projectProvider.createFile("libs/JavaLib.jar");
+        createDir(project, "libs");
+        createFile(project, "libs/JavaLib.jar");
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.JAVA, "JavaLib",
-                PROJECT_NAME + "/libs/JavaLib.jar");
+                project.getName() + "/libs/JavaLib.jar");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project);
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final Map<LibraryDescriptor, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(LibraryDescriptor.ofReferencedLibrary(refLib, variant), LibrarySpecification.create("JavaLib"));
@@ -473,7 +477,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenAbsoluteSearchPathExist_nothingIsReported() throws Exception {
-        final File folder = temporaryFolder.newFolder();
+        final File folder = RedTempDirectory.createNewDir(tempFolder, "dir");
 
         final SearchPath searchPath = SearchPath.create(folder.getAbsolutePath());
 
@@ -492,7 +496,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenAbsoluteSearchPathDoesNotExist_missingLocationProblemIsReported() throws Exception {
-        final File folder = temporaryFolder.newFolder();
+        final File folder = RedTempDirectory.createNewDir(tempFolder, "dir");
         final String path = folder.getAbsolutePath();
         folder.delete();
 
@@ -514,9 +518,9 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenRelativePathExist_nothingIsReported() throws Exception {
-        projectProvider.createDir("folder");
+        createDir(project, "folder");
 
-        final SearchPath searchPath = SearchPath.create(PROJECT_NAME + "/folder");
+        final SearchPath searchPath = SearchPath.create(project.getName() + "/folder");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
@@ -533,7 +537,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenRelativePathDoesNotExist_missingLocationProblemIsReported() throws Exception {
-        final SearchPath searchPath = SearchPath.create(PROJECT_NAME + "/folder");
+        final SearchPath searchPath = SearchPath.create(project.getName() + "/folder");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
@@ -569,7 +573,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenPathContainsKnownEnvironmentVariable_nothingIsReported() throws Exception {
-        projectProvider.createDir("folder");
+        createDir(project, "folder");
 
         final SearchPath searchPath = SearchPath.create("%{ENV_VAR}");
 
@@ -577,7 +581,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addPythonPath(searchPath);
 
         final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(project.getName() + "/folder"));
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(searchPath, new FilePosition(42, 0));
@@ -600,7 +604,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addPythonPath(searchPath);
 
         final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(project.getName() + "/folder"));
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(searchPath, new FilePosition(42, 0));
@@ -614,7 +618,7 @@ public class RobotProjectConfigFileValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ConfigFileProblem.MISSING_SEARCH_PATH, new ProblemPosition(42)));
         assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage))
-                .containsExactly("The path '" + projectProvider.getProject().getLocation().append("folder").toOSString()
+                .containsExactly("The path '" + project.getLocation().append("folder").toOSString()
                         + "' points to non-existing location");
     }
 
@@ -627,7 +631,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addPythonPath(searchPath);
 
         final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(project.getName() + "/folder"));
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(searchPath, new FilePosition(42, 0));
@@ -641,7 +645,7 @@ public class RobotProjectConfigFileValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(ConfigFileProblem.INVALID_SEARCH_PATH, new ProblemPosition(42)));
         assertThat(reporter.getReportedProblems().stream().map(Problem::getMessage)).containsExactly(
-                "The path '" + projectProvider.getProject().getLocation().append("/folder/${INCORRECT}").toOSString()
+                "The path '" + project.getLocation().append("/folder/${INCORRECT}").toOSString()
                         + "' is invalid");
     }
 
@@ -654,7 +658,7 @@ public class RobotProjectConfigFileValidatorTest {
         config.addPythonPath(searchPath);
 
         final SystemVariableAccessor variableAccessor = mock(SystemVariableAccessor.class);
-        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(PROJECT_NAME + "/folder"));
+        when(variableAccessor.getValue("ENV_VAR")).thenReturn(Optional.of(project.getName() + "/folder"));
 
         final Map<Object, FilePosition> locations = new HashMap<>();
         locations.put(searchPath, new FilePosition(42, 0));
@@ -675,10 +679,10 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileExist_nothingIsReported() throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createFile("a/vars.py", "VAR = 100");
+        createDir(project, "a");
+        createFile(project, "a/vars.py", "VAR = 100");
 
-        final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "/a/vars.py");
+        final ReferencedVariableFile variableFile = ReferencedVariableFile.create(project.getName() + "/a/vars.py");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
@@ -695,10 +699,10 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileDoesNotExist_missingFileIsReported() throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createFile("a/vars2.py", "VAR = 100");
+        createDir(project, "a");
+        createFile(project, "a/vars2.py", "VAR = 100");
 
-        final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "a/vars.py");
+        final ReferencedVariableFile variableFile = ReferencedVariableFile.create(project.getName() + "a/vars.py");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
@@ -716,11 +720,11 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenVariableFileExistAndHasAbsolutePath_absolutePathWarningIsReported() throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createFile("a/vars.py", "VAR = 100");
+        createDir(project, "a");
+        createFile(project, "a/vars.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile
-                .create(projectProvider.getProject().getLocation() + "/a/vars.py");
+                .create(project.getLocation() + "/a/vars.py");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
@@ -739,11 +743,11 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenVariableFileDoesNotExistAndHasAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
-        projectProvider.createDir("a");
-        projectProvider.createFile("a/vars2.py", "VAR = 100");
+        createDir(project, "a");
+        createFile(project, "a/vars2.py", "VAR = 100");
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile
-                .create(projectProvider.getProject().getLocation() + "/a/vars.py");
+                .create(project.getLocation() + "/a/vars.py");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
@@ -762,7 +766,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathDoesNotExistInProject_warningIsReported() throws Exception {
-        projectProvider.createDir("directory");
+        createDir(project, "directory");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("does/not/exist");
@@ -780,7 +784,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathExistInProject_nothingIsReported() throws Exception {
-        projectProvider.createDir("directory");
+        createDir(project, "directory");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory");
@@ -797,11 +801,11 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenValidationExcludedPathExcludesAnotherPath_warningIsReported() throws Exception {
-        projectProvider.createDir("directory");
-        projectProvider.createDir("directory/nested");
-        projectProvider.createDir("directory/nested/1");
-        projectProvider.createDir("directory/nested/1/2");
-        projectProvider.createDir("directory/nested/1/2/3");
+        createDir(project, "directory");
+        createDir(project, "directory/nested");
+        createDir(project, "directory/nested/1");
+        createDir(project, "directory/nested/1/2");
+        createDir(project, "directory/nested/1/2/3");
 
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory/nested");

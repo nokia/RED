@@ -21,29 +21,26 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.execution.agent.Status;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class ExecutionStatusStoreTest {
 
-    private static final String PROJECT_NAME = ExecutionStatusStoreTest.class.getSimpleName();
+    @Project(cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    public File tempFolder;
 
     @Test
     public void newlyCreatedStoreHaveZeroedCountersAndNoTree() {
@@ -377,15 +374,15 @@ public class ExecutionStatusStoreTest {
     public void whenManySuitesContainFailedTests_failedSuitePathsMapIsReturnedWithManySuites()
             throws IOException, CoreException {
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString()));
+                URI.create("file://" + project.getLocation().toPortableString()));
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file://" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file://" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suite3 = ExecutionTreeNode.newSuiteNode(root, "suite3", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite3.robot"));
+                .create("file://" + project.getLocation().toPortableString() + "/suite3.robot"));
         final ExecutionTreeNode suite4 = ExecutionTreeNode.newSuiteNode(root, "suite4", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite4.robot"));
+                .create("file://" + project.getLocation().toPortableString() + "/suite4.robot"));
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
         final ExecutionTreeNode testPassed1 = ExecutionTreeNode.newTestNode(suite1, "test2", suite1.getPath());
         final ExecutionTreeNode testFailed2 = ExecutionTreeNode.newTestNode(suite2, "test1", suite2.getPath());
@@ -403,12 +400,12 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
-        projectProvider.createFile("suite3.robot");
-        projectProvider.createFile("suite4.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
+        project.createFile("suite3.robot");
+        project.createFile("suite4.robot");
 
-        assertThat(store.getFailedSuitePaths(projectProvider.getProject()))
+        assertThat(store.getFailedSuitePaths(project.getProject()))
                 .containsEntry("suite1.robot", newArrayList("test1"))
                 .containsEntry("suite2.robot", newArrayList("test1"));
     }
@@ -416,26 +413,23 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenManySuitesAndLinkedResourceContainFailedTests_failedSuitePathsMapIsReturnedWithManySuites()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1");
-        final IFile linkedSuite1 = projectProvider.getFile("linked_suite");
-        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
+        final File linkedNonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_1");
+        project.createFileLink("linked_suite", linkedNonWorkspaceFile1.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
-        final ExecutionTreeNode project = ExecutionTreeNode.newSuiteNode(root, "Project",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString()));
-        final ExecutionTreeNode suite1Catalog = ExecutionTreeNode.newSuiteNode(project, "Suite1 Catalog", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite1_catalog"));
-        final ExecutionTreeNode suite2Catalog = ExecutionTreeNode.newSuiteNode(project, "Suite2 Catalog", URI
-                .create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite2_catalog"));
+        final ExecutionTreeNode projectNode = ExecutionTreeNode.newSuiteNode(root, "Project",
+                URI.create("file://" + project.getLocation().toPortableString()));
+        final ExecutionTreeNode suite1Catalog = ExecutionTreeNode.newSuiteNode(projectNode, "Suite1 Catalog",
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite1_catalog"));
+        final ExecutionTreeNode suite2Catalog = ExecutionTreeNode.newSuiteNode(projectNode, "Suite2 Catalog",
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite2_catalog"));
         final ExecutionTreeNode suiteLinked3 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 1",
                 linkedNonWorkspaceFile1.toURI());
 
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(suite1Catalog, "Suite1",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString()
-                        + "/suite1_catalog/suite1.robot"));
-        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(suite2Catalog, "Suite2", URI.create("file://"
-                + projectProvider.getProject().getLocation().toPortableString()
-                        + "/suite2_catalog/suite2.robot"));
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite1_catalog/suite1.robot"));
+        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(suite2Catalog, "Suite2",
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite2_catalog/suite2.robot"));
 
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
         final ExecutionTreeNode testPassed1 = ExecutionTreeNode.newTestNode(suite1, "test2", suite1.getPath());
@@ -459,19 +453,19 @@ public class ExecutionStatusStoreTest {
         suite1Catalog.addChildren(suite1);
         suite2Catalog.addChildren(suite2);
         suiteLinked3.addChildren(testFailed3);
-        project.addChildren(suite1Catalog, suite2Catalog);
-        root.addChildren(project, suiteLinked3);
+        projectNode.addChildren(suite1Catalog, suite2Catalog);
+        root.addChildren(projectNode, suiteLinked3);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createDir("suite1_catalog");
-        projectProvider.createDir("suite2_catalog");
-        projectProvider.createFile("suite1_catalog/suite1.robot");
-        projectProvider.createFile("suite2_catalog/suite2.robot");
-        projectProvider.createFile("suiteLinked3.robot");
+        project.createDir("suite1_catalog");
+        project.createDir("suite2_catalog");
+        project.createFile("suite1_catalog/suite1.robot");
+        project.createFile("suite2_catalog/suite2.robot");
+        project.createFile("suiteLinked3.robot");
 
-        assertThat(store.getFailedSuitePaths(projectProvider.getProject()))
+        assertThat(store.getFailedSuitePaths(project.getProject()))
                 .containsEntry("suite1_catalog", newArrayList("Suite1.test1"))
                 .containsEntry("suite2_catalog", newArrayList("Suite2.test1", "Suite2.test3"))
                 .containsEntry("linked_suite", newArrayList("test1"));
@@ -481,9 +475,9 @@ public class ExecutionStatusStoreTest {
     public void whenSingleSuiteContainsFailedTests_failedSuitePathsMapIsReturnedWithSingleSuite()
             throws IOException, CoreException {
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
-                projectProvider.getProject().getLocationURI());
+                project.getLocationURI());
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite.robot"));
         final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
         suite.addChildren(test);
         root.addChildren(suite);
@@ -493,9 +487,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite.robot");
+        project.createFile("suite.robot");
 
-        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).containsEntry("suite.robot",
+        assertThat(store.getFailedSuitePaths(project.getProject())).containsEntry("suite.robot",
                 newArrayList("test"));
     }
 
@@ -506,7 +500,7 @@ public class ExecutionStatusStoreTest {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(null, "suite",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+                URI.create("file://" + project.getLocation().toPortableString() + "/suite.robot"));
         final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
         test.setStatus(Status.FAIL);
         suite.addChildren(test);
@@ -514,9 +508,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(suite);
 
-        projectProvider.createFile("suite.robot");
+        project.createFile("suite.robot");
 
-        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).containsEntry("suite.robot",
+        assertThat(store.getFailedSuitePaths(project.getProject())).containsEntry("suite.robot",
                 newArrayList("test"));
     }
 
@@ -529,22 +523,21 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        assertThat(store.getFailedSuitePaths(projectProvider.getProject())).isEmpty();
+        assertThat(store.getFailedSuitePaths(project.getProject())).isEmpty();
     }
 
     @Test
     public void whenManySuitesContainNonExecutedTests_nonExecutedSuitePathsMapIsReturnedWithNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
-                projectProvider.getProject().getLocationURI());
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", project.getLocationURI());
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suite3 = ExecutionTreeNode.newSuiteNode(root, "suite3", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite3.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite3.robot"));
         final ExecutionTreeNode suite4 = ExecutionTreeNode.newSuiteNode(root, "suite4", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite4.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite4.robot"));
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
         final ExecutionTreeNode testPassed1 = ExecutionTreeNode.newTestNode(suite1, "test2", suite1.getPath());
         final ExecutionTreeNode testFailed2 = ExecutionTreeNode.newTestNode(suite2, "test1", suite2.getPath());
@@ -562,12 +555,12 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
-        projectProvider.createFile("suite3.robot");
-        projectProvider.createFile("suite4.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
+        project.createFile("suite3.robot");
+        project.createFile("suite4.robot");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite2.robot", new ArrayList<>()).containsEntry("suite3.robot", new ArrayList<>())
                 .containsEntry("suite4.robot", new ArrayList<>());
     }
@@ -575,17 +568,17 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenManySuitesAndLinkedResourceContainNonExecutedTests_nonExecutedSuitePathsMapIsReturnedWithNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot");
+        final IFile linkedSuite = project.getFile("linkedSuite.robot");
+        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suite3 = ExecutionTreeNode.newSuiteNode(root, "suite3", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite3.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite3.robot"));
         final ExecutionTreeNode suiteLinked4 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite", null);
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
         final ExecutionTreeNode testPassed1 = ExecutionTreeNode.newTestNode(suite1, "test2", suite1.getPath());
@@ -604,11 +597,11 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
-        projectProvider.createFile("suite3.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
+        project.createFile("suite3.robot");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite2.robot", new ArrayList<>()).containsEntry("suite3.robot", new ArrayList<>())
                 .containsEntry("linkedSuite.robot", new ArrayList<>());
     }
@@ -616,18 +609,18 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenLinkedResourcesContainNonExecutedTestsAndItsRobotNamesAreTheSame_nonExecutedSuitePathsMapIsReturnedWithAllNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1");
-        final File linkedNonWorkspaceFile2 = tempFolder.newFile("non_workspace_suite_2");
-        final IFile linkedSuite1 = projectProvider.getFile("linked_suite.robot");
-        final IFile linkedSuite2 = projectProvider.getFile("linked suite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
-        resourceCreator.createLink(linkedNonWorkspaceFile2.toURI(), linkedSuite2);
+        final File linkedNonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_1");
+        final File linkedNonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_2");
+        final IFile linkedSuite1 = project.getFile("linked_suite.robot");
+        final IFile linkedSuite2 = project.getFile("linked suite.robot");
+        project.createFileLink("linked_suite.robot", linkedNonWorkspaceFile1.toURI());
+        project.createFileLink("linked suite.robot", linkedNonWorkspaceFile2.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suiteLinked3 = ExecutionTreeNode.newSuiteNode(root, "Linked Suite", null);
         final ExecutionTreeNode suiteLinked4 = ExecutionTreeNode.newSuiteNode(root, "Linked Suite", null);
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
@@ -648,10 +641,10 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite2.robot", new ArrayList<>()).containsEntry("linked_suite.robot", new ArrayList<>())
                 .containsEntry("linked suite.robot", new ArrayList<>());
     }
@@ -659,17 +652,15 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenLinkedResourcesContainNonExecutedTestsAndOneOfThemHasPath_nonExecutedSuitePathsMapIsReturnedWithAllNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1");
-        final File linkedNonWorkspaceFile2 = tempFolder.newFile("non_workspace_suite_2");
-        final IFile linkedSuite1 = projectProvider.getFile("linked_suite_1.robot");
-        final IFile linkedSuite2 = projectProvider.getFile("linked_suite_2.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
-        resourceCreator.createLink(linkedNonWorkspaceFile2.toURI(), linkedSuite2);
+        final File linkedNonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_1");
+        final File linkedNonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_2");
+        project.createFileLink("linked_suite_1.robot", linkedNonWorkspaceFile1.toURI());
+        project.createFileLink("linked_suite_2.robot", linkedNonWorkspaceFile2.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
-                projectProvider.getProject().getLocationURI());
+                project.getLocationURI());
         final ExecutionTreeNode parent = ExecutionTreeNode.newSuiteNode(root, "parent",
-                URI.create("file://" + projectProvider.getProject().getLocation().toPortableString() + "/parent"));
+                URI.create("file://" + project.getLocation().toPortableString() + "/parent"));
         final ExecutionTreeNode suiteLinked1 = ExecutionTreeNode.newSuiteNode(parent, "Linked Suite 1",
                 URI.create(linkedNonWorkspaceFile1.toURI().toString() + "/linked_suite_1.robot"));
         final ExecutionTreeNode suiteLinked2 = ExecutionTreeNode.newSuiteNode(parent, "Linked Suite 2", null);
@@ -688,28 +679,28 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("parent");
+        project.createFile("parent");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("parent", new ArrayList<>());
     }
 
     @Test
     public void whenManySuitesAndSingleLinkedResourceContainNonExecutedTests_nonExecutedSuitePathsMapIsReturnedWithNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1.robot");
-        final File linkedNonWorkspaceFile2 = tempFolder.newFile("non_workspace_suite_2.robot");
-        final IFile linkedSuite1 = projectProvider.getFile("linkedSuite_1.robot");
-        final IFile linkedSuite2 = projectProvider.getFile("linkedSuite_2.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
-        resourceCreator.createLink(linkedNonWorkspaceFile2.toURI(), linkedSuite2);
+        final File linkedNonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_1.robot");
+        final File linkedNonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_2.robot");
+        final IFile linkedSuite1 = project.getFile("linkedSuite_1.robot");
+        final IFile linkedSuite2 = project.getFile("linkedSuite_2.robot");
+        project.createFileLink("linkedSuite_1.robot", linkedNonWorkspaceFile1.toURI());
+        project.createFileLink("linkedSuite_2.robot", linkedNonWorkspaceFile2.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
                 null);
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suiteLinked3 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 1", null);
         final ExecutionTreeNode suiteLinked4 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 2", null);
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
@@ -730,10 +721,11 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
 
-        final Map<String, List<String>> nonExecutedSuitePaths = store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources);
+        final Map<String, List<String>> nonExecutedSuitePaths = store.getNonExecutedSuitePaths(project.getProject(),
+                linkedResources);
         assertThat(nonExecutedSuitePaths)
                 .containsEntry("suite2.robot", new ArrayList<>())
                 .containsEntry("linkedSuite_1.robot", new ArrayList<>())
@@ -743,18 +735,18 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenManySuitesAndLinkedResourcesContainNonExecutedTests_nonExecutedSuitePathsMapIsReturnedWithNonExecutedSuitesWithoutTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile1 = tempFolder.newFile("non_workspace_suite_1.robot");
-        final File linkedNonWorkspaceFile2 = tempFolder.newFile("non_workspace_suite_2.robot");
-        final IFile linkedSuite1 = projectProvider.getFile("linkedSuite_1.robot");
-        final IFile linkedSuite2 = projectProvider.getFile("linkedSuite_2.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile1.toURI(), linkedSuite1);
-        resourceCreator.createLink(linkedNonWorkspaceFile2.toURI(), linkedSuite2);
+        final File linkedNonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_1.robot");
+        final File linkedNonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite_2.robot");
+        final IFile linkedSuite1 = project.getFile("linkedSuite_1.robot");
+        final IFile linkedSuite2 = project.getFile("linkedSuite_2.robot");
+        project.createFileLink("linkedSuite_1.robot", linkedNonWorkspaceFile1.toURI());
+        project.createFileLink("linkedSuite_2.robot", linkedNonWorkspaceFile2.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
         final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "suite1", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite1.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
         final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "suite2", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite2.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
         final ExecutionTreeNode suiteLinked3 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 1", null);
         final ExecutionTreeNode suiteLinked4 = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite 2", null);
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite1, "test1", suite1.getPath());
@@ -772,12 +764,12 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite1.robot");
-        projectProvider.createFile("suite2.robot");
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot");
 
         final List<String> linkedResources = newArrayList(linkedSuite1.getFullPath().toPortableString(),
                 linkedSuite2.getFullPath().toPortableString());
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite2.robot", new ArrayList<>())
                 .containsEntry("linkedSuite_1.robot", new ArrayList<>())
                 .containsEntry("linkedSuite_2.robot", new ArrayList<>());
@@ -787,9 +779,9 @@ public class ExecutionStatusStoreTest {
     public void whenSingleSuiteContainsNonExcutedTests_nonExcutedSuitePathsMapIsReturnedWithOnlyNonExecutedTests()
             throws IOException, CoreException {
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root",
-                projectProvider.getProject().getLocationURI());
+                project.getLocationURI());
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite.robot"));
         final ExecutionTreeNode testFailed1 = ExecutionTreeNode.newTestNode(suite, "test1", suite.getPath());
         final ExecutionTreeNode testNonExecuted2 = ExecutionTreeNode.newTestNode(suite, "test2", suite.getPath());
         final ExecutionTreeNode testNonExecuted3 = ExecutionTreeNode.newTestNode(suite, "test3", suite.getPath());
@@ -801,9 +793,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        projectProvider.createFile("suite.robot");
+        project.createFile("suite.robot");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite.robot", newArrayList("test2", "test3"));
     }
 
@@ -814,7 +806,7 @@ public class ExecutionStatusStoreTest {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(null, "suite", URI
-                .create("file:///" + projectProvider.getProject().getLocation().toPortableString() + "/suite.robot"));
+                .create("file:///" + project.getLocation().toPortableString() + "/suite.robot"));
         final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
         suite.addChildren(test);
 
@@ -822,18 +814,18 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(suite);
 
-        projectProvider.createFile("suite.robot");
+        project.createFile("suite.robot");
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("suite.robot", newArrayList("test"));
     }
 
     @Test
     public void whenSingleSuiteFromLinkedResourceContainsNonExcutedTests_nonExcutedSuitePathsMapIsReturnedWithOnlyNonExecutedTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot");
+        final IFile linkedSuite = project.getFile("linkedSuite.robot");
+        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
         final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "LinkedSuite", null);
@@ -849,7 +841,7 @@ public class ExecutionStatusStoreTest {
 
         final List<String> linkedResources = newArrayList(linkedSuite.getFullPath().toPortableString());
         final Map<String, List<String>> nonExecutedSuitePaths = store
-                .getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources);
+                .getNonExecutedSuitePaths(project.getProject(), linkedResources);
 
         assertThat(nonExecutedSuitePaths).containsEntry("linkedSuite.robot", newArrayList("test2", "test3"));
     }
@@ -857,9 +849,9 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenSingleSuiteFromLinkedResourceContainsNonExcutedTestsAndSingleSuitePreferenceIsSet_nonExcutedSuitePathsMapIsReturnedWithOnlyNonExecutedTests()
             throws IOException, CoreException {
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_suite.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot");
+        final IFile linkedSuite = project.getFile("linkedSuite.robot");
+        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         final RedPreferences preferences = mock(RedPreferences.class);
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
@@ -877,7 +869,7 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         final List<String> linkedResources = newArrayList(linkedSuite.getFullPath().toPortableString());
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources))
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources))
                 .containsEntry("linkedSuite.robot", newArrayList("test2", "test3"));
     }
 
@@ -892,6 +884,6 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
 
-        assertThat(store.getNonExecutedSuitePaths(projectProvider.getProject(), linkedResources)).isEmpty();
+        assertThat(store.getNonExecutedSuitePaths(project.getProject(), linkedResources)).isEmpty();
     }
 }

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
@@ -25,15 +24,13 @@ import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
-import org.rf.ide.core.RedSystemProperties;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.libraries.LibraryConstructor;
@@ -55,8 +52,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -65,18 +64,14 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class GeneralSettingsLibrariesImportValidatorTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            GeneralSettingsLibrariesImportValidatorTest.class);
+    @Project(cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    static File tempFolder;
 
     private RobotModel model;
 
@@ -84,22 +79,20 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private RobotProject robotProject;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        final File root = tempFolder.getRoot();
+        getFile(tempFolder, "external_lib.py").createNewFile();
+        getFile(tempFolder, "external_dir").mkdir();
+        getFile(tempFolder, "external_dir", "external_nested_lib.py").createNewFile();
 
-        getFile(root, "external_lib.py").createNewFile();
-        getFile(root, "external_dir").mkdir();
-        getFile(root, "external_dir", "external_nested_lib.py").createNewFile();
-
-        projectProvider.configure();
+        project.configure();
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         model = new RobotModel();
         reporter = new MockReporter();
-        robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject = model.createRobotProject(project.getProject());
     }
 
     @Test
@@ -590,7 +583,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenUsingAbsolutePathImport() throws Exception {
-        final File tmpFile = tempFolder.newFile("library.py");
+        final File tmpFile = RedTempDirectory.createNewFile(tempFolder, "library.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateLibraryImport(absPath);
@@ -601,9 +594,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaSysPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested_lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -615,9 +608,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaRedXmlPythonPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested_lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -634,9 +627,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_1() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested_lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -648,7 +641,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_2() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested_lib.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateLibraryImport(absPath);
@@ -660,7 +653,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenExternalFileDoesNotExist() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "non_existing.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateLibraryImport(absPath);
@@ -680,8 +673,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenImportedResourceLiesInDifferentDirectory() throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/lib.py");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/lib.py");
 
         validateLibraryImport("lib.py");
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
@@ -692,10 +685,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenThereIsProblemWithLibraryArgumentsWhenImportedByName() throws Exception {
-        final String libPath = projectProvider.getProject().getName();
+        final String libPath = project.getName();
         final String libName = "lib";
 
-        final IFile libFile = projectProvider.createFile(libPath);
+        final IFile libFile = project.createFile(libPath);
 
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
@@ -716,10 +709,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenThereIsProblemWithLibraryArgumentsWhenImportedByPath() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/lib.py";
+        final String libPath = project.getName() + "/lib.py";
         final String libName = "lib";
 
-        final IFile libFile = projectProvider.createFile("lib.py");
+        final IFile libFile = project.createFile("lib.py");
 
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
@@ -737,15 +730,14 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         libFile.delete(true, null);
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     public void noMarkerIsReported_whenFileIsImportedByPoKeMoNPath_onWindows() throws Exception {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-
         final String libFileName = "library.py";
-        final String libPath = projectProvider.getProject().getName() + "/" + libFileName;
+        final String libPath = project.getName() + "/" + libFileName;
         final String libName = "library";
 
-        final IFile libFile = projectProvider.createFile(libFileName);
+        final IFile libFile = project.createFile(libFileName);
 
         final LibraryConstructor constructor = new LibraryConstructor();
 
@@ -958,10 +950,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByName_1() throws Exception {
-        final String libPath = projectProvider.getProject().getName();
+        final String libPath = project.getName();
         final String libName = "lib";
 
-        final IFile libFile = projectProvider.createFile("lib.py");
+        final IFile libFile = project.createFile("lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
@@ -978,11 +970,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByName_2() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libPath = project.getName() + "/directory";
         final String libName = "lib";
 
-        final IFolder dir = projectProvider.createDir("directory");
-        projectProvider.createFile("directory/lib.py");
+        final IFolder dir = project.createDir("directory");
+        project.createFile("directory/lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
@@ -999,12 +991,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByName_3() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libPath = project.getName() + "/directory";
         final String libName = "lib";
 
-        final IFolder dir1 = projectProvider.createDir("directory");
-        final IFolder dir2 = projectProvider.createDir("directory/lib");
-        projectProvider.createFile("directory/lib/__init__.py");
+        final IFolder dir1 = project.createDir("directory");
+        final IFolder dir2 = project.createDir("directory/lib");
+        project.createFile("directory/lib/__init__.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + "/__init__.py");
@@ -1022,10 +1014,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_1() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/lib.py";
+        final String libPath = project.getName() + "/lib.py";
         final String libName = "lib";
 
-        final IFile libFile = projectProvider.createFile("lib.py");
+        final IFile libFile = project.createFile("lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
@@ -1041,11 +1033,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_2() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory/lib.py";
+        final String libPath = project.getName() + "/directory/lib.py";
         final String libName = "lib";
 
-        final IFolder dir = projectProvider.createDir("directory");
-        projectProvider.createFile("directory/lib.py");
+        final IFolder dir = project.createDir("directory");
+        project.createFile("directory/lib.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
@@ -1061,12 +1053,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLocallyExistingLibraryIsImportedByPath_3() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory/lib/__init__.py";
+        final String libPath = project.getName() + "/directory/lib/__init__.py";
         final String libName = "lib";
 
-        final IFolder dir1 = projectProvider.createDir("directory");
-        final IFolder dir2 = projectProvider.createDir("directory/lib");
-        projectProvider.createFile("directory/lib/__init__.py");
+        final IFolder dir1 = project.createDir("directory");
+        final IFolder dir2 = project.createDir("directory/lib");
+        project.createFile("directory/lib/__init__.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
@@ -1084,12 +1076,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void markerIsReported_whenLocallyExistingLibraryIsImportedByRelativePathWithoutTrailingSeparator()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/directory";
+        final String libPath = project.getName() + "/directory";
         final String libName = "lib";
 
-        final IFolder dir1 = projectProvider.createDir("directory");
-        final IFolder dir2 = projectProvider.createDir("directory/lib");
-        projectProvider.createFile("directory/lib/__init__.py");
+        final IFolder dir1 = project.createDir("directory");
+        final IFolder dir2 = project.createDir("directory/lib");
+        project.createFile("directory/lib/__init__.py");
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName,
                 libPath + "/" + libName + ".py");
@@ -1110,10 +1102,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMajorProblemsAreReported_whenLibraryFileExistLocallyButIsImportedUsingAbsolutePath()
             throws Exception {
 
-        final String libPath = projectProvider.getProject().getName() + "/lib.py";
+        final String libPath = project.getName() + "/lib.py";
         final String libName = "lib";
 
-        final IFile libFile = projectProvider.createFile("lib.py");
+        final IFile libFile = project.createFile("lib.py");
         final String absPath = libFile.getLocation().toString();
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
@@ -1130,12 +1122,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileExistLocallyAsALinkToExternalFile() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested_lib.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested_lib.py");
 
         final String libPath = tmpFile.getPath().replaceAll("\\\\", "/");
         final String libName = "external_nested_lib";
 
-        resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
+        project.createFileLink("link.py", tmpFile.toURI());
 
         final ReferencedLibrary refLib = ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath);
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(refLib,
@@ -1149,12 +1141,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromWorkspace() throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/dir/lib.py";
+        final String libPath = project.getName() + "/dir/lib.py";
 
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/lib.py");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
@@ -1173,9 +1165,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir/external_nested_lib.py");
+        final File dir = getFile(tempFolder, "external_dir/external_nested_lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -1195,12 +1187,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/linking_dir/external_nested_lib.py";
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final String libPath = project.getName() + "/linking_dir/external_nested_lib.py";
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -1218,11 +1210,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/dir/lib.py";
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/lib.py");
+        final String libPath = project.getName() + "/dir/lib.py";
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/lib.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -1244,9 +1236,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -1269,12 +1261,12 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final String libPath = projectProvider.getProject().getName() + "/linking_dir/external_nested_lib.py";
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final String libPath = project.getProject().getName() + "/linking_dir/external_nested_lib.py";
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -1354,7 +1346,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private RobotSuiteFile createLibraryImportingSuite(final String toImport) {
         try {
-            final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  " + toImport);
+            final IFile file = project.createFile("suite.robot", "*** Settings ***", "Library  " + toImport);
             final RobotSuiteFile suite = model.createSuiteFile(file);
             suite.dispose();
             return suite;

@@ -18,19 +18,21 @@ import java.io.File;
 import org.assertj.core.util.Files;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
 import com.google.common.base.Charsets;
 
+@ExtendWith(RedTempDirectory.class)
 public class CheckstyleReportingStrategyTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    File tempFolder;
 
     @Test
     public void whenProjectIsValidated_normalStrategyLogsInfoAboutTimeAndReportedProblems() {
@@ -75,7 +77,7 @@ public class CheckstyleReportingStrategyTest {
 
     @Test
     public void whenReportingIsFinished_strategyGeneratesTheReportFile() throws Exception {
-        final File file = temporaryFolder.newFile("my_report.xml");
+        final File file = RedTempDirectory.createNewFile(tempFolder, "my_report.xml");
 
         final Logger logger = mock(Logger.class);
         final CheckstyleReportingStrategy strategy = new CheckstyleReportingStrategy(false, file.getAbsolutePath(),

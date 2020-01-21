@@ -20,14 +20,11 @@ import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -40,42 +37,36 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class GeneralSettingsVariablesImportValidatorTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            GeneralSettingsVariablesImportValidatorTest.class);
+    @Project(cleanUpAfterEach = true, createDefaultRedXml = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    static File tempFolder;
 
     private RobotModel model;
 
     private MockReporter reporter;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        final File root = tempFolder.getRoot();
-
-        getFile(root, "external.py").createNewFile();
-        getFile(root, "external_dir").mkdir();
-        getFile(root, "external_dir", "external_nested.py").createNewFile();
-        getFile(root, "external_dir", "external_nested.txt").createNewFile();
-
-        projectProvider.configure();
+        getFile(tempFolder, "external.py").createNewFile();
+        getFile(tempFolder, "external_dir").mkdir();
+        getFile(tempFolder, "external_dir", "external_nested.py").createNewFile();
+        getFile(tempFolder, "external_dir", "external_nested.txt").createNewFile();
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         model = new RobotModel();
         reporter = new MockReporter();
@@ -142,7 +133,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenUsingAbsolutePathImport() throws Exception {
-        final File tmpFile = tempFolder.newFile("file.py");
+        final File tmpFile = RedTempDirectory.createNewFile(tempFolder, "file.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateVariablesImport(absPath);
@@ -153,9 +144,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaSysPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -168,9 +159,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaRedXmlPythonPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -188,9 +179,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_1() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.py");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -202,7 +193,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_2() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateVariablesImport(absPath);
@@ -214,7 +205,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenExternalFileDoesNotExist() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "non_existing.py");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateVariablesImport(absPath);
@@ -234,8 +225,8 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenImportedVariablesLiesInDifferentDirectory() throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.py");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.py");
 
         validateVariablesImport("res.py");
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
@@ -246,7 +237,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileExistLocally_1() throws Exception {
-        final IFile file = projectProvider.createFile("res.robot");
+        final IFile file = project.createFile("res.robot");
 
         validateVariablesImport("res.robot");
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -256,8 +247,8 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileExistLocally_2() throws Exception {
-        final IFolder dir = projectProvider.createDir("directory");
-        projectProvider.createFile("directory/res.robot");
+        final IFolder dir = project.createDir("directory");
+        project.createFile("directory/res.robot");
 
         validateVariablesImport("directory/res.robot");
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -267,7 +258,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenWorkspaceImportIsNotAFile() throws Exception {
-        final IFolder dir = projectProvider.createDir("directory");
+        final IFolder dir = project.createDir("directory");
 
         validateVariablesImport("directory");
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -277,7 +268,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenExternalImportIsNotAFile() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir");
+        final File tmpFile = getFile(tempFolder, "external_dir");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateVariablesImport(absPath);
@@ -289,7 +280,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileExistLocallyButIsImportedUsingAbsolutePath()
             throws Exception {
-        final IFile resFile = projectProvider.createFile("res.robot");
+        final IFile resFile = project.createFile("res.robot");
 
         final String absPath = resFile.getLocation().toString();
         validateVariablesImport(absPath);
@@ -301,9 +292,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileExistLocallyAsALinkToExternalFile() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.py");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.py");
 
-        resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
+        project.createFileLink("link.py", tmpFile.toURI());
 
         validateVariablesImport(tmpFile.getAbsolutePath().replaceAll("\\\\", "/"));
         assertThat(reporter.getReportedProblems()).are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_ABSOLUTE));
@@ -311,10 +302,10 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaSysPathFromWorkspace() throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.robot");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
@@ -327,9 +318,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaSysPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -342,11 +333,11 @@ public class GeneralSettingsVariablesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaSysPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -358,10 +349,10 @@ public class GeneralSettingsVariablesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.robot");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -377,9 +368,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaRedXmlPythonPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -396,11 +387,11 @@ public class GeneralSettingsVariablesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaRedXmlPythonPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -439,7 +430,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     private RobotSuiteFile createVariablesImportingSuite(final String toImport) {
         try {
-            final IFile file = projectProvider.createFile("suite.robot",
+            final IFile file = project.createFile("suite.robot",
                     "*** Settings ***",
                     "Variables  " + toImport);
             final RobotSuiteFile suite = model.createSuiteFile(file);

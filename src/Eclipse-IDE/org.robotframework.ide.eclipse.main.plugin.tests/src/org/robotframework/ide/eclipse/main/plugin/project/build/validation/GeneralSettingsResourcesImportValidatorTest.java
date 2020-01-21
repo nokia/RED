@@ -22,14 +22,11 @@ import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
@@ -43,45 +40,39 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class GeneralSettingsResourcesImportValidatorTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            GeneralSettingsResourcesImportValidatorTest.class);
+    @Project(cleanUpAfterEach = true, createDefaultRedXml = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    static File tempFolder;
 
     private RobotModel model;
 
     private MockReporter reporter;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        final File root = tempFolder.getRoot();
-
-        getFile(root, "external.robot").createNewFile();
-        getFile(root, "external_dir").mkdir();
-        getFile(root, "external_dir", "external_nested.robot").createNewFile();
-        getFile(root, "external_dir", "external_nested.txt").createNewFile();
-        getFile(root, "external_dir", "external_nested.tsv").createNewFile();
-        getFile(root, "external_dir", "external_nested.html").createNewFile();
-        getFile(root, "external_dir", "external_nested.jpg").createNewFile();
-
-        projectProvider.configure();
+        getFile(tempFolder, "external.robot").createNewFile();
+        getFile(tempFolder, "external_dir").mkdir();
+        getFile(tempFolder, "external_dir", "external_nested.robot").createNewFile();
+        getFile(tempFolder, "external_dir", "external_nested.txt").createNewFile();
+        getFile(tempFolder, "external_dir", "external_nested.tsv").createNewFile();
+        getFile(tempFolder, "external_dir", "external_nested.html").createNewFile();
+        getFile(tempFolder, "external_dir", "external_nested.jpg").createNewFile();
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         model = new RobotModel();
         reporter = new MockReporter();
@@ -140,7 +131,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenUsingAbsolutePathImport() throws Exception {
-        final File tmpFile = tempFolder.newFile("file.robot");
+        final File tmpFile = RedTempDirectory.createNewFile(tempFolder, "file.robot");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -151,9 +142,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaSysPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -165,9 +156,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedRelativelyViaRedXmlPythonPathInsteadOfLocally() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -184,9 +175,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_1() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(tmpFile.getParentFile()));
 
@@ -198,7 +189,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenFileIsImportedFromOutsideOfWorkspace_2() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -210,7 +201,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenExternalFileDoesNotExist() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "non_existing.robot");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -230,7 +221,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenExternalImportIsNotAFile() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir");
+        final File tmpFile = getFile(tempFolder, "external_dir");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -241,7 +232,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenWorkspaceImportIsNotAFile() throws Exception {
-        final IFolder dir = projectProvider.createDir("directory");
+        final IFolder dir = project.createDir("directory");
 
         validateResourceImport("directory");
         assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
@@ -252,7 +243,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenExternalImportPointsToHtmlFile() {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.html");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.html");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -263,7 +254,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenWorkspaceImportPointsToHtmlFile() throws Exception {
-        final IFile file = projectProvider.createFile("res.html");
+        final IFile file = project.createFile("res.html");
 
         validateResourceImport("res.html");
         assertThat(reporter.getReportedProblems()).contains(
@@ -275,7 +266,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void markerIsReported_whenExternalImportIsNotAResourceFile() {
         // approximation, since we don't check if external files are really resources
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.jpg");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.jpg");
 
         final String absPath = tmpFile.getAbsolutePath().replaceAll("\\\\", "/");
         validateResourceImport(absPath);
@@ -287,7 +278,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void markerIsReported_whenWorkspaceImportIsNotAResourceFile() throws Exception {
         // it contains test cases section, so it is not a resource file
-        final IFile file = projectProvider.createFile("res.robot", "*** Test Cases ***");
+        final IFile file = project.createFile("res.robot", "*** Test Cases ***");
 
         validateResourceImport("res.robot");
         assertThat(reporter.getReportedProblems()).contains(new Problem(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT,
@@ -298,8 +289,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenImportedResourceLiesInDifferentDirectory() throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.robot");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.robot");
 
         validateResourceImport("res.robot");
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
@@ -310,7 +301,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileExistLocally_1() throws Exception {
-        final IFile file = projectProvider.createFile("res.robot");
+        final IFile file = project.createFile("res.robot");
 
         validateResourceImport("res.robot");
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -320,8 +311,8 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileExistLocally_2() throws Exception {
-        final IFolder dir = projectProvider.createDir("directory");
-        projectProvider.createFile("directory/res.robot");
+        final IFolder dir = project.createDir("directory");
+        project.createFile("directory/res.robot");
 
         validateResourceImport("directory/res.robot");
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -332,7 +323,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenResourceFileExistLocallyButIsImportedUsingAbsolutePath()
             throws Exception {
-        final IFile resFile = projectProvider.createFile("res.robot");
+        final IFile resFile = project.createFile("res.robot");
 
         final String absPath = resFile.getLocation().toString();
         validateResourceImport(absPath);
@@ -344,9 +335,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileExistLocallyAsALinkToExternalFile() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
 
-        resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.robot"));
+        project.createFileLink("link.robot", tmpFile.toURI());
 
         validateResourceImport(tmpFile.getAbsolutePath().replaceAll("\\\\", "/"));
         assertThat(reporter.getReportedProblems()).are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_ABSOLUTE));
@@ -354,10 +345,10 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromWorkspace() throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.robot");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir.getLocation().toFile()));
 
@@ -370,9 +361,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -386,11 +377,11 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(newArrayList(dir));
 
@@ -402,10 +393,10 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
-        final IFolder dir = projectProvider.createDir("dir");
-        projectProvider.createFile("dir/res.robot");
+        final IFolder dir = project.createDir("dir");
+        project.createFile("dir/res.robot");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -421,9 +412,9 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromExternalLocation() {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<File>());
 
@@ -476,11 +467,11 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @Test
     public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromExternalLocationWhichIsLinkedInWorkspace()
             throws Exception {
-        final File dir = getFile(tempFolder.getRoot(), "external_dir");
+        final File dir = getFile(tempFolder, "external_dir");
 
-        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
+        project.createDirLink("linking_dir", dir.toURI());
 
-        final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
+        final RobotProject robotProject = model.createRobotProject(project.getProject());
         final RobotProjectHolder projectHolder = robotProject.getRobotProjectHolder();
         projectHolder.setModuleSearchPaths(new ArrayList<>());
 
@@ -533,7 +524,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     private RobotSuiteFile createResourceImportingSuite(final String toImport) {
         try {
-            final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource  " + toImport);
+            final IFile file = project.createFile("suite.robot", "*** Settings ***", "Resource  " + toImport);
             final RobotSuiteFile suite = model.createSuiteFile(file);
             suite.dispose();
             return suite;
@@ -554,11 +545,11 @@ public class GeneralSettingsResourcesImportValidatorTest {
                 .getLinkedElement();
     }
 
-    private static File getFile(final File root, final String... path) {
+    private static File getFile(final File tempFolder, final String... path) {
         if (path == null || path.length == 0) {
-            return root;
+            return tempFolder;
         } else {
-            return getFile(new File(root, path[0]), Arrays.copyOfRange(path, 1, path.length));
+            return getFile(new File(tempFolder, path[0]), Arrays.copyOfRange(path, 1, path.length));
         }
     }
 }

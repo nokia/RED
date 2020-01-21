@@ -53,6 +53,10 @@ public class StatefulProject {
         return project.getLocation();
     }
 
+    public URI getLocationURI() {
+        return project.getLocationURI();
+    }
+
     public IFolder getDir(final String filePath) {
         return ProjectExtension.getDir(project, filePath);
     }
@@ -61,27 +65,29 @@ public class StatefulProject {
         return ProjectExtension.getFile(project, filePath);
     }
 
-    public void createFile(final String filePath, final String... lines) throws IOException, CoreException {
-        createFile(CleanMode.TEMPORAL, filePath, lines);
+    public IFile createFile(final String filePath, final String... lines) throws IOException, CoreException {
+        return createFile(CleanMode.TEMPORAL, filePath, lines);
     }
 
-    public void createFile(final CleanMode mode, final String filePath, final String... lines)
+    public IFile createFile(final CleanMode mode, final String filePath, final String... lines)
             throws IOException, CoreException {
         final IFile file = ProjectExtension.createFile(project, filePath, lines);
         if (mode == CleanMode.TEMPORAL) {
             createdResources.add(file);
         }
+        return file;
     }
 
-    public void createDir(final String filePath) throws IOException, CoreException {
-        createDir(CleanMode.TEMPORAL, filePath);
+    public IFolder createDir(final String filePath) throws IOException, CoreException {
+        return createDir(CleanMode.TEMPORAL, filePath);
     }
 
-    public void createDir(final CleanMode mode, final String filePath) throws IOException, CoreException {
+    public IFolder createDir(final CleanMode mode, final String filePath) throws IOException, CoreException {
         final IFolder folder = ProjectExtension.createDir(project, filePath);
         if (mode == CleanMode.TEMPORAL) {
             createdResources.add(folder);
         }
+        return folder;
     }
 
     public void createFileLink(final String filePath, final URI targetUri) throws CoreException {

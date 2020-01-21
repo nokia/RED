@@ -19,11 +19,10 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.widgets.Display;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -33,19 +32,19 @@ import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDi
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscovererWindow.DryRunLibraryImportListChildElement;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class LibrariesAutoDiscovererWindowTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererWindowTest.class);
+    @Project
+    static StatefulProject project;
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    File tempFolder;
 
     private static IFile suite;
 
@@ -55,10 +54,10 @@ public class LibrariesAutoDiscovererWindowTest {
 
     private final DiscoveredLibrariesViewerLabelProvider labelProvider = new DiscoveredLibrariesViewerLabelProvider();
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        suite = projectProvider.createFile("suite.robot");
-        lib = projectProvider.createFile("PyLib.py");
+        suite = project.createFile("suite.robot");
+        lib = project.createFile("PyLib.py");
     }
 
     @Test
@@ -90,10 +89,11 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testGettingOpenableFile() throws Exception {
-        final File linkedNonWorkspaceFile = tempFolder.newFile("non_workspace_test.robot");
-        final File notLinkedNonWorkspaceFile = tempFolder.newFile("other_non_workspace_test.robot");
-        final IFile linkedSuite = projectProvider.getFile("linkedSuite.robot");
-        resourceCreator.createLink(linkedNonWorkspaceFile.toURI(), linkedSuite);
+        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
+        final File notLinkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder,
+                "other_non_workspace_test.robot");
+        final IFile linkedSuite = project.getFile("linkedSuite.robot");
+        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
 
         assertThat(LibrariesAutoDiscovererWindow.getOpenableFile(lib.getLocation().toFile().getAbsolutePath()))
                 .hasValue(lib);
@@ -192,11 +192,11 @@ public class LibrariesAutoDiscovererWindowTest {
     public void testConvertingToText_forLibraryImportWithMultipleImporters() throws Exception {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         libImportElement.setStatus(DryRunLibraryImportStatus.ADDED);
-        final IFile suite1 = projectProvider.createFile("suite1.robot");
-        final IFile suite2 = projectProvider.createFile("suite2.robot");
-        final IFile suite3 = projectProvider.createFile("suite3.robot");
-        final IFile suite4 = projectProvider.createFile("suite4.robot");
-        final IFile suite5 = projectProvider.createFile("suite5.robot");
+        final IFile suite1 = project.createFile("suite1.robot");
+        final IFile suite2 = project.createFile("suite2.robot");
+        final IFile suite3 = project.createFile("suite3.robot");
+        final IFile suite4 = project.createFile("suite4.robot");
+        final IFile suite5 = project.createFile("suite5.robot");
         libImportElement.setImporters(newHashSet(suite2.getLocationURI(), suite3.getLocationURI(),
                 suite1.getLocationURI(), suite5.getLocationURI(), suite4.getLocationURI()));
 

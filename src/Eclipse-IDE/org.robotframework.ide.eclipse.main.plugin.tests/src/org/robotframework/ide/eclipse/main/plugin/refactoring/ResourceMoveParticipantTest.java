@@ -10,32 +10,24 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.junit.jupiter.api.io.TempDir;
+import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
-@ExtendWith(ProjectExtension.class)
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class ResourceMoveParticipantTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(ResourceMoveParticipantTest.class);
+    @Project(cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    static File tempFolder;
 
     @Test
     public void checkLabelTest() {
@@ -55,18 +47,17 @@ public class ResourceMoveParticipantTest {
     @Test
     public void changeIsNotCreatedForNotLinkedResources() throws Exception {
         final ResourceMoveParticipant participant = new ResourceMoveParticipant();
-        participant.initialize(projectProvider.createFile("res.robot"));
+        participant.initialize(project.createFile("res.robot"));
 
         assertThat(participant.createChange(new NullProgressMonitor())).isNull();
     }
 
     @Test
     public void changeIsCreatedForLinkedResources() throws Exception {
-        final File nonWorkspaceFile = tempFolder.newFile("res.robot");
-        final IFile linkedFile = projectProvider.getFile("linkedRes.robot");
-        resourceCreator.createLink(nonWorkspaceFile.toURI(), linkedFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "res.robot");
+        project.createFileLink("linkedRes.robot", nonWorkspaceFile.toURI());
         final ResourceMoveParticipant participant = new ResourceMoveParticipant();
-        participant.initialize(linkedFile);
+        participant.initialize(project.getFile("linkedRes.robot"));
 
         assertThat(participant.createChange(new NullProgressMonitor()))
                 .isExactlyInstanceOf(LinkedResourceLocationChange.class);

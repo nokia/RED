@@ -18,24 +18,26 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.validation.CheckstyleReportingStrategy.RobotProblemWithPosition;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
 import com.google.common.base.Charsets;
 
+@ExtendWith(RedTempDirectory.class)
 public class ReportWithCheckstyleFormatTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    File tempFolder;
 
     @Test
     public void emptyCheckstyleFileIsWritten_whenThereAreNoProblems() throws Exception {
-        final File file = temporaryFolder.newFile("empty.xml");
+        final File file = RedTempDirectory.createNewFile(tempFolder, "empty.xml");
 
         try (ReportWithCheckstyleFormat reporter = new ReportWithCheckstyleFormat(file)) {
             reporter.write(new HashMap<>());
@@ -51,7 +53,7 @@ public class ReportWithCheckstyleFormatTest {
 
     @Test
     public void checkStyleFileWithViolationsIsWritten_whenThereAreProblems() throws Exception {
-        final File file = temporaryFolder.newFile("empty.xml");
+        final File file = RedTempDirectory.createNewFile(tempFolder, "empty.xml");
 
         final RobotProblem problem1 = mock(RobotProblem.class);
         when(problem1.getMessage()).thenReturn("ImportantProblem!!!");

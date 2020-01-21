@@ -6,31 +6,25 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.File;
 import java.util.function.BiConsumer;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
@@ -41,25 +35,23 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
+import org.robotframework.red.junit.jupiter.StatefulProject.CleanMode;
 
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class SourceOpeningSupportTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(SourceOpeningSupportTest.class);
+    @Project(cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    static File tempFolder;
 
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
-
-    @Mock
     private BiConsumer<String, Exception> errorHandler;
 
     private LibrarySpecification libSpec;
@@ -68,9 +60,9 @@ public class SourceOpeningSupportTest {
 
     private IWorkbenchPage page;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("testlib.py",
+        project.createFile(CleanMode.NONTEMPORAL, "testlib.py",
                 "#comment",
                 "def defined_kw():",
                 "  print(\"kw\")",
@@ -78,27 +70,29 @@ public class SourceOpeningSupportTest {
                 "  print(\"kw\")");
     }
 
-    @Before
+    @SuppressWarnings("unchecked")
+    @BeforeEach
     public void beforeTest() throws Exception {
+        errorHandler = mock(BiConsumer.class);
         final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
-                projectProvider.getProject().getName() + "/testlib.py");
+                project.getName() + "/testlib.py");
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
-        projectProvider.configure(config);
+        project.configure(config);
 
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(lib, variant);
         libSpec = LibrarySpecification.create("testlib");
         libSpec.setDescriptor(libDesc);
 
-        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        robotProject = new RobotModel().createRobotProject(project.getProject());
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, libSpec));
 
         page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
     }
 
-    @After
+    @AfterEach
     public void afterTest() {
         robotProject.clearConfiguration();
 
@@ -116,15 +110,14 @@ public class SourceOpeningSupportTest {
 
     @Test
     public void testIfLinkedLibraryIsOpened() throws Exception {
-        final File nonWorkspaceLib = tempFolder.newFile("linkedLib.py");
+        final File nonWorkspaceLib = RedTempDirectory.createNewFile(tempFolder, "linkedLib.py");
         final LibrarySpecification linkedLibSpec = LibrarySpecification.create("linkedLib");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
                 .create(LibraryType.PYTHON, "linkedLib", nonWorkspaceLib.getAbsolutePath()), variant);
         linkedLibSpec.setDescriptor(libDesc);
 
-        final IFile linkedFile = projectProvider.getFile("linkedLib.py");
-        resourceCreator.createLink(nonWorkspaceLib.toURI(), linkedFile);
+        project.createFileLink("linkedLib.py", nonWorkspaceLib.toURI());
 
         robotProject.setReferencedLibraries(ImmutableMap.of(libDesc, linkedLibSpec));
 
@@ -137,7 +130,7 @@ public class SourceOpeningSupportTest {
 
     @Test
     public void testIfNonWorkspaceLibraryIsOpened() throws Exception {
-        final File nonWorkspaceLib = tempFolder.newFile("outsideLib.py");
+        final File nonWorkspaceLib = RedTempDirectory.createNewFile(tempFolder, "outsideLib.py");
         final LibrarySpecification nonWorkspaceLibSpec = LibrarySpecification.create("outsideLib");
         final ReferencedLibraryArgumentsVariant variant = ReferencedLibraryArgumentsVariant.create();
         final LibraryDescriptor libDesc = LibraryDescriptor.ofReferencedLibrary(ReferencedLibrary
@@ -245,7 +238,7 @@ public class SourceOpeningSupportTest {
         kwSpec.setName("Defined Kw");
 
         final RobotDryRunKeywordSource kwSource = new RobotDryRunKeywordSource();
-        kwSource.setFilePath(projectProvider.getFile("testlib.py").getLocation().toOSString());
+        kwSource.setFilePath(project.getFile("testlib.py").getLocation().toOSString());
         kwSource.setLibraryName(libSpec.getName());
         kwSource.setName(kwSpec.getName());
         kwSource.setLine(1);
@@ -275,7 +268,7 @@ public class SourceOpeningSupportTest {
 
     @Test
     public void testIfFileIsOpenedInEditor() throws Exception {
-        SourceOpeningSupport.tryToOpenInEditor(page, projectProvider.getFile("testlib.py"));
+        SourceOpeningSupport.tryToOpenInEditor(page, project.getFile("testlib.py"));
 
         assertOpenedEditor("testlib.py");
         assertEmptySelection();
@@ -284,7 +277,7 @@ public class SourceOpeningSupportTest {
     private void assertOpenedEditor(final String expectedFilePath) throws PartInitException {
         assertThat(page.getEditorReferences()).hasSize(1);
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(expectedFilePath));
+        assertThat(editorInput.getFile()).isEqualTo(project.getFile(expectedFilePath));
     }
 
     private void assertEmptySelection() throws PartInitException {

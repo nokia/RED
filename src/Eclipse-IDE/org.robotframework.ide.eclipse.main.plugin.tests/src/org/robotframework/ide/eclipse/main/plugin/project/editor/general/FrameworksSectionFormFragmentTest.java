@@ -8,39 +8,44 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.getDir;
 
 import java.io.File;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.InvalidPythonRuntimeEnvironment;
 import org.rf.ide.core.environment.MissingRobotRuntimeEnvironment;
 import org.rf.ide.core.environment.NullRuntimeEnvironment;
 import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class FrameworksSectionFormFragmentTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(FrameworksSectionFormFragmentTest.class);
+    @Project(dirs = { "workspaceFolder" })
+    static IProject project;
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    static File tempFolder;
 
     private static File nonWorkspaceFolder;
 
     private static IFolder workspaceFolder;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
-        nonWorkspaceFolder = temporaryFolder.newFolder("nonWorkspaceFolder");
-        workspaceFolder = projectProvider.createDir("workspaceFolder");
+        nonWorkspaceFolder = RedTempDirectory.createNewDir(tempFolder, "nonWorkspaceFolder");
+        workspaceFolder = getDir(project, "workspaceFolder");
     }
 
     @Test

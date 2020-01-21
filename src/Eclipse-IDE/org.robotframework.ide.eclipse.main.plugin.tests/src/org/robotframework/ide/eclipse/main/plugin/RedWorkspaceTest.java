@@ -11,30 +11,28 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace.Paths;
-import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class RedWorkspaceTest {
 
-    private static final String PROJECT_NAME = RedWorkspaceTest.class.getSimpleName();
+    @Project(dirs = { "folder" }, files = { "folder/file.txt" })
+    static StatefulProject project;
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @Project(nameSuffix = "_OUTSIDE")
+    StatefulProject outsideProject;
 
-    @ClassRule
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public ProjectProvider outsideProjectProvider = new ProjectProvider(PROJECT_NAME + "_OUTSIDE");
-
-    private static IProject project;
+    @TempDir
+    static File tempFolder;
 
     private static IFolder workspaceDir;
 
@@ -44,21 +42,20 @@ public class RedWorkspaceTest {
 
     private static File nonWorkspaceFile;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        project = projectProvider.getProject();
-        workspaceDir = projectProvider.createDir("folder");
-        workspaceFile = projectProvider.createFile("folder/file.txt");
-        nonWorkspaceDir = tempFolder.newFolder("nonWorkspaceFolder");
-        nonWorkspaceFile = tempFolder.newFile("nonWorkspaceFolder/nonWorkspaceFile.txt");
+        workspaceDir = project.getDir("folder");
+        workspaceFile = project.getFile("folder/file.txt");
+        nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "nonWorkspaceFolder");
+        nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "nonWorkspaceFolder/nonWorkspaceFile.txt");
     }
 
     @Test
     public void workspaceRelativePathIsCreated_whenPathIsFromWorkspace() throws Exception {
         assertThat(Paths.toWorkspaceRelativeIfPossible(new Path(workspaceDir.getLocation().toOSString())))
-                .isEqualTo(new Path(PROJECT_NAME + "/folder"));
+                .isEqualTo(new Path(project.getName() + "/folder"));
         assertThat(Paths.toWorkspaceRelativeIfPossible(new Path(workspaceFile.getLocation().toOSString())))
-                .isEqualTo(new Path(PROJECT_NAME + "/folder/file.txt"));
+                .isEqualTo(new Path(project.getName() + "/folder/file.txt"));
     }
 
     @Test
@@ -71,16 +68,16 @@ public class RedWorkspaceTest {
 
     @Test
     public void workspaceRelativePathIsCreated_whenPathIsFromProjectNotFromWorkspace() throws Exception {
-        final File projectLocation = tempFolder.newFolder("PROJECT_OUT_OF_WORKSPACE");
-        final IFolder outsideProjectDir = outsideProjectProvider.createDir("outsideFolder");
-        final IFile outsideProjectFile = outsideProjectProvider.createFile("outsideFolder/outsideFile.txt");
+        final File projectLocation = RedTempDirectory.createNewDir(tempFolder, "PROJECT_OUT_OF_WORKSPACE");
+        final IFolder outsideProjectDir = outsideProject.createDir("outsideFolder");
+        final IFile outsideProjectFile = outsideProject.createFile("outsideFolder/outsideFile.txt");
 
-        outsideProjectProvider.move(projectLocation);
+        outsideProject.move(projectLocation);
 
         assertThat(Paths.toWorkspaceRelativeIfPossible(new Path(outsideProjectDir.getLocation().toOSString())))
-                .isEqualTo(new Path(PROJECT_NAME + "_OUTSIDE/outsideFolder"));
+                .isEqualTo(new Path(project.getName() + "_OUTSIDE/outsideFolder"));
         assertThat(Paths.toWorkspaceRelativeIfPossible(new Path(outsideProjectFile.getLocation().toOSString())))
-                .isEqualTo(new Path(PROJECT_NAME + "_OUTSIDE/outsideFolder/outsideFile.txt"));
+                .isEqualTo(new Path(project.getName() + "_OUTSIDE/outsideFolder/outsideFile.txt"));
     }
 
     @Test
@@ -101,17 +98,17 @@ public class RedWorkspaceTest {
 
     @Test
     public void absolutePathIsCreated_whenWorkspacePathIsRelativeToWorkspace() throws Exception {
-        assertThat(Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(PROJECT_NAME + "/folder")))
+        assertThat(Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(project.getName() + "/folder")))
                 .isEqualTo(new Path(workspaceDir.getLocation().toOSString()));
-        assertThat(Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(PROJECT_NAME + "/folder/file.txt")))
+        assertThat(Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(project.getName() + "/folder/file.txt")))
                 .isEqualTo(new Path(workspaceFile.getLocation().toOSString()));
     }
 
     @Test
     public void absolutePathIsCreated_whenWorkspacePathIsRelativeToProject() throws Exception {
-        assertThat(Paths.toAbsoluteFromRelativeIfPossible(project, new Path("folder")))
+        assertThat(Paths.toAbsoluteFromRelativeIfPossible(project.getProject(), new Path("folder")))
                 .isEqualTo(new Path(workspaceDir.getLocation().toOSString()));
-        assertThat(Paths.toAbsoluteFromRelativeIfPossible(project, new Path("folder/file.txt")))
+        assertThat(Paths.toAbsoluteFromRelativeIfPossible(project.getProject(), new Path("folder/file.txt")))
                 .isEqualTo(new Path(workspaceFile.getLocation().toOSString()));
     }
 

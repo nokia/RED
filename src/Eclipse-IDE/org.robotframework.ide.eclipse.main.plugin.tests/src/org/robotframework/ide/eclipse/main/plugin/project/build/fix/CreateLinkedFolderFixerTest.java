@@ -6,31 +6,37 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createDir;
+import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.io.File;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.robotframework.red.junit.ProjectProvider;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class CreateLinkedFolderFixerTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(CreateLinkedFolderFixerTest.class);
+    @Project
+    IProject project;
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    File tempFolder;
 
     @Test
     public void linkedFolderIsCreated_whenResourceFileIsImportedFromExternalLocationViaAbsolutePath() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "resource.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "resource.robot");
         final String path = tmpFile.getCanonicalPath().replaceAll("\\\\", "/");
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -44,10 +50,10 @@ public class CreateLinkedFolderFixerTest {
     @Test
     public void linkedFolderIsCreatedWithParentName_whenResourceFileIsImportedFromExternalLocationViaAbsolutePath()
             throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "parent_dir", "external_dir", "resource.robot");
+        final File tmpFile = getFile(tempFolder, "parent_dir", "external_dir", "resource.robot");
         final String path = tmpFile.getCanonicalPath().replaceAll("\\\\", "/");
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
-        projectProvider.createDir("external_dir");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
+        createDir(project, "external_dir");
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -62,7 +68,7 @@ public class CreateLinkedFolderFixerTest {
     public void linkedFolderIsCreated_whenResourceFileIsImportedFromExternalLocationViaRelativePath() throws Exception {
         final String path = "../../../../../../../../../external_dir/resource.robot";
         final String absolutePath = "/external_dir/resource.robot";
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(absolutePath, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -78,8 +84,8 @@ public class CreateLinkedFolderFixerTest {
             throws Exception {
         final String path = "../../../../../../../../../parent_dir/external_dir/resource.robot";
         final String absolutePath = "/parent_dir/external_dir/resource.robot";
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
-        projectProvider.createDir("external_dir");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
+        createDir(project, "external_dir");
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(absolutePath, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -95,8 +101,8 @@ public class CreateLinkedFolderFixerTest {
             throws Exception {
         final String path = "../../../../../../../../../external_dir/resource.robot";
         final String absolutePath = "/external_dir/resource.robot";
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
-        projectProvider.createDir("external_dir");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
+        createDir(project, "external_dir");
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(absolutePath, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -112,9 +118,9 @@ public class CreateLinkedFolderFixerTest {
             throws Exception {
         final String path = "../../../../../../../../../external_dir/resource.robot";
         final String absolutePath = "/external_dir/resource.robot";
-        final IFile file = projectProvider.createFile("suite.robot", "*** Settings ***", "Resource    " + path);
-        projectProvider.createDir("external_dir");
-        projectProvider.createDir("external_dir(1)");
+        final IFile file = createFile(project, "suite.robot", "*** Settings ***", "Resource    " + path);
+        createDir(project, "external_dir");
+        createDir(project, "external_dir(1)");
 
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(absolutePath, path);
         fixer.executeCreateFolderOperation(file, null);
@@ -127,7 +133,7 @@ public class CreateLinkedFolderFixerTest {
 
     @Test
     public void fixerExistInFixers_whenResourceIsLocatedOutsideWorkspace() throws Exception {
-        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "non_existing.robot");
+        final File tmpFile = getFile(tempFolder, "external_dir", "non_existing.robot");
         final String path = tmpFile.getCanonicalPath().replaceAll("\\\\", "/");
         final CreateLinkedFolderFixer fixer = new CreateLinkedFolderFixer(path, path);
 

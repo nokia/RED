@@ -12,70 +12,56 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
-import org.robotframework.red.junit.ProjectProvider;
-import org.robotframework.red.junit.ResourceCreator;
+import org.robotframework.red.junit.jupiter.Project;
+import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
+import org.robotframework.red.junit.jupiter.StatefulProject;
 
+@ExtendWith({ ProjectExtension.class, RedTempDirectory.class })
 public class GeneralSettingsImportsFixesTest {
 
-    public static ProjectProvider projectProvider = new ProjectProvider(GeneralSettingsImportsFixesTest.class);
+    @Project(dirs = { "Dir1", "Dir1/Dir2", "tests" },
+            files = { "Lib.py", "Lib.java", "Res.robot", "Dir1/Lib.py", "Dir1/Dir2/Lib.py",
+                    "tests/Lib.py", "tests/suite.robot" },
+            cleanUpAfterEach = true)
+    static StatefulProject project;
 
-    public static TemporaryFolder tempFolder = new TemporaryFolder();
+    @Project(name = "OTHER_PROJECT", files = { "Lib.py" })
+    static IProject otherProject;
 
-    @ClassRule
-    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
-
-    @ClassRule
-    public static ProjectProvider otherProjectProvider = new ProjectProvider("OTHER_PROJECT");
-
-    @Rule
-    public ResourceCreator resourceCreator = new ResourceCreator();
+    @TempDir
+    static File tempFolder;
 
     private static IMarker marker;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeSuite() throws Exception {
-        projectProvider.createFile("Lib.py");
-        projectProvider.createFile("Lib.java");
-        projectProvider.createFile("Res.robot");
-
-        projectProvider.createDir("Dir1");
-        projectProvider.createFile("Dir1/Lib.py");
-        projectProvider.createDir("Dir1/Dir2");
-        projectProvider.createFile("Dir1/Dir2/Lib.py");
-
-        projectProvider.createDir("tests");
-        projectProvider.createFile("tests/Lib.py");
-
-        otherProjectProvider.createFile("Lib.py");
-
-        marker = projectProvider.createFile("tests/suite.robot").createMarker(RedPlugin.PLUGIN_ID);
+        marker = project.getFile("tests/suite.robot").createMarker(RedPlugin.PLUGIN_ID);
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
-        projectProvider.configure();
+        project.configure();
     }
 
-    @After
+    @AfterEach
     public void afterTest() throws Exception {
-        projectProvider.deconfigure();
+        project.deconfigure();
     }
 
     @Test
@@ -89,9 +75,9 @@ public class GeneralSettingsImportsFixesTest {
     @Test
     public void thereIsAFixersForByNameImports_whenThereIsLibraryKnownForGivenPath() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setReferencedLibraries(newArrayList(
-                ReferencedLibrary.create(LibraryType.PYTHON, "LibFromConfig", projectProvider.getProject().getName())));
-        projectProvider.configure(config);
+        config.setReferencedLibraries(
+                newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, "LibFromConfig", project.getName())));
+        project.configure(config);
 
         final List<RedSuiteMarkerResolution> fixers = GeneralSettingsImportsFixes.changeByPathImportToByName(marker,
                 new Path("../../LibFromConfig.py"));
@@ -131,10 +117,10 @@ public class GeneralSettingsImportsFixesTest {
 
     @Test
     public void thereAreNoFixersForOtherPathImports_whenOtherFilesWithSameNameAreLinked() throws Exception {
-        final File nonWorkspaceFolder = tempFolder.newFolder("linked");
-        final File nonWorkspaceFile = tempFolder.newFile("linked/LinkedLib.py");
-        resourceCreator.createLink(nonWorkspaceFolder.toURI(), projectProvider.getDir("linked"));
-        resourceCreator.createLink(nonWorkspaceFile.toURI(), projectProvider.getFile("LinkedLib.py"));
+        final File nonWorkspaceFolder = RedTempDirectory.createNewDir(tempFolder, "linked");
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "linked/LinkedLib.py");
+        project.createDirLink("linked", nonWorkspaceFolder.toURI());
+        project.createFileLink("LinkedLib.py", nonWorkspaceFile.toURI());
 
         final List<RedSuiteMarkerResolution> fixers = GeneralSettingsImportsFixes
                 .changeByPathImportToOtherPathWithSameFileName(marker, new Path(nonWorkspaceFile.getAbsolutePath()));
