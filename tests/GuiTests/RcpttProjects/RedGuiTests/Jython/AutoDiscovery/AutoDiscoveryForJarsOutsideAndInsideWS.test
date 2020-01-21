@@ -1,40 +1,22 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _6-akYGfbEeiEwYlEOPk68w,_2JCD4B3CEeehL98jfxP8Sw,_3GPE0GfOEeiEwYlEOPk68w,_6kElkDBsEemdFPzzB7f3Tg
+Contexts: _6-akYGfbEeiEwYlEOPk68w,_2JCD4B3CEeehL98jfxP8Sw,_3GPE0GfOEeiEwYlEOPk68w,_6kElkDBsEemdFPzzB7f3Tg,_OyDWIBxfEeq6f9_VBibLOg
 Element-Name: AutoDiscoveryForJarsOutsideAndInsideWS
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Ph_egGfOEeiEwYlEOPk68w
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/5/19 5:24 PM
+Save-Time: 1/21/20 11:22 AM
+Tags: jython
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-// set jython as interpreter  
-get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
-
-
-//set path to jython
-set-dialog-result Folder [os-specific "C:\\jython2.7.0\\bin" "/usr/local/lib/jython/bin"]
-with [get-window Preferences] {
-//	wait 5000
-    get-button "Add..." | click
-    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
-    get-button $Apply_and_OK_in_preference | click
-    get-window "Rebuild required" | get-button OK | click
-}
-
-get-preferences-menu | click
-with [get-window Preferences] {
-     get-tree | select "Robot Framework/Libraries"
-    get-group "Libdoc generating" | get-button "Generate Python libraries libdocs in separate process" | uncheck
-    get-button "Apply and Close" | click
-}
+uncheck-generating-libdocs-in-process
+set-jython-as-interpereter
 
 
 //open red.xml and add 2 jars from user folder

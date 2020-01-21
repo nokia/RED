@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _OyDWIBxfEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/11/19 10:56 PM
+Save-Time: 1/21/20 11:06 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -21,8 +21,10 @@ proc "uncheck-generating-libdocs-in-process"{
 	}
 }
 
-proc "set-jython-as-interpereter"{
-	get-preferences-menu | click
+proc "set-jython-as-interpereter" [val open_preferences_menu True]{
+	if [$open_preferences_menu | eq True ]{
+		get-preferences-menu | click
+	}
 	get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
 	// add jython to preference
 	set-dialog-result Folder [os-specific -windowsValue "C:\\jython\\bin" -linuxValue ""]
@@ -33,4 +35,30 @@ proc "set-jython-as-interpereter"{
 	    get-window "Rebuild required" | get-button OK | click
 	}
 }
+
+proc "add-jython-to-interpereters" [val open_preferences_menu True]{
+	if [$open_preferences_menu | eq True ]{
+		get-preferences-menu | click
+	}
+	get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+	// add jython to preference
+	set-dialog-result Folder [os-specific -windowsValue "C:\\jython\\bin" -linuxValue ""]
+	with [get-window Preferences] {
+	    get-button "Add..." | click
+	    get-button "Apply and Close" | click
+	    get-window "Rebuild required" | get-button OK | click
+	}
+}
+
+
+proc "remove-all-interpreters"{
+	//remove all interpreters
+	repeat  -times [get-window Preferences | get-table | get-property itemCount -raw] -command{
+		with [get-window Preferences] {
+		    get-table | get-item ".*" -index 0 | click
+		    get-button Remove | click
+		}
+	}
+}
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

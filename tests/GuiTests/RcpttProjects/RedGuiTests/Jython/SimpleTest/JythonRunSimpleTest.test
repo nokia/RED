@@ -1,41 +1,22 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Wjy7oOFJEeWu0tyN3Pwjmg
+Contexts: _Wjy7oOFJEeWu0tyN3Pwjmg,_OyDWIBxfEeq6f9_VBibLOg
 Element-Name: JythonRunSimpleTest
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/4/19 2:28 PM
+Save-Time: 1/21/20 11:43 AM
+Tags: jython
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-preferences-menu | click
-with [get-window Preferences] {
-    get-tree | select "Robot Framework/Libraries"
-    get-group "Libdoc generating" | get-button "Generate Python libraries libdocs in separate process" | uncheck
-    get-button "Apply and Close" | click
-}
-
-// try to run tests with jython libs
-
-// set jython as interpreter  
-get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
-
-try -delay 1000 -times 5 -command{
-	get-window Preferences | get-table | get-property itemCount | not-eq 0 | verify-true
-}	
-
-with [get-window Preferences] {
-    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
-    get-button $Apply_and_OK_in_preference | click
-    get-window "Rebuild required" | get-button OK | click
-}
+uncheck-generating-libdocs-in-process
+set-jython-as-interpereter
 
 try -command{
 	// open test and check if errors due to unknown libs are present
