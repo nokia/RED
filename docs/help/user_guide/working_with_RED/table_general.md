@@ -23,7 +23,10 @@ All table related preferences (cell text folding, number of columns, default beh
 Window -> Preferences -> Robot Framework -> Editor</a></code> in <b>Tables</b> section.
 <br/><br/><img src="images/table_preferences.png"/> <br/><br/>
 <h3>Keyword argument highlighting</h3>
-<p>RED allows to automatically color required, optional and redundant keyword arguments cells in any of table editors.</p><br/>
+<p>RED allows to automatically color required, optional and redundant keyword arguments cells in any of table editors.<br/><br/>
+Ambiguous keyword finding strategy (<code><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist)')">
+Window -> Preferences -> Robot Framework -> Editor -> Content Assist</a></code>) is used here when keyword name conflict exists.
+</p><br/>
 <h3>Default number of columns in table editors</h3>
 <p>To make table editors tidy, RED creates predefined numbers of columns.</p><br/>
 <h3>To long cell text behavior</h3>

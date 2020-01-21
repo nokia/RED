@@ -26,9 +26,20 @@ If single proposals insertion is enabled, code assistant will choose and insert 
 When auto activation is enabled, triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br/>
 <br/><b>Keywords</b><br/>
 Options in this section allow to:<br/>
-Enable keyword propositions from libraries available in red.xml, but not imported in robot file. Library import will be added automatically when such proposal is accepted.<br/>
-Configure library/resource prefix addition strategy. Such prefix can be enabled/disabled or enabled only if keyword conflict exist.<br/>
+<ul>
+<li>
+Enable keyword propositions from libraries available in red.xml, but not imported in robot file. Library import will be added automatically when such proposal is accepted.
+</li>
+<li>
+Configure library/resource prefix addition strategy. Such prefix can be enabled/disabled or enabled only if keyword conflict exist.
+</li>
+<li>
 Specify "Tab" behavior for automatically added arguments in source view. Cycle between arguments or exit on last argument can be chosen.
+</li>
+<li>
+Choose ambiguous keyword finding strategy used for features like table cell coloring, documentation show action and template arguments proposals.
+</li>
+</ul>
 <br/><br/><img src="images/content-assist-pref.png"/><br/>
 </body>
 </html>
