@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7mMR4OiVEea0ALtmCcrmfA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/14/19 3:15 PM
+Save-Time: 1/22/20 2:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -153,6 +153,8 @@ get-editor "new.robot" | get-tab-folder | get-property activePage | equals "Test
 get-editor "new.robot" | get-tab-folder | get-tab-item Source | click
 
 //open now from PE
+get-view "Project Explorer" | get-tree | get-item "RobotProject/new.robot/Test Cases" | expand
+wait 200
 get-view "Project Explorer" | get-tree | select "RobotProject/new.robot/Test Cases/test 3" | double-click
 wait 200
 get-editor "new.robot" | get-text-viewer | get-property "getSelectionText()" | equals "test 3" | verify-true
@@ -164,9 +166,9 @@ get-editor "res1.tsv" | get-tab-folder | get-property activePage | equals Source
 
 //open source for second file and open from PE
 get-editor "next.robot" | get-tab-folder | get-tab-item Source | click
+get-view "Project Explorer" | get-tree | get-item "RobotProject/next.robot/Test Cases" | expand
 wait 200
 get-view "Project Explorer" | get-tree | select "RobotProject/next.robot/Test Cases/one" | double-click
-wait 100
 with [get-editor "next.robot"] {
 	get-tab-folder | get-property activePage | equals Source | verify-true
     get-text-viewer | get-property "getSelectionText()" | equals one | verify-true
