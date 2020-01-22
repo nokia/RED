@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-qvG8Ae3EearkLC-7wHL-g
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/20/20 6:44 PM
-Tags: jython
+Save-Time: 1/22/20 1:47 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -23,7 +22,7 @@ Entry-Name: .content
 
 //
 //
-//									You must have installed python and jython. Other intrpreters are omitted.
+//									You must have installed python. Other intrpreters are omitted.
 //
 //
 //
@@ -31,9 +30,6 @@ Entry-Name: .content
 restart-aut
 wait-until-eclipse-is-ready
 get-view Welcome | close
-
-//set jython version
-check-jython-version
 
 //open preference
 get-preferences-menu | click
@@ -44,24 +40,14 @@ try -times 15 -delay 1000 -command{
 	get-window Preferences | get-table | get-property itemCount | not-eq 0 | verify-true
 }
 with [get-window Preferences | get-table] {
-    get-item "Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals bold 
+    get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "styles[0].fontStyle" | equals bold 
         | verify-true
-    get-item "Robot Framework .*\\(Python .*\)" | get-property "styles[1].fontStyle" | equals bold 
+    get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version]  | get-property "styles[1].fontStyle" | equals bold 
         | verify-true
-    get-item "Robot Framework .*\\(Python .*\\)" | get-property "values['Name']" 
+    get-item [format  "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "values['Name']" 
         | equals $robot_version | verify-true
-    get-item "Robot Framework .*\\(Python .*\\)" | get-property "values['Path']" | equals $python_exe_path
+    get-item [format  "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "values['Path']" | equals $python_exe_path
         | verify-true
-        
-        
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
-        | equals normal | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
-        | equals normal | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Name']" 
-        | equals $jybot_version | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Path']" 
-        | equals $jython_path | verify-true
 }
 
 //remove all interpreters
@@ -79,50 +65,26 @@ with [get-window Preferences | get-table] {
         | equals $robot_version  | verify-true
     get-item"Robot Framework .*\\(Python .*\\)" | get-property "values['Path']" | equals $python_exe_path
         | verify-true
-        
-        
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property selection | equals false 
-        | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property enablement | equals false 
-        | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Name']" 
-        | equals $jybot_version| verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Path']" 
-        | equals $jython_path | verify-true
 }
 
 //select python is bold after selecting
-get-window Preferences | get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
+get-window Preferences | get-table | get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version] | check
 with [get-window Preferences | get-table] {
-    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals bold 
+    get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "styles[0].fontStyle" | equals bold 
         | verify-true
-    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[1].fontStyle" | equals bold 
+    get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version]  | get-property "styles[1].fontStyle" | equals bold 
         | verify-true
-}
-with [get-window Preferences | get-table] {
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
-        | equals normal | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
-        | equals normal | verify-true
+    get-item [format  "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "values['Name']" 
+        | equals $robot_version | verify-true
+    get-item [format  "Robot Framework .*\\(Python %s.*\\)" $python_version] | get-property "values['Path']" | equals $python_exe_path
+        | verify-true
 }
 
-//select jython now
-get-window Preferences | get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
-with [get-window Preferences | get-table] {
-    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals normal 
-        | verify-true
-    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[1].fontStyle" | equals normal 
-        | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
-        | equals bold | verify-true
-    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
-        | equals bold | verify-true
-}
-
-//select python again adn close window
 with [get-window Preferences] {
-    get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
-    get-button $Apply_and_OK_in_preference | click
+    with [get-table] {
+        get-item -path [format "Robot Framework .*\\(Python %s.*\\)"  $python_version] | check
+    }
+    get-button "Apply and Close" | click
     get-window "Rebuild required" | get-button OK | click
 }
 
