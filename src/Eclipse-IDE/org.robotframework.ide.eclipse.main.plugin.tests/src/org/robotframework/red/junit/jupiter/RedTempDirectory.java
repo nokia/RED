@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.red.junit.jupiter;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
@@ -198,6 +203,12 @@ public class RedTempDirectory implements BeforeAllCallback, BeforeEachCallback, 
                 return dir.relativize(path);
             } catch (final IllegalArgumentException e) {
                 return path;
+            }
+        }
+    }
+
+}
+           return path;
             }
         }
     }
