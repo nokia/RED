@@ -167,7 +167,9 @@ public class RedTempDirectory implements BeforeAllCallback, BeforeEachCallback, 
 
                 private FileVisitResult deleteAndContinue(final Path path) {
                     try {
-                        Files.delete(path);
+                        if (Files.exists(path)) {
+                            Files.delete(path);
+                        }
                     } catch (final IOException ex) {
                         failures.put(path, ex);
                     }
@@ -203,12 +205,6 @@ public class RedTempDirectory implements BeforeAllCallback, BeforeEachCallback, 
                 return dir.relativize(path);
             } catch (final IllegalArgumentException e) {
                 return path;
-            }
-        }
-    }
-
-}
-           return path;
             }
         }
     }

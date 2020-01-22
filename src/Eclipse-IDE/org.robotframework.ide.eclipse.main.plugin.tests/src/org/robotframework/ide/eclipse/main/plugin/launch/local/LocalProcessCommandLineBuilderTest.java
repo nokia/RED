@@ -1227,9 +1227,9 @@ public class LocalProcessCommandLineBuilderTest {
             nonWorkspaceTest.createNewFile();
             Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
 
+            movedProject.move(nonWorkspaceDir);
             movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c1", " Log 1");
             movedProject.createFileLink("suites/LinkedTest.robot", nonWorkspaceTest.toURI());
-            movedProject.move(nonWorkspaceDir);
 
             final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
             final RobotProject robotProject = createRobotProject(movedProject.getProject());

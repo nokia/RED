@@ -257,7 +257,7 @@ public class ProjectExtension
                 if (project instanceof IProject && ((IProject) project).exists()) {
                     ((IProject) project).delete(true, null);
                 }
-            } catch (IllegalArgumentException | IllegalAccessException | CoreException e) {
+            } catch (final Throwable e) {
             } finally {
                 try {
                     field.set(instance, null);
