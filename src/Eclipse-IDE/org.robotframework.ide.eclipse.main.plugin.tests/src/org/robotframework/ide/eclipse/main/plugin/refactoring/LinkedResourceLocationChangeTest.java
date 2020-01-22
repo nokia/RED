@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.RedTempDirectory;
 import org.robotframework.red.junit.jupiter.StatefulProject;
 
 @ExtendWith(ProjectExtension.class)
@@ -45,8 +46,7 @@ public class LinkedResourceLocationChangeTest {
     @Test
     public void linkedResourceLocationsAreRefreshed_whenChangeIsPerformed() throws Exception {
         final IWorkspace workspace = project.getWorkspace();
-        final File nonWorkspaceFile = new File(tempFolder, "linkedRes.robot");
-        nonWorkspaceFile.createNewFile();
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "linkedRes.robot");
         project.createFileLink(nonWorkspaceFile.getName(), nonWorkspaceFile.toURI());
 
         assertThat(findResource(workspace, nonWorkspaceFile)).isEqualTo(project.getFile("linkedRes.robot"));

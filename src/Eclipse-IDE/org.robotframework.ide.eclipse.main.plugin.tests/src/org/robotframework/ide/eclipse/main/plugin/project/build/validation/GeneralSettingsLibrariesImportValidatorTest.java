@@ -81,9 +81,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @BeforeAll
     public static void beforeSuite() throws Exception {
-        getFile(tempFolder, "external_lib.py").createNewFile();
-        getFile(tempFolder, "external_dir").mkdir();
-        getFile(tempFolder, "external_dir", "external_nested_lib.py").createNewFile();
+        final File externalDir = RedTempDirectory.createNewDir(tempFolder, "external_dir");
+
+        RedTempDirectory.createNewFile(tempFolder, "external_lib.py");
+        RedTempDirectory.createNewFile(externalDir, "external_nested_lib.py");
 
         project.configure();
     }

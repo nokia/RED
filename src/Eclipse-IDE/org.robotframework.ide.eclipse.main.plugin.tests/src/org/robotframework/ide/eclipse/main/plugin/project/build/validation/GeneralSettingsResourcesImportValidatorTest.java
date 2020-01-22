@@ -63,13 +63,15 @@ public class GeneralSettingsResourcesImportValidatorTest {
 
     @BeforeAll
     public static void beforeSuite() throws Exception {
-        getFile(tempFolder, "external.robot").createNewFile();
-        getFile(tempFolder, "external_dir").mkdir();
-        getFile(tempFolder, "external_dir", "external_nested.robot").createNewFile();
-        getFile(tempFolder, "external_dir", "external_nested.txt").createNewFile();
-        getFile(tempFolder, "external_dir", "external_nested.tsv").createNewFile();
-        getFile(tempFolder, "external_dir", "external_nested.html").createNewFile();
-        getFile(tempFolder, "external_dir", "external_nested.jpg").createNewFile();
+        final File externalDir = RedTempDirectory.createNewDir(tempFolder, "external_dir");
+        
+        RedTempDirectory.createNewFile(tempFolder, "external.robot");
+
+        RedTempDirectory.createNewFile(externalDir, "external_nested.robot");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.txt");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.tsv");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.html");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.jpg");
     }
 
     @BeforeEach

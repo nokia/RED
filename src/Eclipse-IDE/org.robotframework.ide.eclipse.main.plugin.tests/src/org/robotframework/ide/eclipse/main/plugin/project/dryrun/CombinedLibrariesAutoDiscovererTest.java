@@ -25,7 +25,6 @@ import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryI
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -246,9 +245,8 @@ public class CombinedLibrariesAutoDiscovererTest {
 
     @Test
     public void libsAreAddedToProjectConfig_forLinkedSuite() throws Exception {
-        getFile(tempFolder, "external_dir").mkdir();
-        getFile(tempFolder, "external_dir", "external_nested.robot").createNewFile();
-        final File tmpFile = getFile(tempFolder, "external_dir", "external_nested.robot");
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "external_dir");
+        final File tmpFile = RedTempDirectory.createNewFile(nonWorkspaceDir, "external_nested.robot");
 
         final IFile linkedFile = project.getFile("linked_suite.robot");
         project.createFileLink("linked_suite.robot", tmpFile.toURI());
@@ -517,14 +515,6 @@ public class CombinedLibrariesAutoDiscovererTest {
                         newHashSet(suite.getFile())),
                 createImport(NOT_ADDED, "NotExisting.py", newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
-    }
-
-    private static File getFile(final File root, final String... path) {
-        if (path == null || path.length == 0) {
-            return root;
-        } else {
-            return getFile(new File(root, path[0]), Arrays.copyOfRange(path, 1, path.length));
-        }
     }
 
     private static Condition<? super ReferencedLibrary> sameFieldsAs(final ReferencedLibrary library) {

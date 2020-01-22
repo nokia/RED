@@ -37,9 +37,13 @@ import org.junit.platform.commons.support.ModifierSupport;
  */
 public class RedTempDirectory implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
-    public static File createNewFile(final File tempFolder, final String name) throws IOException {
+    public static File createNewFile(final File tempFolder, final String name, final String... lines)
+            throws IOException {
         final File file = new File(tempFolder, name);
         file.createNewFile();
+        if (lines.length > 0) {
+            Files.write(file.toPath(), String.join("\n", lines).getBytes());
+        }
         return file;
     }
 

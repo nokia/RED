@@ -29,7 +29,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,9 +55,8 @@ import org.robotframework.red.junit.jupiter.StatefulProject;
 import org.robotframework.red.junit.jupiter.StatefulProject.CleanMode;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 
-@ExtendWith({ ProjectExtension.class, RedTempDirectory.class, LaunchConfigExtension.class })
+@ExtendWith({ RedTempDirectory.class, ProjectExtension.class, LaunchConfigExtension.class })
 public class LocalProcessCommandLineBuilderTest {
 
     private static final IStringVariableManager VARIABLE_MANAGER = VariablesPlugin.getDefault()
@@ -73,6 +71,9 @@ public class LocalProcessCommandLineBuilderTest {
             files = { "executable_script.bat" },
             cleanUpAfterEach = true)
     public static StatefulProject project;
+
+    @Project(nameSuffix = "Moved", dirs = { "suites" })
+    public StatefulProject movedProject;
 
     @TempDir
     public File tempFolder;
@@ -333,9 +334,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsAdditionalDataSource_whenWholeProjectIsSelected() throws Exception {
-        final File nonWorkspaceFile = new File(tempFolder, "non_workspace.robot");
-        nonWorkspaceFile.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace.robot",
+                "*** Test Cases ***");
         project.createFileLink("LinkedFile.robot", nonWorkspaceFile.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -352,9 +352,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsAdditionalDataSource_whenLinkedSuiteFileIsSelected() throws Exception {
-        final File nonWorkspaceTest = new File(tempFolder, "non_workspace_test.robot");
-        nonWorkspaceTest.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
+        final File nonWorkspaceTest = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot",
+                "*** Test Cases ***");
         project.createFileLink("LinkedTestFile.robot", nonWorkspaceTest.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -374,9 +373,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsAdditionalDataSource_whenLinkedRpaSuiteFileIsSelected() throws Exception {
-        final File nonWorkspaceTask = new File(tempFolder, "non_workspace_task.robot");
-        nonWorkspaceTask.createNewFile();
-        Files.write("*** Tasks ***".getBytes(), nonWorkspaceTask);
+        final File nonWorkspaceTask = RedTempDirectory.createNewFile(tempFolder, "non_workspace_task.robot",
+                "*** Tasks ***");
         project.createFileLink("LinkedTaskFile.robot", nonWorkspaceTask.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -396,8 +394,7 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineContainsAdditionalDataSource_whenLinkedFolderIsSelected() throws Exception {
-        final File nonWorkspaceDir = new File(tempFolder, "non_workspace_dir");
-        nonWorkspaceDir.mkdirs();
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "non_workspace_dir");
         project.createDirLink("LinkedFolder", nonWorkspaceDir.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -417,9 +414,8 @@ public class LocalProcessCommandLineBuilderTest {
 
     @Test
     public void commandLineDoesNotContainAdditionalDataSource_whenLinkedResourceFileIsSelected() throws Exception {
-        final File nonWorkspaceResource = new File(tempFolder, "non_workspace_resource.robot");
-        nonWorkspaceResource.createNewFile();
-        Files.write("*** Settings ***".getBytes(), nonWorkspaceResource);
+        final File nonWorkspaceResource = RedTempDirectory.createNewFile(tempFolder, "non_workspace_resource.robot",
+                "*** Settings ***");
         project.createFileLink("LinkedResourceFile.robot", nonWorkspaceResource.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -462,9 +458,8 @@ public class LocalProcessCommandLineBuilderTest {
         project.createVirtualDir("VirtualDir");
         project.createVirtualDir("VirtualDir/NestedDir");
 
-        final File nonWorkspaceFile = new File(tempFolder, "non_workspace_file.robot");
-        nonWorkspaceFile.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_file.robot",
+                "*** Test Cases ***");
         project.createFileLink("VirtualDir/LinkedFileInsideVirtualDir.robot", nonWorkspaceFile.toURI());
         project.createFileLink("VirtualDir/NestedDir/LinkedFileInsideVirtualDir.robot", nonWorkspaceFile.toURI());
 
@@ -489,16 +484,11 @@ public class LocalProcessCommandLineBuilderTest {
         project.createVirtualDir("100__VirtualDir");
         project.createVirtualDir("100__VirtualDir/NestedDir");
 
-        final File nonWorkspaceDir = new File(tempFolder, "dir");
-        nonWorkspaceDir.mkdirs();
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "dir");
         project.createDirLink("100__VirtualDir/LinkedFolder", nonWorkspaceDir.toURI());
 
-        final File nonWorkspaceFile1 = new File(tempFolder, "file 1.robot");
-        nonWorkspaceFile1.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile1);
-        final File nonWorkspaceFile2 = new File(tempFolder, "file 2.robot");
-        nonWorkspaceFile2.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile2);
+        final File nonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "file 1.robot", "*** Test Cases ***");
+        final File nonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "file 2.robot", "*** Test Cases ***");
         project.createFileLink("100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot", nonWorkspaceFile1.toURI());
         project.createFileLink("200__Linked.robot", nonWorkspaceFile2.toURI());
 
@@ -532,12 +522,8 @@ public class LocalProcessCommandLineBuilderTest {
         project.createVirtualDir("100__VirtualDir");
         project.createVirtualDir("100__VirtualDir/NestedDir");
 
-        final File nonWorkspaceFile1 = new File(tempFolder, "file 1.robot");
-        nonWorkspaceFile1.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile1);
-        final File nonWorkspaceFile2 = new File(tempFolder, "file 2.robot");
-        nonWorkspaceFile2.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile2);
+        final File nonWorkspaceFile1 = RedTempDirectory.createNewFile(tempFolder, "file 1.robot", "*** Test Cases ***");
+        final File nonWorkspaceFile2 = RedTempDirectory.createNewFile(tempFolder, "file 2.robot", "*** Test Cases ***");
         project.createFileLink("100__VirtualDir/NestedDir/LinkedInsideVirtualDir.robot", nonWorkspaceFile1.toURI());
         project.createFileLink("200__Linked.robot", nonWorkspaceFile2.toURI());
 
@@ -882,9 +868,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void pathToSingleSuiteIsUsed_whenSingleLinkedSuiteIsRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final File nonWorkspaceFile = new File(tempFolder, "non_workspace_suite.robot");
-        nonWorkspaceFile.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot",
+                "*** Test Cases ***");
         project.createFileLink("LinkedSuite.robot", nonWorkspaceFile.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -939,9 +924,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void pathToSingleSuiteIsUsed_whenTestsFromSingleLinkedSuiteAreRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final File nonWorkspaceFile = new File(tempFolder, "non_workspace_suite.robot");
-        nonWorkspaceFile.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot",
+                "*** Test Cases ***");
         project.createFileLink("LinkedSuite.robot", nonWorkspaceFile.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -982,9 +966,8 @@ public class LocalProcessCommandLineBuilderTest {
     public void pathToSingleSuiteIsNotUsed_whenSingleFolderWithLinkedSuiteIsRunAndPreferenceIsSet() throws Exception {
         when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
 
-        final File nonWorkspaceFile = new File(tempFolder, "non_workspace_suite.robot");
-        nonWorkspaceFile.createNewFile();
-        Files.write("*** Test Cases ***".getBytes(), nonWorkspaceFile);
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_suite.robot",
+                "*** Test Cases ***");
         project.createFileLink("001__suites_a/LinkedSuite.robot", nonWorkspaceFile.toURI());
 
         final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
@@ -1149,104 +1132,81 @@ public class LocalProcessCommandLineBuilderTest {
                 .isEqualTo("SecondOtherName");
     }
 
-    @Nested
-    public class LocalProcessCommandLineBuilderMovedTest {
+    @Test
+    public void commandLineContainsSuitesToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
+        movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c1", " Log 1");
+        movedProject.createFile("suites/s2.robot", "*** Test Cases ***", "c2", " Log 1");
 
-        @Project(dirs = { "suites" })
-        public StatefulProject movedProject;
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "Project_outside");
 
-        @TempDir
-        public File tempFolder;
+        movedProject.move(nonWorkspaceDir);
 
-        @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
-        public ILaunchConfiguration launchCfg;
+        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
+        final RobotProject robotProject = createRobotProject(movedProject.getProject());
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProject.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("suites/s1.robot", emptyList(), "suites/s2.robot", emptyList()));
 
-        @Test
-        public void commandLineContainsSuitesToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
-            movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c1", " Log 1");
-            movedProject.createFile("suites/s2.robot", "*** Test Cases ***", "c2", " Log 1");
+        final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
 
-            final File nonWorkspaceDir = new File(tempFolder, "Project_outside");
-            nonWorkspaceDir.mkdirs();
+        assertThat(commandLine.getCommandLine()).hasSize(10)
+                .containsSequence("-s", "Project Outside.Suites.S1")
+                .containsSequence("-s", "Project Outside.Suites.S2")
+                .doesNotContain("-t")
+                .endsWith(nonWorkspaceDir.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
 
-            movedProject.move(nonWorkspaceDir);
+    @Test
+    public void commandLineContainsTestsToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
+        movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c11", " Log 1", "c12", " Log 2");
+        movedProject.createFile("suites/s2.robot", "*** Test Cases ***", "c21", " Log 1", "c22", " Log 2");
 
-            final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
-            final RobotProject robotProject = createRobotProject(movedProject.getProject());
-            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
-            robotConfig.fillDefaults();
-            robotConfig.setProjectName(movedProject.getName());
-            robotConfig.setSuitePaths(ImmutableMap.of("suites/s1.robot", emptyList(), "suites/s2.robot", emptyList()));
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "Project_outside_with_tests");
 
-            final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
+        movedProject.move(nonWorkspaceDir);
 
-            assertThat(commandLine.getCommandLine()).hasSize(10)
-                    .containsSequence("-s", "Project Outside.Suites.S1")
-                    .containsSequence("-s", "Project Outside.Suites.S2")
-                    .doesNotContain("-t")
-                    .endsWith(nonWorkspaceDir.getPath());
-            assertThat(commandLine.getArgumentFile()).isNotPresent();
-        }
+        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
+        final RobotProject robotProject = createRobotProject(movedProject.getProject());
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProject.getProject());
+        robotConfig.setSuitePaths(
+                ImmutableMap.of("suites/s1.robot", asList("c11", "c12"), "suites/s2.robot", asList("c21", "c22")));
 
-        @Test
-        public void commandLineContainsTestsToRun_whenProjectIsOutsideOfWorkspace() throws Exception {
-            movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c11", " Log 1", "c12", " Log 2");
-            movedProject.createFile("suites/s2.robot", "*** Test Cases ***", "c21", " Log 1", "c22", " Log 2");
+        final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
 
-            final File nonWorkspaceDir = new File(tempFolder, "Project_outside_with_tests");
-            nonWorkspaceDir.mkdirs();
+        assertThat(commandLine.getCommandLine()).hasSize(18)
+                .containsSequence("-s", "Project Outside With Tests.Suites.S1")
+                .containsSequence("-s", "Project Outside With Tests.Suites.S2")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S1.c11")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S1.c12")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S2.c21")
+                .containsSequence("-t", "Project Outside With Tests.Suites.S2.c22")
+                .endsWith(nonWorkspaceDir.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
+    }
 
-            movedProject.move(nonWorkspaceDir);
+    @Test
+    public void commandLineContainsAdditionalDataSource_whenProjectIsOutsideOfWorkspace() throws Exception {
+        final File nonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "Project_outside");
+        final File nonWorkspaceTest = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot",
+                "*** Test Cases ***");
 
-            final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
-            final RobotProject robotProject = createRobotProject(movedProject.getProject());
-            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
-            robotConfig.fillDefaults();
-            robotConfig.setProjectName(movedProject.getName());
-            robotConfig.setSuitePaths(
-                    ImmutableMap.of("suites/s1.robot", asList("c11", "c12"), "suites/s2.robot", asList("c21", "c22")));
+        movedProject.move(nonWorkspaceDir);
+        movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c1", " Log 1");
+        movedProject.createFileLink("suites/LinkedTest.robot", nonWorkspaceTest.toURI());
 
-            final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
+        final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
+        final RobotProject robotProject = createRobotProject(movedProject.getProject());
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(movedProject.getProject());
+        robotConfig.setSuitePaths(ImmutableMap.of("suites", emptyList()));
 
-            assertThat(commandLine.getCommandLine()).hasSize(18)
-                    .containsSequence("-s", "Project Outside With Tests.Suites.S1")
-                    .containsSequence("-s", "Project Outside With Tests.Suites.S2")
-                    .containsSequence("-t", "Project Outside With Tests.Suites.S1.c11")
-                    .containsSequence("-t", "Project Outside With Tests.Suites.S1.c12")
-                    .containsSequence("-t", "Project Outside With Tests.Suites.S2.c21")
-                    .containsSequence("-t", "Project Outside With Tests.Suites.S2.c22")
-                    .endsWith(nonWorkspaceDir.getPath());
-            assertThat(commandLine.getArgumentFile()).isNotPresent();
-        }
+        final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
 
-        @Test
-        public void commandLineContainsAdditionalDataSource_whenProjectIsOutsideOfWorkspace() throws Exception {
-            final File nonWorkspaceDir = new File(tempFolder, "Project_outside");
-            nonWorkspaceDir.mkdirs();
-            final File nonWorkspaceTest = new File(tempFolder, "non_workspace_test.robot");
-            nonWorkspaceTest.createNewFile();
-            Files.write("*** Test Cases ***".getBytes(), nonWorkspaceTest);
-
-            movedProject.move(nonWorkspaceDir);
-            movedProject.createFile("suites/s1.robot", "*** Test Cases ***", "c1", " Log 1");
-            movedProject.createFileLink("suites/LinkedTest.robot", nonWorkspaceTest.toURI());
-
-            final LocalProcessInterpreter interpreter = createInterpreter(SuiteExecutor.Python);
-            final RobotProject robotProject = createRobotProject(movedProject.getProject());
-            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCfg);
-            robotConfig.fillDefaults();
-            robotConfig.setProjectName(movedProject.getName());
-            robotConfig.setSuitePaths(ImmutableMap.of("suites", emptyList()));
-
-            final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
-
-            assertThat(commandLine.getCommandLine()).hasSize(11)
-                    .containsSequence("-s", "Project Outside & Non Workspace Test.Project Outside.Suites")
-                    .containsSequence("-s", "Project Outside & Non Workspace Test.Non Workspace Test")
-                    .doesNotContain("-t")
-                    .endsWith(nonWorkspaceDir.getPath(), nonWorkspaceTest.getPath());
-            assertThat(commandLine.getArgumentFile()).isNotPresent();
-        }
+        assertThat(commandLine.getCommandLine()).hasSize(11)
+                .containsSequence("-s", "Project Outside & Non Workspace Test.Project Outside.Suites")
+                .containsSequence("-s", "Project Outside & Non Workspace Test.Non Workspace Test")
+                .doesNotContain("-t")
+                .endsWith(nonWorkspaceDir.getPath(), nonWorkspaceTest.getPath());
+        assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
     private RunCommandLine createCommandLine(final LocalProcessInterpreter interpreter, final RobotProject robotProject,

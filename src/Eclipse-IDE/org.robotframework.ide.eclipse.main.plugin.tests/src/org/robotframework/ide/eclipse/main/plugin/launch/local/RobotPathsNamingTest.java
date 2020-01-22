@@ -41,8 +41,7 @@ public class RobotPathsNamingTest {
 
     @BeforeAll
     public static void beforeSuite() throws Exception {
-        final File nonWorkspaceFile = new File(tempFolder, "linked_suite.robot");
-        nonWorkspaceFile.createNewFile();
+        final File nonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "linked_suite.robot");
 
         project.createFileLink("ProjectLink.robot", nonWorkspaceFile.toURI());
     }

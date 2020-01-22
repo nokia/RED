@@ -60,10 +60,11 @@ public class GeneralSettingsVariablesImportValidatorTest {
 
     @BeforeAll
     public static void beforeSuite() throws Exception {
-        getFile(tempFolder, "external.py").createNewFile();
-        getFile(tempFolder, "external_dir").mkdir();
-        getFile(tempFolder, "external_dir", "external_nested.py").createNewFile();
-        getFile(tempFolder, "external_dir", "external_nested.txt").createNewFile();
+        final File externalDir = RedTempDirectory.createNewDir(tempFolder, "external_dir");
+
+        RedTempDirectory.createNewFile(tempFolder, "external.py");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.py");
+        RedTempDirectory.createNewFile(externalDir, "external_nested.txt");
     }
 
     @BeforeEach

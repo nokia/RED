@@ -155,16 +155,17 @@ public class ProjectExtension
             try {
                 project.create(null);
                 project.open(null);
-                project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
                 createDirectories(project, directoryPaths);
                 createFiles(project, filePaths);
+
                 if (createRedXml) {
                     configure(project);
                 }
                 if (useRobotNature) {
                     addRobotNature(project);
                 }
+                project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
                 if (field.getType() == IProject.class) {
                     field.set(testInstance, project);
@@ -173,7 +174,16 @@ public class ProjectExtension
                     final StatefulProject statefulProject = new StatefulProject(project,
                             projectAnnotation.cleanUpAfterEach());
                     field.set(testInstance, statefulProject);
-                    context.getStore(NAMESPACE).put(createStoreKey(context), statefulProject);
+
+                    final String key = createStoreKey(context);
+                    final Store store = context.getStore(NAMESPACE);
+                    @SuppressWarnings("unchecked")
+                    List<StatefulProject> projects = store.get(key, List.class);
+                    if (projects == null) {
+                        projects = new ArrayList<>();
+                        store.put(key, projects);
+                    }
+                    projects.add(statefulProject);
                 }
 
             } catch (CoreException | IllegalArgumentException | IllegalAccessException | IOException e) {
@@ -194,13 +204,15 @@ public class ProjectExtension
         final String testLevelKey = PROJECT_PARAM + ":" + context.getRequiredTestClass().getSimpleName() + "#"
                 + context.getRequiredTestMethod().getName();
         
-        final StatefulProject staticLevelProject = store.get(staticLevelKey, StatefulProject.class);
+        @SuppressWarnings("unchecked")
+        final List<StatefulProject> staticLevelProject = store.get(staticLevelKey, List.class);
         if (staticLevelProject != null) {
-            staticLevelProject.cleanUp();
+            staticLevelProject.forEach(StatefulProject::cleanUp);
         }
-        final StatefulProject testLevelProject = store.get(testLevelKey, StatefulProject.class);
+        @SuppressWarnings("unchecked")
+        final List<StatefulProject> testLevelProject = store.get(testLevelKey, List.class);
         if (testLevelProject != null) {
-            testLevelProject.cleanUp();
+            staticLevelProject.forEach(StatefulProject::cleanUp);
         }
     }
 
