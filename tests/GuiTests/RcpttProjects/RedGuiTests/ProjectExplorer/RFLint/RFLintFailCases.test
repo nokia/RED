@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/20/20 6:46 PM
+Save-Time: 1/22/20 11:11 AM
 Tags: jython
 Testcase-Type: ecl
 
@@ -42,7 +42,7 @@ exec-with-options {
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
         | get-property text -raw | invoke toLowerCase  | contains [format [str "RuntimeError: There is no rflint module installed for %s interpreter" ] 
-         [os-specific [concat $jython_path"\\jython.exe"] "/usr/local/bin/jython"] | invoke toLowerCase ]
+         [os-specific [concat $jython_path"\\jython.exe"] [concat $jython_path"/jython" ]  ] | invoke toLowerCase ]
         | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
