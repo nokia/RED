@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/21/20 10:39 PM
+Save-Time: 1/23/20 3:47 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -70,7 +70,7 @@ global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os
 
 //get jython path: "d:\jyton\jython2.7.0\bin\"
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val jython_path [run-process-and-trim  "python" "-c" "import os, sys; [sys.stdout.write(i.rstrip('\\/')) for i in os.environ['PATH'].split(os.pathsep) if i.find('jython')!=-1]"]]
+	global [val jython_path "C:\\jython\\bin"]
 }-else{
 	global [val jython_path "/usr/local/lib/jython/bin"]
 	//global [val jython_path [exec-process "which" "jython" |  get stdout  |invoke trim | invoke replace "jython" ""]]
