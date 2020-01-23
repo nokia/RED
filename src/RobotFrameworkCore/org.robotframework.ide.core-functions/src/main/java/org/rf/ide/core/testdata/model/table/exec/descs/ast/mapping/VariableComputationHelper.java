@@ -28,10 +28,13 @@ public class VariableComputationHelper {
     private static final Pattern NUMBER_OPERATION = Pattern
             .compile("^" + NUMBER_PATTERN + "(" + COUNT_OPERATIONS + NUMBER_PATTERN + ")*");
 
-    private static final String QUOTA_TEXT = "[\"](([\\\\][\"])|((?![\"]).))*[\"]";
+    private static final String QUOTE_TEXT_1 = "[\"](([\\\\][\"])|((?![\"]).))*[\"]";
+
+    private static final String QUOTE_TEXT_2 = "['](([\\\\]['])|((?![']).))*[']";
 
     private static final Pattern TEXT_OPERATION = Pattern
-            .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTA_TEXT + ")+\\s*)+)*");
+            .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTE_TEXT_1 + "|"
+                    + QUOTE_TEXT_2 + ")+\\s*)+)*");
 
     public static Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
         if (variableDec.getVariableType() == VariableDeclarationType.COMPUTATION) {

@@ -5,13 +5,14 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.VariableDeclarationType;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class MappingResult {
@@ -52,34 +53,11 @@ public class MappingResult {
     }
 
     public List<IElementDeclaration> getTextElements() {
-        final List<IElementDeclaration> texts = new ArrayList<>();
-        for (final IElementDeclaration e : mappedElements) {
-            if (!e.isComplex()) {
-                texts.add(e);
-            }
-        }
-
-        return texts;
+        return mappedElements.stream().filter(elem -> !elem.isComplex()).collect(toList());
     }
 
     public List<IElementDeclaration> getMappedElements() {
         return Collections.unmodifiableList(mappedElements);
-    }
-
-    public boolean isOnlyPossibleCollectionVariable() {
-        if (mappedElements.size() == 1 && mappedElements.get(0) instanceof VariableDeclaration) {
-            final VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
-            final VariableType robotType = varDec.getRobotType();
-            if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
-                    || robotType == VariableType.SCALAR) {
-                final VariableDeclarationType extractorVariableType = varDec.getVariableType();
-                return !isCollectionVariableElementGet()
-                        && (extractorVariableType == VariableDeclarationType.NORMAL_TEXT
-                                || extractorVariableType == VariableDeclarationType.DYNAMIC);
-            }
-        }
-
-        return false;
     }
 
     public boolean isCollectionVariableElementGet() {
@@ -102,7 +80,6 @@ public class MappingResult {
                 return indexDeclarationsCount == 1;
             }
         }
-
         return false;
     }
 
@@ -135,11 +112,12 @@ public class MappingResult {
     }
 
     public void removeExactlyTheSameInstance(final IElementDeclaration elem) {
-        for (int i = 0; i < mappedElements.size(); i++) {
-            final IElementDeclaration d = mappedElements.get(i);
-            if (d == elem) {
+        int i = 0;
+        while (i < mappedElements.size()) {
+            if (mappedElements.get(i) == elem) {
                 mappedElements.remove(i);
-                i--;
+            } else {
+                i++;
             }
         }
     }
