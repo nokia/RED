@@ -85,8 +85,8 @@ public class ConvertDeprecatedForLoopFixerTest {
 
         final Document document = new Document(":FOR  ${x}    IN RANGE    1", "        kw");
         final ConvertDeprecatedForLoopFixer fixer = new ConvertDeprecatedForLoopFixer(27);
-        final Stream<IDocument> changedDocuments = Stream.of(fixer).map(Fixers.byApplyingToDocument(marker, document,
-                model));
+        final Stream<IDocument> changedDocuments = Stream.of(fixer)
+                .map(Fixers.byApplyingToDocument(marker, document, model));
 
         assertThat(fixer.getLabel()).isEqualTo("Convert to current FOR loop syntax");
         assertThat(changedDocuments).containsExactly(new Document("FOR  ${x}    IN RANGE    1", "END", "        kw"));

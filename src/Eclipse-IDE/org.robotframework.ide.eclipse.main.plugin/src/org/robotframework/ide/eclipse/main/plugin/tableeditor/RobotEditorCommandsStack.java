@@ -18,50 +18,50 @@ public class RobotEditorCommandsStack {
 
     private static final int COMMANDS_STACK_MAX_SIZE = 100;
 
-    private final Deque<EditorCommand> _executedCommands = new ArrayDeque<>();
+    private final Deque<EditorCommand> executedCommands = new ArrayDeque<>();
 
-    private final Deque<EditorCommand> _toRedoCommands = new ArrayDeque<>();
+    private final Deque<EditorCommand> toRedoCommands = new ArrayDeque<>();
 
     public void execute(final EditorCommand command) throws CommandExecutionException {
         final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.inject(command, context);
         command.execute();
 
-        if (_executedCommands.size() > COMMANDS_STACK_MAX_SIZE) {
-            _executedCommands.removeLast();
+        if (executedCommands.size() > COMMANDS_STACK_MAX_SIZE) {
+            executedCommands.removeLast();
         }
 
-        _executedCommands.push(command);
-        clear(_toRedoCommands);
+        executedCommands.push(command);
+        clear(toRedoCommands);
     }
 
     public boolean isUndoPossible() {
-        return !_executedCommands.isEmpty();
+        return !executedCommands.isEmpty();
     }
 
     public void undo() {
         if (isUndoPossible()) {
-            final EditorCommand commandToUndo = _executedCommands.pop();
-            executeUndoCommands(commandToUndo.getUndoCommands(), _toRedoCommands);
-            findAndExecuteUndoCommandsWithTheSameParent(commandToUndo, _executedCommands, _toRedoCommands);
+            final EditorCommand commandToUndo = executedCommands.pop();
+            executeUndoCommands(commandToUndo.getUndoCommands(), toRedoCommands);
+            findAndExecuteUndoCommandsWithTheSameParent(commandToUndo, executedCommands, toRedoCommands);
         }
     }
 
     public boolean isRedoPossible() {
-        return !_toRedoCommands.isEmpty();
+        return !toRedoCommands.isEmpty();
     }
 
     public void redo() {
         if (isRedoPossible()) {
-            final EditorCommand commandToRedo = _toRedoCommands.pop();
-            executeUndoCommands(commandToRedo.getUndoCommands(), _executedCommands);
-            findAndExecuteUndoCommandsWithTheSameParent(commandToRedo, _toRedoCommands, _executedCommands);
+            final EditorCommand commandToRedo = toRedoCommands.pop();
+            executeUndoCommands(commandToRedo.getUndoCommands(), executedCommands);
+            findAndExecuteUndoCommandsWithTheSameParent(commandToRedo, toRedoCommands, executedCommands);
         }
     }
 
     public void clear() {
-        clear(_toRedoCommands);
-        clear(_executedCommands);
+        clear(toRedoCommands);
+        clear(executedCommands);
     }
 
     private void clear(final Deque<EditorCommand> stackToClear) {

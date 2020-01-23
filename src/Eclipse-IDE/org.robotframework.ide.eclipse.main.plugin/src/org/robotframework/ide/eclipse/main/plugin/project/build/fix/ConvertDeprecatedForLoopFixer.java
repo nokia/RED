@@ -31,7 +31,7 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
 
     private final ImageDescriptor image;
 
-    private int length;
+    private final int length;
 
     public ConvertDeprecatedForLoopFixer(final int regionLength) {
         this(regionLength, RedImages.getChangeImage());
@@ -64,18 +64,17 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
                     .proposalsShouldHaveIcon(ImagesManager.getImage(image))
                     .create();
             return Optional.of(proposal);
-        } catch (BadLocationException e) {
+        } catch (final BadLocationException e) {
             return Optional.empty();
         }
     }
 
     private IRegion createRegionToChange(final IDocument document, final IMarker marker) throws BadLocationException {
-            final int markerOffset = marker.getAttribute(IMarker.CHAR_START, -1);
-            final int markerLineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1) - 1;
-            final int lineOffset = document.getLineOffset(markerLineNumber);
-            final int forLength = length + markerOffset - lineOffset;
-            return new Region(lineOffset, forLength);
-
+        final int markerOffset = marker.getAttribute(IMarker.CHAR_START, -1);
+        final int markerLineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1) - 1;
+        final int lineOffset = document.getLineOffset(markerLineNumber);
+        final int forLength = length + markerOffset - lineOffset;
+        return new Region(lineOffset, forLength);
     }
 
     private String convertForLoopToCurrentSyntax(final IMarker marker, final IDocument document,
@@ -87,10 +86,12 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
         final StringBuilder regionBuilder = new StringBuilder();
 
         for (int i = markerLineNumber; i < markerLineNumber + regionNumberOfLines; i++) {
-            final List<IRobotLineElement> lineModelElements = suiteModel.getLinkedElement().getFileContent().get(i)
+            final List<IRobotLineElement> lineModelElements = suiteModel.getLinkedElement()
+                    .getFileContent()
+                    .get(i)
                     .getLineElements();
             int elementIndex = 0;
-            for (IRobotLineElement element : lineModelElements) {
+            for (final IRobotLineElement element : lineModelElements) {
                 if (i == markerLineNumber && atFistPosition(elementIndex, element, lineModelElements, ":FOR")) {
                     regionBuilder.append("FOR");
                 } else if (i > markerLineNumber && atFistPosition(elementIndex, element, lineModelElements, "\\")) {
@@ -121,7 +122,8 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
             final RobotSuiteFile suiteModel, final IRegion regionToChange, final int markerLineNumber,
             final int regionNumberOfLines) {
         if (document.getNumberOfLines() > markerLineNumber + regionNumberOfLines) {
-            final RobotLine potentialEndLine = suiteModel.getLinkedElement().getFileContent()
+            final RobotLine potentialEndLine = suiteModel.getLinkedElement()
+                    .getFileContent()
                     .get(markerLineNumber + regionNumberOfLines);
             final String joinedPotentialEndLine = potentialEndLine.elementsStream()
                     .map(IRobotLineElement::getText)
@@ -131,21 +133,20 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
             }
         }
         return true;
-
     }
 
-    private boolean atFistPosition(final int elementIndex, IRobotLineElement element,
+    private boolean atFistPosition(final int elementIndex, final IRobotLineElement element,
             final List<IRobotLineElement> lineModelElements, final String toVerify) {
         final String joinedToElementLine = lineModelElements.stream()
                 .limit(elementIndex + 1)
                 .map(IRobotLineElement::getText)
                 .collect(Collectors.joining(""));
         if (toVerify.equals(":FOR")) {
-            return element.getText().replaceAll("\\s", "").toUpperCase().equals(toVerify) && joinedToElementLine.trim()
-                    .replaceAll("\\s", "").toUpperCase().equals(toVerify);
+            return element.getText().replaceAll("\\s", "").toUpperCase().equals(toVerify)
+                    && joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase().equals(toVerify);
         } else {
-            return element.getText().equals(toVerify) && joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase()
-                    .equals(toVerify);
+            return element.getText().equals(toVerify)
+                    && joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase().equals(toVerify);
         }
     }
 }

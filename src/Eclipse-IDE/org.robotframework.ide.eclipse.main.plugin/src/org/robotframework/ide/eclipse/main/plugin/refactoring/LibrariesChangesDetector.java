@@ -157,14 +157,14 @@ class LibrariesChangesDetector {
                 afterSegments.length - lastSegmentsToRemove + 1));
     }
 
-    private Range getNameRangeInPath(final String[] segmentedName, String[] beforeSegments) {
-        if ("__init__".equals(beforeSegments[beforeSegments.length - 1])) {
-            beforeSegments = Arrays.copyOfRange(beforeSegments, 0, beforeSegments.length - 1);
-        }
-        final String pathToCompare = String.join(".", beforeSegments);
+    private Range getNameRangeInPath(final String[] segmentedName, final String[] beforeSegments) {
+        final String[] pathSegments = "__init__".equals(beforeSegments[beforeSegments.length - 1])
+                ? Arrays.copyOfRange(beforeSegments, 0, beforeSegments.length - 1)
+                : beforeSegments;
+        final String pathToCompare = String.join(".", pathSegments);
         for (int i = segmentedName.length; i > 0; i--) {
             if (pathToCompare.endsWith(String.join(".", Arrays.copyOfRange(segmentedName, 0, i)))) {
-                return new Range(beforeSegments.length - i, beforeSegments.length);
+                return new Range(pathSegments.length - i, pathSegments.length);
             }
         }
         return new Range(-1, -1);

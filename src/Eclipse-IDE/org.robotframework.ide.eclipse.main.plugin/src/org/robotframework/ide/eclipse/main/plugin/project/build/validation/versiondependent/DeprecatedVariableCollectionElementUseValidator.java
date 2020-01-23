@@ -55,7 +55,7 @@ class DeprecatedVariableCollectionElementUseValidator extends VersionDependentMo
     }
 
     @Override
-    public void validate(IProgressMonitor monitor) throws CoreException {
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         if (robotSuiteFile.getLinkedElement() != null) {
             final List<RobotToken> variableTokens = robotSuiteFile.getLinkedElement()
                     .getFileContent()

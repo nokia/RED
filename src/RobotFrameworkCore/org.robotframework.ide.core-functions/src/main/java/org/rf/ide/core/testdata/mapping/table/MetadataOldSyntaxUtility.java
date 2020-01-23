@@ -19,7 +19,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class MetadataOldSyntaxUtility {
 
-    private final Pattern METADATA = Pattern.compile("(([M|m])([E]|[e])([T]|[t])([A]|[a])[:])(\\s+)((?!\\s+).+)");
+    private static final Pattern METADATA = Pattern
+            .compile("(([M|m])([E]|[e])([T]|[t])([A]|[a])[:])(\\s+)((?!\\s+).+)");
 
     public void fixSettingMetadata(final RobotFileOutput out, final RobotLine line, final RobotToken token,
             final Stack<ParsingState> processingState) {
