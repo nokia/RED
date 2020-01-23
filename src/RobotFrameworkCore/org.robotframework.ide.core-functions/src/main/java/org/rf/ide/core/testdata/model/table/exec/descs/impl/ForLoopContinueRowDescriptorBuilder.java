@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -114,7 +113,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         final MappingResult mappingResult = varExtractor.extract(execRowLine.getAction(), fileName);
         forContinueDesc.addMessages(mappingResult.getMessages());
-        forContinueDesc.setAction(new RobotAction(execRowLine.getAction().copy(), mappingResult.getMappedElements()));
+        forContinueDesc.setAction(execRowLine.getAction().copy());
 
         if (lineElements.size() > 1) {
             mapRestOfForLoopContinue(execRowLine, forContinueDesc, lineElements);

@@ -12,7 +12,6 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -31,12 +30,12 @@ public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public RobotAction getAction() {
-        return new RobotAction(row.getAction(), null);
+    public RobotToken getAction() {
+        return row.getAction();
     }
 
     @Override
-    public RobotAction getKeywordAction() {
+    public RobotToken getKeywordAction() {
         return getAction();
     }
 

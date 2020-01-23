@@ -88,7 +88,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
         } else if (isExecutable()) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            return row.buildLineDescription().getAction().getToken().getText();
+            return row.buildLineDescription().getAction().getText();
 
         } else {
             return linkedElement.getElementTokens().get(0).getText();
@@ -285,7 +285,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         final List<RobotToken> tokens = linkedElement.getElementTokens();
         if (linkedElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            token = row.buildLineDescription().getAction().getToken();
+            token = row.buildLineDescription().getAction();
         } else {
             token = tokens.get(0);
         }

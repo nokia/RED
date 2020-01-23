@@ -12,7 +12,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -21,7 +20,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
-    private RobotAction action = new RobotAction(new RobotToken(), new ArrayList<>());
+    private RobotToken action = new RobotToken();
 
     private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
 
@@ -49,16 +48,16 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public RobotAction getAction() {
+    public RobotToken getAction() {
         return action;
     }
 
-    public void setAction(final RobotAction action) {
+    public void setAction(final RobotToken action) {
         this.action = action;
     }
 
     @Override
-    public RobotAction getKeywordAction() {
+    public RobotToken getKeywordAction() {
         return getAction();
     }
 

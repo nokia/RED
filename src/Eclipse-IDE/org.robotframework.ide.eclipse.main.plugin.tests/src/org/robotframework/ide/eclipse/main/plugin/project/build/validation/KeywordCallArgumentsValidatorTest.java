@@ -2804,7 +2804,7 @@ public class KeywordCallArgumentsValidatorTest {
                 @SuppressWarnings("unchecked")
                 final RobotExecutableRow<TestCase> executable = (RobotExecutableRow<TestCase>) call.getLinkedElement();
                 final IExecutableRowDescriptor<?> executableRowDescriptor = executable.buildLineDescription();
-                final RobotToken definingToken = executableRowDescriptor.getAction().getToken();
+                final RobotToken definingToken = executableRowDescriptor.getAction();
                 final List<RobotToken> argumentTokens = executableRowDescriptor.getKeywordArguments();
 
                 final FileValidationContext context = version == null ? prepareContext() : prepareContext(version);

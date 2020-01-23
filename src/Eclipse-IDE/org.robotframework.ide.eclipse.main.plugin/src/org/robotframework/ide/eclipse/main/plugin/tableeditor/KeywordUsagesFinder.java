@@ -190,7 +190,7 @@ public class KeywordUsagesFinder {
                 final IExecutableRowDescriptor<?> desc) {
             final List<Entry<RedKeywordProposal, RobotToken>> kwTokens = new ArrayList<>();
 
-            final RobotToken kwToken = desc.getKeywordAction().getToken();
+            final RobotToken kwToken = desc.getKeywordAction();
             final RedKeywordProposal proposal = proposalCache.apply(kwToken.getText());
 
             if (proposal != null) {

@@ -73,7 +73,7 @@ class ExecutableWithDescriptor {
     }
 
     String getCalledKeywordName() {
-        return template != null ? template : getDescriptor().getKeywordAction().getToken().getText();
+        return template != null ? template : getDescriptor().getKeywordAction().getText();
     }
 
     List<RobotToken> getForVariables() {

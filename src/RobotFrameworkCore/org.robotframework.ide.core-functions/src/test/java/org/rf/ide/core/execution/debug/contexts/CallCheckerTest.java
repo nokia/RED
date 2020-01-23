@@ -5,14 +5,12 @@
 */
 package org.rf.ide.core.execution.debug.contexts;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
@@ -55,7 +53,7 @@ public class CallCheckerTest {
         variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
         descriptor.addCreatedVariable(variable);
 
-        descriptor.setInAction(new RobotAction(RobotToken.create("IN"), newArrayList()));
+        descriptor.setInAction(RobotToken.create("IN"));
 
         assertThat(CallChecker.createName(descriptor)).isEqualTo("${x} IN [ ${XS} ]");
     }
@@ -83,7 +81,7 @@ public class CallCheckerTest {
         variable2.setRobotTokenPosition(new FilePosition(5, 0, 67));
         descriptor.addCreatedVariable(variable2);
 
-        descriptor.setInAction(new RobotAction(RobotToken.create("IN ZIP"), newArrayList()));
+        descriptor.setInAction(RobotToken.create("IN ZIP"));
 
         assertThat(CallChecker.createName(descriptor)).isEqualTo("${x} | ${y} IN ZIP [ ${XS} | ${YS} ]");
     }
@@ -104,7 +102,7 @@ public class CallCheckerTest {
         variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
         descriptor.addCreatedVariable(variable);
 
-        descriptor.setInAction(new RobotAction(RobotToken.create("IN"), newArrayList()));
+        descriptor.setInAction(RobotToken.create("IN"));
 
         assertThat(CallChecker.isSameForLoop(descriptor, new RunningKeyword(null, "${x} IN [ ${XS} ]", null))).isTrue();
     }
@@ -125,7 +123,7 @@ public class CallCheckerTest {
         variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
         descriptor.addCreatedVariable(variable);
 
-        descriptor.setInAction(new RobotAction(RobotToken.create("IN"), newArrayList()));
+        descriptor.setInAction(RobotToken.create("IN"));
 
         assertThat(CallChecker.isSameForLoop(descriptor, new RunningKeyword(null, "${y} IN [ ${YS} ]", null)))
                 .isFalse();

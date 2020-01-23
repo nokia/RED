@@ -17,7 +17,6 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
@@ -145,7 +144,7 @@ public class ExecutableWithDescriptorTest {
         final RobotToken token = RobotToken.create("keyword");
 
         final IExecutableRowDescriptor descriptor = mock(IExecutableRowDescriptor.class);
-        when(descriptor.getKeywordAction()).thenReturn(new RobotAction(token, newArrayList()));
+        when(descriptor.getKeywordAction()).thenReturn(token);
         final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
 
         final ExecutableWithDescriptor execDescriptor = new ExecutableWithDescriptor(executable, descriptor, null);
@@ -159,7 +158,7 @@ public class ExecutableWithDescriptorTest {
         final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
 
         final ForLoopContinueRowDescriptor<?> descriptor = new ForLoopContinueRowDescriptor<>(executable);
-        descriptor.setKeywordAction(new RobotAction(token, newArrayList()));
+        descriptor.setKeywordAction(token);
 
         final ExecutableWithDescriptor execDescriptor = new ExecutableWithDescriptor(executable, descriptor, null);
 

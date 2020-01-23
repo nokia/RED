@@ -45,7 +45,7 @@ public class ExecutableForValidator implements ExecutableValidator {
 
     private final IExecutableRowDescriptor<?> descriptor;
 
-    private RobotVersion robotVersion;
+    private final RobotVersion robotVersion;
 
     public ExecutableForValidator(final FileValidationContext validationContext, final Set<String> additionalVariables,
             final IExecutableRowDescriptor<?> descriptor, final ValidationReportingStrategy reporter) {
@@ -80,7 +80,7 @@ public class ExecutableForValidator implements ExecutableValidator {
     }
 
     private void reportInconsistentName() {
-        final RobotToken forToken = descriptor.getAction().getToken();
+        final RobotToken forToken = descriptor.getAction();
         final String actualText = forToken.getText();
         if (!actualText.equals(":FOR") && !actualText.equals("FOR")) {
             final RobotProblem problem = RobotProblem
@@ -91,7 +91,7 @@ public class ExecutableForValidator implements ExecutableValidator {
     }
     
     private void reportDeprecatedLoop() {
-        final RobotToken forToken = descriptor.getAction().getToken();
+        final RobotToken forToken = descriptor.getAction();
         final String actualText = forToken.getText();
 
         final AModelElement<?> row = descriptor.getRow();
@@ -106,7 +106,7 @@ public class ExecutableForValidator implements ExecutableValidator {
                     forLenght);
 
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_FOR);
-            reporter.handleProblem(problem, validationContext.getFile(), descriptor.getAction().getToken(),
+            reporter.handleProblem(problem, validationContext.getFile(), descriptor.getAction(),
                     additionalAttributes);
         }
     }
@@ -148,7 +148,7 @@ public class ExecutableForValidator implements ExecutableValidator {
 
         if (index >= 0 && !isFollowedByForContinuationRow(children, index, shouldSettingBreakRule(row))) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.FOR_IS_EMPTY);
-            reporter.handleProblem(problem, validationContext.getFile(), descriptor.getAction().getToken());
+            reporter.handleProblem(problem, validationContext.getFile(), descriptor.getAction());
         }
     }
 

@@ -62,7 +62,7 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
 
         if (call.isExecutable() && hasKeywordAction(call)) {
             final IExecutableRowDescriptor<?> desc = ((RobotExecutableRow<?>) linkedElement).buildLineDescription();
-            final RobotToken action = desc.getKeywordAction().getToken();
+            final RobotToken action = desc.getKeywordAction();
             if (!action.isEmpty()) {
                 final int start = findKeywordActionOffset(desc);
                 addRowLabels(desc, action.getText(), 0,
@@ -107,7 +107,7 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
         } else {
             final RobotExecutableRow<?> nestedExec = nestedExecutables.get(nestedExecutables.size() - 1);
             final IExecutableRowDescriptor<?> nestedDesc = nestedExec.buildLineDescription();
-            final String lastExecutableKwName = nestedDesc.getKeywordAction().getToken().getText();
+            final String lastExecutableKwName = nestedDesc.getKeywordAction().getText();
             final int nestedOffset = offset + desc.getKeywordArguments().size() - nestedExec.getElementTokens().size();
             addRowLabels(nestedDesc, lastExecutableKwName, nestedOffset + 1, labelAdder);
         }

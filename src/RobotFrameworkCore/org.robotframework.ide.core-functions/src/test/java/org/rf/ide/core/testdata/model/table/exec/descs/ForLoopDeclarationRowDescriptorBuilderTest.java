@@ -94,11 +94,11 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
 
     private List<RobotToken> line(final ForLoopDeclarationRowDescriptor<?> c) {
         final List<RobotToken> done = new ArrayList<>();
-        done.add(c.getAction().getToken());
+        done.add(c.getAction());
         for (final VariableDeclaration varDec : c.getCreatedVariables()) {
             done.add(varDec.asToken());
         }
-        done.add(c.getInAction().getToken());
+        done.add(c.getInAction());
         for (final VariableDeclaration varDecUsed : c.getUsedVariables()) {
             done.add(varDecUsed.asToken());
         }
@@ -108,15 +108,14 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
 
     private List<RobotToken> line(final ForLoopContinueRowDescriptor<?> c) {
         final List<RobotToken> done = new ArrayList<>();
-        done.add(c.getAction().getToken());
+        done.add(c.getAction());
         for (final VariableDeclaration varDec : c.getCreatedVariables()) {
             done.add(varDec.asToken());
         }
-        done.add(c.getKeywordAction().getToken());
+        done.add(c.getKeywordAction());
         for (final VariableDeclaration varDecUsed : c.getUsedVariables()) {
             done.add(varDecUsed.asToken());
         }
-
         return done;
     }
 

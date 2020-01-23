@@ -81,7 +81,7 @@ public class LocalAssignQuickAssistProvider implements QuickAssistProvider {
     private int computeOffsetToInsert(final IExecutableRowDescriptor<?> description) {
         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) description.getRow();
         if (description.getRowType() == RowType.FOR_CONTINUE) {
-            if (description.getAction().getToken().getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
+            if (description.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)) {
                 // old loop style with # continuation
                 return row.getArguments().get(0).getStartOffset();
             } else {

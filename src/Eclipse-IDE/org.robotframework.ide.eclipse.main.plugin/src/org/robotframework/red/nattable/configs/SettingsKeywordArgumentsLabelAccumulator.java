@@ -66,7 +66,7 @@ public class SettingsKeywordArgumentsLabelAccumulator implements IConfigLabelAcc
         } else {
             final RobotExecutableRow<?> nestedExec = nestedExecutables.get(nestedExecutables.size() - 1);
             final IExecutableRowDescriptor<?> nestedDesc = nestedExec.buildLineDescription();
-            final String lastExecutableKwName = nestedDesc.getKeywordAction().getToken().getText();
+            final String lastExecutableKwName = nestedDesc.getKeywordAction().getText();
             final int nestedOffset = offset + desc.getKeywordArguments().size() - nestedExec.getElementTokens().size();
             addRowLabels(nestedDesc, lastExecutableKwName, nestedOffset + 1, labelAdder);
         }

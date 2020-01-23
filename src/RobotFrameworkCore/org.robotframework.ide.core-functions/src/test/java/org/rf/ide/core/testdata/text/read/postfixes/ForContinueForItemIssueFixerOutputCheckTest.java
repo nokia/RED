@@ -80,14 +80,14 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
         final ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
-        assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
-        assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
+        assertThat(forLineOne.getKeywordAction().getText()).isEqualTo("Log");
+        assertThat(forLineOne.getAction().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
         final ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(2).buildLineDescription();
-        assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
-        assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
+        assertThat(forLineTwo.getKeywordAction().getText()).isEqualTo("Log");
+        assertThat(forLineTwo.getAction().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("done"), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
     }
@@ -113,14 +113,14 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
         final ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
-        assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
-        assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
+        assertThat(forLineOne.getKeywordAction().getText()).isEqualTo("Log");
+        assertThat(forLineOne.getAction().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(RowType.FOR_CONTINUE);
         final ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
-        assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
-        assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
+        assertThat(forLineTwo.getKeywordAction().getText()).isEqualTo("Log");
+        assertThat(forLineTwo.getAction().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("done"), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(RowType.SIMPLE);
     }

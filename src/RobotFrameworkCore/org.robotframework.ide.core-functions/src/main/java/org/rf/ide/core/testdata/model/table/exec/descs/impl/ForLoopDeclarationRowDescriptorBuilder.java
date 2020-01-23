@@ -18,9 +18,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.CommentedVariablesFilter.FilteredVariables;
@@ -57,7 +55,6 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
             final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
             loopDescriptor.addCommentedVariables(filteredVars.getCommented());
             final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
-            final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
 
             if (wasFor) {
                 if (wasIn) {
@@ -66,7 +63,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                     wasElementsToIterate = true;
                 } else {
                     if (ForDescriptorInfo.isInToken(elem)) {
-                        loopDescriptor.setInAction(new RobotAction(elem.copy(), mappedElements));
+                        loopDescriptor.setInAction(elem.copy());
                         wasIn = true;
                     } else {
                         final int variablesSize = correctVariables.size();
@@ -85,7 +82,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                 }
             } else {
                 if (elem.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
-                    loopDescriptor.setAction(new RobotAction(elem.copy(), mappedElements));
+                    loopDescriptor.setAction(elem.copy());
                     wasFor = true;
                 } else {
                     throw new IllegalStateException("Internal problem - FOR should be the first token.");
@@ -94,7 +91,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         }
 
         if (!wasIn || !wasElementsToIterate) {
-            final RobotToken forToken = loopDescriptor.getAction().getToken();
+            final RobotToken forToken = loopDescriptor.getAction();
             final FilePosition startFilePosition = forToken.getFilePosition();
             final FilePosition endFilePosition = new FilePosition(startFilePosition.getLine(), forToken.getEndColumn(),
                     forToken.getStartOffset() + forToken.getText().length());

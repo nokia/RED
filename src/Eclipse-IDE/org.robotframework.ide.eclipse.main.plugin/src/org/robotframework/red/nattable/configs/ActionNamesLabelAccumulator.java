@@ -65,7 +65,7 @@ public class ActionNamesLabelAccumulator implements IConfigLabelAccumulator {
 
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linked;
             final IExecutableRowDescriptor<?> description = row.buildLineDescription();
-            final RobotToken action = description.getKeywordAction().getToken();
+            final RobotToken action = description.getKeywordAction();
             if (action.getText().equals(actual.getText()) && action.getTypes().containsAll(actual.getTypes())) {
                 configLabels.addLabel(ACTION_NAME_CONFIG_LABEL);
 

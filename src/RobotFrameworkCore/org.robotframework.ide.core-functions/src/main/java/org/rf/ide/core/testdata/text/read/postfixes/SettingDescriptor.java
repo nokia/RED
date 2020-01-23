@@ -10,7 +10,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -29,12 +28,12 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public RobotAction getAction() {
+    public RobotToken getAction() {
         return null;
     }
 
     @Override
-    public RobotAction getKeywordAction() {
+    public RobotToken getKeywordAction() {
         return null;
     }
 

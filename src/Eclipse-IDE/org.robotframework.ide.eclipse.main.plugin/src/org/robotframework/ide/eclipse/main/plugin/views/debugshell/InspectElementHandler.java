@@ -92,7 +92,7 @@ public class InspectElementHandler extends DIParameterizedHandler<E4InspectEleme
                 final IExecutableRowDescriptor<?> descriptor = execRow.buildLineDescription();
                 if (descriptor.getRowType() == RowType.SIMPLE) {
                     final List<String> inspectedCall = new ArrayList<>();
-                    inspectedCall.add(descriptor.getKeywordAction().getToken().getText());
+                    inspectedCall.add(descriptor.getKeywordAction().getText());
                     descriptor.getKeywordArguments().stream().map(RobotToken::getText).forEach(inspectedCall::add);
 
                     view.putExpression(ExpressionType.ROBOT, String.join("    ", inspectedCall));

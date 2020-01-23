@@ -40,7 +40,7 @@ class CallChecker {
                 .map(RobotToken::getText)
                 .collect(toList());
 
-        final String in = descriptor.getInAction().getToken().getText().toUpperCase();
+        final String in = descriptor.getInAction().getText().toUpperCase();
         final List<RobotToken> args = descriptor.getRow().getArguments();
         final String source = args.stream()
                 .skip(variables.size() + 1)

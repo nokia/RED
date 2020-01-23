@@ -37,7 +37,7 @@ class ExecutableRowValidator implements ExecutableValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        final RobotToken keywordNameToken = descriptor.getKeywordAction().getToken();
+        final RobotToken keywordNameToken = descriptor.getKeywordAction();
 
         if (keywordNameToken.getFilePosition().isNotSet()) {
             reporter.handleProblem(

@@ -12,7 +12,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -21,9 +20,9 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
-    private RobotAction continueAction = new RobotAction(new RobotToken(), new ArrayList<>());
+    private RobotToken continueAction = new RobotToken();
 
-    private RobotAction keywordAction = new RobotAction(new RobotToken(), new ArrayList<>());
+    private RobotToken keywordAction = new RobotToken();
 
     private final List<VariableDeclaration> usedVariables = new ArrayList<>();
 
@@ -59,7 +58,7 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
     }
 
     @Override
-    public RobotAction getAction() {
+    public RobotToken getAction() {
         return continueAction;
     }
 
@@ -71,16 +70,16 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
         this.forLoopStartRowIndex = forLoopStartRowIndex;
     }
 
-    public void setAction(final RobotAction continueAction) {
+    public void setAction(final RobotToken continueAction) {
         this.continueAction = continueAction;
     }
 
     @Override
-    public RobotAction getKeywordAction() {
+    public RobotToken getKeywordAction() {
         return keywordAction;
     }
 
-    public void setKeywordAction(final RobotAction keywordAction) {
+    public void setKeywordAction(final RobotToken keywordAction) {
         this.keywordAction = keywordAction;
     }
 

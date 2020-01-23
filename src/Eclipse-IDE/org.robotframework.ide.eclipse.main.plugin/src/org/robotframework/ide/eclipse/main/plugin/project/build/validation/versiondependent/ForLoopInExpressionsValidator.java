@@ -45,7 +45,7 @@ class ForLoopInExpressionsValidator extends VersionDependentModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        final RobotToken inToken = descriptor.getInAction().getToken();
+        final RobotToken inToken = descriptor.getInAction();
         RobotTokenType.IN_TOKEN.getRepresentation().stream()
                 .filter(repr -> !repr.equals(inToken.getText())
                         && repr.replaceAll(" ", "").equalsIgnoreCase(inToken.getText().replaceAll(" +", "")))

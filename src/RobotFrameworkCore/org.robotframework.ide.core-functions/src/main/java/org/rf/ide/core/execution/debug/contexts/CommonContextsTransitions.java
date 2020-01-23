@@ -141,7 +141,7 @@ class CommonContextsTransitions {
             final RobotBreakpointSupplier breakpointSupplier) {
 
         if (index >= elements.size()) {
-            final int line = elements.get(elements.size() - 1).getDescriptor().getAction().getToken().getLineNumber();
+            final int line = elements.get(elements.size() - 1).getDescriptor().getAction().getLineNumber();
             final String errorMsg = String.format(ErrorMessages.executableCallNotFound, keyword.asCall());
             return new ErroneousExecutableCallContext(locationUri, line, errorMsg);
 

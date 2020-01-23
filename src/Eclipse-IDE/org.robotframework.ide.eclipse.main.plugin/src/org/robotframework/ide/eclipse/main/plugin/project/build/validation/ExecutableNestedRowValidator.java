@@ -48,7 +48,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) {
-        final RobotToken keywordNameToken = descriptor.getKeywordAction().getToken();
+        final RobotToken keywordNameToken = descriptor.getKeywordAction();
 
         final KeywordCallValidator keywordCallValidator = new KeywordCallValidator(validationContext, keywordNameToken,
                 descriptor.getKeywordArguments(), reporter);

@@ -13,7 +13,6 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
@@ -65,7 +64,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                     if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                         simpleDesc.addTextParameters(mappingResult.getTextElements());
                     } else {
-                        simpleDesc.setAction(new RobotAction(elem.copy(), mappedElements));
+                        simpleDesc.setAction(elem.copy());
                         simpleDesc.addUsedVariables(correctVariables);
                         isAfterFirstAction = true;
                     }
@@ -89,7 +88,8 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
     }
 
     private <T> void moveCreatedToUsedInCaseNoKeywords(final SimpleRowDescriptor<T> simple) {
-        if (simple.getAction().getToken().getFilePosition().isNotSet() && !simple.getAction().getToken().isNotEmpty()
+        final RobotToken actionToken = simple.getAction();
+        if (actionToken == null || actionToken.getFilePosition().isNotSet() && !actionToken.isNotEmpty()
                 && simple.getKeywordArguments().isEmpty()) {
             simple.moveCreatedVariablesToUsedVariables();
         }

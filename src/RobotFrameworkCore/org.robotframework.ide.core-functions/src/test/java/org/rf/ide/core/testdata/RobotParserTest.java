@@ -27,7 +27,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -257,8 +256,7 @@ public class RobotParserTest {
         final IExecutableRowDescriptor<TestCase> xTestFirstLineDescription = xTestExecutionList.get(0)
                 .buildLineDescription();
 
-        final RobotAction action = xTestFirstLineDescription.getAction();
-        final RobotToken emptyAction = action.getToken();
+        final RobotToken emptyAction = xTestFirstLineDescription.getAction();
         assertThat(emptyAction.getText()).isEmpty();
         final FilePosition emptyActionPosition = emptyAction.getFilePosition();
         assertThat(emptyActionPosition.isSamePlace(new FilePosition(4, 5, 43))).as("got %s", emptyActionPosition)

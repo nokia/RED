@@ -16,7 +16,6 @@ import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -335,17 +334,13 @@ class ExecutableUnitsFixer {
             final IExecutableRowDescriptor<T> execRow) {
 
         if (execRow.getRowType() == RowType.SIMPLE) {
-            final RobotAction action = execRow.getAction();
-            if (action.isPresent() || !action.getToken().getFilePosition().isNotSet()) {
-                final RobotToken actionToken = action.getToken();
-                final FilePosition actionTokenPos = actionToken.getFilePosition();
+            final RobotToken actionToken = execRow.getAction();
+            if (actionToken != null && actionToken.getFilePosition().isSet()) {
                 final List<RobotToken> elementTokens = execRow.getRow().getElementTokens();
-                if (!actionTokenPos.isNotSet()) {
-                    for (final RobotToken rt : elementTokens) {
-                        if (rt != actionToken && rt.getLineNumber() < actionToken.getLineNumber()
-                                && !isVariableDeclaration(rt.getTypes())) {
-                            return true;
-                        }
+                for (final RobotToken rt : elementTokens) {
+                    if (rt != actionToken && rt.getLineNumber() < actionToken.getLineNumber()
+                            && !isVariableDeclaration(rt.getTypes())) {
+                        return true;
                     }
                 }
             }

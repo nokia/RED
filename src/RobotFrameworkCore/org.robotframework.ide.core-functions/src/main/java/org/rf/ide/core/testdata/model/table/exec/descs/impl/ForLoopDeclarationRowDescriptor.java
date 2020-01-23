@@ -12,7 +12,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -24,9 +23,9 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
-    private RobotAction forAction = new RobotAction(new RobotToken(), new ArrayList<>());
+    private RobotToken forAction = new RobotToken();
 
-    private RobotAction inAction = new RobotAction(new RobotToken(), new ArrayList<>());
+    private RobotToken inAction = new RobotToken();
 
     private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
 
@@ -58,24 +57,24 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
     }
 
     @Override
-    public RobotAction getAction() {
+    public RobotToken getAction() {
         return forAction;
     }
 
-    public void setAction(final RobotAction forAction) {
+    public void setAction(final RobotToken forAction) {
         this.forAction = forAction;
     }
 
     @Override
-    public RobotAction getKeywordAction() {
+    public RobotToken getKeywordAction() {
         return getAction();
     }
 
-    public RobotAction getInAction() {
+    public RobotToken getInAction() {
         return inAction;
     }
 
-    public void setInAction(final RobotAction inAction) {
+    public void setInAction(final RobotToken inAction) {
         this.inAction = inAction;
     }
 
