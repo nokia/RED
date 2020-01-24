@@ -43,11 +43,6 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getCommentedVariables() {
-        return null;
-    }
-
-    @Override
     public List<IElementDeclaration> getTextParameters() {
         return null;
     }

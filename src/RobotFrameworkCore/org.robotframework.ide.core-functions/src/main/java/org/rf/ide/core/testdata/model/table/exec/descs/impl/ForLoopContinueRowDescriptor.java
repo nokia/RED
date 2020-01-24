@@ -26,8 +26,6 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     private final List<VariableDeclaration> usedVariables = new ArrayList<>();
 
-    private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
-
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
 
     private final List<RobotToken> keywordArguments = new ArrayList<>(0);
@@ -96,21 +94,6 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     public void addUsedVariable(final VariableDeclaration variable) {
         this.usedVariables.add(variable);
-    }
-
-    @Override
-    public List<VariableDeclaration> getCommentedVariables() {
-        return Collections.unmodifiableList(commentedVariables);
-    }
-
-    public void addCommentedVariable(final VariableDeclaration variable) {
-        this.commentedVariables.add(variable);
-    }
-
-    public void addCommentedVariables(final List<VariableDeclaration> commentedVars) {
-        for (final VariableDeclaration var : commentedVars) {
-            addCommentedVariable(var);
-        }
     }
 
     @Override

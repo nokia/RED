@@ -32,11 +32,11 @@ public class MappingResult {
         this.fileName = fileName;
     }
 
-    public FilePosition getLastFilePosition() {
+    FilePosition getLastFilePosition() {
         return fp;
     }
 
-    public void setLastFilePosition(final FilePosition fp) {
+    void setLastFilePosition(final FilePosition fp) {
         this.fp = fp;
     }
 

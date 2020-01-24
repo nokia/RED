@@ -22,8 +22,6 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private RobotToken action = new RobotToken();
 
-    private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
-
     private final List<VariableDeclaration> usedVariables = new ArrayList<>();
 
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
@@ -78,21 +76,6 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     public void addUsedVariables(final List<VariableDeclaration> usedVars) {
         for (final VariableDeclaration usedVar : usedVars) {
             addUsedVariable(usedVar);
-        }
-    }
-
-    @Override
-    public List<VariableDeclaration> getCommentedVariables() {
-        return Collections.unmodifiableList(commentedVariables);
-    }
-
-    public void addCommentedVariable(final VariableDeclaration variable) {
-        this.commentedVariables.add(variable);
-    }
-
-    public void addCommentedVariables(final List<VariableDeclaration> commentedVars) {
-        for (final VariableDeclaration var : commentedVars) {
-            addCommentedVariable(var);
         }
     }
 

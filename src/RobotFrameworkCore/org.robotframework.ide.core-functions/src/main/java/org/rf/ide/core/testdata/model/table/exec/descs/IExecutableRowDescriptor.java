@@ -23,8 +23,6 @@ public interface IExecutableRowDescriptor<T> {
 
     List<VariableDeclaration> getUsedVariables();
 
-    List<VariableDeclaration> getCommentedVariables();
-
     List<IElementDeclaration> getTextParameters();
 
     List<BuildMessage> getMessages();

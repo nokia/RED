@@ -45,11 +45,6 @@ public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getCommentedVariables() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public List<IElementDeclaration> getTextParameters() {
         return null;
     }

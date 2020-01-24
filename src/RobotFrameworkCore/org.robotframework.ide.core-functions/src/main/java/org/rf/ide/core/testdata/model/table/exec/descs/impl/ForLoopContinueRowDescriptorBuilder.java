@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
@@ -18,8 +17,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.RowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -91,13 +88,9 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
     }
 
     private <T> boolean isTsv(final RobotExecutableRow<T> execRowLine) {
-        @SuppressWarnings("unchecked")
-        final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent =
-            (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) execRowLine.getParent();
-        final AModelElement<? extends ARobotSectionTable> keywordOrTestAsTableElement = parent.getHolder();
-        final ARobotSectionTable table = keywordOrTestAsTableElement.getParent();
-        final RobotFile model = table.getParent();
-        final RobotFileOutput output = model.getParent();
+        final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
+        final ARobotSectionTable table = (ARobotSectionTable) execParent.getParent();
+        final RobotFileOutput output = table.getParent().getParent();
         return output.getFileFormat() == FileFormat.TSV;
     }
 
@@ -105,16 +98,9 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
     public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
         final ForLoopContinueRowDescriptor<T> forContinueDesc = new ForLoopContinueRowDescriptor<>(execRowLine);
         forContinueDesc.setForLoopStartRowIndex(forLoopDeclarationLine.get());
-
-        final RobotFileOutput rfo = getFileOutput(execRowLine);
-        final String fileName = rfo.getProcessedFile().getAbsolutePath();
-
-        final VariableExtractor varExtractor = new VariableExtractor();
-        final List<RobotToken> lineElements = execRowLine.getElementTokens();
-        final MappingResult mappingResult = varExtractor.extract(execRowLine.getAction(), fileName);
-        forContinueDesc.addMessages(mappingResult.getMessages());
         forContinueDesc.setAction(execRowLine.getAction().copy());
 
+        final List<RobotToken> lineElements = execRowLine.getElementTokens();
         if (lineElements.size() > 1) {
             mapRestOfForLoopContinue(execRowLine, forContinueDesc, lineElements);
         }
@@ -156,14 +142,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         forContinueDesc.addMessages(buildDescription.getMessages());
         forContinueDesc.addTextParameters(buildDescription.getTextParameters());
         forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
-        forContinueDesc.addCommentedVariables(buildDescription.getCommentedVariables());
         forContinueDesc.addUsedVariables(buildDescription.getUsedVariables());
         forContinueDesc.addKeywordArguments(buildDescription.getKeywordArguments());
-    }
-
-    private <T> RobotFileOutput getFileOutput(final RobotExecutableRow<T> execRowLine) {
-        final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) execParent.getParent();
-        return table.getParent().getParent();
     }
 }

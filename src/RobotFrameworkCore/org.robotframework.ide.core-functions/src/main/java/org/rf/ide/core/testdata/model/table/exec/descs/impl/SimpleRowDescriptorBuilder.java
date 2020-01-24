@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.JoinedTextDeclarations;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.impl.CommentedVariablesFilter.FilteredVariables;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -39,17 +38,16 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         final VariableExtractor varExtractor = new VariableExtractor();
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         boolean isAfterFirstAction = false;
-        final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
-            final MappingResult mappingResult = varExtractor.extract(elem, fileName);
+            final MappingResult mappingResult = elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE) ? new MappingResult(null, null)
+                            : varExtractor.extract(elem, fileName);
             simpleDesc.addMessages(mappingResult.getMessages());
 
             // value is a keyword if is on the first place and is not just a variable or
             // variable with equal sign. Keyword can be defined as a ${var}=, however must
             // be called with a plain text in the place of an embedded variable
-            final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
-            simpleDesc.addCommentedVariables(filteredVars.getCommented());
-            final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
+            final List<VariableDeclaration> correctVariables = mappingResult.getCorrectVariables();
             final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
             if (isAfterFirstAction) {
                 simpleDesc.addUsedVariables(correctVariables);

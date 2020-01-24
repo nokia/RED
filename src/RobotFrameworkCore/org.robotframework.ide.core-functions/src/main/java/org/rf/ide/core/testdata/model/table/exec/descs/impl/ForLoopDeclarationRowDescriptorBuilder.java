@@ -21,7 +21,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.impl.CommentedVariablesFilter.FilteredVariables;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -45,16 +44,16 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         boolean wasFor = false;
         boolean wasIn = false;
         boolean wasElementsToIterate = false;
-        final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
-            final MappingResult mappingResult = varExtractor.extract(elem, fileName);
+            final MappingResult mappingResult = elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE) ? new MappingResult(null, null)
+                            : varExtractor.extract(elem, fileName);
+
             loopDescriptor.addMessages(mappingResult.getMessages());
 
             // value is keyword if is on the first place and have in it nested
             // variables and when contains text on the beginning or end of field
-            final FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
-            loopDescriptor.addCommentedVariables(filteredVars.getCommented());
-            final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
+            final List<VariableDeclaration> correctVariables = mappingResult.getCorrectVariables();
 
             if (wasFor) {
                 if (wasIn) {
@@ -66,10 +65,9 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                         loopDescriptor.setInAction(elem.copy());
                         wasIn = true;
                     } else {
-                        final int variablesSize = correctVariables.size();
                         loopDescriptor.addCreatedVariables(correctVariables);
 
-                        if (!mappingResult.getTextElements().isEmpty() || variablesSize > 1) {
+                        if (!mappingResult.getTextElements().isEmpty() || correctVariables.size() > 1) {
                             final FilePosition startFilePosition = elem.getFilePosition();
                             final FilePosition end = new FilePosition(startFilePosition.getLine(), elem.getEndColumn(),
                                     elem.getStartOffset() + elem.getText().length());
