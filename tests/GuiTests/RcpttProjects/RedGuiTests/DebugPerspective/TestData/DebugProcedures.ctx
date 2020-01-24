@@ -5,8 +5,8 @@ Element-Name: DebugProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 3/28/19 3:08 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/24/20 1:53 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -40,12 +40,10 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
  	loop [val index 0]{
 	 	try -times 1 -command{
 			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].Type" $line $index] -raw
-			
 			| let [val marker -input]{
 				if [ $marker | not-eq "org.eclipse.debug.ui.currentIP" ] {  
 					recur [$index | plus 1]
 				}
-	
 			}
  		}-catch{
  			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
@@ -67,7 +65,6 @@ proc "wait-for-specific-nr-of-threads" [val nr_items_in_thread 3]{
 		get-view Debug | get-tree 
 		    | get-item ".* \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
 		    | get-property childCount | equals $nr_items_in_thread | verify-true
-    
 	}
 	try -times 3 -delay 1000 -command{
 		with [get-view Debug | get-tree] {
@@ -96,7 +93,6 @@ proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames] [va
 				with [get-view Debug | get-tree] {
 					get-item $selector | get-property "getItems().TreeItem[0].getText()" -raw|  not-eq "" | verify-true			  		
 			        get-item $selector | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_of_frames 1]] -raw|  not-eq "" | verify-true
-				        
 			}
 		}
 	}
@@ -129,4 +125,5 @@ proc "check-library-kw-editor" [val kw_name]{
 	    + "Note: if you don't want to see this page you can configure debugger in Preferencesso that it will never suspend inside library keywords when stepping.\r\n"   $kw_name]
 	    | verify-true
 }
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
