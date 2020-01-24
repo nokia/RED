@@ -130,54 +130,67 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private void autoIndentAfterNewLine(final RobotLine currentLine, final String lineDelimiter,
             final DocumentCommand command) {
-        final Optional<IRobotLineElement> firstElem = getFirstElement(currentLine);
-        if (!firstElem.isPresent()) {
-            return;
-        }
+        getFirstElement(currentLine).ifPresent(firstElement -> {
+            if (isDefinitionRequiringIndent(currentLine, command.offset)) {
+                command.text += preferences.getSeparatorToUse(isTsvFile);
 
-        if (isDefinitionRequiringIndent(currentLine, command.offset)) {
-            command.text += preferences.getSeparatorToUse(isTsvFile);
-
-        } else {
-            final IRobotLineElement firstElement = firstElem.get();
-            String addedIndent = "";
-            if (firstElement instanceof Separator || isEmptyCellToken(firstElement)) {
-                final int length = Math.max(0,
-                        Math.min(firstElement.getText().length(), command.offset - firstElement.getStartOffset()));
-                addedIndent = firstElement.getText().substring(0, length);
-                command.text += addedIndent;
-            }
-
-            final RobotToken firstMeaningfulToken = firstElement instanceof RobotToken ? (RobotToken) firstElement
-                    : getSecondElement(currentLine).filter(RobotToken.class::isInstance)
-                            .map(RobotToken.class::cast)
-                            .orElseGet(RobotToken::new);
-
-            if (command.offset < firstMeaningfulToken.getEndOffset()) {
-                // we're modifying region before the end of the token so we don't want to add
-                // anything more
-                return;
-            }
-
-            if (isEndTerminatedForLoopStyle(firstMeaningfulToken)) {
+            } else {
+                final String addedIndent = countAddedIndent(firstElement, command.offset);
                 command.text += addedIndent;
 
-                if (endTerminatedForLoopRequiresEnd(currentLine)) {
-                    command.shiftsCaret = false;
-                    command.caretOffset = command.offset + command.text.length();
-                    command.text += lineDelimiter + addedIndent + "END";
+                final RobotToken firstMeaningfulToken = firstElement instanceof RobotToken ? (RobotToken) firstElement
+                        : getSecondElement(currentLine).filter(RobotToken.class::isInstance)
+                                .map(RobotToken.class::cast)
+                                .orElseGet(RobotToken::new);
+
+                if (command.offset < firstMeaningfulToken.getEndOffset()) {
+                    // we're modifying region before the end of the token so we don't want to add
+                    // anything more
+                    return;
                 }
 
-            } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
-                command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
+                if (isEndTerminatedForLoopStyle(firstMeaningfulToken)) {
+                    command.text += addedIndent;
 
-            } else if (isRequiringContinuation(firstMeaningfulToken)
-                    || isBetweenCells(currentLine, command.offset) && !isInCommentPart(currentLine, command.offset)) {
-                command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
+                    if (endTerminatedForLoopRequiresEnd(currentLine)) {
+                        command.shiftsCaret = false;
+                        command.caretOffset = command.offset + command.text.length();
+                        command.text += lineDelimiter + addedIndent + "END";
+                    }
+
+                } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
+                    command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
+
+                } else if (isRequiringContinuation(firstMeaningfulToken)) {
+                    command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
+
+                } else if (!isInCommentPart(currentLine, command.offset)) {
+                    getCurrentElement(currentLine, command.offset).ifPresent(currentElement -> {
+                        if (currentElement instanceof Separator) {
+                            command.text += "..." + currentElement.getText();
+                            command.offset = currentElement.getStartOffset();
+                            command.length = currentElement.getEndOffset() - currentElement.getStartOffset();
+                        } else if (currentElement.getEndOffset() == command.offset) {
+                            getNextElement(currentLine, command.offset).ifPresent(nextElement -> {
+                                command.text += "...";
+                                command.caretOffset = nextElement.getStartOffset();
+                            });
+                        }
+                    });
+
+                }
 
             }
+        });
+    }
 
+    private String countAddedIndent(final IRobotLineElement firstElement, final int offset) {
+        if (firstElement instanceof Separator || isEmptyCellToken(firstElement)) {
+            final int length = Math.max(0,
+                    Math.min(firstElement.getText().length(), offset - firstElement.getStartOffset()));
+            return firstElement.getText().substring(0, length);
         }
+        return "";
     }
 
     private Optional<IRobotLineElement> getFirstElement(final RobotLine line) {
@@ -188,14 +201,21 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         return line.elementsStream().skip(1).findFirst();
     }
 
-    private boolean isDefinitionRequiringIndent(final RobotLine currentLine, final int modificationStartOffset) {
+    private Optional<IRobotLineElement> getCurrentElement(final RobotLine line, final int offset) {
+        return line.elementsStream()
+                .filter(e -> e.getStartOffset() <= offset && offset <= e.getEndOffset())
+                .findFirst();
+    }
+
+    private Optional<IRobotLineElement> getNextElement(final RobotLine line, final int offset) {
+        return line.elementsStream().filter(e -> e.getStartOffset() > offset).findFirst();
+    }
+
+    private boolean isDefinitionRequiringIndent(final RobotLine currentLine, final int offset) {
         final Optional<RobotToken> firstToken = currentLine.tokensStream()
                 .filter(token -> !token.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE))
                 .findFirst();
-        final boolean modificationStartsAfterTheToken = firstToken
-                .filter(token -> token.getEndOffset() <= modificationStartOffset)
-                .isPresent();
-        if (modificationStartsAfterTheToken) {
+        if (firstToken.filter(token -> token.getEndOffset() <= offset).isPresent()) {
             final List<IRobotTokenType> typesOfFirstToken = firstToken.map(RobotToken::getTypes)
                     .orElseGet(ArrayList::new);
 
@@ -244,18 +264,9 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
     }
 
-    private boolean isBetweenCells(final RobotLine currentLine, final int modificationStartOffset) {
+    private boolean isInCommentPart(final RobotLine currentLine, final int offset) {
         return currentLine.elementsStream()
-                .filter(e -> e.getStartOffset() <= modificationStartOffset
-                        && modificationStartOffset <= e.getEndOffset())
-                .findFirst()
-                .filter(e -> e instanceof Separator || e.getEndOffset() == modificationStartOffset)
-                .isPresent();
-    }
-
-    private boolean isInCommentPart(final RobotLine currentLine, final int modificationStartOffset) {
-        return currentLine.elementsStream()
-                .filter(e -> modificationStartOffset < e.getEndOffset())
+                .filter(e -> offset < e.getEndOffset())
                 .allMatch(e -> e instanceof Separator || e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                         || e.getTypes().contains(RobotTokenType.COMMENT_CONTINUE));
     }

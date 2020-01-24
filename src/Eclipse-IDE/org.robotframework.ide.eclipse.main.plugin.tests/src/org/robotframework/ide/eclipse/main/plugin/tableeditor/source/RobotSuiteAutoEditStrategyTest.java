@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotSuiteA
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -624,9 +625,25 @@ public class RobotSuiteAutoEditStrategyTest {
             strategy.customizeDocumentCommand(document, command);
 
             if (offsetsBetweenCells.contains(offset)) {
-                assertThat(command.text).isEqualTo("\n  ...  ");
+                final Range<Integer> separator = offsetsBetweenCells.rangeContaining(offset);
+                final int separatorStart = separator.lowerEndpoint();
+                final int separatorEnd = separator.upperEndpoint();
+                if (separatorStart == offset) {
+                    assertThat(command.text).isEqualTo("\n  ...");
+                    assertThat(command.offset).isEqualTo(separatorStart);
+                    assertThat(command.length).isEqualTo(0);
+                    assertThat(command.caretOffset).isEqualTo(separatorEnd);
+                } else {
+                    assertThat(command.text).isEqualTo("\n  ..." + Strings.repeat(" ", separatorEnd - separatorStart));
+                    assertThat(command.offset).isEqualTo(separatorStart);
+                    assertThat(command.length).isEqualTo(separatorEnd - separatorStart);
+                    assertThat(command.caretOffset).isEqualTo(-1);
+                }
             } else {
                 assertThat(command.text).isEqualTo("\n  ");
+                assertThat(command.offset).isEqualTo(offset);
+                assertThat(command.length).isEqualTo(0);
+                assertThat(command.caretOffset).isEqualTo(-1);
             }
         }
     }
@@ -642,9 +659,11 @@ public class RobotSuiteAutoEditStrategyTest {
             strategy.customizeDocumentCommand(document, command);
 
             assertThat(command.text).isEqualTo("\n  ");
+            assertThat(command.offset).isEqualTo(offset);
+            assertThat(command.length).isEqualTo(0);
+            assertThat(command.caretOffset).isEqualTo(-1);
         }
     }
-
 
     private static RobotDocument newDocument(final String... lines) {
         final RobotProject robotProject = new RobotModel().createRobotProject(project);
