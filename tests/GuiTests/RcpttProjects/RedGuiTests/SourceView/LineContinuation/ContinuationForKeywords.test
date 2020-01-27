@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5Lj7UB0NEeq8Rrp68Tq-Rw
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/13/19 2:41 PM
+Save-Time: 1/27/20 3:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,7 +65,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 // continuation is added
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    \n"
+    + "Test Teardown\n"
     + "...    Convert To Binary    33    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
@@ -88,8 +88,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -110,8 +110,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Star\n"
@@ -134,12 +134,12 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
-    + "    Should Start With  text1 \n"
-    + "    ...     text2   aaa   bbb     ccc\n"
+    + "    Should Start With  text1\n"
+    + "    ...  text2   aaa   bbb     ccc\n"
     + "    Should Be Equal As Integers    first    ${a1}   #text\n"
     + "    Should Be Equal As Strings    ijk    \n"
     + "    ...    klm\n"
@@ -160,8 +160,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 // comment is moved with no continuation
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -186,8 +186,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 // no continuation
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -213,8 +213,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 // new line is added
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -236,8 +236,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -255,15 +255,14 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
     
     
-    
 // press enter after [Arg..]       
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 18 16
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -277,7 +276,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Keywords ***\n"
     + "kw\n"
     + "    [Arguments]\n"
-    + "    ...        ${d}   ${w}\n"
+    + "    ...    ${d}   ${w}\n"
     + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
     
@@ -288,8 +287,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -302,18 +301,10 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    \n\n"
     + "*** Keywords ***\n"
     + "kw\n"
-    + "    [Arguments]    ${d} \n"
-    + "    ...      ${w}\n"
+    + "    [Arguments]    ${d}\n"
+    + "    ...   ${w}\n"
     + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
-    
-  
-
-
-
-
-
-
 
 
 
@@ -325,8 +316,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 // no continuation
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -339,8 +330,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    \n\n"
     + "*** Keywords ***\n"
     + "kw\n"
-    + "    [Arguments]    ${d} \n"
-    + "    ...      ${w}\n"
+    + "    [Arguments]    ${d}\n"
+    + "    ...   ${w}\n"
     + "    Run Keyword If  C=4    Variable S\n"
     + "    hould Exist    ghi      @{list}\n"
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
@@ -353,8 +344,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -367,8 +358,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    \n\n"
     + "*** Keywords ***\n"
     + "kw\n"
-    + "    [Arguments]    ${d} \n"
-    + "    ...      ${w}\n"
+    + "    [Arguments]    ${d}\n"
+    + "    ...   ${w}\n"
     + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{li\n"
     + "    st}\n"
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
@@ -380,8 +371,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -394,10 +385,10 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    \n\n"
     + "*** Keywords ***\n"
     + "kw\n"
-    + "    [Arguments]    ${d} \n"
-    + "    ...      ${w}\n"
-    + "    Run Keyword If \n"
-    + "    ...     C=4    Variable Should Exist    ghi      @{list}\n"
+    + "    [Arguments]    ${d}\n"
+    + "    ...   ${w}\n"
+    + "    Run Keyword If\n"
+    + "    ...  C=4    Variable Should Exist    ghi      @{list}\n"
     + "    [Teardown]    Should Be Equal    first    second    dd" | verify-true
     
 // press enter in teardown    
@@ -408,8 +399,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Teardown    Convert To Binary    33  \n"
-    + "...      a2cdef\n\n"
+    + "Test Teardown    Convert To Binary    33\n"
+    + "...    a2cdef\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    Should Start With  text1  text2   aaa   bbb     ccc\n"
@@ -422,10 +413,10 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    \n\n"
     + "*** Keywords ***\n"
     + "kw\n"
-    + "    [Arguments]    ${d} \n"
-    + "    ...      ${w}\n"
+    + "    [Arguments]    ${d}\n"
+    + "    ...   ${w}\n"
     + "    Run Keyword If  C=4    Variable Should Exist    ghi      @{list}\n"
-    + "    [Teardown]    Should Be Equal \n"
-    + "    ...       first    second    dd" | verify-true
+    + "    [Teardown]    Should Be Equal\n"
+    + "    ...    first    second    dd" | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
