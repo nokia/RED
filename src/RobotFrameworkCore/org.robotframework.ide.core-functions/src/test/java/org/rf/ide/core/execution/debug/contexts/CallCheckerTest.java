@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.debug.RunningKeyword;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class CallCheckerTest {
 
@@ -39,93 +39,62 @@ public class CallCheckerTest {
 
     @Test
     public void forKeywordNamesGenerationTests_1() {
-        final RobotExecutableRow<?> row = new RobotExecutableRow<>();
-        row.setAction(RobotToken.create(":FOR"));
+        final RobotExecutableRow<Object> row = new RobotExecutableRow<>();
+        row.setParent(new TestCase(RobotToken.create("test")));
+        row.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
         row.addArgument(RobotToken.create("${x}"));
-        row.addArgument(RobotToken.create("IN"));
+        row.addArgument(RobotToken.create("IN", RobotTokenType.IN_TOKEN));
         row.addArgument(RobotToken.create("${XS}"));
 
-        final ForLoopDeclarationRowDescriptor<?> descriptor = new ForLoopDeclarationRowDescriptor<>(row);
+        final IExecutableRowDescriptor<?> desc = row.buildLineDescription();
 
-        final VariableDeclaration variable = new VariableDeclaration(new TextPosition("${x}", 0, 3),
-                new TextPosition("${x}", 0, 3));
-        variable.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
-        descriptor.addCreatedVariable(variable);
-
-        descriptor.setInAction(RobotToken.create("IN"));
-
-        assertThat(CallChecker.createName(descriptor)).isEqualTo("${x} IN [ ${XS} ]");
+        assertThat(CallChecker.createName((ForLoopDeclarationRowDescriptor<?>) desc)).isEqualTo("${x} IN [ ${XS} ]");
     }
 
     @Test
     public void forKeywordNamesGenerationTests_2() {
-        final RobotExecutableRow<?> row = new RobotExecutableRow<>();
-        row.setAction(RobotToken.create(":FOR"));
+        final RobotExecutableRow<Object> row = new RobotExecutableRow<>();
+        row.setParent(new TestCase(RobotToken.create("test")));
+        row.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
         row.addArgument(RobotToken.create("${x}"));
         row.addArgument(RobotToken.create("${y}"));
-        row.addArgument(RobotToken.create("IN ZIP"));
+        row.addArgument(RobotToken.create("IN ZIP", RobotTokenType.IN_TOKEN));
         row.addArgument(RobotToken.create("${XS}"));
         row.addArgument(RobotToken.create("${YS}"));
 
-        final ForLoopDeclarationRowDescriptor<?> descriptor = new ForLoopDeclarationRowDescriptor<>(row);
+        final IExecutableRowDescriptor<?> desc = row.buildLineDescription();
 
-        final VariableDeclaration variable1 = new VariableDeclaration(new TextPosition("${x}", 0, 3), new TextPosition("${x}", 0, 3));
-        variable1.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable1.setRobotTokenPosition(new FilePosition(5, 0, 60));
-        descriptor.addCreatedVariable(variable1);
-
-        final VariableDeclaration variable2 = new VariableDeclaration(new TextPosition("${y}", 0, 3),
-                new TextPosition("${y}", 0, 3));
-        variable2.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable2.setRobotTokenPosition(new FilePosition(5, 0, 67));
-        descriptor.addCreatedVariable(variable2);
-
-        descriptor.setInAction(RobotToken.create("IN ZIP"));
-
-        assertThat(CallChecker.createName(descriptor)).isEqualTo("${x} | ${y} IN ZIP [ ${XS} | ${YS} ]");
+        assertThat(CallChecker.createName((ForLoopDeclarationRowDescriptor<?>) desc))
+                .isEqualTo("${x} | ${y} IN ZIP [ ${XS} | ${YS} ]");
     }
 
     @Test
     public void positiveMatchingForCallsExample() {
-        final RobotExecutableRow<?> row = new RobotExecutableRow<>();
-        row.setAction(RobotToken.create(":FOR"));
+        final RobotExecutableRow<Object> row = new RobotExecutableRow<>();
+        row.setParent(new TestCase(RobotToken.create("test")));
+        row.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
         row.addArgument(RobotToken.create("${x}"));
-        row.addArgument(RobotToken.create("IN"));
+        row.addArgument(RobotToken.create("IN", RobotTokenType.IN_TOKEN));
         row.addArgument(RobotToken.create("${XS}"));
 
-        final ForLoopDeclarationRowDescriptor<?> descriptor = new ForLoopDeclarationRowDescriptor<>(row);
+        final IExecutableRowDescriptor<?> desc = row.buildLineDescription();
 
-        final VariableDeclaration variable = new VariableDeclaration(new TextPosition("${x}", 0, 3),
-                new TextPosition("${x}", 0, 3));
-        variable.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
-        descriptor.addCreatedVariable(variable);
-
-        descriptor.setInAction(RobotToken.create("IN"));
-
-        assertThat(CallChecker.isSameForLoop(descriptor, new RunningKeyword(null, "${x} IN [ ${XS} ]", null))).isTrue();
+        assertThat(CallChecker.isSameForLoop((ForLoopDeclarationRowDescriptor<?>) desc,
+                new RunningKeyword(null, "${x} IN [ ${XS} ]", null))).isTrue();
     }
 
     @Test
     public void negativeMatchingForCallsExample() {
-        final RobotExecutableRow<?> row = new RobotExecutableRow<>();
-        row.setAction(RobotToken.create(":FOR"));
+        final RobotExecutableRow<Object> row = new RobotExecutableRow<>();
+        row.setParent(new TestCase(RobotToken.create("test")));
+        row.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
         row.addArgument(RobotToken.create("${x}"));
-        row.addArgument(RobotToken.create("IN"));
+        row.addArgument(RobotToken.create("IN", RobotTokenType.IN_TOKEN));
         row.addArgument(RobotToken.create("${XS}"));
 
-        final ForLoopDeclarationRowDescriptor<?> descriptor = new ForLoopDeclarationRowDescriptor<>(row);
+        final IExecutableRowDescriptor<?> desc = row.buildLineDescription();
 
-        final VariableDeclaration variable = new VariableDeclaration(new TextPosition("${x}", 0, 3),
-                new TextPosition("${x}", 0, 3));
-        variable.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable.setRobotTokenPosition(new FilePosition(5, 0, 60));
-        descriptor.addCreatedVariable(variable);
-
-        descriptor.setInAction(RobotToken.create("IN"));
-
-        assertThat(CallChecker.isSameForLoop(descriptor, new RunningKeyword(null, "${y} IN [ ${YS} ]", null)))
-                .isFalse();
+        assertThat(CallChecker.isSameForLoop((ForLoopDeclarationRowDescriptor<?>) desc,
+                new RunningKeyword(null, "${y} IN [ ${YS} ]", null))).isFalse();
     }
 }

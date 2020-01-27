@@ -9,8 +9,10 @@ import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
+import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -45,25 +47,31 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
     Style createElementStyle() {
         final Style style = new Style();
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
+
+        // FIXME : version
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                findVariables(variableStyler, createVariableExtractor()));
+                findVariables(variableStyler, VariablesAnalyzer.analyzer(null, getAllowedVariableMarks())));
         return style;
     }
 
-    VariableExtractor createVariableExtractor() {
-        return new VariableExtractor();
+    protected String getAllowedVariableMarks() {
+        return VariablesAnalyzer.ALL;
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findVariables(final Styler variableStyler,
-            final VariableExtractor variableExtractor) {
+            final VariablesAnalyzer variablesAnalyzer) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
-            for (final IElementDeclaration declaration : variableExtractor.extract(label).getMappedElements()) {
-                if (declaration.isComplex()) {
-                    mapping.put(Range.closedOpen(declaration.getStart().getStart() - 1,
-                            declaration.getEnd().getStart() + 1), variableStyler);
+            variablesAnalyzer.visitExpression(label, new ExpressionVisitor() {
+
+                @Override
+                public boolean visit(final VariableUse usage) {
+                    final FileRegion region = usage.getRegion();
+                    mapping.put(Range.closedOpen(region.getStart().getOffset(), region.getEnd().getOffset()),
+                            variableStyler);
+                    return true;
                 }
-            }
+            });
             return mapping;
         };
     }

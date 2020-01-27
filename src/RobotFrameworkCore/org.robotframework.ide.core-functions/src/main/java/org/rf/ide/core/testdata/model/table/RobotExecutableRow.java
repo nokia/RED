@@ -10,12 +10,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.exec.descs.ExecutableRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -244,7 +247,14 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
         if (getParent() instanceof IExecutableStepsHolder) {
             @SuppressWarnings("unchecked")
             final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
-            final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
+            final FileFormat fileFormat = Optional.ofNullable(parent)
+                    .map(IExecutableStepsHolder::getHolder)
+                    .map(AModelElement::getParent)
+                    .map(ARobotSectionTable.class::cast)
+                    .map(ARobotSectionTable::getParent)
+                    .map(RobotFile::getParent)
+                    .map(RobotFileOutput::getFileFormat)
+                    .orElse(null);
 
             return RobotExecutableRow.isExecutable(fileFormat, getElementTokens());
         } else {

@@ -17,15 +17,14 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes" })
 public class ExecutableWithDescriptorTest {
 
     @Test
@@ -154,11 +153,23 @@ public class ExecutableWithDescriptorTest {
 
     @Test
     public void keywordCallNameIsTakenFromExecutableIfNoTemplateIsProvided_2() {
-        final RobotToken token = RobotToken.create("keyword_in_loop");
-        final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
+        final UserKeyword holder = new UserKeyword(RobotToken.create("kw"));
+        final RobotExecutableRow<UserKeyword> loopHeader = new RobotExecutableRow<>();
+        loopHeader.setParent(holder);
+        holder.addElement(loopHeader);
+        loopHeader.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
+        loopHeader.addArgument(RobotToken.create("${x}"));
+        loopHeader.addArgument(RobotToken.create("IN", RobotTokenType.IN_TOKEN));
+        loopHeader.addArgument(RobotToken.create("${XS}"));
 
-        final ForLoopContinueRowDescriptor<?> descriptor = new ForLoopContinueRowDescriptor<>(executable);
-        descriptor.setKeywordAction(token);
+        final RobotExecutableRow<UserKeyword> executable = new RobotExecutableRow<>();
+        executable.setParent(holder);
+        holder.addElement(executable);
+        executable.setAction(RobotToken.create("\\", RobotTokenType.FOR_CONTINUE_TOKEN));
+        executable.addArgument(RobotToken.create("keyword_in_loop"));
+
+        final ForLoopContinueRowDescriptor<?> descriptor = (ForLoopContinueRowDescriptor<?>) executable
+                .buildLineDescription();
 
         final ExecutableWithDescriptor execDescriptor = new ExecutableWithDescriptor(executable, descriptor, null);
 
@@ -196,21 +207,18 @@ public class ExecutableWithDescriptorTest {
 
     @Test
     public void variablesFromForLoopAreProperlyReturned() {
-        final RobotExecutableRow executable = new RobotExecutableRow<>();
+        final TestCase holder = new TestCase(RobotToken.create("test"));
+        final RobotExecutableRow<TestCase> executable = new RobotExecutableRow<>();
+        executable.setParent(holder);
+        holder.addElement(executable);
+        executable.setAction(RobotToken.create(":FOR", RobotTokenType.FOR_TOKEN));
+        executable.addArgument(RobotToken.create("${x}"));
+        executable.addArgument(RobotToken.create("${y}"));
+        executable.addArgument(RobotToken.create("IN", RobotTokenType.IN_TOKEN));
+        executable.addArgument(RobotToken.create("@{XS}"));
 
-        final ForLoopDeclarationRowDescriptor<?> desc = new ForLoopDeclarationRowDescriptor<>(executable);
-        final VariableDeclaration variable1 = new VariableDeclaration(new TextPosition("${x}", 0, 3),
-                new TextPosition("${x}", 0, 3));
-        variable1.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable1.setRobotTokenPosition(new FilePosition(5, 0, 60));
-        
-        final VariableDeclaration variable2 = new VariableDeclaration(new TextPosition("${y}", 0, 3),
-                new TextPosition("${y}", 0, 3));
-        variable2.setTypeIdentificator(new TextPosition("${y}", 0, 3));
-        variable2.setRobotTokenPosition(new FilePosition(5, 8, 68));
-
-        desc.addCreatedVariable(variable1);
-        desc.addCreatedVariable(variable2);
+        final ForLoopDeclarationRowDescriptor<?> desc = (ForLoopDeclarationRowDescriptor<?>) executable
+                .buildLineDescription();
 
         final ExecutableWithDescriptor loopHeader = new ExecutableWithDescriptor(executable, desc, null);
         final ExecutableWithDescriptor descriptor = new ExecutableWithDescriptor(
@@ -223,22 +231,19 @@ public class ExecutableWithDescriptorTest {
     }
 
     @Test
-    public void variablesFromForHaveProperRegionReturned() {
-        final RobotExecutableRow executable = new RobotExecutableRow<>();
+    public void variablesFromForLoopHaveProperRegionReturned() {
+        final TestCase holder = new TestCase(RobotToken.create("test"));
+        final RobotExecutableRow<TestCase> executable = new RobotExecutableRow<>();
+        executable.setParent(holder);
+        holder.addElement(executable);
+        executable.setAction(RobotToken.create(":FOR", new FilePosition(1, 4, 54), RobotTokenType.FOR_TOKEN));
+        executable.addArgument(RobotToken.create("${x}", new FilePosition(1, 10, 60)));
+        executable.addArgument(RobotToken.create("${y}", new FilePosition(1, 18, 68)));
+        executable.addArgument(RobotToken.create("IN", new FilePosition(1, 26, 76), RobotTokenType.IN_TOKEN));
+        executable.addArgument(RobotToken.create("@{XS}", new FilePosition(1, 30, 80)));
 
-        final ForLoopDeclarationRowDescriptor<?> desc = new ForLoopDeclarationRowDescriptor<>(executable);
-        final VariableDeclaration variable1 = new VariableDeclaration(new TextPosition("${x}", 0, 3),
-                new TextPosition("${x}", 0, 3));
-        variable1.setTypeIdentificator(new TextPosition("${x}", 0, 3));
-        variable1.setRobotTokenPosition(new FilePosition(5, 0, 60));
-
-        final VariableDeclaration variable2 = new VariableDeclaration(new TextPosition("${y}", 0, 3),
-                new TextPosition("${y}", 0, 3));
-        variable2.setTypeIdentificator(new TextPosition("${y}", 0, 3));
-        variable2.setRobotTokenPosition(new FilePosition(5, 8, 68));
-
-        desc.addCreatedVariable(variable1);
-        desc.addCreatedVariable(variable2);
+        final ForLoopDeclarationRowDescriptor<?> desc = (ForLoopDeclarationRowDescriptor<?>) executable
+                .buildLineDescription();
 
         final ExecutableWithDescriptor loopHeader = new ExecutableWithDescriptor(executable, desc, null);
         final ExecutableWithDescriptor descriptor = new ExecutableWithDescriptor(

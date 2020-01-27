@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FileFormat;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -23,6 +24,12 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilder {
 
     private Optional<Integer> forLoopDeclarationLine = Optional.empty();
+
+    private final RobotVersion version;
+
+    public ForLoopContinueRowDescriptorBuilder(final RobotVersion version) {
+        this.version = version;
+    }
 
     @Override
     public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
@@ -136,11 +143,10 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
             }
         }
 
-        final IExecutableRowDescriptor<T> buildDescription = new SimpleRowDescriptorBuilder()
+        final SimpleRowDescriptor<T> buildDescription = (SimpleRowDescriptor<T>) new SimpleRowDescriptorBuilder(version)
                 .buildDescription(rowWithoutLoopContinue);
         forContinueDesc.setKeywordAction(buildDescription.getAction());
         forContinueDesc.addMessages(buildDescription.getMessages());
-        forContinueDesc.addTextParameters(buildDescription.getTextParameters());
         forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
         forContinueDesc.addUsedVariables(buildDescription.getUsedVariables());
         forContinueDesc.addKeywordArguments(buildDescription.getKeywordArguments());

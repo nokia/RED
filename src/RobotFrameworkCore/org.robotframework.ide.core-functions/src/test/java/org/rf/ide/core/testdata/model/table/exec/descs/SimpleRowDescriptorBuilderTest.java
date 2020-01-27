@@ -48,8 +48,8 @@ public class SimpleRowDescriptorBuilderTest {
 
         // verify
         assertThat(lineDesc.getAction().getText()).isEqualTo(action.getText());
-        assertThat(lineDesc.getCreatedVariables()).hasSize(1);
-        assertThat(lineDesc.getCreatedVariables().get(0).asToken().getText()).isEqualTo(createdScalar.getText());
+        assertThat(lineDesc.getCreatingVariables()).hasSize(1);
+        assertThat(lineDesc.getCreatingVariables().findFirst().get().getText()).isEqualTo(createdScalar.getText());
         assertThat(lineDesc.getKeywordArguments()).hasSize(1);
         assertThat(lineDesc.getKeywordArguments().get(0).getText()).isEqualTo(settedText.getText());
     }

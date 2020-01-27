@@ -7,11 +7,14 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.rules.IToken;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
+import org.rf.ide.core.testdata.model.FileRegion;
+import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -44,37 +47,55 @@ public class VariableUsageRule implements ISyntaxColouringRule {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
         if (tokenTypes.contains(RobotTokenType.VARIABLE_USAGE)) {
-            final VariableExtractor extractor = createVariableExtractor();
-            final MappingResult extract = extractor.extract((RobotToken) token);
-            return evaluateVariables(token, offsetInToken, extract.getMappedElements());
+            final AtomicReference<PositionedTextToken> position = new AtomicReference<>();
+
+            final int offsetInFile = token.getStartOffset() + offsetInToken;
+            // FIXME : version
+            VariablesAnalyzer.analyzer(null, getAllowedVariableMarks())
+                    .visitExpression((RobotToken) token, new ExpressionVisitor() {
+
+                        @Override
+                        public boolean visit(final VariableUse usage) {
+                            return visit(usage.getRegion(),
+                                    () -> new PositionedTextToken(varToken, offsetInFile,
+                                            usage.getRegion().getEnd().getOffset() - offsetInFile));
+                        }
+
+                        @Override
+                        public boolean visit(final String text, final FileRegion region) {
+                            return visit(region, () -> evaluateNonVariablePart(token.getStartOffset(), offsetInToken,
+                                    text, region.getStart().getOffset()));
+                        }
+
+                        private boolean visit(final FileRegion region,
+                                final Supplier<PositionedTextToken> tokenSupplier) {
+                            if (offsetInFile < region.getStart().getOffset()) {
+                                // the region is too far so we don't continue
+                                return false;
+
+                            } else if (offsetInFile < region.getEnd().getOffset()) {
+                                // inside region, setting token and don't continue
+                                position.set(tokenSupplier.get());
+                                return false;
+
+                            } else {
+                                // not yet in the region - continue
+                                return true;
+                            }
+                        }
+                    });
+            return Optional.ofNullable(position.get());
         }
         return Optional.empty();
     }
 
-    protected VariableExtractor createVariableExtractor() {
-        return new VariableExtractor();
+    protected String getAllowedVariableMarks() {
+        return VariablesAnalyzer.ALL;
     }
 
-    private Optional<PositionedTextToken> evaluateVariables(final IRobotLineElement token, final int offsetInToken,
-            final List<IElementDeclaration> declarations) {
-        for (final IElementDeclaration declaration : declarations) {
-            final int startOffset = declaration.getStartFromFile().getOffset();
-            final int endOffset = declaration.getEndFromFile().getOffset();
-            final int currentOffset = token.getStartOffset() + offsetInToken;
-            if (currentOffset <= startOffset || currentOffset <= endOffset) {
-                if (declaration.isComplex()) {
-                    return Optional.of(new PositionedTextToken(varToken, currentOffset, endOffset - currentOffset + 1));
-                } else {
-                    return evaluateNonVariablePart(token, offsetInToken, declaration);
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    protected Optional<PositionedTextToken> evaluateNonVariablePart(final IRobotLineElement token,
-            final int offsetInToken, final IElementDeclaration declaration) {
-        return Optional.of(new PositionedTextToken(nonVarToken, token.getStartOffset() + offsetInToken,
-                declaration.getEndFromFile().getOffset() - token.getStartOffset() - offsetInToken + 1));
+    protected PositionedTextToken evaluateNonVariablePart(final int tokenStartOffset, final int offsetInToken,
+            final String text, final int textStartOffset) {
+        return new PositionedTextToken(nonVarToken, tokenStartOffset + offsetInToken,
+                textStartOffset + text.length() - tokenStartOffset - offsetInToken);
     }
 }

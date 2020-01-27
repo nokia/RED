@@ -9,10 +9,11 @@ import java.util.function.Function;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -59,18 +60,16 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
         final Styler libraryStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final Styler quoteStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
+        // FIXME : version !!!
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
-                findStyleRanges(gherkinStyler, libraryStyler, quoteStyler, variableStyler, createVariableExtractor()));
+                findStyleRanges(gherkinStyler, libraryStyler, quoteStyler, variableStyler,
+                        VariablesAnalyzer.analyzer(null, VariablesAnalyzer.ALL_ROBOT)));
         return style;
-    }
-
-    private VariableExtractor createVariableExtractor() {
-        return new VariableExtractor(new NonEnvironmentDeclarationMapper());
     }
 
     private static Function<String, RangeMap<Integer, Styler>> findStyleRanges(final Styler gherkinStyler,
             final Styler libraryStyler, final Styler quoteStyler, final Styler variableStyler,
-            final VariableExtractor variableExtractor) {
+            final VariablesAnalyzer variablesAnalyzer) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
 
@@ -80,44 +79,50 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
                 mapping.put(gherkinRange, gherkinStyler);
             }
 
-            for (final IElementDeclaration declaration : variableExtractor.extract(label).getMappedElements()) {
-                if (declaration.isComplex()) {
-                    mapping.put(Range.closedOpen(declaration.getStart().getStart() - 1,
-                            declaration.getEnd().getStart() + 1), variableStyler);
-                } else {
-                    final String textToEvaluate = declaration.getText();
+            variablesAnalyzer.visitExpression(label, new ExpressionVisitor() {
+
+                @Override
+                public boolean visit(final VariableUse usage) {
+                    final FileRegion region = usage.getRegion();
+                    mapping.put(Range.closedOpen(region.getStart().getOffset(), region.getEnd().getOffset()),
+                            variableStyler);
+                    return true;
+                }
+
+                @Override
+                public boolean visit(final String text, final FileRegion region) {
                     int offset = gherkinRange.upperEndpoint();
 
-                    if (declaration.getStart().getStart() == 0) {
-                        int dotIndex = textToEvaluate.indexOf('.', offset);
+                    if (region.getStart().getOffset() == 0) {
+                        int dotIndex = text.indexOf('.', offset);
                         while (dotIndex > 0) {
-                            final int quoteOpeningIndex = textToEvaluate.indexOf('"', offset);
+                            final int quoteOpeningIndex = text.indexOf('"', offset);
                             if (quoteOpeningIndex == -1 || dotIndex < quoteOpeningIndex) {
                                 mapping.put(Range.closedOpen(offset, dotIndex + 1), libraryStyler);
                                 offset = dotIndex + 1;
-                                dotIndex = textToEvaluate.indexOf('.', offset);
+                                dotIndex = text.indexOf('.', offset);
                                 continue;
                             }
                             break;
                         }
                     }
 
-                    while (offset < textToEvaluate.length()) {
-                        final int quoteOpenIndex = textToEvaluate.indexOf('"', offset);
+                    while (offset < text.length()) {
+                        final int quoteOpenIndex = text.indexOf('"', offset);
                         if (quoteOpenIndex != -1) {
-                            final int quoteCloseIndex = textToEvaluate.indexOf('"', quoteOpenIndex + 1);
+                            final int quoteCloseIndex = text.indexOf('"', quoteOpenIndex + 1);
                             if (quoteOpenIndex < quoteCloseIndex) {
-                                mapping.put(Range.closedOpen(quoteOpenIndex + declaration.getStart().getStart(),
-                                        quoteCloseIndex + declaration.getStart().getStart() + 1), quoteStyler);
+                                mapping.put(Range.closedOpen(quoteOpenIndex + region.getStart().getOffset(),
+                                        quoteCloseIndex + region.getStart().getOffset() + 1), quoteStyler);
                                 offset = quoteCloseIndex + 1;
                                 continue;
                             }
                         }
                         break;
                     }
+                    return true;
                 }
-            }
-
+            });
             return mapping;
         };
     }

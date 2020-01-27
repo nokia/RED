@@ -64,7 +64,6 @@ public class VariablesImporterTest {
         final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
         assertThat(buildingMessages).hasSize(1);
         final BuildMessage buildMessage = buildingMessages.get(0);
-        assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
         assertThat(buildMessage.getMessage()).contains(
                 "Problem importing variable file '\\VariableFiles\u0000/UnicodeInVariables.py'. ");
@@ -106,7 +105,6 @@ public class VariablesImporterTest {
         final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
         assertThat(buildingMessages).hasSize(1);
         final BuildMessage buildMessage = buildingMessages.get(0);
-        assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.WARN);
         assertThat(buildMessage.getMessage()).isEqualTo("Could not find any variable in variable file 'empty.py'");
         final FileRegion fileRegion = buildMessage.getFileRegion();

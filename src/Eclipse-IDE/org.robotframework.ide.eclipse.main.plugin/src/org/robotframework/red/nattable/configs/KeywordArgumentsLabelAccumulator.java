@@ -91,7 +91,7 @@ public class KeywordArgumentsLabelAccumulator implements IConfigLabelAccumulator
         if (desc.getRowType() == RowType.FOR_CONTINUE) {
             start++;
         }
-        if (!desc.getCreatedVariables().isEmpty()) {
+        if (desc.isCreatingVariables()) {
             start++;
         }
         return start;

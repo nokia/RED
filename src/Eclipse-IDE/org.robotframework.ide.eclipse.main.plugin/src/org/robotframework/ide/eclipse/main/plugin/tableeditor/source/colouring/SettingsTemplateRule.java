@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -50,7 +49,7 @@ public class SettingsTemplateRule extends VariableUsageRule {
     }
 
     @Override
-    protected VariableExtractor createVariableExtractor() {
-        return new VariableExtractor(new NonEnvironmentDeclarationMapper());
+    protected String getAllowedVariableMarks() {
+        return VariablesAnalyzer.ALL_ROBOT;
     }
 }

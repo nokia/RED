@@ -131,6 +131,24 @@ public class DeprecatedVariableCollectionElementUseValidatorTest {
                 new Problem(VariablesProblem.VARIABLE_ELEMENT_OLD_USE, new ProblemPosition(5, Range.closed(158, 168))));
     }
 
+    @Test
+    public void allOutdatedVariablesUsageIsReported_forMultipleVariablesNestedInside() throws CoreException {
+        final RobotVersion version = new RobotVersion(3, 2);
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().setVersion(version)
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  @{list}=  Create List   1  2  3")
+                .appendLine("  &{dict}=  Create Dictionary   a=1")
+                .appendLine("  @{foo@{list}[0][2]}[1][&{dict}[${key}]]")
+                .build();
+
+        final Collection<Problem> problems = validate(fileModel);
+        assertThat(problems).containsExactly(
+                new Problem(VariablesProblem.VARIABLE_ELEMENT_OLD_USE, new ProblemPosition(5, Range.closed(96, 135))),
+                new Problem(VariablesProblem.VARIABLE_ELEMENT_OLD_USE, new ProblemPosition(5, Range.closed(101, 114))),
+                new Problem(VariablesProblem.VARIABLE_ELEMENT_OLD_USE, new ProblemPosition(5, Range.closed(119, 134))));
+    }
+
     private Collection<Problem> validate(final RobotSuiteFile fileModel) throws CoreException {
         final MockReporter reporter = new MockReporter();
         new DeprecatedVariableCollectionElementUseValidator(fileModel.getFile(), fileModel, reporter)

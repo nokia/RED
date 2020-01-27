@@ -13,7 +13,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -78,7 +77,7 @@ class ExecutableWithDescriptor {
 
     List<RobotToken> getForVariables() {
         final ForLoopDeclarationRowDescriptor<?> descriptor = loopExecutable.getDescriptor();
-        return descriptor.getCreatedVariables().stream().map(VariableDeclaration::asToken).collect(toList());
+        return descriptor.getCreatingVariables().collect(toList());
     }
 
     FileRegion getForVariablesRegion() {

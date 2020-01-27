@@ -23,7 +23,6 @@ import org.rf.ide.core.testdata.model.GlobalVariable;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -162,12 +161,11 @@ public class VariableDefinitionLocator {
                     }
                 }
             }
-            final List<VariableDeclaration> embeddedArguments = keywordDef.getEmbeddedArguments();
-            for (final VariableDeclaration declaration : embeddedArguments) {
-                final RobotToken variableAsToken = declaration.asToken();
-                variableAsToken.setText(EmbeddedKeywordNamesSupport.removeRegex(variableAsToken.getText()));
+            final List<RobotToken> embeddedArguments = keywordDef.getEmbeddedArguments();
+            for (final RobotToken varToken : embeddedArguments) {
+                varToken.setText(EmbeddedKeywordNamesSupport.removeRegex(varToken.getText()));
 
-                final ContinueDecision shouldContinue = detector.localVariableDetected(keywordDef, variableAsToken);
+                final ContinueDecision shouldContinue = detector.localVariableDetected(keywordDef, varToken);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -186,10 +184,12 @@ public class VariableDefinitionLocator {
             if (linkedElement instanceof RobotExecutableRow<?>) {
                 final RobotExecutableRow<?> executableRow = (RobotExecutableRow<?>) linkedElement;
 
-                for (final VariableDeclaration variableDeclaration : executableRow.buildLineDescription()
-                        .getCreatedVariables()) {
+                final List<RobotToken> creatingVars = executableRow.buildLineDescription()
+                        .getCreatingVariables()
+                        .collect(toList());
+                for (final RobotToken variableDeclaration : creatingVars) {
                     final ContinueDecision shouldContinue = detector.localVariableDetected(children.get(i),
-                            variableDeclaration.asToken());
+                            variableDeclaration);
                     if (shouldContinue == ContinueDecision.STOP) {
                         return ContinueDecision.STOP;
                     }

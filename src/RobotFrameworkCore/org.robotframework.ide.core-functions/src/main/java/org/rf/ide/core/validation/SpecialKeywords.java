@@ -17,19 +17,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.collect.Streams;
 
 public class SpecialKeywords {
+
+    private static final Pattern VAR_PATTERN = Pattern.compile("^[@\\$&]\\{[^\\}]+\\}$");
 
     // keywords which creates variables from given arguments
     private static final Set<QualifiedKeywordName> VARS_CREATING_KEYWORDS = new HashSet<>();
@@ -142,7 +145,9 @@ public class SpecialKeywords {
             final IExecutableRowDescriptor<?> lineDescriptor) {
         final Set<String> createdVariables = new HashSet<>();
 
-        lineDescriptor.getCreatedVariables().stream().map(var -> VariableNamesSupport.extractUnifiedVariableName(var)).forEach(createdVariables::add);
+        lineDescriptor.getCreatingVariables()
+                .map(VariablesAnalyzer::normalizeName)
+                .forEach(createdVariables::add);
         if (VARS_CREATING_KEYWORDS.contains(keywordName)) {
             lineDescriptor.getKeywordArguments()
                     .stream()
@@ -151,7 +156,7 @@ public class SpecialKeywords {
                     .orElseGet(Stream::empty)
                     .filter(arg -> !arg.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED))
                     .map(RobotToken::getText)
-                    .filter(VariableNamesSupport::isCleanVariable)
+                    .filter(SpecialKeywords::isCleanVariable)
                     .forEach(createdVariables::add);
         }
         return createdVariables;
@@ -167,7 +172,7 @@ public class SpecialKeywords {
      * BuiltIn.Set Global Variable - as above
      * BuiltIn.Get Variable Value - as above
      */
-    public static List<VariableDeclaration> getUsedVariables(final QualifiedKeywordName keywordName,
+    public static List<VariableUse> getUsedVariables(final QualifiedKeywordName keywordName,
             final IExecutableRowDescriptor<?> lineDescriptor) {
         if (VARS_OMITTING_KEYWORDS.contains(keywordName)) {
             if (QualifiedKeywordName.create("Comment", "BuiltIn").equals(keywordName)) {
@@ -179,18 +184,23 @@ public class SpecialKeywords {
                         .map(Stream::of)
                         .orElseGet(Stream::empty)
                         .filter(arg -> !arg.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED))
-                        .filter(token -> VariableNamesSupport.isCleanVariable(token.getText()))
+                        .filter(token -> isCleanVariable(token.getText()))
                         .findFirst();
                 if (firstArgVar.isPresent()) {
                     return lineDescriptor.getUsedVariables()
                             .stream()
-                            .filter(varDec -> varDec.findRobotTokenPosition()
+                            .filter(varDec -> varDec.getRegion()
+                                    .getStart()
                                     .isAfter(firstArgVar.get().getFilePosition()))
                             .collect(toList());
                 }
             }
         }
         return lineDescriptor.getUsedVariables();
+    }
+
+    public static boolean isCleanVariable(final String input) {
+        return VAR_PATTERN.matcher(input).matches();
     }
 
     /**

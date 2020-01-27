@@ -11,7 +11,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
@@ -24,13 +24,13 @@ abstract class HyperlinksToVariablesDetector {
 
     protected final VariableDetector createDetector(final RobotSuiteFile suiteFile, final IRegion fromRegion,
             final String fullVariableName, final List<IHyperlink> hyperlinks) {
-        final String hoveredVariableName = VariableNamesSupport
-                .extractUnifiedVariableNameWithoutBrackets(fullVariableName);
+        final String hoveredVariableName = VariablesAnalyzer
+                .normalizeName(VariablesAnalyzer.extractFromBrackets(fullVariableName));
         return new VariableDetector() {
 
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                if (VariableNamesSupport.extractUnifiedVariableName(variable.getName()).equals(hoveredVariableName)) {
+                if (VariablesAnalyzer.normalizeName(variable.getName()).equals(hoveredVariableName)) {
                     final DefinitionPosition position = variable.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
@@ -49,7 +49,8 @@ abstract class HyperlinksToVariablesDetector {
             @Override
             public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
                     final RobotToken variableToken) {
-                if (VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(variableToken.getText().toString())
+                if (VariablesAnalyzer
+                        .normalizeName(VariablesAnalyzer.extractFromBrackets(variableToken.getText().toString()))
                         .equals(hoveredVariableName)) {
                     final IRegion destination = new Region(variableToken.getStartOffset(),
                             variableToken.getText().length());

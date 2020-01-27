@@ -80,10 +80,10 @@ public class CodeHolderNameRuleTest {
     @Test
     public void variableTokenIsDetected_whenPositionedInsideVariable() {
         final String var1 = "${var}";
-        final String var2 = "@{list}";
-        final String var3 = "&{dir}";
+        final String var2 = "@{list}[0]";
+        final String var3 = "&{dir}[key]";
 
-        final String content = "abc" + var1 + "def" + var2 + "[0]ghi" + var3 + "[key]jkl";
+        final String content = "abc" + var1 + "def" + var2 + "ghi" + var3 + "jkl";
 
         final List<Position> varPositions = new ArrayList<>();
         varPositions.add(new Position(content.indexOf(var1), var1.length()));

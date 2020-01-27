@@ -56,10 +56,10 @@ public class VariableUsageRuleTest {
     @Test
     public void variableTokenIsDetected_whenPositionedInsideVariable() {
         final String var1 = "${var}";
-        final String var2 = "@{list}";
-        final String var3 = "&{dir}";
+        final String var2 = "@{list}[0]";
+        final String var3 = "&{dir}[key]";
 
-        final String content = "abc" + var1 + "def" + var2 + "[0]ghi" + var3 + "[key]jkl";
+        final String content = "abc" + var1 + "def" + var2 + "ghi" + var3 + "jkl";
 
         final List<Position> varPositions = new ArrayList<>();
         varPositions.add(new Position(content.indexOf(var1), var1.length()));
@@ -108,9 +108,8 @@ public class VariableUsageRuleTest {
 
     @Test
     public void variableTokenIsDetected_forVariableWithIndex() {
-        final String var = "@{list}";
-        final String index = "[0]";
-        final RobotToken token = createToken(var + index);
+        final String var = "@{list}[0]";
+        final RobotToken token = createToken(var);
 
         final Optional<PositionedTextToken> evaluatedVar = evaluate(token);
 
@@ -118,13 +117,6 @@ public class VariableUsageRuleTest {
         assertThat(evaluatedVar.get().getPosition())
                 .isEqualTo(new Position(token.getStartOffset(), var.length()));
         assertThat(evaluatedVar.get().getToken().getData()).isEqualTo("token");
-
-        final Optional<PositionedTextToken> evaluatedIndex = evaluate(token, var.length());
-
-        assertThat(evaluatedIndex).isPresent();
-        assertThat(evaluatedIndex.get().getPosition())
-                .isEqualTo(new Position(var.length(), index.length()));
-        assertThat(evaluatedIndex.get().getToken().getData()).isEqualTo("token");
     }
 
     @Test

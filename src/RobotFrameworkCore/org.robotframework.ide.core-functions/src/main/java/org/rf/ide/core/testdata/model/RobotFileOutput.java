@@ -199,33 +199,27 @@ public class RobotFileOutput {
 
     public static class BuildMessage {
 
-        public static BuildMessage createWarnMessage(final String message, final String fileName,
-                final FileRegion fileRegion) {
-            return new BuildMessage(LogLevel.WARN, message, fileName, fileRegion);
+        public static BuildMessage createWarnMessage(final String message, final FileRegion fileRegion) {
+            return new BuildMessage(LogLevel.WARN, message, fileRegion);
         }
 
-        public static BuildMessage createErrorMessage(final String message, final String fileName) {
-            return createErrorMessage(message, fileName, null);
+        public static BuildMessage createErrorMessage(final String message) {
+            return createErrorMessage(message, null);
         }
 
-        public static BuildMessage createErrorMessage(final String message, final String fileName,
-                final FileRegion fileRegion) {
-            return new BuildMessage(LogLevel.ERROR, message, fileName, fileRegion);
+        public static BuildMessage createErrorMessage(final String message, final FileRegion fileRegion) {
+            return new BuildMessage(LogLevel.ERROR, message, fileRegion);
         }
 
         private final LogLevel type;
 
         private final String message;
 
-        private final String fileName;
-
         private final FileRegion fileRegion;
 
-        private BuildMessage(final LogLevel level, final String message, final String fileName,
-                final FileRegion fileRegion) {
+        private BuildMessage(final LogLevel level, final String message, final FileRegion fileRegion) {
             this.type = level;
             this.message = message;
-            this.fileName = fileName == null ? null : fileName.intern();
             this.fileRegion = fileRegion;
         }
 
@@ -235,10 +229,6 @@ public class RobotFileOutput {
 
         public String getMessage() {
             return message;
-        }
-
-        public String getFileName() {
-            return fileName;
         }
 
         public FileRegion getFileRegion() {
@@ -253,13 +243,12 @@ public class RobotFileOutput {
 
         @Override
         public String toString() {
-            return String.format("BuildMessage [type=%s, message=%s, fileName=%s, fileRegion=%s]", type, message,
-                    fileName, fileRegion);
+            return String.format("BuildMessage [type=%s, message=%s, fileRegion=%s]", type, message, fileRegion);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, message, fileName, fileRegion);
+            return Objects.hash(type, message, fileRegion);
         }
 
         @Override
@@ -267,7 +256,6 @@ public class RobotFileOutput {
             if (obj != null && obj.getClass() == BuildMessage.class) {
                 final BuildMessage that = (BuildMessage) obj;
                 return this.type == that.type && Objects.equals(this.message, that.message)
-                        && Objects.equals(this.fileName, that.fileName)
                         && Objects.equals(this.fileRegion, that.fileRegion);
             }
             return false;

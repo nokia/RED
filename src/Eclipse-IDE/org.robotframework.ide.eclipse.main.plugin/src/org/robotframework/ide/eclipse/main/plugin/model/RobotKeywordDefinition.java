@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.Documentation;
 import org.rf.ide.core.libraries.Documentation.DocFormat;
@@ -26,11 +27,9 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -144,11 +143,12 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(getDocumentation().toLowerCase()).find();
     }
 
-    public List<VariableDeclaration> getEmbeddedArguments() {
-        final VariableExtractor extractor = new VariableExtractor();
-        final MappingResult extractedVars = extractor.extract(getLinkedElement().getDeclaration(),
-                getSuiteFile().getName());
-        return extractedVars.getCorrectVariables();
+    public List<RobotToken> getEmbeddedArguments() {
+        final RobotToken kwName = getLinkedElement().getDeclaration();
+        final RobotVersion version = getSuiteFile().getRobotProject().getRobotParserComplianceVersion();
+        return VariablesAnalyzer.analyzer(version, VariablesAnalyzer.ALL_ROBOT)
+                .getVariables(kwName)
+                .collect(toList());
     }
 
     @SuppressWarnings("unchecked")

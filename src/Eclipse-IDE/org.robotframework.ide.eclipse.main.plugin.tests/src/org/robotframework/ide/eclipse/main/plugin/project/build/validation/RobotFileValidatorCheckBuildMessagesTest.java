@@ -149,12 +149,12 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
     private static BuildMessage createBuildWarnMessage() {
         final FileRegion region = new FileRegion(new FilePosition(0, 0, 0), new FilePosition(0, 0, 0));
-        return BuildMessage.createWarnMessage("warn", "file", region);
+        return BuildMessage.createWarnMessage("warn", region);
     }
 
     private static BuildMessage createBuildErrorMessage() {
         final FileRegion region = new FileRegion(new FilePosition(0, 0, 0), new FilePosition(0, 0, 0));
-        return BuildMessage.createErrorMessage("error", "file", region);
+        return BuildMessage.createErrorMessage("error", region);
     }
 
     private static class MockRobotFileValidator extends RobotFileValidator {

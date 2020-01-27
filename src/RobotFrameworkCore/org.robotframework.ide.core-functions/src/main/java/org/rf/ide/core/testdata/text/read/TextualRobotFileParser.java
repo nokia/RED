@@ -113,8 +113,8 @@ public class TextualRobotFileParser {
             parsingOutput.setStatus(Status.PASSED);
 
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
-                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage
+                    .createErrorMessage("Unknown problem during reading file " + robotFile + ".\nStack:" + e));
             parsingOutput.setStatus(Status.FAILED);
 
             System.err.println("File: " + robotFile);
@@ -132,13 +132,13 @@ public class TextualRobotFileParser {
             parsingOutput.setStatus(Status.PASSED);
 
         } catch (final FileNotFoundException e) {
-            parsingOutput.addBuildMessage(BuildMessage
-                    .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(
+                    BuildMessage.createErrorMessage("File " + robotFile + " was not found.\nStack:" + e));
             parsingOutput.setStatus(Status.FAILED);
 
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
-                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage
+                    .createErrorMessage("Unknown problem during reading file " + robotFile + ".\nStack:" + e));
             parsingOutput.setStatus(Status.FAILED);
 
             System.err.println("File: " + robotFile);
@@ -328,19 +328,18 @@ public class TextualRobotFileParser {
             parsingOutput.setStatus(Status.PASSED);
 
         } catch (final FileNotFoundException e) {
-            parsingOutput.addBuildMessage(BuildMessage
-                    .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(
+                    BuildMessage.createErrorMessage("File " + robotFile + " was not found.\nStack:" + e));
             parsingOutput.setStatus(Status.FAILED);
 
         } catch (final IOException e) {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
-                    "Problem during file " + robotFile + " reading.\nStack:" + e.getLocalizedMessage(),
-                    "File " + robotFile));
+                    "Problem during file " + robotFile + " reading.\nStack:" + e.getLocalizedMessage()));
             parsingOutput.setStatus(Status.FAILED);
 
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
-                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage
+                    .createErrorMessage("Unknown problem during reading file " + robotFile + ".\nStack:" + e));
             parsingOutput.setStatus(Status.FAILED);
 
             System.err.println("File: " + robotFile + " line " + lineNumber);

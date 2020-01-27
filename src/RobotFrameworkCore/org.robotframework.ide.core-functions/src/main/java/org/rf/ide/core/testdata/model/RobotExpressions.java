@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 
 import com.google.common.collect.Range;
 
@@ -77,8 +77,8 @@ public class RobotExpressions {
 
         final StringBuilder resolved = new StringBuilder(expression);
         for (final Range<Integer> position : positions) {
-            final String variable = VariableNamesSupport.extractUnifiedVariableName(
-                    expression.substring(position.lowerEndpoint(), position.upperEndpoint() + 1));
+            final String variable = VariablesAnalyzer
+                    .normalizeName(expression.substring(position.lowerEndpoint(), position.upperEndpoint() + 1));
             if (knownVariables.containsKey(variable)) {
                 resolved.replace(position.lowerEndpoint(), position.upperEndpoint() + 1, knownVariables.get(variable));
             }

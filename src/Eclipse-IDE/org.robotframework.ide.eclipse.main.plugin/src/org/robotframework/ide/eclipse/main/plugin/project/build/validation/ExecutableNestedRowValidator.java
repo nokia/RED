@@ -13,9 +13,9 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.SpecialKeywords;
@@ -81,13 +81,12 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
                 unknownVarsValidator.reportUnknownVars(additionalVariables, nested.getOmittedTokens());
 
             } else {
-                final List<VariableDeclaration> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName,
-                        descriptor);
+                final List<VariableUse> variableUsedInCall = SpecialKeywords.getUsedVariables(keywordName, descriptor);
                 unknownVarsValidator.reportUnknownVarsDeclarations(additionalVariables, variableUsedInCall);
             }
 
             SpecialKeywords.getCreatedVariables(keywordName, descriptor)
-                    .forEach(var -> additionalVariables.add(VariableNamesSupport.extractUnifiedVariableName(var)));
+                    .forEach(var -> additionalVariables.add(VariablesAnalyzer.normalizeName(var)));
 
         } catch (final NestedKeywordsSyntaxException e) {
             e.forEachProblem((msg, token) -> {

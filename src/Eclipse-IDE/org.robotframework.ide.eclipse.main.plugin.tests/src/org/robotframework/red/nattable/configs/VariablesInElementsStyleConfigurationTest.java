@@ -106,10 +106,9 @@ public class VariablesInElementsStyleConfigurationTest {
 
         final RangeMap<Integer, Styler> styles = decoratingFunction
                 .apply("&{var@{${ia}ble}} sth} &{another}[index]]variable {nonvariable} @{list}");
-        assertThat(styles.asMapOfRanges()).hasSize(4)
+        assertThat(styles.asMapOfRanges()).hasSize(3)
                 .hasEntrySatisfying(Range.closedOpen(0, 17), styler -> hasForeground(styler, new RGB(1, 2, 3)))
-                .hasEntrySatisfying(Range.closedOpen(23, 32), styler -> hasForeground(styler, new RGB(1, 2, 3)))
-                .hasEntrySatisfying(Range.closedOpen(32, 40), styler -> hasForeground(styler, new RGB(1, 2, 3)))
+                .hasEntrySatisfying(Range.closedOpen(23, 40), styler -> hasForeground(styler, new RGB(1, 2, 3)))
                 .hasEntrySatisfying(Range.closedOpen(64, 71), styler -> hasForeground(styler, new RGB(1, 2, 3)));
     }
 

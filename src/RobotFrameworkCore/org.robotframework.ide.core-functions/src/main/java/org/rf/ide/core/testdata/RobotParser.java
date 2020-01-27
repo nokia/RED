@@ -59,11 +59,9 @@ public class RobotParser {
 
             clearIfNeeded(robotFile);
         } else {
-            robotFile.addBuildMessage(
-                    BuildMessage.createErrorMessage("No parser found for file.", fileOrDir.getAbsolutePath()));
+            robotFile.addBuildMessage(BuildMessage.createErrorMessage("No parser found for given file"));
             robotFile.setStatus(Status.FAILED);
         }
-
         return robotFile;
     }
 

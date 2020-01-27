@@ -23,7 +23,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -107,11 +107,10 @@ class VariablesTableValidator implements ModelUnitValidator {
         final Set<String> duplicatedNames = newHashSet();
 
         for (final IVariableHolder var1 : variableTable.getVariables()) {
-            final String var1Name = VariableNamesSupport.extractUnifiedVariableName(var1.getName());
+            final String var1Name = VariablesAnalyzer.normalizeName(var1.getName());
             for (final IVariableHolder var2 : variableTable.getVariables()) {
                 if (var1.getName() != null && var2.getName() != null) {
-                    if (var1 != var2
-                            && var1Name.equals(VariableNamesSupport.extractUnifiedVariableName(var2.getName()))) {
+                    if (var1 != var2 && var1Name.equals(VariablesAnalyzer.normalizeName(var2.getName()))) {
                         duplicatedNames.add(var1Name);
                     }
                 }
@@ -120,7 +119,7 @@ class VariablesTableValidator implements ModelUnitValidator {
 
         for (final IVariableHolder variable : variableTable.getVariables()) {
             if (variable.getName() != null
-                    && duplicatedNames.contains(VariableNamesSupport.extractUnifiedVariableName(variable.getName()))) {
+                    && duplicatedNames.contains(VariablesAnalyzer.normalizeName(variable.getName()))) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
                 final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,

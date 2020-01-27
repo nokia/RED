@@ -15,17 +15,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.RobotTimeFormat;
@@ -169,19 +166,16 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportArgumentsProblems() {
-        final IFile file = validationContext.getFile();
-        final String fileName = file.getName();
-
         keyword.getArguments()
                 .stream()
                 .filter(args -> args.getToken(RobotTokenType.KEYWORD_SETTING_ARGUMENT) == null)
                 .forEach(this::reportEmptySetting);
 
-        if (!keyword.getArguments().isEmpty() && hasEmbeddedArguments(fileName, keyword)) {
+        if (!keyword.getArguments().isEmpty() && hasEmbeddedArguments(keyword)) {
             reporter.handleProblem(
                     RobotProblem.causedBy(GeneralSettingsProblem.DUPLICATED_SETTING)
                             .formatMessageWith("[Arguments]", ". There are variables defined in keyword name"),
-                    file, keyword.getDeclaration());
+                    validationContext.getFile(), keyword.getDeclaration());
         }
 
         final boolean shouldContinue = reportArgumentsSyntaxProblems();
@@ -218,10 +212,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportDuplicatedArguments() {
-        final String fileName = validationContext.getFile().getName();
-
-        final Multimap<String, RobotToken> arguments = extractArgumentVariables(keyword, new VariableExtractor(),
-                fileName);
+        final Multimap<String, RobotToken> arguments = extractArgumentVariables(keyword);
 
         for (final String arg : arguments.keySet()) {
             final Collection<RobotToken> tokens = arguments.get(arg);
@@ -235,13 +226,13 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         }
     }
 
-    private Multimap<String, RobotToken> extractArgumentVariables(final UserKeyword keyword,
-            final VariableExtractor extractor, final String fileName) {
+    private Multimap<String, RobotToken> extractArgumentVariables(final UserKeyword keyword) {
+        final VariablesAnalyzer varAnalyzer = VariablesAnalyzer.analyzer(validationContext.getVersion());
+
         final Multimap<String, RobotToken> arguments = ArrayListMultimap.create();
 
         // first add arguments embedded in name, then from [Arguments] setting
-        final Multimap<String, RobotToken> embeddedArguments = VariableNamesSupport
-                .extractUnifiedVariables(keyword.getName(), extractor, fileName);
+        final Multimap<String, RobotToken> embeddedArguments = varAnalyzer.getVariablesUnified(keyword.getName());
         for (final String argName : embeddedArguments.keySet()) {
             arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
         }
@@ -252,26 +243,21 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                 if (hasDefault) {
                     final List<String> splitted = Splitter.on('=').limit(2).splitToList(token.getText());
                     final String def = splitted.get(0);
-                    final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
-                    final Multimap<String, RobotToken> usedVariables = VariableNamesSupport
-                            .extractUnifiedVariables(token, new VariableExtractor(), null);
+                    final String unifiedDefinitionName = VariablesAnalyzer.normalizeName(def);
+                    final Multimap<String, RobotToken> usedVariables = varAnalyzer.getVariablesUnified(token);
                     arguments.put(unifiedDefinitionName,
                             Iterables.getFirst(usedVariables.get(unifiedDefinitionName), null));
                 } else {
-                    arguments.putAll(
-                            VariableNamesSupport.extractUnifiedVariables(token, extractor, fileName));
+                    arguments.putAll(varAnalyzer.getVariablesUnified(token));
                 }
             }
         }
         return arguments;
     }
 
-    private boolean hasEmbeddedArguments(final String fileName, final UserKeyword keyword) {
-        final VariableExtractor variableExtractor = new VariableExtractor();
-        final List<VariableDeclaration> extractedVariables = variableExtractor
-                .extract(keyword.getName(), fileName)
-                .getCorrectVariables();
-        return !extractedVariables.isEmpty();
+    private boolean hasEmbeddedArguments(final UserKeyword keyword) {
+        return VariablesAnalyzer.analyzer(validationContext.getVersion(), VariablesAnalyzer.ALL_ROBOT)
+                .containsVariables(keyword.getName());
     }
 
     private void reportArgumentsOrderProblems() {
@@ -314,6 +300,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportArgumentsDefaultValuesUnknownVariables() {
+        final VariablesAnalyzer varAnalyzer = VariablesAnalyzer.analyzer(validationContext.getVersion());
+
         for (final LocalSetting<UserKeyword> argSetting : keyword.getArguments()) {
             final Set<String> additionalKnownVariables = new HashSet<>();
 
@@ -325,9 +313,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                     final List<String> splitted = Splitter.on('=').limit(2).splitToList(argToken.getText());
                     final String def = splitted.get(0);
 
-                    final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
-                    final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
-                            argToken, new VariableExtractor(), validationContext.getFile().getName());
+                    final String unifiedDefinitionName = VariablesAnalyzer.normalizeName(def);
+                    final Multimap<String, RobotToken> usedVariables = varAnalyzer.getVariablesUnified(argToken);
 
                     final List<RobotToken> varTokens = usedVariables.values()
                             .stream()
@@ -338,7 +325,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                             varTokens);
                     additionalKnownVariables.add(unifiedDefinitionName);
                 } else {
-                    additionalKnownVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
+                    additionalKnownVariables.add(VariablesAnalyzer.normalizeName(argToken.getText()));
                 }
             }
         }

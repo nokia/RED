@@ -5,8 +5,7 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.NonEnvironmentDeclarationMapper;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
@@ -33,7 +32,7 @@ public class VariablesInNamesStyleConfiguration extends VariablesInElementsStyle
     }
 
     @Override
-    VariableExtractor createVariableExtractor() {
-        return new VariableExtractor(new NonEnvironmentDeclarationMapper());
+    protected String getAllowedVariableMarks() {
+        return VariablesAnalyzer.ALL_ROBOT;
     }
 }

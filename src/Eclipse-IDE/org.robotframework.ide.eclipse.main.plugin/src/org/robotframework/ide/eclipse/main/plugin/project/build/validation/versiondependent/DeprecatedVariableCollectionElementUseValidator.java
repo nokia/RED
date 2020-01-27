@@ -5,19 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IndexDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesVisitor;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -56,45 +51,30 @@ class DeprecatedVariableCollectionElementUseValidator extends VersionDependentMo
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        if (robotSuiteFile.getLinkedElement() != null) {
-            final List<RobotToken> variableTokens = robotSuiteFile.getLinkedElement()
-                    .getFileContent()
-                    .stream()
-                    .flatMap(line -> line.getLineTokens()
-                            .stream()
-                            .filter(t -> t.getTypes().contains(RobotTokenType.VARIABLE_USAGE)))
-                    .collect(Collectors.toList());
-
-            for (final RobotToken token : variableTokens) {
-                reportOldVariableElementUsePosition(token);
-            }
+        if (robotSuiteFile.getLinkedElement() == null) {
+            return;
         }
+        final VariablesAnalyzer analyzer = VariablesAnalyzer.analyzer(robotSuiteFile.getRobotParserComplianceVersion());
+        robotSuiteFile.getLinkedElement()
+                .getFileContent()
+                .stream()
+                .flatMap(RobotLine::tokensStream)
+                .filter(t -> t.getTypes().contains(RobotTokenType.VARIABLE_USAGE))
+                .forEach(token -> {
+                    analyzer.visitVariables(token, withIndexedListsOrDictsVisitor());
+                });
     }
 
-    private void reportOldVariableElementUsePosition(final RobotToken token) {
-        final String text = token.getText();
-        final List<IElementDeclaration> elements = new VariableExtractor().extract(text).getMappedElements();
-        for (int i = 0; i < elements.size() - 1; i++) {
-            if (elements.get(i) instanceof VariableDeclaration && elements.get(i + 1) instanceof IndexDeclaration) {
-                final VariableDeclaration varDec = (VariableDeclaration) elements.get(i);
-                if (varDec.getRobotType() != VariableType.ENVIRONMENT && varDec.getRobotType() != VariableType.SCALAR) {
-                    if (elements.get(i)
-                            .getElementsDeclarationInside()
-                            .stream()
-                            .noneMatch(declaration -> declaration instanceof IndexDeclaration)) {
-                        final int start = elements.get(i).getStart().getStart() - 1;
-                        final int end = elements.get(i + 1).getEnd().getEnd() + 1;
-                        reporter.handleProblem(
-                                RobotProblem.causedBy(VariablesProblem.VARIABLE_ELEMENT_OLD_USE)
-                                        .formatMessageWith(text.substring(start, end)),
-                                file,
-                                new ProblemPosition(token.getLineNumber(),
-                                        Range.closed(token.getStartOffset() + start, token.getStartOffset() + end)),
-                                ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
-                                        token.getText().substring(start, end)));
-                    }
-                }
+    private VariablesVisitor withIndexedListsOrDictsVisitor() {
+        return VariablesVisitor.variableUsagesVisitor(usage -> {
+            if (usage.isIndexed()
+                    && (usage.getType() == VariableType.LIST || usage.getType() == VariableType.DICTIONARY)) {
+                final String varContent = usage.asToken().getText();
+                final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.VARIABLE_ELEMENT_OLD_USE)
+                        .formatMessageWith(varContent);
+                reporter.handleProblem(problem, file, ProblemPosition.fromRegion(usage.getRegion()),
+                        ImmutableMap.of(AdditionalMarkerAttributes.VALUE, varContent));
             }
-        }
+        });
     }
 }

@@ -58,9 +58,8 @@ public class RobotParserTest {
         final List<BuildMessage> buildingMessages = editorContent.getBuildingMessages();
         assertThat(buildingMessages).hasSize(1);
         final BuildMessage buildMessage = buildingMessages.get(0);
-        assertThat(buildMessage.getFileName()).contains("f.unknown");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
-        assertThat(buildMessage.getMessage()).contains("No parser found for file.");
+        assertThat(buildMessage.getMessage()).contains("No parser found for given file");
     }
 
     @Test

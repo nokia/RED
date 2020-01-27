@@ -35,7 +35,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotModelPresentation;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -201,7 +201,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     final RobotStackFrame robotStackFrame = (RobotStackFrame) stackFrame;
                     if (Objects.equal(robotStackFrame.getPath(), Optional.of(suiteFile.getFile().getLocationURI()))) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
-                            if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {
+                            if (VariablesAnalyzer.hasEqualNormalizedNames(variable.getName(), variableName)) {
                                 final String value = ((RobotDebugVariable) variable).getValue().getDetailedValue();
                                 return formatVariableValue(value);
                             }

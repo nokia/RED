@@ -22,7 +22,7 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -129,7 +129,7 @@ public class ValidationContext {
 
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                variables.add(VariableNamesSupport.extractUnifiedVariableName(variable.getActualName()));
+                variables.add(VariablesAnalyzer.normalizeName(variable.getActualName()));
                 return ContinueDecision.CONTINUE;
             }
 
@@ -142,14 +142,14 @@ public class ValidationContext {
 
             @Override
             public ContinueDecision globalVariableDetected(final String name, final Object value) {
-                variables.add(VariableNamesSupport.extractUnifiedVariableName(name));
+                variables.add(VariablesAnalyzer.normalizeName(name));
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file, final String name,
                     final Object value) {
-                variables.add(VariableNamesSupport.extractUnifiedVariableName(name));
+                variables.add(VariablesAnalyzer.normalizeName(name));
                 return ContinueDecision.CONTINUE;
             }
         });

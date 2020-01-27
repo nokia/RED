@@ -6,12 +6,12 @@
 package org.rf.ide.core.testdata.text.read.postfixes;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
@@ -23,8 +23,13 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getCreatedVariables() {
-        return null;
+    public boolean isCreatingVariables() {
+        return false;
+    }
+
+    @Override
+    public Stream<RobotToken> getCreatingVariables() {
+        return Stream.empty();
     }
 
     @Override
@@ -38,12 +43,7 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getUsedVariables() {
-        return null;
-    }
-
-    @Override
-    public List<IElementDeclaration> getTextParameters() {
+    public List<VariableUse> getUsedVariables() {
         return null;
     }
 

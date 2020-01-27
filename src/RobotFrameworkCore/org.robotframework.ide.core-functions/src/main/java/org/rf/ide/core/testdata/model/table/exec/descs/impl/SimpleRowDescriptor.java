@@ -8,41 +8,49 @@ package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
-    private final List<VariableDeclaration> createdVariables = new ArrayList<>();
+    private final RobotExecutableRow<T> row;
+
+    private final List<VariableUse> createdVariables = new ArrayList<>();
+
+    private final List<VariableUse> usedVariables = new ArrayList<>();
 
     private RobotToken action = new RobotToken();
-
-    private final List<VariableDeclaration> usedVariables = new ArrayList<>();
-
-    private final List<IElementDeclaration> textParameters = new ArrayList<>();
 
     private final List<RobotToken> keywordArguments = new ArrayList<>(0);
 
     private final List<BuildMessage> messages = new ArrayList<>();
 
-    private final RobotExecutableRow<T> row;
 
     public SimpleRowDescriptor(final RobotExecutableRow<T> row) {
         this.row = row;
     }
 
     @Override
-    public List<VariableDeclaration> getCreatedVariables() {
-        return Collections.unmodifiableList(createdVariables);
+    public boolean isCreatingVariables() {
+        return !createdVariables.isEmpty();
     }
 
-    public void addCreatedVariable(final VariableDeclaration variable) {
-        this.createdVariables.add(variable);
+    List<VariableUse> getCreatedVariables() {
+        return createdVariables;
+    }
+
+    @Override
+    public Stream<RobotToken> getCreatingVariables() {
+        return createdVariables.stream().map(VariableUse::asToken);
+    }
+
+    void addCreatedVariables(final List<? extends VariableUse> createdVars) {
+        createdVariables.addAll(createdVars);
     }
 
     @Override
@@ -50,7 +58,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return action;
     }
 
-    public void setAction(final RobotToken action) {
+    void setAction(final RobotToken action) {
         this.action = action;
     }
 
@@ -59,39 +67,13 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return getAction();
     }
 
-    public void moveCreatedVariablesToUsedVariables() {
-        usedVariables.addAll(createdVariables);
-        createdVariables.clear();
-    }
-
     @Override
-    public List<VariableDeclaration> getUsedVariables() {
+    public List<VariableUse> getUsedVariables() {
         return Collections.unmodifiableList(usedVariables);
     }
 
-    public void addUsedVariable(final VariableDeclaration usedVar) {
-        usedVariables.add(usedVar);
-    }
-
-    public void addUsedVariables(final List<VariableDeclaration> usedVars) {
-        for (final VariableDeclaration usedVar : usedVars) {
-            addUsedVariable(usedVar);
-        }
-    }
-
-    @Override
-    public List<IElementDeclaration> getTextParameters() {
-        return Collections.unmodifiableList(textParameters);
-    }
-
-    public void addTextParameter(final IElementDeclaration text) {
-        textParameters.add(text);
-    }
-
-    public void addTextParameters(final List<IElementDeclaration> texts) {
-        for (final IElementDeclaration text : texts) {
-            addTextParameter(text);
-        }
+    void addUsedVariables(final List<? extends VariableUse> usedVars) {
+        usedVariables.addAll(usedVars);
     }
 
     @Override
@@ -99,14 +81,8 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return Collections.unmodifiableList(keywordArguments);
     }
 
-    public void addKeywordArgument(final RobotToken argument) {
+    void addKeywordArgument(final RobotToken argument) {
         keywordArguments.add(argument);
-    }
-
-    public void addKeywordArguments(final List<RobotToken> arguments) {
-        for (final RobotToken keywordArgument : arguments) {
-            addKeywordArgument(keywordArgument);
-        }
     }
 
     @Override
@@ -114,14 +90,8 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return Collections.unmodifiableList(messages);
     }
 
-    public void addMessages(final List<BuildMessage> msgs) {
-        for (final BuildMessage bm : msgs) {
-            addMessage(bm);
-        }
-    }
-
-    public void addMessage(final BuildMessage bm) {
-        messages.add(bm);
+    void addMessage(final BuildMessage msg) {
+        messages.add(msg);
     }
 
     @Override
@@ -137,7 +107,7 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     @Override
     public String toString() {
         return String.format(
-                "SimpleRowDescriptor [createdVariables=%s, action=%s, rowType=%s, usedVariables=%s, textParameters=%s, messages=%s, row=%s]",
-                createdVariables, action, getRowType(), usedVariables, textParameters, messages, row);
+                "SimpleRowDescriptor [createdVariables=%s, action=%s, rowType=%s, usedVariables=%s, messages=%s, row=%s]",
+                createdVariables, action, getRowType(), usedVariables, messages, row);
     }
 }

@@ -5,26 +5,31 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBuilder {
+
+    private final RobotVersion version;
+
+    public ForLoopDeclarationRowDescriptorBuilder(final RobotVersion version) {
+        this.version = version;
+    }
 
     @Override
     public <T> boolean isAcceptable(final RobotExecutableRow<T> execRowLine) {
@@ -36,75 +41,59 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
     public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine) {
         final ForLoopDeclarationRowDescriptor<T> loopDescriptor = new ForLoopDeclarationRowDescriptor<>(execRowLine);
 
-        final RobotFileOutput rfo = getFileOutput(execRowLine);
-        final String fileName = rfo.getProcessedFile().getAbsolutePath();
+        boolean foundFor = false;
+        boolean foundIn = false;
+        boolean hasElementsToIterate = false;
+        for (final RobotToken elem : execRowLine.getElementTokens()) {
+            if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                break;
+            }
 
-        final VariableExtractor varExtractor = new VariableExtractor();
-        final List<RobotToken> lineElements = execRowLine.getElementTokens();
-        boolean wasFor = false;
-        boolean wasIn = false;
-        boolean wasElementsToIterate = false;
-        for (final RobotToken elem : lineElements) {
-            final MappingResult mappingResult = elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE) ? new MappingResult(null, null)
-                            : varExtractor.extract(elem, fileName);
+            final List<VariableUse> varUses = VariablesAnalyzer.analyzer(version)
+                    .getVariablesUses(elem, loopDescriptor::addMessage)
+                    .collect(toList());
 
-            loopDescriptor.addMessages(mappingResult.getMessages());
+            if (foundFor && foundIn) {
+                loopDescriptor.addUsedVariables(varUses);
+                hasElementsToIterate = true;
 
-            // value is keyword if is on the first place and have in it nested
-            // variables and when contains text on the beginning or end of field
-            final List<VariableDeclaration> correctVariables = mappingResult.getCorrectVariables();
+            } else if (foundFor && !foundIn && ForDescriptorInfo.isInToken(elem)) {
+                loopDescriptor.setInAction(elem.copy());
+                foundIn = true;
 
-            if (wasFor) {
-                if (wasIn) {
-                    loopDescriptor.addUsedVariables(correctVariables);
-                    loopDescriptor.addTextParameters(mappingResult.getTextElements());
-                    wasElementsToIterate = true;
-                } else {
-                    if (ForDescriptorInfo.isInToken(elem)) {
-                        loopDescriptor.setInAction(elem.copy());
-                        wasIn = true;
-                    } else {
-                        loopDescriptor.addCreatedVariables(correctVariables);
+            } else if (foundFor && !foundIn) {
+                loopDescriptor.addCreatedVariables(varUses);
 
-                        if (!mappingResult.getTextElements().isEmpty() || correctVariables.size() > 1) {
-                            final FilePosition startFilePosition = elem.getFilePosition();
-                            final FilePosition end = new FilePosition(startFilePosition.getLine(), elem.getEndColumn(),
-                                    elem.getStartOffset() + elem.getText().length());
-                            final BuildMessage errorMessage = BuildMessage.createErrorMessage(
-                                    "Invalid FOR loop variable \'" + elem.getText().toString() + "\'", fileName,
-                                    new FileRegion(startFilePosition, end));
-                            loopDescriptor.addMessage(errorMessage);
-                        }
-                    }
+                if (varUses.size() != 1 || !varUses.get(0).isPlainVariable()) {
+                    final FilePosition startFilePosition = elem.getFilePosition();
+                    final FilePosition end = new FilePosition(startFilePosition.getLine(), elem.getEndColumn(),
+                            elem.getStartOffset() + elem.getText().length());
+                    final BuildMessage errorMessage = BuildMessage.createErrorMessage(
+                            "Invalid FOR loop variable \'" + elem.getText() + "\'",
+                            new FileRegion(startFilePosition, end));
+                    loopDescriptor.addMessage(errorMessage);
                 }
+
+            } else if (elem.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
+                loopDescriptor.setAction(elem.copy());
+                foundFor = true;
+
             } else {
-                if (elem.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
-                    loopDescriptor.setAction(elem.copy());
-                    wasFor = true;
-                } else {
-                    throw new IllegalStateException("Internal problem - FOR should be the first token.");
-                }
+                throw new IllegalStateException("Internal problem - FOR should be the first token.");
             }
         }
 
-        if (!wasIn || !wasElementsToIterate) {
+        if (!foundIn || !hasElementsToIterate) {
             final RobotToken forToken = loopDescriptor.getAction();
             final FilePosition startFilePosition = forToken.getFilePosition();
             final FilePosition endFilePosition = new FilePosition(startFilePosition.getLine(), forToken.getEndColumn(),
                     forToken.getStartOffset() + forToken.getText().length());
             final BuildMessage errorMessage = BuildMessage.createErrorMessage(
-                    "Invalid FOR loop - missing values to iterate", fileName,
-                    new FileRegion(startFilePosition, endFilePosition));
+                    "Invalid FOR loop - missing values to iterate", new FileRegion(startFilePosition, endFilePosition));
             loopDescriptor.addMessage(errorMessage);
         }
 
         return loopDescriptor;
-    }
-
-    private <T> RobotFileOutput getFileOutput(final RobotExecutableRow<T> execRowLine) {
-        final AModelElement<?> execParent = (AModelElement<?>) execRowLine.getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) execParent.getParent();
-        return table.getParent().getParent();
     }
 }

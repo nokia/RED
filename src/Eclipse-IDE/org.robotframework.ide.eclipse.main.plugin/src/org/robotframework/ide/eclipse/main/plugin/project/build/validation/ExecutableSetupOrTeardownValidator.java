@@ -5,16 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.ExecutableSetting;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
@@ -48,14 +45,11 @@ class ExecutableSetupOrTeardownValidator implements ExecutableValidator {
         final IExecutableRowDescriptor<?> descriptor = row.buildLineDescription();
 
         final RobotToken keywordNameToken = setupOrTeardown.getKeywordName();
-        final MappingResult variablesExtraction = new VariableExtractor().extract(keywordNameToken,
-                validationContext.getFile().getName());
-        final List<VariableDeclaration> variablesDeclarations = variablesExtraction.getCorrectVariables();
 
-        if (variablesExtraction.getMappedElements().size() == 1 && variablesDeclarations.size() == 1) {
+        if (VariablesAnalyzer.analyzer(validationContext.getVersion()).containsVariables(keywordNameToken)) {
             final RobotProblem problem = RobotProblem
                     .causedBy(KeywordsProblem.KEYWORD_NAME_IS_PARAMETERIZED)
-                    .formatMessageWith(variablesDeclarations.get(0).getVariableName().getText(), "");
+                    .formatMessageWith(keywordNameToken.getText(), "");
             reporter.handleProblem(problem, validationContext.getFile(), keywordNameToken);
 
             final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);

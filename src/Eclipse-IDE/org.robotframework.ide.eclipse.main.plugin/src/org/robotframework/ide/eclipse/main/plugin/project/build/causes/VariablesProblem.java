@@ -159,8 +159,14 @@ public enum VariablesProblem implements IProblemCause {
     VARIABLE_ELEMENT_OLD_USE {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
+        }
+
+        @Override
         public String getProblemDescription() {
-            return "Access to list/dictionary using index/key in '%s' is deprecated since RF 3.2. Use scalar notation instead i.e: ${collection}[id/key]";
+            return "Access to list/dictionary using index/key in '%s' is deprecated since RF 3.2. "
+                    + "Use scalar notation instead i.e: ${collection}[id/key]";
         }
 
         @Override

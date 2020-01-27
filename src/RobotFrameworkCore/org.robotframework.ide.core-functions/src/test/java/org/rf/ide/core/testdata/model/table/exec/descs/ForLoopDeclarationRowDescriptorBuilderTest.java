@@ -17,11 +17,11 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.SimpleRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -92,28 +92,24 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
         return null;
     }
 
-    private List<RobotToken> line(final ForLoopDeclarationRowDescriptor<?> c) {
+    private List<RobotToken> line(final ForLoopDeclarationRowDescriptor<?> descriptor) {
         final List<RobotToken> done = new ArrayList<>();
-        done.add(c.getAction());
-        for (final VariableDeclaration varDec : c.getCreatedVariables()) {
-            done.add(varDec.asToken());
-        }
-        done.add(c.getInAction());
-        for (final VariableDeclaration varDecUsed : c.getUsedVariables()) {
+        done.add(descriptor.getAction());
+        descriptor.getCreatingVariables().forEach(done::add);
+        done.add(descriptor.getInAction());
+        for (final VariableUse varDecUsed : descriptor.getUsedVariables()) {
             done.add(varDecUsed.asToken());
         }
 
         return done;
     }
 
-    private List<RobotToken> line(final ForLoopContinueRowDescriptor<?> c) {
+    private List<RobotToken> line(final ForLoopContinueRowDescriptor<?> descriptor) {
         final List<RobotToken> done = new ArrayList<>();
-        done.add(c.getAction());
-        for (final VariableDeclaration varDec : c.getCreatedVariables()) {
-            done.add(varDec.asToken());
-        }
-        done.add(c.getKeywordAction());
-        for (final VariableDeclaration varDecUsed : c.getUsedVariables()) {
+        done.add(descriptor.getAction());
+        descriptor.getCreatingVariables().forEach(done::add);
+        done.add(descriptor.getKeywordAction());
+        for (final VariableUse varDecUsed : descriptor.getUsedVariables()) {
             done.add(varDecUsed.asToken());
         }
         return done;

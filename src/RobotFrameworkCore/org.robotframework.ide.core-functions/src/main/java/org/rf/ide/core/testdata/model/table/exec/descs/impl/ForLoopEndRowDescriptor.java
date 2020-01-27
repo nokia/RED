@@ -7,13 +7,13 @@ package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
@@ -25,8 +25,13 @@ public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getCreatedVariables() {
-        return new ArrayList<>();
+    public boolean isCreatingVariables() {
+        return false;
+    }
+
+    @Override
+    public Stream<RobotToken> getCreatingVariables() {
+        return Stream.empty();
     }
 
     @Override
@@ -40,13 +45,8 @@ public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
-    public List<VariableDeclaration> getUsedVariables() {
+    public List<VariableUse> getUsedVariables() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public List<IElementDeclaration> getTextParameters() {
-        return null;
     }
 
     @Override

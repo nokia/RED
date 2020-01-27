@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 
 import org.rf.ide.core.execution.debug.RunningKeyword;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopDeclarationRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -34,9 +33,7 @@ class CallChecker {
     }
 
     static String createName(final ForLoopDeclarationRowDescriptor<?> descriptor) {
-        final List<String> variables = descriptor.getCreatedVariables()
-                .stream()
-                .map(VariableDeclaration::asToken)
+        final List<String> variables = descriptor.getCreatingVariables()
                 .map(RobotToken::getText)
                 .collect(toList());
 
