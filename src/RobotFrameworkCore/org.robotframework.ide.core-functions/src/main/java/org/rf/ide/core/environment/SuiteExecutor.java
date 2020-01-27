@@ -7,6 +7,7 @@ package org.rf.ide.core.environment;
 
 import org.rf.ide.core.RedSystemProperties;
 
+@SuppressWarnings("PMD.FieldNamingConventions")
 public enum SuiteExecutor {
 
     Python("python"),

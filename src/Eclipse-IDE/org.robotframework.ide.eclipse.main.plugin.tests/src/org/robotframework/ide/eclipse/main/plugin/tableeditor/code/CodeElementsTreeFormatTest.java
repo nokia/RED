@@ -245,7 +245,7 @@ public class CodeElementsTreeFormatTest {
 
     private static final class Node {
 
-        final Object[] pathElements;
+        private final Object[] pathElements;
 
         public Node(final Object... elements) {
             this.pathElements = elements;

@@ -20,7 +20,7 @@ import com.google.common.base.Splitter;
 
 public class ToggleCommentHandlerTest {
 
-    E4ToggleCommentHandler handler = new E4ToggleCommentHandler();
+    private final E4ToggleCommentHandler handler = new E4ToggleCommentHandler();
 
     @Test
     public void commentMarkIsAdded_whenThereIsNoSuchInSingleLineSelection() {

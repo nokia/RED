@@ -175,14 +175,14 @@ public class KeywordCallArgumentsValidatorTest {
 
         private final ArgumentsDescriptor zeroArgs = createDescriptor();
 
-        private final ArgumentsDescriptor zeroArgs_rf31 = createDescriptor("*");
+        private final ArgumentsDescriptor zeroArgsRf31 = createDescriptor("*");
 
         @Test
         public void noProblemsReported_whenThereAreNoArgumentsAtCallSite() {
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(problemsOf(call()).against(zeroArgs)).isEmpty();
 
-                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(zeroArgs_rf31)).isEmpty();
+                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(zeroArgsRf31)).isEmpty();
             });
         }
 
@@ -196,11 +196,11 @@ public class KeywordCallArgumentsValidatorTest {
                                         + "Although this argument looks like named one, it isn't because there is no "
                                         + "'b' argument in the keyword definition"));
 
-                softly.assertThat(problemsOf(call("&{d}", "2")).inVersion(RF_31).against(zeroArgs_rf31))
+                softly.assertThat(problemsOf(call("&{d}", "2")).inVersion(RF_31).against(zeroArgsRf31))
                         .extracting(ALL)
                         .containsOnly(problem(ORDER_PROBLEM, 47, 48,
                                 "Positional argument cannot be used after named arguments"));
-                softly.assertThat(problemsOf(call("&{d}", "b=2")).inVersion(RF_31).against(zeroArgs_rf31))
+                softly.assertThat(problemsOf(call("&{d}", "b=2")).inVersion(RF_31).against(zeroArgsRf31))
                         .extracting(ALL)
                         .containsOnly(problem(ORDER_PROBLEM, 47, 50,
                                 "Positional argument cannot be used after named arguments. "
@@ -231,11 +231,11 @@ public class KeywordCallArgumentsValidatorTest {
                 softly.assertThat(problemsOf(call("&{d}[a]")).against(zeroArgs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects 0 arguments but 1 is provided"));
 
-                softly.assertThat(problemsOf(call("1", "2")).inVersion(RF_31).against(zeroArgs_rf31))
+                softly.assertThat(problemsOf(call("1", "2")).inVersion(RF_31).against(zeroArgsRf31))
                         .extracting(ALL)
                         .containsOnly(problem(NUMBER_PROBLEM, 28, 35,
                                 "Keyword 'keyword' expects 0 arguments but 2 are provided"));
-                softly.assertThat(problemsOf(call("a=1")).inVersion(RF_31).against(zeroArgs_rf31))
+                softly.assertThat(problemsOf(call("a=1")).inVersion(RF_31).against(zeroArgsRf31))
                         .extracting(ALL)
                         .containsOnly(problem(NUMBER_PROBLEM, 28, 35,
                                 "Keyword 'keyword' expects 0 arguments but 1 is provided"));
@@ -256,10 +256,10 @@ public class KeywordCallArgumentsValidatorTest {
                     problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to be empty"),
                     problem(COLLECTION_WARNING, 47, 51, "Dictionary argument '&{d}' has to be empty"));
 
-                softly.assertThat(problemsOf(call("@{l}", "@{l}")).inVersion(RF_31).against(zeroArgs_rf31)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("@{l}", "@{l}")).inVersion(RF_31).against(zeroArgsRf31)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"),
                         problem(COLLECTION_WARNING, 47, 51, "List argument '@{l}' has to be empty"));
-                softly.assertThat(problemsOf(call("&{d}")).inVersion(RF_31).against(zeroArgs_rf31)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("&{d}")).inVersion(RF_31).against(zeroArgsRf31)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to be empty"));
             });
         }
@@ -2619,50 +2619,50 @@ public class KeywordCallArgumentsValidatorTest {
     @Nested
     public static class KeywordOnlyArgumentsInRf31Test {
 
-        private final ArgumentsDescriptor desc_kw_only = createDescriptor("a", "b=2", "*", "d=4", "e");
-        private final ArgumentsDescriptor desc_kw_only_kwargs = createDescriptor("a", "b=2", "*", "d=4", "e", "**kwargs");
-        private final ArgumentsDescriptor desc_varargs_kw_only_kwargs = createDescriptor("a", "b=2", "*varargs", "d=4", "e", "**kwargs");
+        private final ArgumentsDescriptor kwOnly = createDescriptor("a", "b=2", "*", "d=4", "e");
+        private final ArgumentsDescriptor kwOnlyKwargs = createDescriptor("a", "b=2", "*", "d=4", "e", "**kwargs");
+        private final ArgumentsDescriptor varargsKwOnlyKwargs = createDescriptor("a", "b=2", "*varargs", "d=4", "e", "**kwargs");
 
         @Test
         public void noProblemsReported_whenArgumentsAreUsedProperly() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(desc_kw_only)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(desc_kw_only)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(desc_kw_only)).isEmpty();
-                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4")).inVersion(RF_31).against(desc_kw_only)).isEmpty();
-                softly.assertThat(problemsOf(call("e=4", "a=1", "d=3", "b=2")).inVersion(RF_31).against(desc_kw_only)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(kwOnly)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(kwOnly)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(kwOnly)).isEmpty();
+                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4")).inVersion(RF_31).against(kwOnly)).isEmpty();
+                softly.assertThat(problemsOf(call("e=4", "a=1", "d=3", "b=2")).inVersion(RF_31).against(kwOnly)).isEmpty();
 
-                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("a=1", "d=3", "b=2", "f=5", "e=4")).inVersion(RF_31).against(desc_kw_only_kwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("a=1", "d=3", "b=2", "f=5", "e=4")).inVersion(RF_31).against(kwOnlyKwargs)).isEmpty();
 
-                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "3", "e=4")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "3", "d=4", "e=5")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("1", "2", "3", "d=4", "e=5", "f=6")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
-                softly.assertThat(problemsOf(call("a=1", "d=3", "b=2", "f=5", "e=4")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "e=2")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "e=3")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "3", "e=4")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "3", "d=4", "e=5")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("1", "2", "3", "d=4", "e=5", "f=6")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("a=1", "b=2", "d=3", "e=4", "f=5")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
+                softly.assertThat(problemsOf(call("a=1", "d=3", "b=2", "f=5", "e=4")).inVersion(RF_31).against(varargsKwOnlyKwargs)).isEmpty();
             });
         }
 
         @Test
         public void overriddenNamedArgumentsAreReported() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1", "e=2", "e=3")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=2", "e=3")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                                 problem(OVERRIDDEN_ARG_PROBLEM, 44, 47,
                                         "Argument 'e' is passed multiple times using named syntax. This value will never be used"));
 
-                softly.assertThat(problemsOf(call("1", "e=2", "d=3", "d=4")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=2", "d=3", "d=4")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                                 problem(OVERRIDDEN_ARG_PROBLEM, 51, 54,
                                         "Argument 'd' is passed multiple times using named syntax. This value will never be used"));
 
-                softly.assertThat(problemsOf(call("1", "e=2", "e=3", "d=4", "d=5")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=2", "e=3", "d=4", "d=5")).inVersion(RF_31).against(varargsKwOnlyKwargs)).extracting(ALL).containsOnly(
                                 problem(OVERRIDDEN_ARG_PROBLEM, 44, 47,
                                         "Argument 'e' is passed multiple times using named syntax. This value will never be used"),
                                 problem(OVERRIDDEN_ARG_PROBLEM, 58, 61,
@@ -2673,11 +2673,11 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void invalidOrderIsReported_whenPositionalArgumentsAreUsedAfterNamedOne() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(ORDER_PROBLEM, 51, 52, "Positional argument cannot be used after named arguments"));
-                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(ORDER_PROBLEM, 51, 52, "Positional argument cannot be used after named arguments"));
-                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=1", "2")).inVersion(RF_31).against(varargsKwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(ORDER_PROBLEM, 51, 52, "Positional argument cannot be used after named arguments"));
             });
         }
@@ -2685,17 +2685,17 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void invalidNoOfArgumentsReported_whenNumberOfCallSiteArgumentsIsTooLow() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 non-named arguments but 0 are provided"));
-                softly.assertThat(problemsOf(call("1", "2", "3")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "2", "3")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 non-named arguments but 3 are provided"));
 
-                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 non-named arguments but 0 are provided"));
-                softly.assertThat(problemsOf(call("1", "2", "3")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "2", "3")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects from 1 to 2 non-named arguments but 3 are provided"));
 
-                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call()).inVersion(RF_31).against(varargsKwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(NUMBER_PROBLEM, 28, 35, "Keyword 'keyword' expects at least 1 non-named argument but 0 are provided"));
             });
         }
@@ -2703,7 +2703,7 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void multipleMatchesAreReported_whenArgIsPassedPositionallyAndByName() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1", "a=2")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "a=2")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(MULTIPLE_MATCH_PROBLEM, 44, 47, "Argument 'a' has value already passed: 1"));
             });
         }
@@ -2711,13 +2711,13 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void missingArgumentsAreReported_whenItIsNotProvidedAtCallSite() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
 
-                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
 
-                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(desc_varargs_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1")).inVersion(RF_31).against(varargsKwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
             });
         }
@@ -2725,9 +2725,9 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void unexpectedArgumentsPassedByNamesAreReported_whenThereAreNoKwargsInDescriptor() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("1", "e=2", "f=3")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=2", "f=3")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(UNEXPECTED_PROBLEM, 51, 54, "Unexpected named argument 'f'"));
-                softly.assertThat(problemsOf(call("1", "e=2", "f=3", "g=4")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("1", "e=2", "f=3", "g=4")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(UNEXPECTED_PROBLEM, 51, 54, "Unexpected named argument 'f'"),
                         problem(UNEXPECTED_PROBLEM, 58, 61, "Unexpected named argument 'g'"));
             });
@@ -2736,10 +2736,10 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void listsAreReported_whenUsedAsArgumentInOrderToProvideMultipleArguments() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("@{l}")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("@{l}")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to contain from 1 to 2 items"),
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
-                softly.assertThat(problemsOf(call("@{l}", "@{l}")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("@{l}", "@{l}")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"),
                         problem(COLLECTION_WARNING, 47, 51, "List argument '@{l}' has to contain from 1 to 2 items"),
                         problem(MISSING_PROBLEM, 28, 35, "Keyword 'keyword' requires (e) keyword-only argument to be specified"));
@@ -2749,12 +2749,12 @@ public class KeywordCallArgumentsValidatorTest {
         @Test
         public void dictionariesAreReported_whenUsedAsArgumentInOrderToProvideMultipleArguments() {
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(problemsOf(call("&{d}")).inVersion(RF_31).against(desc_kw_only)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("&{d}")).inVersion(RF_31).against(kwOnly)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to contain from 2 to 4 mappings. Required keys: (a, e), possible keys: (b, d)"));
-                softly.assertThat(problemsOf(call("&{d}", "&{d}")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("&{d}", "&{d}")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "Dictionary argument '&{d}' has to be empty"),
                         problem(COLLECTION_WARNING, 47, 51, "Dictionary argument '&{d}' has to contain at least 2 mappings. Required keys: (a, e)"));
-                softly.assertThat(problemsOf(call("@{l}", "&{d}")).inVersion(RF_31).against(desc_kw_only_kwargs)).extracting(ALL).containsOnly(
+                softly.assertThat(problemsOf(call("@{l}", "&{d}")).inVersion(RF_31).against(kwOnlyKwargs)).extracting(ALL).containsOnly(
                         problem(COLLECTION_WARNING, 39, 43, "List argument '@{l}' has to be empty"),
                         problem(COLLECTION_WARNING, 47, 51, "Dictionary argument '&{d}' has to contain at least 2 mappings. Required keys: (a, e)"));
             });

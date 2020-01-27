@@ -24,7 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ToggleComm
 
 public class ToggleCommentInTableHandlerTest {
 
-    E4ToggleCommentInTableHandler handler = new E4ToggleCommentInTableHandler();
+    private final E4ToggleCommentInTableHandler handler = new E4ToggleCommentInTableHandler();
 
     @Test
     public void commentMarkIsAdded_whenThereIsUncommentedKeywordCallSelected() {

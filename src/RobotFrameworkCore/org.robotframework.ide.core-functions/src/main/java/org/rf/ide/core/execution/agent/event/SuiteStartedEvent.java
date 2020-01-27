@@ -49,9 +49,7 @@ public final class SuiteStartedEvent {
                     .map(o -> o.map(Events::toFileUri))
                     .collect(toList());
         } else {
-            paths = Stream.generate(() -> Optional.<URI> empty())
-                    .limit(childSuites.size())
-                    .collect(toList());
+            paths = Stream.generate(Optional::<URI> empty).limit(childSuites.size()).collect(toList());
         }
         return new SuiteStartedEvent(name, suiteFilePath, isDir, mode, totalTests,
                 Events.ensureListOfStrings(childSuites), Events.ensureListOfStrings(childTests), paths);

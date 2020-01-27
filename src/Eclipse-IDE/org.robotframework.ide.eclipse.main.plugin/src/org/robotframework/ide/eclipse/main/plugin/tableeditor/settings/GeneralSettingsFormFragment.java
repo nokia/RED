@@ -217,19 +217,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final AtomicBoolean hasEditDocRepresentation = new AtomicBoolean(false);
 
+    private final Object docLock = new Object();
+
+    private final Semaphore docSemaphore = new Semaphore(1, true);
+
     private Job documentationChangeJob = null;
 
     private GeneralSettingsDataProvider dataProvider;
-
-    private final Semaphore docSemaphore = new Semaphore(1, true);
 
     private ISortModel sortModel;
 
     private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
 
     private SelectionLayerAccessor selectionLayerAccessor;
-
-    private final Object DOCUMENTATION_LOCK = new Object();
 
     private TableHyperlinksSupport detector;
 
@@ -471,7 +471,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
-        synchronized (DOCUMENTATION_LOCK) {
+        synchronized (docLock) {
             if (section != null) {
                 final RobotSetting docSetting = section.getSetting("Documentation");
                 if (docSetting != null && !docSetting.getArguments().isEmpty()) {

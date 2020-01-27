@@ -41,7 +41,7 @@ public final class InitializeAgent implements ServerResponse {
     @Override
     public String toMessage() throws ResponseException {
         try {
-            final Builder<Object, Object> argsBuilder = ImmutableMap.builder()
+            final Builder<String, Object> argsBuilder = ImmutableMap.<String, Object> builder()
                     .put("mode", mode.name())
                     .put("wait_for_start_allowance", agentShouldWaitForSignal);
             if (maxValueLenght >= 0) {
