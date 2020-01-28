@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/20/20 2:52 PM
+Save-Time: 1/28/20 2:32 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -117,7 +117,8 @@ proc "check-content-assist-documentation-for-variables" [val source "Built-in"] 
 //----------------------------------------doc view ----------------------------
 //all arguments must be escaped for regex!
 
-//this is for built-in kw
+//this is for built-in kw or kw imported from pytohn libs
+// library = Source
 proc "check-documentation-view" [val kw_name ] [val project_name "RobotProject"] [val library ] [val arguments "\[\]"] [val spec ""] [val is_empty false]{
 	if [$is_empty | eq true]{
 		get-view "Documentation View" | get-control Browser | get-property text  | equals  [concat $html_beginning  "<body></body></html>"] | verify-true

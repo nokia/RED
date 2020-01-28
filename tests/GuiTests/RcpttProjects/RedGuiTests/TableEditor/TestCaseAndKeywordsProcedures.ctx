@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 10/30/19 3:14 PM
+Save-Time: 1/28/20 12:01 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -48,17 +48,17 @@ proc "compare-rows" [val file] [val table ][val row] [val tc ""] [val c1 ""] [va
 }
 
 //rows starts from 1
-proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""] [val c6 ""] [val extended_col false]
 {	
 	compare-rows -file $file -table "Test Cases" -row $row -tc $tc -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
 
-proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""] [val c6 ""] [val extended_col false]
 {	
 	compare-rows -file $file -table "User Keywords" -row $row -tc $kw -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
 
-proc "check-task-row" [val file] [val row] [val task ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""]  [val c6 ""] [val extended_col false]
+proc "check-task-row" [val file] [val row] [val task ""] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""] [val c6 ""] [val extended_col false]
 {	
 	compare-rows -file $file -table "Tasks" -row $row -tc $task -c1 $c1 -c2 $c2 -c3 $c3 -c4 $c4 -c5 $c5 -c6 $c6 -extended_col $extended_col
 }
@@ -78,10 +78,8 @@ proc "set-list-with-markers-and-comapare"  [val file] [val table] [val ref_list]
 				if [get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
 					    | invoke getLayer| invoke getConfigLabelsByPosition 0 $row|  invoke getLabels  |invoke contains $type | eq true]{
 					   		echo $row
-				}
-					    
+				}					    
 			} | to-list | compare-markers-list-with-ref  -ref_markers $ref_list -type $type
-		
 		}
 }
 
@@ -93,8 +91,8 @@ proc "compare-row-with-list" [val file] [val table] [val row] [val ref_table]
 	
 		repeat [val index] -times $col_amount -command{
 			$ref_table | get $index| let [val ref_value -input]{
-				get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition [plus $index 1] $row | invoke getDataValue 
-				     |  my-assert-true -expected  $ref_value -row $row -col [plus $index 1]
+				get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition [plus $index 1] $row 
+					| invoke getDataValue | my-assert-true -expected  $ref_value -row $row -col [plus $index 1]
 			} 
 		}
 	}
@@ -137,27 +135,46 @@ proc "generate-list2" [val file] [val table]{
 //rows starts from 0
 //tables: "User Keywords" and "Test Cases"
 proc "is-row-fully-selected" [val row] [val table] [val file_name "TestFile.robot"] [val index 0]{
-	get-editor $file_name -index $index| get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected  $row | eq true | verify-true
+	get-editor $file_name -index $index| get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer 
+		| invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected  $row | eq true | verify-true
 	
-	get-editor $file_name -index $index| get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke hasRowSelection | eq true | verify-true
+	get-editor $file_name -index $index| get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer 
+		| invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke hasRowSelection | eq true | verify-true
 					
 	//check if only one row is selected				
-	get-editor $file_name -index $index | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+	get-editor $file_name -index $index | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer 
+		| invoke getBodyLayer | invoke getScrollableLayer
 		| invoke getUnderlyingLayerByPosition 0 0 | invoke getSelectedRowCount | eq 1 | verify-true
 } 
 
 //rows and cols starts from 0
 //tables: "User Keywords" and "Test Cases"
 proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile.robot"]{
-	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true 
-			| assert-true -message [format "Cell in row %s and col %s is not selected" $row $col]
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer 
+		| invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true 
+		| assert-true -message [format "Cell in row %s and col %s is not selected" $row $col]
 			
-	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			|invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false 
-			| assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer 
+		| invoke getBodyLayer | invoke getScrollableLayer
+		|invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false 
+		| assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
+}
+
+
+
+proc "check-cell-color"  [val file] [val table] [val col] [val row] [val color] {
+	let [val color_map [map 
+	[entry red "MISSING_ARGUMENT"]
+	[entry yellow "OPTIONAL_ARGUMENT"]
+	[entry light_grey "REDUNDANT_ARGUMENT"]
+	[entry dark_grey "CELL_NOT_EDITABLE"]]]{
+		get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
+			| invoke getLayer| invoke getConfigLabelsByPosition $col $row|  invoke getLabels
+			| invoke contains [$color_map | get $color ] | verify-true
+	}				
 }
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

@@ -1,0 +1,117 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Nev38EG-EeqKsrGqQZDwmA,_hb89IDvxEeiDC73Fvf4wHA,_VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: TableColoringForAmbiguousKW
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JyRmMEG-EeqKsrGqQZDwmA
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/28/20 4:10 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//check preference to highight cell in TC/KW table
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework" | select "Robot Framework/Editor"
+    get-group Tables | get-button "Enable keyword argument highlighting" | check
+    get-button "Apply and Close" | click
+}
+
+// open test
+get-view "Project Explorer" | get-tree | select "AmbiguousProject/TestFile.robot"  | double-click
+    
+// open doc to see which KW will be shown
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 9
+    get-menu -path "Show documentation" | click
+}
+// check doc
+check-documentation-view  -kw_name "My Lib" -project_name "AmbiguousProject" -library "a" -arguments "\[x\]" -spec "One arg"
+
+// close view
+get-view "Documentation View" | close
+
+// open doc for second KW with the same name
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 9 8
+        get-menu -path "Show documentation" | click
+    }
+}
+
+check-documentation-view  -kw_name "My Lib" -project_name "AmbiguousProject" -library "a" -arguments "\[x\]" -spec "One arg"
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 2 -color red
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 2 -color light_grey
+
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 3 -color red
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 3 -color light_grey
+
+
+//-------------------------------------------- minimum ------------------------------------------------
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-group Keywords | get-combo -after [get-label "Ambiguous keyword finding strategy"] 
+        | select "minimum required arguments"
+    get-button "Apply and Close" | click
+}
+
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "AmbiguousProject/TestFile.robot"  | double-click
+
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 2 -color light_grey
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 2 -color light_grey
+
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 3 -color light_grey
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 3 -color light_grey
+
+// check doc after changing pref
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 8 7
+        get-menu -path "Show documentation" | click
+    }
+}
+
+check-documentation-view  -kw_name "My Lib" -project_name "AmbiguousProject" -library "b"   -arguments "\[\]" -spec "No args"
+
+// ----------------------------------------- maximum -------------------------------
+get-editor "TestFile.robot" | close
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Keywords | get-combo -after [get-label "Ambiguous keyword finding strategy"] 
+        | select "maximum required arguments"
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree  
+    | select "AmbiguousProject/TestFile.robot" | double-click
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 2 -color red
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 2 -color red
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 4  -row 2 -color yellow
+
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 2  -row 3 -color red
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 3  -row 3 -color red    
+check-cell-color -file "TestFile.robot"  -table "Test Cases" -col 4  -row 3 -color yellow
+
+// check doc after changing pref
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 9 7
+        get-menu -path "Show documentation" | click
+    }
+}
+
+check-documentation-view  -kw_name "My Lib" -project_name "AmbiguousProject" -library "c"   -arguments "\[x, y, z=8\]" -spec "Two args and one optional"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
