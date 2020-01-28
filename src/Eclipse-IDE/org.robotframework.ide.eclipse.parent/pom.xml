@@ -382,6 +382,8 @@
 						<inputEncoding>UTF-8</inputEncoding>
 						<outputEncoding>UTF-8</outputEncoding>
 						<locales>en</locales>
+						<generateProjectInfo>false</generateProjectInfo>
+						<relativizeDecorationLinks>false</relativizeDecorationLinks>
 					</configuration>
 				</plugin>
 				<plugin>
