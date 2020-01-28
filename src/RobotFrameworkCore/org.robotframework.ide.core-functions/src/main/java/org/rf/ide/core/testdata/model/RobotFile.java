@@ -52,12 +52,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public void removeLines() {
-        final int numberOfLines = fileContent.size();
-        for (int i = 0; i < numberOfLines; i++) {
-            fileContent.get(i).getLineElements().clear();
-            fileContent.set(i, null);
-        }
-
+        fileContent.forEach(line -> line.getLineElements().clear());
         fileContent.clear();
     }
 
@@ -70,7 +65,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public Optional<RobotLine> getRobotLineBy(final int offset) {
-        return getRobotLineIndexBy(offset).map(i -> fileContent.get(i));
+        return getRobotLineIndexBy(offset).map(fileContent::get);
     }
 
     public Optional<Integer> getRobotLineIndexBy(final int offset) {
@@ -112,7 +107,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public void excludeTable(final ARobotSectionTable table) {
-        if (tables.values().contains(table)) {
+        if (tables.containsValue(table)) {
             final RobotTokenType headerType = (RobotTokenType) table.getHeaders()
                     .get(0).getTableHeader().getTypes().get(0);
             excludeTable(headerType);
@@ -165,25 +160,18 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
         includeTableSection(RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
 
-    public boolean includeTableSection(final RobotTokenType typeOfTable) {
-        final ARobotSectionTable sectionTable = tables.get(typeOfTable);
-        if (sectionTable != null) {
-            if (!sectionTable.isPresent()) {
-                sectionTable.addHeader(createHeader(typeOfTable));
-                return true;
-            }
+    public void includeTableSection(final RobotTokenType headerType) {
+        final ARobotSectionTable sectionTable = tables.get(headerType);
+        if (sectionTable != null && !sectionTable.isPresent()) {
+            sectionTable.addHeader(new TableHeader<>(createHeaderToken(headerType)));
         }
-        return false;
     }
 
-    @SuppressWarnings("rawtypes")
-    private TableHeader createHeader(final RobotTokenType type) {
-        final RobotToken tableHeaderToken = new RobotToken();
-        tableHeaderToken.setText("*** " + type.getRepresentation().get(0) + " ***");
-        tableHeaderToken.setType(type);
-        final TableHeader header = new TableHeader(tableHeaderToken);
-
-        return header;
+    private RobotToken createHeaderToken(final RobotTokenType headerType) {
+        final RobotToken headerToken = new RobotToken();
+        headerToken.setText("*** " + headerType.getRepresentation().get(0) + " ***");
+        headerToken.setType(headerType);
+        return headerToken;
     }
 
     public boolean containsAnyRobotSection() {

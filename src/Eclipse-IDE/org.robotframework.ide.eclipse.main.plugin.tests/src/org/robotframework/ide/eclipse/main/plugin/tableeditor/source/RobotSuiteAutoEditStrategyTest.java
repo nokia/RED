@@ -599,7 +599,7 @@ public class RobotSuiteAutoEditStrategyTest {
 
     @Test
     public void previousLineContinuationShouldBeAdded() {
-        final List<String> lines = Arrays.asList("...", "...     text");
+        final List<String> lines = Arrays.asList("...", "...     text", "...     text     #abc");
         for (final String line : lines) {
             final RobotDocument document = newDocument(line);
             final DocumentCommand command = newDocumentCommand(document.getLength(), "\n");
@@ -613,19 +613,60 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void breakingLineShouldAddContinuation_onlyForOffsetsBetweenCells() {
-        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}   aa    bbb");
-        final RangeSet<Integer> offsetsBetweenCells = TreeRangeSet
-                .create(Arrays.asList(Range.closed(34, 36), Range.closed(40, 43), Range.closed(45, 49)));
-        for (int offset = 34; offset <= 52; offset++) {
+    public void breakingLineShouldAddContinuation_forAllOffsets() {
+        final RobotDocument document = newDocument("...  kw     text   #abc   xy");
+        final RangeSet<Integer> separatorOffsets = TreeRangeSet.create(
+                Arrays.asList(Range.closed(3, 5), Range.closed(7, 12), Range.closed(16, 19), Range.closed(23, 26)));
+        final int start = separatorOffsets.span().lowerEndpoint();
+        final int end = separatorOffsets.span().upperEndpoint();
+        for (int offset = start; offset <= end; offset++) {
             final DocumentCommand command = newDocumentCommand(offset, "\n");
 
             final EditStrategyPreferences preferences = newPreferences();
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            if (offsetsBetweenCells.contains(offset)) {
-                final Range<Integer> separator = offsetsBetweenCells.rangeContaining(offset);
+            if (separatorOffsets.contains(offset)) {
+                final Range<Integer> separator = separatorOffsets.rangeContaining(offset);
+                final int separatorStart = separator.lowerEndpoint();
+                final int separatorEnd = separator.upperEndpoint();
+                if (separatorStart == offset) {
+                    assertThat(command.text).isEqualTo("\n...");
+                    assertThat(command.offset).isEqualTo(separatorStart);
+                    assertThat(command.length).isEqualTo(0);
+                    assertThat(command.caretOffset).isEqualTo(separatorEnd);
+                } else {
+                    assertThat(command.text).isEqualTo("\n..." + Strings.repeat(" ", separatorEnd - separatorStart));
+                    assertThat(command.offset).isEqualTo(separatorStart);
+                    assertThat(command.length).isEqualTo(separatorEnd - separatorStart);
+                    assertThat(command.caretOffset).isEqualTo(-1);
+                }
+            } else {
+                assertThat(command.text).isEqualTo("\n...  ");
+                assertThat(command.offset).isEqualTo(offset);
+                assertThat(command.length).isEqualTo(0);
+                assertThat(command.caretOffset).isEqualTo(-1);
+            }
+        }
+    }
+
+    @Test
+    public void breakingLineShouldAddContinuation_onlyForOffsetsBetweenCells() {
+        final RobotDocument document = newDocument("*** Test Cases ***", "case",
+                "  Log Many  ${x}   aa    bbb  #comment   abc");
+        final RangeSet<Integer> separatorOffsets = TreeRangeSet.create(Arrays.asList(Range.closed(34, 36),
+                Range.closed(40, 43), Range.closed(45, 49), Range.closed(52, 54), Range.closed(62, 65)));
+        final int start = separatorOffsets.span().lowerEndpoint();
+        final int end = separatorOffsets.span().upperEndpoint();
+        for (int offset = start; offset <= end; offset++) {
+            final DocumentCommand command = newDocumentCommand(offset, "\n");
+
+            final EditStrategyPreferences preferences = newPreferences();
+            final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+            strategy.customizeDocumentCommand(document, command);
+
+            if (separatorOffsets.contains(offset)) {
+                final Range<Integer> separator = separatorOffsets.rangeContaining(offset);
                 final int separatorStart = separator.lowerEndpoint();
                 final int separatorEnd = separator.upperEndpoint();
                 if (separatorStart == offset) {
@@ -645,23 +686,6 @@ public class RobotSuiteAutoEditStrategyTest {
                 assertThat(command.length).isEqualTo(0);
                 assertThat(command.caretOffset).isEqualTo(-1);
             }
-        }
-    }
-
-    @Test
-    public void breakingLineShouldNotAddContinuation_whenOffsetInNonBreakableCells() {
-        final RobotDocument document = newDocument("*** Test Cases ***", "case", "  Log Many  ${x}  #comment  abc");
-        for (int offset = 40; offset <= 55; offset++) {
-            final DocumentCommand command = newDocumentCommand(offset, "\n");
-
-            final EditStrategyPreferences preferences = newPreferences();
-            final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
-            strategy.customizeDocumentCommand(document, command);
-
-            assertThat(command.text).isEqualTo("\n  ");
-            assertThat(command.offset).isEqualTo(offset);
-            assertThat(command.length).isEqualTo(0);
-            assertThat(command.caretOffset).isEqualTo(-1);
         }
     }
 

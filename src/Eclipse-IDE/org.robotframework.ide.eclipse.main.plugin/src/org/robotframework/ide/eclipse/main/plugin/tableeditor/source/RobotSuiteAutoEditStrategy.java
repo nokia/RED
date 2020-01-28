@@ -15,7 +15,6 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -48,17 +47,18 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             } else if (command.length > 0) {
                 customizePositiveLengthDocumentCommand(document, command);
             }
-        } catch (final BadLocationException | InterruptedException e) {
+        } catch (final BadLocationException e) {
             // ok, no change in command then
         }
     }
 
     private void customizeZeroLengthDocumentCommand(final IDocument document, final DocumentCommand command)
-            throws InterruptedException, BadLocationException {
+            throws BadLocationException {
         if ("\t".equals(command.text)) {
             replaceTabWithSpecifiedSeparatorOrJumpOutOfRegion(document, command);
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
-            autoIndentAfterNewLine(document, command);
+            findCurrentLine(document, command.offset).ifPresent(currentLine -> autoIndentAfterNewLine(currentLine,
+                    DocumentUtilities.getDelimiter(document), command));
         } else if (preferences.isVariablesBracketsInsertionEnabled()
                 && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
                 && (command.offset == document.getLength() || !"{".equals(document.get(command.offset, 1)))) {
@@ -84,7 +84,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private void replaceTabWithSpecifiedSeparatorOrJumpOutOfRegion(final IDocument document,
             final DocumentCommand command) throws BadLocationException {
-        final Optional<Integer> jumpOffset = findRegionToJumpOf(document, command)
+        final Optional<Integer> jumpOffset = findRegionToJumpOf(document, command.offset)
                 .map(region -> region.getOffset() + region.getLength())
                 .filter(offset -> offset > command.offset);
         if (jumpOffset.isPresent()) {
@@ -96,18 +96,28 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         }
     }
 
-    private Optional<IRegion> findRegionToJumpOf(final IDocument document, final DocumentCommand command)
+    private Optional<IRegion> findRegionToJumpOf(final IDocument document, final int offset)
             throws BadLocationException {
         if (!preferences.isSeparatorJumpModeEnabled()) {
             return Optional.empty();
         }
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, command.offset)
-                .filter(region -> region.getOffset() < command.offset);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, isTsvFile, offset)
+                .filter(region -> region.getOffset() < offset);
         if (variableRegion.isPresent()) {
             return variableRegion;
         }
-        return DocumentUtilities.findCellRegion(document, isTsvFile, command.offset)
-                .filter(region -> region.getOffset() < command.offset);
+        return DocumentUtilities.findCellRegion(document, isTsvFile, offset)
+                .filter(region -> region.getOffset() < offset);
+    }
+
+    private Optional<RobotLine> findCurrentLine(final IDocument document, final int offset)
+            throws BadLocationException {
+        try {
+            return ((RobotDocument) document).getNewestModel().getRobotLineBy(offset);
+        } catch (final InterruptedException e) {
+            // ok, nothing found
+        }
+        return Optional.empty();
     }
 
     private void addVariableBrackets(final DocumentCommand command, final String selectedText) {
@@ -115,17 +125,6 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         command.text += wrappedText;
         command.shiftsCaret = false;
         command.caretOffset = command.offset + wrappedText.length();
-    }
-
-    private void autoIndentAfterNewLine(final IDocument document, final DocumentCommand command)
-            throws InterruptedException, BadLocationException {
-        final RobotFileOutput rfo = ((RobotDocument) document).getNewestFileOutput();
-        final int lineNumber = document.getLineOfOffset(command.offset);
-        final List<RobotLine> contents = rfo.getFileModel().getFileContent();
-        if (lineNumber < contents.size()) {
-            final RobotLine currentLine = contents.get(lineNumber);
-            autoIndentAfterNewLine(currentLine, DocumentUtilities.getDelimiter(document), command);
-        }
     }
 
     private void autoIndentAfterNewLine(final RobotLine currentLine, final String lineDelimiter,
@@ -161,20 +160,22 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                     command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
-                } else if (isRequiringContinuation(firstMeaningfulToken)) {
-                    command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
-
-                } else if (!isInCommentPart(currentLine, command.offset)) {
+                } else {
                     getCurrentElement(currentLine, command.offset).ifPresent(currentElement -> {
                         if (currentElement instanceof Separator) {
                             command.text += "..." + currentElement.getText();
                             command.offset = currentElement.getStartOffset();
                             command.length = currentElement.getEndOffset() - currentElement.getStartOffset();
                         } else if (currentElement.getEndOffset() == command.offset) {
-                            getNextElement(currentLine, command.offset).ifPresent(nextElement -> {
+                            final Optional<IRobotLineElement> nextElement = getNextElement(currentLine, command.offset);
+                            if (nextElement.isPresent()) {
                                 command.text += "...";
-                                command.caretOffset = nextElement.getStartOffset();
-                            });
+                                command.caretOffset = nextElement.get().getStartOffset();
+                            } else if (isRequiringContinuation(firstMeaningfulToken)) {
+                                command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
+                            }
+                        } else if (isRequiringContinuation(firstMeaningfulToken)) {
+                            command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
                         }
                     });
 
@@ -262,13 +263,6 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 || types.contains(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION)
                 || types.contains(RobotTokenType.TASK_SETTING_DOCUMENTATION)
                 || types.contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
-    }
-
-    private boolean isInCommentPart(final RobotLine currentLine, final int offset) {
-        return currentLine.elementsStream()
-                .filter(e -> offset < e.getEndOffset())
-                .allMatch(e -> e instanceof Separator || e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                        || e.getTypes().contains(RobotTokenType.COMMENT_CONTINUE));
     }
 
     static class EditStrategyPreferences {
