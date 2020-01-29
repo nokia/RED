@@ -48,7 +48,7 @@ public class ConvertDeprecatedForLoopFixerTest {
     }
 
     @Test
-    public void documentIsProperlyChangedEndStatementIsNotAdded_whenThereIsEndStatementAfterForRegion()
+    public void documentIsProperlyChangedAndEndStatementIsNotAdded_whenThereIsEndStatementAfterForRegion()
             throws CoreException, IOException {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(IMarker.CHAR_START, -1)).thenReturn(0);
@@ -71,7 +71,7 @@ public class ConvertDeprecatedForLoopFixerTest {
     }
 
     @Test
-    public void documentIsProperlyChangedEndStatementIsNotAdded_whenThereIsNoKeywordsAndEndStatementInForLoop()
+    public void documentIsProperlyChangedAndEndStatementIsAdded_whenThereIsNoKeywordsAndEndStatementInForLoop()
             throws CoreException, IOException {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(IMarker.CHAR_START, -1)).thenReturn(0);
@@ -90,5 +90,29 @@ public class ConvertDeprecatedForLoopFixerTest {
 
         assertThat(fixer.getLabel()).isEqualTo("Convert to current FOR loop syntax");
         assertThat(changedDocuments).containsExactly(new Document("FOR  ${x}    IN RANGE    1", "END", "        kw"));
+    }
+
+    @Test
+    public void documentIsProperlyChangedAndEndStatementIsAdded_whenForLoopIsWithTestCaseNameInTheSameLine()
+            throws CoreException, IOException {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(IMarker.CHAR_START, -1)).thenReturn(18);
+        when(marker.getAttribute(IMarker.CHAR_END, -1)).thenReturn(22);
+        when(marker.getAttribute(IMarker.LINE_NUMBER, -1)).thenReturn(1);
+
+        final RobotSuiteFile model = new RobotSuiteFileCreator()
+                .appendLine("Test Case Name    :FOR  ${x}    IN RANGE    1")
+                .appendLine("                  \\       kw")
+                .build();
+
+        final Document document = new Document("Test Case Name    :FOR  ${x}    IN RANGE    1",
+                "                          kw");
+        final ConvertDeprecatedForLoopFixer fixer = new ConvertDeprecatedForLoopFixer(56);
+        final Stream<IDocument> changedDocuments = Stream.of(fixer).map(Fixers.byApplyingToDocument(marker, document,
+                model));
+
+        assertThat(fixer.getLabel()).isEqualTo("Convert to current FOR loop syntax");
+        assertThat(changedDocuments).containsExactly(new Document("Test Case Name    FOR  ${x}    IN RANGE    1",
+                "                          kw", "                  END"));
     }
 }

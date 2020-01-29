@@ -109,10 +109,9 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
                 regionNumberOfLines)) {
             final int markerOffset = marker.getAttribute(IMarker.CHAR_START, -1);
             final int markerLineOffset = regionToChange.getOffset();
-            final int markerIndentation = markerOffset - markerLineOffset;
-
+            final String indentationContent = document.get(markerLineOffset, markerOffset - markerLineOffset);
             regionBuilder.append("\n");
-            regionBuilder.append(document.get(markerLineOffset, markerIndentation));
+            regionBuilder.append(indentationContent.replaceAll("\\S", " "));
             regionBuilder.append("END");
         }
         return regionBuilder.toString();
@@ -143,10 +142,18 @@ public class ConvertDeprecatedForLoopFixer extends RedSuiteMarkerResolution {
                 .collect(Collectors.joining(""));
         if (toVerify.equals(":FOR")) {
             return element.getText().replaceAll("\\s", "").toUpperCase().equals(toVerify)
-                    && joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase().equals(toVerify);
+                    && (joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase().equals(toVerify)
+                            || firstForOccurence(elementIndex, lineModelElements));
         } else {
             return element.getText().equals(toVerify)
                     && joinedToElementLine.trim().replaceAll("\\s", "").toUpperCase().equals(toVerify);
         }
+    }
+
+    private boolean firstForOccurence(final int elementIndex, final List<IRobotLineElement> lineModelElements) {
+        return lineModelElements.stream()
+                .limit(elementIndex + 1)
+                .filter(el -> el.getText().replaceAll("\\s", "").toUpperCase().equals(":FOR"))
+                .count() == 1;
     }
 }
