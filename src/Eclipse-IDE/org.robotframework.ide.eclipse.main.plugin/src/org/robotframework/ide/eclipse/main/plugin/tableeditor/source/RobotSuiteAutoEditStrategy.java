@@ -160,20 +160,18 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                     command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
-                } else {
+                } else if (!firstMeaningfulToken.isEmpty()) {
+                    final int nextElementEndOffset = getNextElement(currentLine, command.offset)
+                            .map(IRobotLineElement::getEndOffset)
+                            .orElse(-1);
                     getCurrentElement(currentLine, command.offset).ifPresent(currentElement -> {
-                        if (currentElement instanceof Separator) {
+                        if (nextElementEndOffset > 0 && currentElement instanceof Separator) {
                             command.text += "..." + currentElement.getText();
                             command.offset = currentElement.getStartOffset();
                             command.length = currentElement.getEndOffset() - currentElement.getStartOffset();
-                        } else if (currentElement.getEndOffset() == command.offset) {
-                            final Optional<IRobotLineElement> nextElement = getNextElement(currentLine, command.offset);
-                            if (nextElement.isPresent()) {
-                                command.text += "...";
-                                command.caretOffset = nextElement.get().getStartOffset();
-                            } else if (isRequiringContinuation(firstMeaningfulToken)) {
-                                command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
-                            }
+                        } else if (nextElementEndOffset > 0 && currentElement.getEndOffset() == command.offset) {
+                            command.text += "...";
+                            command.caretOffset = nextElementEndOffset;
                         } else if (isRequiringContinuation(firstMeaningfulToken)) {
                             command.text += "..." + preferences.getSeparatorToUse(isTsvFile);
                         }
@@ -203,13 +201,11 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
     }
 
     private Optional<IRobotLineElement> getCurrentElement(final RobotLine line, final int offset) {
-        return line.elementsStream()
-                .filter(e -> e.getStartOffset() <= offset && offset <= e.getEndOffset())
-                .findFirst();
+        return line.elementsStream().filter(e -> offset <= e.getEndOffset()).findFirst();
     }
 
     private Optional<IRobotLineElement> getNextElement(final RobotLine line, final int offset) {
-        return line.elementsStream().filter(e -> e.getStartOffset() > offset).findFirst();
+        return line.elementsStream().filter(e -> offset <= e.getStartOffset()).findFirst();
     }
 
     private boolean isDefinitionRequiringIndent(final RobotLine currentLine, final int offset) {
