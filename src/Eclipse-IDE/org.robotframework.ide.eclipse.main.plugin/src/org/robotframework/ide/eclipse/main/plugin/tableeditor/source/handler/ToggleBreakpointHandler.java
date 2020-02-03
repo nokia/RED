@@ -71,24 +71,15 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
 
         public static void toggle(final IResource file, final int line) throws CoreException {
             final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
-            final Optional<IBreakpoint> existingBreakpoint = findBreakpoint(breakpointManager, file, line);
+            final Optional<Integer> targetBreakpointLine = getPossibleBreakpointLine(file, line);
+
+            final Optional<IBreakpoint> existingBreakpoint = targetBreakpointLine
+                    .flatMap(l -> findBreakpoint(breakpointManager, file, l));
             if (existingBreakpoint.isPresent()) {
                 existingBreakpoint.get().delete();
-                return;
-            }
 
-            final Optional<Integer> targetBreakpointLine = getPossibleBreakpointLine(file, line);
-            if (targetBreakpointLine.isPresent()) {
-                final int targetLine = targetBreakpointLine.get();
-
-                final Optional<IBreakpoint> existingBreakpointInTargetLine = findBreakpoint(breakpointManager, file,
-                        targetLine);
-                if (existingBreakpointInTargetLine.isPresent()) {
-                    // we do not delete it because it means that line != targetLine but there is
-                    // already breakpoint in target line so we simply do not want to duplicate it
-                    return;
-                }
-                breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, targetLine));
+            } else if (targetBreakpointLine.isPresent()) {
+                breakpointManager.addBreakpoint(new RobotLineBreakpoint(file, targetBreakpointLine.get()));
             }
         }
 
