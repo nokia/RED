@@ -5,8 +5,8 @@ Element-Name: SectionsInContentAssist
 Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/11/19 5:45 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/30/20 2:53 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -90,6 +90,16 @@ proc "check-content-assist-under-section" [val section]{
 	}
 }
 
+proc "check-old-for-loop"{
+	get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item -path ":FOR" 
+   		| get-property "getData().getStyledDisplayString().getStyleRanges().StyleRange[0].strikeout" | equals true 
+    	| verify-true
+}
+
+proc "check-old-for-loop-in-table"{
+	get-window -class ContentProposalPopup | get-table | get-item -path ":FOR" 
+	    | get-property "getData().getStyledLabel().getStyleRanges().StyleRange[0].strikeout" | equals true | verify-true
+}	    
 
 proc "check-content-assist-for-keywords" [val source Source]{
 	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
@@ -109,6 +119,7 @@ proc "check-content-assist-for-keywords" [val source Source]{
 	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
 	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	}
+	check-old-for-loop
 }	
 
 //copy for table editor
@@ -130,6 +141,7 @@ proc "check-content-assist-for-keywords-for-table" [val source Source]{
 	    get-property "getItems().TableItem[13].getText()" | equals When | verify-true
 	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	}
+	check-old-for-loop-in-table
 }	
 
 proc "check-content-assist-for-test-cases"{
@@ -151,6 +163,7 @@ proc "check-content-assist-for-test-cases"{
 	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	    get-property "getItems().TableItem[15].getText()" | equals "Catenate - BuiltIn" | verify-true
 	}  
+	check-old-for-loop
 }
 
 //copy for table editor
@@ -173,6 +186,7 @@ proc "check-content-assist-for-test-cases-for-table"{
 	    get-property "getItems().TableItem[14].getText()" | equals "Call Method - BuiltIn" | verify-true
 	    get-property "getItems().TableItem[15].getText()" | equals "Catenate - BuiltIn" | verify-true
 	}  
+	check-old-for-loop-in-table
 }
 
 proc "check-keywords-content-assit"{
