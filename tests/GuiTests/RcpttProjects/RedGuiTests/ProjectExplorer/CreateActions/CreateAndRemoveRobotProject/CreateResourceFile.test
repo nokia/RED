@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bsSM8McMEei8MYxPdH4l7Q
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 1/24/19 4:53 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 1/30/20 2:46 PM
 Testcase-Type: ecl
 Verifications: _ipfpIMcsEei8MYxPdH4l7Q
 
@@ -106,7 +106,7 @@ with [get-editor "res.resource"] {
     }
 }
 get-view Problems | click
-wait 200
+wait-for-errors -amount 1 -times 2
 get-view Problems | get-tree | get-item 
     -path "Errors \\(1 item\\)/'Test Cases' table is not supported inside resource file" | get-property enablement 
     | equals false | verify-true 
