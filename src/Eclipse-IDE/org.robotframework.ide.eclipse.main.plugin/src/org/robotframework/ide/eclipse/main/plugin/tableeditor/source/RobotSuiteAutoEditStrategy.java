@@ -160,7 +160,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 } else if (isIndentedForLoopStyle(firstMeaningfulToken)) {
                     command.text += "\\" + preferences.getSeparatorToUse(isTsvFile);
 
-                } else if (!firstMeaningfulToken.isEmpty()) {
+                } else if (!isPrettyAlignSpace(firstMeaningfulToken)) {
                     final int nextElementEndOffset = getNextElement(currentLine, command.offset)
                             .map(IRobotLineElement::getEndOffset)
                             .orElse(-1);
@@ -210,7 +210,7 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private boolean isDefinitionRequiringIndent(final RobotLine currentLine, final int offset) {
         final Optional<RobotToken> firstToken = currentLine.tokensStream()
-                .filter(token -> !token.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE))
+                .filter(token -> !isPrettyAlignSpace(token))
                 .findFirst();
         if (firstToken.filter(token -> token.getEndOffset() <= offset).isPresent()) {
             final List<IRobotTokenType> typesOfFirstToken = firstToken.map(RobotToken::getTypes)
@@ -221,6 +221,10 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                     || typesOfFirstToken.contains(RobotTokenType.KEYWORD_NAME);
         }
         return false;
+    }
+
+    private boolean isPrettyAlignSpace(final RobotToken token) {
+        return token.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
     }
 
     private boolean isEmptyCellToken(final IRobotLineElement firstElement) {

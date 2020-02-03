@@ -692,11 +692,11 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void breakingLineShouldNotAddContinuation_forLinesWithEmptyTokensOnly() {
-        final List<String> lines = asList("", " ", "  ");
+    public void breakingLineShouldNotAddContinuation_forLinesWithoutMeaningfulTokens() {
+        final List<String> lines = asList("", " ", "  ", "   ");
         for (final String line : lines) {
-            final RobotDocument document = newDocument(line, "*** Test Cases ***");
-            final DocumentCommand command = newDocumentCommand(line.length(), "\n");
+            final RobotDocument document = newDocument("*** Keywords ***", "kw", line);
+            final DocumentCommand command = newDocumentCommand(document.getLength(), "\n");
 
             final EditStrategyPreferences preferences = newPreferences();
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
