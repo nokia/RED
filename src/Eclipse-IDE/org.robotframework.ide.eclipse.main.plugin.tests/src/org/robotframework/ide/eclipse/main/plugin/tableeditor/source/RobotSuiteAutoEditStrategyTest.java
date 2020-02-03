@@ -625,10 +625,7 @@ public class RobotSuiteAutoEditStrategyTest {
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            final Range<Integer> lastSeparator = separators.asDescendingSetOfRanges().iterator().next();
-            final boolean shouldMoveLastSeparator = !lastSeparator.contains(offset)
-                    || lastSeparator.lowerEndpoint() == offset;
-            if (separators.contains(offset) && shouldMoveLastSeparator) {
+            if (separators.contains(offset) && !lastRange(separators).contains(offset)) {
                 final Range<Integer> separator = separators.rangeContaining(offset);
                 final int separatorStart = separator.lowerEndpoint();
                 final int separatorEnd = separator.upperEndpoint();
@@ -664,10 +661,7 @@ public class RobotSuiteAutoEditStrategyTest {
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            final Range<Integer> lastSeparator = separators.asDescendingSetOfRanges().iterator().next();
-            final boolean shouldMoveLastSeparator = !lastSeparator.contains(offset)
-                    || lastSeparator.lowerEndpoint() == offset;
-            if (separators.contains(offset) && shouldMoveLastSeparator) {
+            if (separators.contains(offset) && !lastRange(separators).contains(offset)) {
                 final Range<Integer> separator = separators.rangeContaining(offset);
                 final int separatorStart = separator.lowerEndpoint();
                 final int separatorEnd = separator.upperEndpoint();
@@ -704,6 +698,10 @@ public class RobotSuiteAutoEditStrategyTest {
 
             assertThat(command.text).isEqualTo("\n");
         }
+    }
+
+    private static Range<Integer> lastRange(final RangeSet<Integer> ranges) {
+        return ranges.asDescendingSetOfRanges().iterator().next();
     }
 
     private static RobotDocument newDocument(final String... lines) {

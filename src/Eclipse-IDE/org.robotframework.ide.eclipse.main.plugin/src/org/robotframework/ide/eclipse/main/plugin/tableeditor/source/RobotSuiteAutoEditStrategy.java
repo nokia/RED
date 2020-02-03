@@ -169,7 +169,8 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                             command.text += "..." + currentElement.getText();
                             command.offset = currentElement.getStartOffset();
                             command.length = currentElement.getEndOffset() - currentElement.getStartOffset();
-                        } else if (nextElementEndOffset > 0 && currentElement.getEndOffset() == command.offset) {
+                        } else if (nextElementEndOffset > 0 && currentElement.getEndOffset() == command.offset
+                                && getNextElement(currentLine, nextElementEndOffset).isPresent()) {
                             command.text += "...";
                             command.caretOffset = nextElementEndOffset;
                         } else if (isRequiringContinuation(firstMeaningfulToken)) {
