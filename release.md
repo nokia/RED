@@ -1,3 +1,31 @@
+# RED - Robot Editor v0.9.3
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Oxygen (v 4.7) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+For RED feature installed on Eclipse Neon or earlier, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Breakpoint toggling in multi-line calls should be more coherent
+- Debugger does not stop on breakpoint in a keyword indirectly called by "run keyword"
+- Update platform to eclipse 2019-12
+- Argument coloring in overloading case in Table Mode
+
+
+## GitHub issues updates
+ - #100 Table should display header column names
+ - #359 Exception thrown in TestRunnerAgent under Python 3.5.x
+ - #360 Add YAML filter in red.xml editor / variable files
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.9.2
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 

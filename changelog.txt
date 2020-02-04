@@ -1,3 +1,42 @@
+RED 0.9.3 - 2020/02/04
+
+Feature
+
+	[RED-1377] - Argument coloring in overloading case in Table Mode
+
+Enhancement
+
+	[RED-1380] - [GitHub #100] Table should display header column names
+	[RED-1385] - [GitHub #360] Add YAML filter in red.xml editor / variable files
+	[RED-1386] - Line continuation marker insertion idea
+	[RED-1393] - Breakpoint toggling in multi-line calls should be more coherent
+
+Bug
+
+	[RED-838] - Show library source is not working for pth library
+	[RED-1328] - Fix ContentAssistForNewTrigger RCPTT test
+	[RED-1353] - Extended variable syntax problem
+	[RED-1374] - Debugger does not stop on breakpoint in a keyword indirectly called by "run keyword"
+	[RED-1383] - [GitHub #359] Exception thrown in TestRunnerAgent under Python 3.5.x
+	[RED-1384] - Exception for TC table in History
+
+Task
+
+	[RED-1339] - Switch Python from 2.x to 3.x on machines and make it default in our environments
+	[RED-1341] - Switch to Windows 10
+	[RED-1378] - Update platform to eclipse 2019-12 (4.14)
+	[RED-1379] - Update GitHub release scripts
+	[RED-1382] - Migrate from JUnit 4 to JUnit 5
+	[RED-1390] - Jenkins: no tests report when some fails
+
+Sub-task
+
+	[RED-1345] - Add deprecation warning for for loop without end
+	[RED-1347] - Remove support for additional spaces in settings and sections names
+	[RED-1354] - Support variable in test case name
+	[RED-1357] - Remove support for TSV format
+
+
 RED 0.9.2 - 2019/12/17
 
 Enhancement
