@@ -130,6 +130,8 @@
 </li>
 <li><a href="RED/../../help/whats_new/0_9_2.html">RED 0.9.2</a>
 </li>
+<li><a href="RED/../../help/whats_new/0_9_3.html">RED 0.9.3</a>
+</li>
 </ul></li>
 </ul>
 <h3>About</h3>
