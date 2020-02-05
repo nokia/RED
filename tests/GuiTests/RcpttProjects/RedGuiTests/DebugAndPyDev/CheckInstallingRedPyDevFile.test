@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CeYksFFyEemaBdiDDGirUQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/18/19 4:36 PM
+Save-Time: 2/5/20 2:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,7 +15,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 // remove red-pydevd from python
-exec-process "python" "-m" "pip" "uninstall" "-y" "red-pydevd" -ignoreStderr true -ignoreExitCode true |  get stderr | log
+exec-process "python3" "-m" "pip" "uninstall" "-y" "red-pydevd" -ignoreStderr true -ignoreExitCode true |  get stderr | log
 
 //select python
 get-menu -path "File/New/Other..." | click
@@ -45,7 +45,7 @@ get-window "Debug Configurations" | get-group "External script" | get-editbox
 get-window "Debug Configurations" | get-button Close | click    
     
 //check that now modul is installed
-exec-process "python" "-m" "pip" "list" -ignoreStderr true | let [val result [ get stdout] ]{
+exec-process "python3" "-m" "pip" "list" -ignoreStderr true | let [val result [ get stdout] ]{
   $result| contains "red-pydevd" | assert-true -message [format "red-pydevd not found in: \n %s" $result]
 }
 
