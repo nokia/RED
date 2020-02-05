@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 11/25/19 11:07 AM
+Save-Time: 2/5/20 11:00 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,8 +21,11 @@ Entry-Name: .content
 //   full path to test library, i.e.:
 //   your_path_tor_rcptt_lib\RedGuiTests
 //
+
+
+
 //  INFO:
-// 3. Project doesn't show .pyc files. This is for test stability. See in PE-> Properties-> Resources-> Resources Filteres
+// 3. Project doesn't show .pyc files and __pycache__ folder. This is for test stability. See in Project Explorer -> Properties-> Resources-> Resources Filteres
 //
 //
 proc "check-warnings"{
@@ -104,7 +107,8 @@ check-warnings
 
 // use QuickFix to create linked folder
 get-view Problems | get-tree 
-    | select "Warnings (8 items)/RED does not support importing resources located outside of workspace. Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
+    | select "Warnings (8 items)/RED does not support importing resources located outside of workspace. "
+       + "Keywords from this resource will not be recognized. Try to use Quick Fix (Ctrl+1) to link folder into the project." 
     | key-type "M1+1"
 get-window "Quick Fix" | get-button Finish | click
 
@@ -133,15 +137,19 @@ with [get-view Problems | get-tree] {
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Path '../../.' points to location outside your workspace" | verify-true
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals [format "Path 'res_with_vars.robot' is relative to location from python Modules Search Path (sys.path). Points to '%s/ResourceProject/res/res_with_vars/res_with_vars.robot'" $RED_workspace_path_unix_style]
+        | equals [format "Path 'res_with_vars.robot' is relative to location from python Modules Search Path (sys.path). "
+           + "Points to '%s/ResourceProject/res/res_with_vars/res_with_vars.robot'" $RED_workspace_path_unix_style]
         | verify-true
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals [format "Path 'Resources/ResourcesFromFolder.robot' is relative to location from python Modules Search Path (sys.path). Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'" 
-        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
+        | equals [format "Path 'Resources/ResourcesFromFolder.robot' is relative to location from python Modules Search Path (sys.path). "
+           + "Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'" 
+        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] 
+        | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
         | verify-true
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals [format "Path 'SimpleResource.robot' is relative to location from python Modules Search Path (sys.path). Points to '%s/TestData/LibsFromPythonPath/SimpleResource.robot'" 
-        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
+        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] 
+        | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
         | verify-true
 }
 // delete linked folder
@@ -187,20 +195,23 @@ with [get-view Problems | get-tree] {
         | equals "Path '../../.' points to location outside your workspace" | verify-true
         
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals [format "Path 'res_with_vars.robot' is relative to location from python Modules Search Path (sys.path). Points to '%s/ResourceProject/res/res_with_vars/res_with_vars.robot'" $RED_workspace_path_unix_style]
+        | equals [format "Path 'res_with_vars.robot' is relative to location from python Modules Search Path (sys.path). "
+        + "Points to '%s/ResourceProject/res/res_with_vars/res_with_vars.robot'" $RED_workspace_path_unix_style]
         | verify-true
       
 	        	
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals [format "Path 'Resources/ResourcesFromFolder.robot' is relative to location from python Modules Search Path (sys.path). "
         + "Points to '%s/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot'" 
-         [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
+         [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] 
+         | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
         | verify-true
         
     get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals [format"Path 'SimpleResource.robot' is relative to location from python Modules Search Path (sys.path). "
         + "Points to '%s/TestData/LibsFromPythonPath/SimpleResource.robot'" 
-        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
+        [get-by-os -win [concat [$RCPTT_project_path | invoke substring 0 1| invoke toUpperCase] [$RCPTT_project_path | invoke substring  1 ] 
+        | invoke replace  "\\" "/" ]-linux $RCPTT_project_path ]]
         | verify-true
 }
 
