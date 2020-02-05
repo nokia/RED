@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -60,8 +61,7 @@ public class ActionNamesStyleConfigurationTest {
     public void sameStyleIsRegisteredForEachDisplayMode() throws Exception {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style1 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -85,7 +85,7 @@ public class ActionNamesStyleConfigurationTest {
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(theme, preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(theme);
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -99,8 +99,7 @@ public class ActionNamesStyleConfigurationTest {
     public void foregroundColorDefinedInStyleUsesColorTakenFromPreferences() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -113,8 +112,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesAndGherkinsIsDefinedButDoesNotFindAnything_whenThereAreNoVariablesOrGherkins() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -132,8 +130,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereAreVariables() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -155,8 +152,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForGherkinsIsDefinedAndProperlyFindsGherkins_whenThereIsGherkin() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -176,8 +172,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForGherkinsIsDefinedAndProperlyFindsGherkins_whenThereAreMultipleGherkins() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -197,8 +192,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForGherkinsAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -220,8 +214,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForQuotesIsDefinedAndProperlyFindsQuotes_whenThereAreQuotes() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -244,8 +237,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForQuotesAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -268,8 +260,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForGherkinsQuotesAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -291,8 +282,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForLibraryPrefixIsDefinedAndProperlyFindsLibraryPrefix_whenThereIsLibraryPrefix() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -311,8 +301,7 @@ public class ActionNamesStyleConfigurationTest {
     public void rangeStylesFunctionForGherkinsLibraryPrefixQuotesAndVariablesIsDefinedAndProperlyFindsThose_whenThereAreSuchElements() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final ActionNamesStyleConfiguration config = new ActionNamesStyleConfiguration(mock(TableTheme.class),
-                preferences);
+        final ActionNamesStyleConfiguration config = createConfiguration(mock(TableTheme.class));
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -331,6 +320,10 @@ public class ActionNamesStyleConfigurationTest {
                 .hasEntrySatisfying(Range.closedOpen(22, 27), styler -> hasForeground(styler, new RGB(13, 14, 15)))
                 .hasEntrySatisfying(Range.closedOpen(44, 51), styler -> hasForeground(styler, new RGB(10, 11, 12)))
                 .hasEntrySatisfying(Range.closedOpen(56, 64), styler -> hasForeground(styler, new RGB(4, 5, 6)));
+    }
+
+    private ActionNamesStyleConfiguration createConfiguration(final TableTheme theme) {
+        return new ActionNamesStyleConfiguration(theme, preferences, () -> new RobotVersion(3, 1));
     }
 
     private void hasForeground(final Styler styler, final RGB rgb) {

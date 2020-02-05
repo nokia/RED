@@ -6,9 +6,11 @@
 package org.robotframework.red.nattable.configs;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
@@ -32,20 +34,24 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
 
     private final SyntaxHighlightingCategory mainCategory;
 
-    public ActionNamesStyleConfiguration(final TableTheme theme) {
-        this(theme, RedPlugin.getDefault().getPreferences(), SyntaxHighlightingCategory.KEYWORD_CALL);
-    }
+    private final Supplier<RobotVersion> versionSupplier;
 
-    @VisibleForTesting
-    ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
-        this(theme, preferences, SyntaxHighlightingCategory.KEYWORD_CALL);
+    public ActionNamesStyleConfiguration(final TableTheme theme, final Supplier<RobotVersion> versionSupplier) {
+        this(theme, RedPlugin.getDefault().getPreferences(), SyntaxHighlightingCategory.KEYWORD_CALL, versionSupplier);
     }
 
     @VisibleForTesting
     ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences,
-            final SyntaxHighlightingCategory mainCategory) {
+            final Supplier<RobotVersion> versionSupplier) {
+        this(theme, preferences, SyntaxHighlightingCategory.KEYWORD_CALL, versionSupplier);
+    }
+
+    @VisibleForTesting
+    ActionNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences,
+            final SyntaxHighlightingCategory mainCategory, final Supplier<RobotVersion> versionSupplier) {
         super(theme, preferences);
         this.mainCategory = mainCategory;
+        this.versionSupplier = versionSupplier;
     }
 
     @Override
@@ -60,10 +66,9 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
         final Styler libraryStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_LIBRARY);
         final Styler quoteStyler = createStyler(SyntaxHighlightingCategory.KEYWORD_CALL_QUOTE);
         final Styler variableStyler = createStyler(SyntaxHighlightingCategory.VARIABLE);
-        // FIXME : version !!!
         style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,
                 findStyleRanges(gherkinStyler, libraryStyler, quoteStyler, variableStyler,
-                        VariablesAnalyzer.analyzer(null, VariablesAnalyzer.ALL_ROBOT)));
+                        VariablesAnalyzer.analyzer(versionSupplier.get(), VariablesAnalyzer.ALL_ROBOT)));
         return style;
     }
 

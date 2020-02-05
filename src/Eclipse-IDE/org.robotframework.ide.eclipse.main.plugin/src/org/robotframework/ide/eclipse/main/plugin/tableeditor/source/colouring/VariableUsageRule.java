@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
@@ -27,13 +28,17 @@ public class VariableUsageRule implements ISyntaxColouringRule {
 
     protected final IToken nonVarToken;
 
-    public VariableUsageRule(final IToken varToken) {
-        this(varToken, ISyntaxColouringRule.DEFAULT_TOKEN);
+    private final Supplier<RobotVersion> versionSupplier;
+
+    public VariableUsageRule(final IToken varToken, final Supplier<RobotVersion> versionSupplier) {
+        this(varToken, ISyntaxColouringRule.DEFAULT_TOKEN, versionSupplier);
     }
 
-    public VariableUsageRule(final IToken varToken, final IToken nonVarToken) {
+    public VariableUsageRule(final IToken varToken, final IToken nonVarToken,
+            final Supplier<RobotVersion> versionSupplier) {
         this.varToken = varToken;
         this.nonVarToken = nonVarToken;
+        this.versionSupplier = versionSupplier;
     }
 
     @Override
@@ -50,8 +55,7 @@ public class VariableUsageRule implements ISyntaxColouringRule {
             final AtomicReference<PositionedTextToken> position = new AtomicReference<>();
 
             final int offsetInFile = token.getStartOffset() + offsetInToken;
-            // FIXME : version
-            VariablesAnalyzer.analyzer(null, getAllowedVariableMarks())
+            VariablesAnalyzer.analyzer(versionSupplier.get(), getAllowedVariableMarks())
                     .visitExpression((RobotToken) token, new ExpressionVisitor() {
 
                         @Override

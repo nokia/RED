@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +44,7 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -263,6 +265,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final Supplier<RobotVersion> versionSupplier = fileModel::getRobotParserComplianceVersion;
         table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(hasWrappedCells())));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
@@ -271,8 +274,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme, versionSupplier));
     }
 
     private boolean hasWrappedCells() {

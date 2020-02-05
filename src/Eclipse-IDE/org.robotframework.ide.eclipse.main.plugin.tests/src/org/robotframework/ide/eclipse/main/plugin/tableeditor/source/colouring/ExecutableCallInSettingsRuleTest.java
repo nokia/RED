@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -71,13 +72,17 @@ public class ExecutableCallInSettingsRuleTest {
             final List<RobotLine> lines) {
         return Stream.of(
                 ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"),
+                        new Token("var_token"), () -> new RobotVersion(3, 1)),
                 ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"),
+                        new Token("var_token"), () -> new RobotVersion(3, 1)),
                 ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")),
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"),
+                        new Token("var_token"), () -> new RobotVersion(3, 1)),
                 ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(new Token("call_token"),
-                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token")))
+                        new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"),
+                        new Token("var_token"), () -> new RobotVersion(3, 1)))
                 .filter(rule -> rule.isApplicable(token))
                 .findFirst()
                 .flatMap(rule -> rule.evaluate(token, position, lines));

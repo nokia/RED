@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -86,6 +87,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -645,6 +647,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final Supplier<RobotVersion> versionSupplier = fileModel::getRobotParserComplianceVersion;
         table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(hasWrappedCells())));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
@@ -654,13 +657,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(inactiveSettingsStyle(theme));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
-        table.addConfiguration(new ActionNamesStyleConfiguration(theme));
-        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
+        table.addConfiguration(new ActionNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme, versionSupplier));
         table.addConfiguration(new KeywordArgumentsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme, versionSupplier));
     }
 
     private boolean hasWrappedCells() {

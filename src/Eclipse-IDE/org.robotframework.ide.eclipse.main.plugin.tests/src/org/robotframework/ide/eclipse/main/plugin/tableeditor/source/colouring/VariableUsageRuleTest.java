@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -24,7 +25,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 
 public class VariableUsageRuleTest {
 
-    private final VariableUsageRule testedRule = new VariableUsageRule(new Token("token"));
+    private final VariableUsageRule testedRule = new VariableUsageRule(new Token("token"),
+            () -> new RobotVersion(3, 1));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {

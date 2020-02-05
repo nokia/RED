@@ -46,6 +46,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
@@ -528,6 +529,8 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final IToken special = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
         final IToken defaultSection = coloringTokens.get(SyntaxHighlightingCategory.DEFAULT_SECTION);
 
+        final Supplier<RobotVersion> versionSupplier = () -> editor.getFileModel().getRobotParserComplianceVersion();
+
         final Function<ISyntaxColouringRule, ISyntaxColouringRule> callOverridder = r -> new KeywordCallOverridingRule(
                 r, call, libraryKwCall, editor.getKeywordUsagesFinder());
 
@@ -535,43 +538,45 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CommentRule(comment, tasks), new MatchEverythingRule(defaultSection) };
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                CodeHolderNameRule.forTest(definition, variable), new TestCaseSettingsRule(setting),
-                callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                CodeHolderNameRule.forTest(definition, variable, versionSupplier), new TestCaseSettingsRule(setting),
+                callOverridder.apply(new SettingsTemplateRule(call, variable, versionSupplier)),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTestSetupOrTeardown(call, gherkin,
-                        library, quote, variable)),
-                callOverridder
-                        .apply(ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable)),
+                        library, quote, variable, versionSupplier)),
+                callOverridder.apply(ExecutableCallRule.forExecutableInTestCase(call, gherkin, library, quote, variable,
+                        versionSupplier)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new SpecialTokensRule(special) };
+                new VariableUsageRule(variable, versionSupplier), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] tasksRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                CodeHolderNameRule.forTask(definition, variable), new TaskSettingsRule(setting),
-                callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                CodeHolderNameRule.forTask(definition, variable, versionSupplier), new TaskSettingsRule(setting),
+                callOverridder.apply(new SettingsTemplateRule(call, variable, versionSupplier)),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInTaskSetupOrTeardown(call, gherkin,
-                        library, quote, variable)),
-                callOverridder.apply(ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable)),
+                        library, quote, variable, versionSupplier)),
+                callOverridder.apply(ExecutableCallRule.forExecutableInTask(call, gherkin, library, quote, variable,
+                        versionSupplier)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new SpecialTokensRule(special) };
+                new VariableUsageRule(variable, versionSupplier), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                CodeHolderNameRule.forKeyword(definition, variable), new KeywordSettingsRule(setting),
+                CodeHolderNameRule.forKeyword(definition, variable, versionSupplier), new KeywordSettingsRule(setting),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInKeywordTeardown(call, gherkin, library,
-                        quote, variable)),
-                callOverridder
-                        .apply(ExecutableCallRule.forExecutableInKeyword(call, gherkin, library, quote, variable)),
+                        quote, variable, versionSupplier)),
+                callOverridder.apply(ExecutableCallRule.forExecutableInKeyword(call, gherkin, library, quote, variable,
+                        versionSupplier)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new SpecialTokensRule(special) };
+                new VariableUsageRule(variable, versionSupplier), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
-                new SettingRule(setting), callOverridder.apply(new SettingsTemplateRule(call, variable)),
+                new SettingRule(setting),
+                callOverridder.apply(new SettingsTemplateRule(call, variable, versionSupplier)),
                 callOverridder.apply(ExecutableCallInSettingsRule.forExecutableInGeneralSettingsSetupsOrTeardowns(call,
-                        gherkin, library, quote, variable)),
+                        gherkin, library, quote, variable, versionSupplier)),
                 new SpecialTokensInNestedExecsRule(special), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable), new SpecialTokensRule(special) };
+                new VariableUsageRule(variable, versionSupplier), new SpecialTokensRule(special) };
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment, tasks),
-                new VariableUsageRule(variable) };
+                new VariableUsageRule(variable, versionSupplier) };
 
         final Map<String, ISyntaxColouringRule[]> rules = new HashMap<>();
         rules.put(IDocument.DEFAULT_CONTENT_TYPE, defaultRules);

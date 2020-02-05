@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.ColoringTokens;
@@ -157,7 +158,7 @@ public class ShellSourceViewerConfig extends SourceViewerConfiguration {
                 new TokenTypeBasedRule(passToken, ShellTokenType.PASS),
                 new TokenTypeBasedRule(failToken, ShellTokenType.FAIL),
                 new ExecutableCallInShellRule(call, gherkin, library, quote, variable),
-                new VariableUsageRule(variable) };
+                new VariableUsageRule(variable, () -> new RobotVersion(3, 2)) };
 
         final Map<String, ISyntaxColouringRule[]> rules = new HashMap<>();
         rules.put(IDocument.DEFAULT_CONTENT_TYPE, colouringRules);

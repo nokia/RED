@@ -5,6 +5,9 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.function.Supplier;
+
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -17,13 +20,14 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class VariablesInNamesStyleConfiguration extends VariablesInElementsStyleConfiguration {
 
-    public VariablesInNamesStyleConfiguration(final TableTheme theme) {
-        super(theme, RedPlugin.getDefault().getPreferences());
+    public VariablesInNamesStyleConfiguration(final TableTheme theme, final Supplier<RobotVersion> versionSupplier) {
+        this(theme, RedPlugin.getDefault().getPreferences(), versionSupplier);
     }
 
     @VisibleForTesting
-    VariablesInNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
-        super(theme, preferences);
+    VariablesInNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences,
+            final Supplier<RobotVersion> versionSupplier) {
+        super(theme, preferences, versionSupplier);
     }
 
     @Override

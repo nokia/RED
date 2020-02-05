@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -33,13 +34,16 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 public class ExecutableCallRuleTest {
 
     private final ExecutableCallRule tcTestedRule = ExecutableCallRule.forExecutableInTestCase(new Token("call_token"),
-            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"),
+            () -> new RobotVersion(3, 1));
 
     private final ExecutableCallRule taskTestedRule = ExecutableCallRule.forExecutableInTask(new Token("call_token"),
-            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"),
+            () -> new RobotVersion(3, 1));
 
     private final ExecutableCallRule kwTestedRule = ExecutableCallRule.forExecutableInKeyword(new Token("call_token"),
-            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"));
+            new Token("gherkin_token"), new Token("lib_token"), new Token("quote_token"), new Token("var_token"),
+            () -> new RobotVersion(3, 1));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -23,7 +24,7 @@ public class ExecutableCallInShellRule extends ExecutableCallRule {
             final IToken quoteToken, final IToken embeddedVariablesToken) {
         super(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(ShellTokenType.CALL_KW, ShellTokenType.CALL_ARG),
-                elem -> elem.getTypes().contains(ShellTokenType.MODE_FLAG));
+                elem -> elem.getTypes().contains(ShellTokenType.MODE_FLAG), () -> new RobotVersion(3, 2));
     }
 
     @Override

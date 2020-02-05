@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -49,8 +50,7 @@ public class VariablesInElementsStyleConfigurationTest {
     public void sameStyleIsRegisteredForEachDisplayMode() throws Exception {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
-                mock(TableTheme.class), preferences);
+        final VariablesInElementsStyleConfiguration config = createConfiguration();
         config.configureRegistry(configRegistry);
 
         final IStyle style1 = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -72,9 +72,7 @@ public class VariablesInElementsStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedButDoesNotFindAnyVariable_whenThereAreNoVariables() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
-                mock(TableTheme.class),
-                preferences);
+        final VariablesInElementsStyleConfiguration config = createConfiguration();
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -92,9 +90,7 @@ public class VariablesInElementsStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereAreMultipleSophisticatedVariables() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
-                mock(TableTheme.class),
-                preferences);
+        final VariablesInElementsStyleConfiguration config = createConfiguration();
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -116,9 +112,7 @@ public class VariablesInElementsStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariables_whenThereIsSingleVariable() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
-                mock(TableTheme.class),
-                preferences);
+        final VariablesInElementsStyleConfiguration config = createConfiguration();
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -137,9 +131,7 @@ public class VariablesInElementsStyleConfigurationTest {
     public void rangeStylesFunctionForVariablesIsDefinedAndProperlyFindsVariable_whenThereIsSingleEnvironmentVariable() {
         final IConfigRegistry configRegistry = new ConfigRegistry();
 
-        final VariablesInElementsStyleConfiguration config = new VariablesInElementsStyleConfiguration(
-                mock(TableTheme.class),
-                preferences);
+        final VariablesInElementsStyleConfiguration config = createConfiguration();
         config.configureRegistry(configRegistry);
 
         final IStyle style = configRegistry.getConfigAttribute(CellConfigAttributes.CELL_STYLE, DisplayMode.NORMAL,
@@ -152,6 +144,11 @@ public class VariablesInElementsStyleConfigurationTest {
         final RangeMap<Integer, Styler> styles = decoratingFunction.apply("some%{home}text");
         assertThat(styles.asMapOfRanges()).hasSize(1)
                 .hasEntrySatisfying(Range.closedOpen(4, 11), styler -> hasForeground(styler, new RGB(1, 2, 3)));
+    }
+
+    private VariablesInElementsStyleConfiguration createConfiguration() {
+        return new VariablesInElementsStyleConfiguration(mock(TableTheme.class), preferences,
+                () -> new RobotVersion(3, 1));
     }
 
     private void hasForeground(final Styler styler, final RGB rgb) {

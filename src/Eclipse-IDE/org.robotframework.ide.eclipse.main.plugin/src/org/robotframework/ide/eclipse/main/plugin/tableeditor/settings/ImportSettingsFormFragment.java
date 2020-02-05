@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,6 +50,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.event.Event;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -323,6 +325,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final Supplier<RobotVersion> versionSupplier = fileModel::getRobotParserComplianceVersion;
         final boolean wrapCells = hasWrappedCells();
         table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(wrapCells)));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
@@ -335,8 +338,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SettingsItemsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme, versionSupplier));
     }
 
     private boolean hasWrappedCells() {

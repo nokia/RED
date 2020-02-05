@@ -5,6 +5,9 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import java.util.function.Supplier;
+
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
@@ -14,13 +17,14 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class ActionFromLibNamesStyleConfiguration extends ActionNamesStyleConfiguration {
 
-    public ActionFromLibNamesStyleConfiguration(final TableTheme theme) {
-        this(theme, RedPlugin.getDefault().getPreferences());
+    public ActionFromLibNamesStyleConfiguration(final TableTheme theme, final Supplier<RobotVersion> versionSupplier) {
+        this(theme, RedPlugin.getDefault().getPreferences(), versionSupplier);
     }
 
     @VisibleForTesting
-    ActionFromLibNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
-        super(theme, preferences, SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB);
+    ActionFromLibNamesStyleConfiguration(final TableTheme theme, final RedPreferences preferences,
+            final Supplier<RobotVersion> versionSupplier) {
+        super(theme, preferences, SyntaxHighlightingCategory.KEYWORD_CALL_FROM_LIB, versionSupplier);
     }
 
     @Override

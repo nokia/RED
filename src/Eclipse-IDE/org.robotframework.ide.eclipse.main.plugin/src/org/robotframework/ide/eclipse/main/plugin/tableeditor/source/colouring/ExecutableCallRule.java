@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
@@ -26,24 +28,27 @@ import org.rf.ide.core.validation.SpecialKeywords;
 public class ExecutableCallRule extends VariableUsageRule {
 
     public static ExecutableCallRule forExecutableInTestCase(final IToken textToken, final IToken gherkinToken,
-            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken,
+            final Supplier<RobotVersion> versionSupplier) {
         return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT),
-                elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
+                elem -> elem.getTypes().contains(RobotTokenType.TEST_CASE_NAME), versionSupplier);
     }
 
     public static ExecutableCallRule forExecutableInTask(final IToken textToken, final IToken gherkinToken,
-            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken,
+            final Supplier<RobotVersion> versionSupplier) {
         return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT),
-                elem -> elem.getTypes().contains(RobotTokenType.TASK_NAME));
+                elem -> elem.getTypes().contains(RobotTokenType.TASK_NAME), versionSupplier);
     }
 
     public static ExecutableCallRule forExecutableInKeyword(final IToken textToken, final IToken gherkinToken,
-            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken) {
+            final IToken libraryToken, final IToken quoteToken, final IToken embeddedVariablesToken,
+            final Supplier<RobotVersion> versionSupplier) {
         return new ExecutableCallRule(textToken, gherkinToken, libraryToken, quoteToken, embeddedVariablesToken,
                 EnumSet.of(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT),
-                elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_NAME));
+                elem -> elem.getTypes().contains(RobotTokenType.KEYWORD_NAME), versionSupplier);
     }
 
     private final Set<? extends IRobotTokenType> acceptableTypes;
@@ -59,8 +64,8 @@ public class ExecutableCallRule extends VariableUsageRule {
     protected ExecutableCallRule(final IToken textToken, final IToken gherkinToken, final IToken libraryToken,
             final IToken quoteToken, final IToken embeddedVariablesToken,
             final Set<? extends IRobotTokenType> acceptableTypes,
-            final Predicate<IRobotLineElement> shouldStopOnElement) {
-        super(embeddedVariablesToken, textToken);
+            final Predicate<IRobotLineElement> shouldStopOnElement, final Supplier<RobotVersion> versionSupplier) {
+        super(embeddedVariablesToken, textToken, versionSupplier);
         this.gherkinToken = gherkinToken;
         this.libraryToken = libraryToken;
         this.quoteToken = quoteToken;

@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -29,7 +30,8 @@ public class CodeHolderNameRuleTest {
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
 
         assertThat(rule.isApplicable(new RobotToken())).isTrue();
         assertThat(rule.isApplicable(new Separator())).isFalse();
@@ -38,41 +40,47 @@ public class CodeHolderNameRuleTest {
 
     @Test
     public void simpleKeywordNameIsRecognized() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognized(rule, TokensSource.createTokens(), text -> text.contains("userkw"));
     }
 
     @Test
     public void simpleKeywordNameIsRecognized_evenWhenPositionIsInsideToken() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognizedWhenPositionedInside(rule, TokensSource.createTokens(),
                 text -> text.contains("userkw"));
     }
 
     @Test
     public void simpleTestCaseNameIsRecognized() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forTest(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forTest(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognized(rule, TokensSource.createTokens(),
                 text -> text.equals("case 1") || text.equals("case 2"));
     }
 
     @Test
     public void simpleTestCaseNameIsRecognized_evenWhenPositionIsInsideToken() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forTest(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forTest(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognizedWhenPositionedInside(rule, TokensSource.createTokens(),
                 text -> text.equals("case 1") || text.equals("case 2"));
     }
 
     @Test
     public void simpleTaskNameIsRecognized() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forTask(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forTask(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognized(rule, TokensSource.createRpaTokens(),
                 text -> text.equals("task 1") || text.equals("task 2"));
     }
 
     @Test
     public void simpleTaskNameIsRecognized_evenWhenPositionIsInsideToken() {
-        final CodeHolderNameRule rule = CodeHolderNameRule.forTask(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forTask(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         assertSimpleNameIsRecognizedWhenPositionedInside(rule, TokensSource.createRpaTokens(),
                 text -> text.equals("task 1") || text.equals("task 2"));
     }
@@ -90,7 +98,8 @@ public class CodeHolderNameRuleTest {
         varPositions.add(new Position(content.indexOf(var2), var2.length()));
         varPositions.add(new Position(content.indexOf(var3), var3.length()));
 
-        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         final RobotToken token = createKeywordNameToken(content);
 
         for (final Position position : varPositions) {
@@ -121,7 +130,8 @@ public class CodeHolderNameRuleTest {
 
         final RobotToken token = createKeywordNameToken(content);
 
-        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"));
+        final CodeHolderNameRule rule = CodeHolderNameRule.forKeyword(new Token("name_token"), new Token("var_token"),
+                () -> new RobotVersion(3, 1));
         for (final Position position : nonVarPositions) {
             for (int offset = 0; offset < position.getLength(); offset++) {
                 final Optional<PositionedTextToken> evaluatedToken = rule.evaluate(token, position.getOffset() + offset,

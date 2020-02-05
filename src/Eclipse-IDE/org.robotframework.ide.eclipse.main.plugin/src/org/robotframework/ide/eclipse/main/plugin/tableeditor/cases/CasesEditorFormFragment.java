@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,6 +51,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.rf.ide.core.environment.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -337,6 +339,7 @@ class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final Supplier<RobotVersion> versionSupplier = fileModel::getRobotParserComplianceVersion;
         final boolean wrapCells = hasWrappedCells();
         table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(wrapCells)));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
@@ -345,15 +348,15 @@ class CasesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
         table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), wrapCells,
                 RedImages.getTestCaseImage(), RedImages.getTemplatedTestCaseImage()));
-        table.addConfiguration(new ActionNamesStyleConfiguration(theme));
-        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme));
+        table.addConfiguration(new ActionNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new ActionFromLibNamesStyleConfiguration(theme, versionSupplier));
         table.addConfiguration(new KeywordArgumentsStyleConfiguration(theme));
         table.addConfiguration(new SpecialItemsStyleConfiguration(theme));
         table.addConfiguration(new CommentsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
-        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme));
-        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme));
+        table.addConfiguration(new VariablesInNamesStyleConfiguration(theme, versionSupplier));
+        table.addConfiguration(new VariablesInElementsStyleConfiguration(theme, versionSupplier));
     }
 
     private boolean hasWrappedCells() {
