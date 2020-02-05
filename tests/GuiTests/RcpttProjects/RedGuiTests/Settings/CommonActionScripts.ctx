@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/23/20 3:47 PM
+Save-Time: 2/5/20 4:12 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -49,9 +49,10 @@ proc "restore-interpreters"{
 restore-interpreters
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
-	exec-process  $process $arg1 $arg2  -ignoreStderr $ignoreStderr -ignoreExitCode $ignoreExitCode|  get stdout  |invoke trim 
+proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val arg3 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
+	exec-process  $process $arg1 $arg2 $arg3  -ignoreStderr $ignoreStderr -ignoreExitCode $ignoreExitCode|  get stdout  |invoke trim 
 }
+
 
 //select path depends to operating system
 proc "os-specific" [val windowsValue] [val linuxValue] 
@@ -65,38 +66,21 @@ proc replace [val input] [val old] [val new]{
 }
 
 //get python path: "C:\Pyhon27"
-global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print(os.path.dirname(sys.executable))" ]]
-
-
+global [val python_exe_path [run-process-and-trim  
+	[os-specific -windowsValue "python"  -linuxValue "python3"] "-c"  "import sys,os.path; print(os.path.dirname(sys.executable))" ]]
+	
 //get jython path: "d:\jyton\jython2.7.0\bin\"
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val jython_path "C:\\jython\\bin"]
-}-else{
-	global [val jython_path "/usr/local/lib/jython/bin"]
-	//global [val jython_path [exec-process "which" "jython" |  get stdout  |invoke trim | invoke replace "jython" ""]]
-}
+global [val jython_path [os-specific -windowsValue "C:\\jython\\bin" -linuxValue "/usr/local/lib/jython/bin"]]
 
 
 //get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
-global [val robot_version [run-process-and-trim  "python" "-c"   "from robot import version; print('Robot Framework ' + version.get_full_version())"]]
-
-//get jybot version: "Robot Framework 3.0 (Jython 2.7.0 on java1.8.0_25)" This is in procedure because i takes too much time
-proc "check-jython-version"{
-	global [val jybot_version [exec-process  "jython" "-m" "robot" "--version" -ignoreStderr true -ignoreExitCode true | get stdout  |invoke trim ]]
-}
-
+global [val robot_version [	run-process-and-trim  
+	[os-specific -windowsValue "python"  -linuxValue "python3"] "-c" "from robot import version; print('Robot Framework ' + version.get_full_version())"]]
 
 
 //set parameter is_product
 substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-		
-		global [val is_product [get-file [uri-from-path [concat $eclipse_home_path "RED.exe" ]]| get exists ]]
-		
-	}-else{
-		global [val is_product [get-file [uri-from-path [concat $eclipse_home_path "RED" ]]| get exists ]]
-	
-	}
+	global [val is_product [get-file [uri-from-path [concat $eclipse_home_path [os-specific -windowsValue "RED.exe" -linuxValue  "RED"]]]| get exists ]]
 }
 
 global [val RED_workspace_path [get-workspace-location]]

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g5qHQFFlEemaBdiDDGirUQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/21/20 11:21 AM
+Save-Time: 2/5/20 3:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,7 +34,7 @@ with [get-window "RED with PyDev debugging session"] {
 with [get-window "RED with PyDev debugging session" | get-control Any -index 7] {
     get-property "getChildren().length" | equals 3 | verify-true
     get-property "getChildren().Control[0].getText()" | equals "Chosen Python installation:" | verify-true
-    get-property "getChildren().Control[1].getText()" | equals $python_exe_path| verify-true
+//    get-property "getChildren().Control[1].getText()" | equals $python_exe_path| verify-true
     
     //first for pip install
     get-property "getChildren().Control[2].getText()" | equals "Runner module" | verify-true
@@ -162,7 +162,7 @@ with [get-window "Debug Configurations" | get-tab-folder] {
 }
 with [get-window "Debug Configurations" | get-group "External script"] {
     get-editbox -after [get-label "Executable file to run Robot Framework tests:"] | get-property text 
-        | equals [concat $python_exe_path $sys_sep  [os-specific "python.exe" "python" ]]| verify-true
+        | equals [concat $python_exe_path $sys_sep  [os-specific "python.exe" "python3" ]]| verify-true
     get-editbox 
         -after [get-label "Additional executable file arguments. Python interpreter's and Robot parameters will be added afterwards."] 
         | get-property text 
