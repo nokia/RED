@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-UsioKUBEeazyPh6f3_hNQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/12/19 10:51 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 2/5/20 2:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -53,7 +53,7 @@ proc "check-default-errors"{
 	        | equals "Invalid time format '1 dec'" | verify-true
 	        
 	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[6].getText()" 
-	        | equals "Keyword name 'var_as_kw_name' contains variables." | verify-true
+	        | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 	            
 	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[7].getText()" 
 	        | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
@@ -133,7 +133,7 @@ with [get-view Problems | get-tree] {
     get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals "Invalid time format '1 dec'" | verify-true
     get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-        | equals "Keyword name 'var_as_kw_name' contains variables."| verify-true   
+        | equals "Keyword name '${var_as_kw_name}' contains variables."| verify-true   
             
     get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
         | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
@@ -197,18 +197,18 @@ wait 2000
 try{
 	with [get-editor "tsv_file.tsv" | get-text-viewer] {
 	    get-property "markers['13'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
-	    get-property "markers['13'][0].text" | equals "Keyword name 'var_as_kw_name' contains variables." | verify-true
+	    get-property "markers['13'][0].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 	}
 }-catch{
 	try {
 		with [get-editor "tsv_file.tsv" | get-text-viewer] {
 		    get-property "markers['13'][1].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
-		    get-property "markers['13'][1].text" | equals "Keyword name 'var_as_kw_name' contains variables." | verify-true
+		    get-property "markers['13'][1].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 		}
 	}-catch{
 		with [get-editor "tsv_file.tsv" | get-text-viewer] {
 		    get-property "markers['13'][2].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
-		    get-property "markers['13'][2].text" | equals "Keyword name 'var_as_kw_name' contains variables." | verify-true
+		    get-property "markers['13'][2].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 		}
 	}	
 }
