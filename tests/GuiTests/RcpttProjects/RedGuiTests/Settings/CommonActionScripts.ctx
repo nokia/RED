@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/5/20 4:12 PM
+Save-Time: 2/6/20 5:57 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -77,6 +77,8 @@ global [val jython_path [os-specific -windowsValue "C:\\jython\\bin" -linuxValue
 global [val robot_version [	run-process-and-trim  
 	[os-specific -windowsValue "python"  -linuxValue "python3"] "-c" "from robot import version; print('Robot Framework ' + version.get_full_version())"]]
 
+//check default pytohn - sometimes are 2 and one is linked to "python"
+global [val default_python_version [exec-process  "python" "--version" -ignoreExitCode True -ignoreStderr True  | get stderr | invoke trim ]]
 
 //set parameter is_product
 substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
