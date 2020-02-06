@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _OyDWIBxfEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/21/20 12:36 PM
+Save-Time: 2/6/20 2:37 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -34,6 +34,12 @@ proc "set-jython-as-interpereter" [val open_preferences_menu True]{
 	    get-button "Apply and Close" | click
 	    get-window "Rebuild required" | get-button OK | click
 	}
+	
+	//check label - RED-292
+	get-view "Project Explorer" | get-tree | get-item 
+	    -path ".*/Robot Standard libraries \\[Robot Framework.*\\(Jython.*\\)\\]" 
+	    | get-property caption | equals "Robot Standard libraries \[Robot Framework .*\(Jython .*\)\]" 
+	    | verify-true
 }
 
 proc "add-jython-to-interpereters" [val open_preferences_menu True]{
