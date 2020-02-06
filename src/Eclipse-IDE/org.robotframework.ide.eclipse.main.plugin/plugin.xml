@@ -7875,4 +7875,18 @@ FOR    $${${element}}    IN    @{${elements_list}}
             </pattern>
          </template>
       </extension>
+      <extension
+            point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+         <category
+               id="org.robotframework.ide.eclipse.main.plugin.cheatsheets.category.robot"
+               name="Robot Framework">
+         </category>
+         <cheatsheet
+               category="org.robotframework.ide.eclipse.main.plugin.cheatsheets.category.robot"
+               composite="false"
+               contentFile="resources/cheat_sheets/create_simple_project.xml"
+               id="org.robotframework.ide.eclipse.main.plugin.cheatsheets.createSimpleProject"
+               name="Create Sample Robot Project">
+         </cheatsheet>
+      </extension>
 </plugin>

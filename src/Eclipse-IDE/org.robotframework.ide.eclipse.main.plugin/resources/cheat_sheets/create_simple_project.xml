@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Create and run Robot Framework project">
+
+   <intro href="/org.eclipse.platform.doc.user/reference/ref-cheatsheets.htm">
+      <description>
+         This cheat sheet shows you how to create sample &quot;Robot Framework&quot; project and run it. You will create a Robot project with test suite, resource file and Python library and then execute test.<br/>
+         <br/>
+         If you need help at any step, click the (?) to the right. Let&apos;s get started!
+      </description>
+   </intro>
+
+   <item title="Select Python installation with Robot Framework installed" dialog="false" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/setting_up_environment.html">
+      <description>
+         In the main menu select <b>Window</b> &gt; <b>Preferences</b> &gt; <b>Robot Framework</b> &gt; <b>Installed frameworks</b> or click on the &quot;Click to perform&quot; link below.
+         <br/>
+         Add correct Python installation manually or use &quot;Discover&quot; button to find all installations from PATH.
+      </description>
+      <command serialization="org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed)" required="false"/>
+   </item>
+
+   <item title="Open the Robot perspective" dialog="false" skip="false" href="/org.eclipse.platform.doc.user/concepts/concepts-4.htm">
+      <description>
+         If you&apos;re not already in the Robot perspective, in the main menu select <b>Window</b> &gt; <b>Open Perspective</b> &gt; <b>Robot</b> or click on the &quot;Click to perform&quot; link below.
+      </description>
+      <command serialization="org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.ui.perspectives.RobotPerspective)" required="false"/>
+   </item>
+
+   <item title="Create a Robot project" dialog="true" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         Before creating resources, suites and libraries, we need a project to put them in. In the main toolbar or in Project Explorer context menu, click on the <b>New</b> button and select <b>Robot Project</b>, or click on the link below.<br/>
+         Enter <b>SampleProject</b> for the project name, then click <b>Finish</b>.
+      </description>
+      <command serialization="org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotProject)" required="false"/>
+   </item>
+
+   <item title="Create your Resource file" dialog="true" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         The next step is to create Robot resource file with keyword definition. In the main toolbar or in Project Explorer context menu, click on the <b>New</b> button and select <b>Robot Resource file</b>, or click on the link below.<br/>
+         <br/>
+         Make sure your project is selected, enter <b>SampleResource</b> for the file name, then click <b>Finish</b>.<br/>
+         <br/>
+         The Robot source editor will be automatically opened showing your new resource file.
+      </description>
+      <command serialization="org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotResource)" required="false"/>
+   </item>
+
+   <item title="Add new keyword definition" dialog="false" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         Create keywords section with new keyword by manually typing it in editor or using content assistant activated with Ctrl+Space.<br/>
+         <br/>
+         Keyword can be also defined by code template available in content assistant.
+      </description>
+	  <subitem label="Insert '*** Keywords ***' section"/>
+	  <subitem label="Type keyword name in keywords section, for example 'Resource Keyword'"/>
+	  <subitem label="Define action inside keyword, for example 'Log  resource_message'"/>
+   </item>
+
+   <item title="Create your Python library" dialog="true" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         The next step is to create Robot library in Python file. In the main toolbar or in Project Explorer context menu, click on the <b>New</b> button and select <b>Robot python file</b>, or click on the link below.<br/>
+         <br/>
+         Make sure your project is selected, enter <b>SampleLibrary</b> for the file name, select <b>Library</b> or <b>Dynamic API library</b> radio button, then click <b>Finish</b>.<br/>
+         <br/>
+         Default Python source editor will be automatically opened showing your new Python library file.<br/>
+         <br/>
+         In Python editor create keyword with name <b>Library Keyword</b> which prints some string, for example "library_message".
+      </description>
+      <command serialization="org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotPython)" required="false"/>
+   </item>
+
+   <item title="Add Python library to project configuration" dialog="false" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/user_guide/project_config/libraries.html">
+      <description>
+         In Project Explorer right click on created Python file and select <b>Robot Framework</b> &gt; <b>Add Library to red.xml</b> menu option.<br/>
+         <br/>
+         Library can be also added in <b>red.xml</b> editor in <b>Libraries</b> tab.
+      </description>
+   </item>
+
+   <item title="Create your Test Suite" dialog="true" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         The next step is to create Robot Test Suite with test case definition together with library and resource imports. In the main toolbar or in Project Explorer context menu, click on the <b>New</b> button and select <b>Robot Test Suite</b>, or click on the link below.<br/>
+         <br/>
+         Make sure your project is selected, enter <b>SampleSuite</b> for the file name, then click <b>Finish</b>.<br/>
+         <br/>
+         The Robot source editor will be automatically opened showing your new test suite with empty test cases section.
+      </description>
+      <command serialization="org.eclipse.ui.newWizard(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotCase)" required="false"/>
+   </item>
+
+   <item title="Add new test case and imports" dialog="false" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+         Create new test case and imports by manually typing them in editor or using content assistant activated with Ctrl+Space.<br/>
+         <br/>
+         Test case and setting section can be also defined by code template available in content assistant.
+      </description>
+	  <subitem label="Insert '*** Settings ***' section"/>
+	  <subitem label="Add resource import in settings section, for example 'Resource  SampleResource.robot'"/>
+	  <subitem label="Add library import in settings section, for example 'Library  SampleLibrary '"/>
+	  <subitem label="Type test case name in test cases section, for example 'Sample Test'"/>
+	  <subitem label="Define action inside test case, for example 'Log  test_message'"/>
+	  <subitem label="Define action inside test case using keyword from imported resource, for example 'Resource Keyword'"/>
+	  <subitem label="Define action inside test case using keyword from imported library, for example 'Library Keyword'"/>
+   </item>
+
+   <item title="Run your test" dialog="false" skip="false" href="/org.robotframework.ide.eclipse.main.plugin.doc.user/help/first_steps/create_run.html">
+      <description>
+	  To <b>run</b> your Robot test, right-click on it in source view and select <b>Run test: 'Sample Test'</b>. You can also right click on test or project in Project Explorer and select <b>Run As</b> &gt; <b>Robot Test</b> menu option.<br/>
+	  <br/>
+	  The <b>Console</b> view should appear at the bottom and display output from used keywords.<br/>
+	  <br/>
+	  Congratulations! You have successfully created sample Robot Framework project!
+      </description>
+   </item>
+
+</cheatsheet>
