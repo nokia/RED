@@ -11,8 +11,12 @@ import java.util.function.Predicate;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,13 +42,24 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
 
             final List<IProject> projects = Selections.getAdaptableElements(selection, IProject.class);
 
-            for (final IProject project : projects) {
-                if ("enable".equalsIgnoreCase(enablement)) {
-                    RobotProjectNature.addRobotNature(project, new NullProgressMonitor(), shouldRedXmlBeReplaced());
-                } else if ("disable".equalsIgnoreCase(enablement)) {
-                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(), shouldRedXmlBeRemoved());
+            final WorkspaceJob job = new WorkspaceJob("Configuring Project nature") {
+
+                @Override
+                public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                    for (final IProject project : projects) {
+                        if ("enable".equalsIgnoreCase(enablement)) {
+                            RobotProjectNature.addRobotNature(project, new NullProgressMonitor(),
+                                    shouldRedXmlBeReplaced());
+                        } else if ("disable".equalsIgnoreCase(enablement)) {
+                            RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
+                                    shouldRedXmlBeRemoved());
+                        }
+                    }
+                    return Status.OK_STATUS;
                 }
-            }
+            };
+            job.setUser(false);
+            job.schedule();
         }
 
         private static Predicate<IProject> shouldRedXmlBeRemoved() {
