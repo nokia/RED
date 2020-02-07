@@ -29,7 +29,7 @@ public class RobotProjectNature implements IProjectNature {
     private IProject project;
 
     public static void addRobotNature(final IProject project, final IProgressMonitor monitor,
-            final Predicate<IProject> shouldReplaceConfig) throws CoreException {
+            final Predicate<String> shouldReplaceConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -39,13 +39,13 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
 
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (!cfgFile.exists() || shouldReplaceConfig.test(project)) {
+        if (!cfgFile.exists() || shouldReplaceConfig.test(project.getName())) {
             new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
         }
     }
 
     public static void removeRobotNature(final IProject project, final IProgressMonitor monitor,
-            final Predicate<IProject> shouldRemoveConfig) throws CoreException {
+            final Predicate<String> shouldRemoveConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -55,7 +55,7 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
 
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (cfgFile.exists() && shouldRemoveConfig.test(project)) {
+        if (cfgFile.exists() && shouldRemoveConfig.test(project.getName())) {
             cfgFile.delete(true, null);
         }
     }

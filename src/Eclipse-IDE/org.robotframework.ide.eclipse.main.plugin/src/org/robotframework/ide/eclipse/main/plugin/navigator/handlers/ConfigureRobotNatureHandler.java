@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import javax.inject.Named;
 
@@ -25,6 +24,8 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler.E4ConfigureRobotNatureHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.red.commands.DIParameterizedHandler;
+import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.swt.SwtThread.Evaluation;
 import org.robotframework.red.viewers.Selections;
 
 public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4ConfigureRobotNatureHandler> {
@@ -49,10 +50,11 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
                     for (final IProject project : projects) {
                         if ("enable".equalsIgnoreCase(enablement)) {
                             RobotProjectNature.addRobotNature(project, new NullProgressMonitor(),
-                                    shouldRedXmlBeReplaced());
+                                    E4ConfigureRobotNatureHandler::shouldRedXmlBeReplaced);
+
                         } else if ("disable".equalsIgnoreCase(enablement)) {
                             RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
-                                    shouldRedXmlBeRemoved());
+                                    E4ConfigureRobotNatureHandler::shouldRedXmlBeRemoved);
                         }
                     }
                     return Status.OK_STATUS;
@@ -62,30 +64,30 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
             job.schedule();
         }
 
-        private static Predicate<IProject> shouldRedXmlBeRemoved() {
-            return project -> {
+        private static boolean shouldRedXmlBeRemoved(final String projectName) {
+            return SwtThread.syncEval(Evaluation.of(() -> {
                 final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
                         "Confirm configuration file removal", null,
                         String.format(
                                 "You have deconfigured the project '%s' as a Robot project.\n"
                                         + "Do you want to remove project configuration file '%s' too?",
-                                project.getName(), RobotProjectConfig.FILENAME),
+                                projectName, RobotProjectConfig.FILENAME),
                         MessageDialog.QUESTION, new String[] { "Leave", "Remove" }, 0);
                 return dialog.open() == 1;
-            };
+            }));
         }
 
-        private static Predicate<IProject> shouldRedXmlBeReplaced() {
-            return project -> {
+        private static boolean shouldRedXmlBeReplaced(final String projectName) {
+            return SwtThread.syncEval(Evaluation.of(() -> {
                 final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
                         "Confirm configuration file replacement", null,
                         String.format(
                                 "You have configured the project '%s' as a Robot project.\n"
                                         + "Do you want to replace project configuration file '%s' too?",
-                                project.getName(), RobotProjectConfig.FILENAME),
+                                projectName, RobotProjectConfig.FILENAME),
                         MessageDialog.QUESTION, new String[] { "Leave", "Replace" }, 0);
                 return dialog.open() == 1;
-            };
+            }));
         }
     }
 }

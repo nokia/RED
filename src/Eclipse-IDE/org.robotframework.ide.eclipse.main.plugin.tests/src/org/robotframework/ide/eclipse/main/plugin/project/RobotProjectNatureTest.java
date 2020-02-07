@@ -46,7 +46,7 @@ public class RobotProjectNatureTest {
     @Test
     public void robotNatureIsSetAndDefaultConfigIsCreated_whenDoesNotExist() throws Exception {
         @SuppressWarnings("unchecked")
-        final Predicate<IProject> shouldReplaceConfig = mock(Predicate.class);
+        final Predicate<String> shouldReplaceConfig = mock(Predicate.class);
         RobotProjectNature.addRobotNature(project, monitor, shouldReplaceConfig);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isTrue();
@@ -96,7 +96,7 @@ public class RobotProjectNatureTest {
         project.getFile(RobotProjectConfig.FILENAME).delete(true, null);
 
         @SuppressWarnings("unchecked")
-        final Predicate<IProject> shouldRemoveConfig = mock(Predicate.class);
+        final Predicate<String> shouldRemoveConfig = mock(Predicate.class);
         RobotProjectNature.removeRobotNature(project, monitor, shouldRemoveConfig);
 
         assertThat(RobotProjectNature.hasRobotNature(project)).isFalse();
