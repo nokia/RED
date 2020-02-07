@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _nyd9cMmbEem4rLX8K5H9uw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/24/19 3:50 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 2/7/20 2:11 PM
 Testcase-Type: ecl
 Verifications: _zVmTUMmkEem4rLX8K5H9uw,_tx_g0MmkEem4rLX8K5H9uw,_4zxMMMmkEem4rLX8K5H9uw,_AzGaQMmlEem4rLX8K5H9uw,_odceAMmkEem4rLX8K5H9uw,_G_fEAMmlEem4rLX8K5H9uw,_ueRikMmlEem4rLX8K5H9uw,_dllnkMo8Eem4rLX8K5H9uw
 
@@ -152,6 +152,7 @@ with [get-editor "task.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+get-editor "task.robot" | get-text-viewer | set-caret-pos 3 4
 
 get-view "Project Explorer" | get-tree | select "a1/template_name_in_one_line.robot" | select "a1/template_test.robot" 
     | double-click
