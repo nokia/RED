@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IK9JwOxWEeaEfJH5Ahap2w
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/20/20 6:43 PM
+Save-Time: 2/7/20 2:56 PM
 Tags: jython
 Testcase-Type: ecl
 
@@ -127,6 +127,10 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"
 //run test when wrong interpreter was selected
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
+    
+    try -times 3 -delay 500 -command{
+    	 get-window "Problem Occurred"
+    } 
     //check error 
     get-window "Problem Occurred" | get-label "'Launching Robot Tests' has encountered a problem." 
         | get-property caption | equals "'Launching Robot Tests' has encountered a problem." | verify-true
