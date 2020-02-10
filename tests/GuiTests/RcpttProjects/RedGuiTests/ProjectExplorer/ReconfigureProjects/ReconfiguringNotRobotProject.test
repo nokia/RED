@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _sSLVQEdzEeaRB_Xz0tiYpg
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 5/22/19 4:34 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 2/10/20 2:07 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -230,6 +230,16 @@ get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Unknown keyword 'lo
 //configure (red.xml exists and will be not added)
 get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Add Robot nature" | click
 
+with [get-window "Confirm configuration file replacement"] {
+    get-label "You have configured the project 'new' as a Robot project.Do you want to replace project configuration file 'red.xml' too?" 
+        | get-property caption | equals "You have configured the project 'new' as a Robot project.\n"
+        + "Do you want to replace project configuration file 'red.xml' too?" | verify-true
+    get-button Replace | get-property enablement | equals true | verify-true
+    get-button Leave | get-property enablement | equals true | verify-true
+}
+//set to not remove red.xml
+get-window "Confirm configuration file replacement" | get-button Leave | click
+
 with [get-view "Project Explorer" | get-tree] {
     get-item new | get-property childCount | equals 4 | verify-true
     get-item new | get-property "getItems().TreeItem[0].getText()" 
@@ -258,15 +268,7 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
     + "\t</natures>\n"
     + "</projectDescription>" | verify-true
     
-with [get-window "Confirm configuration file replacement"] {
-    get-label "You have configured the project 'new' as a Robot project.Do you want to replace project configuration file 'red.xml' too?" 
-        | get-property caption | equals "You have configured the project 'new' as a Robot project.\n"
-        + "Do you want to replace project configuration file 'red.xml' too?" | verify-true
-    get-button Replace | get-property enablement | equals true | verify-true
-    get-button Leave | get-property enablement | equals true | verify-true
-}
-//set to not remove red.xml
-get-window "Confirm configuration file replacement" | get-button Leave | click
+
 //check red.xml if was not changed
 get-editor "red.xml" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
@@ -296,4 +298,5 @@ with [get-window "(Available Customizations)|(Filters and Customization)"]  {
     }
     get-button OK | click
 }   
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
