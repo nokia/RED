@@ -1,0 +1,259 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CheatSheets
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ft6yME2zEeqFC4TnQ03-aw
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 2/12/20 5:32 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open cheat sheets from Help
+get-menu -path "Help/Cheat Sheets..." | click
+
+get-window "Cheat Sheet Selection" | get-tree | get-item "Robot Framework" |  expand
+//check that only one is in view
+with [get-window "Cheat Sheet Selection" | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Robot Framework" | verify-true
+    get-property "getItems().TreeItem[0].getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "Create Sample Robot Project" 
+        | verify-true
+}
+
+try -command{
+	// select Create Sample Robot Project
+	with [get-window "Cheat Sheet Selection"] {
+	    get-tree | select "Robot Framework/Create Sample Robot Project"
+	    get-button OK | click
+	}
+	
+	// check how many sections are
+	with [get-view "Cheat Sheets" | get-control Any -after [get-label "Create and run Robot Framework project"]] {
+	    get-property "getChildren().Control[0].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[1].getText()" | equals Introduction | verify-true
+	    get-property "getChildren().Control[2].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[3].getText()" 
+	        | equals "Select Python installation with Robot Framework installed" | verify-true
+	    get-property "getChildren().Control[4].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[5].getText()" | equals "Open the Robot perspective" | verify-true
+	    get-property "getChildren().Control[6].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[7].getText()" | equals "Create a Robot project" | verify-true
+	    get-property "getChildren().Control[8].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[9].getText()" | equals "Create your Resource file" | verify-true
+	    get-property "getChildren().Control[10].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[11].getText()" | equals "Add new keyword definition" | verify-true
+	    get-property "getChildren().Control[12].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[13].getText()" | equals "Create your Python library" | verify-true
+	    get-property "getChildren().Control[14].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[15].getText()" | equals "Add Python library to project configuration" 
+	        | verify-true
+	    get-property "getChildren().Control[16].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[17].getText()" | equals "Create your Test Suite" | verify-true
+	    get-property "getChildren().Control[18].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[19].getText()" | equals "Add new test case and imports" | verify-true
+	    get-property "getChildren().Control[20].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[21].getText()" | equals "Run your test" | verify-true
+	}
+	
+	// restart view - in case it was done
+	get-button "View Menu" -index 1 | click
+	get-view "Cheat Sheets" | get-menu -path Restart | click
+	
+	// check that Introduction is expanded
+	with [get-view "Cheat Sheets" | get-section Introduction] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-link "Click to Begin" | get-property toltip | equals "Click to Begin" | verify-true
+	}
+	
+	// start
+	get-view "Cheat Sheets" | get-section Introduction | get-link "Click to Begin" | click
+	
+	// check that selecting interpreter is now expanded
+	get-view "Cheat Sheets" | get-section "Select Python installation with Robot Framework installed" 
+	    | get-property "isExpanded()" | equals true | verify-true
+	    
+	// use any of interpreter    
+	get-view "Cheat Sheets" | get-section "Select Python installation with Robot Framework installed" 
+	    | get-link "Click to perform" | click
+	
+	with [get-window Preferences] {
+	    get-table | get-cell 0 0 | click
+	    get-button "Apply and Close" | click
+	}
+	
+	//check if now is selecting perspective
+	get-view "Cheat Sheets" | get-section "Open the Robot perspective" | get-canvas | get-property text 
+	    | equals "If you're not already in the Robot perspective, in the main menu select Window > Open Perspective > Robot or click on the \"Click to perform\" link below.\r\n" 
+	    | verify-true
+	get-view "Cheat Sheets" | get-section "Open the Robot perspective" | get-link "Click to perform" | click
+	
+	
+	//create project
+	get-view "Cheat Sheets" | get-section "Create a Robot project" | get-canvas | get-property text 
+	    | equals "Before creating resources, suites and libraries, we need a project to put them in. "
+	    + "In the main toolbar or in Project Explorer context menu, click on the New button and select Robot Project, or click on the link below."
+	    + "Enter SampleProject for the project name, then click Finish.\r\n" 
+	    | verify-true
+	    
+	get-view "Cheat Sheets" | get-section "Create a Robot project" | get-link "Click to perform" | click
+	with [get-window "New Robot project"] {
+	    get-editbox -after [get-label "Project name:"] | set-text test
+	    get-button Finish | click
+	}
+	
+	// check that now resource can be created and is expanded
+	with [get-view "Cheat Sheets" | get-section "Create your Resource file"] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-canvas | get-property text 
+	        | equals "The next step is to create Robot resource file with keyword definition. "
+	        + "In the main toolbar or in Project Explorer context menu, click on the New button and select Robot Resource file, "
+	        + "or click on the link below.Make sure your project is selected, enter SampleResource for the file name, then click Finish."
+	        + "The Robot source editor will be automatically opened showing your new resource file.\r\n" 
+	        | verify-true
+	}
+	get-view "Cheat Sheets" | get-section "Create your Resource file" | get-link "Click to perform" | click
+	with [get-window "New Robot Resource file"] {
+	    get-editbox -after [get-label "File name:"] | set-text res
+	    get-tree | select test
+	    get-button Finish | click
+	}
+	
+	// check if now KW defintion can be added 
+	with [get-view "Cheat Sheets" | get-section "Add new keyword definition"] {
+	    get-canvas | get-property text 
+	        | equals "Create keywords section with new keyword by manually typing it in editor or using content assistant activated with Ctrl+Space."
+	        + "Keyword can be also defined by code template available in content assistant.\r\n" 
+	        | verify-true
+	        
+	    // first secion    
+	    get-editbox | get-property text | equals "Insert '*** Keywords ***' section" | verify-true
+	    
+	    // second section
+	    get-editbox -index 1 | get-property text 
+	        | equals "Type keyword name in keywords section, for example 'Resource Keyword'" | verify-true
+	    // last    
+	    get-editbox -index 2 | get-property text 
+	        | equals "Define action inside keyword, for example 'Log  resource_message'" | verify-true
+	}
+	
+	// click all steps by clicking o notes picture
+	get-view "Cheat Sheets" | get-section "Add new keyword definition" | get-link -index 2 | click   
+	    
+	get-view "Cheat Sheets" | get-section "Add new keyword definition" | get-link -index 3 | click
+	
+	get-view "Cheat Sheets" | get-section "Add new keyword definition" | get-link -index 4 | click
+	
+	// check that automatic creating python lib section is open
+	with [get-view "Cheat Sheets" | get-section "Create your Python library"] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-canvas | get-property text 
+	        | equals "The next step is to create Robot library in Python file. In the main toolbar or in Project Explorer context menu, "
+	        + "click on the New button and select Robot python file, or click on the link below.Make sure your project is selected, "
+	        + "enter SampleLibrary for the file name, select Library or Dynamic API library radio button, then click Finish."
+	        + "Default Python source editor will be automatically opened showing your new Python library file."
+	        + "In Python editor create keyword with name Library Keyword which prints some string, for example \"library_message\".\r\n" 
+	        | verify-true
+	}
+	with [get-view "Cheat Sheets" | get-section "Create your Python library"] {
+	    get-link "Click to perform" | get-property toltip | equals "Click to perform" | verify-true
+	    get-link "Click when complete" | get-property toltip | equals "Click when complete" | verify-true
+	}
+	
+	// add python lib
+	get-view "Cheat Sheets" | get-section "Create your Python library" | get-link "Click to perform" | click
+	with [get-window "New Robot python file"] {
+	    get-editbox -after [get-label "File name:"] | set-text "lib.py"
+	    get-tree | select test
+	    get-button Finish | click
+	}
+	
+	// Add python library to project expanded
+	with [get-view "Cheat Sheets" | get-section "Add Python library to project configuration"] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-canvas | get-property text 
+	        | equals "In Project Explorer right click on created Python file and select Robot Framework > Add Library to red.xml menu option."
+	        + "Library can be also added in red.xml editor in Libraries tab.\r\n" 
+	        | verify-true
+	}
+	
+	// click manually
+	get-view "Cheat Sheets" | get-section "Add Python library to project configuration" | get-link "Click when complete" 
+	    | click
+	    
+	// create suite section is expanded    
+	with [get-view "Cheat Sheets" | get-section "Create your Test Suite"] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-canvas | get-property text 
+	        | equals "The next step is to create Robot Test Suite with test case definition together with library and resource imports. "
+	        + "In the main toolbar or in Project Explorer context menu, click on the New button and select Robot Test Suite, or click on the link below."
+	        + "Make sure your project is selected, enter SampleSuite for the file name, then click Finish."
+	        + "The Robot source editor will be automatically opened showing your new test suite with empty test cases section.\r\n" 
+	        | verify-true
+	}
+	get-view "Cheat Sheets" | get-section "Create your Test Suite" | get-link "Click to perform" | click
+	with [get-window "New Robot Test Suite"] {
+	    get-editbox -after [get-label "File name:"] | set-text suite
+	    get-tree | select test
+	    get-button Finish | click
+	}
+	
+	// Add new test case and imports i expanded
+	with [get-view "Cheat Sheets" | get-section "Add new test case and imports"] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-canvas | get-property text 
+	        | equals "Create new test case and imports by manually typing them in editor or using content assistant activated with Ctrl+Space."
+	        + "Test case and setting section can be also defined by code template available in content assistant.\r\n" 
+	        | verify-true
+	}
+	
+	// click sections from end
+	with [get-view "Cheat Sheets" | get-section "Add new test case and imports"] {
+	    get-link -index 8 | click
+	    get-link -index 7 | click
+	    get-link -index 6 | click
+	    get-link -index 5 | click
+	    get-link -index 4 | click
+	    get-link -index 3 | click
+	    get-link -index 2 | click
+	}
+	
+	// last section with running test
+	with [get-view "Cheat Sheets" | get-section "Run your test"] {
+	    get-canvas | get-property text 
+	        | equals "To run your Robot test, right-click on it in source view and select Run test: 'Sample Test'. "
+	        + "You can also right click on test or project in Project Explorer and select Run As > Robot Test menu option."
+	        + "The Console view should appear at the bottom and display output from used keywords.Congratulations! You have successfully created sample Robot Framework project!\r\n" 
+	        | verify-true
+	    get-link "Click when complete" | get-property toltip | equals "Click when complete" | verify-true
+	    get-property "isExpanded()" | equals true | verify-true
+	}
+	
+	// click complate
+	get-view "Cheat Sheets" | get-section "Run your test" | get-link "Click when complete" | click
+	
+	// intoduction is open again wit restarting button
+	with [get-view "Cheat Sheets" | get-section Introduction] {
+	    get-property "isExpanded()" | equals true | verify-true
+	    get-link "Click to Restart" | get-property toltip | equals "Click to Restart" | verify-true
+	}
+	
+	// check PE
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item -path "test/lib.py" | get-property enablement | equals false | verify-true
+	    get-item -path "test/red.xml" | get-property enablement | equals false | verify-true
+	    get-item -path "test/res.robot" | get-property enablement | equals false | verify-true
+	    get-item -path "test/suite.robot" | get-property enablement | equals false | verify-true
+	}
+
+}-finally{
+	get-view "Cheat Sheets" | close
+}	
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
