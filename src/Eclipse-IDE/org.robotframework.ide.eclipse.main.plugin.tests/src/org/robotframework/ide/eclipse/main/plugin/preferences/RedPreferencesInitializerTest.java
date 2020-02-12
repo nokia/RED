@@ -5,11 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.PythonInstallationDirectoryFinder.PythonInstallationDirectory;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.testdata.formatter.RedFormatter.FormattingSeparatorType;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
@@ -26,10 +32,41 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 public class RedPreferencesInitializerTest {
 
     @Test
+    public void byDefaultEmptyFrameworkPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
+
+        verify(preferences).put(RedPreferences.ACTIVE_INSTALLATION, "{\"interpreter\":null,\"path\":null}");
+        verify(preferences).put(RedPreferences.ALL_INSTALLATIONS, "[]");
+    }
+
+    @Test
+    public void byDefaultNotEmptyFrameworkPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+        final PythonInstallationDirectory dir1 = mock(PythonInstallationDirectory.class);
+        when(dir1.getAbsolutePath()).thenReturn("path_to_jython");
+        when(dir1.getInterpreter()).thenReturn(SuiteExecutor.Jython);
+        final PythonInstallationDirectory dir2 = mock(PythonInstallationDirectory.class);
+        when(dir2.getAbsolutePath()).thenReturn("path_to_iron_python");
+        when(dir2.getInterpreter()).thenReturn(SuiteExecutor.IronPython);
+        final PythonInstallationDirectory dir3 = mock(PythonInstallationDirectory.class);
+        when(dir3.getAbsolutePath()).thenReturn("path_to_no_python_dir");
+        when(dir3.getInterpreter()).thenReturn(null);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, () -> newArrayList(dir1, dir2, dir3));
+
+        verify(preferences).put(RedPreferences.ACTIVE_INSTALLATION,
+                "{\"interpreter\":\"Jython\",\"path\":\"path_to_jython\"}");
+        verify(preferences).put(RedPreferences.ALL_INSTALLATIONS,
+                "[{\"interpreter\":\"Jython\",\"path\":\"path_to_jython\"},{\"interpreter\":\"IronPython\",\"path\":\"path_to_iron_python\"},{\"interpreter\":null,\"path\":\"path_to_no_python_dir\"}]");
+    }
+
+    @Test
     public void byDefaultAllElementsAreFoldable() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putInt(RedPreferences.FOLDING_LINE_LIMIT, 2);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_SECTIONS, true);
@@ -43,7 +80,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultAllSyntaxHighlightingCategoryPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         for (final SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
             final ColoringPreference preference = category.getDefault();
@@ -55,7 +92,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultAllProblemCategoryPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         for (final ProblemCategory category : ProblemCategory.values()) {
             verify(preferences).put(category.getId(), category.getDefaultSeverity().name());
@@ -66,7 +103,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultEditorPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, false);
         verify(preferences).putBoolean(RedPreferences.LIBRARY_KEYWORD_HYPERLINKS, true);
@@ -88,7 +125,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultAllLaunchConfigurationPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.LAUNCH_USE_ARGUMENT_FILE, true);
         verify(preferences).putBoolean(RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, false);
@@ -107,7 +144,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultFormatterPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).put(RedPreferences.FORMATTER_TYPE, FormatterType.CUSTOM.name());
         verify(preferences).putBoolean(RedPreferences.FORMATTER_SEPARATOR_ADJUSTMENT_ENABLED, false);
@@ -122,7 +159,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultSaveActionsPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_CODE_FORMATTING_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.SAVE_ACTIONS_CHANGED_LINES_ONLY_ENABLED, false);
@@ -134,7 +171,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultLibrariesPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT, false);
@@ -147,7 +184,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultAllContentAssistPreferencesAreInitialized() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_INSERT_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
@@ -163,7 +200,7 @@ public class RedPreferencesInitializerTest {
     @Test
     public void byDefaultThereAreNoActiveVariablesSetsNorTheSetsThemselves() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).put(RedPreferences.STRING_VARIABLES_SETS, "");
         verify(preferences).put(RedPreferences.STRING_VARIABLES_ACTIVE_SET, "");
@@ -172,7 +209,7 @@ public class RedPreferencesInitializerTest {
     @Test
     public void byDefaultThereAreNoAdditionalRfRulesFiles() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).put(RedPreferences.RFLINT_RULES_FILES, "");
     }
@@ -180,7 +217,7 @@ public class RedPreferencesInitializerTest {
     @Test
     public void byDefaultNoRfLintRuleIsConfigured() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
         verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
@@ -191,7 +228,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultValidationIsTurnedOn() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.TURN_OFF_VALIDATION, false);
     }
@@ -200,7 +237,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultTasksAreTurnedOn() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).putBoolean(RedPreferences.TASKS_DETECTION_ENABLED, true);
     }
@@ -209,7 +246,7 @@ public class RedPreferencesInitializerTest {
     public void byDefaultTasksAreTaggedWithTodoAndFixmeOfProperPriorities() {
         final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
 
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences, ArrayList::new);
 
         verify(preferences).put(RedPreferences.TASKS_TAGS, "FIXME;TODO");
         verify(preferences).put(RedPreferences.TASKS_PRIORITIES, "HIGH;NORMAL");

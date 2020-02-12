@@ -88,24 +88,23 @@ class InterpretersComposite extends Composite {
         checkEnvironmentBtn.setText("Check interpreter");
         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(checkEnvironmentBtn);
         checkEnvironmentBtn.addSelectionListener(widgetSelectedAdapter(event -> {
-            final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
+            final SuiteExecutor interpreter = getChosenSystemExecutor();
             try {
                 new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
-                    final SuiteExecutor interpreter = SuiteExecutor.valueOf(chosenExecutorName);
                     final Optional<PythonInstallationDirectory> installation = PythonInstallationDirectoryFinder
                             .whereIsPythonInterpreter(interpreter);
                     if (installation.isPresent()) {
                         final Optional<String> robotVersion = installation
                                 .flatMap(PythonInstallationDirectory::getRobotVersion);
                         if (robotVersion.isPresent()) {
-                            MessageDialog.openInformation(null, "Interpreter checked", "The " + interpreter.name()
+                            MessageDialog.openInformation(getShell(), "Interpreter checked", "The " + interpreter.name()
                                     + " interpreter has " + robotVersion.get() + " installed");
                         } else {
-                            MessageDialog.openWarning(null, "Interpreter checked",
+                            MessageDialog.openWarning(getShell(), "Interpreter checked",
                                     "The " + interpreter.name() + " interpreter has no Robot installed");
                         }
                     } else {
-                        MessageDialog.openError(null, "Interpreter checked", "There is no " + interpreter.name()
+                        MessageDialog.openError(getShell(), "Interpreter checked", "There is no " + interpreter.name()
                                 + " interpreter in system PATH environment variable");
                     }
                 });
@@ -115,8 +114,7 @@ class InterpretersComposite extends Composite {
             } catch (final InvocationTargetException e) {
                 StatusManager.getManager()
                         .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                "Unable to find " + SuiteExecutor.valueOf(chosenExecutorName).executableName()
-                                        + " executable in the system.",
+                                "Unable to find " + interpreter.executableName() + " executable in the system.",
                                 e.getTargetException()), StatusManager.BLOCK);
             }
         }));

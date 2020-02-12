@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,13 +17,13 @@ import org.osgi.framework.BundleContext;
 import org.rf.ide.core.RedSystemProperties;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.RobotRuntimeEnvironment;
-import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.rflint.RfLintRules;
 import org.rf.ide.core.watcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
+import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments.InterpreterWithPath;
 import org.robotframework.ide.eclipse.main.plugin.refactoring.RedXmlVersionUpdater;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
@@ -62,7 +61,6 @@ public class RedPlugin extends AbstractUIPlugin {
             if (RedSystemProperties.shouldShowSessionConsole()) {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
-            RedPreferencesFixer.updatePreferencesWithoutPrefixesIfNeeded(getPreferenceStore());
             RedPreferencesFixer.updateModifiedPreferencesIfNeeded(getPreferenceStore());
             RedXmlVersionUpdater.init();
         } catch (final Exception e) {
@@ -94,15 +92,15 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     public IRuntimeEnvironment getActiveRobotInstallation() {
-        return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferences());
+        return InstalledRobotEnvironments.getActiveInstallation(getPreferences());
     }
 
-    public IRuntimeEnvironment getRobotInstallation(final File file, final SuiteExecutor executor) {
-        return InstalledRobotEnvironments.getRobotInstallation(getPreferences(), file, executor);
+    public IRuntimeEnvironment getRobotInstallation(final InterpreterWithPath installation) {
+        return InstalledRobotEnvironments.getInstallation(getPreferences(), installation);
     }
 
-    public List<IRuntimeEnvironment> getAllRuntimeEnvironments() {
-        return InstalledRobotEnvironments.getAllRobotInstallation(getPreferences());
+    public List<IRuntimeEnvironment> getAllRobotInstallations() {
+        return InstalledRobotEnvironments.getAllInstallations(getPreferences());
     }
 
     public static void logInfo(final String message) {

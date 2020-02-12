@@ -64,6 +64,7 @@ import org.rf.ide.core.environment.RobotRuntimeEnvironment;
 import org.rf.ide.core.environment.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments.InterpreterWithPath;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -199,7 +200,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
         final ISelectionChangedListener selectionListener = event -> removeButton
-                .setEnabled(getSelectedInstallation() != null);
+                .setEnabled(getSelectedInstallation().isPresent());
         final ICheckStateListener checkListener = event -> {
             if (event.getChecked()) {
                 viewer.setCheckedElements(new Object[] { event.getElement() });
@@ -262,8 +263,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-                installations = InstalledRobotEnvironments.getAllRobotInstallation(preferences);
-                final IRuntimeEnvironment active = InstalledRobotEnvironments.getActiveRobotInstallation(preferences);
+                installations = InstalledRobotEnvironments.getAllInstallations(preferences);
+                final IRuntimeEnvironment active = InstalledRobotEnvironments.getActiveInstallation(preferences);
                 setProperty(key, active);
                 return Status.OK_STATUS;
             }
@@ -272,11 +273,11 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         job.schedule();
     }
 
-    private IRuntimeEnvironment getSelectedInstallation() {
+    private Optional<IRuntimeEnvironment> getSelectedInstallation() {
         // multiselection is not possible
-        final List<IRuntimeEnvironment> elements = Selections.getElements((IStructuredSelection) viewer.getSelection(),
-                IRuntimeEnvironment.class);
-        return elements.isEmpty() ? null : elements.get(0);
+        return Selections.getElements((IStructuredSelection) viewer.getSelection(), IRuntimeEnvironment.class)
+                .stream()
+                .findFirst();
     }
 
     private SelectionListener createAddListener() {
@@ -288,9 +289,8 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
                 dirDialog.setMessage("Select location of Python with Robot Framework installed");
                 final String path = dirDialog.open();
                 if (path != null) {
-                    final File location = new File(path);
                     final List<PythonInstallationDirectory> possibleExecutors = PythonInstallationDirectoryFinder
-                            .findPossibleInstallationsFor(location);
+                            .findPossibleInstallationsFor(path);
 
                     boolean changed = false;
                     if (!possibleExecutors.isEmpty()) {
@@ -300,7 +300,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
                         changed = addOnlyNonExisting(toAdd);
                     } else {
                         changed = true;
-                        installations.add(new InvalidPythonRuntimeEnvironment(location));
+                        installations.add(new InvalidPythonRuntimeEnvironment(new File(path)));
                     }
                     if (changed) {
                         dirty = true;
@@ -329,9 +329,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     private SelectionListener createRemoveListener() {
         return widgetSelectedAdapter(e -> {
-            final IRuntimeEnvironment env = getSelectedInstallation();
-            installations.remove(env);
-
+            getSelectedInstallation().ifPresent(installations::remove);
             dirty = true;
             viewer.setSelection(StructuredSelection.EMPTY);
             viewer.refresh();
@@ -345,29 +343,15 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
             final IRuntimeEnvironment checkedEnv = checkedElement.length == 0 ? null
                     : (IRuntimeEnvironment) checkedElement[0];
 
-            final List<String> allPathsList = new ArrayList<>();
-            final List<String> allExecsList = new ArrayList<>();
+            final InterpreterWithPath activeInstallation = createInstallation(checkedEnv);
+            getPreferenceStore().putValue(RedPreferences.ACTIVE_INSTALLATION,
+                    InstalledRobotEnvironments.writeInstallation(activeInstallation));
 
-            for (final IRuntimeEnvironment installation : installations) {
-                allPathsList.add(installation.getFile().getAbsolutePath());
-                allExecsList.add(getExecOf(installation));
-            }
-
-            final String activePath = checkedEnv == null ? "" : checkedEnv.getFile().getAbsolutePath();
-            final String activeExec = checkedEnv == null ? "" : getExecOf(checkedEnv);
-            final String allPaths = String.join(";", allPathsList);
-            final String allExecs = String.join(";", allExecsList);
-
-            // The execs has to be stored first, because we're listening on ACTIVE_RUNTIMES
-            // and OTHER_RUNTIMES changes and inside we need actual value of corresponding
-            // execs preference. This may seem a bit weird to have separated ACTIVE_RUNTIME and
-            // ACTIVE_RUNTIME_EXEC pair, but implementing it this way gives us both directions
-            // versions compatibility.
-            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
-            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
-
-            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME, activePath);
-            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES, allPaths);
+            final List<InterpreterWithPath> allInstallations = installations.stream()
+                    .map(InstalledRobotsPreferencesPage::createInstallation)
+                    .collect(Collectors.toList());
+            getPreferenceStore().putValue(RedPreferences.ALL_INSTALLATIONS,
+                    InstalledRobotEnvironments.writeInstallations(allInstallations));
 
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
@@ -379,8 +363,9 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
         }
     }
 
-    private String getExecOf(final IRuntimeEnvironment installation) {
-        return Optional.ofNullable(installation.getInterpreter()).map(SuiteExecutor::name).orElse("");
+    private static InterpreterWithPath createInstallation(final IRuntimeEnvironment env) {
+        return new InterpreterWithPath(Optional.ofNullable(env).map(IRuntimeEnvironment::getInterpreter).orElse(null),
+                Optional.ofNullable(env).map(IRuntimeEnvironment::getFile).map(File::getAbsolutePath).orElse(null));
     }
 
     private void rebuildWorkspace() {

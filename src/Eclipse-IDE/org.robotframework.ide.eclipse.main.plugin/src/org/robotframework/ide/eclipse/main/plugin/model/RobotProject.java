@@ -33,6 +33,7 @@ import org.rf.ide.core.environment.EnvironmentSearchPaths;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentException;
 import org.rf.ide.core.environment.RobotVersion;
+import org.rf.ide.core.environment.SuiteExecutor;
 import org.rf.ide.core.execution.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
@@ -47,6 +48,7 @@ import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigu
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments.InterpreterWithPath;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
@@ -299,9 +301,12 @@ public class RobotProject extends RobotContainer {
         if (config.usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
         }
-        final Path path = new Path(config.providePythonLocation());
-        final File file = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(path).toFile();
-        return RedPlugin.getDefault().getRobotInstallation(file, config.providePythonInterpreter());
+        final SuiteExecutor interpreter = config.providePythonInterpreter();
+        final String path = RedWorkspace.Paths
+                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(config.providePythonLocation()))
+                .toFile()
+                .getAbsolutePath();
+        return RedPlugin.getDefault().getRobotInstallation(new InterpreterWithPath(interpreter, path));
     }
 
     public IFile getConfigurationFile() {

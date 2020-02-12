@@ -5,10 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static java.util.stream.Collectors.joining;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -28,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.LinkedModeStrat
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.MatchingKeywordStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
+import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments.InterpreterWithPath;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotTask.Priority;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
@@ -37,12 +40,14 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        initializeDefaultPreferences(DefaultScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID));
+        initializeDefaultPreferences(DefaultScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID),
+                PythonInstallationDirectoryFinder::whereArePythonInterpreters);
     }
 
     @VisibleForTesting
-    void initializeDefaultPreferences(final IEclipsePreferences preferences) {
-        initializeFrameworkPreferences(preferences);
+    void initializeDefaultPreferences(final IEclipsePreferences preferences,
+            final Supplier<List<PythonInstallationDirectory>> pythonInterpretersFinder) {
+        initializeFrameworkPreferences(preferences, pythonInterpretersFinder);
         initializeEditorPreferences(preferences);
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
@@ -58,25 +63,26 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeTasksPreferences(preferences);
     }
 
-    private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
-        final List<PythonInstallationDirectory> interpreterPaths = PythonInstallationDirectoryFinder
-                .whereArePythonInterpreters();
-        if (!interpreterPaths.isEmpty()) {
-            final String activePath = interpreterPaths.get(0).getAbsolutePath();
-            final String activeExec = interpreterPaths.get(0).getInterpreter().name();
+    private void initializeFrameworkPreferences(final IEclipsePreferences preferences,
+            final Supplier<List<PythonInstallationDirectory>> pythonInterpretersFinder) {
+        final List<PythonInstallationDirectory> pythonDirs = pythonInterpretersFinder.get();
+        final PythonInstallationDirectory firstPythonDir = pythonDirs.stream().findFirst().orElse(null);
 
-            final String allPaths = interpreterPaths.stream()
-                    .map(PythonInstallationDirectory::getAbsolutePath)
-                    .collect(joining(";"));
-            final String allExecs = interpreterPaths.stream()
-                    .map(dir -> dir.getInterpreter().name())
-                    .collect(joining(";"));
+        final InterpreterWithPath activeInstallation = createInstallation(firstPythonDir);
+        preferences.put(RedPreferences.ACTIVE_INSTALLATION,
+                InstalledRobotEnvironments.writeInstallation(activeInstallation));
 
-            preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
-            preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
-            preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
-            preferences.put(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
-        }
+        final List<InterpreterWithPath> allInstallations = pythonDirs.stream()
+                .map(RedPreferencesInitializer::createInstallation)
+                .collect(Collectors.toList());
+        preferences.put(RedPreferences.ALL_INSTALLATIONS,
+                InstalledRobotEnvironments.writeInstallations(allInstallations));
+    }
+
+    private static InterpreterWithPath createInstallation(final PythonInstallationDirectory dir) {
+        return new InterpreterWithPath(
+                Optional.ofNullable(dir).map(PythonInstallationDirectory::getInterpreter).orElse(null),
+                Optional.ofNullable(dir).map(PythonInstallationDirectory::getAbsolutePath).orElse(null));
     }
 
     private void initializeEditorPreferences(final IEclipsePreferences preferences) {

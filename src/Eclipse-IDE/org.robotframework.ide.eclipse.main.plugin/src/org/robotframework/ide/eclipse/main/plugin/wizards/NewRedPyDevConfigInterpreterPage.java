@@ -78,7 +78,7 @@ public class NewRedPyDevConfigInterpreterPage extends JobWizardPage {
 
         final ISelectionChangedListener selectionListener = e -> checkPageCompletion();
         viewer.addSelectionChangedListener(selectionListener);
-        
+
         final IDoubleClickListener dlbClickListener = e -> {
             checkPageCompletion();
             if (isPageComplete()) {
@@ -91,7 +91,7 @@ public class NewRedPyDevConfigInterpreterPage extends JobWizardPage {
             viewer.removeSelectionChangedListener(selectionListener);
             viewer.removeDoubleClickListener(dlbClickListener);
         });
-        
+
         ColumnViewerToolTipSupport.enableFor(viewer);
 
         viewer.setContentProvider(new ListInputStructuredContentProvider());
@@ -149,7 +149,7 @@ public class NewRedPyDevConfigInterpreterPage extends JobWizardPage {
         @Override
         public Environments run(final IProgressMonitor monitor) {
             final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-            final List<IRuntimeEnvironment> envs = InstalledRobotEnvironments.getAllRobotInstallation(preferences)
+            final List<IRuntimeEnvironment> envs = InstalledRobotEnvironments.getAllInstallations(preferences)
                     .stream()
                     .filter(IRuntimeEnvironment::isValidPythonInstallation)
                     .collect(toList());

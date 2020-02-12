@@ -21,8 +21,7 @@ public class PythonInstallationDirectoryFinderTest {
 
     @Test
     public void emptyPossibleInstallationDirectoriesAreReturned_whenLocationDoesNotExist() throws Exception {
-        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(new File("not_existing_location")))
-                .isEmpty();
+        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor("not_existing_location")).isEmpty();
     }
 
     @Test
@@ -33,7 +32,7 @@ public class PythonInstallationDirectoryFinderTest {
         new File(location, "notExecutor").createNewFile();
         new File(location, "nested_dir").mkdir();
 
-        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location)).isEmpty();
+        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location.getPath())).isEmpty();
     }
 
     @Test
@@ -45,7 +44,7 @@ public class PythonInstallationDirectoryFinderTest {
             new File(location, "notExecutor").createNewFile();
             new File(location, "nested_dir").mkdir();
 
-            assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location))
+            assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location.getPath()))
                     .containsOnly(new PythonInstallationDirectory(location.toURI(), executor));
         }
     }
@@ -60,7 +59,7 @@ public class PythonInstallationDirectoryFinderTest {
         new File(location, "notExecutor").createNewFile();
         new File(location, "nested_dir").mkdir();
 
-        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location)).containsOnly(
+        assertThat(PythonInstallationDirectoryFinder.findPossibleInstallationsFor(location.getPath())).containsOnly(
                 new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python),
                 new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python2),
                 new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python3));

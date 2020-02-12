@@ -215,17 +215,17 @@ public class RedProjectEditor extends MultiPageEditorPart {
                         new RedProjectConfigEventData<>(editorInput.getFile(), editorInput.getProjectConfiguration())));
 
                 final RobotProject project = editorInput.getRobotProject();
-                final IRuntimeEnvironment activeEnvironment = project == null ? new NullRuntimeEnvironment()
+                final IRuntimeEnvironment activeRuntimeEnvironment = project == null ? new NullRuntimeEnvironment()
                         : project.getRuntimeEnvironment();
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
                 final List<IRuntimeEnvironment> allRuntimeEnvironments = RedPlugin.getDefault()
-                        .getAllRuntimeEnvironments();
+                        .getAllRobotInstallations();
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
-                setProperty(createKey(activeEnv), activeEnvironment);
+                setProperty(createKey(activeEnv), activeRuntimeEnvironment);
                 setProperty(createKey(allEnvs), allRuntimeEnvironments);
                 return Status.OK_STATUS;
             }

@@ -52,13 +52,14 @@ public final class PythonInstallationDirectoryFinder {
     }
 
     /**
-     * Locates directories in which python interpreters pointed by location are located.
+     * Locates directories in which python interpreters pointed by path are located.
      *
-     * @param location
-     *            Directory where python interpreters should be found
+     * @param path
+     *            Path to directory where python interpreters should be found
      * @return Directories where python interpreters are installed or empty list if not found.
      */
-    public static List<PythonInstallationDirectory> findPossibleInstallationsFor(final File location) {
+    public static List<PythonInstallationDirectory> findPossibleInstallationsFor(final String path) {
+        final File location = new File(path);
         if (!location.exists() || !location.isDirectory()) {
             return new ArrayList<>();
         }
@@ -69,16 +70,6 @@ public final class PythonInstallationDirectoryFinder {
                         .filter(executor -> file.getName().equals(executor.executableName())))
                 .map(interpreter -> new PythonInstallationDirectory(location.toURI(), interpreter))
                 .collect(toList());
-    }
-
-    public static Optional<PythonInstallationDirectory> findInstallation(final File location,
-            final SuiteExecutor interpreter) {
-        if (interpreter == null) {
-            return findPossibleInstallationsFor(location).stream().findFirst();
-        }
-        return findPossibleInstallationsFor(location).stream()
-                .findFirst()
-                .map(dir -> new PythonInstallationDirectory(dir.toURI(), interpreter));
     }
 
     @SuppressWarnings("serial")
