@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 public class InstalledRobotEnvironments {
 
@@ -143,6 +145,9 @@ public class InstalledRobotEnvironments {
     }
 
     public static InterpreterWithPath readInstallation(final String jsonMapping) {
+        if (Strings.isNullOrEmpty(jsonMapping)) {
+            return new InterpreterWithPath();
+        }
         try {
             final TypeReference<InterpreterWithPath> valueType = new TypeReference<InterpreterWithPath>() {
             };
@@ -161,6 +166,9 @@ public class InstalledRobotEnvironments {
     }
 
     public static List<InterpreterWithPath> readInstallations(final String jsonMapping) {
+        if (Strings.isNullOrEmpty(jsonMapping)) {
+            return new ArrayList<>();
+        }
         try {
             final TypeReference<List<InterpreterWithPath>> valueType = new TypeReference<List<InterpreterWithPath>>() {
             };

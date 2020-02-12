@@ -156,6 +156,20 @@ public class InstalledRobotEnvironmentsTest {
     }
 
     @Test
+    void nullInstallationIsReadCorrectly() {
+        final InterpreterWithPath installation = InstalledRobotEnvironments.readInstallation(null);
+
+        assertThat(installation).isEqualTo(new InterpreterWithPath());
+    }
+
+    @Test
+    void emptyInstallationIsReadCorrectly() {
+        final InterpreterWithPath installation = InstalledRobotEnvironments.readInstallation("");
+
+        assertThat(installation).isEqualTo(new InterpreterWithPath());
+    }
+
+    @Test
     void installationsAreWrittenCorrectly() {
         final List<InterpreterWithPath> installations = newArrayList(new InterpreterWithPath(),
                 new InterpreterWithPath(null, "path/no_python"),
@@ -178,6 +192,20 @@ public class InstalledRobotEnvironmentsTest {
                 new InterpreterWithPath(null, "path/invalid"),
                 new InterpreterWithPath(SuiteExecutor.IronPython, "path/iron_dir"),
                 new InterpreterWithPath(SuiteExecutor.Jython, "path/jy_dir"));
+    }
+
+    @Test
+    void nullInstallationsAreReadCorrectly() {
+        final List<InterpreterWithPath> installations = InstalledRobotEnvironments.readInstallations(null);
+
+        assertThat(installations).isEmpty();
+    }
+
+    @Test
+    void emptyInstallationsAreReadCorrectly() {
+        final List<InterpreterWithPath> installations = InstalledRobotEnvironments.readInstallations("");
+
+        assertThat(installations).isEmpty();
     }
 
 }
