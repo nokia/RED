@@ -395,7 +395,8 @@ public class TextualRobotFileParser {
             final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final boolean isNewLine) {
 
         final List<RobotToken> robotTokens = recognize(fp, text);
-        RobotToken robotToken = utility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
+        RobotToken robotToken = utility.computeCorrectRobotToken(robotFileOutput.getRobotVersion(), processingState, fp,
+                text, robotTokens);
 
         final LineContinueType lineContinueType = previousLineHandler.computeLineContinue(processingState, isNewLine,
                 robotFileOutput.getFileModel(), currentLine, robotToken);

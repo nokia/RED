@@ -11,12 +11,10 @@ import java.util.stream.Stream;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.table.variables.descs.impl.VariablesAnalyzerImpl;
 import org.rf.ide.core.testdata.model.table.variables.descs.impl.old.OldVariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Interface for analyzing variables usages in any tokens/expressions.
@@ -33,7 +31,9 @@ public interface VariablesAnalyzer {
     }
 
     public static VariablesAnalyzer analyzer(final RobotVersion version, final String possibleVariableMarks) {
-        return new OldVariablesAnalyzer(possibleVariableMarks);
+        return version.isOlderThan(new RobotVersion(3, 2))
+                ? new OldVariablesAnalyzer(possibleVariableMarks)
+                : new VariablesAnalyzerImpl(possibleVariableMarks);
     }
 
     public static String normalizeName(final RobotToken variableToken) {
@@ -57,54 +57,89 @@ public interface VariablesAnalyzer {
                 .equals(normalizeName(extractFromBrackets(secondVariable)));
     }
 
-    public default boolean containsVariables(final String text) {
-        return containsVariables(RobotToken.create(text, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE));
+    public static RobotToken asRobotToken(final String expression) {
+        return RobotToken.create(expression, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE);
     }
 
+    /**
+     * Checks if given expression token contain variable.
+     * 
+     * @param token
+     *            Expression token to be analysed for variable presence.
+     * @return True when given expression token contain variable usage.
+     */
     public default boolean containsVariables(final RobotToken token) {
-        return getVariables(token).findAny().isPresent();
+        return getDefinedVariablesUses(token).findAny().isPresent();
     }
 
-    public default Stream<VariableUse> getVariablesUses(final String text) {
-        return getVariablesUses(text, msg -> {});
+    /**
+     * Gets the stream of {@link VariableUse} elements consisting of all defined variables. A
+     * defined variable is a variable which:
+     * <ul>
+     * <li>has valid syntax,</li>
+     * <li>it's name is known - it is not dynamic (e.g. <code>${var}</code> has known name, while
+     * <code>${var${i}}</code> do not, although nested <code>${i}</code> has).
+     * </ul>
+     * 
+     * @param token
+     *            Expression token to be analysed for defined variable uses
+     * @return Stream of valid defined variable uses inside given expression token. Note that
+     *         regions of returned variable uses are adjusted with token position.
+     */
+    public default Stream<VariableUse> getDefinedVariablesUses(final RobotToken token) {
+        return getDefinedVariablesUses(token, msg -> {});
     }
 
-    public default Stream<VariableUse> getVariablesUses(final RobotToken token) {
-        return getVariablesUses(token, msg -> {});
-    }
 
-    public default Stream<VariableUse> getVariablesUses(final String text,
-            final Consumer<BuildMessage> parseProblemsConsumer) {
-        return getVariablesUses(RobotToken.create(text, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE),
-                parseProblemsConsumer);
-    }
+    /**
+     * Gets the stream of {@link VariableUse} elements consisting of all defined variables. A
+     * defined variable is a variable which:
+     * <ul>
+     * <li>has valid syntax,</li>
+     * <li>it's name is known - it is not dynamic (e.g. <code>${var}</code> has known name, while
+     * <code>${var${i}}</code> do not, although nested <code>${i}</code> has).
+     * </ul>
+     * 
+     * @param token
+     *            Expression token to be analysed for defined variable uses.
+     * @param parseProblemsConsumer
+     *            The consumer of parsing problem messages found when analysing expression
+     * @return Stream of valid defined variable uses inside given expression token. Note that
+     *         regions of returned variable uses are adjusted with token position.
+     */
+    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token,
+            Consumer<BuildMessage> parseProblemsConsumer);
 
-    public Stream<VariableUse> getVariablesUses(final RobotToken token, Consumer<BuildMessage> parseProblemsConsumer);
-
-    public default Stream<RobotToken> getVariables(final String text) {
-        return getVariables(RobotToken.create(text, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE));
-    }
-
-    public default Stream<RobotToken> getVariables(final RobotToken token) {
-        return getVariablesUses(token).map(VariableUse::asToken);
-    }
-
-    public default Multimap<String, RobotToken> getVariablesUnified(final RobotToken token) {
-        final Multimap<String, RobotToken> vars = ArrayListMultimap.create();
-        getVariables(token).forEach(varToken -> vars.put(normalizeName(varToken), varToken));
-        return vars;
-    }
-
-    public default void visitVariables(final String text, final VariablesVisitor visitor) {
-        visitVariables(RobotToken.create(text, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE), visitor);
-    }
-
+    /**
+     * Analyses given expression token for variable usages and calls given visitor
+     * {@link VariablesVisitor#visit(VariableUse)} method for each of those usages. The visited
+     * usages may be invalid (e.g. having syntax errors like in <code>${var</code> expression) and
+     * can be nested inside other variables (so that visitor will visit two variables in case of
+     * <code>${var_{$i}}</code> expression).
+     * 
+     * @param token
+     *            Expression token in which all variables should be visited.
+     * @param visitor
+     *            A visitor object responsible for handling variable visit.
+     */
     public void visitVariables(RobotToken token, VariablesVisitor visitor);
 
-    public default void visitExpression(final String text, final ExpressionVisitor visitor) {
-        visitExpression(RobotToken.create(text, new FilePosition(0, 0, 0), RobotTokenType.VARIABLE_USAGE), visitor);
-    }
-
+    /**
+     * Analyses given expression token for variable and non-variable parts and calls given visitor
+     * proper methods for var/non-var parts. The visitor will only be called for top-level elements
+     * without entering nested elements.
+     * <p>
+     * For example in case of <code>a${x}b${var_${i}}c</code> the
+     * visitor will first visit non-var part {@code a}, then var part <code>${x}</code>, non-var
+     * part {@code b} followed by last var part <code>${var_${i}}</code> without going into nested
+     * <code>${i}</code> and non-var part {@code c}.
+     * </p>
+     * 
+     * @param token
+     *            Expression token in which all variable/non-variable parts should be visited.
+     * @param visitor
+     *            A visitor object responsible for handling variable/non-variable visits.
+     */
     public void visitExpression(RobotToken token, ExpressionVisitor visitor);
 
 }

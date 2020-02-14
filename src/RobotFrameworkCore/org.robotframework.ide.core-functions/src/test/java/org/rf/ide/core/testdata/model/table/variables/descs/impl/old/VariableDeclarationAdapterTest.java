@@ -16,20 +16,20 @@ public class VariableDeclarationAdapterTest {
 
     @Test
     public void nameGettingTest() {
-        assertThat(varUsage("${x}").getName()).isEqualTo("x");
-        assertThat(varUsage("${x + 2}").getName()).isEqualTo("x");
-        assertThat(varUsage("${x * 7}").getName()).isEqualTo("x");
-        assertThat(varUsage("${x + 'abc'}").getName()).isEqualTo("x");
+        assertThat(varUsage("${x}").getBaseName()).isEqualTo("x");
+        assertThat(varUsage("${x + 2}").getBaseName()).isEqualTo("x");
+        assertThat(varUsage("${x * 7}").getBaseName()).isEqualTo("x");
+        assertThat(varUsage("${x + 'abc'}").getBaseName()).isEqualTo("x");
 
-        assertThat(varUsage("${var}").getName()).isEqualTo("var");
-        assertThat(varUsage("${var + 2}").getName()).isEqualTo("var");
-        assertThat(varUsage("${var * 7}").getName()).isEqualTo("var");
+        assertThat(varUsage("${var}").getBaseName()).isEqualTo("var");
+        assertThat(varUsage("${var + 2}").getBaseName()).isEqualTo("var");
+        assertThat(varUsage("${var * 7}").getBaseName()).isEqualTo("var");
 
-        assertThat(varUsage("@{list}").getName()).isEqualTo("list");
-        assertThat(varUsage("@{list[10]}").getName()).isEqualTo("list");
+        assertThat(varUsage("@{list}").getBaseName()).isEqualTo("list");
+        assertThat(varUsage("@{list[10]}").getBaseName()).isEqualTo("list");
 
-        assertThat(varUsage("&{dict}").getName()).isEqualTo("dict");
-        assertThat(varUsage("&{dict[key]}").getName()).isEqualTo("dict");
+        assertThat(varUsage("&{dict}").getBaseName()).isEqualTo("dict");
+        assertThat(varUsage("&{dict[key]}").getBaseName()).isEqualTo("dict");
     }
 
     private static VariableDeclarationAdapter varUsage(final String text) {

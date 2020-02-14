@@ -64,16 +64,17 @@ public class ElementsUtility {
         }
     }
 
-    public RobotToken computeCorrectRobotToken(final Stack<ParsingState> processingState, final FilePosition fp,
+    public RobotToken computeCorrectRobotToken(final RobotVersion robotVersion,
+            final Stack<ParsingState> processingState, final FilePosition fp,
             final String text, final List<RobotToken> robotTokens) {
 
         final ParsingState state = parsingStateHelper.getCurrentState(processingState);
         RobotToken correct = null;
 
-        final List<String> varIds = VariablesAnalyzer.analyzer(RobotVersion.UNKNOWN)
-                .getVariablesUses(text)
-                .map(use -> use.getType().getIdentificator())
-                .collect(toList());
+        final List<String> varIds = new ArrayList<>();
+        VariablesAnalyzer.analyzer(robotVersion)
+                .visitVariables(VariablesAnalyzer.asRobotToken(text),
+                        varUse -> varIds.add(varUse.getType().getIdentificator()));
 
         if (robotTokens.size() > 1) {
             final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);

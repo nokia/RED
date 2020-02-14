@@ -5,15 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,6 +25,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -38,7 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -228,11 +231,14 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private Multimap<String, RobotToken> extractArgumentVariables(final UserKeyword keyword) {
         final VariablesAnalyzer varAnalyzer = VariablesAnalyzer.analyzer(validationContext.getVersion());
-
+        
         final Multimap<String, RobotToken> arguments = ArrayListMultimap.create();
 
         // first add arguments embedded in name, then from [Arguments] setting
-        final Multimap<String, RobotToken> embeddedArguments = varAnalyzer.getVariablesUnified(keyword.getName());
+        final Map<String, List<RobotToken>> embeddedArguments = varAnalyzer.getDefinedVariablesUses(keyword.getName())
+                .map(VariableUse::asToken)
+                .collect(groupingBy(VariablesAnalyzer::normalizeName));
+
         for (final String argName : embeddedArguments.keySet()) {
             arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
         }
@@ -240,15 +246,19 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             for (final RobotToken token : argument.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT)
                     .collect(toList())) {
                 final boolean hasDefault = token.getText().contains("=");
+                final Map<String, List<RobotToken>> usedVariables = varAnalyzer.getDefinedVariablesUses(token)
+                        .map(VariableUse::asToken)
+                        .collect(groupingBy(VariablesAnalyzer::normalizeName));
                 if (hasDefault) {
                     final List<String> splitted = Splitter.on('=').limit(2).splitToList(token.getText());
                     final String def = splitted.get(0);
                     final String unifiedDefinitionName = VariablesAnalyzer.normalizeName(def);
-                    final Multimap<String, RobotToken> usedVariables = varAnalyzer.getVariablesUnified(token);
                     arguments.put(unifiedDefinitionName,
-                            Iterables.getFirst(usedVariables.get(unifiedDefinitionName), null));
+                            usedVariables.get(unifiedDefinitionName).stream().findFirst().orElse(null));
                 } else {
-                    arguments.putAll(varAnalyzer.getVariablesUnified(token));
+                    for (final String argName : usedVariables.keySet()) {
+                        arguments.putAll(argName, usedVariables.get(argName));
+                    }
                 }
             }
         }
@@ -314,10 +324,10 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                     final String def = splitted.get(0);
 
                     final String unifiedDefinitionName = VariablesAnalyzer.normalizeName(def);
-                    final Multimap<String, RobotToken> usedVariables = varAnalyzer.getVariablesUnified(argToken);
+                    final Stream<VariableUse> usedVariables = varAnalyzer.getDefinedVariablesUses(argToken);
 
-                    final List<RobotToken> varTokens = usedVariables.values()
-                            .stream()
+                    final List<RobotToken> varTokens = usedVariables
+                            .map(VariableUse::asToken)
                             .filter(varToken -> varToken.getStartOffset() != argToken.getStartOffset()
                                     || varToken.getEndOffset() != argToken.getStartOffset() + def.length())
                             .collect(toList());

@@ -47,7 +47,7 @@ public class UnknownVariables {
         for (final RobotToken token : tokens) {
             if (token != null) {
                 final List<VariableUse> uses = VariablesAnalyzer.analyzer(validationContext.getVersion())
-                        .getVariablesUses(token)
+                        .getDefinedVariablesUses(token)
                         .collect(toList());
                 reportUnknownVarsDeclarations(additionalKnownVariables, uses);
             }
@@ -62,10 +62,10 @@ public class UnknownVariables {
         for (final VariableUse declaration : variableUsages) {
             if (!declaration.isDefinedIn(allVariables)) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                        .formatMessageWith(declaration.getName());
+                        .formatMessageWith(declaration.getBaseName());
 
                 final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                        declaration.asToken().getText());
+                        declaration.getType().getIdentificator() + "{" + declaration.getBaseName() + "}");
                 reporter.handleProblem(problem, validationContext.getFile(),
                         ProblemPosition.fromRegion(declaration.getRegion()), additionalArguments);
             }

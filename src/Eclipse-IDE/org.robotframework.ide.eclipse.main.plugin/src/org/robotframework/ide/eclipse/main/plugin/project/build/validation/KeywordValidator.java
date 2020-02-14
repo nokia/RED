@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -35,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 
 
 class KeywordValidator implements ModelUnitValidator {
@@ -169,9 +169,10 @@ class KeywordValidator implements ModelUnitValidator {
         final Set<String> arguments = new HashSet<>();
         // first add arguments embedded in name
         Stream.of(keyword.getName())
-                .map(nameToken -> varAnalyzer.getVariablesUnified(nameToken))
-                .map(Multimap::keySet)
-                .flatMap(Set::stream)
+                .flatMap(varAnalyzer::getDefinedVariablesUses)
+                .map(VariableUse::asToken)
+                .map(VariablesAnalyzer::normalizeName)
+                .distinct()
                 .map(EmbeddedKeywordNamesSupport::removeRegex)
                 .forEach(arguments::add);
 
@@ -179,9 +180,10 @@ class KeywordValidator implements ModelUnitValidator {
         keyword.getArguments()
                 .stream()
                 .flatMap(arg -> arg.tokensOf(RobotTokenType.KEYWORD_SETTING_ARGUMENT))
-                .map(argToken -> varAnalyzer.getVariablesUnified(argToken))
-                .map(Multimap::keySet)
-                .flatMap(Set::stream)
+                .flatMap(varAnalyzer::getDefinedVariablesUses)
+                .map(VariableUse::asToken)
+                .map(VariablesAnalyzer::normalizeName)
+                .distinct()
                 .forEach(arguments::add);
         return arguments;
     }

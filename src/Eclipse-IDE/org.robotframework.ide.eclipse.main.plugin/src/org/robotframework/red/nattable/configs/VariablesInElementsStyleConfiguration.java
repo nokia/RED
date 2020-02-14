@@ -67,7 +67,7 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
             final VariablesAnalyzer variablesAnalyzer) {
         return label -> {
             final RangeMap<Integer, Styler> mapping = TreeRangeMap.create();
-            variablesAnalyzer.visitExpression(label, new ExpressionVisitor() {
+            variablesAnalyzer.visitExpression(VariablesAnalyzer.asRobotToken(label), new ExpressionVisitor() {
 
                 @Override
                 public boolean visit(final VariableUse usage) {

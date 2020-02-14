@@ -47,7 +47,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
             }
 
             final List<VariableUse> varUses = VariablesAnalyzer.analyzer(version)
-                    .getVariablesUses(elem, simpleDesc::addMessage)
+                    .getDefinedVariablesUses(elem, simpleDesc::addMessage)
                     .collect(toList());
 
             // value is a keyword if is on the first place and is not just a variable or

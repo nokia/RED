@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -37,7 +38,8 @@ public class ElementsUtilityTest {
         robotTokens.add(RobotToken.create(text, new FilePosition(4, 0, -1), RobotTokenType.SETTINGS_TABLE_HEADER));
 
         // execute
-        final RobotToken result = elementsUtility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
+        final RobotToken result = elementsUtility.computeCorrectRobotToken(RobotVersion.UNKNOWN, processingState, fp,
+                text, robotTokens);
 
         // verify
         assertThat(result.getText()).isEqualTo(text);
@@ -57,7 +59,8 @@ public class ElementsUtilityTest {
         robotTokens.add(RobotToken.create(text, new FilePosition(4, 0, -1), RobotTokenType.UNKNOWN));
 
         // execute
-        final RobotToken result = elementsUtility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
+        final RobotToken result = elementsUtility.computeCorrectRobotToken(RobotVersion.UNKNOWN, processingState, fp,
+                text, robotTokens);
 
         // verify
         assertThat(result.getText()).isEqualTo(text);
@@ -83,7 +86,8 @@ public class ElementsUtilityTest {
                 RobotTokenType.SETTING_VARIABLES_DECLARATION));
 
         // execute
-        final RobotToken result = elementsUtility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
+        final RobotToken result = elementsUtility.computeCorrectRobotToken(RobotVersion.UNKNOWN, processingState, fp,
+                text, robotTokens);
 
         // verify
         assertThat(result.getText()).isEqualTo(text);
@@ -120,7 +124,8 @@ public class ElementsUtilityTest {
         robotTokens.add(RobotToken.create(text, fp, type));
 
         // execute
-        final RobotToken result = elementsUtility.computeCorrectRobotToken(processingState, fp, text, robotTokens);
+        final RobotToken result = elementsUtility.computeCorrectRobotToken(RobotVersion.UNKNOWN, processingState, fp,
+                text, robotTokens);
 
         // verify
         assertThat(result.getText()).isEqualTo(text);

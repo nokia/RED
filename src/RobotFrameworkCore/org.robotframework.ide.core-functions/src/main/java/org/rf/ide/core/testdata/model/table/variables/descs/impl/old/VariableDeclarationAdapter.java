@@ -34,7 +34,7 @@ class VariableDeclarationAdapter implements VariableUse {
     }
 
     @Override
-    public String getName() {
+    public String getBaseName() {
         return declaration.getName();
     }
 
@@ -71,5 +71,10 @@ class VariableDeclarationAdapter implements VariableUse {
     @Override
     public boolean isPlainVariableAssign() {
         return isPlainAssign;
+    }
+
+    @Override
+    public boolean isInvalid() {
+        return false;
     }
 }

@@ -114,6 +114,19 @@ public enum VariablesProblem implements IProblemCause {
             return fixers;
         }
     },
+    MISSING_CLOSING_PARENTHESIS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Variable '%s' has missing closing parenthesis";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+    },
     INVALID_DICTIONARY_ELEMENT_SYNTAX {
 
         @Override

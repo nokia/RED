@@ -84,7 +84,7 @@ public class ActionNamesStyleConfiguration extends RobotElementsStyleConfigurati
                 mapping.put(gherkinRange, gherkinStyler);
             }
 
-            variablesAnalyzer.visitExpression(label, new ExpressionVisitor() {
+            variablesAnalyzer.visitExpression(VariablesAnalyzer.asRobotToken(label), new ExpressionVisitor() {
 
                 @Override
                 public boolean visit(final VariableUse usage) {

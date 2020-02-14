@@ -31,7 +31,7 @@ public interface VariableUse {
      * 
      * @return Name of variable
      */
-    String getName();
+    String getBaseName();
 
     /**
      * Return this variable use as RobotToken
@@ -86,5 +86,12 @@ public interface VariableUse {
      * @return True if this variable is plain assign usage
      */
     boolean isPlainVariableAssign();
+
+    /**
+     * Returns true if this variable usage has invalid syntax.
+     * 
+     * @return True if this variable is invalid
+     */
+    boolean isInvalid();
 
 }

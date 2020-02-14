@@ -29,6 +29,7 @@ import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -147,7 +148,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         final RobotToken kwName = getLinkedElement().getDeclaration();
         final RobotVersion version = getSuiteFile().getRobotProject().getRobotParserComplianceVersion();
         return VariablesAnalyzer.analyzer(version, VariablesAnalyzer.ALL_ROBOT)
-                .getVariables(kwName)
+                .getDefinedVariablesUses(kwName)
+                .map(VariableUse::asToken)
                 .collect(toList());
     }
 

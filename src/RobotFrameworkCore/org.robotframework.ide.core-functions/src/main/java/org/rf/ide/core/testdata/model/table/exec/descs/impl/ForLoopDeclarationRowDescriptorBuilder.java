@@ -51,7 +51,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
             }
 
             final List<VariableUse> varUses = VariablesAnalyzer.analyzer(version)
-                    .getVariablesUses(elem, loopDescriptor::addMessage)
+                    .getDefinedVariablesUses(elem, loopDescriptor::addMessage)
                     .collect(toList());
 
             if (foundFor && foundIn) {

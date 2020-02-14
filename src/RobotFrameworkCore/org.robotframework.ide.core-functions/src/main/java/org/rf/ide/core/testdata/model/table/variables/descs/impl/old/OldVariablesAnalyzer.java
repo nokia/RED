@@ -27,7 +27,7 @@ public class OldVariablesAnalyzer implements VariablesAnalyzer {
     }
 
     @Override
-    public Stream<VariableUse> getVariablesUses(final RobotToken token,
+    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token,
             final Consumer<BuildMessage> parseProblemsConsumer) {
         final MappingResult result = extractVariables(token);
         final boolean isPlain = result.isPlainVariable();
