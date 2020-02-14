@@ -264,6 +264,20 @@ public class VariablesAnalyzerImplTest {
                     tuple(20, 28, "${z${w}}", "z", DYNAMIC),
                     tuple(28, 29, "6"));
         }
+        
+        @DisplayName("there are variables and text parts found in expressions with different brackets interleaving like {[}]")
+        @Test
+        public void multipleTextVariablesAreFoundInExpressionWithInterleavingBrackets() {
+            assertThat(extractVisitedExpressionParts("[${x]}")).containsExactly(
+                    tuple(0, 1, "["),
+                    tuple(1, 6, "${x]}", "x", NO_FLAGS));
+            assertThat(extractVisitedExpressionParts("${x[}]")).containsExactly(
+                    tuple(0, 5, "${x[}", "x", NO_FLAGS),
+                    tuple(5, 6, "]"));
+            assertThat(extractVisitedExpressionParts("${x${y}[}]")).containsExactly(
+                    tuple(0, 9, "${x${y}[}", "x", DYNAMIC),
+                    tuple(9, 10, "]"));
+        }
     }
 
     @DisplayName("for all possible variables")
@@ -352,7 +366,7 @@ public class VariablesAnalyzerImplTest {
 
         @DisplayName("there are variables found in joined expressions")
         @Test
-        public void multipleTextAndVariablePartsAreFoundInExpression() {
+        public void multipleVariablePartsAreFoundInExpression() {
             assertThat(extractVisitedVariables("${x}3")).containsExactly(
                     tuple(0, 4, "${x}", "x", NO_FLAGS));
             assertThat(extractVisitedVariables("1${x}")).containsExactly(
@@ -374,6 +388,18 @@ public class VariablesAnalyzerImplTest {
                     tuple(14, 18, "${a}", "a", NO_FLAGS),
                     tuple(20, 28, "${z${w}}", "z", DYNAMIC),
                     tuple(23, 27, "${w}", "w", NO_FLAGS));
+        }
+        
+        @DisplayName("there are variables found in expressions with different brackets interleaving like {[}]")
+        @Test
+        public void multipleVariablesAreFoundInExpressionWithInterleavingBrackets() {
+            assertThat(extractVisitedVariables("[${x]}")).containsExactly(
+                    tuple(1, 6, "${x]}", "x", NO_FLAGS));
+            assertThat(extractVisitedVariables("${x[}]")).containsExactly(
+                    tuple(0, 5, "${x[}", "x", NO_FLAGS));
+            assertThat(extractVisitedVariables("${x${y}[}]")).containsExactly(
+                    tuple(0, 9, "${x${y}[}", "x", DYNAMIC),
+                    tuple(3, 8, "${y}[", "y", INDEXED));
         }
     }
 

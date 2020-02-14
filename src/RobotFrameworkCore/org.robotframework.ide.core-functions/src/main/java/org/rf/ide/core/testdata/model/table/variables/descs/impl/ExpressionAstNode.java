@@ -72,10 +72,25 @@ class ExpressionAstNode {
         return child;
     }
 
+    ExpressionAstNode getAncestorOfKind(final NodeKind kind) {
+        ExpressionAstNode result = this;
+        while (!result.isRoot()) {
+            if (result.kind == kind) {
+                return result;
+            }
+            result = result.parent;
+        }
+        return null;
+    }
+
     boolean isInvalid() {
         return isVar() && (exprLenghtWithoutIndex == -1 || exprLenght == -1 || exprLenght < 3);
     }
-    
+
+    public NodeKind getKind() {
+        return kind;
+    }
+
     boolean isVar() {
         return kind == NodeKind.VAR;
     }
