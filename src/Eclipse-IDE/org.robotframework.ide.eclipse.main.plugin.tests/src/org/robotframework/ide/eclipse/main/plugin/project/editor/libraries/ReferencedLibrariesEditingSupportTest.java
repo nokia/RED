@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -179,7 +180,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
         support.setValue(location, "invalid uri");
 
-        assertThat(location.getUri()).isEqualTo("http://some.uri.com");
+        assertThat(location.getUri()).isEqualTo(URI.create("http://some.uri.com"));
         verifyNoInteractions(eventBroker);
     }
 
@@ -197,7 +198,7 @@ public class ReferencedLibrariesEditingSupportTest {
 
         support.setValue(location, "http://some.other.uri.com");
 
-        assertThat(location.getUri()).isEqualTo("http://some.other.uri.com");
+        assertThat(location.getUri()).isEqualTo(URI.create("http://some.other.uri.com"));
         verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_ARGUMENTS_CHANGED),
                 argThat(hasCorrectEventData(file, newArrayList(location))));
     }
@@ -212,7 +213,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
         support.setValue(location, "http://some.uri.com");
 
-        assertThat(location.getUri()).isEqualTo("http://some.uri.com");
+        assertThat(location.getUri()).isEqualTo(URI.create("http://some.uri.com"));
         verifyNoInteractions(eventBroker);
     }
 

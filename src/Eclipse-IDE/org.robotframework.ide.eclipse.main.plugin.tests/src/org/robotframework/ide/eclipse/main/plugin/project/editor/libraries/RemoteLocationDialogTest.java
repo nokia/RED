@@ -52,22 +52,22 @@ public class RemoteLocationDialogTest {
             }
         }
 
-        assertThat(dialog.get().getCreatedElement().getUri()).isEqualTo("http://1.2.3.4:8270/RPC2");
+        assertThat(dialog.get().getCreatedElement().getUri()).isEqualTo(new URI("http://1.2.3.4:8270/RPC2"));
     }
 
     @Test
     public void defaultPortAndPathAreUsedWhenNotSpecified() throws Exception {
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4"), 123, "/def"))
-                .isEqualTo(new URI("http://1.2.3.4:123/def"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/"), 123, "/def"))
-                .isEqualTo(new URI("http://1.2.3.4:123/"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/path"), 123, "/def"))
-                .isEqualTo(new URI("http://1.2.3.4:123/path"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456"), 123, "/def"))
-                .isEqualTo(new URI("http://1.2.3.4:456/def"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/"), 123, "/def"))
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4")))
+                .isEqualTo(new URI("http://1.2.3.4:8270/RPC2"));
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/")))
+                .isEqualTo(new URI("http://1.2.3.4:8270/"));
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/path")))
+                .isEqualTo(new URI("http://1.2.3.4:8270/path"));
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456")))
+                .isEqualTo(new URI("http://1.2.3.4:456/RPC2"));
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/")))
                 .isEqualTo(new URI("http://1.2.3.4:456/"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/path"), 123, "/def"))
+        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/path")))
                 .isEqualTo(new URI("http://1.2.3.4:456/path"));
     }
 }

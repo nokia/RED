@@ -71,7 +71,7 @@ class TemplateSettingUntilRf31Validator extends VersionDependentModelUnitValidat
                 template.getUnexpectedArguments().stream().map(RobotToken::getText).forEach(keywordParts::add);
 
                 final String keywordName = String.join(" ", keywordParts);
-                if (keywordName.toLowerCase().equals("none")) {
+                if (keywordName.equalsIgnoreCase("none")) {
                     continue;
                 }
                 new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();

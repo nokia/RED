@@ -105,19 +105,22 @@ public class SectionsTest {
 
         assertThat(gridData.grabExcessVerticalSpace).isTrue();
 
-        Twistie twistie = null;
-        for (final Control control : sections.get(0).getChildren()) {
-            if (control instanceof Twistie) {
-                twistie = (Twistie) control;
-                break;
-            }
-        }
+        final Twistie twistie = getTwistieControl(sections.get(0));
 
         twistie.notifyListeners(SWT.KeyDown, createKeyEvent());
         assertThat(gridData.grabExcessVerticalSpace).isFalse();
 
         twistie.notifyListeners(SWT.KeyDown, createKeyEvent());
         assertThat(gridData.grabExcessVerticalSpace).isTrue();
+    }
+
+    private Twistie getTwistieControl(final Section section) {
+        for (final Control control : section.getChildren()) {
+            if (control instanceof Twistie) {
+                return (Twistie) control;
+            }
+        }
+        throw new IllegalStateException();
     }
 
     private Event createKeyEvent() {

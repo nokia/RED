@@ -38,8 +38,8 @@ public class RobotDryRunLibraryImport {
                 DryRunLibraryImportStatus.NOT_ADDED, additionalInfo);
     }
 
-    public static RobotDryRunLibraryImport createKnown(final String name, final URI originalPath) {
-        return createKnown(name, originalPath, new HashSet<>());
+    public static RobotDryRunLibraryImport createKnown(final String name, final URI source) {
+        return createKnown(name, source, new HashSet<>());
     }
 
     public static RobotDryRunLibraryImport createKnown(final String name, final URI source, final Set<URI> importers) {
@@ -48,14 +48,16 @@ public class RobotDryRunLibraryImport {
     }
 
     private static DryRunLibraryType resolveType(final String name, final URI source) {
-        if (name.equals("Remote") || name.startsWith("Remote ")) {
-            return DryRunLibraryType.REMOTE;
-        } else if (source != null) {
-            final String path = source.getPath();
-            if (path.toLowerCase().endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
-                return DryRunLibraryType.JAVA;
-            } else if (path.endsWith(".py")) {
-                return DryRunLibraryType.PYTHON;
+        if (source != null) {
+            if (name.startsWith("Remote ")) {
+                return DryRunLibraryType.REMOTE;
+            } else {
+                final String path = source.getPath();
+                if (path.toLowerCase().endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
+                    return DryRunLibraryType.JAVA;
+                } else if (path.endsWith(".py")) {
+                    return DryRunLibraryType.PYTHON;
+                }
             }
         }
         return DryRunLibraryType.UNKNOWN;
@@ -133,19 +135,9 @@ public class RobotDryRunLibraryImport {
     }
 
     public static enum DryRunLibraryImportStatus {
-        ADDED("Added to project configuration"),
-        ALREADY_EXISTING("Already existing in project configuration"),
-        NOT_ADDED("Not added to project configuration");
-
-        private String message;
-
-        private DryRunLibraryImportStatus(final String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
+        ADDED,
+        ALREADY_EXISTING,
+        NOT_ADDED
     }
 
     public static enum DryRunLibraryType {

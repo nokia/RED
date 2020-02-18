@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
 
@@ -124,20 +123,20 @@ public class SourceHyperlinksToFilesDetectorTest {
     @Test
     public void fileHyperlinkIsProvided_whenPathPointsToExistingFile_1() throws Exception {
         final IHyperlink[] hyperlinks = detect("f10.robot", "Resource", "file.robot");
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(FileHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 
     @Test
     public void fileHyperlinkIsProvided_whenPathPointsToExistingFile_2() throws Exception {
         final IHyperlink[] hyperlinks = detect("f11.robot", "Variables", "vars.py");
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(FileHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 
 
     @Test
     public void fileHyperlinkIsProvided_whenPathPointsToExistingFile_3() throws Exception {
         final IHyperlink[] hyperlinks = detect("f12.robot", "Library", "lib.class");
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(FileHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 
     private static IHyperlink[] detect(final String filePath, final String settingName, final String path)

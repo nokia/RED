@@ -70,7 +70,7 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
             final Styler styler = editorInput.getProblemsFor(location).isEmpty() ? Stylers.Common.EMPTY_STYLER
                     : Stylers.Common.ERROR_STYLER;
 
-            return new StyledString(location.getUri(), styler);
+            return new StyledString(location.getUri().toString(), styler);
 
         } else if (element instanceof ReferencedLibraryArgumentsVariant) {
             final ReferencedLibraryArgumentsVariant variant = (ReferencedLibraryArgumentsVariant) element;

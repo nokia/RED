@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.io.File;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.importer.LibraryImportResolver;
 import org.rf.ide.core.testdata.importer.LibraryImportResolver.ImportedLibrary;
@@ -129,7 +127,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             new KeywordCallArgumentsValidator(validationContext, pathOrNameToken, reporter, descriptor, importArguments)
                     .validate(new NullProgressMonitor());
 
-        } else if (pathOrName.equalsIgnoreCase("remote")) {
+        } else if ("Remote".equals(pathOrName)) {
             reportProblemOnRemoteLibraryArguments(pathOrNameToken, importArguments);
 
         } else {
@@ -156,7 +154,6 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
 
         final Optional<RobotToken> addressToken = importBinder.getLastBindedTo(remoteLibConsDescriptor.get(0));
         final Optional<String> address = importBinder.getLastValueBindedTo(remoteLibConsDescriptor.get(0))
-                .map(RemoteLocation::addProtocolIfNecessary)
                 .map(arg -> RobotExpressions.resolve(variableMappings, arg));
 
         final Optional<RobotToken> timeoutToken = importBinder.getLastBindedTo(remoteLibConsDescriptor.get(1));
@@ -183,12 +180,14 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private void reportProblemOnRemoteLocation(final RobotToken markerToken, final String address) {
+        RemoteLocation location;
         try {
-            final String uriScheme = URI.create(address.toLowerCase()).getScheme();
-            if (uriScheme != null && !uriScheme.equals("http") && !uriScheme.equals("https")) {
+            location = RemoteLocation.create(address);
+            final String scheme = location.getUri().getScheme();
+            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
                 final RobotProblem problem = RobotProblem
                         .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
-                        .formatMessageWith(uriScheme);
+                        .formatMessageWith(scheme);
                 reporter.handleProblem(problem, validationContext.getFile(), markerToken);
                 return;
             }
@@ -200,7 +199,12 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             return;
         }
 
-        if (isInRemoteLocations(address)) {
+        final boolean isInRemoteLocations = validationContext.getProjectConfiguration()
+                .getRemoteLocations()
+                .stream()
+                .anyMatch(locationFromSpec -> RemoteLocation.areEqual(location.getUri().toString(),
+                        locationFromSpec.getUri().toString()));
+        if (isInRemoteLocations) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT)
                     .formatMessageWith(address);
@@ -212,12 +216,5 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
             reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
         }
-    }
-
-    private boolean isInRemoteLocations(final String address) {
-        final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
-        final List<RemoteLocation> remoteLocations = robotProjectConfig.getRemoteLocations();
-
-        return remoteLocations.stream().anyMatch(location -> RemoteLocation.areEqual(address, location.getUri()));
     }
 }

@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,7 +23,6 @@ import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesS
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -116,10 +114,9 @@ public class KeywordSearcher {
     }
 
     private List<String> getNamesToCheck(final String usageName) {
-        final List<String> possibleNameCombination = new ArrayList<>(possibleNameCombination(usageName));
-        Collections.sort(possibleNameCombination, new FromLongestLengthComparator());
-
-        return possibleNameCombination;
+        return possibleNameCombination(usageName).stream()
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .collect(toList());
     }
 
     private Set<String> possibleNameCombination(final String usageName) {
@@ -147,7 +144,7 @@ public class KeywordSearcher {
 
         final int splittedLength = splitted.length;
         for (int dotIndex = 0; dotIndex < splittedLength; dotIndex++) {
-            names.add(Joiner.on('.').join(asList.subList(dotIndex, splittedLength)));
+            names.add(String.join(".", asList.subList(dotIndex, splittedLength)));
         }
 
         return (splittedLength > 0) ? splitted[splittedLength - 1] : "";
@@ -174,16 +171,5 @@ public class KeywordSearcher {
         String getSourceNameInUse();
 
         String getKeywordName();
-    }
-
-    private static class FromLongestLengthComparator implements Comparator<String> {
-
-        @Override
-        public int compare(final String o1, final String o2) {
-            final int o1Length = (o1 != null) ? o1.length() : 0;
-            final int o2Length = (o2 != null) ? o2.length() : 0;
-
-            return Integer.compare(o2Length, o1Length); // desc order
-        }
     }
 }

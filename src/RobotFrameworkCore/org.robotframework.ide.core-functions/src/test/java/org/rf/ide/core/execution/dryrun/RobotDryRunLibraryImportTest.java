@@ -24,13 +24,14 @@ public class RobotDryRunLibraryImportTest {
 
     private static Stream<Arguments> provideTestData() throws Exception {
         return Stream.of(Arguments.of("UnknownLibrary", null, DryRunLibraryType.UNKNOWN),
+                Arguments.of("Remote abc", null, DryRunLibraryType.UNKNOWN),
                 Arguments.of("UnsupportedLibrary", new URI("file:///source.txt"), DryRunLibraryType.UNKNOWN),
                 Arguments.of("PythonSourceLibrary", new URI("file:///source.py"), DryRunLibraryType.PYTHON),
+                Arguments.of("RemoteLib", new URI("file:///remote_lib.py"), DryRunLibraryType.PYTHON),
                 Arguments.of("JavaSourceLibrary", new URI("file:///source.java"), DryRunLibraryType.JAVA),
                 Arguments.of("JarSourceLibrary", new URI("file:///source.jar"), DryRunLibraryType.JAVA),
                 Arguments.of("JarUpperSourceLibrary", new URI("file:///SOURCE.JAR"), DryRunLibraryType.JAVA),
                 Arguments.of("ClassSourceLibrary", new URI("file:///source.class"), DryRunLibraryType.JAVA),
-                Arguments.of("Remote", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE),
                 Arguments.of("Remote http://9.8.7.6:1234", new URI("http://9.8.7.6:1234"), DryRunLibraryType.REMOTE));
     }
 

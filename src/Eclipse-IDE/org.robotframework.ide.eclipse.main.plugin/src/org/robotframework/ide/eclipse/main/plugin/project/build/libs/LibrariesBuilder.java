@@ -274,7 +274,7 @@ public class LibrariesBuilder {
             // we always want to regenerate remote libraries, as something may have changed
             final IFile xmlSpecFile = libspecsFolder.getXmlSpecFile(fileName);
             final List<String> resolvedArguments = newArrayList(
-                    RobotExpressions.resolve(varsMapping, location.getUri()));
+                    RobotExpressions.resolve(varsMapping, location.getUri().toString()));
             generators.add(
                     new StandardLibraryLibdocGenerator("Remote", resolvedArguments, xmlSpecFile, LibdocFormat.XML));
         }

@@ -531,7 +531,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenRemoteLibraryIsImportedWithParametrizedUriAndVariableIsNotResolved() {
+    public void markerIsReported_whenRemoteLibraryIsImportedWithParameterizedUriAndVariableIsNotResolved() {
         validateLibraryImport("Remote  http://${remotevar}");
 
         assertThat(reporter.getReportedProblems()).containsExactly(
@@ -890,7 +890,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithParametrizedUriAndVariableIsResolved()
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithParameterizedUriAndVariableIsResolved()
             throws Exception {
         final Map<String, String> variableMappings = robotProject.getRobotProjectHolder().getVariableMappings();
         variableMappings.put("${remotevar}", "127.0");

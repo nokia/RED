@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
@@ -281,7 +280,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "f9.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
@@ -309,7 +308,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "f10.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
@@ -336,7 +335,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "f11.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
@@ -362,7 +361,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "f12.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
@@ -393,7 +392,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "f13.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())
@@ -424,7 +423,7 @@ public class TableHyperlinksToVariablesDetectorTest {
         final TableHyperlinksToVariablesDetector detector = new TableHyperlinksToVariablesDetector(model, dataProvider);
         final List<IHyperlink> hyperlinks = detector.detectHyperlinks(0, 0, labelWithVar, 0);
 
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileTableElementHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileTableElementHyperlink.class::isInstance);
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "file.robot"));
         assertThat(((SuiteFileTableElementHyperlink) hyperlinks.get(0)).getDestinationElement())

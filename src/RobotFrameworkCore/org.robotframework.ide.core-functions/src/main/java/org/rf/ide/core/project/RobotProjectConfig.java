@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -682,19 +681,19 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
 
-        public static final String DEFAULT_ADDRESS = "http://127.0.0.1:8270/RPC2";
+        public static final int DEFAULT_PORT = 8270;
 
-        public static final RemoteLocation DEFAULT_LOCATION = RemoteLocation.create(DEFAULT_ADDRESS);
+        public static final String DEFAULT_PATH = "/RPC2";
+
+        public static final String DEFAULT_ADDRESS = "http://127.0.0.1:" + DEFAULT_PORT + DEFAULT_PATH;
 
         public static RemoteLocation create(final String path) {
-            final RemoteLocation location = new RemoteLocation();
-            location.setUri(path);
-            return location;
+            return create(URI.create(path.contains("://") ? path : "http://" + path));
         }
 
-        public static RemoteLocation create(final URI path) {
+        public static RemoteLocation create(final URI uri) {
             final RemoteLocation location = new RemoteLocation();
-            location.setUriAddress(path);
+            location.setUri(uri);
             return location;
         }
 
@@ -702,16 +701,12 @@ public class RobotProjectConfig {
             return stripLastSlashAndProtocolIfNecessary(path1).equals(stripLastSlashAndProtocolIfNecessary(path2));
         }
 
-        public static String stripLastSlashAndProtocolIfNecessary(final String string) {
-            return stripLastSlashIfNecessary(stripProtocolIfNecessary(string));
+        public static String stripLastSlashAndProtocolIfNecessary(final String path) {
+            return stripLastSlashIfNecessary(stripProtocolIfNecessary(path));
         }
 
-        private static String stripLastSlashIfNecessary(final String string) {
-            return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
-        }
-
-        public static String addProtocolIfNecessary(final String argument) {
-            return argument.contains("://") ? argument : "http://" + argument;
+        private static String stripLastSlashIfNecessary(final String path) {
+            return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
         }
 
         private static String stripProtocolIfNecessary(final String string) {
@@ -726,28 +721,16 @@ public class RobotProjectConfig {
         @XmlAttribute(required = true)
         private URI uri;
 
-        public void setUriAddress(final URI uri) {
+        public void setUri(final URI uri) {
             this.uri = uri;
         }
 
-        public URI getUriAddress() {
+        public URI getUri() {
             return uri;
         }
 
-        public void setUri(final String path) {
-            try {
-                this.uri = new URI(path);
-            } catch (final URISyntaxException e) {
-                throw new IllegalArgumentException("Invalid URI '" + path + "'", e);
-            }
-        }
-
-        public String getUri() {
-            return uri.toString();
-        }
-
         public String getRemoteName() {
-            return "Remote " + getUri();
+            return "Remote " + uri.toString();
         }
 
         @Override

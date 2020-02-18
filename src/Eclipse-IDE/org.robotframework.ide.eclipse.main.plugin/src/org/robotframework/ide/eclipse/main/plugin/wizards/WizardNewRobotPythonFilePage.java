@@ -44,17 +44,20 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     @Override
     protected InputStream getInitialContents() {
-        Template chosenTemplate = null;
-        for (final Entry<Template, Button> entry : buttons.entrySet()) {
-            if (entry.getValue().getSelection()) {
-                chosenTemplate = entry.getKey();
-                break;
-            }
-        }
+        final Template chosenTemplate = getChosenTemplate();
         final String name = getFileName().endsWith(".py") ? getFileName().substring(0, getFileName().length() - 3)
                 : getFileName();
         final String formattedContent = String.format(chosenTemplate.content, name);
         return new ByteArrayInputStream(formattedContent.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private Template getChosenTemplate() {
+        for (final Entry<Template, Button> entry : buttons.entrySet()) {
+            if (entry.getValue().getSelection()) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalStateException();
     }
 
     @Override
@@ -77,23 +80,8 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     @Override
     protected boolean validatePage() {
-        boolean isProjectAvailable = false;
-        final Object[] selection = currentSelection.toArray();
         final boolean isValid = super.validatePage();
-        if (!(selection.length == 0)) {
-            for (Object project : selection) {
-                while (project instanceof IFolder || project instanceof IFile) {
-                    project = ((IResource) project).getParent();
-                }
-                if (project instanceof IProject) {
-                    if (((IProject) project).isOpen()) {
-                        isProjectAvailable = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if (!isProjectAvailable && !isValid) {
+        if (!isProjectAvailable() && !isValid) {
             setErrorMessage("Action impossible to finish: No project available");
             return false;
         }
@@ -123,6 +111,20 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
             ErrorDialog.openError(getShell(), "Problem occurred", "Error when validating wizard page", e.getStatus());
         }
         return true;
+    }
+
+    private boolean isProjectAvailable() {
+        for (Object element : currentSelection.toArray()) {
+            while (element instanceof IFolder || element instanceof IFile) {
+                element = ((IResource) element).getParent();
+            }
+            if (element instanceof IProject) {
+                if (((IProject) element).isOpen()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static enum Template {

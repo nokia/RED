@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,7 +24,6 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.EnvironmentVariableReplacer;
 import org.rf.ide.core.SystemVariableAccessor;
 import org.rf.ide.core.environment.SuiteExecutor;
-import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ConfigVersion;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
@@ -136,26 +136,29 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
 
-        robotProject.getLibraryEntriesStream().filter(entry -> entry.getValue() == null).forEach(entry -> {
-            final ProblemPosition position;
+        robotProject.getLibraryEntriesStream()
+                .filter(entry -> entry.getValue() == null)
+                .map(Entry::getKey)
+                .forEach(descriptor -> {
+                    final ProblemPosition position;
 
-            final LibraryDescriptor descriptor = entry.getKey();
-            if (descriptor.isStandardRemoteLibrary()) {
-                final RemoteLocation remoteLocation = RemoteLocation.create(descriptor.getArguments().get(0));
-                position = new ProblemPosition(config.getLineFor(remoteLocation));
+                    if (descriptor.isStandardRemoteLibrary()) {
+                        final RemoteLocation remoteLocation = RemoteLocation.create(descriptor.getArguments().get(0));
+                        position = new ProblemPosition(config.getLineFor(remoteLocation));
 
-            } else if (descriptor.isStandardLibrary()) {
-                position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
+                    } else if (descriptor.isStandardLibrary()) {
+                        position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
 
-            } else {
-                final ReferencedLibrary refLib = ReferencedLibrary.create(descriptor.getLibraryType(),
-                        descriptor.getName(), descriptor.getPath());
-                position = new ProblemPosition(config.getLineFor(refLib));
-            }
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                    .formatMessageWith(descriptor.getName());
-            reporter.handleProblem(problem, configFile, position);
-        });
+                    } else {
+                        final ReferencedLibrary refLib = ReferencedLibrary.create(descriptor.getLibraryType(),
+                                descriptor.getName(), descriptor.getPath());
+                        position = new ProblemPosition(config.getLineFor(refLib));
+                    }
+                    final RobotProblem problem = RobotProblem
+                            .causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                            .formatMessageWith(descriptor.getName());
+                    reporter.handleProblem(problem, configFile, position);
+                });
     }
 
     private void validateRemoteLocation(final IProgressMonitor monitor, final RemoteLocation location,
@@ -163,13 +166,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         if (monitor.isCanceled()) {
             return;
         }
-        final URI uriAddress = location.getUriAddress();
+        final URI uri = location.getUri();
         try (final Socket s = new Socket()) {
-            final SocketAddress socketAddress = new InetSocketAddress(uriAddress.getHost(), uriAddress.getPort());
-            s.connect(socketAddress, 5000);
+            final SocketAddress socketAddress = new InetSocketAddress(uri.getHost(), uri.getPort());
+            s.connect(socketAddress, 5_000);
         } catch (final IOException | IllegalArgumentException ex) {
             final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
-                    .formatMessageWith(uriAddress);
+                    .formatMessageWith(uri);
             final ProblemPosition position = new ProblemPosition(config.getLineFor(location));
             reporter.handleProblem(unreachableHostProblem, configFile, position);
         }

@@ -229,7 +229,7 @@ public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
         return new String[] { severity.getName(), severity.name() };
     }
 
-    private class ScrolledContent extends SharedScrolledComposite {
+    private static class ScrolledContent extends SharedScrolledComposite {
 
         public ScrolledContent(final Composite parent) {
             this(parent, SWT.H_SCROLL | SWT.V_SCROLL);

@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinksToFilesDetectorTest.objectsOfClass;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFileContent;
@@ -281,7 +280,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(RegionsHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(RegionsHyperlink.class::isInstance);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(24, 6));
     }
 
@@ -305,7 +304,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(RegionsHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(RegionsHyperlink.class::isInstance);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(22, 6));
     }
 
@@ -328,7 +327,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(RegionsHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(RegionsHyperlink.class::isInstance);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(35, 6));
     }
 
@@ -350,7 +349,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(RegionsHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(RegionsHyperlink.class::isInstance);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(20, 6));
     }
 
@@ -375,7 +374,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(RegionsHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(RegionsHyperlink.class::isInstance);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(70, 6));
     }
 
@@ -399,7 +398,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
         final SourceHyperlinksToVariablesDetector detector = new SourceHyperlinksToVariablesDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 3, 1), true);
-        assertThat(hyperlinks).hasSize(1).have(objectsOfClass(SuiteFileSourceRegionHyperlink.class));
+        assertThat(hyperlinks).hasSize(1).allMatch(SuiteFileSourceRegionHyperlink.class::isInstance);
         assertThat(((SuiteFileSourceRegionHyperlink) hyperlinks[0]).getDestinationFile().getFile())
                 .isEqualTo(getFile(project, "file.robot"));
         assertThat(((SuiteFileSourceRegionHyperlink) hyperlinks[0]).getDestinationRegion())

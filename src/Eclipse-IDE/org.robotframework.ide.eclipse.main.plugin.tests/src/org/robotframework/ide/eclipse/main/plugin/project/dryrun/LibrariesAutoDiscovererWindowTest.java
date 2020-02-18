@@ -5,12 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -119,17 +120,15 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void testConvertingToText_forChildElementWithoutLabel() throws Exception {
-        assertThat(LibrariesAutoDiscovererWindow.convertToText(new DryRunLibraryImportChildElement(null, "value")))
+        assertThat(LibrariesAutoDiscovererWindow.convertToText(new DryRunLibraryImportChildElement("value")))
                 .isEqualTo("value");
     }
 
     @Test
     public void testConvertingToText_forListChildElement() throws Exception {
-        final List<DryRunLibraryImportChildElement> childElements = Arrays.asList(
-                new DryRunLibraryImportChildElement(null, "value1"),
-                new DryRunLibraryImportChildElement(null, "value2"),
-                new DryRunLibraryImportChildElement(null, "value3"),
-                new DryRunLibraryImportChildElement(null, "value4"));
+        final List<DryRunLibraryImportChildElement> childElements = newArrayList(
+                new DryRunLibraryImportChildElement("value1"), new DryRunLibraryImportChildElement("value2"),
+                new DryRunLibraryImportChildElement("value3"), new DryRunLibraryImportChildElement("value4"));
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
                 childElements);
 
@@ -143,7 +142,7 @@ public class LibrariesAutoDiscovererWindowTest {
         libImportElement.setStatus(null);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
-                .isEqualTo("Source: Unknown\n" + "Importers: Unknown");
+                .isEqualTo("Status: Not added to project configuration\n" + "Source: Unknown\n" + "Importer: Unknown");
     }
 
     @Test
@@ -152,7 +151,7 @@ public class LibrariesAutoDiscovererWindowTest {
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
-                .isEqualTo("Status: Not added to project configuration\n" + "Source: Unknown\n" + "Importers: Unknown");
+                .isEqualTo("Status: Not added to project configuration\n" + "Source: Unknown\n" + "Importer: Unknown");
     }
 
     @Test
@@ -163,18 +162,18 @@ public class LibrariesAutoDiscovererWindowTest {
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Not added to project configuration\n" + "Source: "
-                        + lib.getLocation().toFile().getAbsolutePath() + "\n" + "Importers: Unknown");
+                        + lib.getLocation().toFile().getAbsolutePath() + "\n" + "Importer: Unknown");
     }
 
     @Test
     public void testConvertingToText_forRemoteLibraryImportWithKnownStatusAndSource() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote",
-                URI.create("http://127.0.0.1:9000"));
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000", URI.create("http://127.0.0.1:9000"));
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
                 .isEqualTo("Status: Not added to project configuration\n" + "Source: "
-                        + libImportElement.getSource().toString() + "\n" + "Importers: Unknown");
+                        + libImportElement.getSource().toString() + "\n" + "Importer: Unknown");
     }
 
     @Test
@@ -184,7 +183,7 @@ public class LibrariesAutoDiscovererWindowTest {
         libImportElement.setImporters(newHashSet(suite.getLocationURI()));
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
-                .isEqualTo("Status: Already existing in project configuration\n" + "Source: Unknown\n" + "Importers: "
+                .isEqualTo("Status: Already existing in project configuration\n" + "Source: Unknown\n" + "Importer: "
                         + suite.getLocation().toFile().getAbsolutePath());
     }
 
@@ -216,7 +215,7 @@ public class LibrariesAutoDiscovererWindowTest {
         libImportElement.setAdditionalInfo("some additional info text");
 
         assertThat(LibrariesAutoDiscovererWindow.convertToText(libImportElement))
-                .isEqualTo("Status: Not added to project configuration\n" + "Source: Unknown\n" + "Importers: Unknown\n"
+                .isEqualTo("Status: Not added to project configuration\n" + "Source: Unknown\n" + "Importer: Unknown\n"
                         + "Additional info: some additional info text");
     }
 
@@ -225,7 +224,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement("name", "value");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
-                Arrays.asList(childElement));
+                newArrayList(childElement));
 
         assertThat(contentProvider.hasChildren(libImportElement)).isTrue();
         assertThat(contentProvider.hasChildren(childElement)).isFalse();
@@ -237,7 +236,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createUnknown("name");
         final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement("name", "value");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
-                Arrays.asList(childElement));
+                newArrayList(childElement));
 
         assertThat(contentProvider.getParent(libImportElement)).isNull();
         assertThat(contentProvider.getParent(childElement)).isNull();
@@ -261,7 +260,7 @@ public class LibrariesAutoDiscovererWindowTest {
         final DryRunLibraryImportChildElement childElement1 = new DryRunLibraryImportChildElement("n1", "v1");
         final DryRunLibraryImportChildElement childElement2 = new DryRunLibraryImportChildElement("n2", "v2");
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
-                Arrays.asList(childElement1, childElement2));
+                newArrayList(childElement1, childElement2));
         final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("name",
                 lib.getLocationURI());
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
@@ -279,7 +278,7 @@ public class LibrariesAutoDiscovererWindowTest {
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
                 .isEqualTo(lib.getLocation().toFile().getAbsolutePath());
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importer:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
                 .isEqualTo(suite.getLocation().toFile().getAbsolutePath());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
@@ -289,8 +288,8 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void elementChildrenAreProvided_whenProviderIsAskedForChildrenDuringForRemoteImport() throws Exception {
-        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport.createKnown("Remote",
-                URI.create("http://127.0.0.1:9000"));
+        final RobotDryRunLibraryImport libImportElement = RobotDryRunLibraryImport
+                .createKnown("Remote http://127.0.0.1:9000", URI.create("http://127.0.0.1:9000"));
         libImportElement.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         libImportElement.setImporters(newHashSet(suite.getLocationURI()));
         libImportElement.setAdditionalInfo("additional info error");
@@ -303,7 +302,7 @@ public class LibrariesAutoDiscovererWindowTest {
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getName()).isEqualTo("Source:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[1]).getValue())
                 .isEqualTo(libImportElement.getSource().toString());
-        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importers:");
+        assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getName()).isEqualTo("Importer:");
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[2]).getValue())
                 .isEqualTo(suite.getLocation().toFile().getAbsolutePath());
         assertThat(((DryRunLibraryImportChildElement) libImportChildren[3]).getName()).isEqualTo("Additional info:");
@@ -331,7 +330,7 @@ public class LibrariesAutoDiscovererWindowTest {
 
     @Test
     public void childElement_hasOnlyValueInLabelWithoutStyles() throws Exception {
-        final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement(null, "value");
+        final DryRunLibraryImportChildElement childElement = new DryRunLibraryImportChildElement("value");
 
         final StyledString label = labelProvider.getStyledText(childElement);
 
@@ -378,7 +377,7 @@ public class LibrariesAutoDiscovererWindowTest {
     @Test
     public void listChildElement_hasOnlyNameInLabelWithBoldStyle() throws Exception {
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
-                Arrays.asList());
+                new ArrayList<>());
 
         final StyledString label = labelProvider.getStyledText(listChildElement);
 
@@ -436,7 +435,7 @@ public class LibrariesAutoDiscovererWindowTest {
     @Test
     public void listChildElement_hasElementImage() {
         final DryRunLibraryImportListChildElement listChildElement = new DryRunLibraryImportListChildElement("name",
-                Arrays.asList());
+                new ArrayList<>());
 
         assertThat(labelProvider.getImage(listChildElement))
                 .isSameAs(ImagesManager.getImage(RedImages.getElementImage()));

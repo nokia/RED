@@ -12,7 +12,6 @@ import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.Region;
@@ -82,20 +81,9 @@ public class HyperlinksToFilesDetectorTest {
         final HyperlinksToFilesDetector detector = createDetector();
 
         final List<IHyperlink> hyperlinks1 = detector.detectHyperlinks(robotFile, new Region(50, 10), relPath, false);
-        assertThat(hyperlinks1).hasSize(1).have(objectsOfClass(FileHyperlink.class));
+        assertThat(hyperlinks1).hasSize(1).allMatch(FileHyperlink.class::isInstance);
         final List<IHyperlink> hyperlinks2 = detector.detectHyperlinks(robotFile, new Region(50, 10), absPath, false);
-        assertThat(hyperlinks2).hasSize(1).have(objectsOfClass(FileHyperlink.class));
-    }
-
-
-    static Condition<IHyperlink> objectsOfClass(final Class<? extends IHyperlink> clazz) {
-        return new Condition<IHyperlink>() {
-
-            @Override
-            public boolean matches(final IHyperlink link) {
-                return clazz.isInstance(link);
-            }
-        };
+        assertThat(hyperlinks2).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 
     private static HyperlinksToFilesDetector createDetector() {

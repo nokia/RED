@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,7 +74,7 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected Object getValue(final Object element) {
         if (element instanceof RemoteLocation) {
-            return ((RemoteLocation) element).getUri();
+            return ((RemoteLocation) element).getUri().toString();
         } else if (element instanceof ReferencedLibraryArgumentsVariant) {
             return ((ReferencedLibraryArgumentsVariant) element).getArgsStream().collect(joining("::"));
         } else {
@@ -90,7 +91,7 @@ class ReferencedLibrariesEditingSupport extends ElementsAddingEditingSupport {
 
                 if (!newValue.equals(oldValue)) {
                     if (element instanceof RemoteLocation) {
-                        ((RemoteLocation) element).setUri(newValue);
+                        ((RemoteLocation) element).setUri(URI.create(newValue));
                     } else if (element instanceof ReferencedLibraryArgumentsVariant) {
                         ((ReferencedLibraryArgumentsVariant) element).setArguments(Arrays.asList(newValue.split("::")));
                     }

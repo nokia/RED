@@ -29,7 +29,8 @@ public final class LibraryDescriptor {
     }
 
     public static LibraryDescriptor ofStandardRemoteLibrary(final RemoteLocation remoteLocation) {
-        return new LibraryDescriptor("Remote", LibraryType.PYTHON, null, newArrayList(remoteLocation.getUri()), true);
+        return new LibraryDescriptor("Remote", LibraryType.PYTHON, null,
+                newArrayList(remoteLocation.getUri().toString()), true);
     }
 
     public static LibraryDescriptor ofReferencedLibrary(final ReferencedLibrary refLibrary,
@@ -83,7 +84,7 @@ public final class LibraryDescriptor {
     }
 
     public boolean isStandardRemoteLibrary() {
-        return name.toLowerCase().equals("remote");
+        return "Remote".equals(name);
     }
 
     public boolean isStandardLibrary() {
