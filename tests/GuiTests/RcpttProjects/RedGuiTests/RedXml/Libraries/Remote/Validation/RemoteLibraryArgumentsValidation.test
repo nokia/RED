@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 11:31 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 2/20/20 4:06 PM
 Testcase-Type: ecl
 Verifications: _JUqVgK-LEeiBA8H4m2oMKw
 
@@ -76,7 +76,7 @@ with [get-view Problems | get-tree] {
         -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/127.0.0.1:8274\\/' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
     get-item 
-        -path "Errors \\(11 items\\)/'Remote' library under 'http:\\/\\/timeoutttt=30' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        -path "Errors \\(11 items\\)/'Remote' library under 'timeoutttt=30' location not in configuration. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
         | get-property enablement | equals false | verify-true
         
     get-item -path "Errors \\(11 items\\)/Keyword 'Remote' expects from 0 to 2 arguments but 3 are provided" 
