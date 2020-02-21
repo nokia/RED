@@ -348,24 +348,25 @@ public class CombinedLibrariesAutoDiscovererTest {
     @Test
     public void remoteLibsAreAddedToProjectConfig_whenAddressIsWithOrWithoutSlash() throws Exception {
         final RobotSuiteFile suite1 = model.createSuiteFile(project.createFile("suite1.robot",
-                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000", "*** Test Cases ***"));
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/path", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(project.createFile("suite2.robot",
-                "*** Settings ***", "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:8000/path/", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(project.createFile("suite3.robot",
-                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/",
-                "Library  Remote  http://127.0.0.1:8000/", "*** Test Cases ***"));
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/path/",
+                "Library  Remote  http://127.0.0.1:8000/path", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getRemoteLocations()).containsExactly(
-                RemoteLocation.create("http://127.0.0.1:8000/"), RemoteLocation.create("http://127.0.0.1:9000/"));
+                RemoteLocation.create("http://127.0.0.1:8000/path/"),
+                RemoteLocation.create("http://127.0.0.1:9000/path"));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
-                createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
+                createImport(ADDED, "Remote http://127.0.0.1:9000/path", URI.create("http://127.0.0.1:9000/path"),
                         newHashSet(suite1.getFile(), suite3.getFile())),
-                createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
+                createImport(ADDED, "Remote http://127.0.0.1:8000/path/", URI.create("http://127.0.0.1:8000/path/"),
                         newHashSet(suite2.getFile(), suite3.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
@@ -381,20 +382,20 @@ public class CombinedLibrariesAutoDiscovererTest {
         final RobotSuiteFile suite2 = model.createSuiteFile(project.createFile("E/F/G/suite2.robot",
                 "*** Settings ***", "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(project.createFile("E/F/G/H/suite3.robot",
-                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000/",
-                "Library  Remote  http://127.0.0.1:8000/", "*** Test Cases ***"));
+                "*** Settings ***", "Library  Remote  http://127.0.0.1:9000",
+                "Library  Remote  http://127.0.0.1:8000", "*** Test Cases ***"));
 
         final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
                 newArrayList(suite1, suite2, suite3), summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getRemoteLocations()).containsExactly(
-                RemoteLocation.create("http://127.0.0.1:8000/"), RemoteLocation.create("http://127.0.0.1:9000/"));
+                RemoteLocation.create("http://127.0.0.1:8000"), RemoteLocation.create("http://127.0.0.1:9000"));
 
         verify(summaryHandler).accept(argThat(hasLibImports(
-                createImport(ADDED, "Remote http://127.0.0.1:9000/", URI.create("http://127.0.0.1:9000/"),
+                createImport(ADDED, "Remote http://127.0.0.1:9000", URI.create("http://127.0.0.1:9000"),
                         newHashSet(suite1.getFile(), suite3.getFile())),
-                createImport(ADDED, "Remote http://127.0.0.1:8000/", URI.create("http://127.0.0.1:8000/"),
+                createImport(ADDED, "Remote http://127.0.0.1:8000", URI.create("http://127.0.0.1:8000"),
                         newHashSet(suite2.getFile(), suite3.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }

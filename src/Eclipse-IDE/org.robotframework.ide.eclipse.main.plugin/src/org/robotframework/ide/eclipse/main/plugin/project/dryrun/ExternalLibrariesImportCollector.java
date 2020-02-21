@@ -159,29 +159,25 @@ class ExternalLibrariesImportCollector {
         }
 
         private void locateRemoteLibrary(final String name, final List<RobotToken> arguments) {
-            final Optional<RemoteLocation> location = resolveRemoteAddress(arguments)
-                    .map(RemoteLocation::stripLastSlashAndProtocolIfNecessary)
-                    .map(address -> address + "/")
-                    .map(RemoteLocation::create);
-
+            final Optional<RemoteLocation> location = resolveRemoteLocation(arguments);
             if (location.isPresent()) {
                 final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport
                         .createKnown(location.get().getRemoteName(), location.get().getUri());
-                final boolean isUnknown = libraryImports.stream()
-                        .filter(lib -> lib.getType() == DryRunLibraryType.REMOTE)
-                        .noneMatch(lib -> RemoteLocation.areEqual(libImport.getSource().toString(),
-                                lib.getSource().toString()));
-                if (isUnknown) {
+                final Optional<RobotDryRunLibraryImport> existingLibImport = libraryImports.stream()
+                        .filter(knownLib -> knownLib.getType() == DryRunLibraryType.REMOTE)
+                        .filter(knownLib -> RemoteLocation.unify(libImport.getSource())
+                                .equals(RemoteLocation.unify(knownLib.getSource())))
+                        .findFirst();
+                if (!existingLibImport.isPresent()) {
                     libraryImports.add(libImport);
-                    knownLibraryNames.put(libImport.getName(), libImport);
                 }
-                libraryImporters.put(libImport, currentSuite);
+                libraryImporters.put(existingLibImport.orElse(libImport), currentSuite);
             } else {
                 reportUnknownLibrary(name, "Invalid remote library arguments.");
             }
         }
 
-        private Optional<String> resolveRemoteAddress(final List<RobotToken> arguments) {
+        private Optional<RemoteLocation> resolveRemoteLocation(final List<RobotToken> arguments) {
             final Map<String, String> variablesMapping = currentSuite.getRobotProject()
                     .getRobotProjectHolder()
                     .getVariableMappings();
@@ -195,7 +191,13 @@ class ExternalLibrariesImportCollector {
             final Optional<String> address = binder.hasBindings()
                     ? Optional.of(binder.getLastValueBindedTo(descriptor.get(0)).orElse(RemoteLocation.DEFAULT_ADDRESS))
                     : Optional.empty();
-            return address.map(expression -> RobotExpressions.resolve(variablesMapping, expression));
+            return address.map(expression -> RobotExpressions.resolve(variablesMapping, expression)).flatMap(a -> {
+                try {
+                    return Optional.of(RemoteLocation.create(a));
+                } catch (final IllegalArgumentException e) {
+                    return Optional.empty();
+                }
+            });
         }
 
         private void locateReferencedLibrary(final String name) {

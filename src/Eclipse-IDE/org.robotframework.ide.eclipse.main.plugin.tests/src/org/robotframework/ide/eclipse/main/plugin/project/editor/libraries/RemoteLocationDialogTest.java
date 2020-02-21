@@ -54,20 +54,4 @@ public class RemoteLocationDialogTest {
 
         assertThat(dialog.get().getCreatedElement().getUri()).isEqualTo(new URI("http://1.2.3.4:8270/RPC2"));
     }
-
-    @Test
-    public void defaultPortAndPathAreUsedWhenNotSpecified() throws Exception {
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4")))
-                .isEqualTo(new URI("http://1.2.3.4:8270/RPC2"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/")))
-                .isEqualTo(new URI("http://1.2.3.4:8270/"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4/path")))
-                .isEqualTo(new URI("http://1.2.3.4:8270/path"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456")))
-                .isEqualTo(new URI("http://1.2.3.4:456/RPC2"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/")))
-                .isEqualTo(new URI("http://1.2.3.4:456/"));
-        assertThat(RemoteLocationDialog.createUriWithDefaultsIfMissing(new URI("http://1.2.3.4:456/path")))
-                .isEqualTo(new URI("http://1.2.3.4:456/path"));
-    }
 }

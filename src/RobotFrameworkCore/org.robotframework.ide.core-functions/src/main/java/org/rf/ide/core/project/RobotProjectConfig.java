@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +32,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.rf.ide.core.environment.SuiteExecutor;
+
+import com.google.common.base.Strings;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
@@ -681,14 +684,20 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
 
+        public static final String DEFAULT_SCHEME = "http";
+
         public static final int DEFAULT_PORT = 8270;
 
         public static final String DEFAULT_PATH = "/RPC2";
 
-        public static final String DEFAULT_ADDRESS = "http://127.0.0.1:" + DEFAULT_PORT + DEFAULT_PATH;
+        public static final String DEFAULT_ADDRESS = DEFAULT_SCHEME + "://127.0.0.1:" + DEFAULT_PORT + DEFAULT_PATH;
 
-        public static RemoteLocation create(final String path) {
-            return create(URI.create(path.contains("://") ? path : "http://" + path));
+        public static RemoteLocation create(final String str) {
+            try {
+                return create(new URI(str));
+            } catch (final URISyntaxException e) {
+                return create(URI.create(str.contains("://") ? str : RemoteLocation.DEFAULT_SCHEME + "://" + str));
+            }
         }
 
         public static RemoteLocation create(final URI uri) {
@@ -697,25 +706,26 @@ public class RobotProjectConfig {
             return location;
         }
 
-        public static boolean areEqual(final String path1, final String path2) {
-            return stripLastSlashAndProtocolIfNecessary(path1).equals(stripLastSlashAndProtocolIfNecessary(path2));
-        }
-
-        public static String stripLastSlashAndProtocolIfNecessary(final String path) {
-            return stripLastSlashIfNecessary(stripProtocolIfNecessary(path));
-        }
-
-        private static String stripLastSlashIfNecessary(final String path) {
-            return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
-        }
-
-        private static String stripProtocolIfNecessary(final String string) {
-            if (string.toLowerCase().startsWith("https://")) {
-                return string.substring(8, string.length());
-            } else if (string.toLowerCase().startsWith("http://")) {
-                return string.substring(7, string.length());
+        public static URI unify(final URI uri) {
+            try {
+                final String path = Strings.isNullOrEmpty(uri.getPath()) ? RemoteLocation.DEFAULT_PATH : uri.getPath();
+                final String unifiedPath = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), unifiedPath,
+                        uri.getQuery(), uri.getFragment());
+            } catch (final URISyntaxException e) {
+                return uri;
             }
-            return string;
+        }
+
+        public static URI addDefaults(final URI uri) {
+            try {
+                final int port = uri.getPort() == -1 ? RemoteLocation.DEFAULT_PORT : uri.getPort();
+                final String path = Strings.isNullOrEmpty(uri.getPath()) ? RemoteLocation.DEFAULT_PATH : uri.getPath();
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), port, path, uri.getQuery(),
+                        uri.getFragment());
+            } catch (final URISyntaxException e) {
+                return uri;
+            }
         }
 
         @XmlAttribute(required = true)

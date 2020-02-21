@@ -180,17 +180,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private void reportProblemOnRemoteLocation(final RobotToken markerToken, final String address) {
-        RemoteLocation location;
+        final RemoteLocation location;
         try {
             location = RemoteLocation.create(address);
-            final String scheme = location.getUri().getScheme();
-            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
-                        .formatMessageWith(scheme);
-                reporter.handleProblem(problem, validationContext.getFile(), markerToken);
-                return;
-            }
         } catch (final IllegalArgumentException e) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
@@ -199,11 +191,20 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             return;
         }
 
+        if (location.getUri().isAbsolute() && !"http".equalsIgnoreCase(location.getUri().getScheme())
+                && !"https".equalsIgnoreCase(location.getUri().getScheme())) {
+            final RobotProblem problem = RobotProblem
+                    .causedBy(GeneralSettingsProblem.NOT_SUPPORTED_URI_PROTOCOL_IN_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(location.getUri().getScheme());
+            reporter.handleProblem(problem, validationContext.getFile(), markerToken);
+            return;
+        }
+
         final boolean isInRemoteLocations = validationContext.getProjectConfiguration()
                 .getRemoteLocations()
                 .stream()
-                .anyMatch(locationFromSpec -> RemoteLocation.areEqual(location.getUri().toString(),
-                        locationFromSpec.getUri().toString()));
+                .anyMatch(locationFromSpec -> RemoteLocation.unify(location.getUri())
+                        .equals(RemoteLocation.unify(locationFromSpec.getUri())));
         if (isInRemoteLocations) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT)

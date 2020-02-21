@@ -107,10 +107,15 @@ public class LibraryImportResolver {
 
             if (libDescriptor.isStandardRemoteLibrary()) {
                 final Argument uriArg = argsDescriptor.get(0);
-                final String specUriArg = extractUriValue(libspecBinder, uriArg);
-                final String importUriArg = extractUriValue(importBinder, uriArg);
+                try {
+                    final RemoteLocation specLocation = RemoteLocation.create(extractUriValue(libspecBinder, uriArg));
+                    final RemoteLocation importLocation = RemoteLocation.create(extractUriValue(importBinder, uriArg));
 
-                return RemoteLocation.areEqual(specUriArg, importUriArg);
+                    return RemoteLocation.unify(specLocation.getUri())
+                            .equals(RemoteLocation.unify(importLocation.getUri()));
+                } catch (final IllegalArgumentException e) {
+                    return false;
+                }
 
             } else {
                 for (final Argument arg : argsDescriptor) {

@@ -7,9 +7,12 @@ package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.net.URI;
 import java.util.List;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedPath;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -586,6 +589,80 @@ public class RobotProjectConfigTest {
 
         assertThat(lib.getArgumentsVariants()).isEmpty();
         assertThat(lib.getArgsVariantsStream()).containsExactly(ReferencedLibraryArgumentsVariant.create());
+    }
+
+    @Nested
+    class RemoteLocationTest {
+
+        @Test
+        void remoteLocationIsCreated() throws Exception {
+            assertThat(RemoteLocation.create("127.0.0.1")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("127.0.0.1"));
+            assertThat(RemoteLocation.create("127.0.0.1/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("127.0.0.1/"));
+            assertThat(RemoteLocation.create("http://127.0.0.1:8270")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270"));
+            assertThat(RemoteLocation.create("http://127.0.0.1:8270/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/"));
+            assertThat(RemoteLocation.create("http://127.0.0.1:8270/path")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/path"));
+            assertThat(RemoteLocation.create("http://127.0.0.1:8270/path/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/path/"));
+            assertThat(RemoteLocation.create("https://127.0.0.1:8270/path/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("https://127.0.0.1:8270/path/"));
+            assertThat(RemoteLocation.create("www.somehost.com")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("www.somehost.com"));
+        }
+
+        @Test
+        void remoteLocationIsCreatedWithDefaultScheme() throws Exception {
+            assertThat(RemoteLocation.create("127.0.0.1:8270")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270"));
+            assertThat(RemoteLocation.create("127.0.0.1:8270/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/"));
+            assertThat(RemoteLocation.create("127.0.0.1:8270/path")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/path"));
+            assertThat(RemoteLocation.create("127.0.0.1:8270/path/")).extracting(RemoteLocation::getUri)
+                    .isEqualTo(new URI("http://127.0.0.1:8270/path/"));
+        }
+
+        @Test
+        void remoteLocationIsNotCreated() throws Exception {
+            assertThatIllegalArgumentException().isThrownBy(() -> RemoteLocation.create("://127.0.0.1:8270"));
+            assertThatIllegalArgumentException().isThrownBy(() -> RemoteLocation.create("127.0.0.1:9000/%"));
+        }
+
+        @Test
+        void uriIsUnified() throws Exception {
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104")))
+                    .isEqualTo(new URI("http://101.102.103.104/RPC2"));
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104/")))
+                    .isEqualTo(new URI("http://101.102.103.104"));
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104:8271")))
+                    .isEqualTo(new URI("http://101.102.103.104:8271/RPC2"));
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104:8271/")))
+                    .isEqualTo(new URI("http://101.102.103.104:8271"));
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104:8271/path")))
+                    .isEqualTo(new URI("http://101.102.103.104:8271/path"));
+            assertThat(RemoteLocation.unify(new URI("http://101.102.103.104:8271/path/")))
+                    .isEqualTo(new URI("http://101.102.103.104:8271/path"));
+        }
+
+        @Test
+        void defaultPortAndPathAreAddedWhenNotSpecified() throws Exception {
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4")))
+                    .isEqualTo(new URI("http://1.2.3.4:8270/RPC2"));
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4/")))
+                    .isEqualTo(new URI("http://1.2.3.4:8270/"));
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4/path")))
+                    .isEqualTo(new URI("http://1.2.3.4:8270/path"));
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4:456")))
+                    .isEqualTo(new URI("http://1.2.3.4:456/RPC2"));
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4:456/")))
+                    .isEqualTo(new URI("http://1.2.3.4:456/"));
+            assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4:456/path")))
+                    .isEqualTo(new URI("http://1.2.3.4:456/path"));
+        }
     }
 
 }

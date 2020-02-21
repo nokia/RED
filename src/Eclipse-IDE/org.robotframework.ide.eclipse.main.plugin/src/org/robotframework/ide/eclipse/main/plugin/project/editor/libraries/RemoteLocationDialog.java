@@ -12,7 +12,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 public class RemoteLocationDialog extends AddNewElementDialog<RemoteLocation> {
@@ -70,19 +69,6 @@ public class RemoteLocationDialog extends AddNewElementDialog<RemoteLocation> {
 
     @Override
     protected RemoteLocation createElement(final String text) {
-        return RemoteLocation.create(createUriWithDefaultsIfMissing(URI.create(text)));
-    }
-
-    @VisibleForTesting
-    static URI createUriWithDefaultsIfMissing(final URI uri) {
-        try {
-            final int port = uri.getPort() != -1 ? uri.getPort() : RemoteLocation.DEFAULT_PORT;
-            final String uriPath = uri.getPath();
-            final String path = !Strings.isNullOrEmpty(uriPath) ? uriPath : RemoteLocation.DEFAULT_PATH;
-            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), port, path, uri.getQuery(),
-                    uri.getFragment());
-        } catch (final URISyntaxException e) {
-            return uri;
-        }
+        return RemoteLocation.create(RemoteLocation.addDefaults(URI.create(text)));
     }
 }

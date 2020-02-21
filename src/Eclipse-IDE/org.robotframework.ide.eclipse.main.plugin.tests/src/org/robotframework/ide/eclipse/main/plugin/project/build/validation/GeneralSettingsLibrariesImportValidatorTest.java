@@ -147,17 +147,17 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryIsImportedWithToManyNamedArguments() {
         final Map<LibraryDescriptor, LibrarySpecification> stdLibs = createLibSpecForLibrary("http://127.0.0.1:9000");
 
-        validateLibraryImport("Remote  uri=http://127.0.0.1:9000/  timeout=60  timeout=30", stdLibs);
+        validateLibraryImport("Remote  uri=http://127.0.0.1:9000  timeout=60  timeout=30", stdLibs);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(62, 72))));
+                new Problem(ArgumentProblem.OVERRIDDEN_NAMED_ARGUMENT, new ProblemPosition(2, Range.closed(61, 71))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithToManyPositionalArguments() {
         final Map<LibraryDescriptor, LibrarySpecification> stdLibs = createLibSpecForLibrary("http://127.0.0.1:9000");
 
-        validateLibraryImport("Remote  http://127.0.0.1:9000/  60  30", stdLibs);
+        validateLibraryImport("Remote  http://127.0.0.1:9000  60  30", stdLibs);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
@@ -242,7 +242,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithPositionalUriWithoutProtocolInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("http://127.0.0.1:9000/");
+        addRemoteUriToConfig("http://127.0.0.1:9000");
 
         validateLibraryImport("Remote  127.0.0.1:9000");
 
@@ -253,7 +253,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithNamedUriInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("https://127.0.0.1:9000/");
+        addRemoteUriToConfig("https://127.0.0.1:9000");
 
         validateLibraryImport("Remote  uri=https://127.0.0.1:9000");
 
@@ -266,27 +266,27 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryWithNamedUriWithoutProtocolInConfigWithoutLibSpec() {
         addRemoteUriToConfig("http://127.0.0.1:9000");
 
-        validateLibraryImport("Remote  uri=127.0.0.1:9000/");
+        validateLibraryImport("Remote  uri=127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(34, 53))));
+                        new ProblemPosition(2, Range.closed(34, 52))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithPositionalTimeoutAndUriInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("http://127.0.0.1:9000/");
+        addRemoteUriToConfig("http://127.0.0.1:9000");
 
-        validateLibraryImport("Remote   http://127.0.0.1:9000/  30");
+        validateLibraryImport("Remote   http://127.0.0.1:9000  30");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(35, 57))));
+                        new ProblemPosition(2, Range.closed(35, 56))));
     }
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithPositionalTimeoutAndUriWithoutProtocolInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("http://127.0.0.1:9000/");
+        addRemoteUriToConfig("http://127.0.0.1:9000");
 
         validateLibraryImport("Remote  127.0.0.1:9000  30");
 
@@ -297,7 +297,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @Test
     public void markerIsReported_whenRemoteLibraryWithNamedTimeoutAndUriInConfigWithoutLibSpec() {
-        addRemoteUriToConfig("http://127.0.0.1:9000/");
+        addRemoteUriToConfig("http://127.0.0.1:9000");
 
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000  timeout=30");
 
@@ -310,11 +310,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryWithInvertedNamedTimeoutAndUriInConfigWithoutLibSpec() {
         addRemoteUriToConfig("http://127.0.0.1:9000");
 
-        validateLibraryImport("Remote  timeout=30  uri=127.0.0.1:9000/");
+        validateLibraryImport("Remote  timeout=30  uri=127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
                 .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(46, 65))));
+                        new ProblemPosition(2, Range.closed(46, 64))));
     }
 
     @Test
@@ -790,7 +790,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithPositionalUriWithoutProtocolInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
@@ -802,7 +802,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     @Test
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedUriInConfigWithLibSpec() throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote  uri=http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
@@ -815,7 +815,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedUriWithoutProtocolInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote  uri=127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
@@ -825,23 +825,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithUriWithHttpProtocolInConfigWithLibSpec()
-            throws Exception {
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithoutDefaultPathButDefinedWithIt() throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
-            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
-
-            validateLibraryImport("Remote  https://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
-
-            assertThat(reporter.getReportedProblems()).isEmpty();
-        }
-    }
-
-    @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithUriWithHttpsProtocolInConfigWithLibSpec()
-            throws Exception {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "https://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/RPC2";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
@@ -851,13 +837,50 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithDefaultPathButDefinedWithoutIt() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/RPC2", new HashMap<>(), libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithoutTrailingSlashButDefinedWithIt() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/path/";
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path", new HashMap<>(), libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithTrailingSlashButDefinedWithoutIt() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/path";
+            final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
+
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path/", new HashMap<>(),
+                    libs);
+
+            assertThat(reporter.getReportedProblems()).isEmpty();
+        }
+    }
+
+    @Test
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithPositionalTimeoutAndUriInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/  30", new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "  30", new HashMap<>(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -867,7 +890,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithPositionalTimeoutAndUriWithoutProtocolInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort() + "  30", new HashMap<>(), libs);
@@ -879,7 +902,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeoutAndUriInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
             validateLibraryImport("Remote   uri=http://127.0.0.1:" + socket.getLocalPort() + "  timeout=30",
@@ -896,12 +919,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         variableMappings.put("${remotevar}", "127.0");
 
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
 
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote   http://${remotevar}.0.1:" + socket.getLocalPort() + "/", new HashMap<>(),
-                    libs);
+            validateLibraryImport("Remote   http://${remotevar}.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -911,12 +933,11 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void noMarkerIsReported_whenRemoteLibraryIsImportedWithInvertedNamedTimeoutAndUriInConfigWithLibSpec()
             throws Exception {
         try (ServerSocket socket = new ServerSocket(0)) {
-            final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
+            final String location = "http://127.0.0.1:" + socket.getLocalPort();
 
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote   timeout=30  uri=127.0.0.1:" + socket.getLocalPort() + "/", new HashMap<>(),
-                    libs);
+            validateLibraryImport("Remote   timeout=30  uri=127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
