@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/20/20 3:15 PM
+Save-Time: 2/21/20 1:15 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -32,10 +32,10 @@ let [val home_path [replace $user_folder -old "\\" -new "\\\\"]]{
 	wait 2000
 	//check error about full windows path for: c:\folder\file.py
 	try -times 5 -delay 1000 -command{
-		get-view Problems | get-tree | get-item -path "Errors \\(18 items\\)" 
-		    | get-property "getItems().TreeItem[17].getText()" 
-		    | equals "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators. Try to use Quick Fix (Ctrl+1)" 
-		    | verify-true
+		with [get-view Problems | get-tree] {
+		    get-property "getLinesVisible()" | equals true | verify-true
+		    get-property "getMenu().isEnabled()" | equals true | verify-true
+		}
 	}	 
 	with [get-view Problems | get-tree] {
 	    get-item "Errors \\(18 items\\)/Windows paths are not supported. Use global variable '${\\/}' or Linux-like '\\/' path separators. Try to use Quick Fix \\(Ctrl\\+1\\)" 
