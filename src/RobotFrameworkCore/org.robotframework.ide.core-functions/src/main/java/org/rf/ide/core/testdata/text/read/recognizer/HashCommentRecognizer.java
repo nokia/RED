@@ -25,4 +25,9 @@ public class HashCommentRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new HashCommentRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }

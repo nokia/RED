@@ -95,4 +95,8 @@ public abstract class ATokenRecognizer {
                 ? "[" + Character.toUpperCase(c) + Character.toLowerCase(c) + "]"
                 : Character.toString(c);
     }
+
+    public boolean shouldContinueWithOtherRecognizers() {
+        return true;
+    }
 }

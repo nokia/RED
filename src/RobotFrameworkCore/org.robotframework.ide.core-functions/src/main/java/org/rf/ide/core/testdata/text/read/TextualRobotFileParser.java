@@ -219,17 +219,9 @@ public class TextualRobotFileParser {
                             // before '|' pipe separator
                             if (remainingData > 0 || utility.shouldGiveEmptyToProcess(parsingOutput, separator,
                                     currentSeparator, line, processingState)) {
-                                final String rawText = text.substring(lastColumnProcessed, startColumn);
-
-                                final RobotToken token = processLineElement(line, processingState, parsingOutput,
-                                        new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
-                                        isNewLine);
-                                token.setStartOffset(currentOffset);
-                                currentOffset += token.getText().length();
-                                line.addLineElement(token);
-
-                                metadataUtility.fixSettingMetadata(parsingOutput, line, token, processingState);
-                                alignUtility.extractPrettyAlignWhitespaces(line, token, rawText);
+                                currentOffset = parseSimpleTokenAndReturnCurrentOffset(
+                                        text.substring(lastColumnProcessed, startColumn), lastColumnProcessed,
+                                        lineNumber, currentOffset, line, isNewLine, processingState, parsingOutput);
 
                                 isNewLine = false;
                             }
@@ -247,17 +239,9 @@ public class TextualRobotFileParser {
                                 processingState.remove(ParsingState.KEYWORD_DECLARATION);
                             }
 
-                            final String rawText = text.substring(lastColumnProcessed);
-
-                            final RobotToken token = processLineElement(line, processingState, parsingOutput,
-                                    new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
-                                    isNewLine);
-                            token.setStartOffset(currentOffset);
-                            currentOffset += token.getText().length();
-                            line.addLineElement(token);
-
-                            metadataUtility.fixSettingMetadata(parsingOutput, line, token, processingState);
-                            alignUtility.extractPrettyAlignWhitespaces(line, token, rawText);
+                            currentOffset = parseSimpleTokenAndReturnCurrentOffset(text.substring(lastColumnProcessed),
+                                    lastColumnProcessed, lineNumber, currentOffset, line, isNewLine, processingState,
+                                    parsingOutput);
 
                             lastColumnProcessed = textLength;
                             isNewLine = false;
@@ -349,6 +333,22 @@ public class TextualRobotFileParser {
 
         postFixerActions.applyFixes(parsingOutput);
         return parsingOutput;
+    }
+
+    private int parseSimpleTokenAndReturnCurrentOffset(final String rawText, final int lastColumnProcessed,
+            final int lineNumber, final int currentOffset, final RobotLine line, final boolean isNewLine,
+            final Stack<ParsingState> processingState, final RobotFileOutput parsingOutput) {
+
+        final RobotToken token = processLineElement(line, processingState, parsingOutput,
+                new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText, isNewLine);
+        token.setStartOffset(currentOffset);
+        final int offset = currentOffset + token.getText().length();
+        line.addLineElement(token);
+
+        metadataUtility.fixSettingMetadata(parsingOutput, line, token, processingState);
+        alignUtility.extractPrettyAlignWhitespaces(line, token, rawText);
+
+        return offset;
     }
 
     private void clearDirtyFlags(final RobotFileOutput parsingOutput) {
@@ -531,6 +531,9 @@ public class TextualRobotFileParser {
                 final RobotToken token = rec.next();
                 token.setStartColumn(token.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(token);
+                if (!rec.shouldContinueWithOtherRecognizers()) {
+                    break;
+                }
             }
         }
         if (possibleRobotTokens.isEmpty()) {
