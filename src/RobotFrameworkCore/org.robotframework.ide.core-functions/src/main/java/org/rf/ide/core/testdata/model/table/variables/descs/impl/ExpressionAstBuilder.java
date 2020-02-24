@@ -42,6 +42,10 @@ class ExpressionAstBuilder {
             } else if (!isEscaped && ch == '[') {
                 current = current.addChild(ExpressionAstNode.child(current, NodeKind.INDEX, offset));
 
+            } else if (!isEscaped && ch == '}' && current.isParens()) {
+                current.setEnd(i + 1);
+                current = current.getParent();
+
             } else if (!isEscaped && ch == '}' && current.getAncestorOfKind(NodeKind.VAR) != null) {
                 final ExpressionAstNode varAncestor = current.getAncestorOfKind(NodeKind.VAR);
                 ExpressionAstNode tmp = current;
@@ -51,10 +55,6 @@ class ExpressionAstBuilder {
                 }
                 varAncestor.setEnd(i + 1);
                 current = varAncestor.getParent();
-
-            } else if (!isEscaped && ch == '}' && current.isParens()) {
-                current.setEnd(i + 1);
-                current = current.getParent();
 
             } else if (!isEscaped && ch == ']' && current.isIndex()) {
                 current.setEnd(i + 1);

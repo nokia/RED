@@ -216,6 +216,8 @@ public class VariablesAnalyzerImplTest {
         @DisplayName("there is a single variable element when there are nested variables")
         @Test
         public void singleVarIsFoundInExpressionWhereVariablesAreNested() {
+            assertThat(extractVisitedExpressionParts("${{1+2}}")).containsExactly(
+                    tuple(0, 8, "${{1+2}}", "", NO_FLAGS));
             assertThat(extractVisitedExpressionParts("${x${y}}")).containsExactly(
                     tuple(0, 8, "${x${y}}", "x", DYNAMIC));
             assertThat(extractVisitedExpressionParts("${x${y}z}")).containsExactly(
