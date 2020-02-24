@@ -8,10 +8,9 @@ package org.rf.ide.core.testdata.model.table.variables.descs.impl.old;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.FileRegion;
-import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.impl.old.Container.ContainerType;
 import org.rf.ide.core.testdata.model.table.variables.descs.impl.old.SimpleElementsMapper.IElementMapper;
 
@@ -54,7 +53,6 @@ class DeclarationMapper {
             final IContainerElement containerElement = elements.get(index);
             if (containerElement.isComplex()) {
                 final Container subContainer = (Container) containerElement;
-                final FilePosition previousForContainer = currentPosition;
                 final MappingResult subResult = map(currentPosition, subContainer);
                 mappingResult.addCorrectVariables(subResult.getCorrectVariables());
                 mappingResult.addBuildMessages(subResult.getMessages());
@@ -106,7 +104,7 @@ class DeclarationMapper {
                                 variableIdentifier.getStart().getStart(), variableIdentifier.getEnd().getEnd()));
                     }
 
-                    if (seemsToBeCorrectRobotVariable(previousForContainer, mappingResult, variableDec)) {
+                    if (seemsToBeCorrectRobotVariable(variableDec)) {
                         mappingResult.addCorrectVariable(variableDec);
                     } else {
                         convertIncorrectVariableBackToText(mappingResult, topContainer, variableDec);
@@ -259,28 +257,12 @@ class DeclarationMapper {
         }
     }
 
-    private boolean seemsToBeCorrectRobotVariable(final FilePosition currentPosition, final MappingResult mappingResult,
-            final VariableDeclaration variableDec) {
-        if (!variableDec.isEscaped()) {
-            final TextPosition typeId = variableDec.getTypeIdentificator();
-            if (typeId != null) {
-                final String idText = typeId.getText();
-                if (idText != null && !idText.isEmpty() && variableDec.getEnd() != null) {
-                    if (idText.length() == 1) {
-                        return true;
-                    } else {
-                        final FileRegion region = new FileRegion(
-                                new FilePosition(currentPosition.getLine(), currentPosition.getColumn(),
-                                        currentPosition.getOffset()),
-                                new FilePosition(currentPosition.getLine(),
-                                        currentPosition.getColumn() + variableDec.getEnd().getEnd(),
-                                        currentPosition.getOffset() + variableDec.getEnd().getEnd()));
-                        final BuildMessage warnMessage = BuildMessage.createWarnMessage(
-                                "Incorrect variable id with space between " + idText.charAt(0) + " and '{'.", region);
-                        mappingResult.addBuildMessage(warnMessage);
-                    }
-                }
-            }
+    private boolean seemsToBeCorrectRobotVariable(final VariableDeclaration variableDec) {
+        if (!variableDec.isEscaped() && variableDec.getEnd() != null) {
+            return Optional.ofNullable(variableDec.getTypeIdentificator())
+                    .map(TextPosition::getText)
+                    .orElse("")
+                    .length() == 1;
         }
         return false;
     }
