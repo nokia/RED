@@ -166,8 +166,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         } else if (address.isPresent()) {
             reportProblemOnRemoteLocation(addressToken.get(), address.get());
 
-        } else {
+        } else if (importBinder.hasBindings()) {
             reportProblemOnRemoteLocation(nameToken, RemoteLocation.DEFAULT_ADDRESS);
+        } else {
             new KeywordCallArgumentsValidator(validationContext, nameToken, reporter, remoteLibConsDescriptor,
                     arguments).validate(new NullProgressMonitor());
         }

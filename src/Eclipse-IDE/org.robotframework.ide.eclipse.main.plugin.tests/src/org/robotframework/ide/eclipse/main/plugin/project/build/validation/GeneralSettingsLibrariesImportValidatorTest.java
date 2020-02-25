@@ -159,11 +159,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         validateLibraryImport("Remote  http://127.0.0.1:9000  60  30", stdLibs);
 
-        assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT,
-                        new ProblemPosition(2, Range.closed(26, 32))),
-                new Problem(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS,
-                        new ProblemPosition(2, Range.closed(26, 32))));
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(2, Range.closed(26, 32))));
     }
 
     @Test
