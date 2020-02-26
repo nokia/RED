@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.Conditions.shellWithText;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.junit.jupiter.api.Test;
 public class CompoundHyperlinkTest {
 
     @Test
-    public void testCompundHyperlinkProperties() {
+    public void testCompoundHyperlinkProperties() {
         final List<RedHyperlink> links = newArrayList(mockHyperlink(), mockHyperlink());
 
         final CompoundHyperlink link = new CompoundHyperlink("name", new Region(20, 50), links, "Link label");
@@ -34,13 +33,13 @@ public class CompoundHyperlinkTest {
     @Test
     public void testIfPopupOpensCorrectly() {
         final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-        assertThat(display.getShells()).doesNotHave(shellWithText(HyperlinkDialog.POPUP_TEXT));
+        assertThat(display.getShells()).extracting(Shell::getText).doesNotContain(HyperlinkDialog.POPUP_TEXT);
 
         final List<RedHyperlink> links = newArrayList(mockHyperlink(), mockHyperlink());
 
         final CompoundHyperlink link = new CompoundHyperlink("name", new Region(20, 50), links, "Link label");
         link.open();
-        assertThat(display.getShells()).has(shellWithText(HyperlinkDialog.POPUP_TEXT));
+        assertThat(display.getShells()).extracting(Shell::getText).contains(HyperlinkDialog.POPUP_TEXT);
 
         for (final Shell shell : display.getShells()) {
             if (shell.getText().equals(HyperlinkDialog.POPUP_TEXT)) {

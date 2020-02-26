@@ -61,9 +61,9 @@ public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector i
     }
 
     private boolean isApplicable(final String lineContent) {
-        return lineContent.trim().toLowerCase().startsWith("resource")
-                || lineContent.trim().toLowerCase().startsWith("variables")
-                || lineContent.trim().toLowerCase().startsWith("library");
+        final String[] words = lineContent.trim().split("\\s+");
+        return words.length == 1 && (words[0].equalsIgnoreCase("resource") || words[0].equalsIgnoreCase("variables")
+                || words[0].equalsIgnoreCase("library"));
     }
 
     @Override

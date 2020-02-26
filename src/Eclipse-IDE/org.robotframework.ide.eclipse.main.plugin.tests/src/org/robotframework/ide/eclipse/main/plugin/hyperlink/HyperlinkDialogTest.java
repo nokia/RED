@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.hyperlink.Conditions.shellWithText;
 
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class HyperlinkDialogTest {
         while (display.readAndDispatch()) {
             // handle all events coming to UI
         }
-        assertThat(display.getShells()).doesNotHave(shellWithText(HyperlinkDialog.POPUP_TEXT));
+        assertThat(display.getShells()).extracting(Shell::getText).doesNotContain(HyperlinkDialog.POPUP_TEXT);
 
         verify(link1, never()).open();
         verify(link2).open();

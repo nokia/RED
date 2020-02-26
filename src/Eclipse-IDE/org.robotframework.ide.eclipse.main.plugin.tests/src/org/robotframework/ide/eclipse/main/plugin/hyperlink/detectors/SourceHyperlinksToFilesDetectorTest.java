@@ -139,6 +139,23 @@ public class SourceHyperlinksToFilesDetectorTest {
         assertThat(hyperlinks).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 
+    @Test
+    public void noHyperlinksAreProvided_forNonRemoteLibraryImportSetting() throws Exception {
+        final IFile file = createFile(project, "f13.robot",
+                "*** Settings ***",
+                "Library  Remote  http://127.0.0.1:8080/RPC2/  30");
+        final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
+        final Document document = new Document(getFileContent(file));
+
+        final ITextViewer textViewer = mock(ITextViewer.class);
+        when(textViewer.getDocument()).thenReturn(document);
+
+        final SourceHyperlinksToFilesDetector detector = new SourceHyperlinksToFilesDetector(suiteFile);
+        for (int i = 34; i < 65; i++) {
+            assertThat(detector.detectHyperlinks(textViewer, new Region(i, 1), true)).isNull();
+        }
+    }
+
     private static IHyperlink[] detect(final String filePath, final String settingName, final String path)
             throws Exception {
         final IFile file = createFile(project, filePath, "*** Settings ***",
