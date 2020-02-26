@@ -88,6 +88,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         if (text.startsWith("#") || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
+            types.remove(RobotTokenType.START_HASH_COMMENT);
             types.add(RobotTokenType.START_HASH_COMMENT);
             row.addCommentPart(rt);
         } else {

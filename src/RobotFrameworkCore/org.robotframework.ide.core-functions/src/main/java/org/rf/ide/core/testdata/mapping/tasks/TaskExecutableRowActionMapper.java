@@ -83,6 +83,7 @@ public class TaskExecutableRowActionMapper implements IParsingMapper {
                 || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.TASK_ACTION_NAME);
             types.remove(RobotTokenType.TASK_ACTION_ARGUMENT);
+            types.remove(RobotTokenType.START_HASH_COMMENT);
             types.add(RobotTokenType.START_HASH_COMMENT);
             row.addCommentPart(rt);
         } else {
