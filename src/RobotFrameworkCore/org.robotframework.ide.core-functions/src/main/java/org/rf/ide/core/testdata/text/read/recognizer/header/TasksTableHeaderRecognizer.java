@@ -29,4 +29,9 @@ public class TasksTableHeaderRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new TasksTableHeaderRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }

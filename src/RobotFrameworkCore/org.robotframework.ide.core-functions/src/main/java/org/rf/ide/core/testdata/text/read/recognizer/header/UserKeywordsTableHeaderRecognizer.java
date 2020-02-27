@@ -31,4 +31,9 @@ public class UserKeywordsTableHeaderRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new UserKeywordsTableHeaderRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }

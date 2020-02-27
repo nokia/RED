@@ -29,4 +29,9 @@ public class CommentsTableHeaderRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new CommentsTableHeaderRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }

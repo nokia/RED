@@ -23,4 +23,9 @@ public class SettingsTableHeaderRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new SettingsTableHeaderRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }

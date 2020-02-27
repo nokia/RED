@@ -24,4 +24,9 @@ public class TestCasesTableHeaderRecognizer extends ATokenRecognizer {
     public ATokenRecognizer newInstance() {
         return new TestCasesTableHeaderRecognizer();
     }
+
+    @Override
+    public boolean shouldContinueWithOtherRecognizers() {
+        return false;
+    }
 }
