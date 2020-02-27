@@ -44,14 +44,13 @@ class VariablesInShellAssistProcessor extends VariablesAssistProcessor {
         if (assist.getModel() == null) {
             return new ArrayList<>();
         }
-        final ShellDocument shellDocument = (ShellDocument) document;
 
-        // user content contains the prompt prefix which needs to be removed for further processing
-        final int prefixLength = shellDocument.getPromptLenght(offset).get().intValue();
+        // user content may contain the prompt prefix which needs to be removed for further processing
+        final int prefixLength = document.getLineInformationOfOffset(offset).getOffset() == offset
+                - userContent.length() ? ((ShellDocument) document).getPromptLength(offset).get() : 0;
         return super.computeProposals(document, offset, cellLength - prefixLength, userContent.substring(prefixLength),
                 atTheEndOfLine);
     }
-
 
     @Override
     protected int getLineNumber(final IDocument document, final int offset) {

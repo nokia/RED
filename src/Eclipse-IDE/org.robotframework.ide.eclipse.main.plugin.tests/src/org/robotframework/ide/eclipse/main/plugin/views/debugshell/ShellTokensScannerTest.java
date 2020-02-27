@@ -34,7 +34,7 @@ public class ShellTokensScannerTest {
 
         final List<RobotLine> lines = new ShellTokensScanner().getLines(document);
         assertThat(lines).hasSize(4);
-        
+
         final List<IRobotLineElement> elements = lines.stream().flatMap(RobotLine::elementsStream).collect(toList());
 
         assertNoHolesBetweenTokens(elements, document.getLength());
@@ -94,7 +94,7 @@ public class ShellTokensScannerTest {
 
         final List<RobotLine> lines = new ShellTokensScanner().getLines(document);
         assertThat(lines).hasSize(3);
-        
+
         final List<IRobotLineElement> elements = lines.stream().flatMap(RobotLine::elementsStream).collect(toList());
 
         assertNoHolesBetweenTokens(elements, document.getLength());
@@ -112,7 +112,7 @@ public class ShellTokensScannerTest {
                         newArrayList(EndOfLineTypes.EOF));
     }
 
-    private static void assertNoHolesBetweenTokens(final List<IRobotLineElement> elements, final int totalLenght) {
+    private static void assertNoHolesBetweenTokens(final List<IRobotLineElement> elements, final int totalLength) {
         int currentOffset = 0;
         for (final IRobotLineElement element : elements) {
             if (element.getStartOffset() != currentOffset) {
@@ -121,8 +121,8 @@ public class ShellTokensScannerTest {
             }
             currentOffset = element.getEndOffset();
         }
-        if (currentOffset != totalLenght) {
-            fail("Last token ended at offset: " + currentOffset + ", the total lenght of text is: " + totalLenght);
+        if (currentOffset != totalLength) {
+            fail("Last token ended at offset: " + currentOffset + ", the total length of text is: " + totalLength);
         }
     }
 }

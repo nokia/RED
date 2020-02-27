@@ -80,8 +80,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
 
         assertThat(proposals).isNull();
@@ -98,9 +97,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, currentEndOffset);
 
         assertThat(proposals).isNull();
@@ -115,8 +112,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
 
         assertThat(proposals).hasSize(2)
@@ -129,6 +125,27 @@ public class VariablesInShellAssistProcessorTest {
     }
 
     @Test
+    public void allProposalsAreProvided_whenOnlySpacesAreWrittenInFirstCellOfPrompt() throws Exception {
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
+
+        final IDocument shellDoc = new ShellDocumentSession("\n").type("   ").get();
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(shellDoc);
+
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
+
+        assertThat(proposals).hasSize(2)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
+
+        assertThat(proposals).extracting(proposal -> applyToDocument(shellDoc, proposal))
+                .containsOnly(
+                        new Document("ROBOT>    ${x}"),
+                        new Document("ROBOT>    ${y}"));
+    }
+
+    @Test
     public void allProposalsAreProvided_whenInFirstCellOfPromptContinuation() throws Exception {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
 
@@ -137,9 +154,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
 
         assertThat(proposals).hasSize(2)
@@ -160,9 +175,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
 
         assertThat(proposals).hasSize(1)
@@ -181,8 +194,7 @@ public class VariablesInShellAssistProcessorTest {
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(shellDoc);
 
-        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(
-                createAssistant(model));
+        final VariablesInShellAssistProcessor processor = new VariablesInShellAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
 
         assertThat(proposals).isEmpty();

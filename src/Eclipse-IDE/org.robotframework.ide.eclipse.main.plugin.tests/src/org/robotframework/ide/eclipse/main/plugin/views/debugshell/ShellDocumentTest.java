@@ -6,8 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.views.debugshell;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
@@ -182,16 +188,16 @@ public class ShellDocumentTest {
         doc.switchTo(ExpressionType.VARIABLE, "expr3");
         doc.executeExpression(s -> 3);
         doc.putEvaluationResult(3, ExpressionType.VARIABLE, Optional.of("result3"), Optional.empty());
-        
+
         doc.append("current expr");
-        
+
         assertThat(doc.getMode()).isEqualTo(ExpressionType.VARIABLE);
         assertThat(doc.get()).isEqualTo(content(
                 "ROBOT> expr1", "PASS: result1",
                 "PYTHON> expr2", "result2",
                 "VARIABLE> expr3", "result3",
                 "VARIABLE> current expr"));
-        
+
         doc.switchToPreviousExpression();
         assertThat(doc.getMode()).isEqualTo(ExpressionType.VARIABLE);
         assertThat(doc.get()).isEqualTo(content(
@@ -271,7 +277,7 @@ public class ShellDocumentTest {
     }
 
     @Test
-    public void writingResultsIsDoneInProperPlaces_independetlyOfOrderInWhichResultsAreComing() {
+    public void writingResultsIsDoneInProperPlaces_independentlyOfOrderInWhichResultsAreComing() {
         final ShellDocument doc = new ShellDocument("\n");
         doc.append("robot pass expr");
         doc.executeExpression(s -> 1);
@@ -335,7 +341,7 @@ public class ShellDocumentTest {
                 awaitingPosition(2, 60, 13), awaitingPosition(3, 99, 13), awaitingPosition(5, 170, 13));
         assertThat(doc.getResultSuccessPositionsStream()).isEmpty();
         assertThat(doc.getResultErrorPositionsStream()).containsOnly(failPosition(138, 7), failPosition(208, 8));
-        
+
         doc.putEvaluationResult(5, ExpressionType.VARIABLE, Optional.of("var pass"), Optional.empty());
         assertThat(doc.get()).isEqualTo(content(
                 "ROBOT> robot pass expr", "evaluating...",
@@ -351,8 +357,8 @@ public class ShellDocumentTest {
                 awaitingPosition(2, 60, 13), awaitingPosition(3, 99, 13));
         assertThat(doc.getResultSuccessPositionsStream()).isEmpty();
         assertThat(doc.getResultErrorPositionsStream()).containsOnly(failPosition(138, 7), failPosition(203, 8));
-        
-        
+
+
         doc.putEvaluationResult(2, ExpressionType.ROBOT, Optional.empty(), Optional.of("robot fail"));
         assertThat(doc.get()).isEqualTo(content(
                 "ROBOT> robot pass expr", "evaluating...",
@@ -368,7 +374,7 @@ public class ShellDocumentTest {
         assertThat(doc.getResultSuccessPositionsStream()).isEmpty();
         assertThat(doc.getResultErrorPositionsStream()).containsOnly(failPosition(60, 6), failPosition(141, 7),
                 failPosition(206, 8));
-        
+
         doc.putEvaluationResult(3, ExpressionType.PYTHON, Optional.of("py pass"), Optional.empty());
         assertThat(doc.get()).isEqualTo(content(
                 "ROBOT> robot pass expr", "evaluating...",
@@ -400,28 +406,60 @@ public class ShellDocumentTest {
                 failPosition(203, 8));
     }
 
-    private static CategorizedPosition promptPosition(final int offset, final int lenght) {
-        return new CategorizedPosition(ShellDocument.CATEGORY_MODE_PROMPT, offset, lenght);
+    @Test
+    public void expressionToExecuteIsTrimmed() {
+        @SuppressWarnings("unchecked")
+        final Function<String, Integer> evaluationRequest = mock(Function.class);
+        when(evaluationRequest.apply(any())).thenReturn(1).thenReturn(2).thenReturn(3);
+
+        final ShellDocument doc = new ShellDocument("\n");
+        doc.append(" expr 1");
+        doc.continueExpressionInNewLine();
+        doc.append("  abc  ");
+        doc.executeExpression(evaluationRequest);
+        doc.switchTo(ExpressionType.PYTHON, "   expr 2  \n abc  \n     def  \n  ");
+        doc.executeExpression(evaluationRequest);
+        doc.switchTo(ExpressionType.VARIABLE, "   expr 3        ");
+        doc.executeExpression(evaluationRequest);
+
+        verify(evaluationRequest).apply("expr 1      abc");
+        verify(evaluationRequest).apply("expr 2  \n abc  \n     def");
+        verify(evaluationRequest).apply("expr 3");
+        verifyNoMoreInteractions(evaluationRequest);
+
+        assertThat(doc.get()).isEqualTo(content("ROBOT>  expr 1", "......   abc  ", "evaluating...",
+                "PYTHON>    expr 2  ", ".......  abc  ", ".......      def  ", ".......   ", "evaluating...",
+                "VARIABLE>    expr 3        ", "evaluating...", "VARIABLE> "));
+        assertThat(doc.getModePromptPositionsStream()).containsExactly(promptPosition(0, 7), promptPosition(44, 8),
+                promptPosition(123, 10), promptPosition(165, 10));
+        assertThat(doc.getPromptContinuationPositionsStream()).containsExactly(continuationPosition(15, 7),
+                continuationPosition(64, 8), continuationPosition(79, 8), continuationPosition(98, 8));
+        assertThat(doc.getAwaitingResultsPositionsStream()).containsOnly(awaitingPosition(1, 30, 13),
+                awaitingPosition(2, 109, 13), awaitingPosition(3, 151, 13));
     }
 
-    private static CategorizedPosition continuationPosition(final int offset, final int lenght) {
-        return new CategorizedPosition(ShellDocument.CATEGORY_PROMPT_CONTINUATION, offset, lenght);
+    private static CategorizedPosition promptPosition(final int offset, final int length) {
+        return new CategorizedPosition(ShellDocument.CATEGORY_MODE_PROMPT, offset, length);
+    }
+
+    private static CategorizedPosition continuationPosition(final int offset, final int length) {
+        return new CategorizedPosition(ShellDocument.CATEGORY_PROMPT_CONTINUATION, offset, length);
     }
 
     private static String awaitingCategory(final int id) {
         return ShellDocument.CATEGORY_AWAITING_RESULT_PREFIX + "_" + id;
     }
 
-    private static CategorizedPosition awaitingPosition(final int id, final int offset, final int lenght) {
-        return new CategorizedPosition(awaitingCategory(id), offset, lenght);
+    private static CategorizedPosition awaitingPosition(final int id, final int offset, final int length) {
+        return new CategorizedPosition(awaitingCategory(id), offset, length);
     }
 
-    private static CategorizedPosition passPosition(final int offset, final int lenght) {
-        return new CategorizedPosition(ShellDocument.CATEGORY_RESULT_SUCC, offset, lenght);
+    private static CategorizedPosition passPosition(final int offset, final int length) {
+        return new CategorizedPosition(ShellDocument.CATEGORY_RESULT_SUCC, offset, length);
     }
 
-    private static CategorizedPosition failPosition(final int offset, final int lenght) {
-        return new CategorizedPosition(ShellDocument.CATEGORY_RESULT_ERROR, offset, lenght);
+    private static CategorizedPosition failPosition(final int offset, final int length) {
+        return new CategorizedPosition(ShellDocument.CATEGORY_RESULT_ERROR, offset, length);
     }
 
     private static String content(final String... lines) {

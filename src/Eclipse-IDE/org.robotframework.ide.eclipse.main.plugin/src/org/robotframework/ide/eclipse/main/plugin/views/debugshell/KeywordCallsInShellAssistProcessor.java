@@ -13,7 +13,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.execution.server.response.EvaluateExpression.ExpressionType;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.AssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
 
@@ -33,9 +32,7 @@ class KeywordCallsInShellAssistProcessor extends KeywordCallsAssistProcessor {
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         final ShellDocument shellDocument = (ShellDocument) document;
-        return shellDocument.getMode() == ExpressionType.ROBOT
-                && shellDocument.isInEditEnabledRegion(offset) && shellDocument.isExpressionPromptLine(offset)
-                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 0;
+        return shellDocument.getMode() == ExpressionType.ROBOT && shellDocument.isInEditEnabledRegion(offset);
     }
 
     @Override
@@ -44,10 +41,10 @@ class KeywordCallsInShellAssistProcessor extends KeywordCallsAssistProcessor {
         if (assist.getModel() == null) {
             return null;
         }
-        final ShellDocument shellDocument = (ShellDocument) document;
 
-        // user content contains the prompt prefix which needs to be removed for further processing
-        final int prefixLength = shellDocument.getPromptLenght(offset).get().intValue();
+        // user content may contain the prompt prefix which needs to be removed for further processing
+        final int prefixLength = document.getLineInformationOfOffset(offset).getOffset() == offset
+                - userContent.length() ? ((ShellDocument) document).getPromptLength(offset).get() : 0;
         return super.computeProposals(document, offset, cellLength - prefixLength, userContent.substring(prefixLength),
                 atTheEndOfLine);
     }

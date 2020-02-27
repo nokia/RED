@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.views.debugshell;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.maxBy;
 import static java.util.stream.Collectors.toList;
 
@@ -19,8 +20,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -99,9 +100,9 @@ class ShellDocument extends Document {
         getResultErrorPositionsStream().forEach(this::removePosition);
 
         removeEmptyAwaitingResultCategories();
-        
+
         addAwaitingPositionOnWholeLine(CATEGORY_MODE_PROMPT, 0);
-        set(type.name() + "> ");
+        set(formatPrompt(type));
 
         currentExpressionInHistory = expressionsHistory.size();
     }
@@ -128,8 +129,8 @@ class ShellDocument extends Document {
         final int lastLine = getNumberOfLines();
         for (int i = lastLine - 1; i >= 0; i--) {
             final String line = getLine(i);
-            
-            if (!isExpressionPromptLine(line) && !isExpressionContinuationLine(line)) {
+
+            if (!isExpressionLine(line)) {
                 break;
             }
             final IRegion lineRegion = getLineInformation(i);
@@ -139,29 +140,14 @@ class ShellDocument extends Document {
         return regions;
     }
 
-    private static boolean isExpressionPromptLine(final String line) {
+    private static boolean isExpressionLine(final String line) {
         return EnumSet.allOf(ExpressionType.class)
                 .stream()
-                .map(t -> t.name() + "> ")
-                .anyMatch(prompt -> line.startsWith(prompt));
-    }
-
-    private static boolean isExpressionContinuationLine(final String line) {
-        return EnumSet.allOf(ExpressionType.class)
-                .stream()
-                .map(t -> Strings.repeat(".", t.name().length() + 1) + " ")
-                .anyMatch(prompt -> line.startsWith(prompt));
-    }
-
-    boolean isExpressionPromptLine(final int offset) {
-        final IRegion lineInfo = getLineInformationOfOffset(offset);
-        return getModePromptPositionsStream().filter(pos -> pos.getOffset() == lineInfo.getOffset())
-                .findAny()
-                .isPresent();
+                .anyMatch(t -> line.startsWith(formatPrompt(t)) || line.startsWith(formatContinuation(t)));
     }
 
     void executeExpression(final Function<String, Integer> evaluationRequest) {
-        final Expression expression = getExpression();
+        final Expression expression = createExpression();
         final int exprId = evaluationRequest.apply(expression.expression);
 
         final int nextLineNumber = getNumberOfLines();
@@ -169,7 +155,7 @@ class ShellDocument extends Document {
         addAwaitingPositionOnWholeLine(resultCategory, nextLineNumber);
         addAwaitingPositionOnWholeLine(CATEGORY_MODE_PROMPT, nextLineNumber + 1);
 
-        appendLines("evaluating...", type.name() + "> ");
+        appendLines("evaluating...", formatPrompt(type));
 
         expressionsHistory.add(expression);
         while (expressionsHistory.size() > 50) {
@@ -178,22 +164,14 @@ class ShellDocument extends Document {
         currentExpressionInHistory = expressionsHistory.size();
     }
 
-    private Expression getExpression() {
+    private Expression createExpression() {
         final Range<Integer> currentExpressionLines = getLinesOfExpression(getLength());
-        final List<String> lines = new ArrayList<>();
-        for (int i = currentExpressionLines.lowerEndpoint(); i <= currentExpressionLines.upperEndpoint(); i++) {
-            lines.add(getLine(i).substring(type.name().length() + 2));
-        }
-
-        if (type == ExpressionType.ROBOT) {
-            return new Expression(type, String.join(SEPARATOR, lines));
-        } else if (type == ExpressionType.PYTHON) {
-            return new Expression(type, String.join("\n", lines));
-        } else if (type == ExpressionType.VARIABLE) {
-            return new Expression(type, String.join("", lines));
-        } else {
-            throw new IllegalStateException();
-        }
+        final String expression = IntStream
+                .rangeClosed(currentExpressionLines.lowerEndpoint(), currentExpressionLines.upperEndpoint())
+                .mapToObj(this::getLine)
+                .map(line -> line.substring(getPromptLength(type)))
+                .collect(joining(getExpressionLineDelimiter(type)));
+        return new Expression(type, expression.trim());
     }
 
     void putEvaluationResult(final int exprId, final ExpressionType type, final Optional<String> result,
@@ -204,7 +182,7 @@ class ShellDocument extends Document {
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
         final int awaitingResOffset = awaitingResPosition.getOffset();
-        final int awaitingResLenght = awaitingResPosition.getLength();
+        final int awaitingResLength = awaitingResPosition.getLength();
         for (final Position p : positions) {
             removePosition(resultCategory, p);
         }
@@ -239,9 +217,9 @@ class ShellDocument extends Document {
             throw new IllegalStateException();
         }
 
-        replace(awaitingResOffset, awaitingResLenght, toPrint);
+        replace(awaitingResOffset, awaitingResLength, toPrint);
         addPosition(newResultPosition);
-        shiftPositions(awaitingResOffset, toPrint.length() - awaitingResLenght);
+        shiftPositions(awaitingResOffset, toPrint.length() - awaitingResLength);
 
         listeners.forEach(ShellDocumentListener::resultWritten);
     }
@@ -250,7 +228,7 @@ class ShellDocument extends Document {
         final int nextLineNumber = getNumberOfLines();
 
         addAwaitingPositionOnWholeLine(CATEGORY_PROMPT_CONTINUATION, nextLineNumber);
-        appendLines(Strings.repeat(".", type.name().length() + 1) + " ");
+        appendLines(formatContinuation(type));
     }
 
     void switchToMode(final ExpressionType mode) {
@@ -271,7 +249,7 @@ class ShellDocument extends Document {
 
         final int delta = newType.name().length() - type.name().length();
 
-        replace(modeOffset, lastModePosition.getLength(), newType.name() + "> ");
+        replace(modeOffset, lastModePosition.getLength(), formatPrompt(newType));
         extendPositions(modeOffset, delta);
         shiftPositions(modeOffset, delta);
 
@@ -283,14 +261,13 @@ class ShellDocument extends Document {
 
             while (!continuations.isEmpty()) {
                 final CategorizedPosition p = continuations.remove(0);
-                final String dots = Strings.repeat(".", newType.name().length() + 1);
 
-                replace(p.getOffset(), p.getLength(), dots + " ");
+                replace(p.getOffset(), p.getLength(), formatContinuation(newType));
                 extendPositions(p.getOffset(), delta);
                 shiftPositions(p.getOffset(), delta);
             }
         }
-        
+
         this.type = newType;
     }
 
@@ -326,7 +303,7 @@ class ShellDocument extends Document {
         final Range<Integer> currentExpressionLines = getLinesOfExpression(getLength());
         final IRegion startLineInfo = getLineInformation(currentExpressionLines.lowerEndpoint());
 
-        final int toRemoveStart = startLineInfo.getOffset() + type.name().length() + 2;
+        final int toRemoveStart = startLineInfo.getOffset() + getPromptLength(type);
 
         replace(toRemoveStart, getLength() - toRemoveStart, "");
 
@@ -335,13 +312,13 @@ class ShellDocument extends Document {
 
     private void insertNewExpression(final String expression) {
         final String[] lines = expression.split("\\r?\\n");
-        
+
         append(lines[0]);
         for (int i = 1; i < lines.length; i++) {
             final int nextLineNumber = getNumberOfLines();
 
             addAwaitingPositionOnWholeLine(CATEGORY_PROMPT_CONTINUATION, nextLineNumber);
-            appendLines(Strings.repeat(".", type.name().length() + 1) + " ");
+            appendLines(formatContinuation(type));
 
             append(lines[i]);
         }
@@ -363,19 +340,18 @@ class ShellDocument extends Document {
 
             int start = line;
             int end = line;
-            final Predicate<String> linePredicate = l -> isExpressionPromptLine(l) || isExpressionContinuationLine(l);
-            if (linePredicate.test(getLine(line))) {
-                for (int i = line - 1; i >= 0 && linePredicate.test(getLine(i)); i--) {
+            if (isExpressionLine(getLine(line))) {
+                for (int i = line - 1; i >= 0 && isExpressionLine(getLine(i)); i--) {
                     start--;
                 }
-                for (int i = line + 1; i < getNumberOfLines() && linePredicate.test(getLine(i)); i++) {
+                for (int i = line + 1; i < getNumberOfLines() && isExpressionLine(getLine(i)); i++) {
                     end++;
                 }
             } else {
-                for (int i = line - 1; i >= 0 && !linePredicate.test(getLine(i)); i--) {
+                for (int i = line - 1; i >= 0 && !isExpressionLine(getLine(i)); i--) {
                     start--;
                 }
-                for (int i = line + 1; i < getNumberOfLines() && !linePredicate.test(getLine(i)); i++) {
+                for (int i = line + 1; i < getNumberOfLines() && !isExpressionLine(getLine(i)); i++) {
                     end++;
                 }
             }
@@ -438,7 +414,7 @@ class ShellDocument extends Document {
             throw new IllegalStateException(e);
         }
     }
-    
+
     @Override
     public void removePositionCategory(final String category) {
         try {
@@ -457,7 +433,7 @@ class ShellDocument extends Document {
                 .filter(p -> p.getOffset() > startingAfterOffset)
                 .forEach(p -> p.setOffset(p.getOffset() + delta));
     }
-    
+
     private void extendPositions(final int overlappingOffset, final int delta) {
         Streams.concat(getModePromptPositionsStream(),
                        getPromptContinuationPositionsStream(),
@@ -529,7 +505,7 @@ class ShellDocument extends Document {
         return getPromptPosition(offset).map(pos -> pos.getOffset() + pos.getLength());
     }
 
-    Optional<Integer> getPromptLenght(final int offset) {
+    Optional<Integer> getPromptLength(final int offset) {
         return getPromptPosition(offset).map(CategorizedPosition::getLength);
     }
 
@@ -589,6 +565,31 @@ class ShellDocument extends Document {
         super.updateDocumentStructures(event);
     }
 
+    private static String formatPrompt(final ExpressionType type) {
+        return type.name() + "> ";
+    }
+
+    private static String formatContinuation(final ExpressionType type) {
+        return Strings.repeat(".", type.name().length() + 1) + " ";
+    }
+
+    private static int getPromptLength(final ExpressionType type) {
+        return type.name().length() + 2;
+    }
+
+    private static String getExpressionLineDelimiter(final ExpressionType type) {
+        switch (type) {
+            case ROBOT:
+                return SEPARATOR;
+            case PYTHON:
+                return "\n";
+            case VARIABLE:
+                return "";
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
     @FunctionalInterface
     interface ShellDocumentListener {
 
@@ -613,8 +614,8 @@ class ShellDocument extends Document {
 
         private final Position position;
 
-        CategorizedPosition(final String category, final int offset, final int lenght) {
-            this(category, new Position(offset, lenght));
+        CategorizedPosition(final String category, final int offset, final int length) {
+            this(category, new Position(offset, length));
         }
 
         CategorizedPosition(final String category, final Position position) {

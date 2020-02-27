@@ -119,39 +119,6 @@ public class KeywordCallsInShellAssistProcessorTest {
     }
 
     @Test
-    public void noProposalsAreProvided_whenInFirstCellOfPromptContinuation() throws Exception {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
-
-        final IDocument shellDoc = new ShellDocumentSession().type("keyword").continueExpr().get();
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        when(viewer.getDocument()).thenReturn(shellDoc);
-
-
-        final KeywordCallsInShellAssistProcessor processor = new KeywordCallsInShellAssistProcessor(
-                createAssistant(model));
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
-
-        assertThat(proposals).isNull();
-    }
-
-    @Test
-    public void noProposalsAreProvided_whenInSecondCellOfPrompt() throws Exception {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
-
-        final IDocument shellDoc = new ShellDocumentSession().type("keyword  k").get();
-
-        final ITextViewer viewer = mock(ITextViewer.class);
-        when(viewer.getDocument()).thenReturn(shellDoc);
-
-        final KeywordCallsInShellAssistProcessor processor = new KeywordCallsInShellAssistProcessor(
-                createAssistant(model));
-        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
-
-        assertThat(proposals).isNull();
-    }
-
-    @Test
     public void allProposalsAreProvided_whenNothingIsWrittenInFirstCellOfPrompt() throws Exception {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
 
@@ -171,6 +138,28 @@ public class KeywordCallsInShellAssistProcessorTest {
                 .containsOnly(
                         new Document("ROBOT> kw1"),
                         new Document("ROBOT> kw2  x"));
+    }
+
+    @Test
+    public void allProposalsAreProvided_whenOnlySpacesAreWrittenInFirstCellOfPrompt() throws Exception {
+        final RobotSuiteFile model = new RobotModel().createSuiteFile(suite);
+
+        final IDocument shellDoc = new ShellDocumentSession().type("   ").get();
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(shellDoc);
+
+        final KeywordCallsInShellAssistProcessor processor = new KeywordCallsInShellAssistProcessor(
+                createAssistant(model));
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, shellDoc.getLength());
+
+        assertThat(proposals).hasSize(2)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+
+        assertThat(proposals).extracting(proposal -> applyToDocument(shellDoc, proposal))
+                .containsOnly(
+                        new Document("ROBOT>    kw1"),
+                        new Document("ROBOT>    kw2  x"));
     }
 
     @Test
