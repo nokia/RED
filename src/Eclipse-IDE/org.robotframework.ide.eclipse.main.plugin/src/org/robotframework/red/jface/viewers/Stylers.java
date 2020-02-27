@@ -127,7 +127,7 @@ public class Stylers {
 
     public static Styler mixingStyler(final Collection<Styler> stylers) {
         if (stylers.size() == 1) {
-            return Iterables.getFirst(stylers, null);
+            return Iterables.getOnlyElement(stylers);
         }
         return new Styler() {
 

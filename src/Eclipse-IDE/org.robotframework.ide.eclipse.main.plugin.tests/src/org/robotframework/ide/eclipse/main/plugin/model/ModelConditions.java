@@ -5,18 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.all;
 import static org.assertj.core.api.Assertions.not;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.assertj.core.api.Condition;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-import com.google.common.base.Predicate;
 
 public class ModelConditions {
 
@@ -26,7 +23,7 @@ public class ModelConditions {
             @Override
             public boolean matches(final RobotFileInternalElement element) {
                 final List<RobotToken> tokens = ((AModelElement<?>) element.getLinkedElement()).getElementTokens();
-                return all(tokens, not(havePositionsSet(false)));
+                return tokens.stream().noneMatch(havePositionsSet(false));
             }
         };
     }
@@ -37,20 +34,13 @@ public class ModelConditions {
             @Override
             public boolean matches(final RobotFileInternalElement element) {
                 final List<RobotToken> tokens = ((AModelElement<?>) element.getLinkedElement()).getElementTokens();
-                return all(tokens, havePositionsSet(true));
+                return tokens.stream().allMatch(havePositionsSet(true));
             }
         };
     }
 
     private static Predicate<RobotToken> havePositionsSet(final boolean expected) {
-        return new Predicate<RobotToken>() {
-
-            @Override
-            public boolean apply(final RobotToken token) {
-                final FilePosition tokenPosition = token.getFilePosition();
-                return "".equals(token.getText()) ? expected : tokenPosition.isNotSet();
-            }
-        };
+        return token -> "".equals(token.getText()) ? expected : token.getFilePosition().isNotSet();
     }
 
     public static Condition<RobotFileInternalElement> nullParent() {

@@ -33,7 +33,7 @@ public class GeneralSettingsModel {
     private static final String TASK_SETUP = "Task Setup";
     private static final String SUITE_TEARDOWN = "Suite Teardown";
     private static final String SUITE_SETUP = "Suite Setup";
-    
+
     static Map<String, ModelType> labelsToTypes() {
         final Map<String, ModelType> returned = new HashMap<>();
         returned.put(DEFAULT_TAGS, ModelType.DEFAULT_TAGS_SETTING);
@@ -64,15 +64,13 @@ public class GeneralSettingsModel {
                 .createInitialMapping();
 
         final Map<String, ModelType> labels = labelsToTypes();
-        if (section != null) {
-            for (final RobotKeywordCall setting : section.getChildren()) {
-                for (final String label : initialMapping.keySet()) {
-                    if (labels.get(label) == setting.getLinkedElement().getModelType()) {
-                         initialMapping.put(label, setting);
-                         break;
-                   }
+        for (final RobotKeywordCall setting : section.getChildren()) {
+            for (final String label : initialMapping.keySet()) {
+                if (labels.get(label) == setting.getLinkedElement().getModelType()) {
+                    initialMapping.put(label, setting);
+                    break;
                 }
-             }
+            }
         }
         return initialMapping;
     }

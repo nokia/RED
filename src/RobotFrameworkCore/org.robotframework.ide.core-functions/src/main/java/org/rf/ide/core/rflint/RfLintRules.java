@@ -10,9 +10,8 @@ import static java.util.stream.Collectors.toMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.google.common.base.Functions;
 
 public class RfLintRules {
 
@@ -25,10 +24,10 @@ public class RfLintRules {
     }
 
     private Map<String, RfLintRule> rules = null;
-    
+
     public synchronized Map<String, RfLintRule> loadRules(final Supplier<List<RfLintRule>> rulesSupplier) {
         if (rules == null) {
-            rules = rulesSupplier.get().stream().collect(toMap(RfLintRule::getRuleName, Functions.identity()));
+            rules = rulesSupplier.get().stream().collect(toMap(RfLintRule::getRuleName, Function.identity()));
         }
         return rules.values().stream().collect(toMap(RfLintRule::getRuleName, RfLintRule::copyFresh));
     }

@@ -25,8 +25,6 @@ import org.rf.ide.core.libraries.Documentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 
-import com.google.common.base.Functions;
-
 public class DocumentationsFormatter {
 
     private static final Pattern HEADER_PATTERN = Pattern.compile("<h(\\d)>([\\w\\d _]+)</h\\d>");
@@ -71,7 +69,7 @@ public class DocumentationsFormatter {
     }
 
     public String format(final String content) {
-        return writeHtml("", content, new HashSet<>(), Functions.identity());
+        return writeHtml("", content, new HashSet<>(), Function.identity());
     }
 
     private String writeHtml(final String header, final String doc, final Collection<String> localSymbols,
