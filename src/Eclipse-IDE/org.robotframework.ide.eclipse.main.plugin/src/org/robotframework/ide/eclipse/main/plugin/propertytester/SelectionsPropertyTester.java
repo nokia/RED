@@ -67,15 +67,15 @@ public class SelectionsPropertyTester extends PropertyTester {
 
     private static boolean isKeywordCallButNotDocumentation(final IStructuredSelection selection) {
         final Object selected = selection.getFirstElement();
-        if (selected == null || !(selected instanceof RobotKeywordCall)) {
+        if (!(selected instanceof RobotKeywordCall)) {
             return false;
         }
-        return !(selected instanceof RobotKeywordCall && ((RobotKeywordCall) selected).isDocumentationSetting());
+        return !((RobotKeywordCall) selected).isDocumentationSetting();
     }
 
     private static boolean isMetadataSelected(final IStructuredSelection selection) {
         final Object selected = selection.getFirstElement();
-        if (selected == null || !(selected instanceof RobotSetting)) {
+        if (!(selected instanceof RobotSetting)) {
             return false;
         }
         return SettingsGroup.METADATA.equals(((RobotSetting) selected).getGroup());

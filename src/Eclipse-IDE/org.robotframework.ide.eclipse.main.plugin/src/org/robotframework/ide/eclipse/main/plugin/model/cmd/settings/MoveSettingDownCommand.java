@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -37,10 +36,8 @@ public class MoveSettingDownCommand extends EditorCommand {
         }
         Collections.swap(section.getChildren(), currentIndex, downIndex);
 
-        final ARobotSectionTable linkedElement = section.getLinkedElement();
-        if (linkedElement != null && linkedElement instanceof SettingTable) {
-            linkedElement.moveDownElement(setting.getLinkedElement());
-        }
+        final SettingTable table = section.getLinkedElement();
+        table.moveDownElement(setting.getLinkedElement());
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(setting.getGroup())
                 .send(RobotModelEvents.ROBOT_SETTING_MOVED, section);

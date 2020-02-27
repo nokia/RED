@@ -12,7 +12,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,7 +93,7 @@ public class VariablesImporter {
 
                     if (varImportRef == null) {
                         // could not find import reference in project, so will ask interpreter
-                        Map<String, Object> variablesFromFile = new HashMap<>();
+                        final Map<String, Object> variablesFromFile;
                         try {
                             final List<String> pythonPaths = pathsProvider.provideUserSearchPaths()
                                     .stream()
