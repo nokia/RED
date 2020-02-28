@@ -28,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.red.junit.jupiter.BooleanPreference;
+import org.robotframework.red.junit.jupiter.IntegerPreference;
 import org.robotframework.red.junit.jupiter.PreferencesExtension;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
@@ -61,8 +62,9 @@ public class PythonLibraryLibdocGeneratorTest {
     }
 
     @BooleanPreference(key = RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED, value = true)
+    @IntegerPreference(key = RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT, value = 321)
     @Test
-    public void verifyIfCreateLibdocInSeparateProcessMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferenceIsEnabled()
+    public void verifyIfCreateLibdocInSeparateProcessMethodIsCalledWithGivenTimeout_whenLibdocGenerationInSeparateProcessPreferenceIsEnabled()
             throws Exception {
         final String libName = "ModuleClass";
         final IFile libFile = robotProject.getFile("lib/module/" + libName + ".py");
@@ -81,12 +83,12 @@ public class PythonLibraryLibdocGeneratorTest {
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 
         verify(runtimeEnvironment).createLibdocInSeparateProcess(libFile.getLocation().toPortableString(),
-                targetSpecFile.getLocation().toFile(), format, additionalPaths);
+                targetSpecFile.getLocation().toFile(), format, additionalPaths, 321);
     }
 
     @BooleanPreference(key = RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED, value = false)
     @Test
-    public void verifyIfCreateLibdocMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferenceIsNotEnabled()
+    public void verifyIfCreateLibdocMethodIsCalled_whenLibdocGenerationInSeparateProcessPreferenceIsDisabled()
             throws Exception {
         final String libName = "ModuleClass";
         final IFile libFile = robotProject.getFile("lib/module/" + libName + ".py");
@@ -127,6 +129,6 @@ public class PythonLibraryLibdocGeneratorTest {
         pythonGenerator.generateLibdoc(runtimeEnvironment, additionalPaths);
 
         verify(runtimeEnvironment).createLibdocInSeparateProcess(libName, targetSpecFile.getLocation().toFile(), format,
-                additionalPaths);
+                additionalPaths, 30);
     }
 }

@@ -5,11 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -166,15 +161,11 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         if (monitor.isCanceled()) {
             return;
         }
-        final URI uri = location.getUri();
-        try (final Socket s = new Socket()) {
-            final SocketAddress socketAddress = new InetSocketAddress(uri.getHost(), uri.getPort());
-            s.connect(socketAddress, 5_000);
-        } catch (final IOException | IllegalArgumentException ex) {
-            final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
-                    .formatMessageWith(uri);
+        if (!location.isReachable(RemoteLocation.DEFAULT_TIMEOUT)) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
+                    .formatMessageWith(location.getUri());
             final ProblemPosition position = new ProblemPosition(config.getLineFor(location));
-            reporter.handleProblem(unreachableHostProblem, configFile, position);
+            reporter.handleProblem(problem, configFile, position);
         }
     }
 

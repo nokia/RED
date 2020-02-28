@@ -119,9 +119,9 @@ public class RobotRuntimeEnvironment implements IRuntimeEnvironment {
 
     @Override
     public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
-            final EnvironmentSearchPaths additionalPaths) {
+            final EnvironmentSearchPaths additionalPaths, final int timeout) {
         final RobotCommandExecutor executor = executors.getRobotCommandExecutor(location);
-        executor.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths);
+        executor.createLibdocInSeparateProcess(libName, outputFile, format, additionalPaths, timeout);
     }
 
     @Override

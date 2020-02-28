@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.net.ServerSocket;
 import java.net.URI;
 import java.util.List;
 
@@ -662,6 +663,34 @@ public class RobotProjectConfigTest {
                     .isEqualTo(new URI("http://1.2.3.4:456/"));
             assertThat(RemoteLocation.addDefaults(new URI("http://1.2.3.4:456/path")))
                     .isEqualTo(new URI("http://1.2.3.4:456/path"));
+        }
+
+        @Test
+        void remoteNameContainsUri() throws Exception {
+            final RemoteLocation location = RemoteLocation.create("http://127.0.0.1:8270/path");
+            assertThat(location.getRemoteName()).isEqualTo("Remote http://127.0.0.1:8270/path");
+        }
+
+        @Test
+        void locationIsNotReachable() throws Exception {
+            final RemoteLocation location;
+            try (ServerSocket socket = new ServerSocket(0)) {
+                location = RemoteLocation.create("http://127.0.0.1:" + socket.getLocalPort() + "/path");
+            } finally {
+                // nothing to do, just let the socket close itself
+            }
+            assertThat(location.isReachable(123)).isFalse();
+        }
+
+        @Test
+        void locationIsReachable() throws Exception {
+            final RemoteLocation location;
+            try (ServerSocket socket = new ServerSocket(0)) {
+                location = RemoteLocation.create("http://127.0.0.1:" + socket.getLocalPort() + "/path");
+                assertThat(location.isReachable(123)).isTrue();
+            } finally {
+                // nothing to do, just let the socket close itself
+            }
         }
     }
 

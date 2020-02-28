@@ -53,7 +53,8 @@ class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final String pathOrNameWithArgs = buildNameWithArgs(getLibPathOrName(), arguments);
         final File outputFile = targetSpecFile.getLocation().toFile();
         if (RedPlugin.getDefault().getPreferences().isPythonLibrariesLibdocGenerationInSeparateProcessEnabled()) {
-            environment.createLibdocInSeparateProcess(pathOrNameWithArgs, outputFile, format, additionalPaths);
+            environment.createLibdocInSeparateProcess(pathOrNameWithArgs, outputFile, format, additionalPaths,
+                    RedPlugin.getDefault().getPreferences().getPythonLibrariesLibdocGenerationTimeout());
         } else {
             environment.createLibdoc(pathOrNameWithArgs, outputFile, format, additionalPaths);
         }

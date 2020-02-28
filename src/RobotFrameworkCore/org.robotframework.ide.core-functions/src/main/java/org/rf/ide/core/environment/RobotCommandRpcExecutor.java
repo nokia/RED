@@ -226,11 +226,11 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     @Override
     public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
-            final EnvironmentSearchPaths additionalPaths) {
+            final EnvironmentSearchPaths additionalPaths, final int timeout) {
         try {
             final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdocInSeparateProcess",
                     libName, format.name().toLowerCase(), additionalPaths.getExtendedPythonPaths(interpreterType),
-                    additionalPaths.getClassPaths());
+                    additionalPaths.getClassPaths(), timeout);
             if (!base64EncodedLibFileContent.isEmpty()) {
                 writeBase64EncodedLibdoc(outputFile, base64EncodedLibFileContent);
             }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ public class LibrariesPreferencesPageTest {
         page.createControl(shell);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(4);
+        assertThat(editors).hasSize(5);
 
         final Map<Class<?>, List<String>> namesGroupedByType = editors.stream()
                 .collect(groupingBy(FieldEditor::getClass, mapping(FieldEditor::getPreferenceName, toList())));
@@ -57,5 +58,7 @@ public class LibrariesPreferencesPageTest {
                         RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT,
                         RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                         RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED));
+        assertThat(namesGroupedByType).hasEntrySatisfying(IntegerFieldEditor.class,
+                names -> assertThat(names).containsOnly(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT));
     }
 }

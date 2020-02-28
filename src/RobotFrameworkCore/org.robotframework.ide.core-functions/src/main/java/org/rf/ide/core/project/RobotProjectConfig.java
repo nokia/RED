@@ -9,6 +9,10 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -692,6 +696,8 @@ public class RobotProjectConfig {
 
         public static final String DEFAULT_ADDRESS = DEFAULT_SCHEME + "://127.0.0.1:" + DEFAULT_PORT + DEFAULT_PATH;
 
+        public static final int DEFAULT_TIMEOUT = 5_000;
+
         public static RemoteLocation create(final String str) {
             try {
                 return create(new URI(str));
@@ -741,6 +747,16 @@ public class RobotProjectConfig {
 
         public String getRemoteName() {
             return "Remote " + uri.toString();
+        }
+
+        public boolean isReachable(final int timeout) {
+            try (final Socket s = new Socket()) {
+                final SocketAddress socketAddress = new InetSocketAddress(uri.getHost(), uri.getPort());
+                s.connect(socketAddress, timeout);
+                return true;
+            } catch (final IOException | IllegalArgumentException e) {
+                return false;
+            }
         }
 
         @Override

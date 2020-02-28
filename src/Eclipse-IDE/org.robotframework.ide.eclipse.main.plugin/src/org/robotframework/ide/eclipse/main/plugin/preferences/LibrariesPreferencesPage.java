@@ -7,9 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
+import java.util.function.Consumer;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +27,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.libraries";
+
+    private Consumer<Boolean> libdocGenerationTimeoutEnablementUpdater;
 
     @Override
     public void createControl(final Composite parent) {
@@ -81,17 +87,47 @@ public class LibrariesPreferencesPage extends RedFieldEditorPreferencePage {
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(libGroup);
         GridLayoutFactory.fillDefaults().applyTo(libGroup);
 
-        final BooleanFieldEditor libdocGenerationEditor = new BooleanFieldEditor(
-                RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
-                "Generate Python libraries libdocs in separate process", libGroup);
-        final Button libdocGenerationButton = (Button) libdocGenerationEditor.getDescriptionControl(libGroup);
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(libdocGenerationButton);
-        addField(libdocGenerationEditor);
-
         final BooleanFieldEditor libdocReloadEditor = new BooleanFieldEditor(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED,
                 "Automatically reload changed libraries", libGroup);
         final Button libdocReloadButton = (Button) libdocReloadEditor.getDescriptionControl(libGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(libdocReloadButton);
         addField(libdocReloadEditor);
+
+        final BooleanFieldEditor libdocGenerationEditor = new BooleanFieldEditor(
+                RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
+                "Generate Python libraries libdocs in separate process", libGroup);
+        addField(libdocGenerationEditor);
+        final Button libdocGenerationButton = (Button) libdocGenerationEditor.getDescriptionControl(libGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(libdocGenerationButton);
+
+        final IntegerFieldEditor libdocGenerationTimeoutEditor = new IntegerFieldEditor(
+                RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT, "Timeout (seconds)", libGroup, 4);
+        GridDataFactory.fillDefaults().indent(25, 5).applyTo(libdocGenerationTimeoutEditor.getLabelControl(libGroup));
+        libdocGenerationTimeoutEditor.setValidRange(0, 3_600);
+        libdocGenerationTimeoutEditor.setEnabled(getPreferenceStore()
+                .getBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED), libGroup);
+        addField(libdocGenerationTimeoutEditor);
+
+        libdocGenerationTimeoutEnablementUpdater = value -> libdocGenerationTimeoutEditor.setEnabled(value, libGroup);
+        libdocGenerationTimeoutEnablementUpdater.accept(getPreferenceStore()
+                .getBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED));
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+        if (event.getSource() instanceof BooleanFieldEditor
+                && ((BooleanFieldEditor) event.getSource()).getPreferenceName()
+                        .equals(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED)) {
+            libdocGenerationTimeoutEnablementUpdater.accept((Boolean) event.getNewValue());
+        }
+        super.propertyChange(event);
+    }
+
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+
+        libdocGenerationTimeoutEnablementUpdater.accept(getPreferenceStore()
+                .getDefaultBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED));
     }
 }

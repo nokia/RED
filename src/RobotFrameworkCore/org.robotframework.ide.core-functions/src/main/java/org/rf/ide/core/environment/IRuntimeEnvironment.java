@@ -40,7 +40,7 @@ public interface IRuntimeEnvironment {
     void createLibdoc(String libName, File outputFile, LibdocFormat format, EnvironmentSearchPaths additionalPaths);
 
     void createLibdocInSeparateProcess(String libName, File outputFile, LibdocFormat format,
-            EnvironmentSearchPaths additionalPaths);
+            EnvironmentSearchPaths additionalPaths, int timeout);
 
     String createHtmlDoc(String doc, DocFormat format);
 

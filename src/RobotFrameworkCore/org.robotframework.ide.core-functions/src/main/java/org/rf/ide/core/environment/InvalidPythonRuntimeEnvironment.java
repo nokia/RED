@@ -84,7 +84,7 @@ public class InvalidPythonRuntimeEnvironment implements IRuntimeEnvironment {
 
     @Override
     public void createLibdocInSeparateProcess(final String libName, final File outputFile, final LibdocFormat format,
-            final EnvironmentSearchPaths additionalPaths) {
+            final EnvironmentSearchPaths additionalPaths, final int timeout) {
         // nothing to do
     }
 

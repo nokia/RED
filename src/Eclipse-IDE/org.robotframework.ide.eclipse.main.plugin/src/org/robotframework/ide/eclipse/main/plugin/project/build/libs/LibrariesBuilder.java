@@ -269,6 +269,10 @@ public class LibrariesBuilder {
         final List<ILibdocGenerator> generators = new ArrayList<>();
 
         for (final RemoteLocation location : configuration.getRemoteLocations()) {
+            if (!location.isReachable(RemoteLocation.DEFAULT_TIMEOUT)) {
+                continue;
+            }
+
             final String fileName = LibraryDescriptor.ofStandardRemoteLibrary(location).generateLibspecFileName();
 
             // we always want to regenerate remote libraries, as something may have changed

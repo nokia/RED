@@ -95,6 +95,7 @@ public class RedPreferences {
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "red.libraries.projectModulesRecursiveAdditionOnVirtualenvEnabled";
     public static final String AUTODISCOVERY_GEVENT_SUPPORT = "red.libraries.autoDiscoveryGeventSupport";
     public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED = "red.libraries.pythonLibrariesLibdocsGenarationInSeperateProcessEnabled";
+    public static final String PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT = "red.libraries.pythonLibrariesLibdocsGenarationT";
     public static final String LIBDOCS_AUTO_RELOAD_ENABLED = "red.libraries.libdocsAutoReloadEnabled";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
@@ -308,6 +309,10 @@ public class RedPreferences {
 
     public boolean isPythonLibrariesLibdocGenerationInSeparateProcessEnabled() {
         return store.getBoolean(PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED);
+    }
+
+    public int getPythonLibrariesLibdocGenerationTimeout() {
+        return store.getInt(PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT);
     }
 
     public boolean isLibdocAutoReloadEnabled() {

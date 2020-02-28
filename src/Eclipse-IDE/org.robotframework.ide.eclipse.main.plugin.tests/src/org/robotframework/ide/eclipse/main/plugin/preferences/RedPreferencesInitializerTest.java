@@ -177,6 +177,7 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putBoolean(RedPreferences.AUTODISCOVERY_GEVENT_SUPPORT, false);
         verify(preferences).putBoolean(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_IN_SEPARATE_PROCESS_ENABLED,
                 true);
+        verify(preferences).putInt(RedPreferences.PYTHON_LIBRARIES_LIBDOCS_GENERATION_TIMEOUT, 30);
         verify(preferences).putBoolean(RedPreferences.LIBDOCS_AUTO_RELOAD_ENABLED, true);
     }
 
