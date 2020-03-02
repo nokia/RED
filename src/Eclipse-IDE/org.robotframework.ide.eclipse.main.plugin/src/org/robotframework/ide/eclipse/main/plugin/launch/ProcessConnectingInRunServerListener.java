@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.base.Predicates.instanceOf;
-
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,19 +24,19 @@ public class ProcessConnectingInRunServerListener extends DefaultAgentServerStat
     public void clientConnected(final int clientId) {
         Optional<IRobotProcess> process = getProcess();
         while (!process.isPresent()) {
-            process = getProcess();
             try {
                 Thread.sleep(100);
             } catch (final InterruptedException e) {
                 // retry
             }
+            process = getProcess();
         }
         process.get().setConnectedToTests(true);
     }
 
     private Optional<IRobotProcess> getProcess() {
         return Arrays.stream(launch.getProcesses())
-                .filter(instanceOf(IRobotProcess.class))
+                .filter(IRobotProcess.class::isInstance)
                 .map(IRobotProcess.class::cast)
                 .findFirst();
     }

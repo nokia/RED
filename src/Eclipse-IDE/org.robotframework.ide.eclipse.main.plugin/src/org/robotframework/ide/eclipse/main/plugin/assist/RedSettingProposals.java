@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
 
 import java.util.ArrayList;
@@ -127,6 +128,10 @@ public class RedSettingProposals {
         return String.format(DESCRIBED_SETTINGS.get(target, settingName.toLowerCase()), arg);
     }
 
+    public static List<String> getAllSettingNames(final SettingTarget target) {
+        return DESCRIBED_SETTINGS.row(target).keySet().stream().map(target::toCanonicalName).sorted().collect(toList());
+    }
+
     private final SettingTarget target;
     private final ProposalMatcher matcher;
 
@@ -153,7 +158,7 @@ public class RedSettingProposals {
             final Optional<ProposalMatch> match = matcher.matches(userContent, settingName);
 
             if (match.isPresent()) {
-                final String name = toCanonicalName(settingName);
+                final String name = target.toCanonicalName(settingName);
                 proposals.add(AssistProposals.createSettingProposal(name, target, match.get()));
             }
         }
@@ -161,30 +166,57 @@ public class RedSettingProposals {
         return proposals;
     }
 
-    private String toCanonicalName(final String settingName) {
-        switch (target) {
-            case GENERAL_TESTS:
-            case GENERAL_TASKS:
-                return Splitter.on(' ')
-                        .splitToList(settingName)
-                        .stream()
-                        .map(elem -> CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem))
-                        .collect(joining(" "));
-            case TEST_CASE:
-            case TASK:
-            case KEYWORD:
-                final char firstLetter = settingName.charAt(1);
-                return settingName.replaceAll("\\[" + firstLetter, "[" + Character.toUpperCase(firstLetter));
-            default:
-                throw new IllegalStateException("Unknown target value: " + target);
-        }
-    }
-
     public enum SettingTarget {
-        TEST_CASE,
-        TASK,
-        KEYWORD,
-        GENERAL_TESTS,
-        GENERAL_TASKS
+
+        TEST_CASE {
+
+            @Override
+            String toCanonicalName(final String name) {
+                return toLocalSettingName(name);
+            }
+        },
+        TASK {
+
+            @Override
+            String toCanonicalName(final String name) {
+                return toLocalSettingName(name);
+            }
+        },
+        KEYWORD {
+
+            @Override
+            String toCanonicalName(final String name) {
+                return toLocalSettingName(name);
+            }
+        },
+        GENERAL_TESTS {
+
+            @Override
+            String toCanonicalName(final String name) {
+                return toGeneralSettingName(name);
+            }
+        },
+        GENERAL_TASKS {
+
+            @Override
+            String toCanonicalName(final String name) {
+                return toGeneralSettingName(name);
+            }
+        };
+
+        abstract String toCanonicalName(String name);
+
+        private static String toLocalSettingName(final String name) {
+            final char firstLetter = name.charAt(1);
+            return name.replaceAll("\\[" + firstLetter, "[" + Character.toUpperCase(firstLetter));
+        }
+
+        private static String toGeneralSettingName(final String name) {
+            return Splitter.on(' ')
+                    .splitToList(name)
+                    .stream()
+                    .map(elem -> CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem))
+                    .collect(joining(" "));
+        }
     }
 }

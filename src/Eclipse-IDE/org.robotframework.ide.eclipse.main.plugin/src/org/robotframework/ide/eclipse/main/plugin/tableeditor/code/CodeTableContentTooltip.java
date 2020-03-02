@@ -5,6 +5,8 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import java.util.Optional;
+
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -32,8 +34,11 @@ public class CodeTableContentTooltip extends RedNatTableContentTooltip {
         if (col == 1 && RedSettingProposals.isSetting(settingTarget, text)) {
             final int row = natTable.getRowPositionByY(event.y);
             final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
-            final String keyword = cell != null && cell.getDataValue() != null
-                    && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue() : "";
+            final String keyword = Optional.ofNullable(cell)
+                    .map(ILayerCell::getDataValue)
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .orElse("");
             return RedSettingProposals.getSettingDescription(settingTarget, text, keyword);
         }
         return text;

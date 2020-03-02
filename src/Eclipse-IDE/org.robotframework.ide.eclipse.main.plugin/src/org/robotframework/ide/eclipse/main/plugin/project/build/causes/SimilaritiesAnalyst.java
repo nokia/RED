@@ -20,6 +20,8 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSectionProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -144,8 +146,15 @@ class SimilaritiesAnalyst {
 
     Collection<String> provideSimilarSectionNames(final String sectionName) {
         return similaritiesAlgorithm
-                .onlyWordsWithinDistance(RedSectionProposals.SECTION_NAMES, sectionName, DEFAULT_MAXIMUM_DISTANCE)
-                .limit(1)
+                .onlyWordsWithinDistance(RedSectionProposals.SECTION_NAMES, sectionName, maximumDistance)
+                .limit(limit)
+                .collect(toList());
+    }
+
+    Collection<String> provideSimilarSettingNames(final SettingTarget target, final String settingName) {
+        return similaritiesAlgorithm
+                .onlyWordsWithinDistance(RedSettingProposals.getAllSettingNames(target), settingName, maximumDistance)
+                .limit(limit)
                 .collect(toList());
     }
 }

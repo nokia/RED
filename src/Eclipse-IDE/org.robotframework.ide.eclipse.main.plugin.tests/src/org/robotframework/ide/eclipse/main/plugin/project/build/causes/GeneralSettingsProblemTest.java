@@ -123,4 +123,16 @@ public class GeneralSettingsProblemTest {
         });
     }
 
+    @Test
+    public void misspelledGeneralSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("Virables");
+
+        final GeneralSettingsProblem problem = GeneralSettingsProblem.UNKNOWN_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to 'Variables'");
+    }
+
 }

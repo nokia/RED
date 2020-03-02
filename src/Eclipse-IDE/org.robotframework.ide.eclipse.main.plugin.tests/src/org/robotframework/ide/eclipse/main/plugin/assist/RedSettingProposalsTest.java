@@ -17,6 +17,8 @@ public class RedSettingProposalsTest {
 
     @Test
     public void isSettingTest() {
+        assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, null)).isFalse();
+
         assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "documentation")).isTrue();
         assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "metadata")).isTrue();
         assertThat(RedSettingProposals.isSetting(SettingTarget.GENERAL_TESTS, "library")).isTrue();
@@ -50,6 +52,10 @@ public class RedSettingProposalsTest {
                 .isEqualTo("Metadata current suite hold");
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "library", ""))
                 .isEqualTo("Imports library given by its name or path");
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "test template", ""))
+                .isEqualTo("The keyword given in first argument is used as default template keyword in this suite");
+        assertThat(RedSettingProposals.getSettingDescription(SettingTarget.GENERAL_TESTS, "test template", "User Kw"))
+                .isEqualTo("The keyword User Kw is used as default template keyword in this suite");
 
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.KEYWORD, "[documentation]", ""))
                 .isNotEmpty();
@@ -60,6 +66,22 @@ public class RedSettingProposalsTest {
                 .isNotEmpty();
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.TEST_CASE, "[template]", "")).isNotEmpty();
         assertThat(RedSettingProposals.getSettingDescription(SettingTarget.TEST_CASE, "[tags]", "")).isNotEmpty();
+    }
+
+    @Test
+    public void getAllSettingNamesTest() {
+        assertThat(RedSettingProposals.getAllSettingNames(SettingTarget.TEST_CASE)).containsExactly("[Documentation]",
+                "[Setup]", "[Tags]", "[Teardown]", "[Template]", "[Timeout]");
+        assertThat(RedSettingProposals.getAllSettingNames(SettingTarget.TASK)).containsExactly("[Documentation]",
+                "[Setup]", "[Tags]", "[Teardown]", "[Template]", "[Timeout]");
+        assertThat(RedSettingProposals.getAllSettingNames(SettingTarget.KEYWORD)).containsExactly("[Arguments]",
+                "[Documentation]", "[Return]", "[Tags]", "[Teardown]", "[Timeout]");
+        assertThat(RedSettingProposals.getAllSettingNames(SettingTarget.GENERAL_TESTS)).containsExactly("Default Tags",
+                "Documentation", "Force Tags", "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown",
+                "Test Setup", "Test Teardown", "Test Template", "Test Timeout", "Variables");
+        assertThat(RedSettingProposals.getAllSettingNames(SettingTarget.GENERAL_TASKS)).containsExactly("Default Tags",
+                "Documentation", "Force Tags", "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown",
+                "Task Setup", "Task Teardown", "Task Template", "Task Timeout", "Variables");
     }
 
     @Test

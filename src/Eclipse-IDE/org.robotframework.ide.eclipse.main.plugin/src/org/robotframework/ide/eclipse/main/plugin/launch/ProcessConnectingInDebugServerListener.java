@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.base.Predicates.instanceOf;
-
 import java.util.Optional;
 
 import org.eclipse.debug.core.ILaunch;
@@ -23,24 +21,22 @@ public class ProcessConnectingInDebugServerListener extends ProcessConnectingInR
     public void clientConnected(final int clientId) {
         super.clientConnected(clientId);
 
-        Optional<RobotDebugTarget> debugTarget;
-        do {
-            debugTarget = getDebugTarget();
-            if (!debugTarget.isPresent()) {
-                try {
-                    Thread.sleep(100);
-                } catch (final InterruptedException e) {
-                    // retry
-                }
+        Optional<RobotDebugTarget> debugTarget = getDebugTarget();
+        while (!debugTarget.isPresent()) {
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+                // retry
             }
-        } while (!debugTarget.isPresent());
+            debugTarget = getDebugTarget();
+        }
 
         debugTarget.get().connected();
     }
 
     private Optional<RobotDebugTarget> getDebugTarget() {
         return Optional.ofNullable(launch.getDebugTarget())
-                .filter(instanceOf(RobotDebugTarget.class))
+                .filter(RobotDebugTarget.class::isInstance)
                 .map(RobotDebugTarget.class::cast);
 
     }

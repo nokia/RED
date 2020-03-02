@@ -983,15 +983,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         refreshTable();
     }
 
-    private static java.util.Optional<RobotFileInternalElement> toOptionalModelElement(
-            final Object rowObject) {
+    private static java.util.Optional<RobotFileInternalElement> toOptionalModelElement(final Object rowObject) {
         if (rowObject instanceof Entry<?, ?>) {
             final Entry<?, ?> entry = (Entry<?, ?>) rowObject;
-            return entry.getValue() instanceof RobotFileInternalElement
-                    ? java.util.Optional.of((RobotFileInternalElement) entry.getValue())
-                    : java.util.Optional.<RobotFileInternalElement>empty();
+            return java.util.Optional.ofNullable(entry.getValue())
+                    .filter(RobotFileInternalElement.class::isInstance)
+                    .map(RobotFileInternalElement.class::cast);
         }
-        return java.util.Optional.<RobotFileInternalElement>empty();
+        return java.util.Optional.empty();
     }
 
     private class GeneralSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
@@ -1074,9 +1073,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             if (col == 1 && text != null && RedSettingProposals.isSetting(target, text)) {
                 final int row = natTable.getRowPositionByY(event.y);
                 final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
-                final String keyword = cell != null && cell.getDataValue() != null
-                        && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
-                                : "given in first argument";
+                final String keyword = java.util.Optional.ofNullable(cell)
+                        .map(ILayerCell::getDataValue)
+                        .filter(String.class::isInstance)
+                        .map(String.class::cast)
+                        .orElse("");
                 return RedSettingProposals.getSettingDescription(target, text, keyword);
             }
             return text;

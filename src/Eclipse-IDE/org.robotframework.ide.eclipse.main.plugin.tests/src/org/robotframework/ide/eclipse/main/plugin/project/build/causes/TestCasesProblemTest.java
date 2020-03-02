@@ -79,4 +79,16 @@ public class TestCasesProblemTest {
         });
     }
 
+    @Test
+    public void misspelledTestCaseSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("[Togs]");
+
+        final TestCasesProblem problem = TestCasesProblem.UNKNOWN_TEST_CASE_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '[Tags]'");
+    }
+
 }

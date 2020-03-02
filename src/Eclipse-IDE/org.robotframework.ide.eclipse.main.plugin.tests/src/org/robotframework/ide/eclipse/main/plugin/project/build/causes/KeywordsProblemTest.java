@@ -137,4 +137,16 @@ public class KeywordsProblemTest {
         });
     }
 
+    @Test
+    public void misspelledKeywordSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("[Saturn]");
+
+        final KeywordsProblem problem = KeywordsProblem.UNKNOWN_KEYWORD_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '[Return]'");
+    }
+
 }

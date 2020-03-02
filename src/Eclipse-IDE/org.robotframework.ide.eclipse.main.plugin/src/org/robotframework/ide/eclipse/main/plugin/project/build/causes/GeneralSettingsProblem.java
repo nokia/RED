@@ -30,6 +30,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePostcondition
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SuitePreconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPostconditionRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.TestPreconditionRecognizer;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddRemoteLibraryToRedXmlFixer;
@@ -86,10 +87,20 @@ public enum GeneralSettingsProblem implements IProblemCause {
                         nameMapping.put(pattern, type);
                     });
 
-            return nameMapping.entrySet()
+            final Stream<String> deprecatedNames = nameMapping.entrySet()
                     .stream()
                     .filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> entry.getValue().getTheMostCorrectOneRepresentation(robotVersion).getRepresentation())
+                    .map(entry -> entry.getValue()
+                            .getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+
+            final Stream<String> similarNames = Stream.concat(
+                    new SimilaritiesAnalyst().provideSimilarSettingNames(SettingTarget.GENERAL_TESTS, name).stream(),
+                    new SimilaritiesAnalyst().provideSimilarSettingNames(SettingTarget.GENERAL_TASKS, name).stream());
+
+            return Stream.concat(deprecatedNames, similarNames)
+                    .distinct()
+                    .sorted()
                     .map(ChangeToFixer::new)
                     .collect(toList());
         }

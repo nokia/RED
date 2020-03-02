@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 
 
 public class SimilaritiesAnalystTest {
@@ -33,6 +34,27 @@ public class SimilaritiesAnalystTest {
         assertThat(analyst.provideSimilarSectionNames("Setimgss")).isEmpty();
         assertThat(analyst.provideSimilarSectionNames("Vommment")).isEmpty();
         assertThat(analyst.provideSimilarSectionNames("Header")).isEmpty();
+    }
+
+    @Test
+    public void similarSettingNamesAreProvided_whenThereIsASmallTypoInName() {
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.TEST_CASE, "[Timeup]"))
+                .containsExactly("[Timeout]");
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.TASK, "[Tourdown]")).containsExactly("[Teardown]");
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.KEYWORD, "[Togs]")).containsExactly("[Tags]");
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.GENERAL_TESTS, "Tost Template"))
+                .containsExactly("Test Template");
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.GENERAL_TASKS, "Vuriablis"))
+                .containsExactly("Variables");
+    }
+
+    @Test
+    public void noSettingNamesAreProvided_whenTypoIsBigOrNothingSimilarAtAll() {
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.TEST_CASE, "[Timelaps]")).isEmpty();
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.TASK, "[Tourdrop]")).isEmpty();
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.KEYWORD, "[Tagasas]")).isEmpty();
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.GENERAL_TESTS, "Tost Plate")).isEmpty();
+        assertThat(analyst.provideSimilarSettingNames(SettingTarget.GENERAL_TASKS, "Vulnerables")).isEmpty();
     }
 
 }

@@ -42,4 +42,17 @@ public class TasksProblemTest {
                     .containsExactly("Change to '" + replacement + "'");
         });
     }
+
+    @Test
+    public void misspelledTaskSetting_hasResolutionAndProvidesFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("[Ducumentation]");
+
+        final TasksProblem problem = TasksProblem.UNKNOWN_TASK_SETTING;
+
+        assertThat(problem.hasResolution()).isTrue();
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '[Documentation]'");
+    }
+
 }

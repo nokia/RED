@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 
@@ -88,10 +89,20 @@ public enum TasksProblem implements IProblemCause {
                         nameMapping.put(pattern, type);
                     });
 
-            return nameMapping.entrySet()
+            final Stream<String> deprecatedNames = nameMapping.entrySet()
                     .stream()
                     .filter(entry -> entry.getKey().matcher(name).matches())
-                    .map(entry -> entry.getValue().getTheMostCorrectOneRepresentation(robotVersion).getRepresentation())
+                    .map(entry -> entry.getValue()
+                            .getTheMostCorrectOneRepresentation(robotVersion)
+                            .getRepresentation());
+
+            final Stream<String> similarNames = new SimilaritiesAnalyst()
+                    .provideSimilarSettingNames(SettingTarget.TASK, name)
+                    .stream();
+
+            return Stream.concat(deprecatedNames, similarNames)
+                    .distinct()
+                    .sorted()
                     .map(ChangeToFixer::new)
                     .collect(toList());
         }
