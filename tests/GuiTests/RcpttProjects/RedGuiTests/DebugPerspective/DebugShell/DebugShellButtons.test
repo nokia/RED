@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-CA7oBqWEeq6f9_VBibLOg
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/10/19 2:19 PM
+Save-Time: 3/2/20 4:29 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -274,10 +274,9 @@ exec-with-options -disableJobWaiting -command {
 	// command is executed with error
 	get-view "Debug Shell" | get-text-viewer | get-property text | equals "ROBOT> Set Global Variable    ${new}  8    \n"
 	    + "PASS: None\n"
-	    + "ROBOT> Set Global Variable    ${new}  8    \n"
+	    + "ROBOT> Set Global Variable    ${new}  8\n"
 	    + "[no suspended Robot execution is selected]\n"
 	    + "ROBOT>" | verify-true
-	    
     // change mode
 	with [get-view "Debug Shell"] {
 	    get-button "Robot variables" | click
@@ -287,7 +286,7 @@ exec-with-options -disableJobWaiting -command {
 	// check that mode is changed even debug was stopped
 	get-view "Debug Shell" | get-text-viewer | get-property text | equals "ROBOT> Set Global Variable    ${new}  8    \n"
 	    + "PASS: None\n"
-	    + "ROBOT> Set Global Variable    ${new}  8    \n"
+	    + "ROBOT> Set Global Variable    ${new}  8\n"
 	    + "[no suspended Robot execution is selected]\n"
 	    + "PYTHON>" | verify-true
 	    
@@ -300,7 +299,7 @@ exec-with-options -disableJobWaiting -command {
 	with [get-view "Debug Shell" | get-text-viewer] {
 	    get-property text | equals "ROBOT> Set Global Variable    ${new}  8    \n"
 	        + "PASS: None\n"
-	        + "ROBOT> Set Global Variable    ${new}  8    \n"
+	        + "ROBOT> Set Global Variable    ${new}  8\n"
 	        + "[no suspended Robot execution is selected]\n"
 	        + "PYTHON> x=3\n"
 	          + "[no suspended Robot execution is selected]\n"
