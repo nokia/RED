@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _srvewJQcEeWNpL9oeriwCw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 7/5/19 5:45 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 3/2/20 11:23 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -91,16 +91,23 @@ with [get-window Preferences | get-control Any -after [get-label Libraries] -ind
         | verify-true
         
     // generating    
-    get-property "getChildren().Control[1].getText()" | equals "Libdoc generating" | verify-true
-    get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
+       get-property "getChildren().Control[1].getText()" | equals "Libdoc generating" | verify-true
+    get-property "getChildren().Control[1].getChildren().length" | equals 4 | verify-true
     
     get-property "getChildren().Control[1].getChildren().Control[0].getText()" 
-        | equals "Generate Python libraries libdocs in separate process" | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getSelection()" | equals true | verify-true
-    
-    get-property "getChildren().Control[1].getChildren().Control[1].getText()" 
         | equals "Automatically reload changed libraries" | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[1].getSelection()" | equals true | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[1].getText()" 
+        | equals "Generate Python libraries libdocs in separate process" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[2].getText()" | equals "Timeout (seconds)" 
+        | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[3].getText()" | equals 30 | verify-true
+    
+     with [get-group "Libdoc generating"] {
+        get-button "Automatically reload changed libraries" | get-property selected | equals true | verify-true
+        get-button "Generate Python libraries libdocs in separate process" | get-property selected | equals true 
+            | verify-true
+    }
+    
 }
 get-window Preferences | get-button Cancel | click
 
