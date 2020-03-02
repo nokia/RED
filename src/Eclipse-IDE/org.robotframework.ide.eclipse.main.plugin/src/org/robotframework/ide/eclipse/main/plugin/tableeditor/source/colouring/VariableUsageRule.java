@@ -14,6 +14,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpression;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -60,9 +61,14 @@ public class VariableUsageRule implements ISyntaxColouringRule {
 
                         @Override
                         public boolean visit(final VariableUse usage) {
-                            return visit(usage.getRegion(),
-                                    () -> new PositionedTextToken(varToken, offsetInFile,
-                                            usage.getRegion().getEnd().getOffset() - offsetInFile));
+                            return visit(usage.getRegion(), () -> new PositionedTextToken(varToken, offsetInFile,
+                                    usage.getRegion().getEnd().getOffset() - offsetInFile));
+                        }
+
+                        @Override
+                        public boolean visit(final PythonExpression expression) {
+                            return visit(expression.getRegion(), () -> new PositionedTextToken(varToken, offsetInFile,
+                                    expression.getRegion().getEnd().getOffset() - offsetInFile));
                         }
 
                         @Override

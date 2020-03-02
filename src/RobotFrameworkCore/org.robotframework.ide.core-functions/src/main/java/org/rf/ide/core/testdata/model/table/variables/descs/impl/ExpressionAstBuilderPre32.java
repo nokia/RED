@@ -9,14 +9,13 @@ import org.rf.ide.core.testdata.model.table.variables.descs.impl.ExpressionAstNo
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
-class ExpressionAstBuilder {
+class ExpressionAstBuilderPre32 extends ExpressionAstBuilder {
 
-    protected final String possibleVariableMarks;
-
-    ExpressionAstBuilder(final String possibleVariableMarks) {
-        this.possibleVariableMarks = possibleVariableMarks;
+    ExpressionAstBuilderPre32(final String possibleVariableMarks) {
+        super(possibleVariableMarks);
     }
 
+    @Override
     ExpressionAstNode buildTree(final RobotToken expressionToken) {
         ExpressionAstNode current = ExpressionAstNode.root(expressionToken);
 
@@ -34,22 +33,15 @@ class ExpressionAstBuilder {
 
                     i++; // actually 2 characters have been read
 
-                } else if (ch == '{') {
-                    current = current.addChild(ExpressionAstNode.child(current, NodeKind.PARENS, offset));
-
                 } else if (ch == '[') {
                     current = current.addChild(ExpressionAstNode.child(current, NodeKind.INDEX, offset));
 
-                } else if (ch == '}' && current.isParens()) {
-                    current.close(i + 1);
-                    current = current.getParent();
-
                 } else if (ch == '}' && current.getAncestorSatisfying(ExpressionAstNode::isVar) != null) {
-                    final int tmp = i;
-
                     final ExpressionAstNode varAncestor = current.getAncestorSatisfying(ExpressionAstNode::isVar);
-                    current.forEachAncestorBetween(varAncestor, n -> n.closeAsInvalid(tmp));
-                    varAncestor.close(tmp + 1);
+                    // there can be only INDEX in between current and VAR ancestor - they have
+                    // missing ] closing bracket, so needs to be removed as they are only text
+                    current.forEachAncestorBetween(varAncestor, ExpressionAstNode::removeItself);
+                    varAncestor.close(i + 1);
                     current = varAncestor.getParent();
 
                 } else if (ch == ']' && current.isIndex()) {
@@ -61,17 +53,14 @@ class ExpressionAstBuilder {
             isEscaped = ch == '\\' && !isEscaped;
             i++;
         }
+        
 
         final ExpressionAstNode root = current.getRoot();
-        current.forEachAncestorBetween(root, n -> n.closeAsInvalid(expression.length()));
+        // if there are opened elements they need to be converted to simple text (e.g. removed),
+        // for example: 'expr ${var' od 'expr ${a${b${c'
+        current.forEachAncestorBetween(root, ExpressionAstNode::removeItself);
         root.mergeIndexesToVars();
         root.close(expression.length());
         return root;
-    }
-
-    protected static String lookahead(final String expression, final int current, final int numberOfChars) {
-        return 0 <= current && current < expression.length()
-                ? expression.substring(current + 1, Math.min(expression.length(), current + 1 + numberOfChars))
-                : "";
     }
 }

@@ -47,11 +47,11 @@ public class FileRegion {
     }
 
     public boolean containsLine(final int line) {
-        if (line > FilePosition.NOT_SET) {
-            return Range.closed(start.getLine(), end.getLine()).contains(line);
-        }
+        return line > FilePosition.NOT_SET && Range.closed(start.getLine(), end.getLine()).contains(line);
+    }
 
-        return false;
+    public Range<Integer> toClosedOpenRange() {
+        return Range.closedOpen(start.getOffset(), end.getOffset());
     }
 
     @Override

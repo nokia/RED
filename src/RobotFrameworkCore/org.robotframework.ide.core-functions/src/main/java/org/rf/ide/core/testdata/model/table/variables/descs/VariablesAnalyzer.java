@@ -12,7 +12,6 @@ import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.impl.VariablesAnalyzerImpl;
-import org.rf.ide.core.testdata.model.table.variables.descs.impl.old.OldVariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -31,9 +30,7 @@ public interface VariablesAnalyzer {
     }
 
     public static VariablesAnalyzer analyzer(final RobotVersion version, final String possibleVariableMarks) {
-        return version.isOlderThan(new RobotVersion(3, 2))
-                ? new OldVariablesAnalyzer(possibleVariableMarks)
-                : new VariablesAnalyzerImpl(possibleVariableMarks);
+        return new VariablesAnalyzerImpl(version, possibleVariableMarks);
     }
 
     public static String normalizeName(final RobotToken variableToken) {
@@ -123,6 +120,19 @@ public interface VariablesAnalyzer {
      *            A visitor object responsible for handling variable visit.
      */
     public void visitVariables(RobotToken token, VariablesVisitor visitor);
+
+    /**
+     * Analysys given expression token for python expressions usages (in form
+     * ${{expr}}/@{{expr}}/&{{expr}}
+     * and calls given visitor {@link PythonExpressionVisitor#visit(PythonExpression)} method for
+     * each of those usages.
+     * 
+     * @param token
+     *            Expression token in which all python expressions should be visited.
+     * @param visitor
+     *            A visitor object responsible for handling expression visit.
+     */
+    public void visitPythonExpressions(RobotToken token, PythonExpressionVisitor visitor);
 
     /**
      * Analyses given expression token for variable and non-variable parts and calls given visitor

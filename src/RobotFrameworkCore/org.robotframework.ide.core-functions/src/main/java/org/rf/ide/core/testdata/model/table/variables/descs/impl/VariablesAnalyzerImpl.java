@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpressionVisitor;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesVisitor;
@@ -22,10 +24,14 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class VariablesAnalyzerImpl implements VariablesAnalyzer {
 
-    private final String possibleVariableMarks;
+    private final RobotVersion version;
+    private final ExpressionAstBuilder astBuilder;
 
-    public VariablesAnalyzerImpl(final String possibleVariableMarks) {
-        this.possibleVariableMarks = possibleVariableMarks;
+    public VariablesAnalyzerImpl(final RobotVersion version, final String possibleVariableMarks) {
+        this.version = version;
+        this.astBuilder = version.isOlderThan(new RobotVersion(3, 2))
+                ? new ExpressionAstBuilderPre32(possibleVariableMarks)
+                : new ExpressionAstBuilder(possibleVariableMarks);
     }
 
     @Override
@@ -39,19 +45,31 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
 
     @Override
     public void visitVariables(final RobotToken token, final VariablesVisitor visitor) {
-        visitTree(new ExpressionAstBuilder(possibleVariableMarks).buildTree(token), visitor);
+        visitTree(astBuilder.buildTree(token), visitor, n -> true);
     }
 
-    private boolean visitTree(final ExpressionAstNode node, final VariablesVisitor visitor) {
-        if (node.isVar()) {
-            final boolean shouldContinue = visitor.visit(new VarAstNodeAdapter(node));
+    @Override
+    public void visitPythonExpressions(final RobotToken token, final PythonExpressionVisitor visitor) {
+        visitTree(astBuilder.buildTree(token), n -> true, visitor);
+    }
+
+    private boolean visitTree(final ExpressionAstNode node, final VariablesVisitor varVisitor,
+            final PythonExpressionVisitor exprVisitor) {
+        if (node.isVar() && !node.isPythonExpression(version)) {
+            final boolean shouldContinue = varVisitor.visit(new VarAstNodeAdapter(node));
+            if (!shouldContinue) {
+                return false;
+            }
+            
+        } else if (node.isVar()) {
+            final boolean shouldContinue = exprVisitor.visit(new PythonExprAdapter(node));
             if (!shouldContinue) {
                 return false;
             }
         }
         boolean shouldContinue = true;
         for (final ExpressionAstNode child : node.getChildren()) {
-            shouldContinue |= visitTree(child, visitor);
+            shouldContinue |= visitTree(child, varVisitor, exprVisitor);
             if (!shouldContinue) {
                 return false;
             }
@@ -61,7 +79,7 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
 
     @Override
     public void visitExpression(final RobotToken token, final ExpressionVisitor visitor) {
-        final ExpressionAstNode tree = new ExpressionAstBuilder(possibleVariableMarks).buildTree(token);
+        final ExpressionAstNode tree = astBuilder.buildTree(token);
         boolean shouldContinue = true;
 
         final int line = token.getLineNumber();
@@ -89,7 +107,11 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
                 previousColumn = nodeRegion.getStart().getColumn();
 
             } else {
-                shouldContinue |= visitor.visit(new VarAstNodeAdapter(node));
+                if (node.isPythonExpression(version)) {
+                    shouldContinue |= visitor.visit(new PythonExprAdapter(node));
+                } else {
+                    shouldContinue |= visitor.visit(new VarAstNodeAdapter(node));
+                }
                 previousOffset = nodeRegion.getEnd().getOffset();
                 previousColumn = nodeRegion.getEnd().getColumn();
                 i++;

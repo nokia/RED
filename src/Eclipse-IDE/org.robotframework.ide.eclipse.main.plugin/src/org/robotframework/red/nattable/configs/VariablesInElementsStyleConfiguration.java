@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpression;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -22,7 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
@@ -71,9 +70,13 @@ public class VariablesInElementsStyleConfiguration extends RobotElementsStyleCon
 
                 @Override
                 public boolean visit(final VariableUse usage) {
-                    final FileRegion region = usage.getRegion();
-                    mapping.put(Range.closedOpen(region.getStart().getOffset(), region.getEnd().getOffset()),
-                            variableStyler);
+                    mapping.put(usage.getRegion().toClosedOpenRange(), variableStyler);
+                    return true;
+                }
+
+                @Override
+                public boolean visit(final PythonExpression expression) {
+                    mapping.put(expression.getRegion().toClosedOpenRange(), variableStyler);
                     return true;
                 }
             });

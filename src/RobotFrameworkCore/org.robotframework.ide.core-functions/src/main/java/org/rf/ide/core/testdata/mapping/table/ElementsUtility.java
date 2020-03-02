@@ -72,9 +72,11 @@ public class ElementsUtility {
         RobotToken correct = null;
 
         final List<String> varIds = new ArrayList<>();
-        VariablesAnalyzer.analyzer(robotVersion)
-                .visitVariables(VariablesAnalyzer.asRobotToken(text),
-                        varUse -> varIds.add(varUse.getType().getIdentificator()));
+        final VariablesAnalyzer varAnalyzer = VariablesAnalyzer.analyzer(robotVersion);
+        varAnalyzer.visitVariables(VariablesAnalyzer.asRobotToken(text),
+                varUse -> varIds.add(varUse.getType().getIdentificator()));
+        varAnalyzer.visitPythonExpressions(VariablesAnalyzer.asRobotToken(text),
+                exprUse -> varIds.add(exprUse.getType().getIdentificator()));
 
         if (robotTokens.size() > 1) {
             final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);

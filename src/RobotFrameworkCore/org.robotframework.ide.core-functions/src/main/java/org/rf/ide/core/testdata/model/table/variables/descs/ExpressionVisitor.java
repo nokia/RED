@@ -12,10 +12,15 @@ import org.rf.ide.core.testdata.model.FileRegion;
  * 
  * @author anglart
  */
-public abstract class ExpressionVisitor implements VariablesVisitor {
+public abstract class ExpressionVisitor implements VariablesVisitor, PythonExpressionVisitor {
 
     @Override
     public boolean visit(final VariableUse usage) {
+        return true;
+    }
+
+    @Override
+    public boolean visit(final PythonExpression expression) {
         return true;
     }
 

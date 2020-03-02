@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpressionVisitor;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesVisitor;
@@ -46,6 +47,11 @@ public class OldVariablesAnalyzer implements VariablesAnalyzer {
     @Override
     public void visitExpression(final RobotToken token, final ExpressionVisitor visitor) {
         visitParts(token, visitor, false);
+    }
+
+    @Override
+    public void visitPythonExpressions(final RobotToken token, final PythonExpressionVisitor visitor) {
+        // nothing to do, this is implemented in RF 3.2
     }
 
     private boolean visitParts(final RobotToken token, final VariablesVisitor visitor, final boolean depthSearch) {
