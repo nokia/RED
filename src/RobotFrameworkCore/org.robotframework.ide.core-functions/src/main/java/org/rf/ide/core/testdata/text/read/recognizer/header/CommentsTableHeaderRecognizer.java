@@ -13,7 +13,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class CommentsTableHeaderRecognizer extends ATokenRecognizer {
 
-    public static final Pattern EXPECTED = Pattern.compile("[ ]?([*][\\s]*)+[\\s]*("
+    public static final Pattern EXPECTED = Pattern.compile("^[ ]?([*][\\s]*)+[\\s]*("
             + createUpperLowerCaseWord("Comments") + "|" + createUpperLowerCaseWord("Comment") + ")([\\s]*[*])*");
 
     public CommentsTableHeaderRecognizer() {

@@ -66,7 +66,7 @@ public class RobotKeywordCallTest {
                 .getChildren()
                 .get(0)
                 .getChildren();
-        assertThat(calls).hasSize(4);
+        assertThat(calls).hasSize(3);
         assertThat(calls.get(0).getName()).isEqualTo("Log");
         assertThat(calls.get(0).getArguments()).containsExactly("t");
         assertThat(calls.get(0).getComment()).isEmpty();
@@ -76,9 +76,6 @@ public class RobotKeywordCallTest {
         assertThat(calls.get(2).getName()).isEmpty();
         assertThat(calls.get(2).getArguments()).isEmpty();
         assertThat(calls.get(2).getComment()).isEmpty();
-        assertThat(calls.get(3).getName()).isEmpty();
-        assertThat(calls.get(3).getArguments()).isEmpty();
-        assertThat(calls.get(3).getComment()).isEqualTo("# *** Settings ***");
     }
 
     @Test

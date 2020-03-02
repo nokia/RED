@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class MetadataTableHeaderRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
-            .compile("[ ]?([*][\\s]*)+[\\s]*" + createUpperLowerCaseWordWithSpacesInside("Metadata") + "([\\s]*[*])*");
+            .compile("^[ ]?([*][\\s]*)+[\\s]*" + createUpperLowerCaseWordWithSpacesInside("Metadata") + "([\\s]*[*])*");
 
     public MetadataTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.SETTINGS_TABLE_HEADER);

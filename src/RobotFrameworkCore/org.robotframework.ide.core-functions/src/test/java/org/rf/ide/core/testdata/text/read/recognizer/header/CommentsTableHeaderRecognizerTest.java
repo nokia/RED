@@ -12,7 +12,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.test.helpers.CombinationGenerator;
-import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -45,16 +44,10 @@ public class CommentsTableHeaderRecognizerTest {
     }
 
     @Test
-    public void test_check_spaceLetterT_and_Comments_withAsterisk_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T * Comments ***");
+    public void test_check_commented_Comments_withAsterisk_atTheBeginAndEnd() {
+        final StringBuilder text = new StringBuilder("# * Comments ***");
 
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" * Comments ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
     }
 
     @Test
@@ -98,16 +91,10 @@ public class CommentsTableHeaderRecognizerTest {
     }
 
     @Test
-    public void test_check_spaceLetterT_and_Comments_withAsterisks_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T *** Comments ***");
+    public void test_check_commented_Comments_withAsterisks_atTheBeginAndEnd() {
+        final StringBuilder text = new StringBuilder("# *** Comments ***");
 
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" *** Comments ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
     }
 
     @Test
@@ -151,16 +138,10 @@ public class CommentsTableHeaderRecognizerTest {
     }
 
     @Test
-    public void test_check_spaceLetterT_and_Comment_withAsterisk_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T * Comment ***");
+    public void test_check_commented_Comment_withAsterisk_atTheBeginAndEnd() {
+        final StringBuilder text = new StringBuilder("# * Comment ***");
 
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" * Comment ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
     }
 
     @Test
@@ -204,16 +185,10 @@ public class CommentsTableHeaderRecognizerTest {
     }
 
     @Test
-    public void test_check_spaceLetterT_and_Comment_withAsterisks_atTheBeginAndEnd() {
-        final StringBuilder text = new StringBuilder("T *** Comment ***");
+    public void test_check_commented_Comment_withAsterisks_atTheBeginAndEnd() {
+        final StringBuilder text = new StringBuilder("# *** Comment ***");
 
-        assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        final RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(" *** Comment ***");
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
     }
 
     @Test
@@ -277,9 +252,7 @@ public class CommentsTableHeaderRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern())
-                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWord("Comments") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Comment") + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern()).isNotEmpty();
     }
 
     @Test
