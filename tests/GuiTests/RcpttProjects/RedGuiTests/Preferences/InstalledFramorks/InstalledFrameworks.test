@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/20/20 6:45 PM
+Save-Time: 3/2/20 6:05 PM
 Tags: Unstable, jython
 Testcase-Type: ecl
 
@@ -32,87 +32,94 @@ get-window Preferences
 
 
 //Save RF version to varaible to further use
-let [val RobotDisplayedVersion [get-window Preferences | get-table | get-item "Robot Framework.*" 
-    | get-property caption -raw ] ] {
-	
-	$RobotDisplayedVersion| eq $robot_version | assert-true
-    	
-	//check how  buttons lokks like
-	with [get-window Preferences] {
-		with [get-button "Add..."] {
-	        get-property enablement | equals true | verify-true
-	        get-property tooltip | equals "Choose interpreter executable directory" | verify-true
-	        get-property selected | equals false | verify-true
-	    }
-	    with [get-button Remove] {
-	        get-property enablement | equals false | verify-true
-	        get-property tooltip | equals "Remove selected environments" | verify-true
-	        get-property selected | equals false | verify-true
-	    }
-	    with [get-button Discover] {
-	        get-property enablement | equals true | verify-true
-	        get-property tooltip | equals "Search again for Python interpreters" | verify-true
-	        get-property selected | equals false | verify-true
-	    }   
+
+repeat [val index]  -times [get-window Preferences | get-table | get-property itemCount -raw] -command{
+	if [get-window Preferences | get-table  | get-item -path ".*" -index $index | get-property checked  -raw | equals true ]{
+		global [val RobotDisplayedVersion [ get-window Preferences | get-table  |get-item -path "Robot Framework.*" -index $index  | get-property caption -raw ]]
 	}
+}
+
 	
-	//check robot and python version and select default one
+$RobotDisplayedVersion| eq $robot_version | assert-true
+	
+//check how  buttons lokks like
+with [get-window Preferences] {
+	with [get-button "Add..."] {
+        get-property enablement | equals true | verify-true
+        get-property tooltip | equals "Choose interpreter executable directory" | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button Remove] {
+        get-property enablement | equals false | verify-true
+        get-property tooltip | equals "Remove selected environments" | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button Discover] {
+        get-property enablement | equals true | verify-true
+        get-property tooltip | equals "Search again for Python interpreters" | verify-true
+        get-property selected | equals false | verify-true
+    }   
+}
+
+//check robot and python version and select default one
    
 	  with [get-window Preferences] {        
 	    get-label "Installed frameworks" | get-property caption | equals "Installed frameworks" | verify-true
-			with [get-table] {
-		        get-item ".*" | get-property "columns[0]" 
-		            | equals $RobotDisplayedVersion | verify-true
-		        get-item ".*" | get-property "columns[1]" 
-		            | equals $python_exe_path| verify-true
-		    }
-		    
-		get-window Preferences | get-table | select $RobotDisplayedVersion
-	}
-	
-	//check how buttons were changed (Remove and Install are enable now)
-	with [get-window Preferences] {
-	    with [get-button "Add..."] {
-	        get-property enablement | equals true | verify-true
-	        get-property selected | equals false | verify-true
-	    }
-	    with [get-button Remove] {
-	        get-property enablement | equals true | verify-true
-	        get-property selected | equals false | verify-true
-	    }
-	    with [get-button "Discover"] {
-	        get-property enablement | equals true | verify-true
-	        get-property selected | equals false | verify-true
-	    }
-	}
-	get-window Preferences | get-button $Apply_and_OK_in_preference | click
-	
-	
-	    
-	//check library description
-	get-view "Project Explorer" | get-tree | select [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
-	with [get-view "Project Explorer" | get-tree] {
-	    get-item [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
-	        | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
-	}
-	
-	//create new project
-	get-menu "File/New/Robot Project" | click
-	with [get-window "New Robot project"] {
-	    get-editbox -after [get-label "Project name:"] | set-text "To_remove"
-	    get-button Finish | click
-	}
-	
-	//check labels for 2. project
-	with [get-view "Project Explorer" | get-tree] {
-	    get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-	        | get-property caption | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-	      
-	}
+    
+ }
+ 
+ with [get-window Preferences | get-table] {
+    get-item -path [format "Robot Framework .*\\(Python %s.*\)" $python_version]  | get-property "values['Name']" 
+        | equals $RobotDisplayedVersion | verify-true
+    get-item -path [format "Robot Framework .*\\(Python %s.*\)" $python_version]  | get-property "values['Path']" 
+        | equals $python_exe_path| verify-true
 
-	get-view "Project Explorer" | get-tree 
-    	| get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-    		| get-property caption | equals [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+}	   
+	get-window Preferences | get-table | select $RobotDisplayedVersion
+
+
+//check how buttons were changed (Remove and Install are enable now)
+with [get-window Preferences] {
+    with [get-button "Add..."] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button Remove] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button "Discover"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
 }
+get-window Preferences | get-button $Apply_and_OK_in_preference | click
+
+    
+//check library description
+get-view "Project Explorer" | get-tree | select [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
+with [get-view "Project Explorer" | get-tree] {
+    get-item [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
+        | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
+}
+
+//create new project
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text "To_remove"
+    get-button Finish | click
+}
+
+//check labels for 2. project
+with [get-view "Project Explorer" | get-tree] {
+    get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+        | get-property caption | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+      
+}
+
+get-view "Project Explorer" | get-tree 
+	| get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+		| get-property caption | equals [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
