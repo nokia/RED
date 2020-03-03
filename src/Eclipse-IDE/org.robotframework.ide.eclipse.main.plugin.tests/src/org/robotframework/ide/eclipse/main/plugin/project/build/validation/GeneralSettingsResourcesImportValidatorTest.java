@@ -64,7 +64,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     @BeforeAll
     public static void beforeSuite() throws Exception {
         final File externalDir = RedTempDirectory.createNewDir(tempFolder, "external_dir");
-        
+
         RedTempDirectory.createNewFile(tempFolder, "external.robot");
 
         RedTempDirectory.createNewFile(externalDir, "external_nested.robot");
@@ -101,7 +101,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         validateResourceImport("${unknown}/file.robot");
 
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED, new ProblemPosition(2, Range.closed(27, 48))));
+                GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(27, 48))));
     }
 
     @Test

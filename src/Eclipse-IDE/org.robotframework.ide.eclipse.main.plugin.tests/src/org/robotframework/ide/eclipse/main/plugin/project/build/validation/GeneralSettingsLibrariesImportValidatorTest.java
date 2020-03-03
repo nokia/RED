@@ -531,9 +531,19 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     public void markerIsReported_whenRemoteLibraryIsImportedWithParameterizedUriAndVariableIsNotResolved() {
         validateLibraryImport("Remote  http://${remotevar}");
 
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(34, 53))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithParameterizedUriAndTimeoutAndVariableIsNotResolved() {
+        validateLibraryImport("Remote  http://${remotevar}  ${timeoutvar}");
+
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED,
-                        new ProblemPosition(2, Range.closed(34, 53))));
+                new Problem(GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(34, 53))),
+                new Problem(GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(55, 68))));
     }
 
     @Test
@@ -549,7 +559,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("${unknown}/file.robot");
 
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED, new ProblemPosition(2, Range.closed(26, 47))));
+                GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(26, 47))));
     }
 
     @Test
@@ -777,7 +787,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/", new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -790,7 +800,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -802,7 +812,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  uri=http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote  uri=http://127.0.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -815,7 +825,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  uri=127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote  uri=127.0.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -827,7 +837,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/RPC2";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -839,7 +849,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/RPC2", new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/RPC2", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -851,7 +861,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/path/";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path", new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -863,8 +873,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort() + "/path";
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path/", new HashMap<>(),
-                    libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "/path/", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -877,7 +886,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "  30", new HashMap<>(), libs);
+            validateLibraryImport("Remote  http://127.0.0.1:" + socket.getLocalPort() + "  30", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -890,7 +899,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort() + "  30", new HashMap<>(), libs);
+            validateLibraryImport("Remote  127.0.0.1:" + socket.getLocalPort() + "  30", libs);
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
     }
@@ -902,8 +911,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             final String location = "http://127.0.0.1:" + socket.getLocalPort();
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote   uri=http://127.0.0.1:" + socket.getLocalPort() + "  timeout=30",
-                    new HashMap<>(), libs);
+            validateLibraryImport("Remote   uri=http://127.0.0.1:" + socket.getLocalPort() + "  timeout=30", libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -920,7 +928,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote   http://${remotevar}.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote   http://${remotevar}.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -934,7 +942,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
             final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary(location);
 
-            validateLibraryImport("Remote   timeout=30  uri=127.0.0.1:" + socket.getLocalPort(), new HashMap<>(), libs);
+            validateLibraryImport("Remote   timeout=30  uri=127.0.0.1:" + socket.getLocalPort(), libs);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
         }
@@ -1408,16 +1416,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     private Map<LibraryDescriptor, LibrarySpecification> createLibSpecForLibrary(final String address) {
-        final RemoteLocation remoteLibrary = RemoteLocation.create(address);
         final LibraryConstructor constructor = new LibraryConstructor();
-        constructor.setArguments(newArrayList("uri=http://127.0.0.1:8270", "timeout=None"));
-        final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(remoteLibrary);
+        constructor.setArguments(newArrayList("uri=" + address, "timeout=None"));
+        final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(address));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
-        final Map<LibraryDescriptor, LibrarySpecification> libs = ImmutableMap.of(descriptor, spec);
-
-        final RobotProjectConfig robotProjectConfig = robotProject.getRobotProjectConfig();
-        robotProjectConfig.addRemoteLocation(remoteLibrary);
-
-        return libs;
+        return ImmutableMap.of(descriptor, spec);
     }
 }

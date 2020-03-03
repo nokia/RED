@@ -237,7 +237,7 @@ class ExternalLibrariesImportCollector {
         @Override
         public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
                 final Map<String, Object> additionalAttributes) {
-            if (problem.getCause() == GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED) {
+            if (problem.getCause() == GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT) {
                 final RobotDryRunLibraryImport libImport = RobotDryRunLibraryImport.createUnknown(
                         (String) additionalAttributes.get(AdditionalMarkerAttributes.NAME), problem.getMessage());
                 libraryImports.add(libImport);

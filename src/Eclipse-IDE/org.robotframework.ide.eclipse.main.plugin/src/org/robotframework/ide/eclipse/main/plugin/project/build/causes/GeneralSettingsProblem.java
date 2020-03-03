@@ -292,12 +292,12 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Empty setting '%s'. Specify path of variable file to import";
         }
     },
-    IMPORT_PATH_PARAMETERIZED {
+    PARAMETERIZED_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
-            return "The import name/path '%s' is parameterized. Some of used parameters cannot be resolved."
-                    + " Use Variable mappings in " + RobotProjectConfig.FILENAME + " for parameter resolution";
+            return "'%s' contains unresolved import parameters.  Use Variable mappings in "
+                    + RobotProjectConfig.FILENAME + " for parameter resolution";
         }
 
         @Override

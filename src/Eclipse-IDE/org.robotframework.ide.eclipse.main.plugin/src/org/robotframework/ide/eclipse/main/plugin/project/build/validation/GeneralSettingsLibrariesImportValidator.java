@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.importer.LibraryImportResolver;
@@ -152,35 +153,43 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             importBinder.bind(arguments);
         }
 
-        final Optional<RobotToken> addressToken = importBinder.getLastBindedTo(remoteLibConsDescriptor.get(0));
-        final Optional<String> address = importBinder.getLastValueBindedTo(remoteLibConsDescriptor.get(0))
+        final Argument addressArgument = remoteLibConsDescriptor.get(0);
+        final Optional<String> address = importBinder.getLastValueBindedTo(addressArgument)
                 .map(arg -> RobotExpressions.resolve(variableMappings, arg));
-
-        final Optional<RobotToken> timeoutToken = importBinder.getLastBindedTo(remoteLibConsDescriptor.get(1));
-        final Optional<String> timeout = importBinder.getLastValueBindedTo(remoteLibConsDescriptor.get(1))
-                .map(arg -> RobotExpressions.resolve(variableMappings, arg));
-
-        if (address.isPresent() && RobotExpressions.isParameterized(address.get())) {
-            reportUnresolvedParameterizedImport(address.get(), addressToken.get());
-
-        } else if (address.isPresent()) {
-            reportProblemOnRemoteLocation(addressToken.get(), address.get());
-
-        } else if (importBinder.hasBindings()) {
-            reportProblemOnRemoteLocation(nameToken, RemoteLocation.DEFAULT_ADDRESS);
+        if (address.isPresent()) {
+            final String addressValue = address.get();
+            final RobotToken addressToken = importBinder.getLastBindedTo(addressArgument).get();
+            if (RobotExpressions.isParameterized(addressValue)) {
+                reportUnresolvedParameterizedImport(addressValue, addressToken);
+            } else {
+                reportProblemOnRemoteLocation(addressValue, addressToken);
+            }
         } else {
-            new KeywordCallArgumentsValidator(validationContext, nameToken, reporter, remoteLibConsDescriptor,
-                    arguments).validate(new NullProgressMonitor());
+            if (importBinder.hasBindings()) {
+                reportProblemOnRemoteLocation(RemoteLocation.DEFAULT_ADDRESS, nameToken);
+            } else {
+                new KeywordCallArgumentsValidator(validationContext, nameToken, reporter, remoteLibConsDescriptor,
+                        arguments).validate(new NullProgressMonitor());
+            }
         }
 
-        if (timeout.isPresent() && !RobotTimeFormat.isValidRobotTimeArgument(timeout.get())) {
-            final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
-                    .formatMessageWith(timeout.get());
-            reporter.handleProblem(problem, validationContext.getFile(), timeoutToken.get());
+        final Argument timeoutArgument = remoteLibConsDescriptor.get(1);
+        final Optional<String> timeout = importBinder.getLastValueBindedTo(timeoutArgument)
+                .map(arg -> RobotExpressions.resolve(variableMappings, arg));
+        if (timeout.isPresent()) {
+            final String timeoutValue = timeout.get();
+            final RobotToken timeoutToken = importBinder.getLastBindedTo(timeoutArgument).get();
+            if (RobotExpressions.isParameterized(timeoutValue)) {
+                reportUnresolvedParameterizedImport(timeoutValue, timeoutToken);
+            } else if (!RobotTimeFormat.isValidRobotTimeArgument(timeoutValue)) {
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
+                        .formatMessageWith(timeoutValue);
+                reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
+            }
         }
     }
 
-    private void reportProblemOnRemoteLocation(final RobotToken markerToken, final String address) {
+    private void reportProblemOnRemoteLocation(final String address, final RobotToken markerToken) {
         final RemoteLocation location;
         try {
             location = RemoteLocation.create(address);

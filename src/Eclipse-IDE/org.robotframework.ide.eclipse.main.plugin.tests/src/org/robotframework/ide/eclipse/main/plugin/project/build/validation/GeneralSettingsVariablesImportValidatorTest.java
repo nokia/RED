@@ -102,7 +102,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
         validateVariablesImport("${unknown}/file.py");
 
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED, new ProblemPosition(2, Range.closed(28, 46))));
+                GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(28, 46))));
     }
 
     @Test
