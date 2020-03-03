@@ -68,7 +68,8 @@ class VarAstNodeAdapter implements VariableUse {
             return true;
         }
         final String baseName = getBaseName();
-        return contains(baseName, variableDefinitions) || Pattern.matches("[0-9]+", baseName);
+        return contains(baseName, variableDefinitions)
+                || Pattern.matches("[0-9]*|0[bB][0-1]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+", baseName);
     }
 
     private boolean contains(final String name, final Set<String> varDefs) {
@@ -111,7 +112,7 @@ class VarAstNodeAdapter implements VariableUse {
     }
 
     private String getContentWithoutBraces() {
-        final String content = node.getTextWithoutItem().substring(2);
-        return isInvalid() ? content : content.substring(0, content.length() - 1);
+        final String content = node.getTextWithoutItem().substring(2).trim();
+        return isInvalid() ? content : content.substring(0, content.length() - 1).trim();
     }
 }
