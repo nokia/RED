@@ -56,13 +56,24 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             throws BadLocationException {
         if ("\t".equals(command.text)) {
             replaceTabWithSpecifiedSeparatorOrJumpOutOfRegion(document, command);
+
         } else if (TextUtilities.endsWith(document.getLegalLineDelimiters(), command.text) != -1) {
             findCurrentLine(document, command.offset).ifPresent(currentLine -> autoIndentAfterNewLine(currentLine,
                     DocumentUtilities.getDelimiter(document), command));
+
         } else if (preferences.isVariablesBracketsInsertionEnabled()
                 && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)
                 && (command.offset == document.getLength() || !"{".equals(document.get(command.offset, 1)))) {
             addVariableBrackets(command, "");
+
+        } else if (preferences.isVariablesBracketsInsertionEnabled() && command.text.equals("{")
+                && document.get(command.offset - 1, 1).equals("{")
+                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(document.get(command.offset - 2, 1))) {
+            addMatchingBracket(command, "}");
+
+        } else if (preferences.isVariablesBracketsInsertionEnabled() && command.text.equals("[")
+                && document.get(command.offset - 1, 1).equals("}")) {
+            addMatchingBracket(command, "]");
         }
     }
 
@@ -74,9 +85,9 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
             if (selectedText.matches(preferences.getVariablesBracketsInsertionWrappingPattern())) {
                 addVariableBrackets(command, selectedText);
             }
+
         } else if (preferences.isVariablesBracketsInsertionEnabled() && command.length == 1 && command.text.isEmpty()
-                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(document.get(command.offset - 1, 1))
-                && document.get(command.offset, 2).equals("{}")) {
+                && (document.get(command.offset, 2).equals("{}") || document.get(command.offset, 2).equals("[]"))) {
             // deleting empty variable brackets
             command.length = 2;
         }
@@ -125,6 +136,12 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
         command.text += wrappedText;
         command.shiftsCaret = false;
         command.caretOffset = command.offset + wrappedText.length();
+    }
+
+    private void addMatchingBracket(final DocumentCommand command, final String matchingBracket) {
+        command.text += matchingBracket;
+        command.shiftsCaret = false;
+        command.caretOffset = command.offset + 1;
     }
 
     private void autoIndentAfterNewLine(final RobotLine currentLine, final String lineDelimiter,

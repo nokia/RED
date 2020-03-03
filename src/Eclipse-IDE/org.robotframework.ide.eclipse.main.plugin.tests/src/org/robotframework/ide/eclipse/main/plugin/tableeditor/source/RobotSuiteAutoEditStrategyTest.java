@@ -225,6 +225,66 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
+    public void closingExpressionBracketIsNotAdded_whenOpeningBracketRequestedOutsideOfExistingVariable_andInsertionModeIsDisabled() {
+        final RobotDocument document = newDocument("abc");
+        final DocumentCommand command = newDocumentCommand(2, "{");
+
+        final EditStrategyPreferences preferences = newPreferences(false);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("{");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void closingExpressionBracketIsAdded_whenOpeningBracketRequestedInsideExistingVariable_andInsertionModeIsEnabled() {
+        final RobotDocument document = newDocument("abc${}");
+        final DocumentCommand command = newDocumentCommand(5, "{");
+
+        final EditStrategyPreferences preferences = newPreferences(true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("{}");
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(6);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void closingIndexBracketIsNotAdded_whenOpeningBracketRequestedOutsideOfExistingVariable_andInsertionModeIsDisabled() {
+        final RobotDocument document = newDocument("abc");
+        final DocumentCommand command = newDocumentCommand(2, "[");
+
+        final EditStrategyPreferences preferences = newPreferences(false);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("[");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
+    public void closingIndexBracketIsAdded_whenOpeningBracketRequestedInsideExistingVariable_andInsertionModeIsEnabled() {
+        final RobotDocument document = newDocument("abc${}");
+        final DocumentCommand command = newDocumentCommand(6, "[");
+
+        final EditStrategyPreferences preferences = newPreferences(true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("[]");
+        assertThat(command.shiftsCaret).isFalse();
+        assertThat(command.caretOffset).isEqualTo(7);
+        assertThat(command.length).isEqualTo(0);
+    }
+
+    @Test
     public void bracketsAreNotDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyVariableBrackets_andInsertionModeIsDisabled() {
         for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
             final RobotDocument document = newDocument(varId + "{}");
@@ -261,7 +321,7 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void bracketsAreNotDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyNonVariableBrackets_andInsertionModeIsEnabled() {
+    public void bracketsAreDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyNonVariableBrackets_andInsertionModeIsEnabled() {
         final RobotDocument document = newDocument("abc{}");
 
         final DocumentCommand command = newDocumentCommand(3, "", 1);
@@ -273,7 +333,23 @@ public class RobotSuiteAutoEditStrategyTest {
         assertThat(command.text).isEmpty();
         assertThat(command.shiftsCaret).isTrue();
         assertThat(command.caretOffset).isEqualTo(-1);
-        assertThat(command.length).isEqualTo(1);
+        assertThat(command.length).isEqualTo(2);
+    }
+
+    @Test
+    public void bracketsAreDeleted_whenBackspaceOrDeleteIsRequestedOnEmptyNonIndexBrackets_andInsertionModeIsEnabled() {
+        final RobotDocument document = newDocument("abc[]");
+
+        final DocumentCommand command = newDocumentCommand(3, "", 1);
+
+        final EditStrategyPreferences preferences = newPreferences(true);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEmpty();
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(2);
     }
 
     @Test

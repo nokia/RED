@@ -20,7 +20,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -215,19 +214,15 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
     private void createVariablesSettingsEditors(final Composite parent) {
         final Group varGroup = new Group(parent, SWT.NONE);
-        varGroup.setText("Variables");
+        varGroup.setText("Variables bracket autocompletion");
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(varGroup);
         GridLayoutFactory.fillDefaults().applyTo(varGroup);
-
-        final Label varDescription = new Label(varGroup, SWT.WRAP);
-        varDescription.setText("When one of robot variable identificators ($, @, &&, %) is typed");
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(varDescription);
 
         final BooleanFieldEditor varInsertionEnabled = new BooleanFieldEditor(
                 RedPreferences.VARIABLES_BRACKETS_INSERTION_ENABLED, "Automatically add variable brackets", varGroup);
         addField(varInsertionEnabled);
         final Button varInsertionEnabledButton = (Button) varInsertionEnabled.getDescriptionControl(varGroup);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(varInsertionEnabledButton);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(varInsertionEnabledButton);
 
         final BooleanFieldEditor varWrappingEnabled = new BooleanFieldEditor(
                 RedPreferences.VARIABLES_BRACKETS_INSERTION_WRAPPING_ENABLED,
