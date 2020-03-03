@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/27/20 11:19 AM
+Save-Time: 3/3/20 11:27 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -147,10 +147,10 @@ with [get-view Problems | get-tree] {
 }
 // add variable ${path_second} to red.xml
 with [get-editor "TestSuite.robot" | get-text-viewer] {
-    hover-text 9 20
     set-caret-pos 9 19
-    key-type "M1+1"
     wait 200
+    key-type "M1+1"
+    wait 300
     key-type Enter
 }
 with [get-window "Add variable mapping"] {

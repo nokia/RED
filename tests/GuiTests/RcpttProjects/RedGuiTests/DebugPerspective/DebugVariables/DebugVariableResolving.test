@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Qz9jYLX5EeWiPpdsqt1XOg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 2:42 PM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 3/3/20 11:16 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -65,5 +65,7 @@ exec-with-options -disableJobWaiting -command {
 	wait 500
 	get-eclipse-window | key-type F8
 }
+
+wait-for-console 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
