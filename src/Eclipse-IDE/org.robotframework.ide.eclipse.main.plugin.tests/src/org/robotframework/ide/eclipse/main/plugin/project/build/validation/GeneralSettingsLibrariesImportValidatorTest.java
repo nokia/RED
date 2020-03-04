@@ -128,7 +128,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
     }
 
@@ -139,7 +139,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=60");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(26, 32))));
     }
 
@@ -233,7 +233,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  http://127.0.0.1:9000/");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 56))));
     }
 
@@ -244,7 +244,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 48))));
     }
 
@@ -255,7 +255,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=https://127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 60))));
     }
 
@@ -266,7 +266,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 52))));
     }
 
@@ -277,7 +277,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote   http://127.0.0.1:9000  30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(35, 56))));
     }
 
@@ -288,7 +288,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  127.0.0.1:9000  30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 48))));
     }
 
@@ -299,7 +299,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  uri=http://127.0.0.1:9000  timeout=30");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(34, 59))));
     }
 
@@ -310,7 +310,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("Remote  timeout=30  uri=127.0.0.1:9000");
 
         assertThat(reporter.getReportedProblems())
-                .containsExactly(new Problem(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT,
+                .containsExactly(new Problem(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(46, 64))));
     }
 
@@ -498,6 +498,16 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithInvalidTimeout() {
+        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
+
+        validateLibraryImport("Remote  timeout=2 days 3 hours 20 minutes 2 seconds 10 miliseconds", libs);
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(34, 92))));
+    }
+
+    @Test
     public void markerIsReported_whenRemoteLibraryIsImportedWithInvertedNamedInvalidTimeoutAndUri() {
         validateLibraryImport("Remote  timeout=wrong  uri=http://127.0.0.1:9000/");
 
@@ -544,6 +554,16 @@ public class GeneralSettingsLibrariesImportValidatorTest {
                         new ProblemPosition(2, Range.closed(34, 53))),
                 new Problem(GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT,
                         new ProblemPosition(2, Range.closed(55, 68))));
+    }
+
+    @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithParameterizedTimeoutAndVariableIsNotResolved() {
+        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
+
+        validateLibraryImport("Remote  ${timeoutvar}", libs);
+
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                GeneralSettingsProblem.PARAMETERIZED_LIBRARY_IMPORT, new ProblemPosition(2, Range.closed(34, 47))));
     }
 
     @Test
@@ -949,28 +969,10 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_1() {
-        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
-
-        validateLibraryImport("Remote  timeout=2 days 3 hours 20 minutes 2 seconds 10 miliseconds", libs);
-
-        assertThat(reporter.getReportedProblems()).isEmpty();
-    }
-
-    @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_2() {
+    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout() {
         final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
 
         validateLibraryImport("Remote  timeout=2d3h20m2s10ms", libs);
-
-        assertThat(reporter.getReportedProblems()).isEmpty();
-    }
-
-    @Test
-    public void noMarkerIsReported_whenRemoteLibraryIsImportedWithNamedTimeout_3() {
-        final Map<LibraryDescriptor, LibrarySpecification> libs = createLibSpecForLibrary("http://127.0.0.1:8270/RPC2");
-
-        validateLibraryImport("Remote  timeout=2:3:20:2:10", libs);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
@@ -1416,8 +1418,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     private Map<LibraryDescriptor, LibrarySpecification> createLibSpecForLibrary(final String address) {
-        final LibraryConstructor constructor = new LibraryConstructor();
-        constructor.setArguments(newArrayList("uri=" + address, "timeout=None"));
+        final LibraryConstructor constructor = LibraryConstructor.createDefaultForStandardRemote();
         final LibraryDescriptor descriptor = LibraryDescriptor.ofStandardRemoteLibrary(RemoteLocation.create(address));
         final LibrarySpecification spec = createNewLibrarySpecification(descriptor, constructor);
         return ImmutableMap.of(descriptor, spec);

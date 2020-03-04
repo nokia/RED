@@ -403,18 +403,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
-    NON_REACHABLE_REMOTE_LIBRARY_IMPORT {
+    UNREACHABLE_REMOTE_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
-            return "Unknown 'Remote' library under '%s' location. Unable to connect";
+            return "Unreachable '%s' library.";
         }
     },
     NON_EXISTING_REMOTE_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
-            return "'Remote' library under '%s' location not in configuration. Try to use Quick Fix (Ctrl+1) or add library to "
+            return "Unknown '%s' library. Try to use Quick Fix (Ctrl+1) or add library to "
                     + RobotProjectConfig.FILENAME + " for proper validation";
         }
 

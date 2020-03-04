@@ -15,7 +15,6 @@ import java.util.function.BiFunction;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
-import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
@@ -88,9 +87,7 @@ public class LibraryImportResolver {
             return true;
         }
 
-        final ArgumentsDescriptor argsDescriptor = Optional.ofNullable(specification.getConstructor())
-                .map(LibraryConstructor::createArgumentsDescriptor)
-                .orElse(ArgumentsDescriptor.createDescriptor());
+        final ArgumentsDescriptor argsDescriptor = specification.createArgumentsDescriptor();
 
         if (CallArgumentsBinder.canBind(version, argsDescriptor)) {
             final CallArgumentsBinder<String> libspecBinder = new CallArgumentsBinder<>(new StringAsArgExtractor(),

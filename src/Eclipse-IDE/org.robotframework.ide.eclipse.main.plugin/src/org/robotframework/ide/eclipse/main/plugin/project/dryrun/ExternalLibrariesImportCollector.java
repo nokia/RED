@@ -29,6 +29,7 @@ import org.rf.ide.core.environment.IRuntimeEnvironment;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.execution.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
+import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -182,8 +183,8 @@ class ExternalLibrariesImportCollector {
                     .getRobotProjectHolder()
                     .getVariableMappings();
 
-            final ArgumentsDescriptor descriptor = ArgumentsDescriptor
-                    .createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=None");
+            final ArgumentsDescriptor descriptor = LibraryConstructor.createDefaultForStandardRemote()
+                    .createArgumentsDescriptor();
             final CallArgumentsBinder<RobotToken> binder = new CallArgumentsBinder<>(new RobotTokenAsArgExtractor(),
                     descriptor);
             binder.bind(arguments);

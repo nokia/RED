@@ -73,7 +73,7 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
         final String srcHref = createShowSrcUri(project, specification);
         final String source = Formatters.hyperlink(srcHref, specification.getName());
 
-        final ArgumentsDescriptor descriptor = getDescriptor(specification);
+        final ArgumentsDescriptor descriptor = specification.createArgumentsDescriptor();
         final String args = HtmlEscapers.htmlEscaper().escape(descriptor.getDescription());
 
         final String header = Formatters.simpleHeader(imgUri, specification.getName(),
@@ -108,11 +108,6 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
         return builder.toString();
     }
 
-    private static ArgumentsDescriptor getDescriptor(final LibrarySpecification specification) {
-        return specification.getConstructor() == null ? ArgumentsDescriptor.createDescriptor()
-                : specification.getConstructor().createArgumentsDescriptor();
-    }
-
     private String localKeywordsLinker(final String name) {
         try {
             return LibraryUri.createShowKeywordDocUri(project.getName(), specification.getName(), name).toString();
@@ -131,7 +126,7 @@ public class LibrarySpecificationInput implements DocumentationViewInput {
         final StringBuilder builder = new StringBuilder();
         builder.append("Version: ").append(specification.getVersion()).append("\n");
         builder.append("Scope: ").append(specification.getScope()).append("\n");
-        builder.append("Arguments: ").append(getDescriptor(specification).getDescription()).append("\n\n");
+        builder.append("Arguments: ").append(specification.createArgumentsDescriptor().getDescription()).append("\n\n");
         builder.append(specification.getDocumentation());
         return builder.toString();
     }

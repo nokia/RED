@@ -5,11 +5,15 @@
  */
 package org.rf.ide.core.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 
 /**
  * @author Michal Anglart
@@ -22,6 +26,12 @@ public class LibraryConstructor {
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setDocumentation(documentation);
         constructor.setArguments(arguments);
+        return constructor;
+    }
+
+    public static LibraryConstructor createDefaultForStandardRemote() {
+        final LibraryConstructor constructor = new LibraryConstructor();
+        constructor.setArguments(newArrayList("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=None"));
         return constructor;
     }
 

@@ -148,6 +148,10 @@ public class LibrarySpecification {
         this.isModified = isModified;
     }
 
+    public ArgumentsDescriptor createArgumentsDescriptor() {
+        return constructor == null ? ArgumentsDescriptor.createDescriptor() : constructor.createArgumentsDescriptor();
+    }
+
     public Documentation createDocumentation() {
         return new Documentation(DocFormat.valueOf(format), documentation, getKeywordNames());
     }

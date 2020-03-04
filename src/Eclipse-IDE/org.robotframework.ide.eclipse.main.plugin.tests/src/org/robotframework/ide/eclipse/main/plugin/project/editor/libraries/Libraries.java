@@ -57,7 +57,7 @@ public class Libraries {
         libSpec.setFormat("ROBOT");
         libSpec.setDescriptor(descriptor);
         libSpec.setName("Remote");
-        libSpec.setConstructor(LibraryConstructor.create("", newArrayList("uri=default", "timeout=30")));
+        libSpec.setConstructor(LibraryConstructor.createDefaultForStandardRemote());
         libSpec.setKeywords(Stream.of(kwNames).map(KeywordSpecification::create).collect(toList()));
         return ImmutableMap.of(descriptor, libSpec);
     }

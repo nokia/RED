@@ -12,11 +12,10 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.libraries.ArgumentsDescriptor;
 import org.rf.ide.core.libraries.ArgumentsDescriptor.Argument;
+import org.rf.ide.core.libraries.LibraryConstructor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.testdata.importer.LibraryImportResolver;
@@ -120,16 +119,12 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     }
 
     private void validateWithSpec(final LibrarySpecification specification, final String pathOrName,
-            final RobotToken pathOrNameToken, final List<RobotToken> importArguments, final boolean isPath) {
-        if (specification != null) {
-            final ArgumentsDescriptor descriptor = specification.getConstructor() == null
-                    ? ArgumentsDescriptor.createDescriptor()
-                    : specification.getConstructor().createArgumentsDescriptor();
-            new KeywordCallArgumentsValidator(validationContext, pathOrNameToken, reporter, descriptor, importArguments)
-                    .validate(new NullProgressMonitor());
+            final RobotToken pathOrNameToken, final List<RobotToken> arguments, final boolean isPath) {
+        if ("Remote".equals(pathOrName)) {
+            validateRemoteLibraryArguments(specification, pathOrNameToken, arguments);
 
-        } else if ("Remote".equals(pathOrName)) {
-            reportProblemOnRemoteLibraryArguments(pathOrNameToken, importArguments);
+        } else if (specification != null) {
+            validateArguments(specification.createArgumentsDescriptor(), arguments, pathOrNameToken);
 
         } else {
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
@@ -140,45 +135,47 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         }
     }
 
-    private void reportProblemOnRemoteLibraryArguments(final RobotToken nameToken, final List<RobotToken> arguments) {
-        final RobotVersion parserVersion = suiteFile.getRobotProject().getRobotParserComplianceVersion();
-        final Map<String, String> variableMappings = suiteFile.getRobotProject().getRobotProjectHolder()
+    private void validateRemoteLibraryArguments(final LibrarySpecification specification, final RobotToken nameToken,
+            final List<RobotToken> arguments) {
+        final ArgumentsDescriptor descriptor = Optional.ofNullable(specification)
+                .map(LibrarySpecification::createArgumentsDescriptor)
+                .orElseGet(LibraryConstructor.createDefaultForStandardRemote()::createArgumentsDescriptor);
+        validateArguments(descriptor, arguments, nameToken);
+
+        if (!CallArgumentsBinder.canBind(suiteFile.getRobotProject().getRobotParserComplianceVersion(), descriptor)) {
+            return;
+        }
+
+        final Map<String, String> variableMappings = suiteFile.getRobotProject()
+                .getRobotProjectHolder()
                 .getVariableMappings();
-        final ArgumentsDescriptor remoteLibConsDescriptor = ArgumentsDescriptor
-                .createDescriptor("uri=" + RemoteLocation.DEFAULT_ADDRESS, "timeout=30");
-        final CallArgumentsBinder<RobotToken> importBinder = new CallArgumentsBinder<>(new RobotTokenAsArgExtractor(),
-                remoteLibConsDescriptor);
+        final CallArgumentsBinder<RobotToken> binder = new CallArgumentsBinder<>(new RobotTokenAsArgExtractor(),
+                descriptor);
+        binder.bind(arguments);
 
-        if (CallArgumentsBinder.canBind(parserVersion, remoteLibConsDescriptor)) {
-            importBinder.bind(arguments);
-        }
-
-        final Argument addressArgument = remoteLibConsDescriptor.get(0);
-        final Optional<String> address = importBinder.getLastValueBindedTo(addressArgument)
-                .map(arg -> RobotExpressions.resolve(variableMappings, arg));
-        if (address.isPresent()) {
-            final String addressValue = address.get();
-            final RobotToken addressToken = importBinder.getLastBindedTo(addressArgument).get();
-            if (RobotExpressions.isParameterized(addressValue)) {
-                reportUnresolvedParameterizedImport(addressValue, addressToken);
-            } else {
-                reportProblemOnRemoteLocation(addressValue, addressToken);
-            }
-        } else {
-            if (importBinder.hasBindings()) {
-                reportProblemOnRemoteLocation(RemoteLocation.DEFAULT_ADDRESS, nameToken);
-            } else {
-                new KeywordCallArgumentsValidator(validationContext, nameToken, reporter, remoteLibConsDescriptor,
-                        arguments).validate(new NullProgressMonitor());
+        if (specification == null) {
+            final Argument uriArgument = descriptor.get(0);
+            final Optional<String> uri = binder.getLastValueBindedTo(uriArgument)
+                    .map(arg -> RobotExpressions.resolve(variableMappings, arg));
+            if (uri.isPresent()) {
+                final String uriValue = uri.get();
+                final RobotToken uriToken = binder.getLastBindedTo(uriArgument).get();
+                if (RobotExpressions.isParameterized(uriValue)) {
+                    reportUnresolvedParameterizedImport(uriValue, uriToken);
+                } else {
+                    validateRemoteLocation(uriValue, uriToken);
+                }
+            } else if (binder.hasBindings()) {
+                validateRemoteLocation(RemoteLocation.DEFAULT_ADDRESS, nameToken);
             }
         }
 
-        final Argument timeoutArgument = remoteLibConsDescriptor.get(1);
-        final Optional<String> timeout = importBinder.getLastValueBindedTo(timeoutArgument)
+        final Argument timeoutArgument = descriptor.get(1);
+        final Optional<String> timeout = binder.getLastValueBindedTo(timeoutArgument)
                 .map(arg -> RobotExpressions.resolve(variableMappings, arg));
         if (timeout.isPresent()) {
             final String timeoutValue = timeout.get();
-            final RobotToken timeoutToken = importBinder.getLastBindedTo(timeoutArgument).get();
+            final RobotToken timeoutToken = binder.getLastBindedTo(timeoutArgument).get();
             if (RobotExpressions.isParameterized(timeoutValue)) {
                 reportUnresolvedParameterizedImport(timeoutValue, timeoutToken);
             } else if (!RobotTimeFormat.isValidRobotTimeArgument(timeoutValue)) {
@@ -189,10 +186,15 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         }
     }
 
-    private void reportProblemOnRemoteLocation(final String address, final RobotToken markerToken) {
+    private void validateArguments(final ArgumentsDescriptor descriptor, final List<RobotToken> arguments,
+            final RobotToken markerToken) {
+        new KeywordCallArgumentsValidator(validationContext, markerToken, reporter, descriptor, arguments).validate();
+    }
+
+    private void validateRemoteLocation(final String uri, final RobotToken markerToken) {
         final RemoteLocation location;
         try {
-            location = RemoteLocation.create(address);
+            location = RemoteLocation.create(uri);
         } catch (final IllegalArgumentException e) {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.INVALID_URI_IN_REMOTE_LIBRARY_IMPORT)
@@ -217,14 +219,15 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                         .equals(RemoteLocation.unify(locationFromSpec.getUri())));
         if (isInRemoteLocations) {
             final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.NON_REACHABLE_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(address);
+                    .causedBy(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(location.getRemoteName());
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         } else {
             final RobotProblem problem = RobotProblem
                     .causedBy(GeneralSettingsProblem.NON_EXISTING_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(address);
-            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH, address);
+                    .formatMessageWith(location.getRemoteName());
+            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
+                    location.getUri().toString());
             reporter.handleProblem(problem, validationContext.getFile(), markerToken, additional);
         }
     }
