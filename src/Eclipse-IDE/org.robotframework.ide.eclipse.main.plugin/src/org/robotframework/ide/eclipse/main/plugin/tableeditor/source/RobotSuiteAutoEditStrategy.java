@@ -86,6 +86,10 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
                 addVariableBrackets(command, selectedText);
             }
 
+        } else if (preferences.isVariablesBracketsInsertionEnabled()
+                && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
+            addVariableBrackets(command, "");
+
         } else if (preferences.isVariablesBracketsInsertionEnabled() && command.length == 1 && command.text.isEmpty()
                 && (document.get(command.offset, 2).equals("{}") || document.get(command.offset, 2).equals("[]"))) {
             // deleting empty variable brackets

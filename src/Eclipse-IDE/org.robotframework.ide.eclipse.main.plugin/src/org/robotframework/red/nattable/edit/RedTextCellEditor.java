@@ -274,27 +274,44 @@ public class RedTextCellEditor extends TextCellEditor {
             if (AVariable.ROBOT_VAR_IDENTIFICATORS.contains(event.text)
                     && !"{".equals(control.getText(event.start, event.end))) {
                 final String selectedText = control.getText(event.start, event.end - 1);
-                if (selectedText.isEmpty() || isWrappingEnabled && selectedText.matches(wrappingPattern)) {
-                    addVariableBrackets(event);
+                if (isWrappingEnabled && selectedText.matches(wrappingPattern)) {
+                    addVariableBrackets(event, selectedText);
+                } else {
+                    addVariableBrackets(event, "");
                 }
+
+            } else if ("{".equals(event.text) && event.start == event.end
+                    && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(control.getText(event.start - 2, event.end - 2))
+                    && "{".equals(control.getText(event.start - 1, event.end - 1))) {
+                addMatchingBracket(event, "}");
+
+            } else if ("[".equals(event.text) && event.start == event.end
+                    && "}".equals(control.getText(event.start - 1, event.end - 1))) {
+                addMatchingBracket(event, "]");
+
             } else if ((event.keyCode == SWT.BS || event.keyCode == SWT.DEL) && event.start == event.end - 1) {
                 final String bracketsCandidate = control.getText(event.start, event.end);
-                final String varTypeCandidate = control.getText(event.start - 1, event.end - 2);
-                if ("{}".equals(bracketsCandidate) && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(varTypeCandidate)) {
+                if ("{}".equals(bracketsCandidate) || "[]".equals(bracketsCandidate)) {
                     deleteVariableBrackets(event);
                 }
             }
         }
 
-        private void addVariableBrackets(final VerifyEvent event) {
-            final String wrappedText = "{" + control.getText(event.start, event.end - 1) + "}";
+        private void addVariableBrackets(final VerifyEvent event, final String selectedText) {
+            final String wrappedText = "{" + selectedText + "}";
             event.text += wrappedText;
 
             SwtThread.asyncExec(event.display, () -> control.setSelection(event.start + wrappedText.length()));
         }
 
+        private void addMatchingBracket(final VerifyEvent event, final String matchingBracket) {
+            event.text += matchingBracket;
+
+            SwtThread.asyncExec(event.display, () -> control.setSelection(event.start + 1));
+        }
+
         private void deleteVariableBrackets(final VerifyEvent event) {
-            final String prefix = control.getText(0, event.start);
+            final String prefix = control.getText(0, event.start - 1);
             final String suffix = control.getText().substring(event.end + 1);
 
             // when empty brackets are deleted we want to set control text and selection ourself,

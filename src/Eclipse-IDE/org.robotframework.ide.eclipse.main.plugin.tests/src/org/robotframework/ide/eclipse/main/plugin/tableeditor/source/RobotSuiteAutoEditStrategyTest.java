@@ -353,7 +353,7 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
-    public void textIsNotWrappedInVariableBrackets_whenVariableIdentifiersAreRequestedOnSelectedTextContainingOnlyWordCharacters_andWrappingModeIsDisabled() {
+    public void textIsDeletedAndVariableWithBracketsIsInserted_whenVariableIdentifiersAreRequestedOnSelectedTextContainingOnlyWordCharacters_andWrappingModeIsDisabledButInsertionIsEnabled() {
         for (final String varId : AVariable.ROBOT_VAR_IDENTIFICATORS) {
             final RobotDocument document = newDocument("Abc Def_123");
 
@@ -363,9 +363,9 @@ public class RobotSuiteAutoEditStrategyTest {
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            assertThat(command.text).isEqualTo(varId);
-            assertThat(command.shiftsCaret).isTrue();
-            assertThat(command.caretOffset).isEqualTo(-1);
+            assertThat(command.text).isEqualTo(varId + "{}");
+            assertThat(command.shiftsCaret).isFalse();
+            assertThat(command.caretOffset).isEqualTo(6);
             assertThat(command.length).isEqualTo(7);
         }
     }
