@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _wbtl8CtnEeikWYhBbRs9Qw
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 8/21/19 10:48 AM
+Runtime-Version: 2.4.3.201909171500
+Save-Time: 3/4/20 2:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -108,9 +108,9 @@ with [get-editor "TestFile.robot"] {
 
 wait-for-errors -amount 2 -times 5 -delay 500
 get-view Problems | get-tree | get-item 
-    -path "Errors \\(2 items\\)/The import name\\/path '%{res2}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+    -path "Errors \\(2 items\\)/'%{res2}' contains unresolved import parameters.  Use Variable mappings in red.xml for parameter resolution" 
     | get-property caption 
-    | equals "The import name/path '%{res2}' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+    | equals "'%{res2}' contains unresolved import parameters.  Use Variable mappings in red.xml for parameter resolution" 
     | verify-true
     
 // go to red.xml and remove res2    
