@@ -407,7 +407,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unreachable '%s' library.";
+            return "Unreachable remote server %s";
         }
     },
     NON_EXISTING_REMOTE_LIBRARY_IMPORT {

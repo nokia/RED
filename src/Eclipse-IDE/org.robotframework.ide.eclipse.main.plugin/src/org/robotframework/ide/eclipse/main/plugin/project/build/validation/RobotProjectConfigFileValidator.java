@@ -135,23 +135,27 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                 .filter(entry -> entry.getValue() == null)
                 .map(Entry::getKey)
                 .forEach(descriptor -> {
+                    final String name;
                     final ProblemPosition position;
 
                     if (descriptor.isStandardRemoteLibrary()) {
                         final RemoteLocation remoteLocation = RemoteLocation.create(descriptor.getArguments().get(0));
+                        name = remoteLocation.getRemoteName();
                         position = new ProblemPosition(config.getLineFor(remoteLocation));
 
                     } else if (descriptor.isStandardLibrary()) {
+                        name = descriptor.getName();
                         position = new ProblemPosition(config.getLineFor(config.getConfigurationModel()));
 
                     } else {
                         final ReferencedLibrary refLib = ReferencedLibrary.create(descriptor.getLibraryType(),
                                 descriptor.getName(), descriptor.getPath());
+                        name = refLib.getName();
                         position = new ProblemPosition(config.getLineFor(refLib));
                     }
                     final RobotProblem problem = RobotProblem
                             .causedBy(ConfigFileProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
-                            .formatMessageWith(descriptor.getName());
+                            .formatMessageWith(name);
                     reporter.handleProblem(problem, configFile, position);
                 });
     }

@@ -218,9 +218,8 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                 .anyMatch(locationFromSpec -> RemoteLocation.unify(location.getUri())
                         .equals(RemoteLocation.unify(locationFromSpec.getUri())));
         if (isInRemoteLocations) {
-            final RobotProblem problem = RobotProblem
-                    .causedBy(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT)
-                    .formatMessageWith(location.getRemoteName());
+            final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNREACHABLE_REMOTE_LIBRARY_IMPORT)
+                    .formatMessageWith(location.getUri());
             reporter.handleProblem(problem, validationContext.getFile(), markerToken);
         } else {
             final RobotProblem problem = RobotProblem
