@@ -32,7 +32,7 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
     @Override
     public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
             final RobotFile fileModel) {
-        ARobotSectionTable table = null;
+        ARobotSectionTable table;
         if (currentState == ParsingState.SETTING_TABLE_HEADER) {
             table = fileModel.getSettingTable();
         } else if (currentState == ParsingState.VARIABLE_TABLE_HEADER) {
@@ -43,6 +43,8 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
             table = fileModel.getTestCaseTable();
         } else if (currentState == ParsingState.TASKS_TABLE_HEADER) {
             table = fileModel.getTasksTable();
+        } else {
+            throw new IllegalStateException();
         }
 
         final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();

@@ -22,7 +22,6 @@ import org.rf.ide.core.RedTemporaryDirectory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
@@ -73,17 +72,13 @@ public class ArgumentsFile {
 
     File writeToTemporaryOrUseAlreadyExisting() throws IOException {
         final String content = generateContent();
-        // it's deprecated although we don't need security here, so md5 is fine
-        @SuppressWarnings("deprecation")
-        final HashFunction md5Hasher = Hashing.md5();
-        final HashCode hash = md5Hasher.hashString(content, Charsets.UTF_8);
+        final HashCode hash = hashString(content);
 
         final String fileName = "args_" + Strings.padStart(Integer.toHexString(hash.asInt()), 8, '0') + ".arg";
         final Path dir = RedTemporaryDirectory.createTemporaryDirectoryIfNotExists();
 
         for (final File existingArgFile : dir.toFile().listFiles((d, name) -> name.equals(fileName))) {
-            final HashCode candidateHash = md5Hasher
-                    .hashString(Files.asCharSource(existingArgFile, Charsets.UTF_8).read(), Charsets.UTF_8);
+            final HashCode candidateHash = hashString(readFrom(existingArgFile));
             if (hash.equals(candidateHash)) {
                 return existingArgFile;
             }
@@ -94,7 +89,17 @@ public class ArgumentsFile {
         return filePath;
     }
 
-    private void writeTo(final File file, final String content) throws IOException {
+    @SuppressWarnings("deprecation")
+    private static HashCode hashString(final String content) {
+        // it's deprecated although we don't need security here, so md5 is fine
+        return Hashing.md5().hashString(content, Charsets.UTF_8);
+    }
+
+    private static String readFrom(final File file) throws IOException {
+        return Files.asCharSource(file, Charsets.UTF_8).read();
+    }
+
+    private static void writeTo(final File file, final String content) throws IOException {
         if (!file.exists()) {
             final boolean created = file.createNewFile();
             if (!created) {

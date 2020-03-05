@@ -94,16 +94,15 @@ public class CaseContext extends DefaultContext {
     private StackFrameContext moveToTestSetupOrTeardown(final RunningKeyword keyword,
             final RobotBreakpointSupplier breakpointSupplier) {
 
-        if (theCase == null && models.isEmpty()) {
+        if (theCase != null) {
+            return CommonContextsTransitions.moveToTestSetupOrTeardown(theCase, models, keyword, this,
+                    breakpointSupplier);
+        } else if (models.isEmpty()) {
             final String errorMsg = String.format(ErrorMessages.errorOfLocalPrePostKwNotFound(keyword.isSetup()),
                     keyword.asCall());
             return new SetupTeardownContext(locationUri, line, errorMsg, this, breakpointSupplier);
-
-        } else if (theCase == null && !models.isEmpty()) {
-            return CommonContextsTransitions.moveToTestSetupOrTeardown(models, keyword, this, breakpointSupplier);
         } else {
-            return CommonContextsTransitions.moveToTestSetupOrTeardown(theCase, models, keyword, this,
-                    breakpointSupplier);
+            return CommonContextsTransitions.moveToTestSetupOrTeardown(models, keyword, this, breakpointSupplier);
         }
     }
 

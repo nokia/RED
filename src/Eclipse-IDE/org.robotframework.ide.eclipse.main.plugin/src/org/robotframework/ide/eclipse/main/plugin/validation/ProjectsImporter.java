@@ -61,7 +61,7 @@ class ProjectsImporter {
             }
             project.open(null);
 
-            logger.log("Project: " + path + " was succesfully imported");
+            logger.log("Project: " + path + " was successfully imported");
         }
     }
 
@@ -74,9 +74,8 @@ class ProjectsImporter {
                 }
             }
 
-            final String[] children = sourceLocation.list();
-            for (int i = 0; i < children.length; i++) {
-                copyProjectFiles(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
+            for (final String child : sourceLocation.list()) {
+                copyProjectFiles(new File(sourceLocation, child), new File(targetLocation, child));
             }
         } else {
             Files.copy(sourceLocation, targetLocation);

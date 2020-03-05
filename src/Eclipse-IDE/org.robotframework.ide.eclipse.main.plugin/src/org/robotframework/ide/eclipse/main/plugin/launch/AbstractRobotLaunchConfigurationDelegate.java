@@ -58,7 +58,9 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
             launchExecution.waitFor(monitor);
         } finally {
             try {
-                executionService.testExecutionEnded(testsLaunchContext);
+                if (testsLaunchContext != null) {
+                    executionService.testExecutionEnded(testsLaunchContext);
+                }
             } finally {
                 IRobotLaunchConfiguration.unlockConfigurationLaunches();
             }
