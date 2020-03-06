@@ -192,6 +192,12 @@ public class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     @Override
+    public String[] getIndentPrefixes(final ISourceViewer sourceViewer, final String contentType) {
+        return new String[] {
+                RedPlugin.getDefault().getPreferences().getSeparatorToUse(editor.getFileModel().isTsvFile()) };
+    }
+
+    @Override
     public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
         contentAssistant = new ContentAssistant();
         contentAssistant.enableColoredLabels(true);

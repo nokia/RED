@@ -19,6 +19,7 @@ import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -38,10 +39,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
+import org.robotframework.red.junit.jupiter.PreferencesExtension;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
+import org.robotframework.red.junit.jupiter.StringPreference;
 
-@ExtendWith(ProjectExtension.class)
+@ExtendWith({ PreferencesExtension.class, ProjectExtension.class })
 public class SuiteSourceEditorConfigurationTest {
 
     @Project
@@ -157,4 +160,37 @@ public class SuiteSourceEditorConfigurationTest {
         assertThat(contentAssist).isNotNull();
         assertThat(config.getContentAssistant()).isSameAs(contentAssist);
     }
+
+    @StringPreference(key = RedPreferences.SEPARATOR_MODE, value = "FILE_TYPE_DEPENDENT")
+    @StringPreference(key = RedPreferences.SEPARATOR_TO_USE, value = "ss")
+    @Test
+    public void indentPrefixesAreBasedOnPreferences_forRobotFile() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().build();
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final ISourceViewer sourceViewer = mock(ISourceViewer.class);
+
+        assertThat(config.getIndentPrefixes(sourceViewer, "")).containsExactly("  ");
+    }
+
+    @StringPreference(key = RedPreferences.SEPARATOR_MODE, value = "FILE_TYPE_DEPENDENT")
+    @StringPreference(key = RedPreferences.SEPARATOR_TO_USE, value = "ss")
+    @Test
+    public void indentPrefixesAreBasedOnPreferences_forTsvFile() {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().buildTsv();
+        final SuiteSourceEditor editor = ContextInjector.prepareContext()
+                .inWhich(fileModel)
+                .isInjectedInto(new SuiteSourceEditor());
+
+        final SuiteSourceEditorConfiguration config = new SuiteSourceEditorConfiguration(editor,
+                KeySequence.getInstance());
+        final ISourceViewer sourceViewer = mock(ISourceViewer.class);
+
+        assertThat(config.getIndentPrefixes(sourceViewer, "")).containsExactly("\t");
+    }
+
 }

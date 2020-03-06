@@ -79,7 +79,10 @@ public class RobotSuiteAutoEditStrategy implements IAutoEditStrategy {
 
     private void customizePositiveLengthDocumentCommand(final IDocument document, final DocumentCommand command)
             throws BadLocationException {
-        if (preferences.isVariablesBracketsInsertionWrappingEnabled()
+        if ("\t".equals(command.text)) {
+            command.text = preferences.getSeparatorToUse(isTsvFile);
+
+        } else if (preferences.isVariablesBracketsInsertionWrappingEnabled()
                 && AVariable.ROBOT_VAR_IDENTIFICATORS.contains(command.text)) {
             final String selectedText = document.get(command.offset, command.length);
             if (selectedText.matches(preferences.getVariablesBracketsInsertionWrappingPattern())) {

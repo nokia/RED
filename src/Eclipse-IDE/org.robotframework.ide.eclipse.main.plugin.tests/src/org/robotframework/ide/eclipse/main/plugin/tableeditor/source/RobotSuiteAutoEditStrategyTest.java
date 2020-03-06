@@ -52,6 +52,21 @@ public class RobotSuiteAutoEditStrategyTest {
     }
 
     @Test
+    public void separatorIsInserted_whenTabWasOriginallyRequestedInsideSelection_andJumpOfModeIsDisabled() {
+        final RobotDocument document = newDocument("abc  def");
+        final DocumentCommand command = newDocumentCommand(1, "\t", 5);
+
+        final EditStrategyPreferences preferences = newPreferences("the_separator", false);
+        final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
+        strategy.customizeDocumentCommand(document, command);
+
+        assertThat(command.text).isEqualTo("the_separator");
+        assertThat(command.shiftsCaret).isTrue();
+        assertThat(command.caretOffset).isEqualTo(-1);
+        assertThat(command.length).isEqualTo(5);
+    }
+
+    @Test
     public void separatorIsInserted_whenTabWasOriginallyRequestedInsideVariableRegion_andJumpOfModeIsDisabled() {
         final RobotDocument document = newDocument("a${var}bc  def");
         final DocumentCommand command = newDocumentCommand(4, "\t");
