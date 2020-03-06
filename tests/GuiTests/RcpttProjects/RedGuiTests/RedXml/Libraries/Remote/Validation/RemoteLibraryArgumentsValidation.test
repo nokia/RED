@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _khwPUCKpEei2ypVbzE5QqA
 Runtime-Version: 2.4.3.201909171500
-Save-Time: 3/5/20 3:01 PM
+Save-Time: 3/6/20 10:37 AM
 Testcase-Type: ecl
 Verifications: _JUqVgK-LEeiBA8H4m2oMKw
 
@@ -84,8 +84,13 @@ with [get-view Problems | get-tree] {
         | verify-true
     get-item -path "Errors \\(10 items\\)/Unknown keyword 'Remote.Stop Remote Server'" | get-property enablement 
         | equals false | verify-true
-     get-item 
-       -path "Errors \\(10 items\\)/Unknown 'Remote' library under 'http:\\/\\/127.0.0.1:8270\\/RPC2' location. Unable to connect" 
+   
+   
+   get-item -path "Errors \\(10 items\\)/Unreachable remote server http:\\/\\/127.0.0.1:8270\\/RPC2" 
+        | get-property caption | equals "Unreachable remote server http://127.0.0.1:8270/RPC2" | verify-true
+    get-item -path "Errors \\(10 items\\)" | get-item 
+        -path "Unreachable remote server http:\\/\\/127.0.0.1:8270\\/RPC2" -index 1 | get-property caption 
+        | equals "Unreachable remote server http://127.0.0.1:8270/RPC2" | verify-true
 }
 
     
