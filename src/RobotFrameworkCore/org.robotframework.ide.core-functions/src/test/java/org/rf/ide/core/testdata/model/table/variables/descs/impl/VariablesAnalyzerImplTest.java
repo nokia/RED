@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpressionVisi
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesVisitor;
+import org.rf.ide.core.testdata.model.table.variables.descs.impl.ExpressionAstNode.VarSyntaxIssue;
 
 @DisplayName("When expression is analyzed")
 public class VariablesAnalyzerImplTest {
@@ -32,9 +33,10 @@ public class VariablesAnalyzerImplTest {
     private static final int NO_FLAGS = 0;
     private static final int DYNAMIC = 1 << 0;
     private static final int INDEXED = 1 << 1;
-    private static final int INVALID = 1 << 2;
-    private static final int PLAIN_VAR = 1 << 3;
-    private static final int PLAIN_VAR_ASSIGN = 1 << 4;
+    private static final int INVALID_PAREN = 1 << 2;
+    private static final int INVALID_BRACKET = 1 << 3;
+    private static final int PLAIN_VAR = 1 << 4;
+    private static final int PLAIN_VAR_ASSIGN = 1 << 5;
 
     @DisplayName("using RF 3.2 syntax")
     @Nested
@@ -186,8 +188,8 @@ public class VariablesAnalyzerImplTest {
             @DisplayName("there is a single variable element when plain invalid variable is used")
             @Test
             public void singleInvalidVarIsFoundInPlainInvalidVarExpression() {
-                assertThat(extractVisitedExpressionParts("${")).containsExactly(tuple(0, 2, "${", "", INVALID));
-                assertThat(extractVisitedExpressionParts("${x")).containsExactly(tuple(0, 3, "${x", "x", INVALID));
+                assertThat(extractVisitedExpressionParts("${")).containsExactly(tuple(0, 2, "${", "", INVALID_PAREN));
+                assertThat(extractVisitedExpressionParts("${x")).containsExactly(tuple(0, 3, "${x", "x", INVALID_PAREN));
             }
 
             @DisplayName("there is a single variable element when plain variable is used")
@@ -302,8 +304,8 @@ public class VariablesAnalyzerImplTest {
             @DisplayName("there is a single variable element when plain invalid variable is used")
             @Test
             public void singleVariableIsFoundInPlainInvalidVarExpression() {
-                assertThat(extractVisitedVariables("${")).containsExactly(tuple(0, 2, "${", "", INVALID));
-                assertThat(extractVisitedVariables("${x")).containsExactly(tuple(0, 3, "${x", "x", INVALID));
+                assertThat(extractVisitedVariables("${")).containsExactly(tuple(0, 2, "${", "", INVALID_PAREN));
+                assertThat(extractVisitedVariables("${x")).containsExactly(tuple(0, 3, "${x", "x", INVALID_PAREN));
             }
 
             @DisplayName("there is a single variable element when plain variable is used")
@@ -366,7 +368,7 @@ public class VariablesAnalyzerImplTest {
                 assertThat(extractVisitedVariables("[${x]}")).containsExactly(tuple(1, 6, "${x]}", "x", NO_FLAGS));
                 assertThat(extractVisitedVariables("${x[}]")).containsExactly(tuple(0, 5, "${x[}", "x", NO_FLAGS));
                 assertThat(extractVisitedVariables("${x${y}[}]")).containsExactly(
-                        tuple(0, 9, "${x${y}[}", "x", DYNAMIC), tuple(3, 8, "${y}[", "y", INDEXED | INVALID));
+                        tuple(0, 9, "${x${y}[}", "x", DYNAMIC), tuple(3, 8, "${y}[", "y", INDEXED | INVALID_BRACKET));
             }
         }
 
@@ -531,12 +533,14 @@ public class VariablesAnalyzerImplTest {
     }
 
     private static int getFlags(final VariableUse use) {
+        final VarAstNodeAdapter adapter = (VarAstNodeAdapter) use;
         int result = 0;
-        result += use.isDynamic() ? DYNAMIC : 0;
-        result += use.isIndexed() ? INDEXED : 0;
-        result += use.isInvalid() ? INVALID : 0;
-        result += use.isPlainVariable() ? PLAIN_VAR : 0;
-        result += use.isPlainVariableAssign() ? PLAIN_VAR_ASSIGN : 0;
+        result += adapter.isDynamic() ? DYNAMIC : 0;
+        result += adapter.isIndexed() ? INDEXED : 0;
+        result += adapter.getErrorType() == VarSyntaxIssue.MISSING_PAREN ? INVALID_PAREN : 0;
+        result += adapter.getErrorType() == VarSyntaxIssue.MISSING_BRACKET ? INVALID_BRACKET : 0;
+        result += adapter.isPlainVariable() ? PLAIN_VAR : 0;
+        result += adapter.isPlainVariableAssign() ? PLAIN_VAR_ASSIGN : 0;
         return result;
     }
 }

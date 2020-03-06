@@ -79,17 +79,6 @@ class ExpressionAstNode {
         parent.children.remove(this);
     }
 
-    ExpressionAstNode getAncestorOfKind(final NodeKind kind) {
-        ExpressionAstNode result = this;
-        while (!result.isRoot()) {
-            if (result.kind == kind) {
-                return result;
-            }
-            result = result.parent;
-        }
-        return null;
-    }
-
     ExpressionAstNode getAncestorSatisfying(final Predicate<ExpressionAstNode> condition) {
         ExpressionAstNode result = this;
         while (!result.isRoot()) {
@@ -114,6 +103,10 @@ class ExpressionAstNode {
         return parent == null;
     }
 
+    VarSyntaxIssue getErrorType() {
+        return varSyntaxIssue;
+    }
+
     boolean isVar() {
         return kind == NodeKind.VAR;
     }
@@ -127,7 +120,11 @@ class ExpressionAstNode {
     }
 
     boolean isInvalid() {
-        return isVar() && varSyntaxIssue != VarSyntaxIssue.NONE;
+        return isVar() && varSyntaxIssue == VarSyntaxIssue.MISSING_PAREN;
+    }
+
+    boolean hasMissingClosingParen() {
+        return varSyntaxIssue == VarSyntaxIssue.MISSING_PAREN;
     }
 
     boolean isIndexed() {
@@ -140,15 +137,7 @@ class ExpressionAstNode {
                 .anyMatch(ExpressionAstNode::isVar);
     }
 
-    boolean isPlainVariable() {
-        return isPlainVariableFollowedBySuffix("");
-    }
-
-    boolean isPlainVariableAssign() {
-        return isPlainVariableFollowedBySuffix("", "=");
-    }
-
-    private boolean isPlainVariableFollowedBySuffix(final String... allowedSuffixes) {
+    boolean isPlainVariableFollowedBySuffix(final String... allowedSuffixes) {
         return !isIndexed() && !isDynamic() && !isInvalid()
                 && children.isEmpty()
                 && exprOffset == 0

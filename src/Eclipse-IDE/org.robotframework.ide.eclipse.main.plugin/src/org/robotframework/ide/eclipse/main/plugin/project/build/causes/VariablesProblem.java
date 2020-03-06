@@ -80,6 +80,24 @@ public enum VariablesProblem implements IProblemCause {
                     marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
+    INVALID_SYNTAX_USE {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid variable syntax. %s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String newName = marker.getAttribute(AdditionalMarkerAttributes.NAME, "");
+            return newArrayList(new ChangeToFixer(newName));
+        }
+    },
     UNDECLARED_VARIABLE_USE {
 
         @Override

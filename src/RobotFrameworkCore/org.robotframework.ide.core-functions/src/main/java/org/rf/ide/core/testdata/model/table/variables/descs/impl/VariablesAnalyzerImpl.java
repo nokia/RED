@@ -7,13 +7,11 @@ package org.rf.ide.core.testdata.model.table.variables.descs.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
-import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.ExpressionVisitor;
 import org.rf.ide.core.testdata.model.table.variables.descs.PythonExpressionVisitor;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
@@ -26,21 +24,23 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
 
     private final RobotVersion version;
     private final ExpressionAstBuilder astBuilder;
+    private final VariableSyntaxValidator syntaxValidator;
 
     public VariablesAnalyzerImpl(final RobotVersion version, final String possibleVariableMarks) {
         this.version = version;
         this.astBuilder = version.isOlderThan(new RobotVersion(3, 2))
                 ? new ExpressionAstBuilderPre32(possibleVariableMarks)
                 : new ExpressionAstBuilder(possibleVariableMarks);
+        this.syntaxValidator = version.isOlderThan(new RobotVersion(3, 2))
+                ? new VariableSyntaxValidatorPreRf32()
+                : new VariableSyntaxValidator();
     }
 
     @Override
-    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token,
-            final Consumer<BuildMessage> parseProblemsConsumer) {
-
+    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token) {
         final List<VariableUse> uses = new ArrayList<>();
         visitVariables(token, VariablesVisitor.variableUsagesVisitor(uses::add));
-        return uses.stream().filter(use -> !use.isDynamic() && !use.isInvalid());
+        return uses.stream().filter(use -> !use.isDynamic() && !((VarAstNodeAdapter) use).isInvalid());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
     private boolean visitTree(final ExpressionAstNode node, final VariablesVisitor varVisitor,
             final PythonExpressionVisitor exprVisitor) {
         if (node.isVar() && !node.isPythonExpression(version)) {
-            final boolean shouldContinue = varVisitor.visit(new VarAstNodeAdapter(node));
+            final boolean shouldContinue = varVisitor.visit(new VarAstNodeAdapter(syntaxValidator, node));
             if (!shouldContinue) {
                 return false;
             }
@@ -110,7 +110,7 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
                 if (node.isPythonExpression(version)) {
                     shouldContinue |= visitor.visit(new PythonExprAdapter(node));
                 } else {
-                    shouldContinue |= visitor.visit(new VarAstNodeAdapter(node));
+                    shouldContinue |= visitor.visit(new VarAstNodeAdapter(syntaxValidator, node));
                 }
                 previousOffset = nodeRegion.getEnd().getOffset();
                 previousColumn = nodeRegion.getEnd().getColumn();

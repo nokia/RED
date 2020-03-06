@@ -5,12 +5,10 @@
  */
 package org.rf.ide.core.testdata.model.table.variables.descs;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.variables.descs.impl.VariablesAnalyzerImpl;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -83,29 +81,7 @@ public interface VariablesAnalyzer {
      * @return Stream of valid defined variable uses inside given expression token. Note that
      *         regions of returned variable uses are adjusted with token position.
      */
-    public default Stream<VariableUse> getDefinedVariablesUses(final RobotToken token) {
-        return getDefinedVariablesUses(token, msg -> {});
-    }
-
-
-    /**
-     * Gets the stream of {@link VariableUse} elements consisting of all defined variables. A
-     * defined variable is a variable which:
-     * <ul>
-     * <li>has valid syntax,</li>
-     * <li>it's name is known - it is not dynamic (e.g. <code>${var}</code> has known name, while
-     * <code>${var${i}}</code> do not, although nested <code>${i}</code> has).
-     * </ul>
-     * 
-     * @param token
-     *            Expression token to be analysed for defined variable uses.
-     * @param parseProblemsConsumer
-     *            The consumer of parsing problem messages found when analysing expression
-     * @return Stream of valid defined variable uses inside given expression token. Note that
-     *         regions of returned variable uses are adjusted with token position.
-     */
-    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token,
-            Consumer<BuildMessage> parseProblemsConsumer);
+    public Stream<VariableUse> getDefinedVariablesUses(final RobotToken token);
 
     /**
      * Analyses given expression token for variable usages and calls given visitor

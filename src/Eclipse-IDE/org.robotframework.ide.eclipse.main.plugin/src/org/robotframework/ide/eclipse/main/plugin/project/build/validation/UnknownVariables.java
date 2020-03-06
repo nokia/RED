@@ -6,14 +6,15 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse.VariableUseSyntaxException;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -46,9 +47,8 @@ public class UnknownVariables {
     void reportUnknownVars(final Set<String> additionalKnownVariables, final List<RobotToken> tokens) {
         for (final RobotToken token : tokens) {
             if (token != null) {
-                final List<VariableUse> uses = VariablesAnalyzer.analyzer(validationContext.getVersion())
-                        .getDefinedVariablesUses(token)
-                        .collect(toList());
+                final List<VariableUse> uses = new ArrayList<>();
+                VariablesAnalyzer.analyzer(validationContext.getVersion()).visitVariables(token, uses::add);
                 reportUnknownVarsDeclarations(additionalKnownVariables, uses);
             }
         }
@@ -60,15 +60,39 @@ public class UnknownVariables {
         allVariables.addAll(additionalKnownVariables);
 
         for (final VariableUse declaration : variableUsages) {
-            if (!declaration.isDefinedIn(allVariables)) {
-                final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                        .formatMessageWith(declaration.getBaseName());
-
-                final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                        declaration.getType().getIdentificator() + "{" + declaration.getBaseName() + "}");
-                reporter.handleProblem(problem, validationContext.getFile(),
-                        ProblemPosition.fromRegion(declaration.getRegion()), additionalArguments);
+            final boolean isValid = checkValidity(declaration);
+            if (isValid && !declaration.isDynamic()) {
+                checkAvailability(allVariables, declaration);
             }
+        }
+    }
+
+    private boolean checkValidity(final VariableUse variableUse) {
+        try {
+            variableUse.validate();
+            return true;
+
+        } catch (final VariableUseSyntaxException e) {
+            final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_SYNTAX_USE)
+                    .formatMessageWith(e.getMessage());
+
+            final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                    e.getFixedNameProposal());
+            reporter.handleProblem(problem, validationContext.getFile(),
+                    ProblemPosition.fromRegion(variableUse.getRegion()), additionalArguments);
+            return false;
+        }
+    }
+
+    private void checkAvailability(final Set<String> allVariables, final VariableUse declaration) {
+        if (!declaration.isDefinedIn(allVariables)) {
+            final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                    .formatMessageWith(declaration.getBaseName());
+
+            final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                    declaration.getType().getIdentificator() + "{" + declaration.getBaseName() + "}");
+            reporter.handleProblem(problem, validationContext.getFile(),
+                    ProblemPosition.fromRegion(declaration.getRegion()), additionalArguments);
         }
     }
 }

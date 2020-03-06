@@ -5,13 +5,10 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 
-import static java.util.stream.Collectors.toList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.environment.RobotVersion;
-import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -50,9 +47,8 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                 break;
             }
 
-            final List<VariableUse> varUses = VariablesAnalyzer.analyzer(version)
-                    .getDefinedVariablesUses(elem, loopDescriptor::addMessage)
-                    .collect(toList());
+            final List<VariableUse> varUses = new ArrayList<>();
+            VariablesAnalyzer.analyzer(version).visitVariables(elem, varUses::add);
 
             if (foundFor && foundIn) {
                 loopDescriptor.addUsedVariables(varUses);
@@ -66,13 +62,8 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                 loopDescriptor.addCreatedVariables(varUses);
 
                 if (varUses.size() != 1 || !varUses.get(0).isPlainVariable()) {
-                    final FilePosition startFilePosition = elem.getFilePosition();
-                    final FilePosition end = new FilePosition(startFilePosition.getLine(), elem.getEndColumn(),
-                            elem.getStartOffset() + elem.getText().length());
-                    final BuildMessage errorMessage = BuildMessage.createErrorMessage(
-                            "Invalid FOR loop variable \'" + elem.getText() + "\'",
-                            new FileRegion(startFilePosition, end));
-                    loopDescriptor.addMessage(errorMessage);
+                    loopDescriptor.addMessage(BuildMessage.createErrorMessage(
+                            "Invalid FOR loop variable \'" + elem.getText() + "\'", elem.getFileRegion()));
                 }
 
             } else if (elem.getTypes().contains(RobotTokenType.FOR_TOKEN)) {
@@ -85,15 +76,9 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         }
 
         if (!foundIn || !hasElementsToIterate) {
-            final RobotToken forToken = loopDescriptor.getAction();
-            final FilePosition startFilePosition = forToken.getFilePosition();
-            final FilePosition endFilePosition = new FilePosition(startFilePosition.getLine(), forToken.getEndColumn(),
-                    forToken.getStartOffset() + forToken.getText().length());
-            final BuildMessage errorMessage = BuildMessage.createErrorMessage(
-                    "Invalid FOR loop - missing values to iterate", new FileRegion(startFilePosition, endFilePosition));
-            loopDescriptor.addMessage(errorMessage);
+            loopDescriptor.addMessage(BuildMessage.createErrorMessage("Invalid FOR loop - missing values to iterate",
+                    loopDescriptor.getAction().getFileRegion()));
         }
-
         return loopDescriptor;
     }
 }

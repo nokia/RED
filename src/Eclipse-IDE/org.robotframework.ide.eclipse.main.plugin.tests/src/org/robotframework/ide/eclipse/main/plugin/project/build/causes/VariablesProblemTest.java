@@ -23,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixe
 public class VariablesProblemTest {
 
     @Test
-    public void variableElementOldUse_hasFix() {
+    public void variableElementOldUseHasFix() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, null)).thenReturn("@{list}[id]");
         final List<? extends IMarkerResolution> fixers = VariablesProblem.VARIABLE_ELEMENT_OLD_USE.createFixers(marker);
@@ -32,10 +32,27 @@ public class VariablesProblemTest {
     }
 
     @Test
-    public void variableElementOldUseFixer_canFixProblem() {
+    public void variableElementOldUseFixerCanFixProblem() {
         final IMarker marker = mock(IMarker.class);
         when(marker.getAttribute(AdditionalMarkerAttributes.VALUE, null)).thenReturn("@{list}[id]");
         final List<? extends IMarkerResolution> fixers = VariablesProblem.VARIABLE_ELEMENT_OLD_USE.createFixers(marker);
         assertThat(fixers).extracting(IMarkerResolution::getLabel).containsExactly("Change to '${list}[id]'");
+    }
+
+    @Test
+    public void variableSyntaxProblemHasResolutionAndProvidesAFixer() {
+        final IMarker marker = mock(IMarker.class);
+        when(marker.getAttribute(AdditionalMarkerAttributes.NAME, "")).thenReturn("${x}");
+
+        final VariablesProblem problem = VariablesProblem.INVALID_SYNTAX_USE;
+        
+        assertThat(problem.hasResolution()).isTrue();
+        
+        final List<? extends IMarkerResolution> fixers = problem.createFixers(marker);
+        assertThat(fixers).hasSize(1);
+
+        final IMarkerResolution fixer = fixers.get(0);
+        assertThat(fixer).isInstanceOf(ChangeToFixer.class);
+        assertThat(fixer.getLabel()).isEqualTo("Change to '${x}'");
     }
 }

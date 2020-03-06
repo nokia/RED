@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.impl;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +44,8 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 break;
             }
 
-            final List<VariableUse> varUses = VariablesAnalyzer.analyzer(version)
-                    .getDefinedVariablesUses(elem, simpleDesc::addMessage)
-                    .collect(toList());
+            final List<VariableUse> varUses = new ArrayList<>();
+            VariablesAnalyzer.analyzer(version).visitVariables(elem, varUses::add);
 
             // value is a keyword if is on the first place and is not just a variable or
             // variable with equal sign. Keyword can be defined as a ${var}=, however must
@@ -59,7 +56,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 simpleDesc.addKeywordArgument(elem.copy());
 
             } else if (varUses.size() == 1 && varUses.get(0).isPlainVariableAssign()) {
-                createdVariables.add(varUses.get(0));
+                createdVariables.addAll(varUses);
 
             } else {
                 simpleDesc.setAction(elem.copy());

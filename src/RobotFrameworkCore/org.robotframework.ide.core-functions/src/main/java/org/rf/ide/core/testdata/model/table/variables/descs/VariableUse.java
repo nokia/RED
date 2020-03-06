@@ -88,10 +88,25 @@ public interface VariableUse {
     boolean isPlainVariableAssign();
 
     /**
-     * Returns true if this variable usage has invalid syntax.
+     * Validates this variable use for possible syntax problems
      * 
-     * @return True if this variable is invalid
+     * @throws VariableUseSyntaxException
      */
-    boolean isInvalid();
+    void validate() throws VariableUseSyntaxException;
 
+    public static class VariableUseSyntaxException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String fixedNameProposal;
+
+        public VariableUseSyntaxException(final String message, final String fixedNameProposal) {
+            super(message);
+            this.fixedNameProposal = fixedNameProposal;
+        }
+
+        public String getFixedNameProposal() {
+            return fixedNameProposal;
+        }
+    }
 }

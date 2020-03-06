@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariablesAnalyzer;
+import org.rf.ide.core.testdata.model.table.variables.descs.impl.ExpressionAstNode.VarSyntaxIssue;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Preconditions;
@@ -19,10 +20,13 @@ import com.google.common.base.Preconditions;
 
 class VarAstNodeAdapter implements VariableUse {
 
+    private final VariableSyntaxValidator validator;
+
     private final ExpressionAstNode node;
 
-    VarAstNodeAdapter(final ExpressionAstNode node) {
+    VarAstNodeAdapter(final VariableSyntaxValidator validator, final ExpressionAstNode node) {
         Preconditions.checkArgument(node.isVar());
+        this.validator = validator;
         this.node = node;
     }
 
@@ -43,7 +47,7 @@ class VarAstNodeAdapter implements VariableUse {
                 break;
             }
         }
-        return baseName.toString();
+        return baseName.toString().trim();
     }
 
     @Override
@@ -58,7 +62,7 @@ class VarAstNodeAdapter implements VariableUse {
 
     @Override
     public boolean isDefinedIn(final Set<String> variableDefinitions) {
-        if (isInvalid()) {
+        if (node.hasMissingClosingParen() || node.isDynamic()) {
             return false;
 
         } else if (getType() == VariableType.ENVIRONMENT) {
@@ -69,7 +73,7 @@ class VarAstNodeAdapter implements VariableUse {
         }
         final String baseName = getBaseName();
         return contains(baseName, variableDefinitions)
-                || Pattern.matches("[0-9]*|0[bB][0-1]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+", baseName);
+                || Pattern.matches("[0-9]+|0[bB][0-1]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+", baseName);
     }
 
     private boolean contains(final String name, final Set<String> varDefs) {
@@ -78,7 +82,8 @@ class VarAstNodeAdapter implements VariableUse {
             return varDefs.contains("${" + normalized + "}") || varDefs.contains("@{" + normalized + "}")
                     || varDefs.contains("&{" + normalized + "}");
         } else {
-            return varDefs.contains(getType().getIdentificator() + "{" + normalized + "}");
+            return varDefs.contains("${" + normalized + "}")
+                    || varDefs.contains(getType().getIdentificator() + "{" + normalized + "}");
         }
     }
 
@@ -94,17 +99,25 @@ class VarAstNodeAdapter implements VariableUse {
 
     @Override
     public boolean isPlainVariable() {
-        return node.isPlainVariable();
+        return node.isPlainVariableFollowedBySuffix("");
     }
 
     @Override
     public boolean isPlainVariableAssign() {
-        return node.isPlainVariableAssign();
+        return node.isPlainVariableFollowedBySuffix("", "=");
     }
 
     @Override
-    public boolean isInvalid() {
+    public void validate() throws VariableUseSyntaxException {
+        validator.validate(this);
+    }
+
+    boolean isInvalid() {
         return node.isInvalid();
+    }
+
+    VarSyntaxIssue getErrorType() {
+        return node.getErrorType();
     }
 
     private String getContent() {
@@ -113,6 +126,6 @@ class VarAstNodeAdapter implements VariableUse {
 
     private String getContentWithoutBraces() {
         final String content = node.getTextWithoutItem().substring(2).trim();
-        return isInvalid() ? content : content.substring(0, content.length() - 1).trim();
+        return node.hasMissingClosingParen() ? content : content.substring(0, content.length() - 1).trim();
     }
 }

@@ -40,17 +40,17 @@ public class VarAstNodeAdapterTest {
         assertThat(newVar("${ X}").isDefinedIn(newHashSet("@{x}"))).isTrue();
         assertThat(newVar("${X }").isDefinedIn(newHashSet("&{x}"))).isTrue();
 
-        assertThat(newVar("@{l}").isDefinedIn(newHashSet("${l}"))).isFalse();
+        assertThat(newVar("@{l}").isDefinedIn(newHashSet("${l}"))).isTrue();
         assertThat(newVar("@{l}").isDefinedIn(newHashSet("@{l}"))).isTrue();
         assertThat(newVar("@{l}").isDefinedIn(newHashSet("&{l}"))).isFalse();
-        assertThat(newVar("@{L }").isDefinedIn(newHashSet("${l}"))).isFalse();
+        assertThat(newVar("@{L }").isDefinedIn(newHashSet("${l}"))).isTrue();
         assertThat(newVar("@{ L}").isDefinedIn(newHashSet("@{l}"))).isTrue();
         assertThat(newVar("@{L }").isDefinedIn(newHashSet("&{l}"))).isFalse();
 
-        assertThat(newVar("&{d}").isDefinedIn(newHashSet("${d}"))).isFalse();
+        assertThat(newVar("&{d}").isDefinedIn(newHashSet("${d}"))).isTrue();
         assertThat(newVar("&{d}").isDefinedIn(newHashSet("@{d}"))).isFalse();
         assertThat(newVar("&{d}").isDefinedIn(newHashSet("&{d}"))).isTrue();
-        assertThat(newVar("&{D }").isDefinedIn(newHashSet("${d}"))).isFalse();
+        assertThat(newVar("&{D }").isDefinedIn(newHashSet("${d}"))).isTrue();
         assertThat(newVar("&{ D}").isDefinedIn(newHashSet("@{d}"))).isFalse();
         assertThat(newVar("&{D }").isDefinedIn(newHashSet("&{d}"))).isTrue();
     }
@@ -69,7 +69,7 @@ public class VarAstNodeAdapterTest {
         final ExpressionAstNode root = ExpressionAstNode.root(RobotToken.create(var));
         final ExpressionAstNode node = ExpressionAstNode.child(root, NodeKind.VAR, 0);
         node.close(var.length());
-        return new VarAstNodeAdapter(node);
+        return new VarAstNodeAdapter(null, node);
     }
 
 }
