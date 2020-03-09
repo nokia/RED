@@ -84,7 +84,7 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Invalid variable syntax. %s";
+            return "Invalid variable syntax";
         }
 
         @Override

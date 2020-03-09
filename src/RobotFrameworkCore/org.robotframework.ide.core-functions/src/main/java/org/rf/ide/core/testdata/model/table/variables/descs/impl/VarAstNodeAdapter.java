@@ -71,15 +71,26 @@ class VarAstNodeAdapter implements VariableUse {
 
         } else if (contains(getContentWithoutBraces(), variableDefinitions)) {
             return true;
+
+        } else if (startsWithANumber(getContentWithoutBraces())) {
+            return true;
         }
-        final String baseName = getBaseName();
-        return contains(baseName, variableDefinitions)
-                || Pattern.matches("[0-9]+|0[bB][0-1]+|0[oO][0-7]+|0[xX][0-9a-fA-F]+", baseName);
+        return contains(getBaseName(), variableDefinitions);
     }
 
     private boolean contains(final String name, final Set<String> varDefs) {
         final String normalized = VariablesAnalyzer.normalizeName(name);
         return Stream.of("$", "@", "&").anyMatch(typeId -> varDefs.contains(typeId + "{" + normalized + "}"));
+    }
+
+    private boolean startsWithANumber(final String name) {
+        final String binNumber = "0[bB][0-1]+";
+        final String octNumber = "0[oO][0-7]+";
+        final String decNumber = "[+-]?[0-9]+([eE][+-][0-9]+)?";
+        final String hexNumber = "0[xX][0-9a-fA-F]+";
+
+        return Stream.of(binNumber, octNumber, decNumber, hexNumber)
+                .anyMatch(p -> Pattern.matches("^" + p + ".*$", name));
     }
 
     @Override
@@ -119,7 +130,7 @@ class VarAstNodeAdapter implements VariableUse {
         return node.getText();
     }
 
-    private String getContentWithoutBraces() {
+    String getContentWithoutBraces() {
         final String content = node.getTextWithoutItem().substring(2).trim();
         return node.hasMissingClosingParen() ? content : content.substring(0, content.length() - 1).trim();
     }

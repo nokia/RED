@@ -23,6 +23,9 @@ public class VarAstNodeAdapterTest {
         assertThat(newVar("${1 }").isDefinedIn(new HashSet<>())).isTrue();
         assertThat(newVar("${ 1 }").isDefinedIn(new HashSet<>())).isTrue();
         assertThat(newVar("${1+2}").isDefinedIn(new HashSet<>())).isTrue();
+        assertThat(newVar("${-2}").isDefinedIn(new HashSet<>())).isTrue();
+        assertThat(newVar("${-1e5}").isDefinedIn(new HashSet<>())).isTrue();
+        assertThat(newVar("${-1e-5}").isDefinedIn(new HashSet<>())).isTrue();
         assertThat(newVar("${0b11101}").isDefinedIn(new HashSet<>())).isTrue();
         assertThat(newVar("${0B11101}").isDefinedIn(new HashSet<>())).isTrue();
         assertThat(newVar("${0o123}").isDefinedIn(new HashSet<>())).isTrue();

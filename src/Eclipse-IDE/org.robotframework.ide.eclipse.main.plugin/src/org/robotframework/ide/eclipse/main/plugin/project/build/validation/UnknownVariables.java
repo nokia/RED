@@ -74,7 +74,7 @@ public class UnknownVariables {
 
         } catch (final VariableUseSyntaxException e) {
             final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_SYNTAX_USE)
-                    .formatMessageWith(e.getMessage());
+                    .withMessage(e.getMessage());
 
             final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
                     e.getFixedNameProposal());

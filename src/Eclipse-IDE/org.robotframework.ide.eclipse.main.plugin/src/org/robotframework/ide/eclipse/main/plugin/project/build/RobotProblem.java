@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -30,6 +31,8 @@ public class RobotProblem {
     private static final String CAUSE_ATTRIBUTE = "cause";
 
     private final IProblemCause cause;
+
+    private String message;
     private Object[] objects;
 
     public static IRegion getRegionOf(final IMarker marker) {
@@ -85,6 +88,11 @@ public class RobotProblem {
         return cause;
     }
 
+    public RobotProblem withMessage(final String message) {
+        this.message = message;
+        return this;
+    }
+
     public RobotProblem formatMessageWith(final Object... objects) {
         this.objects = objects;
         return this;
@@ -123,8 +131,11 @@ public class RobotProblem {
     }
 
     public String getMessage() {
-        return cause.getProblemDescription() == null ? ""
-                : String.format(cause.getProblemDescription(), objects == null ? new Object[0] : objects);
+        final String msgToUse = Stream.of(message, cause.getProblemDescription())
+                .filter(msg -> msg != null)
+                .findFirst()
+                .orElse("");
+        return String.format(msgToUse, objects == null ? new Object[0] : objects);
     }
 
     public Severity getSeverity() {

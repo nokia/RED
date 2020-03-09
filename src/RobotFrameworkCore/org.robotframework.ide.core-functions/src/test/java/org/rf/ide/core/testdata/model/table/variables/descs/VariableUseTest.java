@@ -52,6 +52,8 @@ public class VariableUseTest {
             assertThatCode(oldVariableSyntaxValidation("${x[0]}")).doesNotThrowAnyException();
             assertThatCode(oldVariableSyntaxValidation("${1+2}")).doesNotThrowAnyException();
             assertThatCode(oldVariableSyntaxValidation("${1+2}}")).doesNotThrowAnyException();
+            assertThatCode(oldVariableSyntaxValidation("${x}[${y}]")).doesNotThrowAnyException();
+            assertThatCode(oldVariableSyntaxValidation("${x${y}}")).doesNotThrowAnyException();
         }
     }
 

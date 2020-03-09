@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.variables.descs.impl;
 
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse.VariableUseSyntaxException;
 
 class VariableSyntaxValidatorPreRf32 extends VariableSyntaxValidator {
@@ -16,18 +17,21 @@ class VariableSyntaxValidatorPreRf32 extends VariableSyntaxValidator {
 
         // this is implementation of robot.variables.isvar.is_var(string, identifiers) function
 
-        final String name = varNode.asToken().getText();
+        if (varNode.isDynamic()) {
+            return;
+        }
 
-        final String nameBody = name.substring(2, name.length() - 1);
-        if (nameBody.isEmpty() || nameBody.contains("{") || nameBody.contains("}")) {
-            throw new VariableUseSyntaxException("The name '" + name + "' is invalid", proposal(name));
+        final String name = varNode.getContentWithoutBraces();
+
+        if (name.isEmpty() || name.contains("{") || name.contains("}")) {
+            throw new VariableUseSyntaxException("The name '" + varNode.asToken().getText() + "' is invalid",
+                    proposal(varNode.getType(), name));
         }
     }
 
-    private String proposal(final String name) {
-        final String nameBody = name.substring(2, name.length() - 1);
-        final String nameBodyFixed = nameBody.replaceAll("\\{", "").replaceAll("\\}", "");
+    private String proposal(final VariableType type, final String name) {
+        final String nameFixed = name.replaceAll("\\{", "").replaceAll("\\}", "");
 
-        return name.substring(0, 2) + nameBodyFixed + name.substring(name.length() - 1);
+        return type.getIdentificator() + "{" + nameFixed + "}";
     }
 }
