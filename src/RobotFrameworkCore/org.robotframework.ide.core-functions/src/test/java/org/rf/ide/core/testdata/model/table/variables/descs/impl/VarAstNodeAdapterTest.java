@@ -42,16 +42,16 @@ public class VarAstNodeAdapterTest {
 
         assertThat(newVar("@{l}").isDefinedIn(newHashSet("${l}"))).isTrue();
         assertThat(newVar("@{l}").isDefinedIn(newHashSet("@{l}"))).isTrue();
-        assertThat(newVar("@{l}").isDefinedIn(newHashSet("&{l}"))).isFalse();
+        assertThat(newVar("@{l}").isDefinedIn(newHashSet("&{l}"))).isTrue();
         assertThat(newVar("@{L }").isDefinedIn(newHashSet("${l}"))).isTrue();
         assertThat(newVar("@{ L}").isDefinedIn(newHashSet("@{l}"))).isTrue();
-        assertThat(newVar("@{L }").isDefinedIn(newHashSet("&{l}"))).isFalse();
+        assertThat(newVar("@{L }").isDefinedIn(newHashSet("&{l}"))).isTrue();
 
         assertThat(newVar("&{d}").isDefinedIn(newHashSet("${d}"))).isTrue();
-        assertThat(newVar("&{d}").isDefinedIn(newHashSet("@{d}"))).isFalse();
+        assertThat(newVar("&{d}").isDefinedIn(newHashSet("@{d}"))).isTrue();
         assertThat(newVar("&{d}").isDefinedIn(newHashSet("&{d}"))).isTrue();
         assertThat(newVar("&{D }").isDefinedIn(newHashSet("${d}"))).isTrue();
-        assertThat(newVar("&{ D}").isDefinedIn(newHashSet("@{d}"))).isFalse();
+        assertThat(newVar("&{ D}").isDefinedIn(newHashSet("@{d}"))).isTrue();
         assertThat(newVar("&{D }").isDefinedIn(newHashSet("&{d}"))).isTrue();
     }
 

@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table.variables.descs.impl;
 
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -78,13 +79,7 @@ class VarAstNodeAdapter implements VariableUse {
 
     private boolean contains(final String name, final Set<String> varDefs) {
         final String normalized = VariablesAnalyzer.normalizeName(name);
-        if (getType() == VariableType.SCALAR) {
-            return varDefs.contains("${" + normalized + "}") || varDefs.contains("@{" + normalized + "}")
-                    || varDefs.contains("&{" + normalized + "}");
-        } else {
-            return varDefs.contains("${" + normalized + "}")
-                    || varDefs.contains(getType().getIdentificator() + "{" + normalized + "}");
-        }
+        return Stream.of("$", "@", "&").anyMatch(typeId -> varDefs.contains(typeId + "{" + normalized + "}"));
     }
 
     @Override
