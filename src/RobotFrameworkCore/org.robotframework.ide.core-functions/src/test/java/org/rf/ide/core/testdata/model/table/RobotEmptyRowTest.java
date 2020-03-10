@@ -69,8 +69,8 @@ public class RobotEmptyRowTest {
         row.createToken(10);
 
         assertThat(cellsOf(row)).containsExactly("\\", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class RobotEmptyRowTest {
         row.createToken(0);
 
         assertThat(cellsOf(row)).containsExactly("", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -106,11 +106,12 @@ public class RobotEmptyRowTest {
 
         assertThat(cellsOf(row1)).containsExactly("\\", "# c1", "", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.EMPTY_CELL,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("# c1", "", "c2");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -123,8 +124,8 @@ public class RobotEmptyRowTest {
         row.updateToken(-10, "c");
 
         assertThat(cellsOf(row)).containsExactly("\\", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -152,7 +153,7 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "");
 
         assertThat(cellsOf(row)).containsExactly("", "# c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -163,7 +164,7 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "\\");
 
         assertThat(cellsOf(row)).containsExactly("\\", "# c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -174,7 +175,7 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "# other");
 
         assertThat(cellsOf(row)).containsExactly("# other", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -193,8 +194,8 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "\\");
 
         assertThat(cellsOf(row)).containsExactly("\\", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -205,8 +206,8 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "");
 
         assertThat(cellsOf(row)).containsExactly("", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -217,8 +218,8 @@ public class RobotEmptyRowTest {
         row.updateToken(0, "# comment");
 
         assertThat(cellsOf(row)).containsExactly("# comment", "# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -235,18 +236,18 @@ public class RobotEmptyRowTest {
         row4.updateToken(3, "d4");
 
         assertThat(cellsOf(row1)).containsExactly("# d1", "c2");
-        assertThat(typesOf(row1)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row1)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("# c1", "d2");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row3)).containsExactly("# c1", "c2", "d3");
-        assertThat(typesOf(row3)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row3)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row4)).containsExactly("# c1", "c2", "\\", "d4");
-        assertThat(typesOf(row4)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row4)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -263,20 +264,21 @@ public class RobotEmptyRowTest {
         row4.updateToken(4, "d4");
 
         assertThat(cellsOf(row1)).containsExactly("\\", "# d1", "c2");
-        assertThat(typesOf(row1)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row1)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("\\", "# c1", "d2");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row3)).containsExactly("\\", "# c1", "c2", "d3");
-        assertThat(typesOf(row3)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row3)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row4)).containsExactly("\\", "# c1", "c2", "\\", "d4");
-        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -299,7 +301,7 @@ public class RobotEmptyRowTest {
 
         assertThat(cellsOf(row)).containsExactly("\\", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.EMPTY_CELL,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -325,7 +327,7 @@ public class RobotEmptyRowTest {
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.EMPTY_CELL);
 
         assertThat(cellsOf(row2)).containsExactly("\\", "# c3");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -336,7 +338,7 @@ public class RobotEmptyRowTest {
         row.deleteToken(0);
 
         assertThat(cellsOf(row)).containsExactly("# c1", "c2");
-        assertThat(typesOf(row)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -356,13 +358,13 @@ public class RobotEmptyRowTest {
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.UNKNOWN);
 
         assertThat(cellsOf(row2)).containsExactly("# c2");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row3)).containsExactly("\\");
         assertThat(typesOf(row3)).containsExactly(RobotTokenType.EMPTY_CELL);
 
         assertThat(cellsOf(row4)).containsExactly("\\", "# c2");
-        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -379,17 +381,17 @@ public class RobotEmptyRowTest {
         row4.deleteToken(2);
 
         assertThat(cellsOf(row1)).containsExactly("# c1");
-        assertThat(typesOf(row1)).containsExactly(RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row1)).containsExactly(RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("# c1", "c3");
-        assertThat(typesOf(row2)).containsExactly(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row2)).containsExactly(RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row3)).containsExactly("\\", "# c1");
-        assertThat(typesOf(row3)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT);
+        assertThat(typesOf(row3)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row4)).containsExactly("\\", "# c1", "c3");
-        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(row4)).containsExactly(RobotTokenType.EMPTY_CELL, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -408,15 +410,15 @@ public class RobotEmptyRowTest {
         assertThat(typesOf(backslash)).containsExactly(RobotTokenType.EMPTY_CELL);
 
         assertThat(cellsOf(comment)).containsExactly("# c1", "c2");
-        assertThat(typesOf(comment)).containsExactly(RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+        assertThat(typesOf(comment)).containsExactly(RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(unknown)).containsExactly("");
         assertThat(typesOf(unknown)).containsExactly(RobotTokenType.UNKNOWN);
 
         assertThat(cellsOf(backslashWithComment)).containsExactly("\\", "# c1", "c2");
         assertThat(typesOf(backslashWithComment)).containsExactly(RobotTokenType.EMPTY_CELL,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     private static List<String> comment(final String... comments) {

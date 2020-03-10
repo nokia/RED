@@ -114,8 +114,7 @@ public class RobotParserSimpleExecutableContinueTest {
         for (int i = 0; i < commentsSize; i++) {
             final RobotToken token = comments.get(i);
             assertThat(token.getText()).isEqualTo(comment.get(i));
-            assertThat(token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    || token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)).isTrue();
+            assertThat(token.getTypes().contains(RobotTokenType.COMMENT)).isTrue();
         }
     }
 

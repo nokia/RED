@@ -25,9 +25,9 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         rt.setText(text);
         final List<IRobotTokenType> types = rt.getTypes();
         if (isComment(currentLine) || isPreviousLineContinueOrStartComment(currentLine)) {
-            types.add(0, RobotTokenType.COMMENT_CONTINUE);
+            types.add(0, RobotTokenType.COMMENT);
         }
-        if (!types.contains(RobotTokenType.START_HASH_COMMENT) && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+        if (!types.contains(RobotTokenType.COMMENT)) {
             types.add(0, RobotTokenType.UNKNOWN);
         }
         return rt;
@@ -40,8 +40,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
             for (int i = size - 1; i >= 0; i--) {
                 final IRobotLineElement elem = lineElements.get(i);
                 if (elem.getClass() == RobotToken.class) {
-                    return (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE));
+                    return (elem.getTypes().contains(RobotTokenType.COMMENT));
                 }
             }
         }
@@ -53,7 +52,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || isComment(currentLine)
+        if (rt.getTypes().contains(RobotTokenType.COMMENT) || isComment(currentLine)
                 || isTrash(currentLine)) {
             if (processingState.isEmpty()) {
                 result = true;
@@ -71,7 +70,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
     }
 
     private boolean isComment(final RobotLine currentLine) {
-        return firstRobotTokenContains(currentLine, RobotTokenType.START_HASH_COMMENT);
+        return firstRobotTokenContains(currentLine, RobotTokenType.COMMENT);
     }
 
     private boolean firstRobotTokenContains(final RobotLine currentLine, final RobotTokenType type) {

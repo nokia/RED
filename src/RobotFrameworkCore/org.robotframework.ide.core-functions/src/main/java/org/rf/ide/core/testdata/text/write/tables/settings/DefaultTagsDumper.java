@@ -26,10 +26,8 @@ public class DefaultTagsDumper extends ANotExecutableTableElementDumper<SettingT
         final DefaultTags defaultTags = (DefaultTags) currentElement;
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_DEFAULT_TAG, 1, defaultTags.getTags());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                elemUtility.filter(defaultTags.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                elemUtility.filter(defaultTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 2,
+                elemUtility.filter(defaultTags.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

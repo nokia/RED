@@ -54,8 +54,7 @@ class SingleValuedSettingsHaveMultipleValuesProvidedValidator<T extends AModelEl
             final List<RobotToken> values = setting.getElementTokens()
                     .stream()
                     .skip(1)
-                    .filter(t -> !t.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            && !t.getTypes().contains(RobotTokenType.COMMENT_CONTINUE))
+                    .filter(t -> !t.getTypes().contains(RobotTokenType.COMMENT))
                     .collect(toList());
 
             if (values.size() > 1) {

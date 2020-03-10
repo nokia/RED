@@ -86,12 +86,12 @@ public class NotModelRelatedHashCommentedLineDumper {
         for (int lineIndex = startLine; lineIndex < lineSize; lineIndex++) {
             final RobotLine line = lines.get(lineIndex);
             for (final RobotToken token : line.getLineTokens()) {
-                if ((token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                        || token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
+                if ((token.getTypes().contains(RobotTokenType.COMMENT)
                         || (token.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                                 && line.getLineElements().size() == 1))
                         && token != lastTokenInLines) {
                     lastHash = line.getLineNumber();
+                    break;
                 } else {
                     return lastHash;
                 }

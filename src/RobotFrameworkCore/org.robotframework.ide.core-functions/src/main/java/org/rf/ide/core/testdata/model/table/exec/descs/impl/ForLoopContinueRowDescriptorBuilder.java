@@ -130,7 +130,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         boolean foundCommentStart = false;
         for (int index = startIndex; index < lineElements.size(); index++) {
             final RobotToken token = lineElements.get(index);
-            if (token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            if (token.getTypes().contains(RobotTokenType.COMMENT)) {
                 foundCommentStart = true;
             }
 

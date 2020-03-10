@@ -26,10 +26,8 @@ public class ForceTagsDumper extends ANotExecutableTableElementDumper<SettingTab
         final ForceTags forceTags = (ForceTags) currentElement;
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_FORCE_TAG, 1, forceTags.getTags());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                elemUtility.filter(forceTags.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                elemUtility.filter(forceTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 2,
+                elemUtility.filter(forceTags.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

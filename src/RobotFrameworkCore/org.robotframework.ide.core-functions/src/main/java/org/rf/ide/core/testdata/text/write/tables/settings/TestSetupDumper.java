@@ -37,10 +37,8 @@ public class TestSetupDumper extends ANotExecutableTableElementDumper<SettingTab
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_SETUP_KEYWORD_ARGUMENT, 2,
                 testSetup.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(testSetup.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(testSetup.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(testSetup.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

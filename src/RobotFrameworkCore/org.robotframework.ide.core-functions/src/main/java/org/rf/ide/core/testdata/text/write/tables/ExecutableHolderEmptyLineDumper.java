@@ -30,10 +30,8 @@ class ExecutableHolderEmptyLineDumper extends ExecutableTableElementDumper {
 
         final RobotEmptyRow<?> emptyRow = (RobotEmptyRow<?>) currentElement;
         sorter.addPresaveSequenceForType(RobotTokenType.EMPTY_CELL, 1, getEmpty(emptyRow));
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                elemUtility.filter(emptyRow.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                elemUtility.filter(emptyRow.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 2,
+                elemUtility.filter(emptyRow.getComment(), RobotTokenType.COMMENT));
         return sorter;
     }
 

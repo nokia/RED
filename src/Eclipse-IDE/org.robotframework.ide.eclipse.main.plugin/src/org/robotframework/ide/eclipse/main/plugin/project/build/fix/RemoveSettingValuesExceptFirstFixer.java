@@ -87,7 +87,7 @@ public class RemoveSettingValuesExceptFirstFixer extends RedSuiteMarkerResolutio
 
     private IRegion calculateRegion(final List<RobotToken> tokens, final int offset) {
         final int lastTokenIndex = tokens.stream()
-                .filter(token -> token.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
+                .filter(token -> token.getTypes().contains(RobotTokenType.COMMENT))
                 .findFirst()
                 .map(tokens::indexOf)
                 .orElseGet(() -> tokens.size())

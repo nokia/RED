@@ -34,7 +34,7 @@ public class TestCaseNameMapper implements IParsingMapper {
         return positionResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME, currentLine, rt)
                 && processingState.contains(ParsingState.TEST_CASE_TABLE_INSIDE)
                 && (rt.getText() == null || !rt.getText().trim()
-                        .startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0)));
+                        .startsWith(RobotTokenType.COMMENT.getRepresentation().get(0)));
     }
 
     @Override

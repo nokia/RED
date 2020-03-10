@@ -37,10 +37,8 @@ public class TaskSetupDumper extends ANotExecutableTableElementDumper<SettingTab
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_SETUP_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_SETUP_KEYWORD_ARGUMENT, 2,
                 taskSetup.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(taskSetup.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(taskSetup.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(taskSetup.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

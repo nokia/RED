@@ -290,8 +290,7 @@ public class KeywordUsagesFinder {
             return template.getElementTokens()
                     .stream()
                     .skip(1)
-                    .filter(t -> !t.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            && !t.getTypes().contains(RobotTokenType.COMMENT_CONTINUE))
+                    .filter(t -> !t.getTypes().contains(RobotTokenType.COMMENT))
                     .collect(toList());
         }
     }

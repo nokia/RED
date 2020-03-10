@@ -80,8 +80,8 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
                 || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.TEST_CASE_NAME);
             types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
-            types.remove(RobotTokenType.START_HASH_COMMENT);
-            types.add(0, RobotTokenType.START_HASH_COMMENT);
+            types.remove(RobotTokenType.COMMENT);
+            types.add(0, RobotTokenType.COMMENT);
             robotExecutableRow.addCommentPart(rt);
         } else {
             if (robotExecutableRow.getAction().getFilePosition().isNotSet()) {

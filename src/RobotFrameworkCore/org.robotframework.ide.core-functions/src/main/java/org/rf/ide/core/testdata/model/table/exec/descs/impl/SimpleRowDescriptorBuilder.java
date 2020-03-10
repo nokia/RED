@@ -39,8 +39,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
 
         boolean foundAction = false;
         for (final RobotToken elem : execRowLine.getElementTokens()) {
-            if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (elem.getTypes().contains(RobotTokenType.COMMENT)) {
                 break;
             }
 

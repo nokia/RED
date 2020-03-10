@@ -46,7 +46,7 @@ public class LibraryImportTest {
         assertThat(elementTokens.get(2)).isSameAs(argToken);
         assertThat(elementTokens.get(2).getTypes()).contains(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
         assertThat(elementTokens.get(3)).isSameAs(cmtToken);
-        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.COMMENT);
     }
 
     @Test
@@ -70,6 +70,6 @@ public class LibraryImportTest {
         assertThat(elementTokens.get(2).getText()).isEqualTo("value");
         assertThat(elementTokens.get(2).getTypes()).contains(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
         assertThat(elementTokens.get(3)).isSameAs(cmtToken);
-        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.COMMENT);
     }
 }

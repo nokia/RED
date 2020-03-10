@@ -38,10 +38,8 @@ public class ResourceImportDumper extends ANotExecutableTableElementDumper<Setti
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_RESOURCE_FILE_NAME, 1, resourcePaths);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT, 2,
                 resource.getUnexpectedTrashArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(resource.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(resource.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(resource.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

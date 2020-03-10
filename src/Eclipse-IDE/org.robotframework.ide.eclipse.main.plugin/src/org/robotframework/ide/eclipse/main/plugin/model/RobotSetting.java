@@ -87,7 +87,7 @@ public class RobotSetting extends RobotKeywordCall {
             arguments = getLinkedElement().getElementTokens().stream().filter(token -> {
                 final List<IRobotTokenType> types = token.getTypes();
                 final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                return type != RobotTokenType.COMMENT
                         && type != RobotTokenType.SETTING_METADATA_DECLARATION
                         && type != RobotTokenType.SETTING_VARIABLES_DECLARATION
                         && type != RobotTokenType.SETTING_RESOURCE_DECLARATION

@@ -37,10 +37,8 @@ public class VariablesImportDumper extends ANotExecutableTableElementDumper<Sett
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_FILE_NAME, 1, varsPaths);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_ARGUMENT, 2, variables.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(variables.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(variables.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(variables.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

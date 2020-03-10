@@ -26,13 +26,13 @@ class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
     static {
         TYPES.put(ModelType.TEST_CASE_EXECUTABLE_ROW,
                 newArrayList(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                        RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
+                        RobotTokenType.COMMENT));
         TYPES.put(ModelType.TASK_EXECUTABLE_ROW,
                 newArrayList(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT,
-                        RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
+                        RobotTokenType.COMMENT));
         TYPES.put(ModelType.USER_KEYWORD_EXECUTABLE_ROW,
                 newArrayList(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                        RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
+                        RobotTokenType.COMMENT));
     }
 
     ExecutableHolderExecutionRowDumper(final DumperHelper helper, final ModelType modelType) {
@@ -50,7 +50,6 @@ class ExecutableHolderExecutionRowDumper extends ExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(tokenTypes.get(0), 1, getAction(row));
         sorter.addPresaveSequenceForType(tokenTypes.get(1), 2, row.getArguments());
         sorter.addPresaveSequenceForType(tokenTypes.get(2), 3, elemUtility.filter(row.getComment(), tokenTypes.get(2)));
-        sorter.addPresaveSequenceForType(tokenTypes.get(3), 4, elemUtility.filter(row.getComment(), tokenTypes.get(3)));
 
         return sorter;
     }

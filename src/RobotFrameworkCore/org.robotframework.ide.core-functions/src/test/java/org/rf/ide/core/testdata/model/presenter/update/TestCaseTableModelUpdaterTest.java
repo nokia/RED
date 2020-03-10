@@ -470,7 +470,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly("action", "a", "b", "#comment");
         assertThat(row.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                        RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -495,7 +495,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -520,7 +520,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -544,7 +544,7 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                         RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                        RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -569,7 +569,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_TEARDOWN,
                         RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_NAME,
                         RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -594,7 +594,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_TIMEOUT,
                         RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE,
                         RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE,
-                        RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -619,7 +619,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION,
                         RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
                         RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT,
-                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -648,7 +648,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_SETUP,
                         RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
                         RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT,
-                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -678,7 +678,7 @@ public class TestCaseTableModelUpdaterTest {
                         RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME,
                         RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
                         RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
-                        RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.COMMENT);
     }
 
     @Test
@@ -707,7 +707,7 @@ public class TestCaseTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test

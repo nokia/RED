@@ -39,7 +39,7 @@ public class TaskNameMapper implements IParsingMapper {
         return positionResolver.isCorrectPosition(PositionExpected.TASK_NAME, currentLine, rt)
                 && processingState.contains(ParsingState.TASKS_TABLE_INSIDE)
                 && (rt.getText() == null || !rt.getText().trim()
-                        .startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0)));
+                        .startsWith(RobotTokenType.COMMENT.getRepresentation().get(0)));
     }
 
     @Override

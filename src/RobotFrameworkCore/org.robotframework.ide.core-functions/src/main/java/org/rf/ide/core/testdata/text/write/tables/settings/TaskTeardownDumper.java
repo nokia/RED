@@ -37,10 +37,8 @@ public class TaskTeardownDumper extends ANotExecutableTableElementDumper<Setting
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TEARDOWN_KEYWORD_ARGUMENT, 2,
                 taskTeardown.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(taskTeardown.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(taskTeardown.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(taskTeardown.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

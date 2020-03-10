@@ -78,12 +78,9 @@ public enum RobotTokenType implements IRobotTokenType {
     TABLE_HEADER_COLUMN(TableType.NOT_STRICTLY_BELONGS),
     /**
      */
-    START_HASH_COMMENT(
+    COMMENT(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation("#").build()),
-    /**
-     */
-    COMMENT_CONTINUE(TableType.NOT_STRICTLY_BELONGS),
     /**
      */
     PREVIOUS_LINE_CONTINUE(

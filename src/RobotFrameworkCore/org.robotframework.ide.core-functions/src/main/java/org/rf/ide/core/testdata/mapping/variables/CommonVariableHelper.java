@@ -27,7 +27,7 @@ public class CommonVariableHelper {
     public boolean isVariable(final RobotToken token) {
         final List<IRobotTokenType> types = token.getTypes();
         for (final IRobotTokenType type : types) {
-            if (type == RobotTokenType.START_HASH_COMMENT || type == RobotTokenType.COMMENT_CONTINUE) {
+            if (type == RobotTokenType.COMMENT) {
                 return false;
             } else if (type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
                     || type == RobotTokenType.VARIABLES_LIST_DECLARATION

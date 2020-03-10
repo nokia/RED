@@ -91,7 +91,7 @@ public class SetVariableNameCommand extends EditorCommand {
         }
 
         final List<RobotToken> commentTokens = elementTokens.stream()
-                .filter(containingOneOf(RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE))
+                .filter(containingOneOf(RobotTokenType.COMMENT))
                 .collect(Collectors.toList());
         for (final RobotToken commentToken : commentTokens) {
             newHolder.addCommentPart(commentToken);

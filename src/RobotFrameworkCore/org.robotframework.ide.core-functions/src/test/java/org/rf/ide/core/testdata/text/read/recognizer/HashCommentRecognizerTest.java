@@ -92,6 +92,6 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.START_HASH_COMMENT);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.COMMENT);
     }
 }

@@ -51,8 +51,7 @@ public class ExecutablesRowView {
             final RobotToken actionToken = tokens.get(0);
             if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty() && !actionToken.isDirty()) {
                 final List<IRobotTokenType> types = tokens.get(1).getTypes();
-                return types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE);
+                return types.contains(RobotTokenType.COMMENT);
             }
         }
         return false;

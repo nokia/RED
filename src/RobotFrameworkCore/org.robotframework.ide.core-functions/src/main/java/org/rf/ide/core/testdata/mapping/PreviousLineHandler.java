@@ -121,7 +121,7 @@ public class PreviousLineHandler {
     }
 
     private boolean isCommentContinue(final RobotToken currentToken, final Stack<ParsingState> storedStack) {
-        return currentToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT) && !storedStack.isEmpty()
+        return currentToken.getTypes().contains(RobotTokenType.COMMENT) && !storedStack.isEmpty()
                 && storedStack.get(storedStack.size() - 1) == ParsingState.COMMENT;
     }
 

@@ -44,8 +44,7 @@ class LocalSettingDumper extends ExecutableTableElementDumper {
         final List<RobotTokenType> types = LocalSettingTokenTypes.getPossibleTokenTypes(type);
 
         types.remove(0); // remove declaration type
-        types.add(RobotTokenType.START_HASH_COMMENT);
-        types.add(RobotTokenType.COMMENT_CONTINUE);
+        types.add(RobotTokenType.COMMENT);
         return types.toArray(new RobotTokenType[0]);
     }
 }

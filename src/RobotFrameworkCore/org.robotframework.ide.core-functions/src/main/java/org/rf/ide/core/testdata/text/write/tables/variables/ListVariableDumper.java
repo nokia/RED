@@ -27,10 +27,8 @@ public class ListVariableDumper extends ANotExecutableTableElementDumper<Variabl
 
         final RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, var.getItems());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                elemUtility.filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
-                elemUtility.filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 2,
+                elemUtility.filter(var.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

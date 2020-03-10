@@ -126,7 +126,7 @@ public class RobotEmptyRow<T> extends CommonStep<T> implements ICommentHolder, S
             throw new IllegalArgumentException();
 
         } else if (1 <= commentsIndex && commentsIndex <= comments.size()) {
-            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
+            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT));
         }
     }
 
@@ -212,14 +212,8 @@ public class RobotEmptyRow<T> extends CommonStep<T> implements ICommentHolder, S
     }
 
     private void fixCommentsTypes() {
-        for (int i = 0; i < comments.size(); i++) {
-            final RobotToken token = comments.get(i);
-            if (i == 0) {
-                token.setType(RobotTokenType.START_HASH_COMMENT);
-
-            } else if (i > 0) {
-                token.setType(RobotTokenType.COMMENT_CONTINUE);
-            }
+        for (RobotToken token : comments) {
+            token.setType(RobotTokenType.COMMENT);
         }
     }
 

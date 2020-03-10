@@ -35,8 +35,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
-    private static final EnumSet<RobotTokenType> NON_ARG_TYPES = EnumSet.of(RobotTokenType.START_HASH_COMMENT,
-            RobotTokenType.COMMENT_CONTINUE, RobotTokenType.TEST_CASE_SETTING_SETUP,
+    private static final EnumSet<RobotTokenType> NON_ARG_TYPES = EnumSet.of(RobotTokenType.COMMENT,
+            RobotTokenType.TEST_CASE_SETTING_SETUP,
             RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
             RobotTokenType.TEST_CASE_SETTING_TEARDOWN, RobotTokenType.TEST_CASE_SETTING_TEMPLATE,
             RobotTokenType.TEST_CASE_SETTING_TIMEOUT, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
@@ -200,8 +200,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                         .filter(token -> {
                             final List<IRobotTokenType> types = token.getTypes();
                             final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                            return !types.contains(RobotTokenType.START_HASH_COMMENT)
-                                    && !types.contains(RobotTokenType.COMMENT_CONTINUE)
+                            return !types.contains(RobotTokenType.COMMENT)
                                     && type != RobotTokenType.KEYWORD_ACTION_NAME
                                     && type != RobotTokenType.TEST_CASE_ACTION_NAME
                                     && type != RobotTokenType.TASK_ACTION_NAME;

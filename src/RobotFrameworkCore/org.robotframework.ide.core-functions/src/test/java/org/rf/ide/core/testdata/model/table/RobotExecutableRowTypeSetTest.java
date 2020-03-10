@@ -39,7 +39,7 @@ public class RobotExecutableRowTypeSetTest {
         assertThat(toks).containsExactly(action, arg, comment);
         assertThat(action.getTypes().get(0)).isEqualTo(RobotTokenType.TEST_CASE_ACTION_NAME);
         assertThat(arg.getTypes().get(0)).isEqualTo(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
-        assertThat(comment.getTypes().get(0)).isEqualTo(RobotTokenType.START_HASH_COMMENT);
+        assertThat(comment.getTypes().get(0)).isEqualTo(RobotTokenType.COMMENT);
     }
 
     @Test

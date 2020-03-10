@@ -95,7 +95,7 @@ public class ATagsTest {
         }
 
         public IRobotTokenType getCommentType() {
-            return RobotTokenType.START_HASH_COMMENT;
+            return RobotTokenType.COMMENT;
         }
     }
 }

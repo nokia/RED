@@ -21,8 +21,8 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
-import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -229,7 +229,7 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
             fixTokensTypes();
 
         } else if (0 <= commentIndex && commentIndex <= comments.size()) {
-            comments.add(commentIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
+            comments.add(commentIndex, RobotToken.create("", RobotTokenType.COMMENT));
         }
     }
 
@@ -271,8 +271,7 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
             if (commentsIndex == 0) {
                 while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
                     final RobotToken toMove = comments.remove(0);
-                    toMove.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
-                    toMove.getTypes().remove(RobotTokenType.COMMENT_CONTINUE);
+                    toMove.getTypes().remove(RobotTokenType.COMMENT);
                     tokens.add(toMove);
                 }
                 fixTokensTypes();
@@ -348,8 +347,7 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
             if (commentsIndex == 0) {
                 while (!comments.isEmpty() && !comments.get(0).getText().trim().startsWith("#")) {
                     final RobotToken toMove = comments.remove(0);
-                    toMove.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
-                    toMove.getTypes().remove(RobotTokenType.COMMENT_CONTINUE);
+                    toMove.getTypes().remove(RobotTokenType.COMMENT);
                     tokens.add(toMove);
                 }
                 fixTokensTypes();
@@ -359,14 +357,8 @@ public class LocalSetting<T> extends CommonStep<T> implements ICommentHolder, Se
     }
 
     private void fixCommentsTypes() {
-        for (int i = 0; i < comments.size(); i++) {
-            final RobotToken token = comments.get(i);
-            if (i == 0) {
-                token.setType(RobotTokenType.START_HASH_COMMENT);
-
-            } else if (i > 0) {
-                token.setType(RobotTokenType.COMMENT_CONTINUE);
-            }
+        for (RobotToken token : comments) {
+            token.setType(RobotTokenType.COMMENT);
         }
     }
 

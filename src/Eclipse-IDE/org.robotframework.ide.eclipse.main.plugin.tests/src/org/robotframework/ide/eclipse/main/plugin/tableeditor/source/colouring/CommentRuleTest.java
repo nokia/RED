@@ -116,7 +116,7 @@ public class CommentRuleTest {
     @Test
     public void taskTagIsRecognizedInsideTokens() {
         final RobotToken token = RobotToken.create("# this is a comment with TODO task", new FilePosition(-1, -1, 100),
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
 
         final CommentRule rule = new CommentRule(new Token("token"), new MockTasksToken("task", true, "TODO"));
 
@@ -135,7 +135,7 @@ public class CommentRuleTest {
     @Test
     public void multipleTaskTagsAreRecognizedInsideToken() {
         final RobotToken token = RobotToken.create("# this is a comment with TODO task and some FIXME tag",
-                new FilePosition(-1, -1, 100), RobotTokenType.START_HASH_COMMENT);
+                new FilePosition(-1, -1, 100), RobotTokenType.COMMENT);
 
         final CommentRule rule = new CommentRule(new Token("token"), new MockTasksToken("task", true, "TODO|FIXME"));
 

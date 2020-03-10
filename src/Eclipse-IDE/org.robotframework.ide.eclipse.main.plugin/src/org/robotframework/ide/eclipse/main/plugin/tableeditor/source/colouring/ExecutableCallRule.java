@@ -256,8 +256,7 @@ public class ExecutableCallRule extends VariableUsageRule {
         for (final IRobotLineElement element : robotLine.getLineElements()) {
             if (element instanceof RobotToken) {
                 final List<IRobotTokenType> types = element.getTypes();
-                return types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE)
+                return types.contains(RobotTokenType.COMMENT)
                         || types.contains(RobotTokenType.EMPTY_CELL)
                         || robotLine.isEmpty();
             }
@@ -315,8 +314,7 @@ public class ExecutableCallRule extends VariableUsageRule {
             return !types.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
                     && !types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                     && !types.contains(RobotTokenType.FOR_CONTINUE_TOKEN)
-                    && !types.contains(RobotTokenType.START_HASH_COMMENT)
-                    && !types.contains(RobotTokenType.COMMENT_CONTINUE)
+                    && !types.contains(RobotTokenType.COMMENT)
                     && !types.contains(RobotTokenType.SETTING_NAME_DUPLICATION)
                     && !types.contains(RobotTokenType.TEST_CASE_SETTING_NAME_DUPLICATION)
                     && !types.contains(RobotTokenType.KEYWORD_SETTING_NAME_DUPLICATION);

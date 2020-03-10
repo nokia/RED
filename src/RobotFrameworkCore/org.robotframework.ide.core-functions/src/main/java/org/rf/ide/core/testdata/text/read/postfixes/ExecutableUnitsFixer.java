@@ -170,7 +170,7 @@ class ExecutableUnitsFixer {
                         execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     }
                 } else if (execLine.getAction().getText().isEmpty()) {
-                    execLine.getAction().setType(RobotTokenType.START_HASH_COMMENT);
+                    execLine.getAction().setType(RobotTokenType.COMMENT);
                 } else {
                     execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_TOKEN);
                 }
@@ -278,7 +278,7 @@ class ExecutableUnitsFixer {
             }
 
             if (shouldMerge) {
-                if (token.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || wasComment) {
+                if (token.getTypes().contains(RobotTokenType.COMMENT) || wasComment) {
                     wasComment = true;
                     toUpdate.addCommentPart(token);
                 } else {

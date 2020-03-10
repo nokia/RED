@@ -45,7 +45,7 @@ public class TestTimeoutTest {
         assertThat(elementTokens.get(1).getTypes()).contains(RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
         assertThat(elementTokens.get(2)).isSameAs(argToken);
         assertThat(elementTokens.get(3)).isSameAs(cmtToken);
-        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.COMMENT);
     }
 
     @Test
@@ -69,6 +69,6 @@ public class TestTimeoutTest {
         assertThat(elementTokens.get(2).getText()).isEqualTo("value");
         assertThat(elementTokens.get(2).getTypes()).contains(RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
         assertThat(elementTokens.get(3)).isSameAs(cmtToken);
-        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.COMMENT);
     }
 }

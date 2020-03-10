@@ -343,7 +343,7 @@ public class SectionBuilder {
                 if (tokenType instanceof RobotTokenType) {
                     final RobotTokenType type = (RobotTokenType) tokenType;
                     if ((type.isSettingDeclaration() && RobotTokenType.getTypesForVariablesTable().contains(type))
-                            || (type == RobotTokenType.START_HASH_COMMENT
+                            || (type == RobotTokenType.COMMENT
                                     && isUnknownVariableStart(model, elem))) {
                         result = true;
                         break;

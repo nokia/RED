@@ -24,8 +24,7 @@ public class CommonVariableHelperTest {
 
     @Test
     public void testIncorrectVariables() throws Exception {
-        assertIncorrectVariable("#abc", RobotTokenType.START_HASH_COMMENT);
-        assertIncorrectVariable("#abc", RobotTokenType.COMMENT_CONTINUE);
+        assertIncorrectVariable("#abc", RobotTokenType.COMMENT);
 
         assertIncorrectVariable(null, RobotTokenType.VARIABLES_SCALAR_DECLARATION);
         assertIncorrectVariable("", RobotTokenType.VARIABLES_SCALAR_DECLARATION);

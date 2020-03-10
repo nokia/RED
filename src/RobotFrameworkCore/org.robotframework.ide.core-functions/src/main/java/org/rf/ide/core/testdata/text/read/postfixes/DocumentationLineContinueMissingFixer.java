@@ -128,7 +128,7 @@ class DocumentationLineContinueMissingFixer implements IPostProcessFixer {
                     final IRobotLineElement elem = lineElements.get(i);
                     final List<IRobotTokenType> elemTypes = elem.getTypes();
                     if (isAnyOfType(elemTypes, SeparatorType.PIPE, SeparatorType.TABULATOR_OR_DOUBLE_SPACE,
-                            RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE)) {
+                            RobotTokenType.COMMENT)) {
                         continue;
                     } else if (isAnyOfType(elemTypes, acceptable)) {
                         if (elemTypes.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
@@ -148,7 +148,7 @@ class DocumentationLineContinueMissingFixer implements IPostProcessFixer {
                     final IRobotLineElement elem = lineElements.get(i);
                     final List<IRobotTokenType> elemTypes = elem.getTypes();
                     if (isAnyOfType(elemTypes, SeparatorType.PIPE, SeparatorType.TABULATOR_OR_DOUBLE_SPACE,
-                            RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE)) {
+                            RobotTokenType.COMMENT)) {
                         continue;
                     } else if (isAnyOfType(elemTypes, acceptable)) {
                         toks.add((RobotToken) elem);

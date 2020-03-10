@@ -57,17 +57,17 @@ public class TrashCommentsParsingTest {
 
         final List<RobotLine> fileContent = fileModel.getFileContent();
         assertThat(fileContent).hasSize(6);
-        assertLine(fileContent.get(0), RobotToken.create("# comment", RobotTokenType.START_HASH_COMMENT));
-        assertLine(fileContent.get(1), RobotToken.create("#", RobotTokenType.START_HASH_COMMENT), separator("\t"),
-                RobotToken.create("*** Settings ***", RobotTokenType.COMMENT_CONTINUE,
+        assertLine(fileContent.get(0), RobotToken.create("# comment", RobotTokenType.COMMENT));
+        assertLine(fileContent.get(1), RobotToken.create("#", RobotTokenType.COMMENT), separator("\t"),
+                RobotToken.create("*** Settings ***", RobotTokenType.COMMENT,
                         RobotTokenType.SETTINGS_TABLE_HEADER));
-        assertLine(fileContent.get(2), RobotToken.create("#d", RobotTokenType.START_HASH_COMMENT), separator("\t"),
-                RobotToken.create("ok", RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN));
+        assertLine(fileContent.get(2), RobotToken.create("#d", RobotTokenType.COMMENT), separator("\t"),
+                RobotToken.create("ok", RobotTokenType.COMMENT, RobotTokenType.UNKNOWN));
         assertLine(fileContent.get(3),
                 RobotToken.create("*** unknown header ***", RobotTokenType.USER_OWN_TABLE_HEADER));
         assertLine(fileContent.get(4), RobotToken.create("d", RobotTokenType.UNKNOWN), separator("\t"),
-                RobotToken.create("#start", RobotTokenType.START_HASH_COMMENT), separator("\t"),
-                RobotToken.create("continue", RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN));
+                RobotToken.create("#start", RobotTokenType.COMMENT), separator("\t"),
+                RobotToken.create("continue", RobotTokenType.COMMENT, RobotTokenType.UNKNOWN));
     }
 
     private void assertLine(final RobotLine toTest, final IRobotLineElement... toks) {

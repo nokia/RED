@@ -32,8 +32,7 @@ public class SectionHeaderRule extends TokenTypeBasedRule {
             final List<RobotLine> context) {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
-        if (tokenTypes.contains(RobotTokenType.START_HASH_COMMENT)
-                || tokenTypes.contains(RobotTokenType.COMMENT_CONTINUE)) {
+        if (tokenTypes.contains(RobotTokenType.COMMENT)) {
             return Optional.empty();
         }
         return super.evaluate(token, offsetInToken, context);

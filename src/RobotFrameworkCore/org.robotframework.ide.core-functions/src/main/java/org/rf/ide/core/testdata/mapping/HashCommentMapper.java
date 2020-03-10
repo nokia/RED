@@ -84,7 +84,7 @@ public class HashCommentMapper implements IParsingMapper {
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
 
         final ParsingState nearestState = stateHelper.getCurrentState(processingState);
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+        if (rt.getTypes().contains(RobotTokenType.COMMENT)
                 || isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
 
             if (isInsideTestCase(nearestState) || isInsideTask(nearestState) || isInsideKeyword(nearestState)) {
@@ -123,16 +123,16 @@ public class HashCommentMapper implements IParsingMapper {
     public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         boolean addToStack = false;
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        if (rt.getTypes().contains(RobotTokenType.COMMENT)) {
             addToStack = true;
 
         } else if (isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
-            rt.getTypes().add(0, RobotTokenType.START_HASH_COMMENT);
+            rt.getTypes().add(0, RobotTokenType.COMMENT);
             addToStack = true;
 
         } else {
-            rt.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
-            rt.getTypes().add(0, RobotTokenType.COMMENT_CONTINUE);
+            rt.getTypes().remove(RobotTokenType.COMMENT);
+            rt.getTypes().add(0, RobotTokenType.COMMENT);
         }
 
         final ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);

@@ -42,8 +42,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         boolean foundIn = false;
         boolean hasElementsToIterate = false;
         for (final RobotToken elem : execRowLine.getElementTokens()) {
-            if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (elem.getTypes().contains(RobotTokenType.COMMENT)) {
                 break;
             }
 

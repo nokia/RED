@@ -64,7 +64,7 @@ public class CommentRule implements ISyntaxColouringRule {
 
     private static boolean isLineComment(final IRobotLineElement token) {
         final List<IRobotTokenType> types = token.getTypes();
-        return types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE);
+        return types.contains(RobotTokenType.COMMENT);
     }
 
     private static boolean isInCommentsTable(final IRobotLineElement token) {

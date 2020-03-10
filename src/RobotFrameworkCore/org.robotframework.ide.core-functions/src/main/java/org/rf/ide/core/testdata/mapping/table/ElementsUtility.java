@@ -289,7 +289,7 @@ public class ElementsUtility {
         RobotToken comment = null;
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
-            if (types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (types.contains(RobotTokenType.COMMENT)) {
                 if (text.equals(rt.getText())) {
                     comment = rt;
                     break;
@@ -322,7 +322,7 @@ public class ElementsUtility {
                 final IRobotTokenType tokenType = types.get(0);
                 if (tokenType == SeparatorType.PIPE || tokenType == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
                     continue;
-                } else if (tokenType == RobotTokenType.START_HASH_COMMENT) {
+                } else if (tokenType == RobotTokenType.COMMENT) {
                     result = true;
                     break;
                 } else {

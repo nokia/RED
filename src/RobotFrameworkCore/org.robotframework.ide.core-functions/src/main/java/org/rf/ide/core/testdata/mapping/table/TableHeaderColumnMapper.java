@@ -34,7 +34,7 @@ public class TableHeaderColumnMapper implements IParsingMapper {
         final ParsingState currentState = stateHelper.getCurrentState(processingState);
         if (!processingState.isEmpty() && currentState != ParsingState.COMMENT_TABLE_HEADER
                 && !stateHelper.isTableInsideStateInHierarchy(currentState)
-                && !rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                && !rt.getTypes().contains(RobotTokenType.COMMENT)
                 && lineContinueDoesNotExistAfterHeader(currentLine)) {
 
             final ParsingState state = processingState.peek();

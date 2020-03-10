@@ -185,7 +185,7 @@ public class RobotExecutableRowTest {
         assertThat(elementTokens.get(5).getText()).isEqualTo("argument");
         assertThat(elementTokens.get(5).getTypes()).contains(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
         assertThat(elementTokens.get(6)).isSameAs(cmt);
-        assertThat(elementTokens.get(6).getTypes()).contains(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(6).getTypes()).contains(RobotTokenType.COMMENT);
     }
 
     @Test
@@ -201,7 +201,7 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -214,8 +214,8 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("", "action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -232,18 +232,18 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row1)).containsExactly("action", "", "1", "2", "# c1", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
         assertThat(cellsOf(row2)).containsExactly("action", "1", "", "2", "# c1", "c2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
         assertThat(cellsOf(row3)).containsExactly("action", "1", "2", "", "# c1", "c2");
         assertThat(typesOf(row3)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("action", "1", "2", "# c1", "", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -282,7 +282,7 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -294,8 +294,8 @@ public class RobotExecutableRowTest {
 
         assertThat(cellsOf(row)).containsExactly("1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -309,13 +309,13 @@ public class RobotExecutableRowTest {
 
         assertThat(cellsOf(row1)).containsExactly("action", "2", "# c1", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("action", "1", "# c1", "c2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -336,8 +336,8 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row2)).containsExactly("action", "1", "2", "c2", "# c3", "c4");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -360,7 +360,7 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -373,7 +373,7 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row)).containsExactly("other action", "1", "2", "# c1", "c2");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -388,12 +388,12 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row1)).containsExactly("action", "11", "2", "# c1", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("action", "1", "22", "# c1", "c2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -407,13 +407,13 @@ public class RobotExecutableRowTest {
 
         assertThat(cellsOf(row1)).containsExactly("action", "# commented", "2", "# c1", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("action", "1", "# commented", "# c1", "c2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -428,12 +428,12 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row1)).containsExactly("action", "1", "2", "# d1", "c2");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("action", "1", "2", "# c1", "d2");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -453,8 +453,8 @@ public class RobotExecutableRowTest {
         assertThat(cellsOf(row2)).containsExactly("action", "1", "2", "d1", "# c2", "c3");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -482,7 +482,7 @@ public class RobotExecutableRowTest {
         assertThat(typesOf(row3)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
                 RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -498,18 +498,18 @@ public class RobotExecutableRowTest {
 
         assertThat(cellsOf(row1)).containsExactly("action", "1", "# c1", "3");
         assertThat(typesOf(row1)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row2)).containsExactly("action", "1", "# c1", "\\", "4");
         assertThat(typesOf(row2)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(row3)).containsExactly("action", "1", "# c1", "\\", "\\", "# 5");
         assertThat(typesOf(row3)).containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME,
-                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_ACTION_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -550,7 +550,7 @@ public class RobotExecutableRowTest {
         assertThat(elementTokens.get(3).getTypes()).containsExactly(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
                 RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
         assertThat(elementTokens.get(4)).isSameAs(comment);
-        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.COMMENT);
     }
 
     @Test
@@ -591,7 +591,7 @@ public class RobotExecutableRowTest {
         assertThat(elementTokens.get(3).getTypes()).contains(RobotTokenType.TEST_CASE_ACTION_ARGUMENT,
                 RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
         assertThat(elementTokens.get(4)).isSameAs(comment);
-        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.START_HASH_COMMENT);
+        assertThat(elementTokens.get(4).getTypes()).containsExactly(RobotTokenType.COMMENT);
     }
 
     private static List<String> args(final String... arguments) {

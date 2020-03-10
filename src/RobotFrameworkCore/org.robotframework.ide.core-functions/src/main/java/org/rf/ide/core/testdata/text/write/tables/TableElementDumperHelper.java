@@ -62,9 +62,8 @@ public class TableElementDumperHelper {
         IRobotTokenType type = null;
         for (int index = 0; index < size; index++) {
             final IRobotLineElement el = elems.get(index);
-            final boolean isComment = el.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    || el.getTypes().contains(RobotTokenType.COMMENT_CONTINUE);
-            final RobotTokenType newType = isComment ? RobotTokenType.START_HASH_COMMENT : RobotTokenType.UNKNOWN;
+            final boolean isComment = el.getTypes().contains(RobotTokenType.COMMENT);
+            final RobotTokenType newType = isComment ? RobotTokenType.COMMENT : RobotTokenType.UNKNOWN;
 
             if (type == null) {
                 type = newType;

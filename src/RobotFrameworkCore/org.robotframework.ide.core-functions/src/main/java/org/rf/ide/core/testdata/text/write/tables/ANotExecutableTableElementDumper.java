@@ -191,11 +191,9 @@ public abstract class ANotExecutableTableElementDumper<T extends ARobotSectionTa
             final IRobotLineElement tokElem) {
         boolean dumpAfterSep = false;
         if (tokenId + 1 < nrOfTokens) {
-            if (!tokElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                    && !tokElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (!tokElem.getTypes().contains(RobotTokenType.COMMENT)) {
                 final IRobotLineElement nextElem = tokens.get(tokenId + 1);
-                if (nextElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                        || nextElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                if (nextElem.getTypes().contains(RobotTokenType.COMMENT)) {
                     dumpAfterSep = true;
                 }
             }

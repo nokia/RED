@@ -35,7 +35,7 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -58,14 +58,14 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "", "2", "# c1", "c2");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -78,8 +78,8 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -92,7 +92,8 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "# c1", "", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -118,7 +119,7 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -132,13 +133,13 @@ public class LocalSettingTest {
 
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "2", "# c1", "c2");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "# c1", "c2");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -159,8 +160,8 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "2", "c2", "# c3", "c4");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -176,12 +177,13 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "1", "2", "# c1");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "2", "# c1", "c2", "c4");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -196,7 +198,7 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -217,7 +219,7 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[tags]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -231,8 +233,8 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[Setup]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_SETUP,
                 RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_NAME,
-                RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -246,7 +248,7 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting)).containsExactly("[unknown]", "1", "2", "# c1", "c2");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -261,12 +263,12 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "11", "2", "# c1", "c2");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "22", "# c1", "c2");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -280,13 +282,13 @@ public class LocalSettingTest {
 
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "# comment", "2", "# c1", "c2");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "# comment", "# c1", "c2");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -301,12 +303,12 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "1", "2", "# d1", "c2");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "2", "# c1", "d2");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -327,8 +329,8 @@ public class LocalSettingTest {
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "2", "d1", "# c2", "c3");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -356,7 +358,7 @@ public class LocalSettingTest {
         assertThat(typesOf(setting3)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
                 RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.TEST_CASE_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -372,18 +374,19 @@ public class LocalSettingTest {
 
         assertThat(cellsOf(setting1)).containsExactly("[Tags]", "1", "# c1", "3");
         assertThat(typesOf(setting1)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting2)).containsExactly("[Tags]", "1", "# c1", "\\", "4");
         assertThat(typesOf(setting2)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT);
 
         assertThat(cellsOf(setting3)).containsExactly("[Tags]", "1", "# c1", "\\", "\\", "# 5");
         assertThat(typesOf(setting3)).containsExactly(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION,
-                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.START_HASH_COMMENT,
-                RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE, RobotTokenType.COMMENT_CONTINUE);
+                RobotTokenType.TEST_CASE_SETTING_TAGS, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT, RobotTokenType.COMMENT,
+                RobotTokenType.COMMENT);
     }
 
     @Test

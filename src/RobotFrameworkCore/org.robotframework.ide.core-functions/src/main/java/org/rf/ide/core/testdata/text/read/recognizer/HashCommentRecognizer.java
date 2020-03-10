@@ -17,7 +17,7 @@ public class HashCommentRecognizer extends ATokenRecognizer {
 
 
     public HashCommentRecognizer() {
-        super(EXPECTED, RobotTokenType.START_HASH_COMMENT);
+        super(EXPECTED, RobotTokenType.COMMENT);
     }
 
 

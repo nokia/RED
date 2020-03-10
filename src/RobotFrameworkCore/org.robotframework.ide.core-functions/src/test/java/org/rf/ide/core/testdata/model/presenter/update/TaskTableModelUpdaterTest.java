@@ -431,7 +431,7 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(row)).containsExactly("action", "a", "b", "#comment");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT,
-                RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -453,7 +453,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Arguments]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -475,7 +475,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Return]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -497,7 +497,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -520,7 +520,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEARDOWN,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -542,7 +542,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Timeout]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TIMEOUT,
                 RobotTokenType.TASK_SETTING_TIMEOUT_VALUE, RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE,
-                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -564,7 +564,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Documentation]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_DOCUMENTATION,
                 RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -590,7 +590,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Setup]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_SETUP,
                 RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME, RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
-                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -617,7 +617,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEMPLATE,
                 RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME,
                 RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT,
-                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -643,7 +643,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[something]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -669,7 +669,7 @@ public class TaskTableModelUpdaterTest {
 
         assertThat(cellsOf(row)).containsExactly("action", "a", "b", "#comment");
         assertThat(typesOf(row)).containsExactly(RobotTokenType.TASK_ACTION_NAME, RobotTokenType.TASK_ACTION_ARGUMENT,
-                RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_ACTION_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -691,7 +691,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Template]", "a", "b", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEMPLATE,
                 RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_NAME,
-                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -713,7 +713,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Tags]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TAGS_DECLARATION,
                 RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS, RobotTokenType.TASK_SETTING_TAGS,
-                RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.COMMENT);
     }
 
     @Test
@@ -735,7 +735,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Setup]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_SETUP,
                 RobotTokenType.TASK_SETTING_SETUP_KEYWORD_NAME, RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT,
-                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_SETUP_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -758,7 +758,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TEARDOWN,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_NAME,
                 RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -780,7 +780,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Timeout]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_TIMEOUT,
                 RobotTokenType.TASK_SETTING_TIMEOUT_VALUE, RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE,
-                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_TIMEOUT_MESSAGE, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -802,7 +802,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[Documentation]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_DOCUMENTATION,
                 RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT,
-                RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_DOCUMENTATION_TEXT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -828,7 +828,7 @@ public class TaskTableModelUpdaterTest {
         assertThat(cellsOf(setting)).containsExactly("[something]", "a", "b", "c", "#comment");
         assertThat(typesOf(setting)).containsExactly(RobotTokenType.TASK_SETTING_UNKNOWN_DECLARATION,
                 RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS,
-                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                RobotTokenType.TASK_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test

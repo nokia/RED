@@ -59,9 +59,9 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
                 if (posResolver.isCorrectPosition(PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME, currentLine, rt)) {
                     return true;
                 } else if (posResolver.isCorrectPosition(PositionExpected.USER_KEYWORD_NAME, currentLine, rt)) {
-                    if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
-                        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                            rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
+                    if (text.trim().startsWith(RobotTokenType.COMMENT.getRepresentation().get(0))) {
+                        if (!rt.getTypes().contains(RobotTokenType.COMMENT)) {
+                            rt.getTypes().add(RobotTokenType.COMMENT);
                         }
                         return true;
                     }
@@ -88,8 +88,8 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         if (text.startsWith("#") || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
-            types.remove(RobotTokenType.START_HASH_COMMENT);
-            types.add(RobotTokenType.START_HASH_COMMENT);
+            types.remove(RobotTokenType.COMMENT);
+            types.add(RobotTokenType.COMMENT);
             row.addCommentPart(rt);
         } else {
             row.setAction(rt);

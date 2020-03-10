@@ -87,13 +87,8 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
             rt.setText("#" + rt.getText());
         }
 
-        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                && !rt.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
-            if (comment.isEmpty()) {
-                rt.setType(RobotTokenType.START_HASH_COMMENT);
-            } else {
-                rt.setType(RobotTokenType.COMMENT_CONTINUE);
-            }
+        if (!rt.getTypes().contains(RobotTokenType.COMMENT)) {
+            rt.setType(RobotTokenType.COMMENT);
         }
     }
 

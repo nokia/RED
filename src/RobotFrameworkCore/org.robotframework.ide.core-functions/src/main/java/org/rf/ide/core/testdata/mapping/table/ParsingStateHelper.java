@@ -44,8 +44,7 @@ public class ParsingStateHelper {
 
         return (state == ParsingState.TEST_CASE_DECLARATION || state == ParsingState.TASK_DECLARATION
                 || state == ParsingState.KEYWORD_DECLARATION || state == ParsingState.UNKNOWN)
-                && (types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE));
+                && (types.contains(RobotTokenType.COMMENT));
     }
 
     public void updateStatusesForNewLine(final Stack<ParsingState> processingState) {

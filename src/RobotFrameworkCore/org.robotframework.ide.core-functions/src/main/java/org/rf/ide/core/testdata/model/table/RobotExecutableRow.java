@@ -43,16 +43,16 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
         if (action == null) {
             return false;
         }
-        if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        if (!action.getTypes().contains(RobotTokenType.COMMENT)) {
             final String text = action.getText().trim();
 
             if (text.equals("\\")) {
-                return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+                return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.COMMENT);
 
             } else if (text.isEmpty()) {
                 if (fileFormat == FileFormat.TSV
                         || action.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
-                    return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+                    return tokens.size() > 1 && !tokens.get(1).getTypes().contains(RobotTokenType.COMMENT);
                 }
                 return false;
             } else {
@@ -258,7 +258,7 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
 
             return RobotExecutableRow.isExecutable(fileFormat, getElementTokens());
         } else {
-            return !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+            return !action.getTypes().contains(RobotTokenType.COMMENT);
         }
     }
 
@@ -287,7 +287,7 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
             fixTemplateArgumentsTypes();
 
         } else if (1 <= commentsIndex && commentsIndex <= comments.size()) {
-            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT_CONTINUE));
+            comments.add(commentsIndex, RobotToken.create("", RobotTokenType.COMMENT));
         }
     }
 
@@ -414,7 +414,7 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
                 final RobotToken token = elementTokens.get(i);
                 token.getTypes().remove(RobotTokenType.TEST_CASE_TEMPLATE_ARGUMENT);
                 token.getTypes().remove(RobotTokenType.TASK_TEMPLATE_ARGUMENT);
-                if (isTemplateUsed && !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                if (isTemplateUsed && !token.getTypes().contains(RobotTokenType.COMMENT)) {
                     if (i == 0 && !token.getTypes().contains(RobotTokenType.FOR_CONTINUE_TOKEN)
                             && !token.getTypes().contains(RobotTokenType.FOR_WITH_END_CONTINUATION)) {
                         token.getTypes().add(templateArgumentType);
@@ -429,14 +429,8 @@ public class RobotExecutableRow<T> extends CommonStep<T> implements ICommentHold
     }
 
     private void fixCommentsTypes() {
-        for (int i = 0; i < comments.size(); i++) {
-            final RobotToken token = comments.get(i);
-            if (i == 0) {
-                token.setType(RobotTokenType.START_HASH_COMMENT);
-
-            } else if (i > 0) {
-                token.setType(RobotTokenType.COMMENT_CONTINUE);
-            }
+        for (RobotToken token : comments) {
+            token.setType(RobotTokenType.COMMENT);
         }
     }
 }

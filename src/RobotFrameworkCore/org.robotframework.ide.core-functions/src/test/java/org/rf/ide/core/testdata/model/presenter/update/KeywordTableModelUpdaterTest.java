@@ -295,7 +295,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly("action", "a", "b", "#comment");
         assertThat(row.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME, RobotTokenType.KEYWORD_ACTION_ARGUMENT,
-                        RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_ACTION_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -320,7 +320,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -345,7 +345,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -369,7 +369,7 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_TAGS, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
                         RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME, RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME,
-                        RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.COMMENT);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_TEARDOWN,
                         RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME,
                         RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT,
-                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -418,7 +418,7 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_TIMEOUT, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE,
                         RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE,
-                        RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.COMMENT);
     }
 
     @Test
@@ -443,7 +443,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION,
                         RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
                         RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT,
-                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.COMMENT);
     }
 
     @Test
@@ -471,7 +471,7 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_ARGUMENTS, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
                         RobotTokenType.KEYWORD_SETTING_ARGUMENT, RobotTokenType.KEYWORD_SETTING_ARGUMENT,
-                        RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.COMMENT);
     }
 
     @Test
@@ -499,7 +499,7 @@ public class KeywordTableModelUpdaterTest {
         assertThat(setting.getElementTokens()).extracting(token -> token.getTypes().get(0))
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_RETURN, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
                         RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE,
-                        RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.COMMENT);
     }
 
     @Test
@@ -528,7 +528,7 @@ public class KeywordTableModelUpdaterTest {
                 .containsExactly(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
                         RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS,
-                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.START_HASH_COMMENT);
+                        RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, RobotTokenType.COMMENT);
     }
 
     private static List<String> cellsOf(final AModelElement<?> setting) {

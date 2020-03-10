@@ -37,10 +37,8 @@ public class TaskTimeoutDumper extends ANotExecutableTableElementDumper<SettingT
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TIMEOUT_VALUE, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TASK_TIMEOUT_MESSAGE, 2,
                 taskTimeout.getMessageArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
-                elemUtility.filter(taskTimeout.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
-                elemUtility.filter(taskTimeout.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT, 3,
+                elemUtility.filter(taskTimeout.getComment(), RobotTokenType.COMMENT));
 
         return sorter;
     }

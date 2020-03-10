@@ -86,7 +86,7 @@ public class RobotTasksReporter {
         final List<IRobotLineElement> lineElements = line.getLineElements();
 
         return lineElements.stream()
-                .filter(element -> element.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
+                .filter(element -> element.getTypes().contains(RobotTokenType.COMMENT))
                 .map(lineElements::indexOf)
                 .findFirst()
                 .map(Stream::of)

@@ -37,8 +37,7 @@ public class CommentsLabelAccumulator implements IConfigLabelAccumulator {
             final List<RobotToken> tokens = ((RobotKeywordCall) rowObject).getLinkedElement().getElementTokens();
             if (tokens.size() > columnPosition) {
                 final List<IRobotTokenType> types = tokens.get(columnPosition).getTypes();
-                if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                        || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+                if (types.contains(RobotTokenType.COMMENT)) {
                     configLabels.addLabel(COMMENT_CONFIG_LABEL);
                 }
             }

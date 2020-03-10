@@ -374,8 +374,7 @@ public abstract class ExecutableTableElementDumper {
     }
 
     private boolean isComment(final IRobotLineElement token) {
-        final List<IRobotTokenType> types = token.getTypes();
-        return types.contains(RobotTokenType.COMMENT_CONTINUE) || types.contains(RobotTokenType.START_HASH_COMMENT);
+        return token.getTypes().contains(RobotTokenType.COMMENT);
     }
 
     private List<RobotToken> prepareTokens(final AModelElement<? extends IExecutableStepsHolder<?>> currentElement) {
@@ -394,7 +393,7 @@ public abstract class ExecutableTableElementDumper {
                 && !tokens.isEmpty()) {
             final RobotToken firstToken = tokens.get(0);
             if (currentElement.getDeclaration() != firstToken
-                    && firstToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                    && firstToken.getTypes().contains(RobotTokenType.COMMENT)) {
                 tokens.clear();
 
                 final List<RobotToken> tokensInOrderFromModel = currentElement.getElementTokens();

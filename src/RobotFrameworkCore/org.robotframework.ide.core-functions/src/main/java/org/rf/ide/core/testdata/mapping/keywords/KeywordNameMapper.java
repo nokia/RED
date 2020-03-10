@@ -35,7 +35,7 @@ public class KeywordNameMapper implements IParsingMapper {
             if (processingState.contains(ParsingState.KEYWORD_TABLE_INSIDE)) {
                 final String keywordName = rt.getText();
                 return keywordName == null
-                        || !keywordName.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0));
+                        || !keywordName.trim().startsWith(RobotTokenType.COMMENT.getRepresentation().get(0));
             }
         }
         return false;
