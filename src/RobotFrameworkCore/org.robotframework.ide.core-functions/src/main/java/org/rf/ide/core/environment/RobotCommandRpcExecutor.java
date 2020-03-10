@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -479,19 +478,13 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             server = new XmlRpcServer();
             try {
                 server.start(serverPath, port);
+                connectToServer("http://127.0.0.1:" + port, interpreterPath);
+                server.verifyStart();
             } catch (final IOException e) {
                 throw new XmlRpcServerException(
                         String.format("Unable to start XML-RPC server (interpreter: %s, server: %s, port: %d)",
                                 interpreterPath, serverPath, port),
                         e);
-            }
-
-            connectToServer("http://127.0.0.1:" + port, interpreterPath);
-
-            if (!isAlive()) {
-                throw new XmlRpcServerException(
-                        String.format("Unable to start XML-RPC server (interpreter: %s, server: %s, port: %d)",
-                                interpreterPath, serverPath, port));
             }
         }
 
@@ -523,15 +516,20 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
             private Process process;
 
+            private StartExceptionListener startExceptionListener = new StartExceptionListener();
+
             private void start(final String serverPath, final int port) throws IOException {
                 final ProcessBuilder processBuilder = new ProcessBuilder(interpreterPath, serverPath,
                         String.valueOf(port));
                 processBuilder.environment().put("PYTHONIOENCODING", "utf8");
                 process = processBuilder.start();
 
-                final Semaphore semaphore = new Semaphore(0);
-                startStdOutReadingThread(semaphore);
-                startStdErrReadingThread(semaphore);
+                for (final PythonProcessListener listener : getProcessListeners()) {
+                    listener.processStarted(interpreterPath, process);
+                }
+
+                startStdOutReadingThread();
+                startStdErrReadingThread();
             }
 
             private boolean isAlive() {
@@ -550,18 +548,14 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 }
             }
 
-            private void startStdOutReadingThread(final Semaphore semaphore) {
+            private void startStdOutReadingThread() {
                 new Thread(() -> {
-                    for (final PythonProcessListener listener : processListeners.get()) {
-                        listener.processStarted(interpreterPath, process);
-                    }
-                    semaphore.release();
                     final InputStream inputStream = process.getInputStream();
                     try (final BufferedReader reader = new BufferedReader(
                             new InputStreamReader(inputStream, Charsets.UTF_8))) {
                         String line = reader.readLine();
                         while (line != null) {
-                            for (final PythonProcessListener listener : processListeners.get()) {
+                            for (final PythonProcessListener listener : getProcessListeners()) {
                                 listener.lineRead(process, line);
                             }
                             line = reader.readLine();
@@ -569,26 +563,21 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     } catch (final IOException e) {
                         // ignore it
                     } finally {
-                        for (final PythonProcessListener listener : processListeners.get()) {
+                        for (final PythonProcessListener listener : getProcessListeners()) {
                             listener.processEnded(process);
                         }
                     }
                 }).start();
             }
 
-            private void startStdErrReadingThread(final Semaphore semaphore) {
+            private void startStdErrReadingThread() {
                 new Thread(() -> {
-                    try {
-                        semaphore.acquire();
-                    } catch (final InterruptedException e) {
-                        // ignore it
-                    }
                     final InputStream inputStream = process.getErrorStream();
                     try (final BufferedReader reader = new BufferedReader(
                             new InputStreamReader(inputStream, Charsets.UTF_8))) {
                         String line = reader.readLine();
                         while (line != null) {
-                            for (final PythonProcessListener listener : processListeners.get()) {
+                            for (final PythonProcessListener listener : getProcessListeners()) {
                                 listener.errorLineRead(process, line);
                             }
                             line = reader.readLine();
@@ -599,20 +588,58 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 }).start();
             }
 
+            private List<PythonProcessListener> getProcessListeners() {
+                if (startExceptionListener == null) {
+                    return processListeners.get();
+                }
+                final List<PythonProcessListener> listeners = new ArrayList<>();
+                listeners.add(startExceptionListener);
+                listeners.addAll(processListeners.get());
+                return listeners;
+            }
+
+            private void verifyStart() throws IOException {
+                if (isAlive()) {
+                    startExceptionListener = null;
+                } else {
+                    throw new IOException(String.join("\n", startExceptionListener.errorLines));
+                }
+            }
+
         }
 
         @SuppressWarnings("serial")
         private static class XmlRpcServerException extends RuntimeException {
-
-            private XmlRpcServerException(final String message) {
-                super(message);
-            }
 
             private XmlRpcServerException(final String message, final Throwable cause) {
                 super(message, cause);
             }
         }
 
+        private class StartExceptionListener implements PythonProcessListener {
+
+            private final List<String> errorLines = new ArrayList<>();
+
+            @Override
+            public void processStarted(final String name, final Process process) {
+                // nothing to do
+            }
+
+            @Override
+            public void processEnded(final Process process) {
+                // nothing to do
+            }
+
+            @Override
+            public void lineRead(final Process serverProcess, final String line) {
+                // nothing to do
+            }
+
+            @Override
+            public void errorLineRead(final Process serverProcess, final String line) {
+                errorLines.add(line);
+            }
+        }
     }
 
     static class ExternalRobotCommandRpcExecutor extends RobotCommandRpcExecutor {
