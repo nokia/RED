@@ -123,10 +123,6 @@ class ExpressionAstNode {
         return isVar() && varSyntaxIssue == VarSyntaxIssue.MISSING_PAREN;
     }
 
-    boolean hasMissingClosingParen() {
-        return varSyntaxIssue == VarSyntaxIssue.MISSING_PAREN;
-    }
-
     boolean isIndexed() {
         return exprLenghtWithoutIndex != -1 && exprLenghtWithoutIndex < exprLenght;
     }
@@ -172,11 +168,19 @@ class ExpressionAstNode {
         }
     }
 
-    String getTextWithoutItem() {
+    String getVariableName() {
+        if (!isVar()) {
+            throw new IllegalStateException();
+        }
         if (exprLenghtWithoutIndex == -1) {
-            return getText();
+            return getText().substring(2).trim();
+
+        } else if (!children.isEmpty() && children.get(0).isIndex()) {
+            return token.getText().substring(exprOffset + 2, children.get(0).exprOffset).trim();
+
         } else {
-            return token.getText().substring(exprOffset, exprOffset + exprLenghtWithoutIndex);
+            final int shift = isInvalid() ? 0 : 1;
+            return token.getText().substring(exprOffset + 2, exprOffset + exprLenghtWithoutIndex - shift).trim();
         }
     }
 

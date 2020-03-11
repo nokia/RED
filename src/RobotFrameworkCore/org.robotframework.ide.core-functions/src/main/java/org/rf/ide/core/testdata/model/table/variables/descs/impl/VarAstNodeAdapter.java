@@ -38,7 +38,7 @@ class VarAstNodeAdapter implements VariableUse {
 
     @Override
     public String getBaseName() {
-        final String internal = getContentWithoutBraces();
+        final String internal = getVariableName();
         final StringBuilder baseName = new StringBuilder();
 
         for (final char ch : internal.toCharArray()) {
@@ -63,16 +63,16 @@ class VarAstNodeAdapter implements VariableUse {
 
     @Override
     public boolean isDefinedIn(final Set<String> variableDefinitions) {
-        if (node.hasMissingClosingParen() || node.isDynamic()) {
+        if (node.isDynamic()) {
             return false;
 
         } else if (getType() == VariableType.ENVIRONMENT) {
             return true;
 
-        } else if (contains(getContentWithoutBraces(), variableDefinitions)) {
+        } else if (contains(getVariableName(), variableDefinitions)) {
             return true;
 
-        } else if (startsWithANumber(getContentWithoutBraces())) {
+        } else if (startsWithANumber(getVariableName())) {
             return true;
         }
         return contains(getBaseName(), variableDefinitions);
@@ -130,8 +130,7 @@ class VarAstNodeAdapter implements VariableUse {
         return node.getText();
     }
 
-    String getContentWithoutBraces() {
-        final String content = node.getTextWithoutItem().substring(2).trim();
-        return node.hasMissingClosingParen() ? content : content.substring(0, content.length() - 1).trim();
+    String getVariableName() {
+        return node.getVariableName();
     }
 }

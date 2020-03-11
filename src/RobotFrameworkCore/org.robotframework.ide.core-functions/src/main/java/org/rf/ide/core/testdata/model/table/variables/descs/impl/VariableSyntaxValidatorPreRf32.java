@@ -21,7 +21,7 @@ class VariableSyntaxValidatorPreRf32 extends VariableSyntaxValidator {
             return;
         }
 
-        final String name = varNode.getContentWithoutBraces();
+        final String name = varNode.getVariableName();
 
         if (name.isEmpty() || name.contains("{") || name.contains("}")) {
             throw new VariableUseSyntaxException("The name '" + varNode.asToken().getText() + "' is invalid",
