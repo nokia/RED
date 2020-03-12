@@ -86,10 +86,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
 
         final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
         if (text.startsWith("#") || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
-            types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
-            types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
-            types.remove(RobotTokenType.COMMENT);
-            types.add(RobotTokenType.COMMENT);
+            rt.setType(RobotTokenType.COMMENT);
             row.addCommentPart(rt);
         } else {
             row.setAction(rt);

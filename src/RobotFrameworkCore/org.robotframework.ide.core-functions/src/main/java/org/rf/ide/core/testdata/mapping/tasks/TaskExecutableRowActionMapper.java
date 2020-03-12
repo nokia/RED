@@ -81,10 +81,7 @@ public class TaskExecutableRowActionMapper implements IParsingMapper {
         final RobotExecutableRow<Task> row = new RobotExecutableRow<>();
         if (text.startsWith(" #") || text.startsWith("#")
                 || HashCommentMapper.isTsvComment(text, robotFileOutput.getFileFormat())) {
-            types.remove(RobotTokenType.TASK_ACTION_NAME);
-            types.remove(RobotTokenType.TASK_ACTION_ARGUMENT);
-            types.remove(RobotTokenType.COMMENT);
-            types.add(RobotTokenType.COMMENT);
+            rt.setType(RobotTokenType.COMMENT);
             row.addCommentPart(rt);
         } else {
             row.setAction(rt);
