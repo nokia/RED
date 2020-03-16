@@ -32,12 +32,10 @@ import org.robotframework.red.junit.jupiter.ProjectExtension;
 import org.robotframework.red.junit.jupiter.RedTempDirectory;
 import org.robotframework.red.junit.jupiter.StatefulProject;
 
-import com.google.common.collect.ImmutableMap;
-
 @ExtendWith({ ProjectExtension.class, RedTempDirectory.class, LaunchConfigExtension.class })
 public class RerunNonExecutedHandlerTest {
 
-    @Project(dirs = { "dir", "dir/dir" }, cleanUpAfterEach = true)
+    @Project(cleanUpAfterEach = true)
     static StatefulProject project;
 
     @LaunchConfig(typeId = RobotLaunchConfiguration.TYPE_ID, name = "robot")
@@ -93,7 +91,7 @@ public class RerunNonExecutedHandlerTest {
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
         assertThatExceptionOfType(CoreException.class)
                 .isThrownBy(() -> RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch))
-                .withMessage("Non executed tests do not exist")
+                .withMessage("Non executed elements do not exist")
                 .withNoCause();
     }
 
@@ -107,11 +105,19 @@ public class RerunNonExecutedHandlerTest {
         robotConfig.setProjectName(project.getName());
         project.createFile("suite.robot");
 
-        final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "Suite",
+                URI.create("file:///" + project.getLocation().toPortableString() + "/suite.robot"));
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
+        suite.addChildren(test);
+        root.addChildren(suite);
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
         assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
+                .containsEntry("Robot arguments", "-t RerunNonExecutedHandlerTest.Suite.test");
     }
 
     @Test
@@ -123,13 +129,27 @@ public class RerunNonExecutedHandlerTest {
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(project.getName());
-        project.createFile("dir/dir/suite.robot");
+        project.createFile("dir1");
 
-        final ExecutionStatusStore store = createExecutionStatusStore("/dir/dir/suite.robot");
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode dir1 = ExecutionTreeNode.newSuiteNode(root, "Dir1",
+                URI.create("file:///" + project.getLocation().toPortableString() + "/dir1"));
+        final ExecutionTreeNode dir2 = ExecutionTreeNode.newSuiteNode(dir1, "Dir2",
+                URI.create("file:///" + project.getLocation().toPortableString() + "/dir1/dir2"));
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(dir2, "Suite",
+                URI.create("file:///" + project.getLocation().toPortableString() + "/suite.robot"));
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
+        suite.addChildren(test);
+        dir2.addChildren(suite);
+        dir1.addChildren(dir2);
+        root.addChildren(dir1);
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
         assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Test suites", ImmutableMap.of("dir/dir/suite.robot", "test"));
+                .containsEntry("Robot arguments", "-t RerunNonExecutedHandlerTest.Dir1.Dir2.Suite.test");
     }
 
     @Test
@@ -142,34 +162,28 @@ public class RerunNonExecutedHandlerTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(project.getName());
 
-        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
-        project.createFileLink("linkedSuite.robot", linkedNonWorkspaceFile.toURI());
+        final File linkedNonWorkspaceDir = RedTempDirectory.createNewDir(tempFolder, "linked_dir");
+        RedTempDirectory.createNewFile(linkedNonWorkspaceDir, "linked_suite.robot");
+        project.createDirLink("linked_dir", linkedNonWorkspaceDir.toURI());
+        project.getFile("linked_dir");
 
-        final ExecutionStatusStore store = createExecutionStatusStore("/linkedSuite.robot");
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
+        final ExecutionTreeNode dir = ExecutionTreeNode.newSuiteNode(root, "Linked Dir",
+                URI.create(linkedNonWorkspaceDir.toURI().toString()));
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(dir, "Linked Suite",
+                URI.create(linkedNonWorkspaceDir.toURI().toString() + "/linked_suite.robot"));
+        final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
+        suite.addChildren(test);
+        dir.addChildren(suite);
+        root.addChildren(dir);
 
-        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
-        assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Test suites", ImmutableMap.of("linkedSuite.robot", "test"));
-    }
-
-    @Test
-    public void configurationForNonExecutedTestsRerunIsReturned_whenNonExecutedTestsExistAndSuiteIsLinkedAndNasted()
-            throws Exception {
-        final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
-        when(configuration.exists()).thenReturn(true);
-
-        final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setProjectName(project.getName());
-
-        final File linkedNonWorkspaceFile = RedTempDirectory.createNewFile(tempFolder, "non_workspace_test.robot");
-        project.createFileLink("dir/linkedSuite.robot", linkedNonWorkspaceFile.toURI());
-
-        final ExecutionStatusStore store = createExecutionStatusStore("/dir/linkedSuite.robot");
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
 
         when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
         assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Test suites", ImmutableMap.of("dir/linkedSuite.robot", "test"));
+                .containsEntry("Robot arguments",
+                        "-t \"RerunNonExecutedHandlerTest & Linked Dir.Linked Dir.Linked Suite.test\"");
     }
 
     @Test
@@ -177,35 +191,30 @@ public class RerunNonExecutedHandlerTest {
             throws Exception {
         final ILaunchConfigurationWorkingCopy configuration = createConfigurationSpy();
         when(configuration.exists()).thenReturn(true);
-        configuration.setAttribute("Robot arguments", "-a -b -c");
+        configuration.setAttribute("Robot arguments", "-a a -b b -c c");
 
         final RobotTestsLaunch launch = spy(new RobotTestsLaunch(configuration));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName(project.getName());
         project.createFile("suite.robot");
 
-        final ExecutionStatusStore store = createExecutionStatusStore("/suite.robot");
-
-        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
-        assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
-                .containsEntry("Robot arguments", "-a -b -c")
-                .containsEntry("Test suites", ImmutableMap.of("suite.robot", "test"));
-    }
-
-    private ILaunchConfigurationWorkingCopy createConfigurationSpy() throws CoreException {
-        return spy(launchCfg.getWorkingCopy());
-    }
-
-    private ExecutionStatusStore createExecutionStatusStore(final String suitePath) {
         final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", null);
-        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "suite",
-                URI.create("file:///" + project.getLocation().toPortableString() + suitePath));
+        final ExecutionTreeNode suite = ExecutionTreeNode.newSuiteNode(root, "Suite",
+                URI.create("file:///" + project.getLocation().toPortableString() + "/suite.robot"));
         final ExecutionTreeNode test = ExecutionTreeNode.newTestNode(suite, "test", suite.getPath());
         suite.addChildren(test);
         root.addChildren(suite);
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
-        return store;
+
+        when(launch.getExecutionData(ExecutionStatusStore.class)).thenReturn(Optional.of(store));
+        assertThat(RerunNonExecutedHandler.E4ShowNonExecutedOnlyHandler.getConfig(launch).getAttributes())
+                .containsEntry("Robot arguments",
+                        "-a a -b b -c c -t RerunNonExecutedHandlerTest.Suite.test");
+    }
+
+    private ILaunchConfigurationWorkingCopy createConfigurationSpy() throws CoreException {
+        return spy(launchCfg.getWorkingCopy());
     }
 }

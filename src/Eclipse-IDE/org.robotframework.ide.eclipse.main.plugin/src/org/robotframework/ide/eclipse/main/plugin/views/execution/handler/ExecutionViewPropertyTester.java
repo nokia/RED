@@ -33,9 +33,9 @@ public class ExecutionViewPropertyTester extends PropertyTester {
     public static final String PROPERTY_CURRENT_LAUNCH_HAS_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_TEST;
 
     @VisibleForTesting
-    static final String CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = "currentLaunchHasNonExecutedTest";
-    public static final String PROPERTY_CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = NAMESPACE + "."
-            + CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST;
+    static final String CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS = "currentLaunchHasNonExecutedElements";
+    public static final String PROPERTY_CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS = NAMESPACE + "."
+            + CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS;
 
     @VisibleForTesting static final String CURRENT_LAUNCH_HAS_FAILED_TEST = "currentLaunchHasFailedTest";
     public static final String PROPERTY_CURRENT_LAUNCH_HAS_FAILED_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_FAILED_TEST;
@@ -86,7 +86,7 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
                     .map(ExecutionStatusStore::getTotalTests).orElse(0);
             return numberOfTests > 0 == expectedValue;
-        } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST.equals(property)) {
+        } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS.equals(property)) {
             final int numberOfNonExecutionTests = view.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
                     .map(ExecutionStatusStore::getNonExecutedTests).orElse(0);

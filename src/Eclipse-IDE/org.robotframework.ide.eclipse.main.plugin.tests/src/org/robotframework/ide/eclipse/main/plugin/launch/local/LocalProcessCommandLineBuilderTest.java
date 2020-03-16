@@ -16,11 +16,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
@@ -1022,115 +1019,7 @@ public class LocalProcessCommandLineBuilderTest {
         assertThat(commandLine.getArgumentFile()).isNotPresent();
     }
 
-    @Test
-    public void topLevelSuiteNameIsCreatedFromDataSources_whenRobotArgumentsDoNotContainNameArgument()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        dataSources.add(project.getFile("LinkedSuite"));
-        robotArguments.addAll(newArrayList("-s", "Suite.robot"));
 
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo(project.getProject().getName() + " & " + project.getFile("LinkedSuite").getName());
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromDataSources_whenRobotArgumentsAreEmpty() throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        dataSources.add(project.getFile("LinkedSuite"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo(project.getProject().getName() + " & " + project.getFile("LinkedSuite").getName());
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromDataSources_whenRobotArgumentsContainEmptyNameArgument_1()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        dataSources.add(project.getFile("LinkedSuite.robot"));
-        robotArguments.addAll(newArrayList("-s", "LinkedSuite.robot", "--name"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo(project.getProject().getName() + " & " + project.getFile("LinkedSuite").getName());
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromDataSources_whenRobotArgumentsContainEmptyNameArgument_2()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        dataSources.add(project.getFile("LinkedSuite.robot"));
-        robotArguments.addAll(newArrayList("--name", "-s", "LinkedSuite.robot"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo(project.getProject().getName() + " & " + project.getFile("LinkedSuite").getName());
-    }
-
-    @Test
-    public void topLevelSuiteNameIsNotCreatedFromSingleDataSource_whenRobotArgumentsDoNotContainNameArgument()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        robotArguments.addAll(newArrayList("-s", "Suite.robot"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments)).isEmpty();
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromNameArgument_whenRobotArgumentsContainNameArgument_1()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        robotArguments.addAll(newArrayList("--name", "OtherName", "-s", "Suite.robot"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo("OtherName");
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromNameArgument_whenRobotArgumentsContainNameArgument_2()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        robotArguments.addAll(newArrayList("-N", "OtherName", "-s", "Suite.robot"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo("OtherName");
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromNameArgument_whenRobotArgumentsContainNameArgumentAndThereAreTwoDataSources()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        dataSources.add(project.getFile("LinkedSuite.robot"));
-        robotArguments.addAll(newArrayList("-s", "LinkedSuite.robot", "--name", "Other Name"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo("Other Name");
-    }
-
-    @Test
-    public void topLevelSuiteNameIsCreatedFromLastNameArgument_whenRobotArgumentsContainDuplicatedNameArgument()
-            throws CoreException {
-        final List<IResource> dataSources = new ArrayList<>();
-        final List<String> robotArguments = new ArrayList<>();
-        dataSources.add(project.getProject());
-        robotArguments.addAll(newArrayList("--name", "OtherName", "--name", "SecondOtherName"));
-
-        assertThat(LocalProcessCommandLineBuilder.createTopLevelSuiteName(dataSources, robotArguments))
-                .isEqualTo("SecondOtherName");
-    }
 
     @Test
     public void commandLineContainsSuitesToRun_whenProjectIsOutsideOfWorkspace() throws Exception {

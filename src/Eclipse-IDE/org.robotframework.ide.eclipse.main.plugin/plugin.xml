@@ -5626,7 +5626,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester"
           id="org.robotframework.red.view.executionProgress"
           namespace="org.robotframework.red.view.execution"
-          properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasTest,currentLaunchHasNonExecutedTest,currentLaunchHasFailedTest"
+          properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed,currentLaunchHasTest,currentLaunchHasNonExecutedElements,currentLaunchHasFailedTest"
           type="org.eclipse.ui.IWorkbenchWindow">
     </propertyTester>
     <propertyTester
@@ -7417,8 +7417,8 @@
          </command>
          <command
                categoryId="org.robotframework.ide.eclipse.robotCommands"
-               id="org.robotframework.red.view.execution.rerunNonExecutedTests"
-               name="Rerun Non Executed Tests">
+               id="org.robotframework.red.view.execution.rerunNonExecutedElements"
+               name="Rerun Non Executed Elements">
          </command>
          <command
                categoryId="org.robotframework.ide.eclipse.robotCommands"
@@ -7517,7 +7517,7 @@
          </handler>
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunNonExecutedHandler"
-               commandId="org.robotframework.red.view.execution.rerunNonExecutedTests">
+               commandId="org.robotframework.red.view.execution.rerunNonExecutedElements">
                <enabledWhen>
                <with
                      variable="activeWorkbenchWindow">
@@ -7531,7 +7531,7 @@
                            value="false">
                      </test>
                      <test
-                           property="org.robotframework.red.view.execution.currentLaunchHasNonExecutedTest"
+                           property="org.robotframework.red.view.execution.currentLaunchHasNonExecutedElements"
                            value="true">
                      </test>
                   </and>
@@ -7610,9 +7610,9 @@
                   style="push">
             </command>
             <command
-                  commandId="org.robotframework.red.view.execution.rerunNonExecutedTests"
+                  commandId="org.robotframework.red.view.execution.rerunNonExecutedELements"
                   icon="resources/relaunchne.png"
-                  label="Rerun Non-Executed Tests Only"
+                  label="Rerun Non Executed Elements Only"
                   style="push">
             </command>
          </menuContribution>

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 
@@ -65,17 +64,14 @@ public class RerunNonExecutedHandler extends DIParameterizedHandler<E4ShowNonExe
                 final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
                 final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfigCopy);
                 final IProject project = new RobotLaunchConfiguration(launchConfigCopy).getProject();
-                final List<String> linkedResourcesPaths = robotConfig.getLinkedResourcesPaths();
-
                 final ExecutionStatusStore statusStore = launch.getExecutionData(ExecutionStatusStore.class).get();
-                final Map<String, List<String>> nonExecutedSuitesPaths = statusStore.getNonExecutedSuitePaths(project,
-                        linkedResourcesPaths);
+                final List<String> nonExecutedTestOrTaskPaths = statusStore.getNonExecutedTestsOrTasksPaths(project, robotConfig);
 
-                if (!nonExecutedSuitesPaths.isEmpty()) {
-                    RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(launchConfigCopy, nonExecutedSuitesPaths);
+                if (!nonExecutedTestOrTaskPaths.isEmpty()) {
+                    RobotLaunchConfiguration.fillForNonExecutedTestsOrTasksRerun(launchConfigCopy, nonExecutedTestOrTaskPaths);
                     return launchConfigCopy;
                 } else {
-                    throw newCoreException("Non executed tests do not exist");
+                    throw newCoreException("Non executed elements do not exist");
                 }
             } else {
                 throw newCoreException("Launch configuration does not exist");

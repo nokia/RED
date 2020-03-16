@@ -114,10 +114,16 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.setEnvironmentVariables(RedPlugin.getDefault().getPreferences().getLaunchEnvironmentVariables());
     }
 
-    public static void fillForFailedOrNonExecutedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
+    public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
             final Map<String, List<String>> suitePaths) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setSuitePaths(suitePaths);
+    }
+
+    public static void fillForNonExecutedTestsOrTasksRerun(final ILaunchConfigurationWorkingCopy launchConfig,
+            final List<String> testOrTasksPaths) throws CoreException {
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
+        robotConfig.setRobotArguments(RobotLaunchConfigurationHelper.collectRobotArguments(robotConfig, testOrTasksPaths));
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {

@@ -342,18 +342,18 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void failedOrNonExecutedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithoutExistingArguments()
+    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithoutExistingArguments()
             throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(getFile(project, "Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        final Map<String, List<String>> failedOrNonExecutedSuitePaths = new HashMap<>();
-        failedOrNonExecutedSuitePaths.put("Suite1", asList("test1", "test2"));
-        failedOrNonExecutedSuitePaths.put("Suite2", asList("test1", "test2"));
+        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
+        failedSuitePaths.put("Suite1", asList("test1", "test2"));
+        failedSuitePaths.put("Suite2", asList("test1", "test2"));
 
-        RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(robotConfig.asWorkingCopy(),
-                failedOrNonExecutedSuitePaths);
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(),
+                failedSuitePaths);
 
         assertThat(robotConfig.getRobotArguments()).isEmpty();
         assertThat(robotConfig.getSuitePaths()).hasSize(2);
@@ -363,23 +363,97 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void failedOrNonExecutedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithExistingArguments()
+    public void failedSuitePathsAreAddedToSuitePathsArgument_whenAskedForRerunWithExistingArguments()
             throws CoreException {
         final ILaunchConfiguration config = RobotLaunchConfiguration
                 .prepareDefault(asList(getFile(project, "Resource")));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
-        final Map<String, List<String>> failedOrNonExecutedSuitePaths = new HashMap<>();
-        failedOrNonExecutedSuitePaths.put("Suite", asList("test"));
+        final Map<String, List<String>> failedSuitePaths = new HashMap<>();
+        failedSuitePaths.put("Suite", asList("test"));
 
         robotConfig.setRobotArguments("-a -b -c");
-        RobotLaunchConfiguration.fillForFailedOrNonExecutedTestsRerun(robotConfig.asWorkingCopy(),
-                failedOrNonExecutedSuitePaths);
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(),
+                failedSuitePaths);
 
         assertThat(robotConfig.getRobotArguments()).contains("-a -b -c");
         assertThat(robotConfig.getSuitePaths()).hasSize(1);
         assertThat(robotConfig.getSuitePaths()).containsEntry("Suite", asList("test"));
         assertThat(robotConfig.getUnselectedSuitePaths()).isEmpty();
+    }
+
+    @Test
+    public void nonExecutedTestsPathsAreAddedToRobotArguments_whenAskedForRerunWithoutExistingArguments()
+            throws CoreException {
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(getFile(project, "Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        final List<String> nonExecutedTestPaths = new ArrayList<>();
+        nonExecutedTestPaths.add("Suite 1.test1");
+        nonExecutedTestPaths.add("Suite1.test2");
+        nonExecutedTestPaths.add("Suite 2.test1");
+        nonExecutedTestPaths.add("Suite2.test2");
+
+        RobotLaunchConfiguration.fillForNonExecutedTestsOrTasksRerun(robotConfig.asWorkingCopy(),
+                nonExecutedTestPaths);
+
+        assertThat(robotConfig.getRobotArguments()).containsOnlyOnce(
+                "-t \"Suite 1.test1\" -t Suite1.test2 -t \"Suite 2.test1\" -t Suite2.test2");
+    }
+
+    @Test
+    public void nonExecutedTestsPathsAreAddedToRobotArguments_whenAskedForRerunWithExistingArguments()
+            throws CoreException {
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(getFile(project, "Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        final List<String> nonExecutedTestPaths = new ArrayList<>();
+        nonExecutedTestPaths.add("Suite1.test1");
+
+        robotConfig.setRobotArguments("-a a -b b -c c");
+        RobotLaunchConfiguration.fillForNonExecutedTestsOrTasksRerun(robotConfig.asWorkingCopy(),
+                nonExecutedTestPaths);
+
+        assertThat(robotConfig.getRobotArguments())
+                .containsOnlyOnce("-a a -b b -c c -t Suite1.test1");
+    }
+
+    @Test
+    public void nonExecutedTestsPathsAreAddedToRobotArguments_whenAskedForRerunWithExistingArgumentsWhichContainOldTests()
+            throws CoreException {
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(getFile(project, "Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        final List<String> nonExecutedTestPaths = new ArrayList<>();
+        nonExecutedTestPaths.add("Suite1.test1");
+
+        robotConfig.setRobotArguments("-a a -b \"b b\" -c c --test oldTest1 -t old Test2");
+        RobotLaunchConfiguration.fillForNonExecutedTestsOrTasksRerun(robotConfig.asWorkingCopy(),
+                nonExecutedTestPaths);
+
+        assertThat(robotConfig.getRobotArguments())
+                .containsOnlyOnce("-a a -b \"b b\" -c c -t Suite1.test1");
+    }
+
+    @Test
+    public void nonExecutedTasksPathsAreAddedToRobotArguments_whenAskedForRerunWithExistingArgumentsWhichContainOldTasks()
+            throws CoreException {
+        final ILaunchConfiguration config = RobotLaunchConfiguration
+                .prepareDefault(asList(getFile(project, "Resource")));
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
+
+        final List<String> nonExecutedTaskPaths = new ArrayList<>();
+        nonExecutedTaskPaths.add("Suite1.task1");
+
+        robotConfig.setRobotArguments("-a a -b \"b b\" -c c --task oldTask1");
+        RobotLaunchConfiguration.fillForNonExecutedTestsOrTasksRerun(robotConfig.asWorkingCopy(),
+                nonExecutedTaskPaths);
+
+        assertThat(robotConfig.getRobotArguments())
+                .containsOnlyOnce("-a a -b \"b b\" -c c -t Suite1.task1");
     }
 
     @Test
