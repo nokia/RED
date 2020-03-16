@@ -83,7 +83,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
     }
 
     protected void fixComment(final List<RobotToken> comment, final RobotToken rt) {
-        if (comment.isEmpty() && !rt.getText().startsWith("#")) {
+        if (comment.isEmpty() && !rt.getText().trim().startsWith("#")) {
             rt.setText("#" + rt.getText());
         }
 
