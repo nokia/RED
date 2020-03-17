@@ -716,8 +716,8 @@ public class RobotSuiteAutoEditStrategyTest {
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            if (separators.contains(offset) && !lastRange(separators).contains(offset)) {
-                final Range<Integer> separator = separators.rangeContaining(offset);
+            final Range<Integer> separator = separators.rangeContaining(offset);
+            if (separator != null && !lastRange(separators).contains(offset)) {
                 final int separatorStart = separator.lowerEndpoint();
                 final int separatorEnd = separator.upperEndpoint();
                 if (separatorStart == offset) {
@@ -752,8 +752,8 @@ public class RobotSuiteAutoEditStrategyTest {
             final RobotSuiteAutoEditStrategy strategy = new RobotSuiteAutoEditStrategy(preferences, false);
             strategy.customizeDocumentCommand(document, command);
 
-            if (separators.contains(offset) && !lastRange(separators).contains(offset)) {
-                final Range<Integer> separator = separators.rangeContaining(offset);
+            final Range<Integer> separator = separators.rangeContaining(offset);
+            if (separator != null && !lastRange(separators).contains(offset)) {
                 final int separatorStart = separator.lowerEndpoint();
                 final int separatorEnd = separator.upperEndpoint();
                 if (separatorStart == offset) {

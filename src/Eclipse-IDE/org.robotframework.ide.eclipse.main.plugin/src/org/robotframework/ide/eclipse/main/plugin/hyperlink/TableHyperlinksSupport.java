@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -47,7 +48,6 @@ import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 
 public class TableHyperlinksSupport {
@@ -111,13 +111,7 @@ public class TableHyperlinksSupport {
     private void openHyperlink(final IHyperlink linkToOpen) {
         removeHyperlink();
 
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                linkToOpen.open();
-            }
-        });
+        SwtThread.asyncExec(linkToOpen::open);
     }
 
     public List<ITableHyperlinksDetector> getDetectors() {
@@ -126,14 +120,9 @@ public class TableHyperlinksSupport {
 
     @VisibleForTesting
     static Optional<IRegion> getMergedHyperlinkRegion(final Collection<IHyperlink> hyperlinks) {
-        if (hyperlinks.isEmpty()) {
-            return Optional.empty();
-        }
-        IRegion hyperlinkRegion = Iterables.getFirst(hyperlinks, null).getHyperlinkRegion();
-        for (final IHyperlink link : hyperlinks) {
-            hyperlinkRegion = merge(hyperlinkRegion, link.getHyperlinkRegion());
-        }
-        return Optional.of(hyperlinkRegion);
+        return hyperlinks.stream()
+                .map(IHyperlink::getHyperlinkRegion)
+                .collect(Collectors.reducing(TableHyperlinksSupport::merge));
     }
 
     private static IRegion merge(final IRegion region1, final IRegion region2) {
@@ -361,6 +350,7 @@ public class TableHyperlinksSupport {
     }
 
     private static class HyperlinksLabelProvider extends RedCommonLabelProvider {
+
         @Override
         public StyledString getStyledText(final Object element) {
             final IHyperlink hyperlink = (IHyperlink) element;

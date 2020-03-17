@@ -5,7 +5,6 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -140,7 +139,8 @@ public class SettingsTemplateRuleTest {
 
     @Test
     public void templateSettingsArgsAreNotRecognizeIfNoneIsUsedAsKeywordName() {
-        final List<PositionedTextToken> coloredTokens = createNoneAwareSettingsTokens().stream()
+        final List<PositionedTextToken> coloredTokens = createTokens(TokensSource::createTokensOfNoneAwareSettings)
+                .stream()
                 .map(this::evaluate)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -157,21 +157,13 @@ public class SettingsTemplateRuleTest {
         return testedRule.evaluate(token, position, new ArrayList<>());
     }
 
-    static List<RobotToken> createNoneAwareSettingsTokens() {
-        return createTokens(TokensSource::createTokensOfNoneAwareSettings);
-    }
-
-    static List<RobotToken> createTokens() {
-        return createTokens(TokensSource::createTokensInLines);
-    }
-
-    static List<RobotToken> createTokens(final Supplier<List<RobotLine>> linesSupplier) {
+    private static List<RobotToken> createTokens(final Supplier<List<RobotLine>> linesSupplier) {
         final List<RobotLine> lines = linesSupplier.get();
-        final List<RobotToken> tokens = new ArrayList<>();
-        for (final RobotLine line : lines) {
-            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
-        }
-        return tokens;
+        return lines.stream()
+                .flatMap(line -> line.getLineElements().stream())
+                .filter(RobotToken.class::isInstance)
+                .map(RobotToken.class::cast)
+                .collect(toList());
     }
 
     private RobotToken createToken(final String kwName) {

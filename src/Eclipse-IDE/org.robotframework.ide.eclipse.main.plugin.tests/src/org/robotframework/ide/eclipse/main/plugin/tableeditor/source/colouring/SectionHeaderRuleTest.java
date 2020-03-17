@@ -5,8 +5,6 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -114,10 +112,11 @@ public class SectionHeaderRuleTest {
                 .appendLine("*** unknown section *** ")
                 .build();
         final List<RobotLine> lines = model.getLinkedElement().getFileContent();
-        final List<RobotToken> tokens = new ArrayList<>();
-        for (final RobotLine line : lines) {
-            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
-        }
-        return tokens.stream().filter(token -> token.getText().contains("*")).collect(toList());
+        return lines.stream()
+                .flatMap(line -> line.getLineElements().stream())
+                .filter(RobotToken.class::isInstance)
+                .map(RobotToken.class::cast)
+                .filter(token -> token.getText().contains("*"))
+                .collect(toList());
     }
 }

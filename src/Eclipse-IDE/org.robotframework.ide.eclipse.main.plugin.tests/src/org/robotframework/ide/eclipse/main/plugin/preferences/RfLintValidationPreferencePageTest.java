@@ -5,7 +5,6 @@
 */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -120,10 +119,7 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Tree> getTrees() {
-        return Controls.getControlsStream(shell)
-                .filter(c -> c instanceof Tree)
-                .map(c -> Tree.class.cast(c))
-                .collect(toList());
+        return Controls.getControls(shell, Tree.class);
     }
 
     private Text getAdditionalArgumentsField() {
@@ -131,9 +127,6 @@ public class RfLintValidationPreferencePageTest {
     }
 
     private List<Text> getTextFields() {
-        return Controls.getControlsStream(shell)
-                .filter(c -> c instanceof Text)
-                .map(c -> Text.class.cast(c))
-                .collect(toList());
+        return Controls.getControls(shell, Text.class);
     }
 }

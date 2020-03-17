@@ -176,6 +176,6 @@ public class ActiveStringSubstitutionSetsPreferencePageTest {
     }
 
     private Tree getSetsTree() {
-        return (Tree) Controls.findControlSatisfying(shell, c -> c instanceof Tree).get();
+        return (Tree) Controls.findControlSatisfying(shell, Tree.class::isInstance).get();
     }
 }
