@@ -7610,7 +7610,7 @@
                   style="push">
             </command>
             <command
-                  commandId="org.robotframework.red.view.execution.rerunNonExecutedELements"
+                  commandId="org.robotframework.red.view.execution.rerunNonExecutedElements"
                   icon="resources/relaunchne.png"
                   label="Rerun Non Executed Elements Only"
                   style="push">

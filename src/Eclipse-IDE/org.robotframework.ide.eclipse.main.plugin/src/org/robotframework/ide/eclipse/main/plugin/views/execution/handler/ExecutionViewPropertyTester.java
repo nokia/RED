@@ -87,10 +87,10 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .map(ExecutionStatusStore::getTotalTests).orElse(0);
             return numberOfTests > 0 == expectedValue;
         } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS.equals(property)) {
-            final int numberOfNonExecutionTests = view.getCurrentlyShownLaunch()
+            final int numberOfNonExecutedTests = view.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
                     .map(ExecutionStatusStore::getNonExecutedTests).orElse(0);
-            return numberOfNonExecutionTests > 0 == expectedValue;
+            return numberOfNonExecutedTests > 0 == expectedValue;
         } else if (CURRENT_LAUNCH_HAS_FAILED_TEST.equals(property)) {
             final int numberOfFailedTests = view.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
