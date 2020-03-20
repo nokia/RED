@@ -57,8 +57,7 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage(
-                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
+                .withMessage("Unable to find output console for launch configuration:\nredName [redType]")
                 .withNoCause();
 
         verify(consolesSupplier).get();
@@ -74,8 +73,7 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage(
-                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
+                .withMessage("Unable to find output console for launch configuration:\nredName [redType]")
                 .withNoCause();
 
         verify(consolesSupplier).get();
@@ -92,8 +90,7 @@ public class RobotConsoleFacadeTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> RobotConsoleFacade.findConsole(config, "redDescription", consolesSupplier, 0))
-                .withMessage(
-                        "Unable to find output console. Trying to look for a console with name:\nredName [redType] redDescription")
+                .withMessage("Unable to find output console for launch configuration:\nredName [redType]")
                 .withNoCause();
 
         verify(consolesSupplier).get();
@@ -121,7 +118,7 @@ public class RobotConsoleFacadeTest {
     @Test
     public void firstMatchingIOConsoleIsFound_whenNameContainsRequestedOne() throws Exception {
         final IOConsole console1 = mock(IOConsole.class);
-        when(console1.getName()).thenReturn("remoteName [remoteType] remoteDescription ABC");
+        when(console1.getName()).thenReturn("ABC remoteName [remoteType] remoteDescription DEF");
         final IOConsole console2 = mock(IOConsole.class);
         when(consolesSupplier.get()).thenReturn(new IConsole[] { mock(IConsole.class), console1, mock(IConsole.class),
                 console2, mock(IConsole.class), });
@@ -130,6 +127,24 @@ public class RobotConsoleFacadeTest {
                 "remoteName");
 
         assertThat(RobotConsoleFacade.findConsole(config, "remoteDescription", consolesSupplier, 0)).isSameAs(console1);
+
+        verify(consolesSupplier).get();
+        verifyNoMoreInteractions(consolesSupplier);
+    }
+
+    @Test
+    public void firstMatchingIOConsoleIsFound_whenNameContainsRequestedOneWithoutProcessLabel() throws Exception {
+        final IOConsole console1 = mock(IOConsole.class);
+        when(console1.getName()).thenReturn("otherConsole");
+        final IOConsole console2 = mock(IOConsole.class);
+        when(console2.getName()).thenReturn("remoteName [remoteType]");
+        when(consolesSupplier.get()).thenReturn(new IConsole[] { mock(IConsole.class), console1, mock(IConsole.class),
+                console2, mock(IConsole.class), });
+
+        final ILaunchConfiguration config = createConfigMock(RemoteRobotLaunchConfiguration.TYPE_ID, "remoteType",
+                "remoteName");
+
+        assertThat(RobotConsoleFacade.findConsole(config, "remoteDescription", consolesSupplier, 0)).isSameAs(console2);
 
         verify(consolesSupplier).get();
         verifyNoMoreInteractions(consolesSupplier);

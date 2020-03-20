@@ -33,8 +33,9 @@ public class RobotConsoleFacade {
         this.stream = stream;
     }
 
-    public static RobotConsoleFacade provide(final ILaunchConfiguration launchConfiguration, final String description) {
-        final IOConsole console = findConsole(launchConfiguration, description,
+    public static RobotConsoleFacade provide(final ILaunchConfiguration launchConfiguration,
+            final String processLabel) {
+        final IOConsole console = findConsole(launchConfiguration, processLabel,
                 () -> ConsolePlugin.getDefault().getConsoleManager().getConsoles(), 5_000);
         final IOConsoleOutputStream stream = console.newOutputStream();
         SwtThread.syncExec(() -> stream.setColor(RedTheme.Colors.getRobotConsoleRedStreamColor()));
@@ -42,18 +43,17 @@ public class RobotConsoleFacade {
     }
 
     @VisibleForTesting
-    static IOConsole findConsole(final ILaunchConfiguration launchConfiguration, final String description,
+    static IOConsole findConsole(final ILaunchConfiguration launchConfiguration, final String processLabel,
             final Supplier<IConsole[]> consolesSupplier, final int timeout) {
         final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                 .robotLaunchConfiguration(launchConfiguration);
-        final String consoleName = robotConfig.getName() + " [" + robotConfig.getTypeName() + "] " + description;
+        final String configLabel = robotConfig.getName() + " [" + robotConfig.getTypeName() + "]";
 
         // since 4.10 console creation mechanism was changed from a synchronous to an asynchronous
         final long start = System.currentTimeMillis();
         while (true) {
-            final IConsole[] existingConsoles = consolesSupplier.get();
-            for (final IConsole console : existingConsoles) {
-                if (console instanceof IOConsole && console.getName().contains(consoleName)) {
+            for (final IConsole console : consolesSupplier.get()) {
+                if (console instanceof IOConsole && nameMatches(console, configLabel, processLabel)) {
                     return (IOConsole) console;
                 }
             }
@@ -67,9 +67,14 @@ public class RobotConsoleFacade {
             // to avoid infinite loops
             if (System.currentTimeMillis() - start > timeout) {
                 throw new IllegalStateException(
-                        "Unable to find output console. Trying to look for a console with name:\n" + consoleName);
+                        "Unable to find output console for launch configuration:\n" + configLabel);
             }
         }
+    }
+
+    private static boolean nameMatches(final IConsole console, final String configLabel, final String processLabel) {
+        // since 4.15 process label is added to console name after process is terminated
+        return console.getName().contains(configLabel + " " + processLabel) || console.getName().contains(configLabel);
     }
 
     public void writeLine(final String line) throws IOException {

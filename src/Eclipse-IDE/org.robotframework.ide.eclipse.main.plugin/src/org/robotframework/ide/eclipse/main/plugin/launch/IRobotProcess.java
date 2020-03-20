@@ -16,7 +16,9 @@ public interface IRobotProcess extends IProcess, IDisconnect, ISuspendResume {
 
     public static final String PROCESS_USER_CONTROLLER = "PROCESS_USER_CONTROLLER";
 
-    RobotConsoleFacade provideConsoleFacade(String processLabel);
+    default RobotConsoleFacade provideConsoleFacade() {
+        return RobotConsoleFacade.provide(getLaunch().getLaunchConfiguration(), getLabel());
+    }
 
     void onTerminate(Runnable operation);
 

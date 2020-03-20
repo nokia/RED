@@ -145,7 +145,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
         robotProcess.onTerminate(serverJob::stopServer);
         TestsExecutionTerminationSupport.installTerminationSupport(serverJob, robotProcess);
 
-        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
+        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade();
         remoteConnectionStatusTracker.startTrackingInto(redConsole);
 
         return new LaunchExecution(serverJob, null, robotProcess);

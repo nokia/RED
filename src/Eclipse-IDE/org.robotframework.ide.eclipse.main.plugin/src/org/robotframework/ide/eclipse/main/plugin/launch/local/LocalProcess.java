@@ -16,7 +16,6 @@ import org.rf.ide.core.execution.debug.UserProcessController;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.red.swt.SwtThread;
 
 public class LocalProcess extends RuntimeProcess implements IRobotProcess {
@@ -55,11 +54,6 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
     @Override
     public UserProcessController getUserProcessController() {
         return userProcessController;
-    }
-
-    @Override
-    public RobotConsoleFacade provideConsoleFacade(final String consoleDescription) {
-        return RobotConsoleFacade.provide(getLaunch().getLaunchConfiguration(), consoleDescription);
     }
 
     @Override

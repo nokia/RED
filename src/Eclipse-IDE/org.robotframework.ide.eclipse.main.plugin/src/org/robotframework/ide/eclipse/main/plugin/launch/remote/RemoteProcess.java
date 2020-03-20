@@ -23,7 +23,6 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.core.model.IStreamsProxy2;
 import org.rf.ide.core.execution.debug.UserProcessController;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 
 public class RemoteProcess implements IRobotProcess, IDisconnect {
 
@@ -36,7 +35,7 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     private final String label;
 
     private UserProcessController userProcessController;
-    
+
     private boolean isConnectedToTests = false;
     private boolean isSuspended = false;
     private boolean isTerminated = false;
@@ -66,11 +65,6 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     @Override
     public UserProcessController getUserProcessController() {
         return userProcessController;
-    }
-
-    @Override
-    public RobotConsoleFacade provideConsoleFacade(final String consoleDescription) {
-        return RobotConsoleFacade.provide(launch.getLaunchConfiguration(), consoleDescription);
     }
 
     @Override

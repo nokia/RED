@@ -49,7 +49,6 @@ public class RedPlugin extends AbstractUIPlugin {
         return RobotTestExecutionServiceManager.getInstance().service;
     }
 
-    @SuppressWarnings("deprecation")
     static ImageDescriptor getImageDescriptor(final String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
