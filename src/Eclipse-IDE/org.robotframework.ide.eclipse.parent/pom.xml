@@ -194,7 +194,6 @@
 		<profile>
 			<id>2019-12-profile</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>eclipse.version</name>
 					<value>2019-12</value>
@@ -204,6 +203,33 @@
 				<repository>
 					<id>eclipse-2019-12</id>
 					<url>http://download.eclipse.org/releases/2019-12/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.6.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>codeaffine</id>
+					<url>http://fappel.github.io/xiliary/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>2020-03-profile</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>eclipse.version</name>
+					<value>2020-03</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-2020-03</id>
+					<url>http://download.eclipse.org/releases/2020-03/</url>
 					<layout>p2</layout>
 				</repository>
 				<repository>
