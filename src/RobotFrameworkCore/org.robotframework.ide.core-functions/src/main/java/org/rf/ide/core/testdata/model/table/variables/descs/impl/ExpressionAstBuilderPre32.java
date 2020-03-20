@@ -44,9 +44,11 @@ class ExpressionAstBuilderPre32 extends ExpressionAstBuilder {
                     varAncestor.close(i + 1);
                     current = varAncestor.getParent();
 
-                } else if (ch == ']' && current.isIndex()) {
-                    current.close(i + 1);
-                    current = current.getParent();
+                } else if (ch == ']' && current.getAncestorSatisfying(ExpressionAstNode::isIndex) != null) {
+                    final ExpressionAstNode indexAncestor = current.getAncestorSatisfying(ExpressionAstNode::isIndex);
+                    current.forEachAncestorBetween(indexAncestor, ExpressionAstNode::removeItself);
+                    indexAncestor.close(i + 1);
+                    current = indexAncestor.getParent();
                 }
             }
 

@@ -137,7 +137,7 @@ public class VariablesAnalyzerImpl implements VariablesAnalyzer {
                 // only collect this var, do not collect nested
                 topLevelVars.add(child);
 
-            } else if (child.isIndex() || child.isParens()) {
+            } else if (child.isParens() || child.isIndex() || child.isBrackets()) {
                 // collect vars nested inside [] or {} as they are top level too
                 topLevelVars.addAll(getTopLevelVariables(child));
             }

@@ -82,7 +82,8 @@ public class VariablesAnalyzerImplTest {
                 assertThat(extractUsedVariables("${x}}")).containsExactly(tuple(0, 4, "${x}", "x", NO_FLAGS));
                 assertThat(extractUsedVariables("{${x}}")).containsExactly(tuple(1, 5, "${x}", "x", NO_FLAGS));
                 assertThat(extractUsedVariables("${x}[0]")).containsExactly(tuple(0, 7, "${x}[0]", "x", INDEXED));
-                assertThat(extractUsedVariables("${x[0]}")).containsExactly(tuple(0, 7, "${x[0]}", "x", NO_FLAGS));
+                assertThat(extractUsedVariables("${x[0]}"))
+                        .containsExactly(tuple(0, 7, "${x[0]}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
                 assertThat(extractUsedVariables("1${x}2${y}3")).containsExactly(tuple(1, 5, "${x}", "x", NO_FLAGS),
                         tuple(6, 10, "${y}", "y", NO_FLAGS));
                 assertThat(extractUsedVariables("${a b c}"))
@@ -94,7 +95,8 @@ public class VariablesAnalyzerImplTest {
             @DisplayName("they are found when plain variables are used inside indexes")
             @Test
             public void usesAreFoundInsideIndexes() {
-                assertThat(extractUsedVariables("${x}[${y}]")).containsExactly(tuple(0, 10, "${x}[${y}]", "x", INDEXED),
+                assertThat(extractUsedVariables("${x}[${y}]"))
+                        .containsExactly(tuple(0, 10, "${x}[${y}]", "x", INDEXED),
                         tuple(5, 9, "${y}", "y", NO_FLAGS));
                 assertThat(extractUsedVariables("${x}[${y}][0]")).containsExactly(
                         tuple(0, 13, "${x}[${y}][0]", "x", INDEXED), tuple(5, 9, "${y}", "y", NO_FLAGS));
@@ -110,10 +112,12 @@ public class VariablesAnalyzerImplTest {
             @Test
             public void usesAreFoundInNonNestedExpressions() {
                 assertThat(extractUsedVariables("${x${y}}")).containsExactly(tuple(3, 7, "${y}", "y", NO_FLAGS));
-                assertThat(extractUsedVariables("${x[${y}]}"))
-                        .containsExactly(tuple(0, 10, "${x[${y}]}", "x", NO_FLAGS), tuple(4, 8, "${y}", "y", NO_FLAGS));
+                assertThat(extractUsedVariables("${x[${y}]}")).containsExactly(
+                        tuple(0, 10, "${x[${y}]}", "x", NO_FLAGS),
+                        tuple(4, 8, "${y}", "y", NO_FLAGS));
                 assertThat(extractUsedVariables("${x${y}[${z[${w}]}]}")).containsExactly(
-                        tuple(3, 19, "${y}[${z[${w}]}]", "y", INDEXED), tuple(8, 18, "${z[${w}]}", "z", NO_FLAGS),
+                        tuple(3, 19, "${y}[${z[${w}]}]", "y", INDEXED),
+                        tuple(8, 18, "${z[${w}]}", "z", NO_FLAGS),
                         tuple(12, 16, "${w}", "w", NO_FLAGS));
             }
 
@@ -213,7 +217,7 @@ public class VariablesAnalyzerImplTest {
                 assertThat(extractVisitedExpressionParts("${x.call()}"))
                         .containsExactly(tuple(0, 11, "${x.call()}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
                 assertThat(extractVisitedExpressionParts("${x[0]}"))
-                        .containsExactly(tuple(0, 7, "${x[0]}", "x", NO_FLAGS));
+                        .containsExactly(tuple(0, 7, "${x[0]}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
             }
 
             @DisplayName("there is a single variable element when there are nested variables")
@@ -243,6 +247,8 @@ public class VariablesAnalyzerImplTest {
                         tuple(10, 11, "5"));
                 assertThat(extractVisitedExpressionParts("[${x}]")).containsExactly(tuple(0, 1, "["),
                         tuple(1, 5, "${x}", "x", NO_FLAGS), tuple(5, 6, "]"));
+                assertThat(extractVisitedExpressionParts("${x}[${y]")).containsExactly(
+                        tuple(0, 9, "${x}[${y]", "x", INDEXED));
                 assertThat(extractVisitedExpressionParts("${x}1[0]"))
                         .containsExactly(tuple(0, 4, "${x}", "x", NO_FLAGS), tuple(4, 8, "1[0]"));
                 assertThat(extractVisitedExpressionParts("${x} [0]"))
@@ -256,7 +262,8 @@ public class VariablesAnalyzerImplTest {
             @DisplayName("there are variables and text parts found in expressions with different brackets interleaving like {[}]")
             @Test
             public void multipleTextVariablesAreFoundInExpressionWithInterleavingBrackets() {
-                assertThat(extractVisitedExpressionParts("[${x]}")).containsExactly(tuple(0, 1, "["),
+                assertThat(extractVisitedExpressionParts("[${x]}")).containsExactly(
+                        tuple(0, 1, "["),
                         tuple(1, 6, "${x]}", "x", NO_FLAGS));
                 assertThat(extractVisitedExpressionParts("${x[}]")).containsExactly(tuple(0, 5, "${x[}", "x", NO_FLAGS),
                         tuple(5, 6, "]"));
@@ -328,7 +335,8 @@ public class VariablesAnalyzerImplTest {
                         .containsExactly(tuple(0, 10, "${x.field}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
                 assertThat(extractVisitedVariables("${x.call()}"))
                         .containsExactly(tuple(0, 11, "${x.call()}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
-                assertThat(extractVisitedVariables("${x[0]}")).containsExactly(tuple(0, 7, "${x[0]}", "x", NO_FLAGS));
+                assertThat(extractVisitedVariables("${x[0]}"))
+                        .containsExactly(tuple(0, 7, "${x[0]}", "x", PLAIN_VAR | PLAIN_VAR_ASSIGN));
             }
 
             @DisplayName("there are variables found inside other")
@@ -341,8 +349,12 @@ public class VariablesAnalyzerImplTest {
                 assertThat(extractVisitedVariables("${x${y${z}}}")).containsExactly(
                         tuple(0, 12, "${x${y${z}}}", "x", DYNAMIC), tuple(3, 11, "${y${z}}", "y", DYNAMIC),
                         tuple(6, 10, "${z}", "z", NO_FLAGS));
-                assertThat(extractVisitedVariables("${x[${y}]}"))
-                        .containsExactly(tuple(0, 10, "${x[${y}]}", "x", NO_FLAGS), tuple(4, 8, "${y}", "y", NO_FLAGS));
+                assertThat(extractVisitedVariables("${x[${y}]}")).containsExactly(
+                        tuple(0, 10, "${x[${y}]}", "x", NO_FLAGS),
+                        tuple(4, 8, "${y}", "y", NO_FLAGS));
+                assertThat(extractVisitedVariables("${x}[${y]")).containsExactly(
+                        tuple(0, 9, "${x}[${y]", "x", INDEXED),
+                        tuple(5, 8, "${y", "y", INVALID_PAREN));
             }
 
             @DisplayName("there are variables found in joined expressions")
@@ -435,12 +447,15 @@ public class VariablesAnalyzerImplTest {
         @DisplayName("variables indexes with missing closing brackets are recognized as plain text")
         @Test
         public void unclosedVariableIndexesAreJustPlainText() {
-            assertThat(extractVisitedExpressionParts(new RobotVersion(3, 1), "${x${y}[}]")).containsExactly(
-                    tuple(0, 9, "${x${y}[}", "x", DYNAMIC),
-                    tuple(9, 10, "]"));
-            assertThat(extractVisitedVariables(new RobotVersion(3, 1), "${x${y}[}]")).containsExactly(
-                    tuple(0, 9, "${x${y}[}", "x", DYNAMIC),
-                    tuple(3, 7, "${y}", "y", NO_FLAGS));
+            assertThat(extractVisitedExpressionParts(new RobotVersion(3, 1), "${x${y}[}]"))
+                    .containsExactly(tuple(0, 9, "${x${y}[}", "x", DYNAMIC), tuple(9, 10, "]"));
+            assertThat(extractVisitedVariables(new RobotVersion(3, 1), "${x${y}[}]"))
+                    .containsExactly(tuple(0, 9, "${x${y}[}", "x", DYNAMIC), tuple(3, 7, "${y}", "y", NO_FLAGS));
+
+            assertThat(extractVisitedExpressionParts(new RobotVersion(3, 1), "${x}[${y]")).containsExactly(
+                    tuple(0, 9, "${x}[${y]", "x", INDEXED));
+            assertThat(extractVisitedVariables(new RobotVersion(3, 1),"${x}[${y]")).containsExactly(
+                    tuple(0, 9, "${x}[${y]", "x", INDEXED));
         }
 
         @DisplayName("no variables are found when brackets and parenthesis are interleaved")
@@ -453,7 +468,7 @@ public class VariablesAnalyzerImplTest {
     }
 
     private static List<Tuple> extractUsedVariables(final String expression) {
-        return extractUsedVariables(new RobotVersion(3, 1), expression);
+        return extractUsedVariables(new RobotVersion(3, 2), expression);
     }
 
     private static List<Tuple> extractUsedVariables(final RobotVersion version, final String expression) {

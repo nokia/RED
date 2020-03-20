@@ -37,8 +37,11 @@ class ExpressionAstBuilder {
                 } else if (ch == '{') {
                     current = current.addChild(ExpressionAstNode.child(current, NodeKind.PARENS, offset));
 
-                } else if (ch == '[') {
+                } else if (ch == '[' && current.canOpenItemAccessor(offset)) {
                     current = current.addChild(ExpressionAstNode.child(current, NodeKind.INDEX, offset));
+
+                } else if (ch == '[') {
+                    current = current.addChild(ExpressionAstNode.child(current, NodeKind.BRACKETS, offset));
 
                 } else if (ch == '}' && current.isParens()) {
                     current.close(i + 1);
@@ -52,9 +55,17 @@ class ExpressionAstBuilder {
                     varAncestor.close(tmp + 1);
                     current = varAncestor.getParent();
 
-                } else if (ch == ']' && current.isIndex()) {
+                } else if (ch == ']' && current.isBrackets()) {
                     current.close(i + 1);
                     current = current.getParent();
+
+                } else if (ch == ']' && current.getAncestorSatisfying(ExpressionAstNode::isIndex) != null) {
+                    final int tmp = i;
+
+                    final ExpressionAstNode indexAncestor = current.getAncestorSatisfying(ExpressionAstNode::isIndex);
+                    current.forEachAncestorBetween(indexAncestor, n -> n.closeAsInvalid(tmp));
+                    indexAncestor.close(tmp + 1);
+                    current = indexAncestor.getParent();
                 }
             }
 

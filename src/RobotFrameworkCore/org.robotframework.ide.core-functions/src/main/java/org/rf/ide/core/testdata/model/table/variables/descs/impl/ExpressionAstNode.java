@@ -111,12 +111,16 @@ class ExpressionAstNode {
         return kind == NodeKind.VAR;
     }
 
+    boolean isParens() {
+        return kind == NodeKind.PARENS;
+    }
+
     boolean isIndex() {
         return kind == NodeKind.INDEX;
     }
 
-    boolean isParens() {
-        return kind == NodeKind.PARENS;
+    boolean isBrackets() {
+        return kind == NodeKind.BRACKETS;
     }
 
     boolean isInvalid() {
@@ -135,9 +139,14 @@ class ExpressionAstNode {
 
     boolean isPlainVariableFollowedBySuffix(final String... allowedSuffixes) {
         return !isIndexed() && !isDynamic() && !isInvalid()
-                && children.isEmpty()
                 && exprOffset == 0
-                && Arrays.asList(allowedSuffixes).contains(token.getText().substring(exprLenght).trim());
+                && Arrays.asList(allowedSuffixes)
+                        .contains(token.getText().substring(exprLenght).trim())
+                && !children.stream().anyMatch(ExpressionAstNode::containsVariable);
+    }
+
+    private boolean containsVariable() {
+        return isVar() || children.stream().anyMatch(ExpressionAstNode::containsVariable);
     }
 
     boolean isPythonExpression(final RobotVersion version) {
@@ -145,6 +154,15 @@ class ExpressionAstNode {
                 && children.get(0).isParens()
                 && getRegion().getStart().getOffset() == children.get(0).getRegion().getStart().getOffset() - 2
                 && getRegion().getEnd().getOffset() == children.get(0).getRegion().getEnd().getOffset() + 1;
+    }
+
+    boolean canOpenItemAccessor(final int exprOffset) {
+        if (children.isEmpty()) {
+            return false;
+        }
+        final ExpressionAstNode last = children.get(children.size() - 1);
+        return (last.isVar() || last.isIndex())
+                && last.getRegion().getEnd().getOffset() == token.getStartOffset() + exprOffset;
     }
 
     FileRegion getRegion() {
@@ -232,10 +250,11 @@ class ExpressionAstNode {
     }
 
     static enum NodeKind {
-        NONE, // represents a root node only
-        VAR, // represents variable node starting with one of ${, @{, &{, %{ and ending with }
-        INDEX, // represents indexing node starting with [ and ending with ]
-        PARENS // represents parenthesis node starting with { and ending with }
+        NONE,     // represents a root node only
+        VAR,      // represents variable node starting with one of ${, @{, &{, %{ and ending with }
+        PARENS,   // represents parenthesis node starting with { and ending with }
+        INDEX,    // represents indexing node starting with [ just after VAR node and ending with ]
+        BRACKETS  // represents indexing node starting with [ end ending with ]
     }
 
     static enum VarSyntaxIssue {
