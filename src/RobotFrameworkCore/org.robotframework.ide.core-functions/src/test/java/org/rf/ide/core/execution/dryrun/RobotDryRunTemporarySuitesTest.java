@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
-import org.rf.ide.core.execution.dryrun.RobotDryRunTemporarySuites;
 
 public class RobotDryRunTemporarySuitesTest {
 

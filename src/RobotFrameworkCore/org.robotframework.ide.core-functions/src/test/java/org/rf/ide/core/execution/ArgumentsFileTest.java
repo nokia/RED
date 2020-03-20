@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
-import org.rf.ide.core.execution.ArgumentsFile;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

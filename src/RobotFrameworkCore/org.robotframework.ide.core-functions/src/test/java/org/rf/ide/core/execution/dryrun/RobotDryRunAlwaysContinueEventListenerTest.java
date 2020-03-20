@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.jupiter.api.Test;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.ShouldContinueEvent.ShouldContinueEventResponder;
-import org.rf.ide.core.execution.dryrun.RobotDryRunAlwaysContinueEventListener;
 import org.rf.ide.core.execution.server.response.ContinueExecution;
 
 public class RobotDryRunAlwaysContinueEventListenerTest {
