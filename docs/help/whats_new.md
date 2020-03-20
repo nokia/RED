@@ -14,6 +14,8 @@
 </li>
 <li><a href="RED/../../help/whats_new/0_9_3.html">RED 0.9.3</a>
 </li>
+<li><a href="RED/../../help/whats_new/0_9_4.html">RED 0.9.4</a>
+</li>
 </ul>
 </body>
 </html>
