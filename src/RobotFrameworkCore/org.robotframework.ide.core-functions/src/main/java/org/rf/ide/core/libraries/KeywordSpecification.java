@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 
-@XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
+@XmlRootElement(name = "kw")
 public class KeywordSpecification {
 
     public static KeywordSpecification create(final String name, final String... arguments) {
@@ -65,6 +65,15 @@ public class KeywordSpecification {
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
         return ArgumentsDescriptor.createDescriptor(arguments);
+    }
+
+    @XmlAttribute(name = "deprecated")
+    public void setDeprecated(final boolean deprecated) {
+        this.isDeprecated = Boolean.valueOf(deprecated);
+    }
+
+    Boolean getDeprecatedState() {
+        return isDeprecated;
     }
 
     public boolean isDeprecated() {
