@@ -5,7 +5,6 @@
  */
 package org.robotframework.red.viewers;
 
-import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.Array;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 
 public class Selections {
 
@@ -26,44 +24,46 @@ public class Selections {
 
     @SuppressWarnings("unchecked")
     public static <T> T[] getElementsArray(final IStructuredSelection selection, final Class<T> elementsClass) {
-        final List<?> selectionAsList = selection.toList();
-        return newArrayList(Iterables.filter(selectionAsList, elementsClass))
-                .toArray((T[]) Array.newInstance(elementsClass, 0));
+        return getElementsStream(selection, elementsClass).toArray(l -> (T[]) Array.newInstance(elementsClass, l));
     }
 
     public static <T> List<T> getElements(final IStructuredSelection selection, final Class<T> elementsClass) {
-        return newArrayList(Iterables.filter(selection.toList(), elementsClass));
+        return getElementsStream(selection, elementsClass).collect(Collectors.toList());
     }
 
     public static <T> Stream<T> getElementsStream(final IStructuredSelection selection, final Class<T> elementsClass) {
-        return getElements(selection, elementsClass).stream();
+        final List<?> elements = selection.toList();
+        return elements.stream().filter(elementsClass::isInstance).map(elementsClass::cast);
     }
 
     public static <T> List<T> getAdaptableElements(final IStructuredSelection selection, final Class<T> elementsClass) {
-        final List<?> selectionAsList = selection.toList();
-        return selectionAsList.stream()
+        final List<?> elements = selection.toList();
+        return elements
+                .stream()
                 .map(obj -> RedPlugin.getAdapter(obj, elementsClass))
                 .filter(Predicates.notNull())
                 .collect(Collectors.toList());
     }
 
     public static <T> T getSingleElement(final IStructuredSelection selection, final Class<T> elementsClass) {
-        final List<T> elements = getElements(selection, elementsClass);
-        if (elements.size() == 1) {
-            return elements.get(0);
-        }
-        throw new IllegalArgumentException("Given selection should contain only one element of class "
-                + elementsClass.getName() + ", but have " + elements.size() + " elements instead");
+        return getElementsStream(selection, elementsClass).limit(2)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), elements -> {
+                    if (elements.size() == 1) {
+                        return elements.get(0);
+                    }
+                    throw new IllegalArgumentException("Given selection should contain only one element of class "
+                            + elementsClass.getName() + ", but have " + elements.size() + " elements instead");
+                }));
     }
 
     public static <T> Optional<T> getOptionalFirstElement(final IStructuredSelection selection,
             final Class<T> elementsClass) {
-        return getElements(selection, elementsClass).stream().findFirst();
+        return getElementsStream(selection, elementsClass).findFirst();
     }
 
+    @SuppressWarnings("unchecked")
     public static Optional<Object> getOptionalFirstElement(final IStructuredSelection selection,
             final Predicate<Object> predicate) {
-        @SuppressWarnings("unchecked")
         final List<Object> elements = selection.toList();
         return elements.stream().filter(predicate).findFirst();
     }

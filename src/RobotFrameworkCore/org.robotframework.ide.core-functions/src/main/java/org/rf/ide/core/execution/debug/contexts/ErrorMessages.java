@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.execution.debug.contexts;
 
-@SuppressWarnings("PMD.FieldNamingConventions")
+@SuppressWarnings({ "PMD.FieldNamingConventions", "checkstyle:constantname" })
 public class ErrorMessages {
 
     static final String suiteNotFound_unknownLocalDir = "Unable to find directory for suite '%s'\n"
@@ -27,7 +27,7 @@ public class ErrorMessages {
             + "No resource could have been found for expected location inside RED workspace\n\n"
             + "    Robot-side location:%s\n"
             + "    RED-side expected location: %s\n";
-    
+
 
     public static final String testNotFound_missingSuite = "Unable to find test '%s'\n"
             + "RED was unable to find suite where the test could be located\n";

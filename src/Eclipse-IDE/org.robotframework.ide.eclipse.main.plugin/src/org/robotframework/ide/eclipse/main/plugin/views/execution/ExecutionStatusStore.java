@@ -242,7 +242,7 @@ public class ExecutionStatusStore implements IDisposable {
             }
         }
         return failedSuitePaths;
-    };
+    }
 
     private Map<String, List<String>> createFailedTestsMapFromTestsList(final RedWorkspace workspace,
             final List<ExecutionTreeNode> nodes, final List<String> failedTests) {
@@ -300,8 +300,7 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     public List<String> getNonExecutedTestsOrTasksPaths(final IProject project,
-            RobotLaunchConfiguration robotConfig)
-            throws CoreException {
+            final RobotLaunchConfiguration robotConfig) throws CoreException {
         final List<String> nonExecutedTestsOrTasks = new ArrayList<>();
         final List<String> alreadyUsedPaths = new ArrayList<>();
         final Map<String, List<String>> suitePaths = robotConfig.getSelectedSuitePaths();
@@ -380,11 +379,11 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     private void collectTestCasesOrTasks(final RobotModel model, final IResource project, final IResource resource,
-            List<String> failedTestsOrTasks, final String newPath) {
+            final List<String> failedTestsOrTasks, final String newPath) {
         if (resource instanceof IFile) {
             final RobotSuiteFile suiteFile = model.createSuiteFile((IFile) resource);
             final List<RobotSuiteFileSection> sections = suiteFile.getSections();
-            for (RobotSuiteFileSection section : sections) {
+            for (final RobotSuiteFileSection section : sections) {
                 if (section instanceof RobotCasesSection) {
                     final TestCaseTable table = (TestCaseTable) section.getLinkedElement();
                     final List<TestCase> cases = table.getTestCases();
@@ -402,7 +401,7 @@ public class ExecutionStatusStore implements IDisposable {
             }
         } else {
             final File location = new File(resource.getLocation().toString());
-            for (File file : location.listFiles()) {
+            for (final File file : location.listFiles()) {
                 final String path = file.getName().contains(".")
                         ? newPath + "." + file.getName().substring(0, file.getName().indexOf("."))
                         : newPath + "." + file.getName();
