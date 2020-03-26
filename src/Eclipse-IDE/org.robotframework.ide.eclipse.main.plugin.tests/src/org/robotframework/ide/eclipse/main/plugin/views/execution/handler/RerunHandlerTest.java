@@ -7,13 +7,17 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ui.menus.UIElement;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.red.junit.jupiter.LaunchConfig;
@@ -58,5 +62,23 @@ public class RerunHandlerTest {
         final RobotTestsLaunch launch = new RobotTestsLaunch(configuration);
 
         assertThat(RerunHandler.E4ShowFailedOnlyHandler.getConfig(launch)).isSameAs(configuration);
+    }
+
+    @Test
+    public void rerunButtonTooltipIsInTestsMode_whenExecutionContainsTests() {
+        final UIElement element = mock(UIElement.class);
+        final RerunHandler handler = new RerunHandler();
+        handler.setTooltip(element, ExecutionMode.TESTS);
+
+        verify(element).setTooltip("Rerun Tests");
+    }
+
+    @Test
+    public void rerunButtonTooltipIsInTasksMode_whenExecutionContainsTasks() {
+        final UIElement element = mock(UIElement.class);
+        final RerunHandler handler = new RerunHandler();
+        handler.setTooltip(element, ExecutionMode.TASKS);
+
+        verify(element).setTooltip("Rerun Tasks");
     }
 }

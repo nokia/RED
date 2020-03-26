@@ -126,7 +126,7 @@ public class ExecutionStatusStore implements IDisposable {
         return isDisposed;
     }
 
-    ExecutionMode getMode() {
+    public ExecutionMode getMode() {
         return mode;
     }
 

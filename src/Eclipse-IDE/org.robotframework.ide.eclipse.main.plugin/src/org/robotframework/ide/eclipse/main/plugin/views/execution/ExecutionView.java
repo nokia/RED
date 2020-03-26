@@ -36,6 +36,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.services.IEvaluationService;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
@@ -46,6 +47,9 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFileHandler.E4GoToFileHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunNonExecutedHandler;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -67,6 +71,9 @@ public class ExecutionView {
 
     @Inject
     private IEvaluationService evaluationService;
+
+    @Inject
+    private ICommandService commandService;
 
     private ScheduledExecutorService executor;
 
@@ -399,6 +406,9 @@ public class ExecutionView {
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
             SwtThread.asyncExec(() -> {
+                commandService.refreshElements(RerunHandler.COMMAND_ID, null);
+                commandService.refreshElements(RerunFailedHandler.COMMAND_ID, null);
+                commandService.refreshElements(RerunNonExecutedHandler.COMMAND_ID, null);
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
             });

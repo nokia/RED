@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 import java.util.Optional;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
@@ -33,9 +33,9 @@ public class ExecutionViewPropertyTester extends PropertyTester {
     public static final String PROPERTY_CURRENT_LAUNCH_HAS_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_TEST;
 
     @VisibleForTesting
-    static final String CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS = "currentLaunchHasNonExecutedElements";
-    public static final String PROPERTY_CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS = NAMESPACE + "."
-            + CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS;
+    static final String CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = "currentLaunchHasNonExecutedTest";
+    public static final String PROPERTY_CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST = NAMESPACE + "."
+            + CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST;
 
     @VisibleForTesting static final String CURRENT_LAUNCH_HAS_FAILED_TEST = "currentLaunchHasFailedTest";
     public static final String PROPERTY_CURRENT_LAUNCH_HAS_FAILED_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_FAILED_TEST;
@@ -47,25 +47,33 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                         + ". It should be used with " + IWorkbenchWindow.class.getName());
 
         final IWorkbenchWindow window = (IWorkbenchWindow) receiver;
-        final IViewPart viewPart = getViewPart(window);
-        if (viewPart == null) {
+        final Optional<ExecutionView> executionView = getExecutionView(window);
+        if (!executionView.isPresent()) {
             return false;
         }
 
-        @SuppressWarnings("restriction")
-        final ExecutionView view = ((ExecutionViewWrapper) viewPart).getComponent();
         if (expectedValue instanceof Boolean) {
-            return testProperty(view, property, ((Boolean) expectedValue).booleanValue());
+            return testProperty(executionView.get(), property, ((Boolean) expectedValue).booleanValue());
         }
         return false;
     }
 
-    private IViewPart getViewPart(final IWorkbenchWindow window) {
+    static Optional<ExecutionView> getExecutionView(final IWorkbenchWindow window) {
         return Optional.ofNullable(window)
                 .map(IWorkbenchWindow::getActivePage)
                 .map(page -> page.findViewReference(ExecutionView.ID))
                 .map(viewRef -> viewRef.getView(false))
-                .orElse(null);
+                .filter(ExecutionViewWrapper.class::isInstance)
+                .map(ExecutionViewWrapper.class::cast)
+                .map(ExecutionViewWrapper::getComponent);
+    }
+
+    static ExecutionMode getExecutionMode(final IWorkbenchWindow window) {
+        return ExecutionViewPropertyTester.getExecutionView(window)
+                .flatMap(ExecutionView::getCurrentlyShownLaunch)
+                .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
+                .map(ExecutionStatusStore::getMode)
+                .orElse(ExecutionMode.TESTS);
     }
 
     private boolean testProperty(final ExecutionView view, final String property,
@@ -86,7 +94,7 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
                     .map(ExecutionStatusStore::getTotalTests).orElse(0);
             return numberOfTests > 0 == expectedValue;
-        } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_ELEMENTS.equals(property)) {
+        } else if (CURRENT_LAUNCH_HAS_NON_EXECUTED_TEST.equals(property)) {
             final int numberOfNonExecutedTests = view.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
                     .map(ExecutionStatusStore::getNonExecutedTests).orElse(0);

@@ -7,7 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -17,10 +19,12 @@ import java.util.Optional;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ui.menus.UIElement;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
@@ -211,5 +215,23 @@ public class RerunFailedHandlerTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(root);
         return store;
+    }
+
+    @Test
+    public void rerunButtonTooltipIsInTestsMode_whenExecutionContainsTests() {
+        final UIElement element = mock(UIElement.class);
+        final RerunFailedHandler handler = new RerunFailedHandler();
+        handler.setTooltip(element, ExecutionMode.TESTS);
+
+        verify(element).setTooltip("Rerun Failed Tests");
+    }
+
+    @Test
+    public void rerunButtonTooltipIsInTasksMode_whenExecutionContainsTasks() {
+        final UIElement element = mock(UIElement.class);
+        final RerunFailedHandler handler = new RerunFailedHandler();
+        handler.setTooltip(element, ExecutionMode.TASKS);
+
+        verify(element).setTooltip("Rerun Failed Tasks");
     }
 }

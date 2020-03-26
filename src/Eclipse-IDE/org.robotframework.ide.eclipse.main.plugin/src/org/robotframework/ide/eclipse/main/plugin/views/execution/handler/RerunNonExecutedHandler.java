@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -22,6 +23,10 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.commands.IElementUpdater;
+import org.eclipse.ui.menus.UIElement;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
@@ -30,11 +35,30 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunN
 import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CaseFormat;
 
-public class RerunNonExecutedHandler extends DIParameterizedHandler<E4ShowNonExecutedOnlyHandler> {
+public class RerunNonExecutedHandler extends DIParameterizedHandler<E4ShowNonExecutedOnlyHandler>
+        implements IElementUpdater {
+
+    public static final String COMMAND_ID = "org.robotframework.red.view.execution.rerunNonExecutedTests";
 
     public RerunNonExecutedHandler() {
         super(E4ShowNonExecutedOnlyHandler.class);
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void updateElement(final UIElement element, final Map parameters) {
+        final IWorkbenchWindow activeWindow = (IWorkbenchWindow) element.getServiceLocator();
+        final ExecutionMode execMode = ExecutionViewPropertyTester.getExecutionMode(activeWindow);
+
+        setTooltip(element, execMode);
+    }
+
+    @VisibleForTesting
+    void setTooltip(final UIElement element, final ExecutionMode execMode) {
+        element.setTooltip(
+                "Rerun Non Executed " + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, execMode.name()));
     }
 
     public static class E4ShowNonExecutedOnlyHandler {
