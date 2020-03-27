@@ -17,7 +17,8 @@ import org.junit.jupiter.api.Test;
 public class RedSessionProcessListenerTest {
 
     @Test
-    public void onceProcessStartedTheConsoleIsCreatedAndInitializedForIt_afterTerminationItIsRemoved() {
+    public void onceProcessStartedTheConsoleIsCreatedAndInitializedForIt_afterTerminationItIsRemoved()
+            throws Exception {
         final IConsoleManager consoleManager = mock(IConsoleManager.class);
         when(consoleManager.getConsoles()).thenReturn(new IConsole[0]);
         final Process process = mock(Process.class);
@@ -27,7 +28,7 @@ public class RedSessionProcessListenerTest {
         listener.processStarted("myProcess", process);
 
         assertThat(listener.getCurrentProcesses()).hasSize(1);
-        final RedSessionConsole console = listener.getCurrentProcesses().get(process);
+        final RedSessionConsole console = listener.getCurrentProcesses().get(process).get();
         assertThat(console.getName()).isEqualTo("RED session [myProcess]");
         assertThat(console.getProcess()).isSameAs(process);
         assertThat(console.getStdOutStream()).isNotNull();

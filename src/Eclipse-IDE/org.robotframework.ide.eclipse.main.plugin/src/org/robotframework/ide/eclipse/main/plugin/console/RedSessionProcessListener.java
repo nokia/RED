@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.console;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.eclipse.ui.IWorkbench;
@@ -24,6 +26,7 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Futures;
 
 /**
  * @author Michal Anglart
@@ -31,7 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public final class RedSessionProcessListener implements PythonProcessListener {
 
-    private final Map<Process, RedSessionConsole> streams = new ConcurrentHashMap<>();
+    private final Map<Process, Future<RedSessionConsole>> streams = new ConcurrentHashMap<>();
 
     private final IConsoleManager consoleManager;
 
@@ -45,41 +48,60 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     }
 
     @VisibleForTesting
-    Map<Process, RedSessionConsole> getCurrentProcesses() {
+    Map<Process, Future<RedSessionConsole>> getCurrentProcesses() {
         return streams;
     }
 
     @Override
     public void processStarted(final String name, final Process process) {
-        final RedSessionConsole console = SwtThread.syncEval(Evaluation.of(() -> {
-            final RedSessionConsole newConsole = openRobotServerConsole(name, process);
-            newConsole.initializeStreams();
-            return newConsole;
-        }));
-        streams.put(process, console);
+        if (SwtThread.isSwtThread()) {
+            streams.put(process, Futures.immediateFuture(openAndInitializeConsole(name, process)));
+        } else {
+            streams.put(process, SwtThread.asyncEval(Evaluation.of(() -> openAndInitializeConsole(name, process))));
+        }
+    }
+
+    private RedSessionConsole openAndInitializeConsole(final String name, final Process process) {
+        final RedSessionConsole console = openRobotServerConsole(name, process);
+        console.initializeStreams();
+        return console;
     }
 
     @Override
     public void processEnded(final Process process) {
-        final RedSessionConsole console = streams.remove(process);
+        final Future<RedSessionConsole> console = streams.remove(process);
         if (console != null) {
-            SwtThread.asyncExec(() -> console.processTerminated());
+            SwtThread.asyncExec(() -> {
+                try {
+                    console.get().processTerminated();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IllegalStateException(e);
+                }
+            });
         }
     }
 
     @Override
     public void lineRead(final Process serverProcess, final String line) {
-        final RedSessionConsole console = streams.get(serverProcess);
+        final Future<RedSessionConsole> console = streams.get(serverProcess);
         if (console != null) {
-            console.getStdOutStream().println(line);
+            try {
+                console.get().getStdOutStream().println(line);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
     @Override
     public void errorLineRead(final Process serverProcess, final String line) {
-        final RedSessionConsole console = streams.get(serverProcess);
+        final Future<RedSessionConsole> console = streams.get(serverProcess);
         if (console != null) {
-            console.getStdErrStream().println(line);
+            try {
+                console.get().getStdErrStream().println(line);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
