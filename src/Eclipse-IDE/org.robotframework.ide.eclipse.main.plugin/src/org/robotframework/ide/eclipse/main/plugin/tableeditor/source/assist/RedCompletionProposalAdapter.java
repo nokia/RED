@@ -137,14 +137,14 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
         private final Position toReplace;
 
-        public boolean activateAssistant;
+        private final boolean activateAssistant;
 
         private final Position toSelect;
 
         // calculating operations to perform after accepting may be time consuming, so instead of
         // precomputing this information for each proposal we're pushing the calculation into this
         // lambda, which is calculated only when proposal is chosen
-        public Supplier<Collection<Runnable>> operationsAfterAccepting;
+        private final Supplier<Collection<Runnable>> operationsAfterAccepting;
 
         public DocumentModification(final String contentSuffix, final Position toReplace) {
             this(contentSuffix, toReplace, null, false, ArrayList::new);

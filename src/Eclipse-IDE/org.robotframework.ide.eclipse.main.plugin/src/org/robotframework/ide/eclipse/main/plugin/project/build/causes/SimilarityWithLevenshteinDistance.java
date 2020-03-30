@@ -64,11 +64,11 @@ class SimilarityWithLevenshteinDistance {
 
     private static final class StringWithDistance implements Comparable<StringWithDistance> {
 
-        final String word;
+        private final String word;
 
-        final int distance;
+        private final int distance;
 
-        StringWithDistance(final String word, final int distance) {
+        private StringWithDistance(final String word, final int distance) {
             this.word = word;
             this.distance = distance;
         }

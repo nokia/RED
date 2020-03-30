@@ -782,7 +782,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private static class SeverityLabelProvider extends RedCommonLabelProvider {
 
-        static Converter<String, String> severityLabelConverter = CaseFormat.UPPER_UNDERSCORE
+        private static Converter<String, String> severityLabelConverter = CaseFormat.UPPER_UNDERSCORE
                 .converterTo(CaseFormat.UPPER_CAMEL);
 
         @Override

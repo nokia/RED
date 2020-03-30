@@ -84,7 +84,7 @@ public class UserProcessController {
             }
             attempt++;
         }
-        throw new IllegalStateException("Unable to put reponse to agent in the responses queue");
+        throw new IllegalStateException("Unable to put response to agent in the responses queue");
     }
 
     static class ResponseWithCallback {

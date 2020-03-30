@@ -46,8 +46,9 @@ public class CommentsStyleConfiguration extends RobotElementsStyleConfiguration 
     @Override
     Style createElementStyle() {
         final Style style = createStyle(SyntaxHighlightingCategory.COMMENT);
-        final Set<String> tags = !preferences.isTasksDetectionEnabled() ? new HashSet<>()
-                : preferences.getTaskTagsWithPriorities().keySet();
+        final Set<String> tags = getPreferences().isTasksDetectionEnabled()
+                ? getPreferences().getTaskTagsWithPriorities().keySet()
+                : new HashSet<>();
         if (!tags.isEmpty()) {
             final Styler tasksStyler = createStyler(SyntaxHighlightingCategory.TASKS);
             style.setAttributeValue(ITableStringsDecorationsSupport.RANGES_STYLES,

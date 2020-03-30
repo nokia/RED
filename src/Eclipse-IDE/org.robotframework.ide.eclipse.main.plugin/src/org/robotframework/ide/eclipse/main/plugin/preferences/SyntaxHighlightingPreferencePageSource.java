@@ -12,6 +12,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Michal Anglart
  *
  */
+@SuppressWarnings("checkstyle:visibilitymodifier")
 public class SyntaxHighlightingPreferencePageSource extends NLS {
 
     static {

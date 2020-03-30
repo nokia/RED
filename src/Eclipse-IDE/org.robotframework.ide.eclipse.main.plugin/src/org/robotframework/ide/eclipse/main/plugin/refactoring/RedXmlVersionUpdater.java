@@ -245,11 +245,11 @@ public class RedXmlVersionUpdater implements IResourceChangeListener, IMarkerRes
 
     private abstract static class RedXmlVersionTransition {
 
-        final String version;
+        private final String version;
 
-        final boolean canBeAutoUpgraded;
+        private final boolean canBeAutoUpgraded;
 
-        RedXmlVersionTransition(final String version, final boolean canBeAutoUpgraded) {
+        private RedXmlVersionTransition(final String version, final boolean canBeAutoUpgraded) {
             this.version = version;
             this.canBeAutoUpgraded = canBeAutoUpgraded;
         }

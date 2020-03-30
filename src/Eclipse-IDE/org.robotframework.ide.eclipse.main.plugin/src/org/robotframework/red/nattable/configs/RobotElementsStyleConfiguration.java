@@ -29,7 +29,7 @@ public abstract class RobotElementsStyleConfiguration extends AbstractRegistryCo
 
     private final TableTheme theme;
 
-    final RedPreferences preferences;
+    private final RedPreferences preferences;
 
     RobotElementsStyleConfiguration(final TableTheme theme, final RedPreferences preferences) {
         this.theme = theme;
@@ -46,12 +46,16 @@ public abstract class RobotElementsStyleConfiguration extends AbstractRegistryCo
         });
     }
 
+    public RedPreferences getPreferences() {
+        return preferences;
+    }
+
     abstract String getConfigLabel();
 
     abstract Style createElementStyle();
 
     Style createStyle(final SyntaxHighlightingCategory category) {
-        final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
+        final ColoringPreference syntaxColoring = getPreferences().getSyntaxColoring(category);
 
         final Style style = new Style();
         style.setAttributeValue(CellStyleAttributes.FONT,
@@ -61,7 +65,7 @@ public abstract class RobotElementsStyleConfiguration extends AbstractRegistryCo
     }
 
     Styler createStyler(final SyntaxHighlightingCategory category) {
-        final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
+        final ColoringPreference syntaxColoring = getPreferences().getSyntaxColoring(category);
 
         return Stylers.mixingStyler(Stylers.withForeground(syntaxColoring.getRgb()),
                 Stylers.withFontStyle(syntaxColoring.getFontStyle()));

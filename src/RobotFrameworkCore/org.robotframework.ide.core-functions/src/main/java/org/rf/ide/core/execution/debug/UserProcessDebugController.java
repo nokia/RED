@@ -32,7 +32,7 @@ public class UserProcessDebugController extends UserProcessController {
     private final List<PauseReasonListener> pauseListeners = new ArrayList<>();
 
     private PausingPoint lastPausingPoint;
-    private SuspensionData susupensionData = null;
+    private SuspensionData suspensionData = null;
 
     public UserProcessDebugController(final Stacktrace stacktrace, final DebuggerPreferences preferences) {
         this.stacktrace = stacktrace;
@@ -45,13 +45,13 @@ public class UserProcessDebugController extends UserProcessController {
     }
 
     @VisibleForTesting
-    void setSuspensionData(final SuspensionData susupensionData) {
-        this.susupensionData = susupensionData;
+    void setSuspensionData(final SuspensionData suspensionData) {
+        this.suspensionData = suspensionData;
     }
 
     @VisibleForTesting
     SuspensionData getSuspensionData() {
-        return susupensionData;
+        return suspensionData;
     }
 
     public void whenSuspended(final PauseReasonListener listener) {
@@ -59,7 +59,7 @@ public class UserProcessDebugController extends UserProcessController {
     }
 
     public boolean isStepping() {
-        return susupensionData != null && susupensionData.reason == SuspendReason.STEPPING;
+        return suspensionData != null && suspensionData.reason == SuspendReason.STEPPING;
     }
 
     @Override
@@ -67,33 +67,33 @@ public class UserProcessDebugController extends UserProcessController {
         if (!event.getResult().orElse(true)) {
             // condition was evaluated to false so there will be no suspension; otherwise (true or error)
             // execution will pause
-            susupensionData = null;
+            suspensionData = null;
         }
     }
 
     @Override
     public void executionPaused() {
-        if (susupensionData.reason == SuspendReason.BREAKPOINT) {
-            final RobotBreakpoint breakpoint = (RobotBreakpoint) susupensionData.data[0];
+        if (suspensionData.reason == SuspendReason.BREAKPOINT) {
+            final RobotBreakpoint breakpoint = (RobotBreakpoint) suspensionData.data[0];
             pauseListeners.stream().forEach(listener -> listener.pausedOnBreakpoint(breakpoint));
 
-        } else if (susupensionData.reason == SuspendReason.USER_REQUEST) {
+        } else if (suspensionData.reason == SuspendReason.USER_REQUEST) {
             pauseListeners.stream().forEach(listener -> listener.pausedByUser());
 
-        } else if (susupensionData.reason == SuspendReason.STEPPING) {
+        } else if (suspensionData.reason == SuspendReason.STEPPING) {
             pauseListeners.stream().forEach(listener -> listener.pausedByStepping());
 
-        } else if (susupensionData.reason == SuspendReason.VARIABLE_CHANGE) {
+        } else if (suspensionData.reason == SuspendReason.VARIABLE_CHANGE) {
             pauseListeners.stream().forEach(listener -> listener.pausedAfterVariableChange());
 
-        } else if (susupensionData.reason == SuspendReason.ERRONEOUS_STATE) {
-            final String error = (String) susupensionData.data[0];
+        } else if (suspensionData.reason == SuspendReason.ERRONEOUS_STATE) {
+            final String error = (String) suspensionData.data[0];
             pauseListeners.stream().forEach(listener -> listener.pausedOnError(error));
 
-        } else if (susupensionData.reason == SuspendReason.EXPRESSION_EVALUATED) {
+        } else if (suspensionData.reason == SuspendReason.EXPRESSION_EVALUATED) {
             pauseListeners.stream().forEach(listener -> listener.pausedAfterExpressionEvaluated());
         }
-        susupensionData = null;
+        suspensionData = null;
         frames().forEach(frame -> frame.unmark(StackFrameMarker.STEPPING));
     }
 
@@ -126,7 +126,7 @@ public class UserProcessDebugController extends UserProcessController {
                         .map(StackFrame::getContext)
                         .flatMap(StackFrameContext::getErrorMessage)
                         .orElse("");
-                susupensionData = new SuspensionData(SuspendReason.ERRONEOUS_STATE, error);
+                suspensionData = new SuspensionData(SuspendReason.ERRONEOUS_STATE, error);
                 return Optional.of(new PauseExecution());
             }
         }
@@ -151,7 +151,7 @@ public class UserProcessDebugController extends UserProcessController {
             final RobotBreakpoint robotBreakpoint = breakpoint.get();
 
             if (robotBreakpoint.evaluateHitCount()) {
-                susupensionData = new SuspensionData(SuspendReason.BREAKPOINT, robotBreakpoint);
+                suspensionData = new SuspensionData(SuspendReason.BREAKPOINT, robotBreakpoint);
 
                 if (robotBreakpoint.isConditionEnabled()) {
                     return Optional.of(new EvaluateCondition(robotBreakpoint.getCondition()));
@@ -165,7 +165,7 @@ public class UserProcessDebugController extends UserProcessController {
 
     private Optional<ServerResponse> userSteppingResponse(final PausingPoint pausingPoint) {
         if (shouldPauseWhenStepping(pausingPoint)) {
-            ((Runnable) susupensionData.data[1]).run();
+            ((Runnable) suspensionData.data[1]).run();
             return Optional.of(new PauseExecution());
         } else {
             return Optional.empty();
@@ -173,7 +173,7 @@ public class UserProcessDebugController extends UserProcessController {
     }
 
     private boolean shouldPauseWhenStepping(final PausingPoint pausingPoint) {
-        final SteppingMode mode = susupensionData == null ? null : (SteppingMode) susupensionData.data[0];
+        final SteppingMode mode = suspensionData == null ? null : (SteppingMode) suspensionData.data[0];
         return mode == SteppingMode.INTO && shouldPauseOnStepInto(pausingPoint)
                 || mode == SteppingMode.OVER && shouldPauseOnStepOver(pausingPoint)
                 || mode == SteppingMode.RETURN && shouldPauseOnStepReturn(pausingPoint);
@@ -233,7 +233,7 @@ public class UserProcessDebugController extends UserProcessController {
     @Override
     public void pause(final Runnable whenResponseIsSent) {
         super.pause(whenResponseIsSent);
-        susupensionData = new SuspensionData(SuspendReason.USER_REQUEST);
+        suspensionData = new SuspensionData(SuspendReason.USER_REQUEST);
     }
 
     public void stepInto(final Runnable whenResponseIsSent, final Runnable whenSteppingEnds) {
@@ -257,9 +257,9 @@ public class UserProcessDebugController extends UserProcessController {
         frameToStepReturn.mark(StackFrameMarker.STEPPING);
         step(SteppingMode.RETURN, whenResponseIsSent, whenSteppingEnds);
     }
-    
+
     private void step(final SteppingMode mode, final Runnable whenResponseIsSent, final Runnable whenSteppingEnds) {
-        susupensionData = new SuspensionData(SuspendReason.STEPPING, mode, whenSteppingEnds);
+        suspensionData = new SuspensionData(SuspendReason.STEPPING, mode, whenSteppingEnds);
 
         resume(whenResponseIsSent);
     }
@@ -268,7 +268,7 @@ public class UserProcessDebugController extends UserProcessController {
             final List<String> arguments) {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), arguments);
-        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
+        suspensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
         offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
@@ -276,25 +276,25 @@ public class UserProcessDebugController extends UserProcessController {
             final List<Object> path, final List<String> arguments) {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), path, arguments);
-        susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
+        suspensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE);
         offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
     public void evaluateRobotKeywordCall(final int exprId, final String keywordName, final List<String> arguments) {
         final EvaluateExpression evalResponse = EvaluateExpression.robot(exprId, keywordName, arguments);
-        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        suspensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
         offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public void evaluateRobotVariable(final int exprId, final String variable) {
         final EvaluateExpression evalResponse = EvaluateExpression.variable(exprId, variable);
-        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        suspensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
         offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
     public void evaluatePythonExpression(final int exprId, final String expression) {
         final EvaluateExpression evalResponse = EvaluateExpression.python(exprId, expression);
-        susupensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
+        suspensionData = new SuspensionData(SuspendReason.EXPRESSION_EVALUATED);
         offer(new ResponseWithCallback(evalResponse, () -> {}));
     }
 
@@ -332,7 +332,7 @@ public class UserProcessDebugController extends UserProcessController {
             return goIntoLibKeyword;
         }
     }
-    
+
     @VisibleForTesting
     public static class SuspensionData {
 

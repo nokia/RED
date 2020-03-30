@@ -26,7 +26,7 @@ public class InsertSettingCommand extends EditorCommand {
 
     private final List<RobotKeywordCall> settingsToInsert;
 
-    final List<RobotSetting> insertedSettings = new ArrayList<>();
+    private final List<RobotSetting> insertedSettings = new ArrayList<>();
 
     public InsertSettingCommand(final RobotSettingsSection parent, final Optional<RobotSetting> firstSelectedSetting,
             final RobotKeywordCall[] settingsToInsert) {

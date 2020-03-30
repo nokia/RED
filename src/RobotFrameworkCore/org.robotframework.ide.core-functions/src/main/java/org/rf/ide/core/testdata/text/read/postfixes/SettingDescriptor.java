@@ -16,7 +16,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
 
-    final AModelElement<T> line;
+    private final AModelElement<T> line;
 
     SettingDescriptor(final AModelElement<T> line) {
         this.line = line;
