@@ -40,8 +40,9 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return !createdVariables.isEmpty();
     }
 
-    List<VariableUse> getCreatedVariables() {
-        return createdVariables;
+    @Override
+    public List<VariableUse> getCreatedVariables() {
+        return Collections.unmodifiableList(createdVariables);
     }
 
     @Override

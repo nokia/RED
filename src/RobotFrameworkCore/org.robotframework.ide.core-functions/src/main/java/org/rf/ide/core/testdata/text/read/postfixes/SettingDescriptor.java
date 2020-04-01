@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.text.read.postfixes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -30,6 +31,11 @@ class SettingDescriptor<T> implements IExecutableRowDescriptor<T> {
     @Override
     public Stream<RobotToken> getCreatingVariables() {
         return Stream.empty();
+    }
+
+    @Override
+    public List<VariableUse> getCreatedVariables() {
+        return new ArrayList<>();
     }
 
     @Override

@@ -49,6 +49,11 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
         return createdVariables.stream().map(VariableUse::asToken);
     }
 
+    @Override
+    public List<VariableUse> getCreatedVariables() {
+        return Collections.unmodifiableList(createdVariables);
+    }
+
     void addCreatedVariables(final List<VariableUse> variables) {
         createdVariables.addAll(variables);
     }

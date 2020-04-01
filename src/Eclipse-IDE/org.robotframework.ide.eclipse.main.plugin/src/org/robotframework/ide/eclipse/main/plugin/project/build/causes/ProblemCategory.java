@@ -244,6 +244,16 @@ public enum ProblemCategory {
             return Severity.ERROR;
         }
     },
+    VARIABLE_NON_LAST_WITH_ASSIGNMENT(
+            ProblemCategoryType.RUNTIME,
+            "Variable declared with multiple assignments",
+            "Occurs when variable is declared with assign mark '=' but that is not the last variable.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.ERROR;
+        }
+    },
     INVALID_NUMBER_OF_PARAMETERS(
             ProblemCategoryType.RUNTIME,
             "Invalid number of parameters passed to keyword",

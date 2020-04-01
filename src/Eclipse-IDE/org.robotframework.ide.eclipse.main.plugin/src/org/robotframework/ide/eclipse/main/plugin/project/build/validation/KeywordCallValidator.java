@@ -8,13 +8,17 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.base.Predicates.not;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
+import org.rf.ide.core.testdata.model.table.variables.descs.VariableUse;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -27,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 
 import com.google.common.collect.ImmutableMap;
@@ -40,22 +45,25 @@ public class KeywordCallValidator implements ModelUnitValidator {
 
     private final RobotToken keywordNameToken;
 
+    private final IExecutableRowDescriptor<?> descriptor;
     private final List<RobotToken> arguments;
 
     private ValidationKeywordEntity foundKeyword;
 
     protected KeywordCallValidator(final FileValidationContext validationContext, final RobotToken keywordNameToken,
-            final List<RobotToken> arguments, final ValidationReportingStrategy reporter) {
+            final IExecutableRowDescriptor<?> descriptor, final ValidationReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.reporter = reporter;
         this.keywordNameToken = keywordNameToken;
-        this.arguments = arguments;
+        this.descriptor = descriptor;
+        this.arguments = descriptor == null ? new ArrayList<>() : descriptor.getKeywordArguments();
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) {
         foundKeyword = null;
         validateKeywordCall();
+        validateNonLastVariableAssignment();
     }
 
     protected void validateKeywordCall() {
@@ -172,6 +180,28 @@ public class KeywordCallValidator implements ModelUnitValidator {
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_VARIABLE_SYNTAX)
                         .formatMessageWith(varToken.getText());
                 reporter.handleProblem(problem, validationContext.getFile(), varToken);
+            }
+        }
+    }
+
+    private void validateNonLastVariableAssignment() {
+        if(descriptor == null) {
+            //nothing to report
+            return;
+        }
+        if (descriptor.isCreatingVariables()) {
+            List<VariableUse> vars = descriptor.getCreatedVariables();
+            // i < vars.size()-1 is not a mistake - for the last token both options are fine
+            // so we do not need to check it.
+            for (int i = 0; i < vars.size() - 1; i++) {
+                if (!vars.get(i).isPlainVariable()) {
+                    final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
+                            vars.get(i).asToken().getText());
+                    final RobotProblem problem = RobotProblem
+                            .causedBy(VariablesProblem.VARIABLE_NON_LAST_DECLARATION_WITH_ASSIGNMENT);
+                    reporter.handleProblem(problem, validationContext.getFile(), vars.get(i).getUntouchedToken(),
+                            attributes);
+                }
             }
         }
     }

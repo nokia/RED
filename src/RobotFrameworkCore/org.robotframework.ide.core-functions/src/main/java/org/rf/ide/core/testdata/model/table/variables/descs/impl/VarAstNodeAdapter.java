@@ -52,6 +52,11 @@ class VarAstNodeAdapter implements VariableUse {
     }
 
     @Override
+    public RobotToken getUntouchedToken() {
+        return node.getUntouchedToken();
+    }
+
+    @Override
     public RobotToken asToken() {
         return RobotToken.create(getContent(), getRegion().getStart());
     }

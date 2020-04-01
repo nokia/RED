@@ -45,6 +45,11 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
         return createdVariables.stream().map(VariableUse::asToken);
     }
 
+    @Override
+    public List<VariableUse> getCreatedVariables() {
+        return Collections.unmodifiableList(createdVariables);
+    }
+
     void addCreatedVariables(final List<? extends VariableUse> variables) {
         createdVariables.addAll(variables);
     }

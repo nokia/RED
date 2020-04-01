@@ -23,6 +23,8 @@ public interface IExecutableRowDescriptor<T> {
 
     Stream<RobotToken> getCreatingVariables();
 
+    List<VariableUse> getCreatedVariables();
+
     List<VariableUse> getUsedVariables();
 
     RobotToken getAction();

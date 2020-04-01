@@ -51,7 +51,7 @@ class ExecutableNestedRowValidator implements ExecutableValidator {
         final RobotToken keywordNameToken = descriptor.getKeywordAction();
 
         final KeywordCallValidator keywordCallValidator = new KeywordCallValidator(validationContext, keywordNameToken,
-                descriptor.getKeywordArguments(), reporter);
+                descriptor, reporter);
         keywordCallValidator.validate(monitor);
         final QualifiedKeywordName keywordName = keywordCallValidator.getFoundKeywordName().orElse(null);
 

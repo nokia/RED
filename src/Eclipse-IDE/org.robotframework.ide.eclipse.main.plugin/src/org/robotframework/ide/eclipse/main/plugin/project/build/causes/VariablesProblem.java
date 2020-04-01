@@ -168,6 +168,34 @@ public enum VariablesProblem implements IProblemCause {
             return fixers;
         }
     },
+    VARIABLE_NON_LAST_DECLARATION_WITH_ASSIGNMENT {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.VARIABLE_NON_LAST_WITH_ASSIGNMENT;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Assign mark '=' can be used only with the last variable.";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
+
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+            if (value != null) {
+                fixers.addAll(ChangeToFixer.createFixers(newArrayList(value)));
+            }
+            return fixers;
+        }
+    },
     VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT {
 
         @Override

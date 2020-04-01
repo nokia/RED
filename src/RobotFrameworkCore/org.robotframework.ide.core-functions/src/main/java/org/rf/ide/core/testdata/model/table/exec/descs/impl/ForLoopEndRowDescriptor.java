@@ -35,6 +35,11 @@ public class ForLoopEndRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     }
 
     @Override
+    public List<VariableUse> getCreatedVariables() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public RobotToken getAction() {
         return row.getAction();
     }

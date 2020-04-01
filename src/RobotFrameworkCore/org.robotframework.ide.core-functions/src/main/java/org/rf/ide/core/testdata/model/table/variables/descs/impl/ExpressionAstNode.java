@@ -58,6 +58,10 @@ class ExpressionAstNode {
         return parent;
     }
 
+    RobotToken getUntouchedToken() {
+        return token;
+    }
+
     ExpressionAstNode getRoot() {
         ExpressionAstNode result = this;
         while (!result.isRoot()) {

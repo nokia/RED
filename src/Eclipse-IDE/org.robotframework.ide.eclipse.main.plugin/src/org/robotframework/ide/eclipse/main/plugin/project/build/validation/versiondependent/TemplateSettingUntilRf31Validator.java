@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -85,7 +84,7 @@ class TemplateSettingUntilRf31Validator extends VersionDependentModelUnitValidat
 
         KeywordCallInTemplateValidator(final FileValidationContext validationContext, final String keywordName,
                 final RobotToken keywordNameToken, final ValidationReportingStrategy reporter) {
-            super(validationContext, keywordNameToken, new ArrayList<>(), reporter);
+            super(validationContext, keywordNameToken, null, reporter);
             this.keywordName = keywordName;
         }
 
