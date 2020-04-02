@@ -52,8 +52,8 @@ class VarAstNodeAdapter implements VariableUse {
     }
 
     @Override
-    public RobotToken getUntouchedToken() {
-        return node.getUntouchedToken();
+    public RobotToken getEnclosingToken() {
+        return node.getEnclosingToken();
     }
 
     @Override

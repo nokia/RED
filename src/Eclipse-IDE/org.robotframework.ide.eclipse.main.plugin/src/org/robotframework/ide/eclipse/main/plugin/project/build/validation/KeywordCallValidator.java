@@ -189,19 +189,17 @@ public class KeywordCallValidator implements ModelUnitValidator {
             //nothing to report
             return;
         }
-        if (descriptor.isCreatingVariables()) {
-            List<VariableUse> vars = descriptor.getCreatedVariables();
-            // i < vars.size()-1 is not a mistake - for the last token both options are fine
-            // so we do not need to check it.
-            for (int i = 0; i < vars.size() - 1; i++) {
-                if (!vars.get(i).isPlainVariable()) {
-                    final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
-                            vars.get(i).asToken().getText());
-                    final RobotProblem problem = RobotProblem
-                            .causedBy(VariablesProblem.VARIABLE_NON_LAST_DECLARATION_WITH_ASSIGNMENT);
-                    reporter.handleProblem(problem, validationContext.getFile(), vars.get(i).getUntouchedToken(),
-                            attributes);
-                }
+        List<VariableUse> vars = descriptor.getCreatedVariables();
+        // i < vars.size()-1 is not a mistake - for the last token both options are fine
+        // so we do not need to check it.
+        for (int i = 0; i < vars.size() - 1; i++) {
+            if (!vars.get(i).isPlainVariable()) {
+                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.VALUE,
+                        vars.get(i).asToken().getText());
+                final RobotProblem problem = RobotProblem
+                        .causedBy(VariablesProblem.VARIABLE_NON_LAST_DECLARATION_WITH_ASSIGNMENT);
+                reporter.handleProblem(problem, validationContext.getFile(), vars.get(i).getEnclosingToken(),
+                        attributes);
             }
         }
     }

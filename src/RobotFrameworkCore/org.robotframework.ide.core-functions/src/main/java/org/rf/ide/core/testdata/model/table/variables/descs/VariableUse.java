@@ -34,12 +34,12 @@ public interface VariableUse {
     String getBaseName();
 
     /**
-     * Returns token in with this variable is used. This token is untouched by any further
+     * Returns token in which this variable is used. This token is untouched by any further
      * processing.
      * 
      * @return Original token
      */
-    RobotToken getUntouchedToken();
+    RobotToken getEnclosingToken();
 
     /**
      * Return this variable use as RobotToken

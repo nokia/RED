@@ -58,7 +58,7 @@ class ExpressionAstNode {
         return parent;
     }
 
-    RobotToken getUntouchedToken() {
+    RobotToken getEnclosingToken() {
         return token;
     }
 

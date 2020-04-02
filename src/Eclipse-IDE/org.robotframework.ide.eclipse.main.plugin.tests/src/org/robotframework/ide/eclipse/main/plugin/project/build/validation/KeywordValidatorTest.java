@@ -606,6 +606,35 @@ public class KeywordValidatorTest {
     }
 
     @Test
+    public void nothingIsReported_whenMultipleVariablesAreCreatedInOneLine() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("    ${a}  ${b}  ${c}=  kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).isEmpty();
+    }
+
+    @Test
+    public void problemIsReported_whenNonLastVariableInLineHasAssignment() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("    ${a}  ${b}=  ${c}  kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).containsOnly(new Problem(VariablesProblem.VARIABLE_NON_LAST_DECLARATION_WITH_ASSIGNMENT,
+                new ProblemPosition(3, Range.closed(35, 40))));
+    }
+
+    @Test
     public void nothingIsReported_whenVariablesAreCreatedFromLineToLineUsingSpecialKeywords() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
