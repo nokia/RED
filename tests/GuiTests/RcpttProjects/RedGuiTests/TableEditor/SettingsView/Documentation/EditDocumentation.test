@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Z5QR0P4LEeSvjNrJkS7N6Q
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/17/20 11:09 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/2/20 4:34 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -78,6 +78,7 @@ with [get-editor "tab.tsv"] {
         type-text "T"
         wait 1000
         type-text "SV documentation"
+        wait 300
         key-type "M1+s"
     }
     get-tab-folder | get-tab-item Source | click
