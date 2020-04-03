@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -302,7 +303,7 @@ public class ExecutionStatusStore implements IDisposable {
     public List<String> getNonExecutedTestsOrTasksPaths(final IProject project,
             final RobotLaunchConfiguration robotConfig) throws CoreException {
         final List<String> nonExecutedTestsOrTasks = new ArrayList<>();
-        final List<String> alreadyUsedPaths = new ArrayList<>();
+        final List<String> alreadyUsedNodes = new ArrayList<>();
         final Map<String, List<String>> suitePaths = robotConfig.getSelectedSuitePaths();
         final Map<IResource, List<String>> selectedResources = RobotLaunchConfigurationHelper
                 .findResources(project, suitePaths);
@@ -315,7 +316,7 @@ public class ExecutionStatusStore implements IDisposable {
         for (final ExecutionTreeNode node : getExecutionTree().getChildren()) {
             if (!node.isExecuted()) {
                 final List<String> nonExecutedChildren = getNonExecutedChildren(node, project,
-                        linkedResources, alreadyUsedPaths);
+                        selectedResources, linkedResources, alreadyUsedNodes);
 
                 String topLevelSuiteName = RobotLaunchConfigurationHelper.createTopLevelSuiteName(dataSources,
                         RobotLaunchConfigurationHelper.parseArguments(robotConfig.getRobotArguments()));
@@ -330,6 +331,7 @@ public class ExecutionStatusStore implements IDisposable {
                 for (final String child : nonExecutedChildren) {
                     final String path = topLevelSuiteName + "." + child;
                     nonExecutedTestsOrTasks.add(path);
+                    alreadyUsedNodes.add(node.getName());
                 }
             }
         }
@@ -337,24 +339,32 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     private List<String> getNonExecutedChildren(final ExecutionTreeNode node, final IProject project,
-            final Map<IResource, List<String>> linkedResources, final List<String> alreadyUsedPath) {
+            final Map<IResource, List<String>> selectedResources, final Map<IResource, List<String>> linkedResources,
+            final List<String> alreadyUsedNodes) {
         final List<String> nonExecutedTestsOrTasks = new ArrayList<>();
-        collectNonExecutedTestsOrTasksPaths(node, nonExecutedTestsOrTasks, "", project, linkedResources, alreadyUsedPath);
+        collectNonExecutedTestsOrTasksPaths(node, nonExecutedTestsOrTasks, "", project, selectedResources,
+                linkedResources, alreadyUsedNodes);
         return nonExecutedTestsOrTasks;
     }
 
     private void collectNonExecutedTestsOrTasksPaths(final ExecutionTreeNode node, final List<String> nonExecutedTestsOrTasks,
-            final String currentPath, final IProject project, final Map<IResource, List<String>> linkedResources,
-            final List<String> alreadyUsedPaths) {
+            final String currentPath, final IProject project, final Map<IResource, List<String>> selectedResources,
+            final Map<IResource, List<String>> linkedResources, final List<String> alreadyUsedNodes) {
 
         if (!node.isExecuted()) {
             final String newPath = currentPath.isEmpty() ? node.getName() : currentPath + "." + node.getName();
+            final List<String> selectedTests = collectTestsFromSelectedResources(node, selectedResources);
             if (node.getKind() == ElementKind.SUITE) {
                 if (!node.getChildren().isEmpty()) {
                     for (final ExecutionTreeNode n : node.getChildren()) {
-                        collectNonExecutedTestsOrTasksPaths(n, nonExecutedTestsOrTasks, newPath, project, linkedResources,
-                                alreadyUsedPaths);
+                        collectNonExecutedTestsOrTasksPaths(n, nonExecutedTestsOrTasks, newPath, project,
+                                selectedResources, linkedResources, alreadyUsedNodes);
                     }
+                } else if (!selectedTests.isEmpty()) {
+                    for (final String test : selectedTests) {
+                        nonExecutedTestsOrTasks.add(newPath + "." + test);
+                    }
+
                 } else {
                     final RobotModel model = RedPlugin.getModelManager().getModel();
                     final IWorkspaceRoot root = project.getWorkspace().getRoot();
@@ -362,10 +372,7 @@ public class ExecutionStatusStore implements IDisposable {
                     IResource resource = workspace.forUri(node.getPath());
                     if (resource == null) {
                         for (final IResource linkedResource : linkedResources.keySet()) {
-                            final String name = linkedResource.getName();
-                            final String robotName = RobotPathsNaming
-                                    .toRobotFrameworkName(name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name);
-                            if (robotName.equals(node.getName())) {
+                            if (haveSameNames(node, linkedResource)) {
                                 resource = linkedResource;
                             }
                         }
@@ -388,7 +395,8 @@ public class ExecutionStatusStore implements IDisposable {
                     final TestCaseTable table = (TestCaseTable) section.getLinkedElement();
                     final List<TestCase> cases = table.getTestCases();
                     for (final TestCase testCase : cases) {
-                        failedTestsOrTasks.add(newPath + "." + testCase.getName().getText());
+                        failedTestsOrTasks.add(
+                                newPath + "." + testCase.getName().getText());
                     }
                 } else if (section instanceof RobotTasksSection) {
                     final TaskTable table = (TaskTable) section.getLinkedElement();
@@ -412,5 +420,22 @@ public class ExecutionStatusStore implements IDisposable {
                 collectTestCasesOrTasks(model, project, nestedResource, failedTestsOrTasks, path);
             }
         }
+    }
+
+    private List<String> collectTestsFromSelectedResources(final ExecutionTreeNode node,
+            final Map<IResource, List<String>> selectedResources) {
+        return selectedResources
+                .entrySet()
+                .stream()
+                .filter(e -> haveSameNames(node, e.getKey()))
+                .flatMap(e -> e.getValue().stream())
+                .collect(Collectors.toList());
+    }
+
+    private boolean haveSameNames(final ExecutionTreeNode node, final IResource resource) {
+        final String name = resource.getName();
+        final String robotName = RobotPathsNaming
+                .toRobotFrameworkName(name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name);
+        return robotName.equals(node.getName());
     }
 }

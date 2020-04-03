@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,10 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.jupiter.api.Test;
@@ -531,11 +534,8 @@ public class ExecutionStatusStoreTest {
     public void whenManySuitesContainNonExecutedTests_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("suite3.robot", new ArrayList<String>());
-        suitePaths.put("suite4.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "suite3.robot", "suite4.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -574,17 +574,49 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.Suite2.test2")
-                .contains("ExecutionStatusStoreTest.Suite3.test3")
-                .contains("ExecutionStatusStoreTest.Suite4.test4");
+                .containsExactly("ExecutionStatusStoreTest.Suite2.test2", "ExecutionStatusStoreTest.Suite3.test3",
+                        "ExecutionStatusStoreTest.Suite4.test4");
     }
 
     @Test
-    public void whenManyNastedSuitesContainNonExecutedTests_nonExecutedTestsPathsAreReturned()
+    public void whenManySuitesContainSelectedNonExecutedTests_onlySelectedNonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
         final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("dir1", new ArrayList<String>());
+        suitePaths.put("suite1.robot", newArrayList("testFailed1", "test1"));
+        suitePaths.put("suite2.robot", newArrayList("test2"));
+        when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
+
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot", "*** Test Cases ***", "testNotToRun", "    log  2", "test2", "    log  2");
+
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", project.getLocationURI());
+        final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "Suite1", URI
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
+        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "Suite2", URI
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
+
+        final ExecutionTreeNode test1 = ExecutionTreeNode.newTestNode(suite1, "testFailed1", suite1.getPath());
+        final ExecutionTreeNode test1NonExecuted = ExecutionTreeNode.newTestNode(suite1, "test1",
+                suite1.getPath());
+        test1.setStatus(Status.FAIL);
+
+        suite1.addChildren(test1, test1NonExecuted);
+        root.addChildren(suite1, suite2);
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
+                .containsExactly("ExecutionStatusStoreTest.Suite1.test1", "ExecutionStatusStoreTest.Suite2.test2");
+    }
+
+    @Test
+    public void whenManyNestedSuitesContainNonExecutedTests_nonExecutedTestsPathsAreReturned()
+            throws IOException, CoreException {
+        final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("dir1");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -617,19 +649,16 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.dir1.dir2.suite2.test2")
-                .contains("ExecutionStatusStoreTest.dir1.dir2.dir3.suite3.test3");
+                .containsExactly("ExecutionStatusStoreTest.dir1.dir2.dir3.suite3.test3",
+                        "ExecutionStatusStoreTest.dir1.dir2.suite2.test2");
     }
 
     @Test
     public void whenManySuitesAndLinkedResourceContainNonExecutedTests_nonExecutedTestsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("suite3.robot", new ArrayList<String>());
-        suitePaths.put("linked_dir", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "suite3.robot", "linked_dir");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -670,9 +699,9 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite2.test2")
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite3.test3")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked_suite.test4");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir.suite2.test2",
+                        "ExecutionStatusStoreTest & Linked Dir.suite3.test3",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked_suite.test4");
     }
 
     @BooleanPreference(key = RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, value = true)
@@ -680,10 +709,9 @@ public class ExecutionStatusStoreTest {
     public void whenManySuitesAndLinkedResourceContainNonExecutedTestsAndSingleSuitePreferenceIsSet_nonExecutedTestsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_dir1", new ArrayList<String>());
-        suitePaths.put("linked_dir2", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_dir1", "linked_dir2");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         final File linkedNonWorkspaceDir1 = RedTempDirectory.createNewDir(tempFolder, "linked_dir1");
         final File linkedNonWorkspaceDir2 = RedTempDirectory.createNewDir(tempFolder, "linked_dir2");
@@ -708,18 +736,16 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite.test1")
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite.test2");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite.test1",
+                        "ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite.test2");
     }
 
     @Test
     public void whenLinkedResourcesContainNonExecutedTestsAndItsRobotNamesAreTheSame_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("linked_dir", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "linked_dir");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -756,19 +782,18 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite2.test2")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked__suite.test3")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked___suite.test4");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir.suite2.test2",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked__suite.test3",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked___suite.test4");
     }
 
     @Test
     public void whenLinkedResourcesContainNonExecutedTestsAndOneOfThemHasPath_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_dir1", new ArrayList<String>());
-        suitePaths.put("linked_dir2", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_dir1", "linked_dir2");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         final File linkedNonWorkspaceDir1 = RedTempDirectory.createNewDir(tempFolder, "linked_dir1");
         final File linkedNonWorkspaceDir2 = RedTempDirectory.createNewDir(tempFolder, "linked_dir2");
@@ -801,17 +826,17 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite.test1")
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite.test2");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite.test1",
+                        "ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite.test2");
     }
 
     @Test
     public void whenSingleSuiteContainsNonExecutedTests_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         project.createFile("suite.robot");
 
@@ -828,17 +853,16 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.Suite.test2")
-                .contains("ExecutionStatusStoreTest.Suite.test3");
+                .containsExactly("ExecutionStatusStoreTest.Suite.test2", "ExecutionStatusStoreTest.Suite.test3");
     }
 
     @Test
     public void whenSingleNestedSuiteContainsNonExecutedTests_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         project.createFile("suite.robot");
 
@@ -859,8 +883,8 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.dir1.dir2.Suite.test2")
-                .contains("ExecutionStatusStoreTest.dir1.dir2.Suite.test3");
+                .containsExactly("ExecutionStatusStoreTest.dir1.dir2.Suite.test2",
+                        "ExecutionStatusStoreTest.dir1.dir2.Suite.test3");
     }
 
     @BooleanPreference(key = RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, value = true)
@@ -868,9 +892,9 @@ public class ExecutionStatusStoreTest {
     public void whenSingleSuiteContainsNonExecutedTestsAndSingleSuitePreferenceIsSet_nonExecutedTestsPathsAreReturned()
             throws Exception {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         project.createFile("suite.robot");
 
@@ -883,15 +907,14 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(suite);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("Suite.test");
+                .containsExactly("Suite.test");
     }
 
     @Test
     public void whenSingleSuiteFromLinkedResourceContainsNonExecutedTests_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_suite.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_suite.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -912,16 +935,15 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.Linked Suite.test2")
-                .contains("ExecutionStatusStoreTest.Linked Suite.test3");
+                .containsExactly("ExecutionStatusStoreTest.Linked Suite.test2",
+                        "ExecutionStatusStoreTest.Linked Suite.test3");
     }
 
     @Test
     public void whenSingleNestedSuiteFromLinkedResourceContainsNonExecutedTests_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_dir1", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_dir1");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -948,8 +970,8 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir1.Linked Dir1.Linked Dir2.Linked Suite.test2")
-                .contains("ExecutionStatusStoreTest & Linked Dir1.Linked Dir1.Linked Dir2.Linked Suite.test3");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir1.Linked Dir1.Linked Dir2.Linked Suite.test2",
+                        "ExecutionStatusStoreTest & Linked Dir1.Linked Dir1.Linked Dir2.Linked Suite.test3");
     }
 
     @BooleanPreference(key = RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, value = true)
@@ -957,8 +979,7 @@ public class ExecutionStatusStoreTest {
     public void whenSingleSuiteFromLinkedResourceContainsNonExecutedTestsAndSingleSuitePreferenceIsSet_nonExecutedTestsPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_suite.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_suite.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -977,19 +998,15 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(suite);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("Linked Suite.test2")
-                .contains("Linked Suite.test3");
+                .containsExactly("Linked Suite.test2", "Linked Suite.test3");
     }
 
     @Test
     public void whenManySuitesContainNonExecutedTasks_nonExecutedTasksPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("suite3.robot", new ArrayList<String>());
-        suitePaths.put("suite4.robot", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "suite3.robot", "suite4.robot");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -1026,17 +1043,49 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.Suite2.Task2")
-                .contains("ExecutionStatusStoreTest.Suite3.Task3")
-                .contains("ExecutionStatusStoreTest.Suite4.Task4");
+                .containsExactly("ExecutionStatusStoreTest.Suite2.Task2", "ExecutionStatusStoreTest.Suite3.Task3",
+                        "ExecutionStatusStoreTest.Suite4.Task4");
     }
 
     @Test
-    public void whenManyNastedSuitesContainNonExecutedTasks_nonExecutedTasksPathsAreReturned()
+    public void whenManySuitesContainSelectedNonExecutedTasks_onlySelectedNonExecutedTasksPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
         final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("dir1", new ArrayList<String>());
+        suitePaths.put("suite1.robot", newArrayList("taskFailed1", "taks1"));
+        suitePaths.put("suite2.robot", newArrayList("task2"));
+        when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
+
+        project.createFile("suite1.robot");
+        project.createFile("suite2.robot", "*** Tasks ***", "taskNotToRun", "    log  2", "task2", "    log  2");
+
+        final ExecutionTreeNode root = ExecutionTreeNode.newSuiteNode(null, "root", project.getLocationURI());
+        final ExecutionTreeNode suite1 = ExecutionTreeNode.newSuiteNode(root, "Suite1", URI
+                .create("file:///" + project.getLocation().toPortableString() + "/suite1.robot"));
+        final ExecutionTreeNode suite2 = ExecutionTreeNode.newSuiteNode(root, "Suite2", URI
+                .create("file:///" + project.getLocation().toPortableString() + "/suite2.robot"));
+
+        final ExecutionTreeNode task1 = ExecutionTreeNode.newTestNode(suite1, "taskFailed1", suite1.getPath());
+        final ExecutionTreeNode task1NonExecuted = ExecutionTreeNode.newTestNode(suite1, "task1",
+                suite1.getPath());
+        task1.setStatus(Status.FAIL);
+
+        suite1.addChildren(task1, task1NonExecuted);
+        root.addChildren(suite1, suite2);
+
+        final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.setExecutionTree(root);
+
+        assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
+                .containsExactly("ExecutionStatusStoreTest.Suite1.task1", "ExecutionStatusStoreTest.Suite2.task2");
+    }
+
+    @Test
+    public void whenManyNestedSuitesContainNonExecutedTasks_nonExecutedTasksPathsAreReturned()
+            throws IOException, CoreException {
+        final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("dir1");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -1069,19 +1118,16 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest.dir1.dir2.suite2_task.Task2")
-                .contains("ExecutionStatusStoreTest.dir1.dir2.dir3.suite3_task.Task3");
+                .containsExactly("ExecutionStatusStoreTest.dir1.dir2.dir3.suite3_task.Task3",
+                        "ExecutionStatusStoreTest.dir1.dir2.suite2_task.Task2");
     }
 
     @Test
     public void whenManySuitesAndLinkedResourceContainNonExecutedTasks_nonExecutedTasksAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("suite3.robot", new ArrayList<String>());
-        suitePaths.put("linked_dir", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "suite3.robot", "linked_dir");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -1122,9 +1168,9 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite2.Task2")
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite3.Task3")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked_suite_task.Task4");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir.suite2.Task2",
+                        "ExecutionStatusStoreTest & Linked Dir.suite3.Task3",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked_suite_task.Task4");
     }
 
     @BooleanPreference(key = RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, value = true)
@@ -1132,10 +1178,9 @@ public class ExecutionStatusStoreTest {
     public void whenManySuitesAndLinkedResourceContainNonExecutedTasksAndSingleSuitePreferenceIsSet_nonExecutedTasksAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_dir1", new ArrayList<String>());
-        suitePaths.put("linked_dir2", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_dir1", "linked_dir2");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         final File linkedNonWorkspaceDir1 = RedTempDirectory.createNewDir(tempFolder, "linked_dir1");
         final File linkedNonWorkspaceDir2 = RedTempDirectory.createNewDir(tempFolder, "linked_dir2");
@@ -1160,18 +1205,16 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite_task.Task1")
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite_task.Task2");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite_task.Task1",
+                        "ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite_task.Task2");
     }
 
     @Test
     public void whenLinkedResourcesContainNonExecutedTaskssAndItsRobotNamesAreTheSame_nonExecutedTasksPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("suite1.robot", new ArrayList<String>());
-        suitePaths.put("suite2.robot", new ArrayList<String>());
-        suitePaths.put("linked_dir", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("suite1.robot", "suite2.robot",
+                "linked_dir");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
         when(robotConfig.getRobotArguments()).thenReturn("");
 
@@ -1208,19 +1251,18 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir.suite2.Task2")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked__suite_task.Task3")
-                .contains("ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked___suite_task.Task4");
+                .containsExactly("ExecutionStatusStoreTest & Linked Dir.suite2.Task2",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked__suite_task.Task3",
+                        "ExecutionStatusStoreTest & Linked Dir.Linked Dir.linked___suite_task.Task4");
     }
 
     @Test
     public void whenLinkedResourcesContainNonExecutedTasksAndOneOfThemHasPath_nonExecutedTasksPathsAreReturned()
             throws IOException, CoreException {
         final RobotLaunchConfiguration robotConfig = mock(RobotLaunchConfiguration.class);
-        final Map<String, List<String>> suitePaths = new HashMap<>();
-        suitePaths.put("linked_dir1", new ArrayList<String>());
-        suitePaths.put("linked_dir2", new ArrayList<String>());
+        final Map<String, List<String>> suitePaths = createSuitePathsWithoutTests("linked_dir1", "linked_dir2");
         when(robotConfig.getSelectedSuitePaths()).thenReturn(suitePaths);
+        when(robotConfig.getRobotArguments()).thenReturn("");
 
         final File linkedNonWorkspaceDir1 = RedTempDirectory.createNewDir(tempFolder, "linked_dir1");
         final File linkedNonWorkspaceDir2 = RedTempDirectory.createNewDir(tempFolder, "linked_dir2");
@@ -1253,8 +1295,9 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite_task.Task1")
-                .contains("ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite_task.Task2");
+                .containsExactly(
+                        "ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir1.linked_suite_task.Task1",
+                        "ExecutionStatusStoreTest & Linked Dir1 & Linked Dir2.Linked Dir2.linked_suite_task.Task2");
     }
 
     @Test
@@ -1275,5 +1318,10 @@ public class ExecutionStatusStoreTest {
 
         assertThat(store.getNonExecutedTestsOrTasksPaths(project.getProject(), robotConfig))
                 .isEmpty();
+    }
+
+    private Map<String, List<String>> createSuitePathsWithoutTests(final String... suites) {
+        return Arrays.asList(suites).stream().collect(toMap(Function.identity(), v -> new ArrayList<>()));
+
     }
 }

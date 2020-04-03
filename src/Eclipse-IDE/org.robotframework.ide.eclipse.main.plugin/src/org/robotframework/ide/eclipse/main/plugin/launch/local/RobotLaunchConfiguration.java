@@ -124,6 +124,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             final List<String> testOrTasksPaths) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setRobotArguments(RobotLaunchConfigurationHelper.collectRobotArguments(robotConfig, testOrTasksPaths));
+        robotConfig.setSuitePaths(RobotLaunchConfigurationHelper.collectSuitePathsWithoutOldTestsOrTasks(robotConfig));
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {

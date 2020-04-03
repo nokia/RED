@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
@@ -149,6 +150,11 @@ public class RobotLaunchConfigurationHelper {
         }
         return robotArguments;
 
+    }
+
+    public static Map<String, List<String>> collectSuitePathsWithoutOldTestsOrTasks(
+            final RobotLaunchConfiguration robotConfig) throws CoreException {
+        return robotConfig.getSuitePaths().entrySet().stream().collect(toMap(e -> e.getKey(), e -> new ArrayList<>()));
     }
 
 }
