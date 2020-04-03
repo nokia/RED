@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -39,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.KeywordsAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibraryLocationFinder.KeywordLocation;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -87,29 +91,36 @@ public class SourceOpeningSupport {
             errorHandler.accept("Unsupported library type", null);
             return;
         }
+        
+        // first try to use information stored in libspec file (from RF 3.2)
+        final Optional<KeywordLocation> kwLocation = LibraryLocationFinder.findKeywordDefinition(libSpec, kwSpec);
+        if (kwLocation.isPresent()) {
+            try {
+                final KeywordLocation location = kwLocation.get();
+                openEditorAndSelectDefinition(page, robotProject, libSpec, location.getSourcePath(),
+                        editor -> selectDefinitionInLine(editor, location.getLine()));
 
+            } catch (final CoreException e) {
+                errorHandler.accept("Unknown problem", e);
+            }
+            return;
+        }
+
+        // if not possible - use autodiscovery
         final Optional<RobotDryRunKeywordSource> kwSource = tryToFindKeywordSource(robotProject, libSpec, kwSpec);
         if (kwSource.isPresent()) {
             try {
                 final RobotDryRunKeywordSource source = kwSource.get();
-                final IPath location = resolveLocation(robotProject.getProject(), source);
-                final IFile file = resolveFile(location, robotProject.getProject(), libSpec);
-                final IEditorPart editor = openInEditor(page, file);
-                final TextEditor textEditor = editor.getAdapter(TextEditor.class);
-                if (textEditor != null) {
-                    selectTextInLine(textEditor, source.getLine(), source.getOffset(), source.getLength());
-                }
+                openEditorAndSelectDefinition(page, robotProject, libSpec, new Path(source.getFilePath()),
+                        editor -> selectTextInLine(editor, source.getLine(), source.getOffset(), source.getLength()));
+
             } catch (final CoreException e) {
                 errorHandler.accept("Unknown problem", e);
             }
         } else {
+            // fallback and just open the source of the library without looking for definition
             open(page, robotProject, libSpec, errorHandler);
         }
-    }
-
-    private static IPath resolveLocation(final IProject project, final RobotDryRunKeywordSource source) {
-        final Path path = new Path(source.getFilePath());
-        return path.isAbsolute() ? path : project.getLocation().append(path);
     }
 
     private static Optional<RobotDryRunKeywordSource> tryToFindKeywordSource(final RobotProject robotProject,
@@ -121,6 +132,19 @@ public class SourceOpeningSupport {
             kwSource = robotProject.getKeywordSource(qualifiedKwName);
         }
         return kwSource;
+    }
+
+    private static void openEditorAndSelectDefinition(final IWorkbenchPage page,
+            final RobotProject robotProject,
+            final LibrarySpecification libSpec, final IPath source, final Consumer<TextEditor> definitionSelector)
+            throws CoreException {
+        final IPath location = source.isAbsolute() ? source : robotProject.getProject().getLocation().append(source);
+        final IFile file = resolveFile(location, robotProject.getProject(), libSpec);
+        final IEditorPart editor = openInEditor(page, file);
+        final TextEditor textEditor = editor.getAdapter(TextEditor.class);
+        if (textEditor != null) {
+            definitionSelector.accept(textEditor);
+        }
     }
 
     private static IFile resolveFile(final IPath location, final IProject project, final LibrarySpecification libSpec)
@@ -167,13 +191,36 @@ public class SourceOpeningSupport {
         StatusManager.getManager().handle(status, StatusManager.SHOW);
     }
 
-    private static void selectTextInLine(final TextEditor editor, final int line, final int offset, final int length) {
+    private static void selectTextInLine(final TextEditor editor, final int line, final int column, final int length) {
         try {
             final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            final TextSelection selection = new TextSelection(document.getLineOffset(line) + offset, length);
+            final TextSelection selection = new TextSelection(document.getLineOffset(line) + column, length);
             editor.getSelectionProvider().setSelection(selection);
+
         } catch (final BadLocationException e) {
             throw new TextSelectionException("Unable to select text in line: " + line, e);
+        }
+    }
+
+    private static void selectDefinitionInLine(final TextEditor editor, final int lineNo) {
+        try {
+            final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+            final String line = document.get(document.getLineOffset(lineNo - 1), document.getLineLength(lineNo - 1));
+
+            final Matcher matcher = Pattern.compile(" ([a-zA-Z_][a-zA-Z_0-9]*)\\(").matcher(line);
+            if (matcher.find()) {
+                final int start = matcher.start(1);
+                final int end = matcher.end(1);
+                final TextSelection selection = new TextSelection(document.getLineOffset(lineNo - 1) + start,
+                        end - start);
+                editor.getSelectionProvider().setSelection(selection);
+
+            } else {
+                throw new TextSelectionException("Unable to select text in line: " + lineNo);
+            }
+
+        } catch (final BadLocationException e) {
+            throw new TextSelectionException("Unable to select text in line: " + lineNo, e);
         }
     }
 
@@ -193,6 +240,10 @@ public class SourceOpeningSupport {
     private static class TextSelectionException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
+
+        public TextSelectionException(final String message) {
+            super(message);
+        }
 
         public TextSelectionException(final String message, final Throwable cause) {
             super(message, cause);

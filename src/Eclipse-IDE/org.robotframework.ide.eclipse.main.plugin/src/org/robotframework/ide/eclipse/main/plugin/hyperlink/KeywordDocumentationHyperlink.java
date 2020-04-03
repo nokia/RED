@@ -88,7 +88,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return LibraryLocationFinder.findFullPath(model.createRobotProject(project), libSpec)
+        return LibraryLocationFinder.findPath(model.createRobotProject(project), libSpec)
                 .map(path -> "[" + path + "]")
                 .orElse("");
     }

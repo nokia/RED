@@ -51,17 +51,24 @@ def get_site_packages_libraries_names():
 
 def create_libdoc(libname, format):
     from tempfile import mkstemp
+    from base64 import b64encode
     import os
+    import sys
+    
+    is_py2 = sys.version_info < (3, 0, 0)
 
     try:
         f, temp_lib_file_path = mkstemp()
         os.close(f)
-        result = _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path)
-        encoded_libdoc = _encode_libdoc(temp_lib_file_path)
-        if encoded_libdoc:
-            return encoded_libdoc
+        console_output = _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path)
+
+        # check if anything was written into the file i.e. specification was generated        
+        if os.stat(temp_lib_file_path).st_size > 0:
+            content = _switch_source_to_absolute(temp_lib_file_path, 'utf-8' if is_py2 else 'unicode')
+            content = b64encode(content) if is_py2 else str(b64encode(bytes(content, 'utf-8')), 'utf-8')
+            return content
         else:
-            raise Exception(result)
+            raise Exception(console_output)
     finally:
         os.remove(temp_lib_file_path)
 
@@ -83,15 +90,25 @@ def _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path):
         sys.stdout = old_stdout
 
 
-def _encode_libdoc(temp_lib_file_path):
-    from base64 import b64encode
-    import sys
-    if sys.version_info < (3, 0, 0):
-        with open(temp_lib_file_path, 'r') as lib_file:
-            return b64encode(lib_file.read())
-    else:
-        with open(temp_lib_file_path, 'r', encoding='utf-8') as lib_file:
-            return str(b64encode(bytes(lib_file.read(), 'utf-8')), 'utf-8')
+def _switch_source_to_absolute(filepath, encoding):
+    # robot will usually write relative path to source of
+    # keyword/library but we want it to be absolute
+    from xml.etree import ElementTree
+    from os.path import isabs, dirname, normpath, join
+    
+    tree = ElementTree.parse(filepath)
+    root = tree.getroot()
+
+    all_with_source = [root]
+    all_with_source.extend(root.findall('kw'))
+
+    dir_path = dirname(filepath)
+    for tag in all_with_source:
+        if tag.get('source') is not None and not isabs(tag.get('source')):
+            abs_path = normpath(join(dir_path, tag.get('source')))
+            tag.set('source', abs_path)
+            
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + ElementTree.tostring(root, encoding)
 
 
 def create_html_doc(doc, format):

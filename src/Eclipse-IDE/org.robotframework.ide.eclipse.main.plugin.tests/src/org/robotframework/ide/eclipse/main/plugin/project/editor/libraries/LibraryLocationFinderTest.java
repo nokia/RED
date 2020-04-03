@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.getFile;
 
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -23,6 +25,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibraryArgumentsVariant;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.LibraryLocationFinder.KeywordLocation;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
 
@@ -189,4 +192,82 @@ public class LibraryLocationFinderTest {
                 .isEqualTo(getFile(project, "modOuter/modInner/ModLib.py").getLocation()));
     }
 
+    @Test
+    public void keywordDefinitionLocationIsNotFound_whenThereIsNoSourceDefinedInSpecifications() {
+        final KeywordSpecification kw1 = kwSpec(null, null);
+        final KeywordSpecification kw2 = kwSpec(null, 10);
+        final LibrarySpecification lib = libSpec(null, kw1, kw2);
+
+        assertThat(LibraryLocationFinder.findKeywordDefinition(lib, kw1)).isEmpty();
+        assertThat(LibraryLocationFinder.findKeywordDefinition(lib, kw2)).isEmpty();
+    }
+
+    @Test
+    public void keywordDefinitionLocationIsNotFound_whenThereIsNoLineOfKeywordAvailableInSpecificationButSourceIs_1() {
+        final String libPath = Paths.get("lib.py").toFile().getAbsolutePath();
+
+        final KeywordSpecification kw = kwSpec(libPath, null);
+        final LibrarySpecification lib = libSpec(null, kw);
+
+        final Optional<KeywordLocation> def = LibraryLocationFinder.findKeywordDefinition(lib, kw);
+
+        assertThat(def).isEmpty();
+    }
+
+    @Test
+    public void keywordDefinitionLocationIsNotFound_whenThereIsNoLineOfKeywordAvailableInSpecificationButSourceIs_2() {
+        final String libPath = Paths.get("lib.py").toFile().getAbsolutePath();
+
+        final KeywordSpecification kw = kwSpec(null, null);
+        final LibrarySpecification lib = libSpec(libPath, kw);
+
+        final Optional<KeywordLocation> def = LibraryLocationFinder.findKeywordDefinition(lib, kw);
+
+        assertThat(def).isEmpty();
+    }
+
+    @Test
+    public void keywordDefinitionLocationIsFound_whenItIsDefinedInKeywordSpecification() {
+        final String libPath1 = Paths.get("lib.py").toFile().getAbsolutePath();
+        final String libPath2 = Paths.get("lib2.py").toFile().getAbsolutePath();
+
+        final KeywordSpecification kw = kwSpec(libPath1, 10);
+        final LibrarySpecification lib1 = libSpec(libPath2, kw);
+        final LibrarySpecification lib2 = libSpec(null, kw);
+
+        assertThat(LibraryLocationFinder.findKeywordDefinition(lib1, kw)).isNotEmpty().hasValueSatisfying(loc -> {
+            assertThat(loc.getSourcePath().toOSString()).isEqualTo(libPath1);
+            assertThat(loc.getLine()).isEqualTo(10);
+        });
+        assertThat(LibraryLocationFinder.findKeywordDefinition(lib2, kw)).isNotEmpty().hasValueSatisfying(loc -> {
+            assertThat(loc.getSourcePath().toOSString()).isEqualTo(libPath1);
+            assertThat(loc.getLine()).isEqualTo(10);
+        });
+    }
+
+    @Test
+    public void keywordDefinitionLocationIsFound_whenItIsDefinedInLibrarySpecificationOnly() {
+        final String libPath = Paths.get("lib.py").toFile().getAbsolutePath();
+
+        final KeywordSpecification kw = kwSpec(null, 10);
+        final LibrarySpecification lib = libSpec(libPath, kw);
+
+        assertThat(LibraryLocationFinder.findKeywordDefinition(lib, kw)).isNotEmpty().hasValueSatisfying(loc -> {
+            assertThat(loc.getSourcePath().toOSString()).isEqualTo(libPath);
+            assertThat(loc.getLine()).isEqualTo(10);
+        });
+    }
+
+    private static KeywordSpecification kwSpec(final String path, final Integer lineNo) {
+        final KeywordSpecification spec = KeywordSpecification.create("keyword");
+        spec.setSourcePath(path);
+        spec.setLineNumber(lineNo);
+        return spec;
+    }
+
+    private static LibrarySpecification libSpec(final String path, final KeywordSpecification... kwSpecs) {
+        final LibrarySpecification spec = LibrarySpecification.create("library", kwSpecs);
+        spec.setSourcePath(path);
+        return spec;
+    }
 }

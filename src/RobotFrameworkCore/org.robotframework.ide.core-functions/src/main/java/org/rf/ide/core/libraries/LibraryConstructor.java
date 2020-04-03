@@ -7,8 +7,11 @@ package org.rf.ide.core.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,6 +42,9 @@ public class LibraryConstructor {
 
     private List<String> arguments;
 
+    private String sourcePath;
+    private Integer lineNumber;
+
     public String getDocumentation() {
         return documentation;
     }
@@ -60,5 +66,27 @@ public class LibraryConstructor {
 
     public ArgumentsDescriptor createArgumentsDescriptor() {
         return ArgumentsDescriptor.createDescriptor(arguments);
+    }
+
+    @XmlAttribute(name = "source")
+    public void setSourcePath(final String path) {
+        this.sourcePath = path;
+    }
+
+    public String getSourcePath() {
+        return sourcePath;
+    }
+
+    public Optional<File> getSource() {
+        return Optional.ofNullable(sourcePath).map(File::new);
+    }
+
+    @XmlAttribute(name = "lineno")
+    public void setLineNumber(final Integer lineNo) {
+        this.lineNumber = lineNo;
+    }
+
+    public Integer getLineNumber() {
+        return lineNumber;
     }
 }

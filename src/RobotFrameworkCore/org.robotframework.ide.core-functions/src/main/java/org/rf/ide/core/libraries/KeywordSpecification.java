@@ -5,8 +5,10 @@
  */
 package org.rf.ide.core.libraries;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,6 +36,9 @@ public class KeywordSpecification {
     private List<String> arguments = new ArrayList<>();
 
     private Boolean isDeprecated;
+
+    private String sourcePath;
+    private Integer lineNumber;
 
     public String getName() {
         return name;
@@ -82,6 +87,28 @@ public class KeywordSpecification {
                     && Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(documentation.toLowerCase()).find());
         }
         return isDeprecated.booleanValue();
+    }
+
+    @XmlAttribute(name = "source")
+    public void setSourcePath(final String path) {
+        this.sourcePath = path;
+    }
+
+    public String getSourcePath() {
+        return sourcePath;
+    }
+
+    public Optional<File> getSource() {
+        return Optional.ofNullable(sourcePath).map(File::new);
+    }
+
+    @XmlAttribute(name = "lineno")
+    public void setLineNumber(final Integer lineNo) {
+        this.lineNumber = lineNo;
+    }
+
+    public Integer getLineNumber() {
+        return lineNumber;
     }
 
     @Override

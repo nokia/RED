@@ -7,10 +7,12 @@ package org.rf.ide.core.libraries;
 
 import static java.util.stream.Collectors.toSet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -48,6 +50,9 @@ public class LibrarySpecification {
     private String format;
 
     private String version;
+
+    private String sourcePath;
+    private Integer lineNumber;
 
     private LibraryConstructor constructor;
 
@@ -89,6 +94,28 @@ public class LibrarySpecification {
     @XmlElement
     public void setVersion(final String version) {
         this.version = version;
+    }
+
+    @XmlAttribute(name = "source")
+    public void setSourcePath(final String path) {
+        this.sourcePath = path;
+    }
+
+    public String getSourcePath() {
+        return sourcePath;
+    }
+
+    public Optional<File> getSource() {
+        return Optional.ofNullable(sourcePath).map(File::new);
+    }
+
+    @XmlAttribute(name = "lineno")
+    public void setLineNumber(final Integer lineNo) {
+        this.lineNumber = lineNo;
+    }
+
+    public Integer getLineNumber() {
+        return lineNumber;
     }
 
     public String getDocumentation() {

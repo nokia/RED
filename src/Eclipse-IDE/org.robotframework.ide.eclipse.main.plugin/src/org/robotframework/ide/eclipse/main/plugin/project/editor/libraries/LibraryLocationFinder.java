@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
+import org.rf.ide.core.libraries.KeywordSpecification;
 import org.rf.ide.core.libraries.LibraryDescriptor;
 import org.rf.ide.core.libraries.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
@@ -20,24 +21,47 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 public class LibraryLocationFinder {
 
     public static Optional<IPath> findPath(final RobotProject robotProject, final LibrarySpecification libSpec) {
-        if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
+        final Optional<File> source = libSpec.getSource();
+        if (source.isPresent()) {
+            return source.map(LibraryLocationFinder::resolvePathFromSpec);
+
+        } else if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
             return findStandardLibPath(robotProject, libSpec);
+
         } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
-            final LibraryDescriptor descriptor = libSpec.getDescriptor();
-            return Optional
-                    .of(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getPath())));
+            return findReferenceLibPath(libSpec.getDescriptor());
         }
         return Optional.empty();
     }
 
-    public static Optional<IPath> findFullPath(final RobotProject robotProject, final LibrarySpecification libSpec) {
-        if (isLibraryFrom(libSpec, robotProject.getStandardLibraries())) {
-            return findStandardLibPath(robotProject, libSpec);
-        } else if (isLibraryFrom(libSpec, robotProject.getReferencedLibraries())) {
-            final LibraryDescriptor descriptor = libSpec.getDescriptor();
-            return findReferenceLibPath(descriptor, libSpec);
+    public static Optional<KeywordLocation> findKeywordDefinition(
+            final LibrarySpecification libSpec,
+            final KeywordSpecification kwSpec) {
+
+        final Optional<File> kwSource = kwSpec.getSource();
+        final Optional<File> libSource = libSpec.getSource();
+        
+        final File source;
+        if (kwSource.isPresent()) {
+            source = kwSource.get();
+        } else if (libSource.isPresent()) {
+            source = libSource.get();
+        } else {
+            source = null;
         }
-        return Optional.empty();
+
+        final Integer lineNumber = kwSpec.getLineNumber();
+        return lineNumber == null ? Optional.empty()
+                : Optional.ofNullable(source)
+                        .map(LibraryLocationFinder::resolvePathFromSpec)
+                        .map(path -> new KeywordLocation(path, lineNumber));
+    }
+
+    private static IPath resolvePathFromSpec(final File sourceInSpec) {
+        // From RF 3.2 library specification files contain sources which are always absolute
+        // (we change all relative paths into absolute in red_libraries.py module
+
+        return Path.fromOSString(sourceInSpec.getAbsolutePath());
     }
 
     private static boolean isLibraryFrom(final LibrarySpecification spec,
@@ -52,10 +76,28 @@ public class LibraryLocationFinder {
         return standardLibraryPath.map(file -> new Path(file.getAbsolutePath()));
     }
 
-    private static Optional<IPath> findReferenceLibPath(final LibraryDescriptor descriptor,
-            final LibrarySpecification libSpec) {
-        final IPath libPath = RedWorkspace.Paths
-                .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getPath()));
-        return Optional.of(libPath).filter(path -> path.toFile().exists());
+    private static Optional<IPath> findReferenceLibPath(final LibraryDescriptor descriptor) {
+        return Optional
+                .of(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(descriptor.getPath())));
+    }
+
+    static class KeywordLocation {
+
+        private final IPath sourcePath;
+
+        private final int line;
+
+        private KeywordLocation(final IPath sourcePath, final int line) {
+            this.sourcePath = sourcePath;
+            this.line = line;
+        }
+
+        IPath getSourcePath() {
+            return sourcePath;
+        }
+
+        int getLine() {
+            return line;
+        }
     }
 }
