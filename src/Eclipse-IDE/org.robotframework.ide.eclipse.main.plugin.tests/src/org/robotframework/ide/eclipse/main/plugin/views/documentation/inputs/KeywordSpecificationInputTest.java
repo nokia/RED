@@ -127,7 +127,7 @@ public class KeywordSpecificationInputTest {
         kwSpec1.setDocumentation("kw documentation");
         final LibrarySpecification libSpec1 = LibrarySpecification.create("library", kwSpec1);
         libSpec1.setFormat("ROBOT");
-        libSpec1.setScope("scope");
+        libSpec1.setScopeElem("scope");
         libSpec1.setVersion("1.0");
         libSpec1.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         libSpec1.setDocumentation("lib documentation");
@@ -137,7 +137,7 @@ public class KeywordSpecificationInputTest {
         kwSpec2.setDocumentation("kw documentation");
         final LibrarySpecification libSpec2 = LibrarySpecification.create("library", kwSpec2);
         libSpec2.setFormat("ROBOT");
-        libSpec2.setScope("scope");
+        libSpec2.setScopeElem("scope");
         libSpec2.setVersion("1.0");
         libSpec2.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         libSpec2.setDocumentation("lib documentation");
@@ -158,7 +158,7 @@ public class KeywordSpecificationInputTest {
         kwSpec1.setDocumentation("kw documentation");
         final LibrarySpecification libSpec1 = LibrarySpecification.create("library", kwSpec1);
         libSpec1.setFormat("ROBOT");
-        libSpec1.setScope("scope");
+        libSpec1.setScopeElem("scope");
         libSpec1.setVersion("1.0");
         libSpec1.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         libSpec1.setDocumentation("lib documentation");
@@ -168,7 +168,7 @@ public class KeywordSpecificationInputTest {
         kwSpec2.setDocumentation("kw documentation");
         final LibrarySpecification libSpec2 = LibrarySpecification.create("library", kwSpec2);
         libSpec2.setFormat("ROBOT");
-        libSpec2.setScope("scope");
+        libSpec2.setScopeElem("scope");
         libSpec2.setVersion("1.0");
         libSpec2.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         libSpec2.setDocumentation("lib documentation");
@@ -202,7 +202,7 @@ public class KeywordSpecificationInputTest {
 
         final LibrarySpecification libSpec = LibrarySpecification.create("library", kwSpec1, kwSpec2, kwSpec3, kwSpec4);
         libSpec.setFormat("ROBOT");
-        libSpec.setScope("scope");
+        libSpec.setScopeElem("scope");
         libSpec.setVersion("1.0");
         libSpec.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         libSpec.setDocumentation("lib documentation");

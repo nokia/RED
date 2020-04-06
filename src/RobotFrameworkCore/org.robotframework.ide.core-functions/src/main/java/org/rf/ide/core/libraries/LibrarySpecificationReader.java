@@ -21,7 +21,14 @@ public class LibrarySpecificationReader {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(LibrarySpecification.class);
             final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            return Optional.ofNullable((LibrarySpecification) jaxbUnmarshaller.unmarshal(file));
+            final LibrarySpecification spec = (LibrarySpecification) jaxbUnmarshaller.unmarshal(file);
+            if (spec.getSpecificationVersion() >= 2) {
+                // if there is no attribute then the keyword is not deprecated
+                spec.getKeywordsStream()
+                        .filter(kwSpec -> kwSpec.getDeprecatedState() == null)
+                        .forEach(kwSpec -> kwSpec.setDeprecated(false));
+            }
+            return Optional.ofNullable(spec);
         } catch (final JAXBException e) {
             return Optional.empty();
         }

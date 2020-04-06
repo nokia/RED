@@ -43,9 +43,13 @@ public class LibrarySpecification {
     @XmlTransient
     private boolean isModified;
 
+    private Integer specVersion;
+
     private String name;
 
-    private String scope;
+    private String scopeElem;
+
+    private String scopeAttr;
 
     private String format;
 
@@ -60,6 +64,19 @@ public class LibrarySpecification {
 
     private List<KeywordSpecification> keywords = new ArrayList<>();
 
+    @XmlAttribute(name = "specversion")
+    public void setSpecVersion(final Integer version) {
+        this.specVersion = version;
+    }
+
+    public Integer getSpecVersion() {
+        return specVersion;
+    }
+
+    public int getSpecificationVersion() {
+        return specVersion == null ? 1 : specVersion;
+    }
+
     public String getName() {
         return name;
     }
@@ -69,13 +86,26 @@ public class LibrarySpecification {
         this.name = name;
     }
 
-    public String getScope() {
-        return scope;
+    public String getScopeElem() {
+        return scopeElem;
     }
 
-    @XmlElement
-    public void setScope(final String scope) {
-        this.scope = scope;
+    @XmlElement(name = "scope")
+    public void setScopeElem(final String scope) {
+        this.scopeElem = scope;
+    }
+
+    public String getScopeAttr() {
+        return scopeAttr;
+    }
+
+    @XmlAttribute(name = "scope")
+    public void setScopeAttr(final String scope) {
+        this.scopeAttr = scope;
+    }
+
+    public String getScope() {
+        return scopeAttr != null ? scopeAttr : scopeElem;
     }
 
     public String getFormat() {

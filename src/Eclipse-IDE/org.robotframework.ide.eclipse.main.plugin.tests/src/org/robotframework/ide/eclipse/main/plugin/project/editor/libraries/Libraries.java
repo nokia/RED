@@ -93,7 +93,7 @@ public class Libraries {
         final LibraryDescriptor descriptor = LibraryDescriptor.ofReferencedLibrary(library, variant);
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setVersion("1.0");
-        libSpec.setScope("global");
+        libSpec.setScopeElem("global");
         libSpec.setFormat("ROBOT");
         libSpec.setName(library.getName());
         libSpec.setDescriptor(descriptor);

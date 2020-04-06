@@ -69,7 +69,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification.setFormat("ROBOT");
-        specification.setScope("scope");
+        specification.setScopeElem("scope");
         specification.setVersion("1.0");
         specification.setDocumentation("lib documentation");
 
@@ -97,7 +97,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification.setFormat("ROBOT");
-        specification.setScope("scope");
+        specification.setScopeElem("scope");
         specification.setVersion("1.0");
         specification.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification.setDocumentation("lib documentation");
@@ -123,7 +123,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification.setFormat("ROBOT");
-        specification.setScope("scope");
+        specification.setScopeElem("scope");
         specification.setVersion("1.0");
         specification.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification.setDocumentation("lib documentation");
@@ -157,7 +157,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification1.setFormat("ROBOT");
-        specification1.setScope("scope");
+        specification1.setScopeElem("scope");
         specification1.setVersion("1.0");
         specification1.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification1.setDocumentation("lib documentation");
@@ -165,7 +165,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification2 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification2.setFormat("ROBOT");
-        specification2.setScope("scope");
+        specification2.setScopeElem("scope");
         specification2.setVersion("1.0");
         specification2.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification2.setDocumentation("lib documentation");
@@ -184,7 +184,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification1.setFormat("ROBOT");
-        specification1.setScope("scope");
+        specification1.setScopeElem("scope");
         specification1.setVersion("1.0");
         specification1.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification1.setDocumentation("lib documentation");
@@ -192,7 +192,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification2 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification2.setFormat("ROBOT");
-        specification2.setScope("scope");
+        specification2.setScopeElem("scope");
         specification2.setVersion("1.0");
         specification2.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification2.setDocumentation("lib documentation");
@@ -211,7 +211,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification1 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification1.setFormat("ROBOT");
-        specification1.setScope("scope");
+        specification1.setScopeElem("scope");
         specification1.setVersion("1.0");
         specification1.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification1.setDocumentation("lib documentation");
@@ -219,7 +219,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification2 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification2.setFormat("ROBOT");
-        specification2.setScope("scope");
+        specification2.setScopeElem("scope");
         specification2.setVersion("1.0");
         specification2.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification2.setDocumentation("lib documentation2");
@@ -227,7 +227,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification3 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification3.setFormat("ROBOT");
-        specification3.setScope("scope");
+        specification3.setScopeElem("scope");
         specification3.setVersion("2.0");
         specification3.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification3.setDocumentation("lib documentation");
@@ -235,7 +235,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification4 = LibrarySpecification.create("library",
                 KeywordSpecification.create("kw1"));
         specification4.setFormat("ROBOT");
-        specification4.setScope("scope");
+        specification4.setScopeElem("scope");
         specification4.setVersion("1.0");
         specification4.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification4.setDocumentation("lib documentation");
@@ -243,7 +243,7 @@ public class LibrarySpecificationInputTest {
         final LibrarySpecification specification5 = LibrarySpecification.create("library2",
                 KeywordSpecification.create("kw1"), KeywordSpecification.create("kw2"));
         specification5.setFormat("ROBOT");
-        specification5.setScope("scope");
+        specification5.setScopeElem("scope");
         specification5.setVersion("1.0");
         specification5.setConstructor(LibraryConstructor.create("constructor", newArrayList("arg1", "arg2=42")));
         specification5.setDocumentation("lib documentation");
