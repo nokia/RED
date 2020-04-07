@@ -64,13 +64,25 @@ def create_libdoc(libname, format):
 
         # check if anything was written into the file i.e. specification was generated        
         if os.stat(temp_lib_file_path).st_size > 0:
-            content = _switch_source_to_absolute(temp_lib_file_path, 'utf-8' if is_py2 else 'unicode')
+            if format == 'xml':
+                content = _switch_source_to_absolute(temp_lib_file_path, 'utf-8' if is_py2 else 'unicode')
+            else:
+                content = _read_content(temp_lib_file_path, is_py2)
             content = b64encode(content) if is_py2 else str(b64encode(bytes(content, 'utf-8')), 'utf-8')
             return content
         else:
             raise Exception(console_output)
     finally:
         os.remove(temp_lib_file_path)
+
+
+def _read_content(temp_lib_file_path, is_py2):
+    if is_py2:
+        with open(temp_lib_file_path, 'r') as lib_file:
+            return lib_file.read()
+    else:
+        with open(temp_lib_file_path, 'r', encoding='utf-8') as lib_file:
+            return lib_file.read()
 
 
 def _create_libdoc_with_stdout_redirect(libname, format, temp_lib_file_path):
