@@ -1,0 +1,196 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AFeEUHTwEeqtjboiYcRIhQ,_d8aMACuvEeW667Afdo4DcA
+Element-Name: RerunNotExecutedSelectedTests
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _lpswIHTvEeqtjboiYcRIhQ
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/7/20 4:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// set preference to show args in console
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Launching"
+    get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
+    get-button "Apply and Close" | click
+}
+
+// select 4 tests from 2 suites
+get-view "Project Explorer" | get-tree
+	| select "rerun/test2.robot/Test Cases/e" "rerun/test2.robot/Test Cases/d" "rerun/test1.robot/Test Cases/a" "rerun/test1.robot/Test Cases/b"
+
+// run test and terminate on test "b"
+exec-with-options -disableJobWaiting -command{
+	get-view "Project Explorer" | get-tree | get-menu -path Run | click
+	try -times 6 -delay 500 -command{
+		get-view Console | get-text-viewer | get-property text 
+	    	| contains "Now stop the test" | verify-true
+	}
+	get-view Console | get-button Terminate | click
+}
+
+// go to execution view and check if b and only Test2 is shown
+get-view "Execution View" | click
+with [get-view "Execution View" | get-tree] {
+    get-item -path Rerun | get-property "getItems().length" | equals 2 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getText()" | equals Test1 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().length" | equals 2 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "a \(.* s\)" | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals b 
+        | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[1].getText()" | equals Test2 | verify-true
+}
+
+// rerun not executed tests
+get-view "Execution View" | get-button "Rerun Non Executed Tests" | click
+wait-for-console -times 8 -delay 1000
+
+// run tests: b,d,e
+get-view "Execution View" |  get-button "Expand All" | click
+with [get-view "Execution View" | get-tree] {
+    get-item -path "Rerun \\(.* s\\)" | get-property "getText()" | equals "Rerun \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" | equals "Test1 \(.* s\)" 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().length" | equals 1 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "b \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getItems().length" | equals 2 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "d \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals "e \(.* s\)" | verify-true
+}
+
+// check console with tests switches
+get-view Console | get-text-viewer | get-property text 
+    | equals [format "Command: .* -m robot.run --listener .*:\d{1,5} -s Rerun.Test1 -s Rerun.Test2 -t rerun.Test1.b -t rerun.Test2.d -t rerun.Test2.e %s%srerun\n"
+    + "Suite Executor: Robot Framework.*\n"
+    + "==============================================================================\n"
+    + "Rerun                                                                         \n"
+    + "==============================================================================\n"
+    + "Rerun.Test1                                                                   \n"
+    + "==============================================================================\n"
+    + "b                                                                     Now stop the test\n"
+    + "\| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Rerun.Test1                                                           \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Rerun.Test2                                                                   \n"
+    + "==============================================================================\n"
+    + "d                                                                     \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "e                                                                     \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Rerun.Test2                                                           \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Rerun                                                                 \| PASS \|\n"
+    + "3 critical tests, 3 passed, 0 failed\n"
+    + "3 tests total, 3 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" $RED_workspace_path_double_slaches $regex_sys_sep] | verify-true
+    
+// select new tests: b, b2, c, d    
+get-view "Project Explorer" | get-tree |  select "rerun/test2.robot/Test Cases/d" "rerun/test2.robot/Test Cases/c" "rerun/test1.robot/Test Cases/b2" "rerun/test1.robot/Test Cases/b"
+
+
+exec-with-options -disableJobWaiting -command{
+	get-view "Project Explorer" | get-tree | get-menu -path Run | click
+	try -times 6 -delay 500 -command{
+		get-view Console | get-text-viewer | get-property text 
+	    	| contains "Now stop the test" | verify-true
+	}
+	get-view Console | get-button Terminate | click
+}
+
+// check if b, b2 are visble in Execution View
+with [get-view "Execution View" | get-tree] {
+    get-item -path Rerun | get-property "getItems().length" | equals 2 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getText()" | equals Test1 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().length" | equals 2 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals b 
+        | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals b2 
+        | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[1].getText()" | equals Test2 | verify-true
+    get-item -path Rerun | get-property "getItems().TreeItem[1].getItems().length" | equals 0 | verify-true
+}
+
+// rerun not executed tests
+get-view "Execution View" | get-button "Rerun Non Executed Tests" | click
+wait-for-console -times 8 -delay 1000
+// run tests: b, b2, c, d
+get-view "Execution View" |  get-button "Expand All" | click
+
+with [get-view "Execution View" | get-tree] {
+    get-item -path "Rerun \\(.* s\\)" | get-property "getText()" | equals "Rerun \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().length" | equals 2 | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" | equals "Test1 \(.* s\)" 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().length" | equals 2 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "b \(.*s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "b2 \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getText()" | equals "Test2 \(.* s\)" 
+        | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "c \(.* s\)" | verify-true
+    get-item -path "Rerun \\(.* s\\)" | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals "d \(.* s\)" | verify-true
+}
+
+get-view Console | get-text-viewer | get-property text 
+    | equals [format  "Command: .* --listener .*:\d{1,5} -s Rerun\.Test1 -s Rerun\.Test2 -t rerun\.Test1\.b -t rerun\.Test1\.b2 -t rerun\.Test2\.c -t rerun\.Test2\.d %s%srerun\n"
+    + "Suite Executor: Robot Framework.*\n"
+    + "==============================================================================\n"
+    + "Rerun                                                                         \n"
+    + "==============================================================================\n"
+    + "Rerun.Test1                                                                   \n"
+    + "==============================================================================\n"
+    + "b                                                                     Now stop the test\n"
+    + "\| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "b2                                                                    \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Rerun.Test1                                                           \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Rerun.Test2                                                                   \n"
+    + "==============================================================================\n"
+    + "c                                                                     \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "d                                                                     \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Rerun.Test2                                                           \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Rerun                                                                 \| PASS \|\n"
+    + "4 critical tests, 4 passed, 0 failed\n"
+    + "4 tests total, 4 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*\n"
+    + "Log:     .*\n"
+    + "Report:  .*" $RED_workspace_path_double_slaches $regex_sys_sep] | verify-true
+    
+        
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
