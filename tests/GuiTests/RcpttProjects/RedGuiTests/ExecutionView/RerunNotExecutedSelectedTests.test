@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lpswIHTvEeqtjboiYcRIhQ
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/7/20 4:01 PM
+Save-Time: 4/9/20 11:35 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,14 +27,8 @@ get-view "Project Explorer" | get-tree
 	| select "rerun/test2.robot/Test Cases/e" "rerun/test2.robot/Test Cases/d" "rerun/test1.robot/Test Cases/a" "rerun/test1.robot/Test Cases/b"
 
 // run test and terminate on test "b"
-exec-with-options -disableJobWaiting -command{
-	get-view "Project Explorer" | get-tree | get-menu -path Run | click
-	try -times 6 -delay 500 -command{
-		get-view Console | get-text-viewer | get-property text 
-	    	| contains "Now stop the test" | verify-true
-	}
-	get-view Console | get-button Terminate | click
-}
+get-view "Project Explorer" | get-tree | get-menu -path Run | click
+wait-for-console
 
 // go to execution view and check if b and only Test2 is shown
 get-view "Execution View" | click
@@ -50,6 +44,16 @@ with [get-view "Execution View" | get-tree] {
 }
 
 // rerun not executed tests
+get-view "Project Explorer" | get-tree | select "rerun/test1.robot" | select "rerun/test1.robot" | get-menu 
+    -path "Open With/Text Editor" | click
+with [get-editor "test1.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 8 5
+        type-text "#"
+        key-type "M1+s"
+    }
+}
+
 get-view "Execution View" | get-button "Rerun Non Executed Tests" | click
 wait-for-console -times 8 -delay 1000
 
@@ -105,18 +109,14 @@ get-view Console | get-text-viewer | get-property text
     + "Log:     .*log.html\n"
     + "Report:  .*report.html" $RED_workspace_path_double_slaches $regex_sys_sep] | verify-true
     
-// select new tests: b, b2, c, d    
+// select new tests: b, b2, c, d  
+with [get-editor "test1.robot" | get-text-viewer] {
+    set-caret-pos 8 6
+    key-type BackSpace
+    key-type "M1+s"
+}  
 get-view "Project Explorer" | get-tree |  select "rerun/test2.robot/Test Cases/d" "rerun/test2.robot/Test Cases/c" "rerun/test1.robot/Test Cases/b2" "rerun/test1.robot/Test Cases/b"
-
-
-exec-with-options -disableJobWaiting -command{
-	get-view "Project Explorer" | get-tree | get-menu -path Run | click
-	try -times 6 -delay 500 -command{
-		get-view Console | get-text-viewer | get-property text 
-	    	| contains "Now stop the test" | verify-true
-	}
-	get-view Console | get-button Terminate | click
-}
+get-view "Project Explorer" | get-tree | get-menu -path Run | click
 
 // check if b, b2 are visble in Execution View
 with [get-view "Execution View" | get-tree] {
@@ -132,6 +132,12 @@ with [get-view "Execution View" | get-tree] {
 }
 
 // rerun not executed tests
+with [get-editor "test1.robot" | get-text-viewer] {
+    set-caret-pos 8 5
+    type-text "#"
+    key-type "M1+s"
+}
+
 get-view "Execution View" | get-button "Rerun Non Executed Tests" | click
 wait-for-console -times 8 -delay 1000
 // run tests: b, b2, c, d
