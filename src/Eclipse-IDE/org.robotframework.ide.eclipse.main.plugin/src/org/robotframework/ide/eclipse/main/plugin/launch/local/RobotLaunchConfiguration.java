@@ -70,6 +70,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static final String EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE = "Executable file arguments";
 
+    private static final String RERUN_CONFIGURATION_ATTRIBUTE = "Rerun configuration option enabled";
+
     public static final String CURRENT_CONFIGURATION_VERSION = "1";
 
     public static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
@@ -118,6 +120,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             final Map<String, List<String>> suitePaths) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setSuitePaths(suitePaths);
+        robotConfig.setRerunConfiguration(true);
     }
 
     public static void fillForNonExecutedTestsOrTasksRerun(final ILaunchConfigurationWorkingCopy launchConfig,
@@ -125,6 +128,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setRobotArguments(RobotLaunchConfigurationHelper.collectRobotArguments(robotConfig, testOrTasksPaths));
         robotConfig.setSuitePaths(RobotLaunchConfigurationHelper.collectSuitePathsWithoutOldTestsOrTasks(robotConfig));
+        robotConfig.setRerunConfiguration(true);
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -327,6 +331,15 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public boolean isGeneralPurposeConfiguration() throws CoreException {
         return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
+    }
+
+    public void setRerunConfiguration(final boolean isRerunConfiguration) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(RERUN_CONFIGURATION_ATTRIBUTE, isRerunConfiguration);
+    }
+
+    public boolean isRerunConfiguration() throws CoreException {
+        return configuration.getAttribute(RERUN_CONFIGURATION_ATTRIBUTE, false);
     }
 
     public String getExecutableFilePath() throws CoreException {

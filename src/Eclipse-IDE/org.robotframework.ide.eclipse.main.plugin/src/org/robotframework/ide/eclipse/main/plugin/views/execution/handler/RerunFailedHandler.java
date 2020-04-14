@@ -27,6 +27,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent.ExecutionMode;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
@@ -81,9 +83,10 @@ public class RerunFailedHandler extends DIParameterizedHandler<E4RerunFailedHand
         @VisibleForTesting
         static ILaunchConfigurationWorkingCopy getConfig(final RobotTestsLaunch launch) throws CoreException {
             final ILaunchConfiguration launchConfig = launch.getLaunchConfiguration();
-
             if (launchConfig != null && launchConfig.exists()) {
-                final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
+                final String launchConfigCopyName = RobotLaunchConfigurationNaming.getRerunConfigurationName(
+                        launchConfig, RobotLaunchConfigurationType.RERUN_TEST_CASES);
+                final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfigCopyName);
                 final IProject project = new RobotLaunchConfiguration(launchConfigCopy).getProject();
                 final ExecutionStatusStore statusStore = launch.getExecutionData(ExecutionStatusStore.class).get();
                 final Map<String, List<String>> failedSuitesPaths = statusStore.getFailedSuitePaths(project);

@@ -6,6 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.robotframework.red.junit.jupiter.ProjectExtension.createFile;
 
 import java.util.Arrays;
@@ -13,9 +16,11 @@ import java.util.Collections;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
 
@@ -84,4 +89,27 @@ public class RobotLaunchConfigurationNamingTest {
         assertThat(basicName2).isEqualTo("New Configuration");
     }
 
+    @Test
+    public void projectConfigurationNameWithRerunSuffixIsReturned_whenRerunPurposeConfigurationOptionIsSet()
+            throws Exception {
+        final ILaunchConfiguration launchConfig = mock(ILaunchConfiguration.class);
+        when(launchConfig.getName()).thenReturn("suite.robot");
+
+        final String rurunConfigName = RobotLaunchConfigurationNaming.getRerunConfigurationName(launchConfig,
+                RobotLaunchConfigurationType.RERUN_TEST_CASES);
+        assertThat(rurunConfigName).isEqualTo("suite.robot (Rerun)");
+    }
+
+    @Test
+    public void projectConfigurationNameWithoutRerunSuffixIsReturned_whenRerunPurposeConfigurationOptionIsNotSet()
+            throws Exception {
+        final ILaunchConfiguration launchConfig = mock(ILaunchConfiguration.class);
+        when(launchConfig.getName()).thenReturn("suite.robot");
+        final RobotLaunchConfiguration robotConfig = spy(new RobotLaunchConfiguration(launchConfig));
+        when(robotConfig.isRerunConfiguration()).thenReturn(true);
+
+        final String rurunConfigName = RobotLaunchConfigurationNaming.getRerunConfigurationName(launchConfig,
+                RobotLaunchConfigurationType.RERUN_TEST_CASES);
+        assertThat(rurunConfigName).isEqualTo("suite.robot");
+    }
 }

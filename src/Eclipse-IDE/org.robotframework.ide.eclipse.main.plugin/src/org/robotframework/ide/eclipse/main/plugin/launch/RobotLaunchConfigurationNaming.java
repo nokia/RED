@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 
 public class RobotLaunchConfigurationNaming {
 
@@ -33,9 +36,17 @@ public class RobotLaunchConfigurationNaming {
         return NEW_CONFIGURATION_NAME;
     }
 
+    public static String getRerunConfigurationName(final ILaunchConfiguration launchConfig,
+            final RobotLaunchConfigurationType type) throws CoreException {
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
+        return robotConfig.isRerunConfiguration() ? launchConfig.getName()
+                : launchConfig.getName() + type.getNameSuffix();
+    }
+
     public enum RobotLaunchConfigurationType {
         GENERAL_PURPOSE(""),
-        SELECTED_TEST_CASES(" (Selected Test Cases)");
+        SELECTED_TEST_CASES(" (Selected Test Cases)"),
+        RERUN_TEST_CASES(" (Rerun)");
 
         private final String nameSuffix;
 
