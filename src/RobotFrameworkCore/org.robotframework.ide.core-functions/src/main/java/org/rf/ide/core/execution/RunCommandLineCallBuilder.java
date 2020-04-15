@@ -212,7 +212,8 @@ public class RunCommandLineCallBuilder {
             cmdLine.add("robot.run");
 
             cmdLine.add("--listener");
-            cmdLine.add(RedTemporaryDirectory.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
+            cmdLine.add(RedTemporaryDirectory.copyScriptFile(RedTemporaryDirectory.TEST_RUNNER_AGENT).toPath() + ":"
+                    + listenerPort);
 
             ArgumentsFile argumentsFile = null;
             if (useArgumentFile) {

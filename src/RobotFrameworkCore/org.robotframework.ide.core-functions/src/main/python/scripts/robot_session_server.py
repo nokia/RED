@@ -450,22 +450,30 @@ def __decode_unicode_if_needed(arg):
 
 
 def __extend_paths(python_paths, class_paths):
+    import platform
     from robot import pythonpathsetter
 
-    __extend_classpath(class_paths)
+    if 'Jython' in platform.python_implementation():
+        for class_path in class_paths:
+            __extend_classpath(class_path)
 
     for path in python_paths + class_paths:
         pythonpathsetter.add_path(path)
 
 
-def __extend_classpath(class_paths):
-    import platform
+def __extend_classpath(jar_path):
+    import java.io.File
 
-    if 'Jython' in platform.python_implementation():
-        for class_path in class_paths:
-            from classpath_updater import ClassPathUpdater
-            cp_updater = ClassPathUpdater()
-            cp_updater.add_file(class_path)
+    jar_file = java.io.File(jar_path)
+    try:
+        # extend class path with instrumentation
+        import org.rf.ide.core.jvmutils.classpath.JarLoader
+        org.rf.ide.core.jvmutils.classpath.JarLoader.addToClassPath(jar_file)
+    except:
+        # extend class path with reflection
+        from classpath_updater import ClassPathUpdater
+        cp_updater = ClassPathUpdater()
+        cp_updater.add_url(jar_file.toURI().toURL())
 
 
 def __get_script_path():

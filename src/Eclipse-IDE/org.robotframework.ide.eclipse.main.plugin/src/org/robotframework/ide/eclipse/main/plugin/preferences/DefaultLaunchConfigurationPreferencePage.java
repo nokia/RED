@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -173,8 +174,8 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         final Button exportBtn = new Button(composite, SWT.PUSH);
         GridDataFactory.swtDefaults().applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
-        exportBtn.addSelectionListener(
-                widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
+        exportBtn.addSelectionListener(widgetSelectedAdapter(
+                e -> new ScriptExportDialog(getShell(), RedTemporaryDirectory.TEST_RUNNER_AGENT).open()));
 
         return composite;
     }

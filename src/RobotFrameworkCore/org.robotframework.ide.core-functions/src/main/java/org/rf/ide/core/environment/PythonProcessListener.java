@@ -12,12 +12,12 @@ package org.rf.ide.core.environment;
  */
 public interface PythonProcessListener {
 
-    void processStarted(String name, Process process);
+    void processStarted(String interpreterPath, Process process);
 
     void processEnded(Process process);
 
-    void lineRead(Process serverProcess, String line);
+    void lineRead(Process process, String line);
 
-    void errorLineRead(Process serverProcess, String line);
+    void errorLineRead(Process process, String line);
 
 }

@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.RedTemporaryDirectory;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
@@ -169,8 +170,8 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
         final Button exportBtn = new Button(clientGroup, SWT.PUSH);
         GridDataFactory.swtDefaults().applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
-        exportBtn.addSelectionListener(
-                widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
+        exportBtn.addSelectionListener(widgetSelectedAdapter(
+                e -> new ScriptExportDialog(getShell(), RedTemporaryDirectory.TEST_RUNNER_AGENT).open()));
 
         final Label commandLineDescription = new Label(clientGroup, SWT.WRAP);
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).applyTo(commandLineDescription);
@@ -215,7 +216,8 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
     }
 
     private void updateCommandLineArguments() {
-        commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostTxt.getText() + ":" + portTxt.getText());
+        commandLineArgument.setText(String.format("--listener %s:%s:%s", RedTemporaryDirectory.TEST_RUNNER_AGENT,
+                hostTxt.getText(), portTxt.getText()));
     }
 
     @Override

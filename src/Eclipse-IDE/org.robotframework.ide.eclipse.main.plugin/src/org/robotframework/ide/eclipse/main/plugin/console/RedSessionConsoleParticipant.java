@@ -102,7 +102,7 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
     private class ActionsUpdater implements PythonProcessListener {
 
         @Override
-        public void processStarted(final String name, final Process process) {
+        public void processStarted(final String interpreter, final Process process) {
             // nothing to do
         }
 
@@ -116,12 +116,12 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
         }
 
         @Override
-        public void lineRead(final Process serverProcess, final String line) {
+        public void lineRead(final Process process, final String line) {
             // nothing to do
         }
 
         @Override
-        public void errorLineRead(final Process serverProcess, final String line) {
+        public void errorLineRead(final Process process, final String line) {
             // nothing to do
         }
     }

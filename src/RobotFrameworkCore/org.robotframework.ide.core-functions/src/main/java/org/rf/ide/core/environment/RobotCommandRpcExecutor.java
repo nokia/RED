@@ -47,11 +47,9 @@ import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 
 /**
@@ -81,6 +79,10 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
     abstract boolean isAlive();
 
     abstract void kill();
+
+    SuiteExecutor getType() {
+        return interpreterType;
+    }
 
     void connectToServer(final String serverUrl, final String interpreterPath) {
         try {
@@ -428,44 +430,21 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     static class InternalRobotCommandRpcExecutor extends RobotCommandRpcExecutor {
 
-        private static final List<String> SCRIPT_FILES = ImmutableList.of("robot_session_server.py",
-                "classpath_updater.py", "red_keyword_autodiscover.py", "red_libraries.py",
-                "red_library_autodiscover.py", "red_module_classes.py", "red_modules.py", "red_variables.py",
-                "rflint_integration.py", "SuiteVisitorImportProxy.py", "TestRunnerAgent.py");
-
         private final String interpreterPath;
 
-        private final Supplier<List<PythonProcessListener>> processListeners;
-
-        private final List<File> serverScripts = new ArrayList<>();
-
-        private XmlRpcServer server;
+        private final XmlRpcServer server;
 
         InternalRobotCommandRpcExecutor(final SuiteExecutor interpreterType, final String interpreterPath,
-                final Supplier<List<PythonProcessListener>> processListeners) {
+                final XmlRpcServer server) {
             super(interpreterType);
             this.interpreterPath = interpreterPath;
-            this.processListeners = processListeners;
+            this.server = server;
         }
 
         @Override
         void initialize() {
-            if (serverScripts.isEmpty()) {
-                serverScripts.addAll(copyScripts());
-            } else if (!serverScripts.stream().allMatch(File::exists)) {
-                serverScripts.clear();
-                serverScripts.addAll(copyScripts());
-            }
-        }
-
-        @VisibleForTesting
-        static List<File> copyScripts() {
             try {
-                final List<File> files = new ArrayList<>();
-                for (final String scriptFile : SCRIPT_FILES) {
-                    files.add(RedTemporaryDirectory.copyScriptFile(scriptFile));
-                }
-                return files;
+                RedTemporaryDirectory.createSessionServerFiles();
             } catch (final IOException e) {
                 throw new XmlRpcServerException("Unable to create temporary directory for XML-RPC server", e);
             }
@@ -473,32 +452,44 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
         @Override
         void establishConnection() {
-            final String serverPath = serverScripts.get(0).getPath();
-            final int port = findFreePort();
-            server = new XmlRpcServer();
+            int port;
             try {
-                server.start(serverPath, port);
+                port = server.findFreePort();
+            } catch (final IOException e) {
+                throw new XmlRpcServerException("Unable to find free port for XML-RPC server", e);
+            }
+            final String[] serverProcessStartCommand = createServerProcessStartCommand(port);
+            try {
+                server.start(serverProcessStartCommand);
                 connectToServer("http://127.0.0.1:" + port, interpreterPath);
                 server.verifyStart();
             } catch (final IOException e) {
                 throw new XmlRpcServerException(
-                        String.format("Unable to start XML-RPC server (interpreter: %s, server: %s, port: %d)",
-                                interpreterPath, serverPath, port),
+                        "Unable to start XML-RPC server using command: " + String.join(" ", serverProcessStartCommand),
                         e);
             }
         }
 
-        private static int findFreePort() {
-            try (ServerSocket socket = new ServerSocket(0)) {
-                return socket.getLocalPort();
-            } catch (final IOException e) {
-                throw new XmlRpcServerException("Unable to find free port for XML-RPC server", e);
+        private String[] createServerProcessStartCommand(final int port) {
+            final String serverPath = getFilePath(RedTemporaryDirectory.ROBOT_SESSION_SERVER);
+            if (getType() == SuiteExecutor.Jython) {
+                final String agentPath = getFilePath(RedTemporaryDirectory.CLASS_PATH_UPDATER);
+                return new String[] { interpreterPath, "-J-javaagent:" + agentPath, serverPath, String.valueOf(port) };
+            } else {
+                return new String[] { interpreterPath, serverPath, String.valueOf(port) };
             }
+        }
+
+        private String getFilePath(final String name) {
+            return RedTemporaryDirectory.getSessionServerFile(name)
+                    .map(File::getPath)
+                    .orElseThrow(() -> new XmlRpcServerException(
+                            "Unable to find XML-RPC server file with name '" + name + "'"));
         }
 
         @Override
         boolean isAlive() {
-            return server != null && server.isAlive();
+            return server.isAlive();
         }
 
         @Override
@@ -512,15 +503,29 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
         }
 
-        private class XmlRpcServer {
+        static class XmlRpcServer {
+
+            private final String interpreterPath;
+
+            private final Supplier<List<PythonProcessListener>> processListeners;
 
             private Process process;
 
             private StartExceptionListener startExceptionListener = new StartExceptionListener();
 
-            private void start(final String serverPath, final int port) throws IOException {
-                final ProcessBuilder processBuilder = new ProcessBuilder(interpreterPath, serverPath,
-                        String.valueOf(port));
+            XmlRpcServer(final String interpreterPath, final Supplier<List<PythonProcessListener>> processListeners) {
+                this.interpreterPath = interpreterPath;
+                this.processListeners = processListeners;
+            }
+
+            int findFreePort() throws IOException {
+                try (ServerSocket socket = new ServerSocket(0)) {
+                    return socket.getLocalPort();
+                }
+            }
+
+            void start(final String... command) throws IOException {
+                final ProcessBuilder processBuilder = new ProcessBuilder(command);
                 processBuilder.environment().put("PYTHONIOENCODING", "utf8");
                 process = processBuilder.start();
 
@@ -598,7 +603,7 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 return listeners;
             }
 
-            private void verifyStart() throws IOException {
+            void verifyStart() throws IOException {
                 if (isAlive()) {
                     startExceptionListener = null;
                 } else {
@@ -609,19 +614,23 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
         }
 
         @SuppressWarnings("serial")
-        private static class XmlRpcServerException extends RuntimeException {
+        static class XmlRpcServerException extends RuntimeException {
+
+            private XmlRpcServerException(final String message) {
+                super(message);
+            }
 
             private XmlRpcServerException(final String message, final Throwable cause) {
                 super(message, cause);
             }
         }
 
-        private class StartExceptionListener implements PythonProcessListener {
+        private static class StartExceptionListener implements PythonProcessListener {
 
             private final List<String> errorLines = new ArrayList<>();
 
             @Override
-            public void processStarted(final String name, final Process process) {
+            public void processStarted(final String interpreter, final Process process) {
                 // nothing to do
             }
 
@@ -631,12 +640,12 @@ abstract class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
 
             @Override
-            public void lineRead(final Process serverProcess, final String line) {
+            public void lineRead(final Process process, final String line) {
                 // nothing to do
             }
 
             @Override
-            public void errorLineRead(final Process serverProcess, final String line) {
+            public void errorLineRead(final Process process, final String line) {
                 errorLines.add(line);
             }
         }

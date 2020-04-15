@@ -30,7 +30,6 @@ import com.google.common.util.concurrent.Futures;
 
 /**
  * @author Michal Anglart
- *
  */
 public final class RedSessionProcessListener implements PythonProcessListener {
 
@@ -53,16 +52,16 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     }
 
     @Override
-    public void processStarted(final String name, final Process process) {
+    public void processStarted(final String interpreter, final Process process) {
         if (SwtThread.isSwtThread()) {
-            streams.put(process, Futures.immediateFuture(openAndInitializeConsole(name, process)));
+            streams.put(process, Futures.immediateFuture(openAndInitializeConsole(interpreter, process)));
         } else {
-            streams.put(process, SwtThread.asyncEval(Evaluation.of(() -> openAndInitializeConsole(name, process))));
+            streams.put(process, SwtThread.asyncEval(Evaluation.of(() -> openAndInitializeConsole(interpreter, process))));
         }
     }
 
-    private RedSessionConsole openAndInitializeConsole(final String name, final Process process) {
-        final RedSessionConsole console = openRobotServerConsole(name, process);
+    private RedSessionConsole openAndInitializeConsole(final String interpreter, final Process process) {
+        final RedSessionConsole console = openRobotServerConsole(interpreter, process);
         console.initializeStreams();
         return console;
     }
@@ -82,8 +81,8 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     }
 
     @Override
-    public void lineRead(final Process serverProcess, final String line) {
-        final Future<RedSessionConsole> console = streams.get(serverProcess);
+    public void lineRead(final Process process, final String line) {
+        final Future<RedSessionConsole> console = streams.get(process);
         if (console != null) {
             try {
                 console.get().getStdOutStream().println(line);
@@ -94,8 +93,8 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     }
 
     @Override
-    public void errorLineRead(final Process serverProcess, final String line) {
-        final Future<RedSessionConsole> console = streams.get(serverProcess);
+    public void errorLineRead(final Process process, final String line) {
+        final Future<RedSessionConsole> console = streams.get(process);
         if (console != null) {
             try {
                 console.get().getStdErrStream().println(line);
@@ -105,13 +104,13 @@ public final class RedSessionProcessListener implements PythonProcessListener {
         }
     }
 
-    private RedSessionConsole openRobotServerConsole(final String interpreterName, final Process process) {
+    private RedSessionConsole openRobotServerConsole(final String interpreter, final Process process) {
         final IWorkbench workbench = PlatformUI.getWorkbench();
         final IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
         final IWorkbenchPage page = activeWindow.getActivePage();
         try {
             final IConsoleView consoleView = (IConsoleView) page.showView(IConsoleConstants.ID_CONSOLE_VIEW);
-            final String name = createName(interpreterName);
+            final String name = createName(interpreter);
             RedSessionConsole console = findConsole(name);
             if (console == null) {
                 console = createConsole(name, process);
@@ -124,8 +123,8 @@ public final class RedSessionProcessListener implements PythonProcessListener {
         }
     }
 
-    private static String createName(final String interpreterName) {
-        return "RED session [" + interpreterName + "]";
+    private static String createName(final String interpreter) {
+        return "RED session [" + interpreter + "]";
     }
 
     private RedSessionConsole findConsole(final String name) {

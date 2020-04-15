@@ -155,7 +155,9 @@ public class LocalProcessCommandLineBuilderTest {
         final RunCommandLine commandLine = createCommandLine(interpreter, robotProject, robotConfig);
 
         assertThat(commandLine.getCommandLine()).hasSize(8)
-                .containsSequence("--listener", RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345",
+                .containsSequence("--listener",
+                        RedTemporaryDirectory.getTemporaryFile(RedTemporaryDirectory.TEST_RUNNER_AGENT)
+                                + ":12345",
                         "--argumentfile")
                 .endsWith(project.getProject().getLocation().toOSString());
         assertThat(commandLine.getCommandLine()[6])

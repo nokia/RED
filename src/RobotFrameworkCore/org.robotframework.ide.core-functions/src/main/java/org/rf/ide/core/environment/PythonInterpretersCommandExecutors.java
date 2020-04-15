@@ -64,11 +64,7 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
     public synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory location) {
         RobotCommandRpcExecutor executor = executors.get(location.getInterpreterPath());
         if (executor == null || !executor.isAlive()) {
-            executor = RedSystemProperties.shouldConnectToRunningServer()
-                    ? new ExternalRobotCommandRpcExecutor(location.getInterpreter(),
-                            RedSystemProperties.getSessionServerAddress())
-                    : new InternalRobotCommandRpcExecutor(location.getInterpreter(), location.getInterpreterPath(),
-                            this::getListeners);
+            executor = createExecutor(location);
             executor.initialize();
             executor.establishConnection();
             executors.put(location.getInterpreterPath(), executor);
@@ -76,5 +72,14 @@ class PythonInterpretersCommandExecutors implements RobotCommandsExecutors {
             executor.initialize();
         }
         return executor;
+    }
+
+    private RobotCommandRpcExecutor createExecutor(final PythonInstallationDirectory location) {
+        if (RedSystemProperties.shouldConnectToRunningServer()) {
+            return new ExternalRobotCommandRpcExecutor(location.getInterpreter(),
+                    RedSystemProperties.getSessionServerAddress());
+        }
+        return new InternalRobotCommandRpcExecutor(location.getInterpreter(), location.getInterpreterPath(),
+                new InternalRobotCommandRpcExecutor.XmlRpcServer(location.getInterpreterPath(), this::getListeners));
     }
 }

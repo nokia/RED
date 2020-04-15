@@ -27,7 +27,8 @@ public class RunCommandLineCallBuilderTest {
 
         assertThat(cmdLine.getCommandLine()).hasSize(7)
                 .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                        RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345", "--argumentfile");
+                        RedTemporaryDirectory.getTemporaryFile(RedTemporaryDirectory.TEST_RUNNER_AGENT) + ":12345",
+                        "--argumentfile");
         assertThat(cmdLine.getArgumentFile()).isPresent();
     }
 
@@ -39,7 +40,7 @@ public class RunCommandLineCallBuilderTest {
 
         assertThat(cmdLine.getCommandLine()).hasSize(5)
                 .containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                        RedTemporaryDirectory.getTemporaryFile("TestRunnerAgent.py") + ":12345");
+                        RedTemporaryDirectory.getTemporaryFile(RedTemporaryDirectory.TEST_RUNNER_AGENT) + ":12345");
         assertThat(cmdLine.getArgumentFile()).isNotPresent();
     }
 

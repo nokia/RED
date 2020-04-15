@@ -16,13 +16,27 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public final class RedTemporaryDirectory {
+
+    public static final String ROBOT_SESSION_SERVER = "robot_session_server.py";
+
+    public static final String TEST_RUNNER_AGENT = "TestRunnerAgent.py";
+
+    public static final String CLASS_PATH_UPDATER = "classpath_updater.jar";
 
     private static final String DIR_NAME_PREFIX = "RobotTempDir";
 
     private static Path temporaryDirectory;
+
+    private static final Set<File> SESSION_SERVER_FILES = new HashSet<>();
 
     public static File copyRedpydevdPackage() throws IOException {
         copyScriptFile("red_pydevd_package", "redpydevd", "__init__.py");
@@ -48,6 +62,31 @@ public final class RedTemporaryDirectory {
 
     public static InputStream getRedpydevdFileAsStream() throws IOException {
         return getScriptFileAsStream("red_pydevd_package", "redpydevd", "redpydevd.py");
+    }
+
+    public static synchronized void createSessionServerFiles() throws IOException {
+        if (SESSION_SERVER_FILES.isEmpty()) {
+            SESSION_SERVER_FILES.addAll(RedTemporaryDirectory.copySessionServerFiles());
+        } else if (!SESSION_SERVER_FILES.stream().allMatch(File::exists)) {
+            SESSION_SERVER_FILES.clear();
+            SESSION_SERVER_FILES.addAll(RedTemporaryDirectory.copySessionServerFiles());
+        }
+    }
+
+    public static synchronized Optional<File> getSessionServerFile(final String name) {
+        return SESSION_SERVER_FILES.stream().filter(File::exists).filter(f -> f.getName().equals(name)).findFirst();
+    }
+
+    @VisibleForTesting
+    static Set<File> copySessionServerFiles() throws IOException {
+        final Set<File> files = new HashSet<>();
+        for (final String filename : Arrays.asList(ROBOT_SESSION_SERVER, TEST_RUNNER_AGENT, CLASS_PATH_UPDATER,
+                "classpath_updater.py", "red_keyword_autodiscover.py", "red_libraries.py",
+                "red_library_autodiscover.py", "red_module_classes.py", "red_modules.py", "red_variables.py",
+                "rflint_integration.py", "SuiteVisitorImportProxy.py")) {
+            files.add(RedTemporaryDirectory.copyScriptFile(filename));
+        }
+        return files;
     }
 
     public static File copyScriptFile(final String filename) throws IOException {
