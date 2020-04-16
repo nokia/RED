@@ -4,6 +4,7 @@ import sys
 import os
 import platform
 
+from robot_session_server import get_robot_version_num
 from robot_session_server import get_robot_version
 from robot_session_server import create_libdoc
 from robot_session_server import create_libdoc_in_separate_process
@@ -242,6 +243,7 @@ class RobotFilesConvertingTests(unittest.TestCase):
         golden_file_path = os.path.join(parent_path, 'res_test_robot_session_server', 'converted.robot')
         self.assertEqualToGoldenFileContent(converted, golden_file_path)
 
+    @unittest.skipUnless(get_robot_version_num() < (3, 2), "TSV is not supported by RF 3.2, so is wrongly converted")
     def test_tsv_file_is_properly_converted_to_robot_format(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert.tsv')
@@ -254,7 +256,7 @@ class RobotFilesConvertingTests(unittest.TestCase):
 
     def test_file_with_unicode_charactes_is_converted_to_robot_format_without_exceptions(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert_unicode.tsv')
+        path = os.path.join(parent_path, 'res_test_robot_session_server', 'to_convert_unicode.txt')
 
         from base64 import b64decode
         b64decode(convert_robot_data_file(path)['result'])

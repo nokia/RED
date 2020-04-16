@@ -298,11 +298,8 @@ def stop_auto_discovering():
 @cleanup_modules
 @logargs
 def get_rf_lint_rules(rulesfiles):
-    try:
-        import rflint
-        import rflint_integration
-    except Exception as e:
-        raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
+    import rflint   # trying to import rflint in order to have exception quickly once rflint is not installed
+    import rflint_integration
 
     return rflint_integration.get_rules(rulesfiles)
 
@@ -315,11 +312,8 @@ def run_rf_lint(host, port, project_location_path, excluded_paths, filepath, add
 
     import subprocess
     import os
-    try:
-        import rflint
-        import rflint_integration
-    except Exception as e:
-        raise RuntimeError('There is no rflint module installed for ' + INTERPRETER_PATH + ' interpreter')
+    import rflint   # trying to import rflint in order to have exception quickly once rflint is not installed
+    import rflint_integration
 
     command = [INTERPRETER_PATH]
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
@@ -344,7 +338,8 @@ def convert_robot_data_file(original_filepath):
     from robot.tidy import Tidy
     from base64 import b64encode
 
-    converted_content = Tidy(format='robot').file(original_filepath)
+    tidy = Tidy(format='robot') if get_robot_version_num() < (3, 2) else Tidy()
+    converted_content = tidy.file(original_filepath)
 
     if sys.version_info < (3, 0, 0):
         return b64encode(converted_content.encode('utf-8'))
@@ -420,6 +415,12 @@ def create_libdoc_in_separate_process(libname, format, python_paths, class_paths
 def create_html_doc(doc, format):
     import red_libraries
     return red_libraries.create_html_doc(doc, format)
+
+
+def get_robot_version_num():
+    from robot import version
+    robot_version_str = version.get_version(True)
+    return tuple([int(num) for num in re.split('\\.', robot_version_str)])
 
 
 def __get_robot_version():
