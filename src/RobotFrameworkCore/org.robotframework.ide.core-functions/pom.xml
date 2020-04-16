@@ -231,8 +231,7 @@
 							<executable>python</executable>
 							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
 							<arguments>
-								<argument>-m</argument>
-								<argument>unittest_red</argument>
+								<argument>${basedir}/target/pyunit/unittest_red.py</argument>
 								<argument>discover</argument>
 								<argument>${basedir}/target/pyunit/scripts</argument>
 							</arguments>
@@ -250,8 +249,7 @@
 							<executable>python3</executable>
 							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
 							<arguments>
-								<argument>-m</argument>
-								<argument>unittest_red</argument>
+								<argument>${basedir}/target/pyunit/unittest_red.py</argument>
 								<argument>discover</argument>
 								<argument>${basedir}/target/pyunit/scripts</argument>
 							</arguments>
@@ -270,8 +268,7 @@
 							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
 							<arguments>
 								<argument>-J-javaagent:${basedir}/target/pyunit/scripts/classpath_updater.jar</argument>
-								<argument>-m</argument>
-								<argument>unittest_red</argument>
+								<argument>${basedir}/target/pyunit/unittest_red.py</argument>
 								<argument>discover</argument>
 								<argument>${basedir}/target/pyunit/scripts</argument>
 							</arguments>
