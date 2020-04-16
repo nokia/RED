@@ -53,12 +53,12 @@ public class RobotCommandRpcExecutorTest {
     class InternalRobotCommandRpcExecutorTest {
 
         @BeforeEach
-        public void beforeTest() throws Exception {
+        void beforeTest() throws Exception {
             createSessionServerFiles();
         }
 
         @AfterEach
-        public void afterTest() throws Exception {
+        void afterTest() throws Exception {
             deleteSessionServerFiles();
         }
 

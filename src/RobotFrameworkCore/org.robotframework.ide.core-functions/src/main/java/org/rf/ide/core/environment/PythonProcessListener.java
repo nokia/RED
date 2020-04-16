@@ -12,7 +12,7 @@ package org.rf.ide.core.environment;
  */
 public interface PythonProcessListener {
 
-    void processStarted(String interpreterPath, Process process);
+    void processStarted(String interpreter, Process process);
 
     void processEnded(Process process);
 

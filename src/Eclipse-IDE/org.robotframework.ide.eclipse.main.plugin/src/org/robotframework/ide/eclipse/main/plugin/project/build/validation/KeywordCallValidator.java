@@ -185,11 +185,11 @@ public class KeywordCallValidator implements ModelUnitValidator {
     }
 
     private void validateNonLastVariableAssignment() {
-        if(descriptor == null) {
-            //nothing to report
+        if (descriptor == null) {
+            // nothing to report
             return;
         }
-        List<VariableUse> vars = descriptor.getCreatedVariables();
+        final List<VariableUse> vars = descriptor.getCreatedVariables();
         // i < vars.size()-1 is not a mistake - for the last token both options are fine
         // so we do not need to check it.
         for (int i = 0; i < vars.size() - 1; i++) {
