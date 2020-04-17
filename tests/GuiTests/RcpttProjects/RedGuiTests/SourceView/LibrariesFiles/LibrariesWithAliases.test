@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _PV3F4L4iEeaIos8Jik5jow
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 9/3/19 5:05 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/17/20 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,7 +17,7 @@ Entry-Name: .content
 //check errors
 get-view Problems | get-tree | get-item ".*" -index 0 | expand-all
 
-if [$robot_version | matches "^Robot Framework 3\.1.*"] {
+if [$robot_version | matches "^Robot Framework 3\.[12].*"] {
 	get-view Problems | click
 	with [get-view Problems | get-tree] {
 	    get-item -path "Errors \\(8 items\\)" | get-property "getItems().TreeItem[0].getText()" 

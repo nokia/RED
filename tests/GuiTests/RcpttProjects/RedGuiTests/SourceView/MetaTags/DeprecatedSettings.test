@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oqiBUMD5EeWqU8ILayOzQw
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/3/19 2:55 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/17/20 2:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -232,8 +232,57 @@ if [$robot_version | matches "^Robot Framework 3\.1.*"] {
 	get-view Problems | get-tree | get-item -path "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
 	    | equals "Specifying custom timeout messages is deprecated" | verify-true
 	}	
-	
-if [$robot_version |or [ matches "^Robot Framework 2\.9\.\d .*" ] [ matches "^Robot Framework 3\.[01](\.\d)? .*"]  | eq false]{
+
+if [$robot_version | matches "^Robot Framework 3\.2.*"] {
+	with [get-view Problems | get-tree] {
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().length" | equals 20 | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Extra spaces in library name 'Collection s'. Remove spaces and use 'Collections' instead." 
+	        | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "Keyword 'Log' expects from 1 to 6 arguments but 0 are provided" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "Keyword 'OperatingSystem' expects 0 arguments but 2 are provided" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	        | equals "Setting 'Test Timeout' accepts only 1 value but 2 are given. No timeout will be checked" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	        | equals "Setting alias using 'With Name' not in upper case is removed from RF 3.1. This is now treated as an argument to library import." 
+	        | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	        | equals "Unknown 'Document' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+	        | equals "Unknown 'Meta: Name' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+	        | equals "Unknown 'Meta: Name' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+	        | equals "Unknown 'Meta:' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[9].getText()" 
+	        | equals "Unknown 'Suite Postcondition' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[10].getText()" 
+	        | equals "Unknown 'Suite Precondition' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[11].getText()" 
+	        | equals "Unknown 'Test Postcondition' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[12].getText()" 
+	        | equals "Unknown 'Test Precondition' setting" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[13].getText()" 
+	        | equals "Unknown keyword 'log something'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[14].getText()" 
+	        | equals "Unknown test case's setting definition '[Document]'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[15].getText()" 
+	        | equals "Unknown test case's setting definition '[Postcondition]'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[16].getText()" 
+	        | equals "Unknown test case's setting definition '[Precondition]'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[17].getText()" 
+	        | equals "Unrecognized table header: 'Metadata'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[18].getText()" 
+	        | equals "Unrecognized table header: 'User Keyword'" | verify-true
+	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[19].getText()" 
+	        | equals "Unrecognized table header: 'User Keywords'" | verify-true
+	}
+}	
+
+//this is to check new verions of Robot and to check errors
+if [$robot_version |or [ matches "^Robot Framework 2\.9\.\d .*" ] [ matches "^Robot Framework 3\.[012].*"]  | eq false]{
 
 	get-view Problems | get-label "21 errors, 2 warnings, 0 others" | get-property caption 
     	| equals "21 errors, 2 warnings, 0 others" | verify-true
@@ -271,8 +320,13 @@ open-qf-and-select-option 5 5 "Change to 'Documentation'"
 wait 1000
 
 //Test Timeout
-open-qf-and-select-option 18 27  "Remove Test Timeout message"
+if [$robot_version | matches "^Robot Framework 3\.1.*"] {
+	open-qf-and-select-option 18 27  "Remove Test Timeout message"
+}
 
+if [$robot_version | matches "^Robot Framework 3\.2.*"] {
+	open-qf-and-select-option 18 8  "Remove unexpected values"
+}
 //Collection s
 open-qf-and-select-option 14 18 "Change to 'Collections'" 
     

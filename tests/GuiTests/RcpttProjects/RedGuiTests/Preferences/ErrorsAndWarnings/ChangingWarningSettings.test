@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-UsioKUBEeazyPh6f3_hNQ
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/5/20 2:08 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/17/20 12:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,31 +37,28 @@ proc "check-default-errors"{
     		| equals "Variable '${var}' is given as a keyword name" | verify-true	
 	 
 	        
-	    get-item "Warnings \\(10 items\\)" | get-property childCount | equals 10 | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property childCount | equals 9 | verify-true
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[0].getText()" 
 	        | equals "Duplicated test case definition 'test1'" | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[1].getText()" 
 	        | equals "Duplicated test case definition 'test1'" | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "Duplicated variable definition 'newList'" | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[3].getText()" 
 	        | equals "Duplicated variable definition 'newList'" | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[4].getText()" 
 	        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
 	        | verify-true
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[5].getText()" 
 	        | equals "Invalid time format '1 dec'" | verify-true
 	        
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[6].getText()" 
 	        | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 	            
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+	    get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[7].getText()" 
 	        | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
 	        
-	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[8].getText()" 
-	        | equals "The '*.tsv' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
-	        
-        get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[9].getText()" 
+        get-item "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[8].getText()" 
 	        | equals "The [Teardown] test case setting is empty" | verify-true
 	    
 	}
@@ -88,7 +85,7 @@ with [get-view Problems | get-tree] {
         | get-property caption 
         | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
         | verify-true
-    get-item "Warnings \\(9 items\\)" | get-property childCount | equals 9 | verify-true
+    get-item "Warnings \\(8 items\\)" | get-property childCount | equals 8 | verify-true
 }
 
 // change on to Info one to Ignore
@@ -125,20 +122,18 @@ with [get-view Problems | get-tree] {
 
 
         
-    get-item "Warnings \\(6 items\\)" | get-property childCount | equals 6 | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item "Warnings \\(5 items\\)" | get-property childCount | equals 5 | verify-true
+    get-item "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Duplicated variable definition 'newList'" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Duplicated variable definition 'newList'" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals "Invalid time format '1 dec'" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-item "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "Keyword name '${var_as_kw_name}' contains variables."| verify-true   
             
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    get-item "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
         | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
-	get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-        | equals "The '*.tsv' file extension is deprecated. Only '*.robot' should be used for suites." | verify-true
      
 }	
 
@@ -150,8 +145,8 @@ with [get-view Problems | get-tree] {
         | equals "Duplicated test case definition 'test1'" | verify-true
 }
 //check if marekr are info
-get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
-with [get-editor "tsv_file.tsv" | get-text-viewer] {
+get-view "Project Explorer" | get-tree | select "RobotProject/second_file.robot" | double-click
+with [get-editor "second_file.robot" | get-text-viewer] {
     get-property "markers['9'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.info" | verify-true
     get-property "markers['9'][0].text" | equals "Duplicated test case definition 'test1'" | verify-true
     get-property "markers['5'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.info" | verify-true
@@ -182,7 +177,7 @@ with [get-window Preferences] {
     get-button Apply | click
     get-button $Apply_and_OK_in_preference | click
 }
-with [get-editor "tsv_file.tsv" | get-text-viewer] {
+with [get-editor "second_file.robot" | get-text-viewer] {
     set-caret-pos 12 1
     type-text "test 3"
     key-type Enter
@@ -195,18 +190,18 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
 wait 2000
 
 try{
-	with [get-editor "tsv_file.tsv" | get-text-viewer] {
+	with [get-editor "second_file.robot" | get-text-viewer] {
 	    get-property "markers['13'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
 	    get-property "markers['13'][0].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 	}
 }-catch{
 	try {
-		with [get-editor "tsv_file.tsv" | get-text-viewer] {
+		with [get-editor "second_file.robot" | get-text-viewer] {
 		    get-property "markers['13'][1].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
 		    get-property "markers['13'][1].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 		}
 	}-catch{
-		with [get-editor "tsv_file.tsv" | get-text-viewer] {
+		with [get-editor "second_file.robot" | get-text-viewer] {
 		    get-property "markers['13'][2].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
 		    get-property "markers['13'][2].text" | equals "Keyword name '${var_as_kw_name}' contains variables." | verify-true
 		}

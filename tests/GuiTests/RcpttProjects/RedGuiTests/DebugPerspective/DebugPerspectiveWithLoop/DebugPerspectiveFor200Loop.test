@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 5:53 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/17/20 6:44 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -39,6 +39,20 @@ proc "check-items-in-thred-view" [val index] [val line]{
 }
 
 get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" | double-click
+
+
+// set for robot 3.2
+if [$robot_version | matches "^Robot Framework 3\.[01].*" | eq false ]{
+	get-editor "For200TestSuite.robot" | get-text-viewer | set-text "*** Variables ***\n\n"
+	    + "*** Settings ***\n\n"
+	    + "*** Test Cases ***\n"
+	    + "test\n"
+	    + "\tFOR\t${i}\tIN RANGE\t0\t200\n"
+	    + "\t \tLog\t${i}\n"
+	    + "\tEND\n\n"
+	    + "*** Keywords ***" 
+}
+get-editor "For200TestSuite.robot" | get-text-viewer | key-type "M1+s"    
 
 get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
 

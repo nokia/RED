@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 4:17 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/17/20 4:17 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -125,76 +125,78 @@ get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()" | 
 
 //----------------------------------------------------------- tsv file --------------------------------------------------------------
 //open tsv file
-get-view "Project Explorer" | get-tree | select "RunTestFromOutline/tsv_file.tsv" | double-click
+get-view "Project Explorer" | get-tree | select "RunTestFromOutline/ex_tsv_file.robot" | double-click
 with [get-view Outline] {
     click
     get-button "Expand All" | click
 }
 
 //run file from PE
-get-view "Project Explorer" | get-tree | select "RunTestFromOutline/tsv_file.tsv" | get-menu "Run As/1 Robot Test" 
+get-view "Project Explorer" | get-tree | select "RunTestFromOutline/ex_tsv_file.robot" | get-menu "Run As/1 Robot Test" 
     | click
     
 wait-for-message-log    
 get-view "Message Log" | get-editbox | get-property text 
-    | equals "Starting test: RunTestFromOutline.Tsv File.check text\n"
-    + "Ending test: RunTestFromOutline.Tsv File.check text\n\n"
-    + "Starting test: RunTestFromOutline.Tsv File.embeded kw\n"
+    | equals "Starting test: RunTestFromOutline.Ex Tsv File.check text\n"
+    + "Ending test: RunTestFromOutline.Ex Tsv File.check text\n\n"
+    + "Starting test: RunTestFromOutline.Ex Tsv File.embeded kw\n"
     + ".* : INFO : cat\n"
-    + "Ending test: RunTestFromOutline.Tsv File.embeded kw" | verify-true
-    
+    + "Ending test: RunTestFromOutline.Ex Tsv File.embeded kw" | verify-true
     
 //run single test (embeded)    
-get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw" | get-menu Run | click
-get-editor "tsv_file.tsv" | get-text-viewer | get-property "getSelectionText()" | equals "embeded kw" | verify-true
+get-view Outline | get-tree | select "ex_tsv_file.robot/Test Cases/embeded kw" | get-menu Run | click
+get-editor "ex_tsv_file.robot" | get-text-viewer | get-property "getSelectionText()" | equals "embeded kw" | verify-true
 
 //open run config and check if 2 run configs were added
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 3 | verify-true
 with [get-window "Run Configurations" | get-tree] {
     get-item Robot | get-property childCount | equals 3 | verify-true
-    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot (Selected Test Cases)" 
+    
+    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "ex_tsv_file.robot" | verify-true
+
+    get-item Robot | get-property "getItems().TreeItem[1].getText()" | equals "ex_tsv_file.robot (Selected Test Cases)" 
         | verify-true
-    get-item Robot | get-property "getItems().TreeItem[1].getText()" | equals "tsv_file.tsv" | verify-true
-    get-item Robot | get-property "getItems().TreeItem[2].getText()" | equals "tsv_file.tsv (Selected Test Cases)" 
+    get-item Robot | get-property "getItems().TreeItem[2].getText()" | equals "TestFile.robot (Selected Test Cases)" 
         | verify-true
 }
 
 //check config for entire suite
-get-window "Run Configurations" | get-tree | select "Robot/tsv_file.tsv"
+get-window "Run Configurations" | get-tree | select "Robot/ex_tsv_file.robot"
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
-    get-item "tsv_file.tsv" | get-property childCount | equals 2 | verify-true
-    get-item "tsv_file.tsv/check text" | get-property checked | equals true | verify-true
-    get-item "tsv_file.tsv/embeded kw" | get-property checked | equals true | verify-true
+    get-item "ex_tsv_file.robot" | get-property childCount | equals 2 | verify-true
+    get-item "ex_tsv_file.robot/check text" | get-property checked | equals true | verify-true
+    get-item "ex_tsv_file.robot/embeded kw" | get-property checked | equals true | verify-true
 }
 
 //check for single test
-get-window "Run Configurations" | get-tree | select "Robot/tsv_file.tsv (Selected Test Cases)"
+get-window "Run Configurations" | get-tree | select "Robot/ex_tsv_file.robot (Selected Test Cases)"
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
-    get-item "tsv_file.tsv" | get-property childCount | equals 2 | verify-true
-    get-item "tsv_file.tsv/check text" | get-property checked | equals false | verify-true
-    get-item "tsv_file.tsv/embeded kw" | get-property checked | equals true | verify-true
+    get-item "ex_tsv_file.robot" | get-property childCount | equals 2 | verify-true
+    get-item "ex_tsv_file.robot/check text" | get-property checked | equals false | verify-true
+    get-item "ex_tsv_file.robot/embeded kw" | get-property checked | equals true | verify-true
 }
 get-window "Run Configurations" | get-button Close | click
 
 
 //run file from PE again - check that entire file is run not last config
-get-view "Project Explorer" | get-tree | select "RunTestFromOutline/tsv_file.tsv" | get-menu "Run As/1 Robot Test" 
+get-view "Project Explorer" | get-tree | select "RunTestFromOutline/ex_tsv_file.robot" | get-menu "Run As/1 Robot Test" 
     | click
     
 wait-for-message-log    
 get-view "Message Log" | get-editbox | get-property text 
-    | equals "Starting test: RunTestFromOutline.Tsv File.check text\n"
-    + "Ending test: RunTestFromOutline.Tsv File.check text\n\n"
-    + "Starting test: RunTestFromOutline.Tsv File.embeded kw\n"
-    + ".* : INFO : cat\n"
-    + "Ending test: RunTestFromOutline.Tsv File.embeded kw" | verify-true
-
+    | equals "Starting test: RunTestFromOutline.Ex Tsv File.check text\r\n"
+    + "Ending test: RunTestFromOutline.Ex Tsv File.check text\r\n"
+    + "\r\n"
+    + "Starting test: RunTestFromOutline.Ex Tsv File.embeded kw\r\n"
+    + ".* : INFO : cat\r\n"
+    + "Ending test: RunTestFromOutline.Ex Tsv File.embeded kw" | verify-true
+    
 
 //open declaration for embeded test
-get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw/Select cat from list" 
+get-view Outline | get-tree | select "ex_tsv_file.robot/Test Cases/embeded kw/Select cat from list" 
     | get-menu "Open Declaration" | click
-get-editor "tsv_file.tsv" | get-text-viewer | get-property "getSelectionText()" | equals "Select ${animal} from list" 
+get-editor "ex_tsv_file.robot" | get-text-viewer | get-property "getSelectionText()" | equals "Select ${animal} from list" 
     | verify-true
     
     
@@ -202,7 +204,7 @@ get-editor "tsv_file.tsv" | get-text-viewer | get-property "getSelectionText()" 
 //add tag to existing config
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
-    get-tree | select "Robot/tsv_file.tsv (Selected Test Cases)"
+    get-tree | select "Robot/ex_tsv_file.robot (Selected Test Cases)"
     with [get-group Tags] {
         with [get-button "Only run tests with these tags:"] {
             uncheck
@@ -220,10 +222,10 @@ measure-time "selectedTestTime" {
 wait-for-console
 //check error
 get-view Console | get-text-viewer | get-property text 
-    | contains  "[ ERROR ] Suite 'RunTestFromOutline' contains no tests matching tag 'tag1' and matching name 'RunTestFromOutline.Tsv File.embeded kw' in suite 'RunTestFromOutline.Tsv File'." | verify-true
+    | contains  "[ ERROR ] Suite 'RunTestFromOutline' contains no tests matching tag 'tag1' and matching name 'RunTestFromOutline.Ex Tsv File.embeded kw' in suite 'RunTestFromOutline.Ex Tsv File'." | verify-true
 
 //run test from Outline - now existing config is used
-get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw" | get-menu Run | click
+get-view Outline | get-tree | select "ex_tsv_file.robot/Test Cases/embeded kw" | get-menu Run | click
 wait-for-console
 
 get-view "Message Log" | get-editbox | get-property text 
@@ -236,7 +238,7 @@ with [get-window "Run Configurations" | get-group Tags] {
     get-editbox | get-property text | equals "" | verify-true
 }    
 
-get-window "Run Configurations" | get-tree | select "Robot/tsv_file.tsv (Selected Test Cases)"
+get-window "Run Configurations" | get-tree | select "Robot/ex_tsv_file.robot (Selected Test Cases)"
 get-window "Run Configurations" | get-group Tags | get-label tag1 | get-property caption | equals tag1 | verify-true
 
 get-window "Run Configurations" | get-button Close | click
