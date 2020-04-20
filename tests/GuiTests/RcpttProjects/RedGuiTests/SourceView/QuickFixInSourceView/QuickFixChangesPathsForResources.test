@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ZhFIANchEeazM-DbDmejpA
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/10/20 4:18 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 5:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -308,17 +308,19 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Test Cases ***\n"
     + "test 1\n"
     + "    log  7" | verify-true
-    
-    
-get-view Problems | get-tree | select "Errors (3 items)"
+
+get-view Problems | get-tree | select "Errors (4 items)"
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(3 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().length" | equals 4 | verify-true
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-    get-item "Errors \\(3 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Resource import 'res1/res3/deep_res2.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
         | verify-true
-    get-item "Errors \\(3 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals "Resource import 'two' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Setting 'Resource' accepts only 1 value but 2 are given. File will not be imported" | verify-true
 }
 with [get-view Problems | get-tree] {
     get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
@@ -327,4 +329,5 @@ with [get-view Problems | get-tree] {
         | equals "The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
         | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

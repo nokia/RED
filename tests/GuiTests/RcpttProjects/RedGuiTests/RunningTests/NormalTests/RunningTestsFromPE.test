@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _aZra8NS6EeWO-beUKyHz0g
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 12/2/19 11:30 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 6:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,18 +37,18 @@ with [get-view "Project Explorer" | get-tree] {
    
    
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Test.tsv/Test Cases" | get-property childCount | equals 3 | verify-true
-    get-item "RobotProject/Test.tsv/Test Cases" | get-property "getItems().TreeItem[0].getText()" | equals "TSV test" 
+    get-item "RobotProject/Test.robot/Test Cases" | get-property childCount | equals 3 | verify-true
+    get-item "RobotProject/Test.robot/Test Cases" | get-property "getItems().TreeItem[0].getText()" | equals "robot test" 
         | verify-true
-    get-item "RobotProject/Test.tsv/Test Cases" | get-property "getItems().TreeItem[1].getText()" 
+    get-item "RobotProject/Test.robot/Test Cases" | get-property "getItems().TreeItem[1].getText()" 
         | equals   "Empty test"| verify-true
-    get-item "RobotProject/Test.tsv/Test Cases" | get-property "getItems().TreeItem[2].getText()" | equals "Test with comment"
+    get-item "RobotProject/Test.robot/Test Cases" | get-property "getItems().TreeItem[2].getText()" | equals "Test with comment"
         | verify-true
-    get-item "RobotProject/Test.tsv/Test Cases" | get-property "getText()" | equals "Test Cases" | verify-true
+    get-item "RobotProject/Test.robot/Test Cases" | get-property "getText()" | equals "Test Cases" | verify-true
 }
 
 //check if in Test case Run button is enabled
-get-view "Project Explorer" | get-tree | select "RobotProject/Test.tsv/Test Cases"
+get-view "Project Explorer" | get-tree | select "RobotProject/Test.robot/Test Cases"
 get-view "Project Explorer" | get-tree | get-menu Run | get-property enablement | equals true | verify-true
 get-view "Project Explorer" | get-tree | get-menu Debug | get-property enablement | equals true | verify-true
 
@@ -57,7 +57,7 @@ get-view "Project Explorer" | get-tree | get-menu Run | get-property enablement 
 get-view "Project Explorer" | get-tree | get-menu Debug | get-property enablement | equals true | verify-true
 
 //run empty test
-get-view "Project Explorer" | get-tree | select "RobotProject/Test.tsv/Test Cases/Empty test" | get-menu Run | click
+get-view "Project Explorer" | get-tree | select "RobotProject/Test.robot/Test Cases/Empty test" | get-menu Run | click
 
 wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Test.Empty test\n"
@@ -154,7 +154,7 @@ with [get-view "Project Explorer" | get-tree] {
 
 //run two tests from the same project
 get-view "Project Explorer" | get-tree  
-    | select "RobotProject/Test.tsv/Test Cases/TSV test" "RobotProject/TestFile.robot/Test Cases/test 1" | get-menu Run | click
+    | select "RobotProject/Test.robot/Test Cases/robot test" "RobotProject/TestFile.robot/Test Cases/test 1" | get-menu Run | click
 
 wait-for-console
     

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _dnU9IILkEemG5cruxlOj_w
-Runtime-Version: 2.4.2.201905080442
-Save-Time: 6/7/19 3:29 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 5:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -85,7 +85,9 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
     + "    END\n\n"
     + "Example\n"
-    + "    Keyword    argument    another argument    # comment\n\n"
+    + "    Keyword    argument\n"
+    + "    ...    # comment\n"
+    + "    ...    another argument\n\n"
     + "test 2\n"
     + "    SEPLcontrol.LIPLcontrol.thisSetupSomething    ${SDV_MPlane_IP}    ${SDV_SEM_path}    ${SCFundertest}\n"
     + "    log    7\n"
@@ -94,12 +96,14 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "        Log    \"entering loop\"\n"
     + "        ${celka}=    Evaluate    ${counter}%${c}\n"
     + "    END\n"
-    + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}    ${SDV_LOCAL_LIB_PATH}" | verify-true
+    + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}\n"
+    + "    ...    ${SDV_LOCAL_LIB_PATH}" | verify-true
     
 //add new long line and reformat    
 with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 30 90
+    set-caret-pos 33 33
     key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Backspace -times 7
     type-text "This is very long kw with many characters and some chars like # ()-  ${z}"
     key-type "M1+s"
     key-type "M1+M2+f"
@@ -123,7 +127,9 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "        Should Be Equal As Integers    ${resp.status_code}    200\n"
     + "    END\n\n"
     + "Example\n"
-    + "    Keyword    argument    another argument    # comment\n\n"
+    + "    Keyword    argument\n"
+    + "    ...    # comment\n"
+    + "    ...    another argument\n\n"
     + "test 2\n"
     + "    SEPLcontrol.LIPLcontrol.thisSetupSomething    ${SDV_MPlane_IP}    ${SDV_SEM_path}    ${SCFundertest}\n"
     + "    log    7\n"
@@ -132,7 +138,8 @@ get-editor "test.robot" | get-text-viewer | get-property text | equals "*** Sett
     + "        Log    \"entering loop\"\n"
     + "        ${celka}=    Evaluate    ${counter}%${c}\n"
     + "    END\n"
-    + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}    ${SDV_LOCAL_LIB_PATH}\n"
+    + "    Run Keyword If    '${os}'!='Linux'    Convert To Hex    ${x}\n"
+    + "    ...    ${SDV_LOCAL_LIB_PATH}\n"
     + "    This is very long kw with many characters and some chars like # ()-    ${z}" | verify-true
     
 

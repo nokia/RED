@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
-Runtime-Version: 2.4.1.201903190000
-Save-Time: 10/7/19 10:56 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 3:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -195,28 +195,27 @@ with [get-window Preferences] {
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
 with [get-window "New Robot Test Suite"] {
     get-editbox -after [get-label "File name:"] | set-text new
-    get-button "as .tsv file" | click
     get-button Finish | click
 }
 
 //set single test
-get-editor "new.tsv" | get-text-viewer | set-text "*** Test Cases ***\n"
+get-editor "new.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "test 1\n"
-    + "\tlog\t8" 
+    + "    log  t8" 
 
 //save it
-with [get-editor "new.tsv" | get-text-viewer] {
+with [get-editor "new.robot" | get-text-viewer] {
     set-caret-pos 3 1
     key-type "M1+s"
 }
 //debug it    
-get-view "Project Explorer" | get-tree | select "RobotProject/new.tsv" | get-menu "Debug As/1 Robot Test" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/new.robot" | get-menu "Debug As/1 Robot Test" | click
 wait-for-console
 
 //open run conigs and check if new one was added
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 3 | verify-true
-get-window "Run Configurations" | get-tree | select "Robot/new.tsv"
+get-window "Run Configurations" | get-tree | select "Robot/new.robot"
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
     | equals "-o None -d None -l None -r None" | verify-true
@@ -257,7 +256,7 @@ with [get-window "Run Configurations"] {
         select "Robot/test_for_run_config.robot (Selected Test Cases)" | key-type "M2+ARROW_UP"
         select "Robot/test_for_run_config.robot" "Robot/test_for_run_config.robot (Selected Test Cases)"
         key-type "M2+ARROW_UP"
-        select "Robot/new.tsv" "Robot/test_for_run_config.robot" "Robot/test_for_run_config.robot (Selected Test Cases)"
+        select "Robot/new.robot" "Robot/test_for_run_config.robot" "Robot/test_for_run_config.robot (Selected Test Cases)"
     }
     get-button "Delete selected launch configuration(s)" | click
     get-window "Confirm Launch Configuration Deletion" | get-button "(Yes|Delete)" | click

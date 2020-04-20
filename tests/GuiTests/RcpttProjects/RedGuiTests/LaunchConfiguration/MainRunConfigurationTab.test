@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
-Runtime-Version: 2.4.1.201903190000
-Save-Time: 10/7/19 12:40 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 4:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -199,29 +199,29 @@ with [get-window "Run Configurations" | get-window "Select suite" | get-tree] {
 }
 
 //check how many items from project are shown
-get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.tsv"
+get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.robot"
 get-window "Run Configurations" | get-window "Select suite" | get-tree 
     | get-property "getItems().TreeItem[0].getItemCount()" | equals 1 | verify-true
     
 //select tsv file    
-get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.tsv" 
+get-window "Run Configurations" | get-window "Select suite" | get-tree | select "SecondProject/SingleTest.robot" 
     | double-click
 
 //check that 2 tests are shown to be selected    
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
-    get-item "SingleTest.tsv" | get-property checked | equals true | verify-true
-    get-item "SingleTest.tsv/test1" | get-property checked | equals true | verify-true
-    get-item "SingleTest.tsv/test2" | get-property checked | equals true | verify-true
+    get-item "SingleTest.robot" | get-property checked | equals true | verify-true
+    get-item "SingleTest.robot/test1" | get-property checked | equals true | verify-true
+    get-item "SingleTest.robot/test2" | get-property checked | equals true | verify-true
 }
 with [get-window "Run Configurations" | get-group "Suite(s)" | get-tree] {
-    get-property "getItems().TreeItem[0].getText()" | equals "SingleTest.tsv" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "SingleTest.robot" | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals test1 | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals test2 | verify-true
     get-property "getItems().TreeItem[0].getItemCount()" | equals 2 | verify-true
 }
 //select only on test (test1) and run 
 with [get-window "Run Configurations"] {
-    get-group "Suite(s)" | get-tree | get-item "SingleTest.tsv/test2" | uncheck
+    get-group "Suite(s)" | get-tree | get-item "SingleTest.robot/test2" | uncheck
     get-button Apply | click
     get-button Run | click
 }
