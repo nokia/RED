@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _3_q8AJRzEeaAWer3wBFETA
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/12/18 3:07 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/20/20 7:06 PM
 Testcase-Type: ecl
 Verifications: _brhw8JRzEeaAWer3wBFETA
 
@@ -15,7 +15,7 @@ Verifications: _brhw8JRzEeaAWer3wBFETA
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "BDDProject/tsv_file.tsv" | select "BDDProject/tsv_file.tsv" 
+get-view "Project Explorer" | get-tree  | select "BDDProject/tsv_file.robot" 
     | double-click
     
 //open prefernece and change to italic pink    
@@ -33,13 +33,13 @@ with [get-window Preferences] {
 
 //close and open editor
 get-view "Project Explorer" | click
-get-editor "tsv_file.tsv" | close
+get-editor "tsv_file.robot" | close
 with [get-view "Project Explorer" | get-tree] {
-    select "BDDProject/tsv_file.tsv" | double-click
+    select "BDDProject/tsv_file.robot" | double-click
 }
 
 //check if words color was changed
-with [get-editor "tsv_file.tsv" | get-text-viewer] {
+with [get-editor "tsv_file.robot" | get-text-viewer] {
     get-property "styles[10].text" | equals given | verify-true
     get-property "styles[10].fontStyle" | equals "bold-italic" | verify-true
     get-property "styles[10].foregroundColor" | equals "#FF80FF" | verify-true
@@ -71,8 +71,8 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     get-property "styles[19].fontStyle" | equals normal | verify-true
     
     get-property "styles[23].text" | equals "${when" | verify-true
-    get-property "styles[23].fontStyle" | equals bold | verify-true
-    get-property "styles[23].foregroundColor" | equals "#0080C0" | verify-true
+    get-property "styles[23].fontStyle" | equals normal | verify-true
+    get-property "styles[23].foregroundColor" | equals "#008000" | verify-true
     
     get-property "styles[25].text" | equals AndThanGoBack | verify-true
     get-property "styles[25].fontStyle" | equals bold | verify-true
@@ -101,9 +101,9 @@ with [get-window Preferences] {
 }
 
 //restart view
-get-editor "tsv_file.tsv" | click
+get-editor "tsv_file.robot" | click
 get-view "Project Explorer" | click
-get-editor "tsv_file.tsv" | close
-get-view "Project Explorer" | get-tree | select "BDDProject/tsv_file.tsv" | double-click
+get-editor "tsv_file.robot" | close
+get-view "Project Explorer" | get-tree | select "BDDProject/tsv_file.robot" | double-click
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 3/24/20 2:32 PM
+Save-Time: 4/20/20 6:50 PM
 Tags: jython
 Testcase-Type: ecl
 
@@ -17,19 +17,19 @@ Entry-Name: .content
 
 add-jython-to-interpereters
 //run test
-get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.tsv" | get-menu "Run As/1 Robot Test" | click
+get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.robot" | get-menu "Run As/1 Robot Test" | click
 wait-for-console
 
 //check if python was used
 with [get-view Console] {
-    get-label "<terminated> SingleTest.tsv \\[Robot\\].*" | get-property caption 
-        | equals [format "<terminated> SingleTest.tsv \\[Robot\\] %s%s%s \\(Terminated .*\\)" [replace -input $python_exe_path -old "\\" -new "\\\\" ] $regex_sys_sep [get-by-os -win "python.exe" -linux "python3" ]]| verify-true
+    get-label "<terminated> SingleTest.robot \\[Robot\\].*" | get-property caption 
+        | equals [format "<terminated> SingleTest.robot \\[Robot\\] %s%s%s \\(Terminated .*\\)" [replace -input $python_exe_path -old "\\" -new "\\\\" ] $regex_sys_sep [get-by-os -win "python.exe" -linux "python3" ]]| verify-true
 }
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
 //select other interpreter
 with [get-window "Run Configurations"] {
-    get-tree | select "Robot/SingleTest.tsv"
+    get-tree | select "Robot/SingleTest.robot"
     get-group Interpreter | get-button Use | click
 }
 //check info for user 
@@ -109,7 +109,7 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
 //
 ////check that jytohn was used
 //get-view Console | get-label ".*" -index 0 
-//    | get-property caption | equals [format "<terminated> SingleTest.tsv [Robot] %s" [os-specific "jython.exe" "jython"]] | verify-true
+//    | get-property caption | equals [format "<terminated> SingleTest.robot [Robot] %s" [os-specific "jython.exe" "jython"]] | verify-true
 //    
 ////check from console
 //get-view Console | get-text-viewer | get-object |invoke getLine 1 | contains "Jython" |verify-true    
@@ -127,8 +127,8 @@ exec-with-options {
     get-window "Run Configurations" | get-button Run | click
     try -times 5 -delay 500 -command{
 	    //first label
-	    get-window "Problem Occurred" | get-label "'Launching SingleTest.tsv' has encountered a problem." 
-	        | get-property caption | equals "'Launching SingleTest.tsv' has encountered a problem." | verify-true
+	    get-window "Problem Occurred" | get-label "'Launching SingleTest.robot' has encountered a problem." 
+	        | get-property caption | equals "'Launching SingleTest.robot' has encountered a problem." | verify-true
     }    
     //second label below    
     get-window "Problem Occurred" | get-label "There is no PyPy interpreter in system PATH environment variable" 
@@ -167,7 +167,7 @@ get-editor "SecondProject/red.xml" | get-section "Robot framework" | get-table
 	wait-for-console -times 15 -delay 1000
 
 	get-view Console | get-label ".*" -index 0 
-	    | get-property caption | equals [format "<terminated> SingleTest.tsv \\[Robot\\] %s%s \\(Terminated .*\\)" 
+	    | get-property caption | equals [format "<terminated> SingleTest.robot \\[Robot\\] %s%s \\(Terminated .*\\)" 
 	    [replace -input $jython_path -old "\\" -new "\\\\" ]  [os-specific "\\\\jython.exe" "/jython"]] | verify-true 
 }    
     
