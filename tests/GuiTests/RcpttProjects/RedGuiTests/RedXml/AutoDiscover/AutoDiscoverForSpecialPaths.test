@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fiIkUBulEeezQPN39rc8sA
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/20/20 6:57 PM
+Save-Time: 4/21/20 6:04 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -119,11 +119,11 @@ get-view "Project Explorer" | get-tree | select "RobotProject/multiply.py"
     | get-menu "Robot Framework/Add Library to red.xml" | click
     
 
-get-view "Project Explorer" | get-tree | select "RobotProject/tests/tsv_with_relative_paths.robot" 
-    | select "RobotProject/tests/tsv_with_relative_paths.robot" | double-click
+get-view "Project Explorer" | get-tree | select "RobotProject/tests/test_with_relative_paths.robot" 
+    | select "RobotProject/tests/test_with_relative_paths.robot" | double-click
 
 //edit and save    
-with [get-editor "tsv_with_relative_paths.robot" | get-text-viewer] {
+with [get-editor "test_with_relative_paths.robot" | get-text-viewer] {
     set-caret-pos 2 10
     type-text "."
     set-caret-pos 3 10
@@ -157,8 +157,8 @@ remove-all-libraries-from-xml
 get-button "Save \((Ctrl|M1)\+S\)" | click
 wait 2000
 
-get-tab-folder -index 1 | get-tab-item "tsv_with_relative_paths.robot" | click
-with [get-editor "tsv_with_relative_paths.robot" | get-text-viewer] {
+get-tab-folder -index 1 | get-tab-item "test_with_relative_paths.robot" | click
+with [get-editor "test_with_relative_paths.robot" | get-text-viewer] {
     set-caret-pos 11 5
     type-text " "
     wait 1000

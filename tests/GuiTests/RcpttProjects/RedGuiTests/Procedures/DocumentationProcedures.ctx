@@ -5,8 +5,8 @@ Element-Name: DocumentationProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _hb89IDvxEeiDC73Fvf4wHA
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/28/20 2:32 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/21/20 5:59 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -157,7 +157,7 @@ proc "check-documentation-view-for-file" [val file_name] [val project_name][val 
 }	
 
 // doc after clicking on library name in Library section or clicking on PE (main file)
-proc "check-documentation-view-for-library" [val file_name] [val project_name][val source] [val version ""][val scope "global"] [val args] [val intro] [val shortcuts]{
+proc "check-documentation-view-for-library" [val file_name] [val project_name][val source] [val version ""][val scope "GLOBAL"] [val args] [val intro] [val shortcuts]{
 	create-shortcuts-list-for-library -sh_list $shortcuts -path $source | log
 	let [val source2 [replace -input $source -old " " -new "\%20"] ]{
 		get-view "Documentation View" | get-control Browser | get-property text 
