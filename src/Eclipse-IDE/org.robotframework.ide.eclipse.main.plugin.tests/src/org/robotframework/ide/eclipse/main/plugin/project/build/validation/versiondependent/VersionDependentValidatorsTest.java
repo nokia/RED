@@ -66,8 +66,9 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersion32() {
-            assertThat(getGeneralSettingsTableValidators("3.2")).hasSize(19)
+            assertThat(getGeneralSettingsTableValidators("3.2")).hasSize(21)
                     .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class, TimeoutMessageValidator.class,
+                            TemplateSettingValidator.class,
                             LibraryAliasNotInUpperCaseValidator31.class,
                             SingleValuedSettingsHaveMultipleValuesProvidedValidator.class);
         }
@@ -178,8 +179,9 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersion32() {
-            assertThat(getTestCaseSettingsValidators("3.2")).hasSize(8)
+            assertThat(getTestCaseSettingsValidators("3.2")).hasSize(9)
                     .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class,
+                            TemplateSettingValidator.class,
                             SingleValuedSettingsHaveMultipleValuesProvidedValidator.class);
         }
 
@@ -260,8 +262,9 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersion32() {
-            assertThat(getTaskSettingsValidators("3.2")).hasSize(8)
+            assertThat(getTaskSettingsValidators("3.2")).hasSize(9)
                     .hasOnlyElementsOfTypes(SettingsDuplicationValidator.class,
+                            TemplateSettingValidator.class,
                             SingleValuedSettingsHaveMultipleValuesProvidedValidator.class);
         }
 

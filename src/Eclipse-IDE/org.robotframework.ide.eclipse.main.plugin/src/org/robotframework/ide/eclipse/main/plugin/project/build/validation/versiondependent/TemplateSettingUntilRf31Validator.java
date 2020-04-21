@@ -13,13 +13,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.TemplateSetting;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ValidationReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.KeywordCallValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.TemplateSettingValidator.KeywordCallInTemplateValidator;
 
 import com.google.common.collect.Range;
 
@@ -75,35 +74,6 @@ class TemplateSettingUntilRf31Validator extends VersionDependentModelUnitValidat
                 }
                 new KeywordCallInTemplateValidator(validationContext, keywordName, keywordToken, reporter).validate();
             }
-        }
-    }
-
-    private static class KeywordCallInTemplateValidator extends KeywordCallValidator {
-
-        private final String keywordName;
-
-        KeywordCallInTemplateValidator(final FileValidationContext validationContext, final String keywordName,
-                final RobotToken keywordNameToken, final ValidationReportingStrategy reporter) {
-            super(validationContext, keywordNameToken, null, reporter);
-            this.keywordName = keywordName;
-        }
-
-        @Override
-        protected String getActualKeywordName() {
-            return keywordName;
-        }
-
-        @Override
-        protected void validateKeywordCall() {
-            // only keyword calls without embedded arguments can be validated in template setting
-            if (!EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
-                super.validateKeywordCall();
-            }
-        }
-
-        @Override
-        protected void validateArguments() {
-            // templates have no arguments which needs validation; only keyword requires validating
         }
     }
 }
