@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _c2s9wAaSEeiksYLFL8zyCg
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 1/17/20 10:53 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/21/20 6:25 PM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _boFGIAagEeiksYLFL8zyCg
@@ -30,8 +30,8 @@ proc "check-errors" [val number_of_erorrs]{
 		 "Errors \\(.*\\)/Unknown keyword 'kw from single test'"		//8
 		"Errors \\(.* items\\)/Unknown keyword 'kw from single test'"  | get $element_index | let [val text -input]{
 		 
-			 get-view Problems | get-tree | get-item -path $text
-	            	| get-property enablement | equals false | verify-true
+		 get-view Problems | get-tree | get-item -path $text
+         	| get-property enablement | equals false | verify-true
 			 
 		}
 	}
@@ -201,10 +201,11 @@ get-window "Discovering libraries summary" | get-button OK | click
 
 get-button "Save All (M1+M2+S)" | click
 
-//run rf lint
-get-view "Project Explorer" | get-tree | select FirstProject 
-    | get-menu -path "Robot Framework/Run RfLint analysis" | click
-    
+//run rf lint 
+exec-with-options {
+    get-view "Project Explorer" | get-tree | select FirstProject 
+     | get-menu -path "Robot Framework/Run RfLint analysis" | click
+} -allowStatusDialog    
 wait-for-errors -amount 7 -times 5 -delay 500    
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
