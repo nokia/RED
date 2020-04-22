@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _D_G4QDvSEeeLGrABQJe5GQ
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 2/7/19 10:56 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/22/20 1:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,10 +20,10 @@ get-view "Project Explorer" | get-tree | select "DuplicatedTests/scout_test.robo
     
 
 get-view Console | get-text-viewer | get-property text
-    | contains "Setting 'Suite Setup' used multiple times." | verify-true
+    | contains "Setting 'Suite Setup' is allowed only once. Only the first value is used." | verify-true
     
 get-view Console | get-text-viewer | get-property text
-    | contains "Setting 'Documentation' used multiple times." | verify-true
+    | contains "Setting 'Documentation' is allowed only once. Only the first value is used." | verify-true
     
 get-view Console | get-text-viewer | get-property text 
     | equals "(.*\n)+"
@@ -57,10 +57,10 @@ get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder1/scout_t
 
 //2 errors from files inside folders  
 get-view Console | get-text-viewer | get-property text
-    | matches "(.*\n)*\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot': Setting 'Suite Setup' used multiple times\.(.*\n.*)*" | verify-true
+    | matches "(.*\n)*\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot' on line 3: Setting 'Suite Setup' is allowed only once. Only the first value is used\.(.*\n.*)*" | verify-true
     
 get-view Console | get-text-viewer | get-property text
-    | contains "Setting 'Documentation' used multiple times." | verify-true
+    | contains "scout_test.robot' on line 3: Setting 'Documentation' is allowed only once. Only the first value is used." | verify-true
     
 get-view Console | get-button "Clear Console" | click
 
@@ -131,26 +131,28 @@ get-view Console | get-text-viewer | get-property text
 get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder2/folder_2_1/scout_test.robot" 
 	| get-menu "Run As/1 Robot Test" | click
 	
-let [val error "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot': Setting 'Documentation' used multiple times.\n"]{
-	get-view Console | get-text-viewer | get-property text 
-	    | equals [format"(%s)?Command: .* --listener .*TestRunnerAgent.py:.* .*[\\\\/]DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot\n"
-	    + "Suite Executor: Robot Framework .*\n"
+let [val error "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot' on line 3:"
+     +" Setting 'Documentation' is allowed only once. Only the first value is used.\n"]{
+     get-view Console | get-text-viewer | get-property text 
+	    | equals [format "(%s)?Command:.*\n"
+	    + "Suite Executor: Robot Framework.*\n"
 	    + "(%s)?"
 	    + "==============================================================================\n"
-	    + "Scout Test                                                                    \n"
+	    + "Scout Test :: on doc                                                          \n"
 	    + "==============================================================================\n"
 	    + "test from 2 dirs                                                      \| PASS \|\n"
 	    + "------------------------------------------------------------------------------\n"
 	    + "i love bacon                                                          \| PASS \|\n"
 	    + "------------------------------------------------------------------------------\n"
-	    + "Scout Test                                                            \| PASS \|\n"
+	    + "Scout Test :: on doc                                                  \| PASS \|\n"
 	    + "2 critical tests, 2 passed, 0 failed\n"
 	    + "2 tests total, 2 passed, 0 failed\n"
 	    + "==============================================================================\n"
 	    + "Output:  .*output.xml\n"
 	    + "Log:     .*log.html\n"
-	    + "Report:  .*report.html" $error $error] | verify-true
-}    
+	    + "Report:  .*report.html"  $error $error ] | verify-true
+}
+    
     
 with [get-view "Execution View"] {
     click
@@ -170,7 +172,8 @@ get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder1/scout_t
     | get-menu Run | click
    
 wait-for-console    
-let [val error "\[ ERROR \] Error in file '.*[\\\\/]DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot': Setting 'Suite Setup' used multiple times.\n"]{    
+let [val error "\[ ERROR \] Error in file '.*[\\\\/]DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot' on line 3: "
+    + "Setting 'Suite Setup' is allowed only once. Only the first value is used\.\n"]{    
 	get-view Console | get-text-viewer | get-property text 
 	    | equals [format "(%s)?Command: .* -m robot.run --listener .*TestRunnerAgent.py:.* -t \"Scout Test.i love bacon\" .*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot\n"
 	    + "Suite Executor: Robot Framework .*\n"

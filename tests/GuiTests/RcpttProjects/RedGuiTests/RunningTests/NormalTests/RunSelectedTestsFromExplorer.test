@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7wTjoPUsEeaWpbE3jg39cA
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/20/20 5:04 PM
+Save-Time: 4/22/20 1:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -102,9 +102,9 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Starting test: LaunchesTests.FirstFile.test 3\n"
     + ".* : INFO : 3\n"
     + "Ending test: LaunchesTests.FirstFile.test 3\n\n"
-    + "Starting test: LaunchesTests.robot Test.FirstFile.robot tst\n"
+    + "Starting test: LaunchesTests.Tsv Test.FirstFile.other tst\n"
     + ".* : INFO : 123\n"
-    + "Ending test: LaunchesTests.robot Test.FirstFile.robot tst" | verify-true
+    + "Ending test: LaunchesTests.Tsv Test.FirstFile.other tst" | verify-true
   
       
 //select Variables section and one test from other file - one test is run
@@ -196,9 +196,9 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Starting test: LaunchesTests.Tests.FirstFile.test 4\n"
     + ".* : INFO : 4a\n"
     + "Ending test: LaunchesTests.Tests.FirstFile.test 4\n\n"
-    + "Starting test: LaunchesTests.robot Test.FirstFile.robot tst\n"
+    + "Starting test: LaunchesTests.Tsv Test.FirstFile.other tst\n"
     + ".* : INFO : 123\n"
-    + "Ending test: LaunchesTests.robot Test.FirstFile.robot tst" | verify-true
+    + "Ending test: LaunchesTests.Tsv Test.FirstFile.other tst" | verify-true
     
 //check new run configs fro folders    
 get-menu "Run/Run Configurations..." | click
