@@ -129,7 +129,9 @@ public class ValidationContext {
 
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                variables.add(VariablesAnalyzer.normalizeName(variable.getActualName()));
+                if (!variable.getName().isEmpty()) {
+                    variables.add(VariablesAnalyzer.normalizeName(variable.getActualName()));
+                }
                 return ContinueDecision.CONTINUE;
             }
 
