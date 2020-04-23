@@ -78,7 +78,7 @@ public class SuiteFileMarkersListenerTest {
                 "Documentation  doc",
                 "Suite Setup",
                 "Suite Teardown",
-                "Test Template  unknown  1  2");
+                "Test Template  unknown");
         settingsSuiteModel = robotModel.createSuiteFile(settingsFile);
         final IFile casesFile = createFile(project, "cases.robot",
                 "*** Test Cases ***",
@@ -193,9 +193,7 @@ public class SuiteFileMarkersListenerTest {
         assertThat(messageFor(listener, settings.get(2))).containsOnly("Empty setting 'Suite Teardown'");
 
         assertThat(severityFor(listener, settings.get(3))).isEqualTo(Severity.ERROR);
-        assertThat(messageFor(listener, settings.get(3))).containsOnly(
-                "The name of template keyword is written in multiple cells",
-                "Unknown keyword 'unknown 1 2'");
+        assertThat(messageFor(listener, settings.get(3))).containsOnly("Unknown keyword 'unknown'");
     }
 
     @Test
