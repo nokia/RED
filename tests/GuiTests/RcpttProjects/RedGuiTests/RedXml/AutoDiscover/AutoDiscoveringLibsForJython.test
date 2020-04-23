@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _dOy-EAJFEea9vai2oGByIg
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 2/20/20 3:53 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 4/23/20 1:55 PM
 Tags: jython
 Testcase-Type: ecl
 
@@ -142,7 +142,7 @@ try -command{
 	//switch to Pytohn interpreter
 	with [get-editor "jython_simple_project/red.xml"] {
 	    get-tab-folder | get-tab-item General | click
-	    get-section "Robot framework" | get-table | get-item "Robot Framework .*\\(Python .*\\)" | check
+	    get-section "Robot framework" | get-table | get-item [format "Robot Framework .*\\(Python %s.*\\)" $python_version] | check
 	}
 	get-button "Save \((Ctrl|M1)\+S\)" | click
 	
