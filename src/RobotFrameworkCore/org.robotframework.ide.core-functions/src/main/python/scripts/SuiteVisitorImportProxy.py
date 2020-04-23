@@ -22,10 +22,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
     LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self, handle_keywords=False, support_gevent=False):
+    def __init__(self, robot_version, handle_keywords=False, support_gevent=False):
         import robot.running.namespace
         robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, self.LIB_IMPORT_TIMEOUT,
-                                                       handle_keywords, support_gevent)
+                                                       robot_version, handle_keywords, support_gevent)
 
     def visit_suite(self, suite):
         suite.tests.clear()
@@ -46,9 +46,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
 
 class RedImporter(object):
-    def __init__(self, importer, lib_import_timeout, handle_keywords=False, support_gevent=False):
+    def __init__(self, importer, lib_import_timeout, robot_version, handle_keywords=False, support_gevent=False):
         self.importer = importer
         self.lib_import_timeout = lib_import_timeout
+        self.robot_version = robot_version
         self.handle_keywords = handle_keywords
         self.support_gevent = support_gevent
         self.func = None
@@ -110,27 +111,28 @@ class RedImporter(object):
             library = libs[0]
         else:
             try:
-                library = TestLibrary(args[0], args[1], args[2], create_handlers=False)
+                library = self._create_test_library(args[0], args[1], args[2])
             except:
                 try:
-                    library = _BaseTestLibrary(libcode=None, name=args[0], args=args[1], source=None, variables=args[2])
+                    library = self._create_base_test_library(args[0], args[1], args[2])
                 except:
                     try:
-                        library = _BaseTestLibrary(libcode=None, name=args[0], args=[], source=None, variables=args[3])
+                        library = self._create_base_test_library(args[0], [], args[3])
                     except:
                         errors.append(sys.exc_info())
-
-        if lib_cached is None:
-            self.cached_lib_items.append(LibItem(args[0], args[1], library, errors))
 
         for e in errors:
             msg = json.dumps({'import_error': {'name': args[0], 'error': str(e)}})
             LOGGER.message(Message(message=msg, level='NONE'))
 
-        if self.handle_keywords:
-            self._handle_keywords(library)
-
-        return library
+        try:
+            if lib_cached is None:
+                self.cached_lib_items.append(LibItem(args[0], args[1], library, errors))
+            if self.handle_keywords:
+                self._handle_keywords(library)
+            return library
+        except:
+            return None
 
     def _get_lib_from_cache(self, name, args):
         for cached_lib in self.cached_lib_items:
@@ -141,6 +143,15 @@ class RedImporter(object):
                             return None
                     return cached_lib
         return None
+
+    def _create_test_library(self, name, args, variables):
+        return TestLibrary(name=name, args=args, variables=variables, create_handlers=False)
+
+    def _create_base_test_library(self, name, args, variables):
+        if self.robot_version < (3, 2):
+            return _BaseTestLibrary(libcode=None, name=name, args=args, source=None, variables=variables)
+        else:
+            return _BaseTestLibrary(libcode=None, name=name, args=args, source=None, logger=None, variables=variables)
 
     def _handle_keywords(self, library):
         if library is not None and hasattr(library, 'handlers'):

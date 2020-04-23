@@ -5,14 +5,14 @@
 #
 
 
-def start_auto_discovering(port, data_source_path, support_gevent):
+def start_auto_discovering(port, data_source_path, robot_version, support_gevent):
     from robot.run import run
     from TestRunnerAgent import TestRunnerAgent
     from SuiteVisitorImportProxy import SuiteVisitorImportProxy
 
     run(data_source_path,
         listener=TestRunnerAgent(port),
-        prerunmodifier=SuiteVisitorImportProxy(True, support_gevent),
+        prerunmodifier=SuiteVisitorImportProxy(robot_version, True, support_gevent),
         runemptysuite=True,
         dryrun=True,
         output='NONE',
@@ -33,5 +33,7 @@ if __name__ == '__main__':
     additional_paths = decoded_args[4].split(';') if len(decoded_args) > 4 else []
 
     robot_session_server.__extend_paths(additional_paths, [])
+    
+    robot_version = robot_session_server.get_robot_version_num()
 
-    start_auto_discovering(port, data_source_path, support_gevent)
+    start_auto_discovering(port, data_source_path, robot_version, support_gevent)
