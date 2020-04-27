@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gjwJoLpnEee_RrklJFm4zA
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/20/20 6:18 PM
+Save-Time: 4/23/20 6:22 PM
 Tags: jython
 Testcase-Type: ecl
 
@@ -54,7 +54,7 @@ verify-error {get-window "Problem Occurred" }
 //select python again    
 get-preferences-menu | click
 with [get-window Preferences] {
-    get-table | get-item -path "Robot Framework .*\\(Python .*\\)" | check
+    get-table | get-item -path [format "Robot Framework .*\\(Python %s.*\\)" $python_version] | check
     get-button "Apply and Close" | click
     get-window "Rebuild required" | get-button OK | click
 }
