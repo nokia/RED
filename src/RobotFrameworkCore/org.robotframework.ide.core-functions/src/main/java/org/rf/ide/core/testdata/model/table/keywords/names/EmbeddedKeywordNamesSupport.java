@@ -141,7 +141,7 @@ public class EmbeddedKeywordNamesSupport {
                 continue;
             }
 
-            if (isEscaped && currentChar != '\\' && currentChar != '}') {
+            if (isEscaped && currentChar != '\\' && currentChar != '{' && currentChar != '}') {
                 escapedRegex.append('\\');
             }
             escapedRegex.append(currentChar);
