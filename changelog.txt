@@ -1,3 +1,54 @@
+RED 0.9.4 - 2020/04/28
+
+Feature
+
+	[RED-884] - Cheat sheets - quick start for newbies
+
+Enhancement
+
+	[RED-1399] - RED hangs for some time when Robot nature is added to project
+	[RED-1406] - Validation should report variables syntax errors
+	[RED-1411] - Move library related timeouts to preferences
+	[RED-1413] - Unify error/warning messages for parameterized remote library imports
+	[RED-1425] - Change rerun buttons names in Execution View tab
+
+Bug
+
+	[RED-292] - When user switch to jython than PE is not refresh
+	[RED-1052] - Coloring list/dict in Setting section when is set as KW name
+	[RED-1173] - Unify adding remote libraries from qick fix and Autodiscovery
+	[RED-1376] - Non-executed rerun with selected tests from many suites
+	[RED-1389] - [GitHub #361] remote library import errors
+	[RED-1395] - Python interpreters can't be switched in preferences when executables are in the same directory
+	[RED-1405] - Wrongly parsed (and coloured) variables for RF 3.1 and older
+	[RED-1407] - Inserts tab instead of user defined separator
+	[RED-1410] - Exception for hyperlink in source
+	[RED-1412] - Remote library timeout is not validated for libraries added to red.xml
+	[RED-1415] - Error when user adds space and open content assist in Debug shell
+	[RED-1426] - Invalid coloring when tab and space is used
+
+Task
+
+	[RED-1222] - Check Jython under Java 9+ issues when Jython 2.7.2 is released
+	[RED-1336] - Support for RF 3.2
+	[RED-1396] - Investigate why session server start exception is not displayed in RED logs
+	[RED-1401] - Update Win10 images
+	[RED-1421] - Check and update any RED related processes documentations
+	[RED-1422] - Jenkins backup
+	[RED-1423] - Update platform to eclipse 2020-03 once it is released
+	[RED-1424] - Unify comment RobotTokenTypes
+
+Sub-task
+
+	[RED-1344] - Add deprecation warning for accessing list/dict items using syntax `@{var}[item]` and `&{var}[item]`
+	[RED-1351] - Inline Python evaluation support using `${{expression}}` syntax
+	[RED-1352] - Strict variable parsing logic
+	[RED-1416] - Provide Quick Fix for similar local & general setting names
+	[RED-1420] - Check how libspec file changes affect us (if it does)
+	[RED-1427] - Show library/keyword source should use data from libspec file
+	[RED-1428] - Library scope element is deprecated and attribute is used instead
+
+
 RED 0.9.3 - 2020/02/04
 
 Feature
