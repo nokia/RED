@@ -5,7 +5,7 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import static org.robotframework.red.swt.Listeners.mouseDownAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseDownAdapter;
 
 import java.util.List;
 

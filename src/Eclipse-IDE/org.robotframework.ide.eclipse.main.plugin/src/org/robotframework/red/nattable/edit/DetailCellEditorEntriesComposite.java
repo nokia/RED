@@ -6,8 +6,8 @@
 package org.robotframework.red.nattable.edit;
 
 import static com.google.common.collect.Lists.transform;
-import static org.robotframework.red.swt.Listeners.mouseUpAdapter;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseUpAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.List;
 

@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import static org.robotframework.red.swt.Listeners.focusLostAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

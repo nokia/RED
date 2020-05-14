@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
-import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
-import static org.robotframework.red.swt.Listeners.menuShownAdapter;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

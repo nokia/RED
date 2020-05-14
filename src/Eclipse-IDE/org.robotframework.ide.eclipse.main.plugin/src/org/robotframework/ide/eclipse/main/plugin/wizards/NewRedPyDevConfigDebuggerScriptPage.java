@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.ExecutableFileComp
 import org.robotframework.ide.eclipse.main.plugin.launch.variables.RedStringVariablesManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.wizards.JobWizardPage;
-import org.robotframework.red.swt.Listeners;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Range;
@@ -122,7 +123,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         pyDevDbgButton = new Button(parent, SWT.RADIO);
         pyDevDbgButton.setText("Use pydevd distributed with PyDev (recommended)");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(pyDevDbgButton);
-        pyDevDbgButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        pyDevDbgButton.addSelectionListener(widgetSelectedAdapter(e -> {
             if (pyDevDbgButton.getSelection()) {
                 checkPageCompletion();
             }
@@ -141,7 +142,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         pythonDbgButton = new Button(parent, SWT.RADIO);
         pythonDbgButton.setText("Use pydevd installed in chosen Python");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(pythonDbgButton);
-        pythonDbgButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        pythonDbgButton.addSelectionListener(widgetSelectedAdapter(e -> {
             if (pythonDbgButton.getSelection()) {
                 checkPageCompletion();
             }
@@ -160,7 +161,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         userDbgButton = new Button(parent, SWT.RADIO);
         userDbgButton.setText("Use pydevd from external location defined below");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(userDbgButton);
-        userDbgButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        userDbgButton.addSelectionListener(widgetSelectedAdapter(e -> {
             if (userDbgButton.getSelection()) {
                 checkPageCompletion();
             }
@@ -178,7 +179,7 @@ public class NewRedPyDevConfigDebuggerScriptPage extends JobWizardPage {
         geventButton.setToolTipText("When this option is on the pydevd will be able to debug Gevent based code."
                 + " This will add GEVENT_SUPPORT environment variable to generated launch configuration.");
         geventButton.setSelection(false);
-        geventButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> checkPageCompletion()));
+        geventButton.addSelectionListener(widgetSelectedAdapter(e -> checkPageCompletion()));
     }
 
     private void createAdditionalSetupGroup(final Composite parent) {

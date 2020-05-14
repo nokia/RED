@@ -13,18 +13,6 @@
 
 	<profiles>
 		<profile>
-			<id>oxygen-profile</id>
-			<activation>
-				<property>
-					<name>eclipse.version</name>
-					<value>oxygen</value>
-				</property>
-			</activation>
-			<properties>
-				<target-file-name>oxygen.target</target-file-name>
-			</properties>
-		</profile>
-		<profile>
 			<id>photon-profile</id>
 			<activation>
 				<property>

@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.search;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

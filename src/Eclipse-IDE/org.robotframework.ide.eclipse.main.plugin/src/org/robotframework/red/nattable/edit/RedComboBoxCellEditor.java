@@ -5,10 +5,10 @@
 */
 package org.robotframework.red.nattable.edit;
 
-import static org.robotframework.red.swt.Listeners.focusLostAdapter;
-import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
-import static org.robotframework.red.swt.Listeners.mouseUpAdapter;
-import static org.robotframework.red.swt.Listeners.shellClosedAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseUpAdapter;
+import static org.eclipse.swt.events.ShellListener.shellClosedAdapter;
 
 import java.util.List;
 

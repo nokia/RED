@@ -8,9 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
-import static org.robotframework.red.swt.Listeners.menuShownAdapter;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashSet;

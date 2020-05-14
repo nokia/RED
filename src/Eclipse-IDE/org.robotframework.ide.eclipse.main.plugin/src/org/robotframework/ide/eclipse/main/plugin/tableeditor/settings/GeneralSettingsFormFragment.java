@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;

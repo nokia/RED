@@ -5,7 +5,7 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;

@@ -9,9 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
-import static org.robotframework.red.swt.Listeners.menuShownAdapter;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -64,6 +64,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.ScrolledFormText;
 import org.rf.ide.core.environment.IRuntimeEnvironment;
@@ -83,7 +85,6 @@ import org.robotframework.red.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.robotframework.red.jface.viewers.Stylers;
 import org.robotframework.red.jface.viewers.ViewerColumnsFactory;
 import org.robotframework.red.jface.viewers.ViewersConfigurator;
-import org.robotframework.red.swt.Listeners;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
@@ -125,7 +126,7 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
 
         description = new Link(parent, SWT.NONE);
         description.setText("Configure rules and their severity");
-        description.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        description.addSelectionListener(widgetSelectedAdapter(e -> {
             if (InstalledRobotsPreferencesPage.ID.equals(e.text)) {
                 PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             }
@@ -234,21 +235,25 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
                 SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, true);
         documentationText.setBackground(parent.getBackground());
         GridDataFactory.fillDefaults().grab(true, false).indent(15, 0).hint(0, 80).applyTo(documentationText);
-        final IHyperlinkListener linkListener = Listeners.linkActivatedAdapter(e -> {
-            if (browser == null) {
-                final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-                try {
-                    browser = browserSupport.createBrowser(null);
-                } catch (final PartInitException e1) {
+        final IHyperlinkListener linkListener = new HyperlinkAdapter() {
+
+            @Override
+            public void linkActivated(final HyperlinkEvent e) {
+                if (browser == null) {
+                    final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+                    try {
+                        browser = browserSupport.createBrowser(null);
+                    } catch (final PartInitException e1) {
+                    }
+                }
+                if (browser != null) {
+                    try {
+                        browser.openURL(new URI((String) e.getHref()).toURL());
+                    } catch (PartInitException | MalformedURLException | URISyntaxException e1) {
+                    }
                 }
             }
-            if (browser != null) {
-                try {
-                    browser.openURL(new URI((String) e.getHref()).toURL());
-                } catch (PartInitException | MalformedURLException | URISyntaxException e1) {
-                }
-            }
-        });
+        };
         documentationText.getFormText().addHyperlinkListener(linkListener);
         documentationText
                 .addDisposeListener(e -> documentationText.getFormText().removeHyperlinkListener(linkListener));

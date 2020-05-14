@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,7 +25,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
-import org.robotframework.red.swt.Listeners;
 
 abstract class WizardNewRobotFileCreationPage extends WizardNewFileCreationPage {
 
@@ -46,7 +47,7 @@ abstract class WizardNewRobotFileCreationPage extends WizardNewFileCreationPage 
             button.setSelection(isFirst);
             GridDataFactory.fillDefaults().indent(20, 0).applyTo(button);
 
-            button.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+            button.addSelectionListener(widgetSelectedAdapter(e -> {
                 if (e.getSource() == button && button.getSelection()) {
                     final String currentName = getFileName();
                     final String currentNameWithoutExtension = currentName.contains(".")

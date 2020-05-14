@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.awt.Desktop;
 import java.io.File;

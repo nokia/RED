@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.wizards;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -30,7 +32,6 @@ import org.rf.ide.core.environment.IRuntimeEnvironment.RuntimeEnvironmentExcepti
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.wizards.JobWizardPage;
-import org.robotframework.red.swt.Listeners;
 
 
 public class NewRedPyDevConfigRunnerScriptPage extends JobWizardPage {
@@ -99,21 +100,21 @@ public class NewRedPyDevConfigRunnerScriptPage extends JobWizardPage {
         pythonModuleButton = new Button(parent, SWT.RADIO);
         pythonModuleButton.setText("Use redpydevd installed in chosen Python (recommended)");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(pythonModuleButton);
-        pythonModuleButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> checkPageCompletion()));
+        pythonModuleButton.addSelectionListener(widgetSelectedAdapter(e -> checkPageCompletion()));
     }
 
     private void createExportedModuleControls(final Composite parent) {
         exportModuleButton = new Button(parent, SWT.RADIO);
         exportModuleButton.setText("Export redpydevd to external location defined below");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(exportModuleButton);
-        exportModuleButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> checkPageCompletion()));
+        exportModuleButton.addSelectionListener(widgetSelectedAdapter(e -> checkPageCompletion()));
     }
 
     private void createChooseOwnModuleControls(final Composite parent) {
         userModelButton = new Button(parent, SWT.RADIO);
         userModelButton.setText("Use redpydevd from external location defined below");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(userModelButton);
-        userModelButton.addSelectionListener(Listeners.widgetSelectedAdapter(e -> checkPageCompletion()));
+        userModelButton.addSelectionListener(widgetSelectedAdapter(e -> checkPageCompletion()));
     }
 
     private void createModuleLocationControls(final Composite parent) {
@@ -123,7 +124,7 @@ public class NewRedPyDevConfigRunnerScriptPage extends JobWizardPage {
         moduleLocationButton = new Button(parent, SWT.PUSH);
         moduleLocationButton.setText("Choose location");
         GridDataFactory.fillDefaults().span(2, 1).align(SWT.END, SWT.BEGINNING).applyTo(moduleLocationButton);
-        moduleLocationButton.addSelectionListener(Listeners.widgetSelectedAdapter(event -> {
+        moduleLocationButton.addSelectionListener(widgetSelectedAdapter(event -> {
             final DirectoryDialog dirDialog = new DirectoryDialog(parent.getShell());
             dirDialog.setMessage("Choose redpydevd module location");
             final String location = dirDialog.open();

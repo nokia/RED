@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoin
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.NonContextualKeywordProposalsProvider;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
-import org.robotframework.red.swt.Listeners;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -99,7 +99,7 @@ public class RobotLineBreakpointDetailPane extends RobotBreakpointDetailPane {
     protected void createSpecificControls(final Composite panel) {
         conditionBtn = new Button(panel, SWT.CHECK);
         conditionBtn.setText("Conditional");
-        conditionBtn.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        conditionBtn.addSelectionListener(widgetSelectedAdapter(e -> {
             if (!isInitializingValues()) {
                 conditionCombo.setEnabled(conditionBtn.getSelection());
                 setDirty(true);

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -31,7 +33,6 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.rf.ide.core.execution.debug.RobotBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.swt.Listeners;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -89,7 +90,7 @@ public abstract class RobotBreakpointDetailPane implements IDetailPane3 {
 
         hitCountBtn = new Button(panel, SWT.CHECK);
         hitCountBtn.setText("Hit count:");
-        hitCountBtn.addSelectionListener(Listeners.widgetSelectedAdapter(e -> {
+        hitCountBtn.addSelectionListener(widgetSelectedAdapter(e -> {
             if (!isInitializingValues) {
                 hitCountTxt.setEnabled(hitCountBtn.getSelection());
                 setDirty(true);

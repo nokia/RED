@@ -7,10 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.robotframework.red.swt.Listeners.keyReleasedAdapter;
-import static org.robotframework.red.swt.Listeners.mouseDoubleClickAdapter;
-import static org.robotframework.red.swt.Listeners.mouseDownAdapter;
-import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyReleasedAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseDoubleClickAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseDownAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.net.URI;
