@@ -11,7 +11,7 @@
 </p>
 <h3>Get Eclipse</h3>
 <p>Currently RED is tested and released with Eclipse 2020-03 (4.15) platform.<br/>
-The oldest supported platform version is Eclipse Oxygen (4.7).<br/>
+The oldest supported platform version is Eclipse Photon (4.8).<br/>
 <a class="external" href="https://www.eclipse.org/" target="_blank">Official Eclipse website</a>
 </p>
 <h3>Get RED</h3>
