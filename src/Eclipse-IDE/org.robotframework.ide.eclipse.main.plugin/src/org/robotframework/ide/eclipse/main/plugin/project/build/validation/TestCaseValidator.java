@@ -51,6 +51,7 @@ class TestCaseValidator implements ModelUnitValidator {
     public void validate(final IProgressMonitor monitor) {
         reportVersionSpecificProblems();
         reportEmptyNamesOfCase();
+        reportLineContinuationAsNameOfCase();
         reportEmptyCase();
 
         validateSettings();
@@ -66,6 +67,17 @@ class TestCaseValidator implements ModelUnitValidator {
         if (caseName.getText().trim().isEmpty()) {
             reporter.handleProblem(RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_NAME), validationContext.getFile(),
                     caseName);
+        }
+    }
+
+    private void reportLineContinuationAsNameOfCase() {
+        final RobotToken caseName = testCase.getName();
+        final String name = caseName.getText();
+        if ("...".equals(name.trim())) {
+            final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION)
+                    .formatMessageWith(name);
+            final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+            reporter.handleProblem(problem, validationContext.getFile(), caseName, arguments);
         }
     }
 

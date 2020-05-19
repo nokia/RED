@@ -90,6 +90,21 @@ public class TestCaseValidatorTest {
     }
 
     @Test
+    public void TestCaseDefinitionIsLineContinuationIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("...")
+                .appendLine("    kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).containsOnly(new Problem(TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION,
+                new ProblemPosition(2, Range.closed(19, 22))));
+    }
+
+    @Test
     public void emptyTestCaseIsReported_1() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")

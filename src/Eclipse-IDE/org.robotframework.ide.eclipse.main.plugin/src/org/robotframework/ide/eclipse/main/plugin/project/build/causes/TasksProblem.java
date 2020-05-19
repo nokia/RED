@@ -49,6 +49,18 @@ public enum TasksProblem implements IProblemCause {
             return "Task name cannot be empty";
         }
     },
+    TASK_NAME_IS_LINE_CONTINUATION {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEFINITION_NAME_IS_LINE_CONTINUATION;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Definition name '...' is considered confusing and deprecated since RobotFramework 3.1.2";
+        }
+    },
     EMPTY_TASK {
 
         @Override

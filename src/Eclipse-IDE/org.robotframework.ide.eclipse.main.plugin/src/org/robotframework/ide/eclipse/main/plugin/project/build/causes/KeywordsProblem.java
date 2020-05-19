@@ -286,6 +286,18 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new ChangeToFixer(":FOR"));
         }
     },
+    KEYWORD_NAME_IS_LINE_CONTINUATION {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEFINITION_NAME_IS_LINE_CONTINUATION;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Definition name '...' is considered confusing and deprecated since RobotFramework 3.1.2";
+        }
+    },
     KEYWORD_NAME_WITH_DOTS {
 
         @Override

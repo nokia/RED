@@ -51,6 +51,7 @@ class TaskValidator implements ModelUnitValidator {
     public void validate(final IProgressMonitor monitor) {
         reportVersionSpecificProblems();
         reportEmptyNamesOfTask();
+        reportLineContinuationAsNameOfTask();
         reportEmptyTask();
 
         validateSettings();
@@ -66,6 +67,17 @@ class TaskValidator implements ModelUnitValidator {
         if (caseName.getText().trim().isEmpty()) {
             reporter.handleProblem(RobotProblem.causedBy(TasksProblem.EMPTY_TASK_NAME), validationContext.getFile(),
                     caseName);
+        }
+    }
+
+    private void reportLineContinuationAsNameOfTask() {
+        final RobotToken taskName = task.getName();
+        final String name = taskName.getText();
+        if ("...".equals(name.trim())) {
+            final RobotProblem problem = RobotProblem.causedBy(TasksProblem.TASK_NAME_IS_LINE_CONTINUATION)
+                    .formatMessageWith(name);
+            final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+            reporter.handleProblem(problem, validationContext.getFile(), taskName, arguments);
         }
     }
 

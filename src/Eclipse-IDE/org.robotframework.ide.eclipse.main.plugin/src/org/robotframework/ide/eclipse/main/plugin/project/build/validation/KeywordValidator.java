@@ -81,7 +81,12 @@ class KeywordValidator implements ModelUnitValidator {
     private void reportKeywordNameWithDots() {
         final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
-        if (name.contains(".")) {
+        if ("...".equals(name.trim())) {
+            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION)
+                    .formatMessageWith(name);
+            final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+            reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
+        } else if (name.contains(".")) {
             final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS)
                     .formatMessageWith(name);
             final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);

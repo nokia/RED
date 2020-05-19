@@ -126,6 +126,21 @@ public class KeywordValidatorTest {
     }
 
     @Test
+    public void keywordDefinitionIsLineContinuationIsReported() throws CoreException {
+        final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("...")
+                .appendLine("    kw")
+                .build();
+
+        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
+        final FileValidationContext context = prepareContext(accessibleKws);
+
+        final Collection<Problem> problems = validate(context, fileModel);
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION,
+                new ProblemPosition(2, Range.closed(17, 20))));
+    }
+
+    @Test
     public void keywordOverridingOtherImportedKeywordIsReported() throws CoreException {
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
