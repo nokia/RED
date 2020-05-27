@@ -37,6 +37,7 @@ public class SpecialKeywords {
     // keywords which creates variables from given arguments
     private static final Set<QualifiedKeywordName> VARS_CREATING_KEYWORDS = new HashSet<>();
     static {
+        VARS_CREATING_KEYWORDS.add(QualifiedKeywordName.create("Set Local Variable", "BuiltIn"));
         VARS_CREATING_KEYWORDS.add(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"));
         VARS_CREATING_KEYWORDS.add(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"));
         VARS_CREATING_KEYWORDS.add(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"));
@@ -46,6 +47,7 @@ public class SpecialKeywords {
     private static final Set<QualifiedKeywordName> VARS_OMITTING_KEYWORDS = new HashSet<>();
     static {
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Comment", "BuiltIn"));
+        VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Local Variable", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"));
         VARS_OMITTING_KEYWORDS.add(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"));
@@ -57,6 +59,7 @@ public class SpecialKeywords {
     // keywords for which some arguments should be validated for variable syntax
     private static final Set<QualifiedKeywordName> VARS_SYNTAX_CHECKING_KEYWORDS = new HashSet<>();
     static {
+        VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Local Variable", "BuiltIn"));
         VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"));
         VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"));
         VARS_SYNTAX_CHECKING_KEYWORDS.add(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"));
@@ -96,6 +99,7 @@ public class SpecialKeywords {
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Get Variable Value", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Variable Should Exist", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Variable Should Not Exist", "BuiltIn"), 0);
+        RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Set Local Variable", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Set Test Variable", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Set Suite Variable", "BuiltIn"), 0);
         RUN_KEYWORD_VARIANTS.put(QualifiedKeywordName.create("Set Global Variable", "BuiltIn"), 0);
@@ -137,6 +141,7 @@ public class SpecialKeywords {
      * Returns collection of variables which were created by given keyword call.
      *
      * Currently supports:
+     * BuiltIn.Set Local Variable
      * BuiltIn.Set Test Variable
      * BuiltIn.Set Suite Variable
      * BuiltIn.Set Global Variable
@@ -167,7 +172,8 @@ public class SpecialKeywords {
      * used in arguments of a call, but for following keywords some variables are removed:
      *
      * BuiltIn.Comment - all variables are removed
-     * BuiltIn.Set Test Variable - variable from first argument is removed
+     * BuiltIn.Set Local Variable - variable from first argument is removed
+     * BuiltIn.Set Test Variable - as above
      * BuiltIn.Set Suite Variable - as above
      * BuiltIn.Set Global Variable - as above
      * BuiltIn.Get Variable Value - as above
@@ -207,6 +213,7 @@ public class SpecialKeywords {
      * Returns tokens which should be checked if is provided with variable syntax. Currently
      * supports:
      *
+     * BuiltIn.Set Local Variable
      * BuiltIn.Set Test Variable
      * BuiltIn.Set Suite Variable
      * BuiltIn.Set Global Variable

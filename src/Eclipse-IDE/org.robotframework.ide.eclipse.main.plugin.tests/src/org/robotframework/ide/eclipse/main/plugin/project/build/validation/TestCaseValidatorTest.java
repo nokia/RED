@@ -174,13 +174,15 @@ public class TestCaseValidatorTest {
                 .appendLine("  Set Global Variable  ${e}  2")
                 .appendLine("  Set Suite Variable  ${e}  3")
                 .appendLine("  Set Test Variable  ${e}  4")
+                .appendLine("  Set Local Variable  ${e}  5")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newBuiltInKeyword("Comment", "*values"),
                 newBuiltInKeyword("Get Variable Value", "var", "def"),
                 newBuiltInKeyword("Set Global Variable", "var", "*values"),
                 newBuiltInKeyword("Set Suite Variable", "var", "*values"),
-                newBuiltInKeyword("Set Test Variable", "var", "*values"));
+                newBuiltInKeyword("Set Test Variable", "var", "*values"),
+                newBuiltInKeyword("Set Local Variable", "var", "*values"));
         final FileValidationContext context = prepareContext(accessibleKws);
 
         final Collection<Problem> problems = validate(context, fileModel);
@@ -242,13 +244,17 @@ public class TestCaseValidatorTest {
                 .appendLine("  Set Suite Variable  %{x}  6")
                 .appendLine("  Set Test Variable  x  7")
                 .appendLine("  Set Test Variable  %{x}  8")
+                .appendLine("  Set Local Variable  x  9")
+                .appendLine(
+                        "  Set Local Variable  %{x}  10")
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(
                 newBuiltInKeyword("Get Variable Value", "var", "def"),
                 newBuiltInKeyword("Set Global Variable", "var", "*values"),
                 newBuiltInKeyword("Set Suite Variable", "var", "*values"),
-                newBuiltInKeyword("Set Test Variable", "var", "*values"));
+                newBuiltInKeyword("Set Test Variable", "var", "*values"),
+                newBuiltInKeyword("Set Local Variable", "var", "*values"));
         final FileValidationContext context = prepareContext(accessibleKws);
 
         final Collection<Problem> problems = validate(context, fileModel);
@@ -260,7 +266,9 @@ public class TestCaseValidatorTest {
                 new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(7, Range.closed(162, 163))),
                 new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(8, Range.closed(189, 193))),
                 new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(9, Range.closed(218, 219))),
-                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(10, Range.closed(244, 248))));
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(10, Range.closed(244, 248))),
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(11, Range.closed(274, 275))),
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(12, Range.closed(301, 305))));
     }
 
     @Test
@@ -640,6 +648,8 @@ public class TestCaseValidatorTest {
                 .appendLine("    use  ${a}  ${b}  ${c}")
                 .appendLine("    Set Test Variable  ${d}  3")
                 .appendLine("    use  ${a}  ${b}  ${c}  ${d}")
+                .appendLine("    Set Local Variable  ${e}  3")
+                .appendLine("    use  ${a}  ${b}  ${c}  ${d}  ${e}")
                 .appendLine("    :FOR  ${e}  IN RANGE  ${a}  ${b}")
                 .appendLine("    \\  use  ${a}  ${b}  ${c}  ${d}  ${e}")
                 .appendLine("    \\  Set Suite Variable  ${f}  4")
@@ -651,6 +661,7 @@ public class TestCaseValidatorTest {
                 newBuiltInKeyword("Set Global Variable", "var", "*values"),
                 newBuiltInKeyword("Set Suite Variable", "var", "*values"),
                 newBuiltInKeyword("Set Test Variable", "var", "*values"),
+                newBuiltInKeyword("Set Local Variable", "var", "*values"),
                 newResourceKeyword("use", new Path("/res.robot"), "*values"));
         final FileValidationContext context = prepareContext(accessibleKws);
 

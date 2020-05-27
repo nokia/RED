@@ -662,6 +662,9 @@ public class KeywordValidatorTest {
                 .appendLine("    use  ${a}  ${b}")
                 .appendLine("    Set Test Variable  ${c}  3")
                 .appendLine("    use  ${a}  ${b}  ${c}")
+                .appendLine("    Set Local Variable  ${d}  4")
+                .appendLine(
+                        "    use  ${a}  ${b}  ${c}  ${d}")
                 .appendLine("    :FOR  ${d}  IN RANGE  ${a}  ${b}")
                 .appendLine("    \\  use  ${a}  ${b}  ${c}  ${d}")
                 .appendLine("    \\  Set Suite Variable  ${e}  4")
@@ -674,6 +677,8 @@ public class KeywordValidatorTest {
                 newBuiltInKeyword("Set Global Variable", "var", "*values"),
                 newBuiltInKeyword("Set Suite Variable", "var", "*values"),
                 newBuiltInKeyword("Set Test Variable", "var", "*values"),
+                newBuiltInKeyword("Set Local Variable", "var",
+                        "*values"),
                 newResourceKeyword("use", new Path("/res.robot"), "*values"));
         final FileValidationContext context = prepareContext(accessibleKws);
 
