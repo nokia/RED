@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 11/15/18 3:24 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 5/28/20 2:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -140,7 +140,7 @@ proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true] [v
 	        
 	}
 	// don't check tooltip when is photon or oxygen - in this vaersions tooltip is empty
-	if [and [$is_product] [$is_eclipse_oxygen | not ] [$is_eclipse_photon | not ]]{
+	if [and [$is_product] [$is_eclipse_photon | not ]]{
 		
 		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Table/Expand All"
 		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -225,7 +225,7 @@ proc "check-menu-for-kw"{
 	    get-property "getMenu().getItems().MenuItem[15].getText()" | equals "References" | verify-true
 	}
 	// don't check tooltip when is photon or oxygen - in this vaersions tooltip is empty
-	if [and [$is_product] [$is_eclipse_oxygen | not ] [$is_eclipse_photon | not ]]{
+	if [and [$is_product] [$is_eclipse_photon | not ]]{
 		check-tooltip
 	}	
 	
@@ -270,7 +270,7 @@ proc "check-menu-for-buton" {
 	    
 	}  
 	// don't check tooltip when is photon or oxygen - in this vaersions tooltip is empty
-	if [and [$is_product] [$is_eclipse_oxygen | not ] [$is_eclipse_photon | not ]]{
+	if [and [$is_product] [$is_eclipse_photon | not ]]{
 		check-tooltip -is_button true
 	}	
 }
