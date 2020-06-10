@@ -71,7 +71,7 @@ public class RobotElementsComparatorWithPositionChangedPresaveTest {
         final Optional<IRobotTokenType> res = robotElemsCmp.findType(tok);
 
         // verify
-        assertThat(res.isPresent()).isFalse();
+        assertThat(res).isNotPresent();
     }
 
     @Test
@@ -85,8 +85,7 @@ public class RobotElementsComparatorWithPositionChangedPresaveTest {
         final Optional<IRobotTokenType> res = robotElemsCmp.findType(tok);
 
         // verify
-        assertThat(res.isPresent()).isTrue();
-        assertThat(res.get()).isEqualTo(RobotTokenType.ASSIGNMENT);
+        assertThat(res).hasValue(RobotTokenType.ASSIGNMENT);
     }
 
     @Test

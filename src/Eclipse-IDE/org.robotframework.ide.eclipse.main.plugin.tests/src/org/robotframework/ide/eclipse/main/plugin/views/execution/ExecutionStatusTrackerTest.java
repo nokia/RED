@@ -37,7 +37,7 @@ public class ExecutionStatusTrackerTest {
         tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
         final Optional<ExecutionStatusStore> optionalStore = context.getExecutionData(ExecutionStatusStore.class);
-        assertThat(optionalStore.isPresent()).isTrue();
+        assertThat(optionalStore).isPresent();
 
         final ExecutionStatusStore store = optionalStore.get();
 

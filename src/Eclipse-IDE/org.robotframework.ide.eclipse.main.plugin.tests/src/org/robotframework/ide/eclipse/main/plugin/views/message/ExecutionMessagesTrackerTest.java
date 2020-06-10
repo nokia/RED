@@ -23,10 +23,11 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
 
-        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isFalse();
+        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class)).isNotPresent();
+
         tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
-        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isTrue();
+        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class)).isPresent();
     }
 
     @Test
@@ -39,8 +40,7 @@ public class ExecutionMessagesTrackerTest {
 
         tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
-        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isTrue();
-        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).get()).isSameAs(store);
+        assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class)).containsSame(store);
     }
 
     @Test

@@ -81,7 +81,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isFalse();
+        assertThat(change).isNotPresent();
     }
 
     @Test
@@ -93,7 +93,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isFalse();
+        assertThat(change).isNotPresent();
     }
 
     @Test
@@ -103,8 +103,9 @@ public class RedXmlInTextEditorChangesCollectorTest {
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(project.getName() + "/x"), Optional.empty());
+        final Optional<Change> change = collector.collect();
 
-        assertThat(collector.collect().isPresent()).isFalse();
+        assertThat(change).isNotPresent();
     }
 
     @Test
@@ -116,7 +117,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/x"), Optional.of(new Path(project.getName() + "/renamed")));
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isFalse();
+        assertThat(change).isNotPresent();
     }
 
     @Test
@@ -129,7 +130,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isTrue();
+        assertThat(change).isPresent();
 
         change.get().perform(new NullProgressMonitor());
 
@@ -155,7 +156,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/a"), Optional.of(new Path(project.getName() + "/moved")));
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isTrue();
+        assertThat(change).isPresent();
 
         change.get().perform(new NullProgressMonitor());
 
@@ -182,7 +183,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 new Path(project.getName() + "/libs/inner_lib"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isTrue();
+        assertThat(change).isPresent();
 
         change.get().perform(new NullProgressMonitor());
 
@@ -223,7 +224,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
                 Optional.of(new Path(project.getName() + "/libs/moved")));
         final Optional<Change> change = collector.collect();
 
-        assertThat(change.isPresent()).isTrue();
+        assertThat(change).isPresent();
 
         change.get().perform(new NullProgressMonitor());
 

@@ -57,7 +57,7 @@ public class DocumentationsTest {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(suiteFile);
-        assertThat(input).isPresent().containsInstanceOf(SuiteFileInput.class);
+        assertThat(input).containsInstanceOf(SuiteFileInput.class);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class DocumentationsTest {
         final RobotSetting setting = new RobotSetting(null, new SuiteDocumentation(RobotToken.create("Documentation")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(SuiteFileOnSettingInput.class);
+        assertThat(input).containsInstanceOf(SuiteFileOnSettingInput.class);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class DocumentationsTest {
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES, importedLib);
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(LibraryImportSettingInput.class);
+        assertThat(input).containsInstanceOf(LibraryImportSettingInput.class);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class DocumentationsTest {
                 .get(0);
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(SuiteFileInput.class);
+        assertThat(input).containsInstanceOf(SuiteFileInput.class);
 
         RedPlugin.getModelManager().dispose();
     }
@@ -117,7 +117,7 @@ public class DocumentationsTest {
                 new UserKeyword(RobotToken.create("keyword")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(keyword);
-        assertThat(input).isPresent().containsInstanceOf(KeywordDefinitionInput.class);
+        assertThat(input).containsInstanceOf(KeywordDefinitionInput.class);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class DocumentationsTest {
                 new LocalSetting<>(ModelType.USER_KEYWORD_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(KeywordDefinitionOnSettingInput.class);
+        assertThat(input).containsInstanceOf(KeywordDefinitionOnSettingInput.class);
     }
 
     @Test
@@ -146,7 +146,7 @@ public class DocumentationsTest {
         final RobotCase testCase = new RobotCase(null, new TestCase(RobotToken.create("test")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(testCase);
-        assertThat(input).isPresent().containsInstanceOf(TestCaseInput.class);
+        assertThat(input).containsInstanceOf(TestCaseInput.class);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class DocumentationsTest {
                 new LocalSetting<>(ModelType.TEST_CASE_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(TestCaseOnSettingInput.class);
+        assertThat(input).containsInstanceOf(TestCaseOnSettingInput.class);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class DocumentationsTest {
         final RobotTask task = new RobotTask(null, new Task(RobotToken.create("task")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(task);
-        assertThat(input).isPresent().containsInstanceOf(TaskInput.class);
+        assertThat(input).containsInstanceOf(TaskInput.class);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class DocumentationsTest {
                 new LocalSetting<>(ModelType.TASK_DOCUMENTATION, RobotToken.create("[Documentation]")));
 
         final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
-        assertThat(input).isPresent().containsInstanceOf(TaskOnSettingInput.class);
+        assertThat(input).containsInstanceOf(TaskOnSettingInput.class);
     }
 
     @Test
@@ -192,6 +192,7 @@ public class DocumentationsTest {
         final RobotKeywordCall setting = new RobotKeywordCall(task,
                 new LocalSetting<>(ModelType.TASK_TEMPLATE, RobotToken.create("[Template]")));
 
-        assertThat(Documentations.findInput(setting)).isEmpty();
+        final Optional<DocumentationViewInput> input = Documentations.findInput(setting);
+        assertThat(input).isNotPresent();
     }
 }

@@ -72,7 +72,7 @@ public class DeleteSectionCommandTest {
                 .isInjectedInto(new DeleteSectionCommand(model.findSection(sectionClass).get()))
                 .execute();
 
-        assertThat(model.findSection(sectionClass).isPresent()).isFalse();
+        assertThat(model.findSection(sectionClass)).isNotPresent();
     }
 
     private static RobotSuiteFile createModel() {

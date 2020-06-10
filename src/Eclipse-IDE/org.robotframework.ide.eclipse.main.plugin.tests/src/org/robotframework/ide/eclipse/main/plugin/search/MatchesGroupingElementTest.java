@@ -35,11 +35,11 @@ public class MatchesGroupingElementTest {
 
         final MatchesGroupingElement groupingElem = new MatchesGroupingElement(elem1, elem2, elem3);
 
-        assertThat(groupingElem.getGroupingObjectOf(Object.class).get()).isSameAs(elem1);
-        assertThat(groupingElem.getGroupingObjectOf(String.class).get()).isSameAs(elem2);
-        assertThat(groupingElem.getGroupingObjectOf(Integer.class).get()).isSameAs(elem3);
-        assertThat(groupingElem.getGroupingObjectOf(Number.class).get()).isSameAs(elem3);
-        assertThat(groupingElem.getGroupingObjectOf(Long.class).isPresent()).isFalse();
+        assertThat(groupingElem.getGroupingObjectOf(Object.class)).containsSame(elem1);
+        assertThat(groupingElem.getGroupingObjectOf(String.class)).containsSame((String) elem2);
+        assertThat(groupingElem.getGroupingObjectOf(Integer.class)).containsSame((Integer) elem3);
+        assertThat(groupingElem.getGroupingObjectOf(Number.class)).containsSame((Number) elem3);
+        assertThat(groupingElem.getGroupingObjectOf(Long.class)).isNotPresent();
     }
 
 }

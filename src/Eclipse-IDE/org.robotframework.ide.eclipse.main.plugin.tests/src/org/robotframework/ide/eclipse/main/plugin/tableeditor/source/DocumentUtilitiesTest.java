@@ -24,7 +24,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 14);
 
-        assertThat(variableRegion.isPresent()).isFalse();
+        assertThat(variableRegion).isNotPresent();
     }
 
     @Test
@@ -33,7 +33,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 8);
 
-        assertThat(variableRegion.isPresent()).isFalse();
+        assertThat(variableRegion).isNotPresent();
     }
 
     @Test
@@ -42,7 +42,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 9);
 
-        assertThat(variableRegion.isPresent()).isFalse();
+        assertThat(variableRegion).isNotPresent();
     }
 
     @Test
@@ -51,7 +51,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 7);
 
-        assertThat(variableRegion.isPresent()).isFalse();
+        assertThat(variableRegion).isNotPresent();
     }
 
     @Test
@@ -60,8 +60,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 9);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(6, 6));
+        assertThat(variableRegion).hasValue(new Region(6, 6));
     }
 
     @Test
@@ -70,7 +69,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 17);
 
-        assertThat(variableRegion.isPresent()).isFalse();
+        assertThat(variableRegion).isNotPresent();
     }
 
     @Test
@@ -79,8 +78,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 12);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(10, 6));
+        assertThat(variableRegion).hasValue(new Region(10, 6));
     }
 
     @Test
@@ -89,8 +87,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 14);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(10, 19));
+        assertThat(variableRegion).hasValue(new Region(10, 19));
     }
 
     @Test
@@ -99,8 +96,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 25);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(10, 19));
+        assertThat(variableRegion).hasValue(new Region(10, 19));
     }
 
     @Test
@@ -109,8 +105,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 20);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(17, 6));
+        assertThat(variableRegion).hasValue(new Region(17, 6));
     }
 
     @Test
@@ -119,7 +114,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, -1);
 
-        assertThat(snippet.isPresent()).isFalse();
+        assertThat(snippet).isNotPresent();
     }
 
     @Test
@@ -128,7 +123,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, -10, 1);
 
-        assertThat(snippet.isPresent()).isFalse();
+        assertThat(snippet).isNotPresent();
     }
 
     @Test
@@ -137,7 +132,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 50, 1);
 
-        assertThat(snippet.isPresent()).isFalse();
+        assertThat(snippet).isNotPresent();
     }
 
     @Test
@@ -146,7 +141,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, 0);
 
-        assertThat(snippet.isPresent()).isTrue();
+        assertThat(snippet).isPresent();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength())).isEqualTo("line3");
     }
 
@@ -156,7 +151,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, 1);
 
-        assertThat(snippet.isPresent()).isTrue();
+        assertThat(snippet).isPresent();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength())).isEqualTo("line2\nline3\nline4");
     }
 
@@ -166,7 +161,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 7, 2);
 
-        assertThat(snippet.isPresent()).isTrue();
+        assertThat(snippet).isPresent();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
                 .isEqualTo("line1\nline2\nline3\nline4");
     }
@@ -177,7 +172,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 18, 2);
 
-        assertThat(snippet.isPresent()).isTrue();
+        assertThat(snippet).isPresent();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
                 .isEqualTo("line2\nline3\nline4\nline5");
     }
@@ -188,7 +183,7 @@ public class DocumentUtilitiesTest {
 
         final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 7, 4);
 
-        assertThat(snippet.isPresent()).isTrue();
+        assertThat(snippet).isPresent();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
                 .isEqualTo("line2\nline3\nline4\nline5\nline6");
     }

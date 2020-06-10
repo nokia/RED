@@ -66,7 +66,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
-        assertThat(msg.isPresent()).isFalse();
+        assertThat(msg).isNotPresent();
     }
 
     @Test
@@ -78,8 +78,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
-        assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Name should match with [$@&]{name}");
+        assertThat(msg).hasValue("Name should match with [$@&]{name}");
     }
 
     @Test
@@ -91,8 +90,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
-        assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Name should end with }");
+        assertThat(msg).hasValue("Name should end with }");
     }
 
     @Test
@@ -104,8 +102,7 @@ public class VariableNameRedCellEditorValidatorTest {
         final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
-        assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Name should start with one of [$@&] followed by {");
+        assertThat(msg).hasValue("Name should start with one of [$@&] followed by {");
     }
 
     @Test
@@ -117,7 +114,6 @@ public class VariableNameRedCellEditorValidatorTest {
         final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
-        assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Name should match with [$@&]{name}");
+        assertThat(msg).hasValue("Name should match with [$@&]{name}");
     }
 }

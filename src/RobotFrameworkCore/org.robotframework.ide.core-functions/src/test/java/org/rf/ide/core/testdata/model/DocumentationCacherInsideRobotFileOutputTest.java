@@ -74,7 +74,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset((int) offset);
 
         // then
-        assertThat(docFound.isPresent()).isFalse();
+        assertThat(docFound).isNotPresent();
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset((int) offset);
 
         // then
-        assertThat(docFound.isPresent()).isFalse();
+        assertThat(docFound).isNotPresent();
     }
 
     @Test
@@ -143,10 +143,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final Optional<IDocumentationHolder> docTc2Found = out.findDocumentationForOffset(middleOffset(adapter2));
 
         // then
-        assertThat(docTc1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docTc1Found.get());
-        assertThat(docTc2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docTc2Found.get());
+        assertThat(docTc1Found).hasValue(adapter1);
+        assertThat(docTc2Found).hasValue(adapter2);
     }
 
     @Test
@@ -162,8 +160,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(testTC2Documentation.getEndPosition().getOffset() + 1);
 
         // then
-        assertThat(docTC1Found.isPresent()).isFalse();
-        assertThat(docTC2Found.isPresent()).isFalse();
+        assertThat(docTC1Found).isNotPresent();
+        assertThat(docTC2Found).isNotPresent();
     }
 
     @Test
@@ -187,10 +185,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(testTc2Documentation.getEndPosition().getOffset());
 
         // then
-        assertThat(docTc1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docTc1Found.get());
-        assertThat(docTc2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docTc2Found.get());
+        assertThat(docTc1Found).hasValue(adapter1);
+        assertThat(docTc2Found).hasValue(adapter2);
     }
 
     @Test
@@ -208,10 +204,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(testTc2Documentation.getBeginPosition().getOffset());
 
         // then
-        assertThat(docTc1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docTc1Found.get());
-        assertThat(docTc2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docTc2Found.get());
+        assertThat(docTc1Found).hasValue(adapter1);
+        assertThat(docTc2Found).hasValue(adapter2);
     }
 
     @Test
@@ -227,8 +221,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(testTC2Documentation.getBeginPosition().getOffset() - 1);
 
         // then
-        assertThat(docTC1Found.isPresent()).isFalse();
-        assertThat(docTC2Found.isPresent()).isFalse();
+        assertThat(docTC1Found).isNotPresent();
+        assertThat(docTC2Found).isNotPresent();
     }
 
     @Test
@@ -250,10 +244,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final Optional<IDocumentationHolder> docKw2Found = out.findDocumentationForOffset(middleOffset(adapter2));
 
         // then
-        assertThat(docKw1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docKw1Found.get());
-        assertThat(docKw2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docKw2Found.get());
+        assertThat(docKw1Found).hasValue(adapter1);
+        assertThat(docKw2Found).hasValue(adapter2);
     }
 
     @Test
@@ -275,8 +267,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(keyKw2Documentation.getEndPosition().getOffset() + 1);
 
         // then
-        assertThat(docKw1Found.isPresent()).isFalse();
-        assertThat(docKw2Found.isPresent()).isFalse();
+        assertThat(docKw1Found).isNotPresent();
+        assertThat(docKw2Found).isNotPresent();
     }
 
     @Test
@@ -300,10 +292,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(keyKw2Documentation.getEndPosition().getOffset());
 
         // then
-        assertThat(docKw1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docKw1Found.get());
-        assertThat(docKw2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docKw2Found.get());
+        assertThat(docKw1Found).hasValue(adapter1);
+        assertThat(docKw2Found).hasValue(adapter2);
     }
 
     @Test
@@ -327,10 +317,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(keyKw2Documentation.getBeginPosition().getOffset());
 
         // then
-        assertThat(docKW1Found.isPresent()).isTrue();
-        assertThat(adapter1).isEqualTo(docKW1Found.get());
-        assertThat(docKW2Found.isPresent()).isTrue();
-        assertThat(adapter2).isEqualTo(docKW2Found.get());
+        assertThat(docKW1Found).hasValue(adapter1);
+        assertThat(docKW2Found).hasValue(adapter2);
     }
 
     @Test
@@ -352,8 +340,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(keyKw2Documentation.getBeginPosition().getOffset() - 1);
 
         // then
-        assertThat(docKW1Found.isPresent()).isFalse();
-        assertThat(docKW2Found.isPresent()).isFalse();
+        assertThat(docKW1Found).isNotPresent();
+        assertThat(docKW2Found).isNotPresent();
     }
 
     @Test
@@ -365,8 +353,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset(middleOffset(suiteDocumentation));
 
         // then
-        assertThat(docFound.isPresent()).isTrue();
-        assertThat(suiteDocumentation).isSameAs(docFound.get());
+        assertThat(docFound).containsSame(suiteDocumentation);
     }
 
     @Test
@@ -379,7 +366,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(suiteDocumentation.getEndPosition().getOffset() + 1);
 
         // then
-        assertThat(docFound.isPresent()).isFalse();
+        assertThat(docFound).isNotPresent();
     }
 
     @Test
@@ -392,8 +379,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(suiteDocumentation.getEndPosition().getOffset());
 
         // then
-        assertThat(docFound.isPresent()).isTrue();
-        assertThat(suiteDocumentation).isSameAs(docFound.get());
+        assertThat(docFound).containsSame(suiteDocumentation);
     }
 
     @Test
@@ -406,8 +392,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(suiteDocumentation.getBeginPosition().getOffset());
 
         // then
-        assertThat(docFound.isPresent()).isTrue();
-        assertThat(suiteDocumentation).isSameAs(docFound.get());
+        assertThat(docFound).containsSame(suiteDocumentation);
     }
 
     @Test
@@ -420,7 +405,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
                 .findDocumentationForOffset(suiteDocumentation.getBeginPosition().getOffset() - 1);
 
         // then
-        assertThat(docFound.isPresent()).isFalse();
+        assertThat(docFound).isNotPresent();
     }
 
     private int middleOffset(final IDocumentationHolder holder) {

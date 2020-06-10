@@ -104,6 +104,6 @@ public class SelectionsTest {
         final IStructuredSelection selection = new StructuredSelection(
                 Arrays.asList(Integer.valueOf(7), new String("1"), Long.valueOf(42), new String("2")));
 
-        assertThat(Selections.getOptionalFirstElement(selection, String.class)).isPresent().hasValue("1");
+        assertThat(Selections.getOptionalFirstElement(selection, String.class)).hasValue("1");
     }
 }
