@@ -110,6 +110,44 @@ public class ShellDocumentTest {
     }
 
     @Test
+    public void modeChangeIsDoneProperly_whenDocumentContainsSeveralExpressions() {
+        final ShellDocument doc = new ShellDocument("\n");
+        doc.append("expr1");
+        doc.continueExpressionInNewLine();
+        doc.append("cont1");
+        doc.executeExpression(s -> 1);
+        doc.putEvaluationResult(1, ExpressionType.ROBOT, Optional.of("result1"), Optional.empty());
+        doc.switchTo(ExpressionType.PYTHON, "expr2");
+        doc.continueExpressionInNewLine();
+        doc.append("cont2");
+        doc.continueExpressionInNewLine();
+        doc.append("cont22");
+        doc.continueExpressionInNewLine();
+        doc.append("cont222");
+
+        assertThat(doc.getMode()).isEqualTo(ExpressionType.PYTHON);
+        assertThat(doc.get()).isEqualTo(content(
+                "ROBOT> expr1", "...... cont1", "PASS: result1",
+                "PYTHON> expr2", "....... cont2", "....... cont22", "....... cont222"));
+        assertThat(doc.getModePromptPositionsStream()).containsExactly(promptPosition(0, 7), promptPosition(40, 8));
+
+        doc.switchToMode(ExpressionType.VARIABLE);
+        assertThat(doc.getMode()).isEqualTo(ExpressionType.VARIABLE);
+        assertThat(doc.get()).isEqualTo(content(
+                "ROBOT> expr1", "...... cont1", "PASS: result1",
+                "VARIABLE> expr2", "......... cont2", "......... cont22", "......... cont222"));
+        assertThat(doc.getModePromptPositionsStream()).containsExactly(promptPosition(0, 7), promptPosition(40, 10));
+
+        doc.switchToMode(ExpressionType.ROBOT);
+        assertThat(doc.getMode()).isEqualTo(ExpressionType.ROBOT);
+        assertThat(doc.get()).isEqualTo(content(
+                "ROBOT> expr1", "...... cont1", "PASS: result1",
+                "ROBOT> expr2", "...... cont2", "...... cont22", "...... cont222"));
+        assertThat(doc.getModePromptPositionsStream()).containsExactly(promptPosition(0, 7), promptPosition(40, 7));
+    }
+
+
+    @Test
     public void modeChangeWithNewExpressionIsDoneProperly() {
         final ShellDocument doc = new ShellDocument("\n");
         doc.append("expression");

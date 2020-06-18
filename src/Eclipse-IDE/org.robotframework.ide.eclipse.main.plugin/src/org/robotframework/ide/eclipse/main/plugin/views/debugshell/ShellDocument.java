@@ -242,33 +242,53 @@ class ShellDocument extends Document {
     }
 
     private void switchMode(final ExpressionType newType) {
-        final CategorizedPosition lastModePosition = getModePromptPositionsStream()
+        final CategorizedPosition lastMode = getModePromptPositionsStream()
                 .collect(maxBy(Comparator.comparing(CategorizedPosition::getOffset)))
                 .orElseThrow(IllegalStateException::new);
-        final int modeOffset = lastModePosition.getOffset();
+        final List<CategorizedPosition> lastModeContinuations = getPromptContinuationPositionsStream()
+                .filter(p -> p.getOffset() > lastMode.getOffset())
+                .sorted(Comparator.comparing(CategorizedPosition::getOffset))
+                .collect(toList());
 
-        final int delta = newType.name().length() - type.name().length();
+        final String lastExpression = getLastExpression(lastMode);
+        final String newExpression = createNewExpression(newType, lastMode, lastModeContinuations, lastExpression);
 
-        replace(modeOffset, lastModePosition.getLength(), formatPrompt(newType));
-        extendPositions(modeOffset, delta);
-        shiftPositions(modeOffset, delta);
+        replace(lastMode.getOffset(), lastExpression.length(), newExpression);
 
-        if (delta != 0) {
-            final List<CategorizedPosition> continuations = getPromptContinuationPositionsStream()
-                    .filter(p -> p.getOffset() > modeOffset)
-                    .sorted((p1, p2) -> Integer.compare(p1.getOffset(), p2.getOffset()))
-                    .collect(toList());
-
-            while (!continuations.isEmpty()) {
-                final CategorizedPosition p = continuations.remove(0);
-
-                replace(p.getOffset(), p.getLength(), formatContinuation(newType));
-                extendPositions(p.getOffset(), delta);
-                shiftPositions(p.getOffset(), delta);
-            }
-        }
+        Stream.concat(Stream.of(lastMode), lastModeContinuations.stream())
+                .map(CategorizedPosition::getOffset)
+                .forEach(offset -> {
+                    final int delta = newType.name().length() - type.name().length();
+                    extendPositions(offset, delta);
+                    shiftPositions(offset, delta);
+                });
 
         this.type = newType;
+    }
+
+    private String getLastExpression(final CategorizedPosition lastMode) {
+        try {
+            return get(lastMode.getOffset(), getLength() - lastMode.getOffset());
+        } catch (final BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private String createNewExpression(final ExpressionType newType, final CategorizedPosition lastMode,
+            final List<CategorizedPosition> lastModeContinuations, final String lastExpression) {
+        final StringBuilder newExpression = new StringBuilder();
+        newExpression.append(formatPrompt(newType));
+        int beginIndex = lastMode.getLength();
+        int endIndex;
+        for (final CategorizedPosition categorizedPosition : lastModeContinuations) {
+            endIndex = categorizedPosition.getOffset() - lastMode.getOffset();
+            newExpression.append(lastExpression.substring(beginIndex, endIndex));
+            newExpression.append(formatContinuation(newType));
+            beginIndex = endIndex + categorizedPosition.getLength();
+        }
+        endIndex = lastExpression.length();
+        newExpression.append(lastExpression.substring(beginIndex, endIndex));
+        return newExpression.toString();
     }
 
     void switchToPreviousExpression() {
