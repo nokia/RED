@@ -18,16 +18,20 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.jupiter.Project;
 import org.robotframework.red.junit.jupiter.ProjectExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(ProjectExtension.class)
 public class HyperlinksToFilesDetectorTest {
 
-    @Project(dirs = { "directory" }, files = { "file.robot", "unhandled.txt", "directory/file.robot" })
+    @Project(dirs = { "directory" }, files = { "file.robot", "lib.py", "unhandled.txt", "directory/file.robot" })
     static IProject project;
 
     @Test
@@ -83,6 +87,43 @@ public class HyperlinksToFilesDetectorTest {
         final List<IHyperlink> hyperlinks1 = detector.detectHyperlinks(robotFile, new Region(50, 10), relPath, false);
         assertThat(hyperlinks1).hasSize(1).allMatch(FileHyperlink.class::isInstance);
         final List<IHyperlink> hyperlinks2 = detector.detectHyperlinks(robotFile, new Region(50, 10), absPath, false);
+        assertThat(hyperlinks2).hasSize(1).allMatch(FileHyperlink.class::isInstance);
+    }
+
+    @Test
+    public void fileHyperlinkIsProvided_whenPathIsParameterized() {
+        final RobotSuiteFile robotFile = new RobotModel().createSuiteFile(getFile(project, "file.robot"));
+        final RobotProject robotProject = robotFile.getRobotProject();
+        robotProject.setRobotProjectConfig(new RobotProjectConfig());
+        robotProject
+                .getRobotProjectHolder()
+                .setVariableMappings(ImmutableMap.of("${varname}", "file", "${varpath}", "file.robot"));
+
+        final HyperlinksToFilesDetector detector = createDetector();
+
+        final List<IHyperlink> hyperlinks1 = detector.detectHyperlinks(robotFile, new Region(50, 10),
+                "${varName}.robot", false);
+        assertThat(hyperlinks1).hasSize(1).allMatch(FileHyperlink.class::isInstance);
+        final List<IHyperlink> hyperlinks2 = detector.detectHyperlinks(robotFile, new Region(50, 10),
+                "${varPath}", false);
+        assertThat(hyperlinks2).hasSize(1).allMatch(FileHyperlink.class::isInstance);
+    }
+
+    @Test
+    public void fileHyperlinkIsProvided_whenPathIsParameterizedInLibraryImport() {
+        final RobotSuiteFile robotFile = new RobotModel().createSuiteFile(getFile(project, "file.robot"));
+        final RobotProject robotProject = robotFile.getRobotProject();
+        robotProject.setRobotProjectConfig(new RobotProjectConfig());
+        robotProject.getRobotProjectHolder()
+                .setVariableMappings(ImmutableMap.of("${libname}", "lib", "${libpath}", "lib.py"));
+
+        final HyperlinksToFilesDetector detector = createDetector();
+
+        final List<IHyperlink> hyperlinks1 = detector.detectHyperlinks(robotFile, new Region(50, 10),
+                "${libName}.py", true);
+        assertThat(hyperlinks1).hasSize(1).allMatch(FileHyperlink.class::isInstance);
+        final List<IHyperlink> hyperlinks2 = detector.detectHyperlinks(robotFile, new Region(50, 10), "${libPath}",
+                true);
         assertThat(hyperlinks2).hasSize(1).allMatch(FileHyperlink.class::isInstance);
     }
 

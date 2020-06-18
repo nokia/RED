@@ -20,6 +20,7 @@ import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProjectPathsProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
@@ -27,14 +28,23 @@ abstract class HyperlinksToFilesDetector {
 
     protected final List<IHyperlink> detectHyperlinks(final RobotSuiteFile suiteFile, final IRegion fromRegion,
             final String pathAsString, final boolean isLibraryImport) {
+        final RobotProject project = suiteFile.getRobotProject();
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
-        final String normalizedPath = RobotExpressions.unescapeSpaces(pathAsString);
-        if (isLibraryImport && !isPath(normalizedPath)) {
-            return hyperlinks;
+        String normalizedPath = RobotExpressions.unescapeSpaces(pathAsString);
+        if (isLibraryImport) {
+            final String resolvedLib = RobotExpressions.resolve(project.getRobotProjectHolder().getVariableMappings(),
+                    normalizedPath);
+            if (isPath(resolvedLib)) {
+                normalizedPath = resolvedLib;
+            } else {
+                // it's by-name library import
+                return hyperlinks;
+            }
         }
 
-        final Optional<URI> absoluteUri = new RobotProjectPathsProvider(suiteFile.getRobotProject())
+        final RobotProjectPathsProvider projectPathsProvider = new RobotProjectPathsProvider(project);
+        final Optional<URI> absoluteUri = projectPathsProvider
                 .tryToFindAbsoluteUri(suiteFile.getFile(), ImportPath.from(normalizedPath));
         if (!absoluteUri.isPresent()) {
             return hyperlinks;
