@@ -1587,16 +1587,6 @@
           id="org.robotframework.red.toggleCommentInTable"
           name="Toggle Comment In Table">
     </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.zoomInText"
-          name="Zoom In">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.zoomOutText"
-          name="Zoom Out">
-    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -2070,26 +2060,7 @@
      <handler
            class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ShowRfLintDocHandler"
            commandId="org.robotframework.red.showRfLintRuleDoc">
-     </handler>
-     <handler
-           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ZoomInTextHandler"
-           commandId="org.robotframework.red.zoomInText">
-        <activeWhen>
-           <reference
-                 definitionId="org.robotframework.sourcePartIsActive">
-           </reference>
-        </activeWhen>
-     </handler>
-     <handler
-           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ZoomOutTextHandler"
-           commandId="org.robotframework.red.zoomOutText">
-        <activeWhen>
-           <reference
-                 definitionId="org.robotframework.sourcePartIsActive">
-           </reference>
-        </activeWhen>
-     </handler>
-	
+     </handler>	
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -3962,18 +3933,6 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+/">
-    </key>
-    <key
-          commandId="org.robotframework.red.zoomInText"
-          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
-          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+=">
-    </key>
-    <key
-          commandId="org.robotframework.red.zoomOutText"
-          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
-          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+-">
     </key>
     <key
           commandId="org.robotframework.red.view.debug.switchShellMode"
