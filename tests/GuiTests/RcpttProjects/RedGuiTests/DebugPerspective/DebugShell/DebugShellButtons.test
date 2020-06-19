@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-CA7oBqWEeq6f9_VBibLOg
-Runtime-Version: 2.4.3.201909171500
-Save-Time: 3/2/20 4:29 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 6/19/20 12:26 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -306,5 +306,39 @@ exec-with-options -disableJobWaiting -command {
 	        + "PYTHON>" | verify-true
 	}        
 }
+
+with [get-view "Debug Shell"] {
+    get-button Clear | click
+    get-text-viewer | set-caret-pos 1 9
+    get-button "Robot keywords" | click
+    get-text-viewer | set-caret-pos 1 8
+}
+
+exec-with-options -disableJobWaiting -command {
+	//run test again
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	// type log and press Shift+Enter
+	with [get-view "Debug Shell"] {
+	    with [get-text-viewer] {
+	        set-caret-pos 1 8
+	        type-text log
+	        key-type "M2+CR"
+	    }
+	    // switch to variables mode - here wa error RED-1418
+	    get-button "Robot variables" | click
+	}
+	// check text
+	get-view "Debug Shell" | get-text-viewer | get-property text | equals "VARIABLE> log\n"
+	    + "........." | verify-true
+
+	// Clear view - here is error RED-1436
+	with [get-view "Debug Shell"] {
+	    get-button Clear | click
+	}
+	get-button "Terminate (M1+F2)" | click    
+}	
+    
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
