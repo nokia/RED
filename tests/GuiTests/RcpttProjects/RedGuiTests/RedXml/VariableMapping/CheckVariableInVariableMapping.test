@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 5/28/20 2:30 PM
+Save-Time: 6/19/20 2:50 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -32,7 +32,9 @@ get-menu "Project/Clean..." | click
 get-window Clean | get-button $OK_Clean_button | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
-//----------------- Resources ----------------------------
+
+//----------------- Resources -------------------------------------------------------------------------------
+
 // modify resource path to include variable ${path}
 with [get-editor "TestSuite.robot" | get-text-viewer] {
     set-caret-pos 7 25
@@ -178,7 +180,8 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Ending test: ProjectWithResource.TestSuite.Test" | verify-true
     
     
-//----------------- Variables ----------------------------
+//----------------- Variables ---------------------------------------------------------------------------------
+
 // add second variable file and rename it
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/external_var" | get-menu "New/Folder" | click
 with [get-window "New Folder"] {
@@ -242,7 +245,10 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
 }
 // verify if no Problems
 wait-for-zero-items -times 6 -delay 500
-// ------------------------- Libraries ----------------
+
+
+// ------------------------- Libraries -----------------------------------------------------------
+
 // add second lib file and rename it
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/external_lib" | get-menu "New/Folder" | click
 with [get-window "New Folder"] {
@@ -336,7 +342,7 @@ with [get-window "Select library class"] {
     get-table | select "calculator_2"
     get-button OK | click
 }
-get-editor "ProjectWithResource/red.xml" | key-type "M1+s" | close
+get-editor "ProjectWithResource/red.xml" | key-type "M1+s"
 
 with [get-editor "TestSuite.robot"] {
     get-text-viewer | key-type "M1+s"
@@ -344,5 +350,53 @@ with [get-editor "TestSuite.robot"] {
 }
 // verify if no Problems
 wait-for-zero-items -times 4 -delay 500
+
+// RED-1015 - error when Library path is in parameter
+
+// remove ${path} variable
+with [get-editor "ProjectWithResource/red.xml"] {
+    get-tab-folder | get-tab-item Variables | click
+    with [get-section "Variable mappings" | get-table] {
+        get-cell 0 0 | click
+        key-type Del
+    }
+}
+get-button "Save (M1+S)" | click
+
+// remove part of path - only paramter left
+with [get-editor "TestSuite.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 6 39
+        select-range 6 40 6 19
+        key-type BackSpace
+        key-type "M1+s"
+    }
+}
+
+// check that now are errors:
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(2 items\\)/'${path}' contains unresolved import parameters.  Use Variable mappings in red.xml for parameter resolution" 
+    | get-property index | equals 1 | verify-true
+    
+// use QF to add variable    
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 6 15
+    key-type "M1+1"
+}
+
+// add ${path}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Define '${path}' variable" 
+    | click -default
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Value] | type-text "external_lib/CalculatorLibrary.py"
+    get-button OK | click
+}
+get-button "Save All (M1+M2+S)" | click
+
+//check if is now olny one error
+get-view Problems | get-tree | get-item 
+    -path "Errors \\(1 item\\)/'${path_second}\\/calculator_2.py' contains unresolved import parameters.  Use Variable mappings in red.xml for parameter resolution" 
+    | get-property index | equals 0 | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
