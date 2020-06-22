@@ -211,10 +211,12 @@ public class SuiteSourceEditor extends TextEditor {
             final int columnNumber = caretPosition - document.getLineOffset(lineNumber) + 1;
             lineNumber++;
 
-            final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
-                    .getStatusLineManager()
-                    .find(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
-            find.setText(lineNumber + ":" + columnNumber);
+            IContributionItem find = getEditorSite().getActionBars()
+                .getStatusLineManager()
+                .find(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+            if (find instanceof StatusLineContributionItem) {
+                find.setText(lineNumber + ":" + columnNumber);
+            }
         } catch (final BadLocationException e) {
             RedPlugin.logError("Unable to get position in source editor in order to update status bar", e);
         }
@@ -223,11 +225,13 @@ public class SuiteSourceEditor extends TextEditor {
     private void updateLineDelimitersStatus() {
         final IDocument document = getDocument();
 
-        final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+        IContributionItem find = getEditorSite().getActionBars()
                 .getStatusLineManager()
-                .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
-        final String delimiter = DocumentUtilities.getDelimiter(document);
-        find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
+                .find(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+        if (find instanceof StatusLineContributionItem) {
+            final String delimiter = DocumentUtilities.getDelimiter(document);
+            find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
+        }
     }
 
     private void installBreakpointTogglingOnDoubleClick() {
