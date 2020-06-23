@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.LocalSetting;
@@ -82,8 +83,13 @@ class KeywordValidator implements ModelUnitValidator {
         final RobotToken keywordName = keyword.getName();
         final String name = keywordName.getText();
         if ("...".equals(name.trim())) {
-            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION)
-                    .formatMessageWith(name);
+            KeywordsProblem cause;
+            if (validationContext.getVersion().isNewerOrEqualTo(new RobotVersion(3, 2))) {
+                cause = KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION_3_2;
+            } else {
+                cause = KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION_PRE_3_2;
+            }
+            final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(name);
             final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
             reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
         } else if (name.contains(".")) {

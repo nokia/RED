@@ -97,10 +97,11 @@ public class TestCaseValidatorTest {
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
+        final RobotVersion version = RobotVersion.from("3.1.2");
+        final FileValidationContext context = prepareContext(accessibleKws, version);
 
         final Collection<Problem> problems = validate(context, fileModel);
-        assertThat(problems).containsOnly(new Problem(TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION,
+        assertThat(problems).containsOnly(new Problem(TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION_PRE_3_2,
                 new ProblemPosition(2, Range.closed(19, 22))));
     }
 

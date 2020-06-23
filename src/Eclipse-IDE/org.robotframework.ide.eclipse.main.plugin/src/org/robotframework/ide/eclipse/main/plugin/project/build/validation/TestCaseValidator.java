@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
@@ -74,8 +75,13 @@ class TestCaseValidator implements ModelUnitValidator {
         final RobotToken caseName = testCase.getName();
         final String name = caseName.getText();
         if ("...".equals(name.trim())) {
-            final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION)
-                    .formatMessageWith(name);
+            TestCasesProblem cause;
+            if (validationContext.getVersion().isNewerOrEqualTo(new RobotVersion(3, 2))) {
+                cause = TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION_3_2;
+            } else {
+                cause = TestCasesProblem.TEST_CASE_NAME_IS_LINE_CONTINUATION_PRE_3_2;
+            }
+            final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(name);
             final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
             reporter.handleProblem(problem, validationContext.getFile(), caseName, arguments);
         }

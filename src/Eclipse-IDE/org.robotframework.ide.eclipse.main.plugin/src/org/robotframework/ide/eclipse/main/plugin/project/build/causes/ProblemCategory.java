@@ -165,10 +165,20 @@ public enum ProblemCategory {
             ProblemCategoryType.CODE_STYLE,
             "Variables are used in called keyword names",
             "Occurs when variables are used in name of called keyword."),
-    DEFINITION_NAME_IS_LINE_CONTINUATION(
+    DEFINITION_NAME_IS_LINE_CONTINUATION_PRE_3_2(
             ProblemCategoryType.CODE_STYLE,
             "Line continuation as definition name",
             "Occurs when keyword, task or test case name is line continuation. It may be confused with line continuation and is deprecated since RF 3.1.2."),
+    DEFINITION_NAME_IS_LINE_CONTINUATION_3_2(
+            ProblemCategoryType.CODE_STYLE,
+            "Line continuation as definition name",
+            "Occurs when keyword, task or test case name is line continuation. It may be confused with line continuation and is removed since RF 3.2.") {
+
+        @Override
+        public Severity getDefaultSeverity() {
+            return Severity.ERROR;
+        }
+    },
     ARGUMENT_IN_MULTIPLE_CELLS(
             ProblemCategoryType.CODE_STYLE,
             "Template keyword written in multiple cells",

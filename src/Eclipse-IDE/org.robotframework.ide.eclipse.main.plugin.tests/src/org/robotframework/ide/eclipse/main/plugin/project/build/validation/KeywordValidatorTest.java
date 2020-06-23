@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.jupiter.api.Test;
+import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -133,10 +134,11 @@ public class KeywordValidatorTest {
                 .build();
 
         final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/res.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws);
+        final RobotVersion version = RobotVersion.from("3.1.2");
+        final FileValidationContext context = prepareContext(accessibleKws, version);
 
         final Collection<Problem> problems = validate(context, fileModel);
-        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION,
+        assertThat(problems).containsOnly(new Problem(KeywordsProblem.KEYWORD_NAME_IS_LINE_CONTINUATION_PRE_3_2,
                 new ProblemPosition(2, Range.closed(17, 20))));
     }
 

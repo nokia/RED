@@ -53,16 +53,28 @@ public enum TestCasesProblem implements IProblemCause {
             return "Test case name cannot be empty";
         }
     },
-    TEST_CASE_NAME_IS_LINE_CONTINUATION {
+    TEST_CASE_NAME_IS_LINE_CONTINUATION_PRE_3_2 {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DEFINITION_NAME_IS_LINE_CONTINUATION;
+            return ProblemCategory.DEFINITION_NAME_IS_LINE_CONTINUATION_PRE_3_2;
         }
 
         @Override
         public String getProblemDescription() {
             return "Definition name '...' is considered confusing and deprecated since RobotFramework 3.1.2";
+        }
+    },
+    TEST_CASE_NAME_IS_LINE_CONTINUATION_3_2 {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEFINITION_NAME_IS_LINE_CONTINUATION_3_2;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Definition name '...' is considered confusing and removed since RobotFramework 3.2";
         }
     },
     EMPTY_CASE {
