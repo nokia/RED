@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/20/20 2:06 PM
+Save-Time: 6/23/20 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,11 +29,11 @@ get-view Problems | get-tree | get-item -path "Errors \\(3 items\\)" | get-prope
 	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[0].getText()" 
 	        | equals "No suite documentation (RequireSuiteDocumentation)" | verify-true
 
-	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[1].getText()" 
 	        | equals "The keyword 'abc' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
 	        | verify-true
 	        
-	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	    get-item -path "Warnings \\(3 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "The keyword 'ABC' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
 	        | verify-true
 	}
@@ -57,7 +57,7 @@ set-list-with-markers-and-comapare -file "test1.robot" -table "Test Cases"  -ref
 
 get-editor "test1.robot" | get-tab-folder | get-tab-item "Keywords" | click
 set-list-with-markers-and-comapare -file "test1.robot" -table "User Keywords"  -ref_list [list 1 7] -type "ERROR"
-set-list-with-markers-and-comapare -file "test1.robot" -table "User Keywords"  -ref_list [list 4] -type "WARNING"
+set-list-with-markers-and-comapare -file "test1.robot" -table "User Keywords"  -ref_list [list 4 5] -type "WARNING"
 get-editor "test1.robot" | close
 
     
@@ -77,26 +77,27 @@ with [get-view Problems | get-tree] {
         | equals "Test case 'test 1' contains no keywords to execute" | verify-true
 }
 with [get-view Problems | get-tree] {
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Line has trailing whitespace (TrailingWhitespace)" | verify-true
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Line has trailing whitespace (TrailingWhitespace)" | verify-true
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[2].getText()" 
         | equals "Line is too long (exceeds 100 characters) (LineTooLong)" | verify-true
-        
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "No suite documentation (RequireSuiteDocumentation)" | verify-true
-        
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[4].getText()" 
         | equals "No suite documentation (RequireSuiteDocumentation)" | verify-true
-        
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[5].getText()" 
         | equals "The keyword 'abc' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[6].getText()" 
         | equals "The keyword 'ABC' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[7].getText()" 
         | equals "Too few steps (0) in test case (TooFewTestSteps)" | verify-true
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[8].getText()" 
         | equals "Too few steps (1) in keyword (TooFewKeywordSteps)" | verify-true
-    get-item -path "Warnings \\(8 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+    get-item -path "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[9].getText()" 
         | equals "Too few steps (1) in keyword (TooFewKeywordSteps)" | verify-true
 }
 
@@ -117,16 +118,16 @@ with [get-view Problems | get-tree] {
 
 //check line, type, file name for one warning
 with [get-view Problems | get-tree] {
-    get-item -path "Warnings \\(9 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+    get-item -path "Warnings \\(10 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property "values['Description']" | equals "Line is too long (exceeds 100 characters) (LineTooLong)" 
         | verify-true
-    get-item -path "Warnings \\(9 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+    get-item -path "Warnings \\(10 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property "values['Resource']" | equals "test1.robot" | verify-true
-    get-item -path "Warnings \\(9 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+    get-item -path "Warnings \\(10 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property "values['Path']" | equals "/project_a/a1/a2" | verify-true
-    get-item -path "Warnings \\(9 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+    get-item -path "Warnings \\(10 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property "values['Location']" | equals "line 11" | verify-true
-    get-item -path "Warnings \\(9 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
+    get-item -path "Warnings \\(10 items\\)/Line is too long \\(exceeds 100 characters\\) \\(LineTooLong\\)" 
         | get-property "values['Type']" | equals "RfLint Problem" | verify-true
 }
 
@@ -139,25 +140,35 @@ check-warnings-for-one-test
 //open preference 
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings/RfLint validation"
+get-window Preferences | maximize
 
 //check how view looks like
-
 with [get-window Preferences | get-tree 
     -after [get-link $link]] {
-    get-property itemCount | equals 5 | verify-true
+    get-property itemCount | equals 7 | verify-true
     
     // 4 built-in files with rules
     get-property "getItems().TreeItem[0].getText()" 
-        | equals [format ".*rflint\\%srules\%skeywordRules.py \\(built-in\\)" $sys_sep $sys_sep]| verify-true
+        | equals [format ".*rflint\\%srules\%sduplicates.py \\(built-in\\)" $sys_sep $sys_sep]| verify-true
+        
     get-property "getItems().TreeItem[1].getText()" 
-        | equals [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)" $sys_sep $sys_sep] | verify-true
+        | equals [format ".*rflint\\%srules\%skeywordRules.py \\(built-in\\)" $sys_sep $sys_sep]| verify-true
+        
     get-property "getItems().TreeItem[2].getText()" 
-        | equals [format ".*rflint\\%srules\\%ssuiteRules.py \\(built-in\\)" $sys_sep $sys_sep] | verify-true
+        | equals [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)" $sys_sep $sys_sep] | verify-true
+       
     get-property "getItems().TreeItem[3].getText()" 
+        | equals [format ".*rflint\\%srules\\%sresourceRules.py \\(built-in\\)" $sys_sep $sys_sep] | verify-true
+            
+    get-property "getItems().TreeItem[4].getText()" 
+        | equals [format ".*rflint\\%srules\\%ssuiteRules.py \\(built-in\\)" $sys_sep $sys_sep] | verify-true
+        
+    get-property "getItems().TreeItem[5].getText()" 
         | equals [format  ".*rflint\\%srules\\%stestcaseRules.py \\(built-in\\)" $sys_sep $sys_sep]| verify-true
 
+        
     //button    
-    get-property "getItems().TreeItem[4].getText()" | equals "...add new rules file" | verify-true
+    get-property "getItems().TreeItem[6].getText()" | equals "...add new rules file" | verify-true
 }
 
 with [get-window Preferences | get-tree 
@@ -199,13 +210,15 @@ with [get-window Preferences | get-tree
 with [get-window Preferences | get-tree 
     -after [get-link $link]] {
     get-item -path [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)"  $sys_sep $sys_sep]
-        | get-property childCount | equals 3 | verify-true
+        | get-property childCount | equals 4 | verify-true
     get-item -path [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)"  $sys_sep $sys_sep]
         | get-property "getItems().TreeItem[0].getText()" | equals FileTooLong | verify-true
     get-item -path [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)"  $sys_sep $sys_sep]
         | get-property "getItems().TreeItem[1].getText()" | equals LineTooLong | verify-true
     get-item -path [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)"  $sys_sep $sys_sep]
         | get-property "getItems().TreeItem[2].getText()" | equals TrailingBlankLines | verify-true
+    get-item -path [format ".*rflint\\%srules\\%sotherRules.py \\(built-in\\)"  $sys_sep $sys_sep]
+        | get-property "getItems().TreeItem[3].getText()" | equals TrailingWhitespace | verify-true    
 }
 
 
@@ -300,15 +313,15 @@ with [get-window Preferences] {
     }
     
     //field for Additional arguments 
-    with [get-control Any 
-        -after [get-link $link] 
-        -index 28] {
-        get-property "getChildren().length" | equals 3 | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Additional arguments for RfLint" | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "" | verify-true
-        get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
-    }
+   with [get-window Preferences | get-control Any 
+	    -after [get-link $link] 
+	    -index 31] {
+	    get-property "getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[0].getText()" | equals "Additional arguments for RfLint" | verify-true
+	    get-property "getChildren().Control[1].getText()" | equals "" | verify-true
+	    get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[2].getText()" | equals "Variables..." | verify-true
+	}
     get-button "Restore Defaults" | get-property enablement | equals true | verify-true
     get-button Apply | get-property enablement | equals true | verify-true
 }
@@ -351,32 +364,32 @@ with [get-view Problems | get-tree] {
     get-item -path "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
     
     //here is new warning
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[13].getText()" 
         | equals "Line is too long (exceeds 80 characters) (LineTooLong)" | verify-true
         
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[14].getText()" 
         | equals "No suite documentation (RequireSuiteDocumentation)" | verify-true
         
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[15].getText()" 
         | equals "No suite documentation (RequireSuiteDocumentation)" | verify-true
 
     	    
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[16].getText()" 
         | equals "The keyword 'abc' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[17].getText()" 
         | equals "The keyword 'ABC' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[18].getText()" 
         | equals "Too few steps (0) in test case (TooFewTestSteps)" | verify-true
         
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[19].getText()" 
         | equals "Too few steps (1) in keyword (TooFewKeywordSteps)" | verify-true
         
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[20].getText()" 
         | equals "Too few steps (1) in keyword (TooFewKeywordSteps)" | verify-true
         
-    get-item -path "Warnings \\(9 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+    get-item -path "Warnings \\(22 items\\)" | get-property "getItems().TreeItem[21].getText()" 
         | equals "Too many trailing blank lines (TrailingBlankLines)" | verify-true
 }
 
@@ -385,11 +398,12 @@ get-view "Project Explorer" | get-tree | select "project_a" | get-menu -path "Ro
     | click
 with [get-view Problems | get-tree] {
     get-item -path "Errors \\(3 items\\)" | get-property childCount | equals 3 | verify-true
-    get-item -path "Warnings \\(3 items\\)" | get-property childCount | equals 3 | verify-true
+    get-item -path "Warnings \\(2 items\\)" | get-property childCount | equals 2 | verify-true
 }
 
 //add cutom rule form python file
 get-preferences-menu | click
+get-window Preferences | maximize
 set-dialog-result File "platform:/resource/project_a/customRules.py"
 get-window Preferences |  get-tree  -after [get-link $link]	| get-item "...add new rules file" | double-click
 get-window Preferences | get-button "Apply and Close" | click
@@ -399,21 +413,22 @@ get-view "Project Explorer" | get-tree | select "project_a/test3.robot" | get-me
     -path "Robot Framework/Run RfLint analysis" | click
     
 with [get-view Problems | get-tree] {
-    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Warnings \\(15 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Line 5 should be empty (CustomRule)" | verify-true
         
-    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Warnings \\(15 items\\)" | get-property "getItems().TreeItem[12].getText()" 
         | equals "The keyword 'abc' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item -path "Warnings \\(15 items\\)" | get-property "getItems().TreeItem[13].getText()" 
         | equals "The keyword 'ABC' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-item -path "Warnings \\(15 items\\)" | get-property "getItems().TreeItem[14].getText()" 
         | equals "Too many trailing blank lines (TrailingBlankLines)" | verify-true
 }
 
 //change new rule to error 
 get-preferences-menu | click
+get-window Preferences | maximize
 with [get-window Preferences] {
     with [get-tree 
         -after [get-link $link]] {
@@ -452,7 +467,7 @@ with [get-window Preferences | get-tree
     -after [get-link $link]] {
     select [format ".*rflint\\%srules\\%skeywordRules.py \\(built-in\\)" $sys_sep $sys_sep]| get-item 
         -path [format ".*rflint\\%srules\\%skeywordRules.py \\(built-in\\)" $sys_sep $sys_sep]| expand
-    get-cell 1 0 | click
+    get-cell 2 0 | click
 }
 
 
@@ -463,7 +478,7 @@ get-window Preferences | get-canvas | get-property text
 //check doc with link - TooManyTestSteps
 with [get-window Preferences | get-tree -after [get-link $link]] {
     get-item -path [format ".*rflint\\%srules\\%stestcaseRules.py \\(built-in\\)"  $sys_sep $sys_sep]| expand
-    get-cell 10 0 | click
+    get-cell 12 0 | click
 }
 get-window Preferences | get-canvas | get-property text 
     | equals ".*[/\\\\]site-packages[/\\\\]rflint[/\\\\]rules[/\\\\]testcaseRules.py\r\n"
@@ -490,18 +505,18 @@ with [get-view Problems | get-tree] {
         | equals "Test case 'test 1' contains no keywords to execute" | verify-true
         
     //warnings    
-    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Warnings \\(16 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Line 3 should be empty (CustomRule)" | verify-true
-    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Warnings \\(16 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Line 5 should be empty (CustomRule)" | verify-true
 
-    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+    get-item -path "Warnings \\(16 items\\)" | get-property "getItems().TreeItem[13].getText()" 
         | equals "The keyword 'abc' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+    get-item -path "Warnings \\(16 items\\)" | get-property "getItems().TreeItem[14].getText()" 
         | equals "The keyword 'ABC' is masking the keyword 'a b c' defined in res1. Use 'res1.a b c' in this suite file if the latter is desired" 
         | verify-true
-    get-item -path "Warnings \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    get-item -path "Warnings \\(16 items\\)" | get-property "getItems().TreeItem[15].getText()" 
         | equals "Too many trailing blank lines (TrailingBlankLines)" | verify-true
 }
 
@@ -513,8 +528,8 @@ get-view Problems | get-tree | select "Errors \\(4 items\\)/'.' in testcase name
 get-editor "test4.robot" | get-text-viewer | get-property "getSelectionText()" | equals "dot.here" | verify-true
 
 //check new warning
-get-view Problems | get-tree | select "Warnings (6 items)/Line 3 should be empty (CustomRule)" 
-    | select "Warnings \\(6 items\\)/Line 3 should be empty \\(CustomRule\\)" | double-click
+get-view Problems | get-tree | select "Warnings (16 items)/Line 3 should be empty (CustomRule)" 
+    | select "Warnings \\(16 items\\)/Line 3 should be empty \\(CustomRule\\)" | double-click
 get-editor "test4.robot" | get-text-viewer | get-property "getSelectionText()" | equals "*** Test Cases ***" | verify-true
 
 
