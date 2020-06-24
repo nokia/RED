@@ -109,6 +109,18 @@
 				<target-file-name>2020-03.target</target-file-name>
 			</properties>
 		</profile>
+		<profile>
+			<id>2020-06-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>2020-06</value>
+				</property>
+			</activation>
+			<properties>
+				<target-file-name>2020-06.target</target-file-name>
+			</properties>
+		</profile>
 	</profiles>
 
 	<build>
