@@ -5,8 +5,7 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oqiBUMD5EeWqU8ILayOzQw
-Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/17/20 2:11 PM
+Save-Time: 6/25/20 4:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -251,11 +250,12 @@ if [$robot_version | matches "^Robot Framework 3\.2.*"] {
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[5].getText()" 
 	        | equals "Unknown 'Document' setting" | verify-true
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[6].getText()" 
-	        | equals "Unknown 'Meta: Name' setting" | verify-true
+	        | equals "Unknown 'Meta:' setting" | verify-true    
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[7].getText()" 
 	        | equals "Unknown 'Meta: Name' setting" | verify-true
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[8].getText()" 
-	        | equals "Unknown 'Meta:' setting" | verify-true
+	        | equals "Unknown 'Meta: Name' setting" | verify-true
+	    
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[9].getText()" 
 	        | equals "Unknown 'Suite Postcondition' setting" | verify-true
 	    get-item -path "Errors \\(20 items\\)" | get-property "getItems().TreeItem[10].getText()" 
