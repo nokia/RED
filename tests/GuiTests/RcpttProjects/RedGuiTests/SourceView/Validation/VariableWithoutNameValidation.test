@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8jBzcM9ZEeeN95nQK08lmg
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/27/20 1:06 PM
+Save-Time: 6/29/20 12:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,9 +33,10 @@ with [get-view Problems | get-tree] {
     get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Variable '@{}=' is declared without name" | verify-true
     get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "Variable '&{}' is declared without name" | verify-true
-    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "Variable '${}=' is declared without name" | verify-true
+    get-item -path "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Variable '&{}' is declared without name" | verify-true
+    
 }
 // uncomment two lines
 with [get-editor "TestFile.robot"] {
