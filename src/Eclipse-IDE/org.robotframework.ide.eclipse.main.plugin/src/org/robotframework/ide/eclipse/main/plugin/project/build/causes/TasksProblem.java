@@ -70,7 +70,7 @@ public enum TasksProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Definition name '...' is considered confusing and removed since RobotFramework 3.2";
+            return "Definition name '...' is removed since RobotFramework 3.2";
         }
     },
     EMPTY_TASK {
