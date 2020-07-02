@@ -105,14 +105,12 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
             final Integer portAsInt = Ints.tryParse(port);
             if (portAsInt == null || !Range
                     .closed(AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT)
-                    .contains(portAsInt)) {
-                throw newCoreException(String.format("Server port '%s' must be an Integer between %,d and %,d", port,
+                    .contains(portAsInt) && portAsInt != 0) {
+                throw newCoreException(String.format(
+                        "Server port '%s' must be an Integer between %,d and %,d or 0 for dynamic allocation", port,
                         AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT));
             }
-            if (portAsInt < 0) {
-                throw newCoreException("Unable to find free port");
-            }
-            return portAsInt;
+            return portAsInt == 0 ? AgentConnectionServer.findFreePort() : portAsInt;
         }
         return AgentConnectionServer.findFreePort();
     }
@@ -186,7 +184,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        setUsingRemoteAgent(false);
+        setUsingRemoteAgent(preferences.isAgentConnectionCustomized());
         setAgentConnectionHostValue(preferences.getLaunchAgentConnectionHost());
         setAgentConnectionPortValue(preferences.getLaunchAgentConnectionPort());
         setAgentConnectionTimeoutValue(preferences.getLaunchAgentConnectionTimeout());

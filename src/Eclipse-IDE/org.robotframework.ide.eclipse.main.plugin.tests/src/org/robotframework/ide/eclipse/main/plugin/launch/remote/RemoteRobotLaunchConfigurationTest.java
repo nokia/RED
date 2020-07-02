@@ -105,7 +105,7 @@ public class RemoteRobotLaunchConfigurationTest {
         robotConfig.setAgentConnectionPortValue("");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
-                .withMessage("Server port '' must be an Integer between 1 and %,d", 65_535)
+                .withMessage("Server port '' must be an Integer between 1 and %,d or 0 for dynamic allocation", 65_535)
                 .withNoCause();
     }
 
@@ -115,17 +115,19 @@ public class RemoteRobotLaunchConfigurationTest {
         robotConfig.setAgentConnectionPortValue("abc");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
-                .withMessage("Server port 'abc' must be an Integer between 1 and %,d", 65_535)
+                .withMessage("Server port 'abc' must be an Integer between 1 and %,d or 0 for dynamic allocation",
+                        65_535)
                 .withNoCause();
     }
 
     @Test
     public void whenPortIsBelowRange_coreExceptionIsThrown() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        robotConfig.setAgentConnectionPortValue("0");
+        robotConfig.setAgentConnectionPortValue("-1");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
-                .withMessage("Server port '0' must be an Integer between 1 and %,d", 65_535)
+                .withMessage("Server port '-1' must be an Integer between 1 and %,d or 0 for dynamic allocation",
+                        65_535)
                 .withNoCause();
     }
 
@@ -135,7 +137,8 @@ public class RemoteRobotLaunchConfigurationTest {
         robotConfig.setAgentConnectionPortValue("65536");
 
         assertThatExceptionOfType(CoreException.class).isThrownBy(robotConfig::getAgentConnectionPort)
-                .withMessage("Server port '65536' must be an Integer between 1 and %,d", 65_535)
+                .withMessage("Server port '65536' must be an Integer between 1 and %,d or 0 for dynamic allocation",
+                        65_535)
                 .withNoCause();
     }
 

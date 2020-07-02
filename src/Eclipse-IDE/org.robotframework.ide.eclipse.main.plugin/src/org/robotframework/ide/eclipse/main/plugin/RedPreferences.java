@@ -374,6 +374,15 @@ public class RedPreferences {
         return store.getString(LAUNCH_AGENT_CONNECTION_TIMEOUT);
     }
 
+    public boolean isAgentConnectionCustomized() {
+        return !store.getString(LAUNCH_AGENT_CONNECTION_HOST)
+                .equals(store.getDefaultString(LAUNCH_AGENT_CONNECTION_HOST))
+                || !store.getString(LAUNCH_AGENT_CONNECTION_PORT)
+                        .equals(store.getDefaultString(LAUNCH_AGENT_CONNECTION_PORT))
+                || !store.getString(LAUNCH_AGENT_CONNECTION_TIMEOUT)
+                        .equals(store.getDefaultString(LAUNCH_AGENT_CONNECTION_TIMEOUT));
+    }
+
     public String getLaunchExecutableFilePath() {
         return store.getString(LAUNCH_EXECUTABLE_FILE_PATH);
     }

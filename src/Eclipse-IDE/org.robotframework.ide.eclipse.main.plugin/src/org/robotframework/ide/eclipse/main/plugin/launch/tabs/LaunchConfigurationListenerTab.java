@@ -40,9 +40,9 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
 
     private final boolean isAgentTypeButtonSelection;
 
-    private Button useLocalAgentButton;
+    private Button defaultAgentConnectionButton;
 
-    private Button useRemoteAgentButton;
+    private Button customAgentConnectionButton;
 
     private ProjectComposite projectComposite;
 
@@ -95,15 +95,16 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
         GridLayoutFactory.fillDefaults().numColumns(3).margins(0, 5).extendedMargins(0, 0, 0, 20).applyTo(agentGroup);
 
         final Label agentDescription = new Label(agentGroup, SWT.WRAP);
-        agentDescription.setText("Choose listener connection type");
+        agentDescription.setText("Choose listener connection settings");
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(agentDescription);
 
-        useLocalAgentButton = createAgentTypeSelectionButton(agentGroup,
-                String.format("Use local agent connection (localhost with free port and %ds timeout)",
+        defaultAgentConnectionButton = createAgentTypeSelectionButton(agentGroup,
+                String.format("default (localhost, find free port, use %ds timeout)",
                         AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT));
+        GridDataFactory.fillDefaults().indent(10, 0).span(3, 1).applyTo(defaultAgentConnectionButton);
 
-        useRemoteAgentButton = createAgentTypeSelectionButton(agentGroup,
-                "Use remote agent connection (custom server parameters)");
+        customAgentConnectionButton = createAgentTypeSelectionButton(agentGroup, "customized");
+        GridDataFactory.fillDefaults().indent(10, 0).span(3, 1).applyTo(customAgentConnectionButton);
     }
 
     private Button createAgentTypeSelectionButton(final Composite parent, final String text) {
@@ -118,7 +119,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
 
     private void updateRemoteGroupState() {
         if (isAgentTypeButtonSelection) {
-            final boolean isRemoteAgent = useRemoteAgentButton.getSelection();
+            final boolean isRemoteAgent = customAgentConnectionButton.getSelection();
             Arrays.stream(serverGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
             Arrays.stream(clientGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
         }
@@ -135,14 +136,14 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
                 .setText("Setup server which will track execution of Robot tests running on remotely connected client");
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(serverDescription);
 
-        hostTxt = createLabeledText(serverGroup, "Local IP:");
+        hostTxt = createLabeledText(serverGroup, "Local IP:", null);
 
-        portTxt = createLabeledText(serverGroup, "Local port:");
+        portTxt = createLabeledText(serverGroup, "Local port:", "(0 = find and allocate free port)");
 
-        timeoutTxt = createLabeledText(serverGroup, "Connection timeout [s]:");
+        timeoutTxt = createLabeledText(serverGroup, "Connection timeout [s]:", null);
     }
 
-    private Text createLabeledText(final Composite parent, final String label) {
+    private Text createLabeledText(final Composite parent, final String label, final String additionalLabel) {
         final Label lbl = new Label(parent, SWT.NONE);
         lbl.setText(label);
 
@@ -150,9 +151,10 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(txt);
         txt.addModifyListener(e -> updateLaunchConfigurationDialog());
 
-        // spacer to occupy next grid cell
-        new Label(parent, SWT.NONE);
-
+        final Label lbl2 = new Label(parent, SWT.NONE);
+        if (additionalLabel != null) {
+            lbl2.setText(additionalLabel);
+        }
         return txt;
     }
 
@@ -198,8 +200,8 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
                     .robotLaunchConfiguration(configuration);
 
             if (isAgentTypeButtonSelection) {
-                useLocalAgentButton.setSelection(!robotConfig.isUsingRemoteAgent());
-                useRemoteAgentButton.setSelection(robotConfig.isUsingRemoteAgent());
+                defaultAgentConnectionButton.setSelection(!robotConfig.isUsingRemoteAgent());
+                customAgentConnectionButton.setSelection(robotConfig.isUsingRemoteAgent());
             } else {
                 projectComposite.setInput(robotConfig.getProjectName());
             }
@@ -248,7 +250,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
                 .robotLaunchConfiguration(configuration);
         try {
             if (isAgentTypeButtonSelection) {
-                robotConfig.setUsingRemoteAgent(useRemoteAgentButton.getSelection());
+                robotConfig.setUsingRemoteAgent(customAgentConnectionButton.getSelection());
             } else {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             }

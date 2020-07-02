@@ -232,7 +232,8 @@ public class LaunchConfigurationTabValidatorTest {
 
         assertThatExceptionOfType(LaunchConfigurationValidationFatalException.class)
                 .isThrownBy(() -> validator.validateListenerTab(launchConfig))
-                .withMessage("Server port 'xyz' must be an Integer between 1 and %,d", 65_535)
+                .withMessage("Server port 'xyz' must be an Integer between 1 and %,d or 0 for dynamic allocation",
+                        65_535)
                 .withNoCause();
     }
 
