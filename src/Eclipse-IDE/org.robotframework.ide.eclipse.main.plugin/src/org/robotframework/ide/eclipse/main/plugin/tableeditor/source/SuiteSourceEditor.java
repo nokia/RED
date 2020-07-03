@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -211,10 +212,12 @@ public class SuiteSourceEditor extends TextEditor {
             final int columnNumber = caretPosition - document.getLineOffset(lineNumber) + 1;
             lineNumber++;
 
-            final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+            final IContributionItem item = getEditorSite().getActionBars()
                     .getStatusLineManager()
                     .find(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
-            find.setText(lineNumber + ":" + columnNumber);
+            if (item instanceof StatusLineContributionItem) {
+                ((StatusLineContributionItem) item).setText(lineNumber + ":" + columnNumber);
+            }
         } catch (final BadLocationException e) {
             RedPlugin.logError("Unable to get position in source editor in order to update status bar", e);
         }
@@ -223,11 +226,13 @@ public class SuiteSourceEditor extends TextEditor {
     private void updateLineDelimitersStatus() {
         final IDocument document = getDocument();
 
-        final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
+        final IContributionItem item = getEditorSite().getActionBars()
                 .getStatusLineManager()
                 .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
-        final String delimiter = DocumentUtilities.getDelimiter(document);
-        find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
+        if (item instanceof StatusLineContributionItem) {
+            final String delimiter = DocumentUtilities.getDelimiter(document);
+            ((StatusLineContributionItem) item).setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
+        }
     }
 
     private void installBreakpointTogglingOnDoubleClick() {
