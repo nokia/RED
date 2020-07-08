@@ -14,7 +14,8 @@ Bundle-ClassPath: .,
  lib/byte-buddy-1.10.6.jar,
  lib/byte-buddy-agent-1.10.6.jar
 Automatic-Module-Name: org.robotframework.ide.eclipse.main.plugin.tests
-Import-Package: org.junit,
+Import-Package: javax.annotation,
+ org.junit,
  org.junit.jupiter.api,
  org.junit.jupiter.api.condition,
  org.junit.jupiter.api.extension,
