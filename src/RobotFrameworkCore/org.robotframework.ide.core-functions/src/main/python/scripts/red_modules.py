@@ -44,7 +44,12 @@ def _find_jar_source_path(module_name):
         source = module.__file__
         if '__pyclasspath__' in source:
             res = source[source.index('__pyclasspath__') + 16:]
-            return jimp.getSyspathJavaLoader().getResource(res).getPath()
+            
+            resource = jimp.getSyspathJavaLoader().getResource(res)
+            if resource:
+                return resource.getPath()
+            from java.lang import Thread
+            return Thread.currentThread().getContextClassLoader().getResource(res).getPath()
         return source
     else:
         return module.getResource('/' + module_name.replace('.', '/') + ".class").getPath()
