@@ -5,8 +5,8 @@ Element-Name: PrepereScriptConfig
 Element-Type: context
 Element-Version: 2.0
 Id: _YLsq8BVSEeeZSZgUeG7ZOA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 3/29/18 5:49 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 7/9/20 3:27 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -35,7 +35,7 @@ proc "prepere-run-config"{
 	    
 	    //got Listener tab end set port to the same as in BAT
 	    get-tab-folder | get-tab-item Listener | click
-	    get-group "Test Runner Agent" | get-button "Use remote agent connection (custom server parameters)" | click
+	    get-group "Test Runner Agent" | get-button "customized" | click
 	    get-button Apply | click
 	    get-button Close | click
 	}
