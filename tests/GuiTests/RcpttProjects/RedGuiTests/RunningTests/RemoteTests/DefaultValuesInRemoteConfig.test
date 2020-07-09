@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HO73kPzXEeaFC_dPBuoMWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 3:48 PM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 7/9/20 3:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,7 +27,7 @@ proc "check-label-for-error" [val val] [val errorType]{
 	}
 	if [$errorType | eq port]{
 		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
-	    	| get-property text | equals [format "Server port '%s' must be an Integer between 1 and 65\D535" $val] | verify-true
+	    	| get-property text | equals [format "Server port '%s' must be an Integer between 1 and 65\D535 or 0 for dynamic allocation" $val] | verify-true
 	}
 	if [$errorType | eq timeout]{
 		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
@@ -175,10 +175,10 @@ check-command-line -ip "www.onet.pl" -port "43981"
 
 // ------------------------------- port ----------------------------------------------------------------------------------
 
-//add 0 as port
-get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 0
-check-label-for-error -val "0" -errorType "port"
-check-command-line -ip "www.onet.pl" -port "0"
+//add 99999999 as port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 99999999
+check-label-for-error -val "99999999" -errorType "port"
+check-command-line -ip "www.onet.pl" -port "99999999"
 
 //add max port
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 65535
