@@ -18,6 +18,7 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.contentassist.ContentAssistEvent;
@@ -25,6 +26,7 @@ import org.eclipse.jface.text.contentassist.ICompletionListener;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -35,6 +37,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
@@ -114,6 +117,16 @@ public class DebugShellView {
         service.activateContext("org.robotframework.red.view.debug.shell");
 
         SwitchShellModeHandler.setMode(site, getDocument().getMode());
+
+        final IWorkbench workbench = part.getSite().getWorkbenchWindow().getWorkbench();
+        final IPropertyChangeListener listener = event -> {
+            if (event.getProperty().equals(JFaceResources.TEXT_FONT)) {
+                styledText.setFont(JFaceResources.getTextFont());
+            }
+        };
+        final FontRegistry fontRegistry = workbench.getThemeManager().getCurrentTheme().getFontRegistry();
+        fontRegistry.addListener(listener);
+        styledText.addDisposeListener(e -> fontRegistry.removeListener(listener));
     }
 
     private void verifyKey(final VerifyEvent e) {

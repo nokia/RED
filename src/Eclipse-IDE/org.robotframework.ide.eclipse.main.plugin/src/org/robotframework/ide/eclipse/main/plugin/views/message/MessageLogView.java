@@ -15,10 +15,14 @@ import javax.annotation.PreDestroy;
 
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.themes.ITheme;
+import org.eclipse.ui.themes.IThemeManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
@@ -63,7 +67,7 @@ public class MessageLogView {
     }
 
     @PostConstruct
-    public void postConstruct(final Composite parent) {
+    public void postConstruct(final Composite parent, final IWorkbench workbench) {
         final FillLayout layout = new FillLayout();
         layout.marginHeight = 2;
         layout.marginWidth = 2;
@@ -74,6 +78,20 @@ public class MessageLogView {
         styledText.setEditable(false);
 
         setInput();
+
+        final IPropertyChangeListener listener = event -> {
+            if (event.getProperty().equals(JFaceResources.TEXT_FONT)) {
+                styledText.setFont(JFaceResources.getTextFont());
+            }
+        };
+        Optional.ofNullable(workbench)
+                .map(IWorkbench::getThemeManager)
+                .map(IThemeManager::getCurrentTheme)
+                .map(ITheme::getFontRegistry)
+                .ifPresent(registry -> {
+                    registry.addListener(listener);
+                    styledText.addDisposeListener(e -> registry.removeListener(listener));
+                });
     }
 
     private void setInput() {

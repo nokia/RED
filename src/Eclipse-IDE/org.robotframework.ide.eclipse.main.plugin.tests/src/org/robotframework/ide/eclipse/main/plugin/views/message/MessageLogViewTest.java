@@ -27,7 +27,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         assertThat(view.getTextControl().getText()).isEmpty();
     }
@@ -55,7 +55,7 @@ public class MessageLogViewTest {
         executionService.testExecutionEnded(launch2);
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         execAllAwaitingMessages();
 
@@ -77,7 +77,7 @@ public class MessageLogViewTest {
 
         // open view after first execution has ended
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         execAllAwaitingMessages();
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
@@ -95,7 +95,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         final Thread executionThread = new Thread(() -> {
             final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
@@ -114,7 +114,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         assertThat(view.getTextControl().getWordWrap()).isFalse();
     }
@@ -124,7 +124,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         view.toggleWordsWrapping();
 
@@ -136,7 +136,7 @@ public class MessageLogViewTest {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
-        view.postConstruct(shell);
+        view.postConstruct(shell, null);
 
         view.toggleWordsWrapping();
         view.toggleWordsWrapping();
