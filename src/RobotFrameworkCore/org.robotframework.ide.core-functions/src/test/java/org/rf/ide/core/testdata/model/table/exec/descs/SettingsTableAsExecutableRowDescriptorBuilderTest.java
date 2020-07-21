@@ -32,21 +32,21 @@ public class SettingsTableAsExecutableRowDescriptorBuilderTest {
 
     private void assertIsSimpleLineForSettingTable(final String actionToken) {
         // prepare
-        final RobotFileOutput rfo = new RobotFileOutput(RobotVersion.from("2.9"));
+        final RobotFileOutput rfo = new RobotFileOutput(RobotVersion.from("3.0"));
         rfo.setProcessedFile(new File("fake.txt"));
         final RobotFile rf = new RobotFile(rfo);
 
         rf.includeSettingTableSection();
-        SuiteSetup s = rf.getSettingTable().newSuiteSetup();
+        final SuiteSetup s = rf.getSettingTable().newSuiteSetup();
 
-        RobotToken keywordAction = new RobotToken();
+        final RobotToken keywordAction = new RobotToken();
         keywordAction.setText(actionToken);
         keywordAction.setLineNumber(10);
         s.setKeywordName(keywordAction);
         s.addArgument("a");
 
         // execute
-        IExecutableRowDescriptor<SettingTable> lineDesc = s.asExecutableRow().buildLineDescription();
+        final IExecutableRowDescriptor<SettingTable> lineDesc = s.asExecutableRow().buildLineDescription();
 
         // verify
         assertThat(lineDesc.getRowType()).isEqualTo(RowType.SIMPLE);

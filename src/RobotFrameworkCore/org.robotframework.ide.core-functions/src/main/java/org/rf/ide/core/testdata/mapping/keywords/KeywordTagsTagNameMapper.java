@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.mapping.keywords;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -23,11 +22,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 public class KeywordTagsTagNameMapper implements IParsingMapper {
 
     private final ParsingStateHelper utility = new ParsingStateHelper();
-
-    @Override
-    public boolean isApplicableFor(final RobotVersion robotVersion) {
-        return robotVersion.isNewerOrEqualTo(new RobotVersion(2, 9));
-    }
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,

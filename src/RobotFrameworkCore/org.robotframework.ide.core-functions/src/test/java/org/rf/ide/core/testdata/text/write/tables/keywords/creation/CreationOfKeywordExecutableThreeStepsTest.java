@@ -33,7 +33,7 @@ public class CreationOfKeywordExecutableThreeStepsTest extends ACreationOfThreeE
     }
 
     private UserKeyword createModelWithOneKeywordInside() {
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("3.0");
         modelFile.includeKeywordTableSection();
         final KeywordTable keywordTable = modelFile.getKeywordTable();
 

@@ -20,6 +20,8 @@ import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
 public class TestCaseNotChangedDumperTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void dumpAsItIsInFile(final FileFormat format) throws Exception {
@@ -29,7 +31,7 @@ public class TestCaseNotChangedDumperTest {
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
 
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, format,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser(ROBOT_VERSION));
         final RobotFileDumper dumper = new RobotFileDumper();
         final DumpContext ctx = new DumpContext(null, false);
 

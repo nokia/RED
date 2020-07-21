@@ -45,7 +45,7 @@ public class SettingTableModelUpdaterTest {
 
     @BeforeAll
     public static void setup() {
-        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("3.0");
         model.includeSettingTableSection();
         settingTable = model.getSettingTable();
 

@@ -29,7 +29,7 @@ public class UserKeywordRemoveElementsTest {
 
     @BeforeEach
     public void setUp() {
-        final RobotFileOutput out = new RobotFileOutput(RobotVersion.from("2.9.0"));
+        final RobotFileOutput out = new RobotFileOutput(RobotVersion.from("3.0.0"));
         out.getFileModel().includeKeywordTableSection();
         keyword = new UserKeyword(new RobotToken());
         out.getFileModel().getKeywordTable().addKeyword(keyword);

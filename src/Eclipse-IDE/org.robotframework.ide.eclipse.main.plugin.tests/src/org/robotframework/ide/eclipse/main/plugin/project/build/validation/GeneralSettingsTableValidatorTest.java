@@ -452,19 +452,6 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
-    public void documentSettingIsNotReported_whenRobotIsOld() throws CoreException {
-        final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
-                .appendLine("Document  doc")
-                .build();
-
-        final FileValidationContext context = prepareContext(version);
-        final Collection<Problem> problems = validate(context, file);
-
-        assertThat(problems).isEmpty();
-    }
-
-    @Test
     public void documentSettingIsReportedToBeDeprecated_whenRobotIs30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
         final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
@@ -491,23 +478,6 @@ public class GeneralSettingsTableValidatorTest {
 
         assertThat(problems).contains(
                 new Problem(GeneralSettingsProblem.UNKNOWN_SETTING, new ProblemPosition(2, Range.closed(17, 25))));
-    }
-
-    @Test
-    public void outdatedSetupAndTeardownSyntaxAreNotReported_whenRobotIsOld() throws CoreException {
-        final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile file = new RobotSuiteFileCreator(version).appendLine("*** Settings ***")
-                .appendLine("Suite Precondition  kw")
-                .appendLine("Suite Postcondition  kw")
-                .appendLine("Test Precondition  kw")
-                .appendLine("Test Postcondition  kw")
-                .build();
-
-        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("kw", new Path("/file.robot")));
-        final FileValidationContext context = prepareContext(accessibleKws, version);
-        final Collection<Problem> problems = validate(context, file);
-
-        assertThat(problems).isEmpty();
     }
 
     @Test

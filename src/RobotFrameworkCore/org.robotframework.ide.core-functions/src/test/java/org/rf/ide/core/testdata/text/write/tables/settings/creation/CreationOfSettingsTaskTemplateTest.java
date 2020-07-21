@@ -16,13 +16,15 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsTaskTemplateTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_createTaskTemplate_withKeywordName_andThreeUnwanted_andComment(final FileFormat format)
             throws Exception {
         // prepare
         final String fileName = convert("TaskTemplateDeclarationWithKeyword3UnwantedArgsCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

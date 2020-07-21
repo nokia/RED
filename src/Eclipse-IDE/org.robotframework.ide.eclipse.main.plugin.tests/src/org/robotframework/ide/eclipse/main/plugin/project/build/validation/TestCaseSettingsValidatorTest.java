@@ -148,18 +148,6 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void documentSettingIsNotReported_inOlderRobot() throws CoreException {
-        final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
-                .appendLine("case")
-                .appendLine("  [Document]    doc1")
-                .build();
-
-        final Collection<Problem> problems = validate(prepareContext(version), fileModel);
-        assertThat(problems).isEmpty();
-    }
-
-    @Test
     public void documentSettingIsReportedAsDeprecated_inRf30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
@@ -426,20 +414,6 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void preconditionSettingIsNotReported_inOlderRobot() throws CoreException {
-        final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
-                .appendLine("case")
-                .appendLine("  [Precondition]    keyword")
-                .build();
-
-        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
-
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
-        assertThat(problems).isEmpty();
-    }
-
-    @Test
     public void preconditionSettingIsReportedAsDeprecated_inRf30() throws CoreException {
         final RobotVersion version = new RobotVersion(3, 0);
         final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
@@ -514,20 +488,6 @@ public class TestCaseSettingsValidatorTest {
         assertThat(problems).containsOnly(
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(3, Range.closed(26, 36))),
                 new Problem(GeneralSettingsProblem.DUPLICATED_SETTING, new ProblemPosition(4, Range.closed(50, 60))));
-    }
-
-    @Test
-    public void postconditionSettingIsNotReported_forOlderRobot() throws CoreException {
-        final RobotVersion version = new RobotVersion(2, 9);
-        final RobotSuiteFile fileModel = new RobotSuiteFileCreator(version).appendLine("*** Test Cases ***")
-                .appendLine("case")
-                .appendLine("  [Postcondition]    keyword")
-                .build();
-
-        final List<KeywordEntity> accessibleKws = newArrayList(newResourceKeyword("keyword", new Path("/file.robot")));
-
-        final Collection<Problem> problems = validate(prepareContext(accessibleKws, version), fileModel);
-        assertThat(problems).isEmpty();
     }
 
     @Test

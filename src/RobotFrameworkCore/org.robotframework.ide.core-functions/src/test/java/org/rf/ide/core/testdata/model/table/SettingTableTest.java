@@ -14,29 +14,6 @@ import org.rf.ide.core.execution.debug.contexts.ModelBuilder;
 public class SettingTableTest {
 
     @Test
-    public void testTemplateInUse_forRfUnder30() {
-        final SettingTable settingsTable1 = ModelBuilder.modelForFile(new RobotVersion(2, 9))
-                .withSettingsTable()
-                .withTestTemplate("keyword")
-                .build()
-                .getSettingTable();
-        final SettingTable settingsTable2 = ModelBuilder.modelForFile(new RobotVersion(2, 9))
-                .withSettingsTable()
-                .withTestTemplate("keyword", "2")
-                .build()
-                .getSettingTable();
-        final SettingTable settingsTable3 = ModelBuilder.modelForFile(new RobotVersion(2, 9))
-                .withSettingsTable()
-                .withTestTemplate("keyword", "2")
-                .withTestTemplate("keyword", "4")
-                .build().getSettingTable();
-
-        assertThat(settingsTable1.getTestTemplateInUse()).isEqualTo("keyword");
-        assertThat(settingsTable2.getTestTemplateInUse()).isEqualTo("keyword 2");
-        assertThat(settingsTable3.getTestTemplateInUse()).isEqualTo("keyword 2 keyword 4");
-    }
-
-    @Test
     public void testTemplateInUse_forRf30And31() {
         final SettingTable settingsTable1 = ModelBuilder.modelForFile(new RobotVersion(3, 1))
                 .withSettingsTable()

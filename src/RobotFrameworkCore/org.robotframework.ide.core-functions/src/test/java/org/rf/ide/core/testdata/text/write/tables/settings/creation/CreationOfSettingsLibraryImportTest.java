@@ -17,12 +17,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsLibraryImportTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateLibraryImport(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyLibraryDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -38,7 +40,7 @@ public class CreationOfSettingsLibraryImportTest {
     public void test_emptyFile_and_thanCreateLibraryImport_withName(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithLibraryNameOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -58,7 +60,7 @@ public class CreationOfSettingsLibraryImportTest {
             throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithLibraryNameAndThreeCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -88,7 +90,7 @@ public class CreationOfSettingsLibraryImportTest {
             throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithThreeCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -115,7 +117,7 @@ public class CreationOfSettingsLibraryImportTest {
             throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithLibraryNameAndThreeArgsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -145,7 +147,7 @@ public class CreationOfSettingsLibraryImportTest {
             final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -185,7 +187,7 @@ public class CreationOfSettingsLibraryImportTest {
             final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsAliasOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

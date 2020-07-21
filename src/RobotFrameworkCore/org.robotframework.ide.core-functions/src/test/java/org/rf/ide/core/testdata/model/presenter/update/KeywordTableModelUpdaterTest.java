@@ -46,7 +46,7 @@ public class KeywordTableModelUpdaterTest {
 
     @BeforeAll
     public static void setupModel() {
-        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("3.0");
         model.includeKeywordTableSection();
         keywordTable = model.getKeywordTable();
 

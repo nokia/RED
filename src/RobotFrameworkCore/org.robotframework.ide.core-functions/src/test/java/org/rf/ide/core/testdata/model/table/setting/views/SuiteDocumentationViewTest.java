@@ -21,10 +21,12 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class SuiteDocumentationViewTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @Test
     public void test_twoSuiteDocDeclarations_shouldReturn_commonView() {
         // prepare
-        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from(ROBOT_VERSION)));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -52,7 +54,7 @@ public class SuiteDocumentationViewTest {
     @Test
     public void test_twoSuiteDocumentations_addOneArgument_shouldReturn_singleSuiteDoc() {
         // prepare
-        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from(ROBOT_VERSION)));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -83,7 +85,7 @@ public class SuiteDocumentationViewTest {
     @Test
     public void test_twoSuiteDocumentations_modificationOfOneArgument_shouldReturn_twoSuiteDocsStill() {
         // prepare
-        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from(ROBOT_VERSION)));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 

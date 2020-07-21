@@ -40,6 +40,7 @@ import com.google.common.io.Files;
 
 public class RobotParserTest {
 
+    private static final RobotVersion ROBOT_VERSION = new RobotVersion(3, 0);
     @TempDir
     static File tempDir;
 
@@ -47,7 +48,7 @@ public class RobotParserTest {
     public void errorMessageIsReported_whenFileHasNotSupportedExtension() throws Exception {
         final String fileContent = "some content";
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.unknown"));
 
@@ -66,7 +67,7 @@ public class RobotParserTest {
     public void emptyOutputIsReturned_whenContentIsNull() throws Exception {
         final String fileContent = null;
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
@@ -77,7 +78,7 @@ public class RobotParserTest {
     public void emptyOutputIsReturned_whenContentIsEmpty() throws Exception {
         final String fileContent = "";
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
@@ -88,7 +89,7 @@ public class RobotParserTest {
     public void notEmptyOutputIsReturned_whenContentIsNotEmptyAndFileHasSupportedExtension() throws Exception {
         final String fileContent = "***Settings***";
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         for (final String name : newHashSet("f.robot", "f.txt", "f.tsv")) {
             final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File(name));
@@ -105,7 +106,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -125,7 +126,7 @@ public class RobotParserTest {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -171,7 +172,7 @@ public class RobotParserTest {
         // prepare
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource(filename).toURI());
@@ -220,7 +221,7 @@ public class RobotParserTest {
         // prepare
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         // prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());
@@ -266,7 +267,7 @@ public class RobotParserTest {
     public void emptyOutputIsReturned_whenFileIsNull() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startFile = null;
 
@@ -279,7 +280,7 @@ public class RobotParserTest {
     public void emptyOutputIsReturned_whenFileHasNotSupportedExtension() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startFile = new File(tempDir, "file.unknown");
         startFile.createNewFile();
@@ -293,7 +294,7 @@ public class RobotParserTest {
     public void notEmptyOutputIsReturned_whenFileHasSupportedExtension() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         for (final String name : newHashSet("f.robot", "f.txt", "f.tsv")) {
             final File startFile = new File(tempDir, name);
@@ -310,7 +311,7 @@ public class RobotParserTest {
     public void fileShouldBeParsedOnlyOnce() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startFile = new File(tempDir, "file.robot");
         final String fileContent = "***Settings***";
@@ -331,7 +332,7 @@ public class RobotParserTest {
     public void fileShouldBeCleared_whenContainsTooManyLines() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startFile = new File(tempDir, "file_with_5000_lines.robot");
         final String fileContent = String.join("", Collections.nCopies(5000, "abc" + System.lineSeparator()));
@@ -347,7 +348,7 @@ public class RobotParserTest {
     public void fileShouldNotBeCleared_whenDoesNotContainTooManyLines() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startFile = new File(tempDir, "file_with_4999_lines.robot");
         final String fileContent = String.join("", Collections.nCopies(4999, "abc" + System.lineSeparator()));
@@ -363,7 +364,7 @@ public class RobotParserTest {
     public void directoryShouldBeParsed() throws Exception {
         final RobotProjectHolder projectHolder = new RobotProjectHolder();
 
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
 
         final File startDir = new File(tempDir, "dir_with_suites");
         startDir.mkdir();

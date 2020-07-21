@@ -96,8 +96,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateSetupsAndTeardowns(settingsTable.getTestTeardowns());
         validateSetupsAndTeardowns(settingsTable.getTaskSetups());
         validateSetupsAndTeardowns(settingsTable.getTaskTeardowns());
-        validateTemplates(settingsTable.getTestTemplatesViews(), settingsTable.getTaskTemplates());
-        validateTestTimeouts(settingsTable.getTestTimeoutsViews());
+        validateTemplates(settingsTable.getTestTemplates(), settingsTable.getTaskTemplates());
+        validateTestTimeouts(settingsTable.getTestTimeouts());
         validateTaskTimeouts(settingsTable.getTaskTimeouts());
         validateTags(settingsTable.getDefaultTags());
         validateTags(settingsTable.getForceTags());
@@ -260,10 +260,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final Set<String> additionalVariables = new HashSet<>();
 
         final List<ExecutableValidator> execValidators = new ArrayList<>();
-        for (final SuiteSetup suiteSetup : settingsTable.getSuiteSetupsViews()) {
+        for (final SuiteSetup suiteSetup : settingsTable.getSuiteSetups()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, suiteSetup, reporter));
         }
-        for (final TestSetup testSetup : settingsTable.getTestSetupsViews()) {
+        for (final TestSetup testSetup : settingsTable.getTestSetups()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testSetup, reporter));
         }
         for (final TaskSetup taskSetup : settingsTable.getTaskSetups()) {
@@ -272,10 +272,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (final TaskTeardown taskTeardown : settingsTable.getTaskTeardowns()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, taskTeardown, reporter));
         }
-        for (final TestTeardown testTeardown : settingsTable.getTestTeardownsViews()) {
+        for (final TestTeardown testTeardown : settingsTable.getTestTeardowns()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, testTeardown, reporter));
         }
-        for (final SuiteTeardown suiteTeardown : settingsTable.getSuiteTeardownsViews()) {
+        for (final SuiteTeardown suiteTeardown : settingsTable.getSuiteTeardowns()) {
             execValidators.add(ExecutableValidator.of(validationContext, additionalVariables, suiteTeardown, reporter));
         }
         execValidators.forEach(ExecutableValidator::validate);

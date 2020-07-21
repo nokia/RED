@@ -32,6 +32,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
  */
 public class RobotParserSimpleExecutableContinueTest {
 
+    private static final RobotVersion ROBOT_VERSION = new RobotVersion(3, 0);
+
     @Test
     public void givenTwoKeywords_oneWithNormalName_andSecondWithTripleDotsName_shouldReturnTwoKeywords()
             throws Exception {
@@ -42,7 +44,7 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -72,7 +74,7 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, ROBOT_VERSION);
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

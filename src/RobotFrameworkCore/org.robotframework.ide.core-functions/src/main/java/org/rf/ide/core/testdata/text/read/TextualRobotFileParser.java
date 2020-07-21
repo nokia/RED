@@ -158,9 +158,9 @@ public class TextualRobotFileParser {
         mappers.clear();
         mappers.addAll(new SettingsMapperProvider().getMappers(robotVersion));
         mappers.addAll(new VariablesDeclarationMapperProvider().getMappers());
-        mappers.addAll(new TestCaseMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new TestCaseMapperProvider().getMappers());
         mappers.addAll(new TaskMapperProvider().getMappers(robotVersion));
-        mappers.addAll(new UserKeywordMapperProvider().getMappers(robotVersion));
+        mappers.addAll(new UserKeywordMapperProvider().getMappers());
         mappers.addAll(new CommentsMapperProvider().getMappers(robotVersion));
 
         unknownTableElementsMapper.clear();

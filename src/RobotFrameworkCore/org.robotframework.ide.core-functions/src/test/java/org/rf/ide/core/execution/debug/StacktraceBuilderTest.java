@@ -34,35 +34,12 @@ import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
-import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
-import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
 import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 
 public class StacktraceBuilderTest {
-
-    @Test
-    public void properKeywordTypesFixerIsCreated_dependingOnRobotVersion() {
-        final ElementsLocator locator = mock(ElementsLocator.class);
-        final StacktraceBuilder builder = new StacktraceBuilder(new Stacktrace(), locator, new RobotBreakpointSupplier());
-
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.5", 1, Optional.of(42L)));
-        assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
-
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.7", 1, Optional.of(42L)));
-        assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
-
-        builder.handleVersions(new VersionsEvent(null, "", "", "2.9", 1, Optional.of(42L)));
-        assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesForRf29Fixer.class);
-
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.0", 1, Optional.of(42L)));
-        assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesFixer.class);
-
-        builder.handleVersions(new VersionsEvent(null, "", "", "3.2", 1, Optional.of(42L)));
-        assertThat(builder.getKeywordsTypesFixer()).isExactlyInstanceOf(KeywordsTypesFixer.class);
-    }
 
     @Test
     public void frameForSuiteIsCreatedWithCurrentlyImportedResources_whenSuiteStarts() {

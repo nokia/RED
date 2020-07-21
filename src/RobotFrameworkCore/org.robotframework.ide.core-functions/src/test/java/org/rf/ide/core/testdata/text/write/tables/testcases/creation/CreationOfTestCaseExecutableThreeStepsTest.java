@@ -17,6 +17,8 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfTestCaseExecutableThreeStepsTest extends ACreationOfThreeExecutionRowsTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
@@ -33,7 +35,7 @@ public class CreationOfTestCaseExecutableThreeStepsTest extends ACreationOfThree
     }
 
     private TestCase createModelWithOneTestCaseInside() {
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
         modelFile.includeTestCaseTableSection();
         final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 

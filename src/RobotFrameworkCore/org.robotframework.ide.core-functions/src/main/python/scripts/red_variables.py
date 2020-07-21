@@ -47,22 +47,17 @@ def get_global_variables():
     }
 
     glob_variables = {}
-    try:
-        from robot.variables import GLOBAL_VARIABLES
+    global_variables['&{EMPTY}'] = {}
+    global_variables['&{SUITE_METADATA}'] = {}
+    from robot.conf.settings import RobotSettings
+    from robot.variables.scopes import GlobalVariables
 
-        glob_variables = GLOBAL_VARIABLES
-    except ImportError:  # for robot >2.9
-        global_variables['&{EMPTY}'] = {}
-        global_variables['&{SUITE_METADATA}'] = {}
-        from robot.conf.settings import RobotSettings
-        from robot.variables.scopes import GlobalVariables
-
-        glob_variables = GlobalVariables(RobotSettings()).as_dict()
-        glob_variables['${OUTPUT_DIR}'] = ''
-        glob_variables['${EXECDIR}'] = ''
-        glob_variables['${OUTPUT_FILE}'] = ''
-        glob_variables['${REPORT_FILE}'] = ''
-        glob_variables['${LOG_FILE}'] = ''
+    glob_variables = GlobalVariables(RobotSettings()).as_dict()
+    glob_variables['${OUTPUT_DIR}'] = ''
+    glob_variables['${EXECDIR}'] = ''
+    glob_variables['${OUTPUT_FILE}'] = ''
+    glob_variables['${REPORT_FILE}'] = ''
+    glob_variables['${LOG_FILE}'] = ''
 
     data = dict((_wrap_variable_if_needed(key), value) for key, value in glob_variables.items())
 

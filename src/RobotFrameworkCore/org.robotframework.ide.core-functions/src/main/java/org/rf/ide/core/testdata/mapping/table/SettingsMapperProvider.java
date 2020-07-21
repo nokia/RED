@@ -30,14 +30,10 @@ import org.rf.ide.core.testdata.mapping.setting.imports.VariablesArgumentsMapper
 import org.rf.ide.core.testdata.mapping.setting.imports.VariablesDeclarationMapper;
 import org.rf.ide.core.testdata.mapping.setting.imports.VariablesImportPathMapper;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteSetupKeywordArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.suite.SuiteSetupKeywordArgumentMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteSetupKeywordMapper;
-import org.rf.ide.core.testdata.mapping.setting.suite.SuiteSetupKeywordMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteSetupMapper;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordArgumentMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordMapper;
-import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownKeywordMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.suite.SuiteTeardownMapper;
 import org.rf.ide.core.testdata.mapping.setting.task.TaskSetupKeywordArgumentMapper;
 import org.rf.ide.core.testdata.mapping.setting.task.TaskSetupKeywordMapper;
@@ -52,14 +48,10 @@ import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutMapper;
 import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutMessageMapper;
 import org.rf.ide.core.testdata.mapping.setting.task.TaskTimeoutValueMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordArgumentMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordMapper;
-import org.rf.ide.core.testdata.mapping.setting.test.TestSetupKeywordMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.test.TestSetupMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTeardownKeywordArgumentMapper;
-import org.rf.ide.core.testdata.mapping.setting.test.TestTeardownKeywordArgumentMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTeardownKeywordMapper;
-import org.rf.ide.core.testdata.mapping.setting.test.TestTeardownKeywordMapperOld;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTeardownMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTemplateKeywordMapper;
 import org.rf.ide.core.testdata.mapping.setting.test.TestTemplateMapper;
@@ -88,21 +80,17 @@ public class SettingsMapperProvider {
 
             new MetadataMapper(), new MetadataKeyMapper(), new MetadataValueMapper(),
 
-            new SuiteSetupMapper(), new SuiteSetupKeywordMapper(), new SuiteSetupKeywordMapperOld(),
-            new SuiteSetupKeywordArgumentMapper(), new SuiteSetupKeywordArgumentMapperOld(),
+            new SuiteSetupMapper(), new SuiteSetupKeywordMapper(), new SuiteSetupKeywordArgumentMapper(),
 
-            new SuiteTeardownMapper(), new SuiteTeardownKeywordMapper(), new SuiteTeardownKeywordMapperOld(),
-            new SuiteTeardownKeywordArgumentMapper(), new SuiteTeardownKeywordArgumentMapperOld(),
+            new SuiteTeardownMapper(), new SuiteTeardownKeywordMapper(), new SuiteTeardownKeywordArgumentMapper(),
 
             new ForceTagsMapper(), new ForceTagsTagNameMapper(),
 
             new DefaultTagsMapper(), new DefaultTagsTagNameMapper(),
 
-            new TestSetupMapper(), new TestSetupKeywordMapper(), new TestSetupKeywordMapperOld(),
-            new TestSetupKeywordArgumentMapper(), new TestSetupKeywordArgumentMapperOld(),
+            new TestSetupMapper(), new TestSetupKeywordMapper(), new TestSetupKeywordArgumentMapper(),
 
-            new TestTeardownMapper(), new TestTeardownKeywordMapper(), new TestTeardownKeywordMapperOld(),
-            new TestTeardownKeywordArgumentMapper(), new TestTeardownKeywordArgumentMapperOld(),
+            new TestTeardownMapper(), new TestTeardownKeywordMapper(), new TestTeardownKeywordArgumentMapper(),
 
             new TestTemplateMapper(), new TestTemplateKeywordMapper(), new TestTemplateTrashDataMapper(),
 

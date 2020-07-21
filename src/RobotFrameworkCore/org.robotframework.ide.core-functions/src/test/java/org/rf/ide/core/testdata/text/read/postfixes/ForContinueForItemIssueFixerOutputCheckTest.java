@@ -350,7 +350,7 @@ public class ForContinueForItemIssueFixerOutputCheckTest {
         when(projectHolder.shouldBeParsed(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(projectHolder, new RobotVersion(3, 0));
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

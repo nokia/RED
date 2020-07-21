@@ -6,13 +6,8 @@
 
 
 def get_standard_library_names():
-    try:
-        import robot.running.namespace
-        return list(robot.running.namespace.STDLIB_NAMES)
-    except:
-        # the std libraries set was moved to other place since Robot 2.9.1
-        import robot.libraries
-        return list(robot.libraries.STDLIBS)
+    import robot.libraries
+    return list(robot.libraries.STDLIBS)
 
 
 def get_standard_library_path(libname):

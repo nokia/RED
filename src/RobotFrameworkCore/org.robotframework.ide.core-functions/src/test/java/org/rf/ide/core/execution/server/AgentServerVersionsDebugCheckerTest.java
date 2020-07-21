@@ -34,7 +34,7 @@ public class AgentServerVersionsDebugCheckerTest {
         final AgentServerVersionsDebugChecker checker = new AgentServerVersionsDebugChecker();
 
         final List<Object> attributes = newArrayList(
-                ImmutableMap.of("cmd_line", "cmd", "python", "", "robot", "2.9", "protocol",
+                ImmutableMap.of("cmd_line", "cmd", "python", "", "robot", "3.0", "protocol",
                         getCurrentProtocolVersion()));
         final Map<String, Object> eventMap = ImmutableMap.of("version", attributes);
         checker.handleVersions(VersionsEvent.from(client, eventMap));
@@ -97,7 +97,7 @@ public class AgentServerVersionsDebugCheckerTest {
 
         assertThatExceptionOfType(RobotAgentEventsListenerException.class)
                 .isThrownBy(() -> checker.handleVersions(VersionsEvent.from(client, eventMap)))
-                .withMessage("RED debugger requires Robot Framework in version 2.9 or newer.\n\tRobot Framework: 2.8")
+                .withMessage("RED debugger requires Robot Framework in version 3.0 or newer.\n\tRobot Framework: 2.8")
                 .withNoCause();
         verify(client).send(any(ProtocolVersion.class));
     }

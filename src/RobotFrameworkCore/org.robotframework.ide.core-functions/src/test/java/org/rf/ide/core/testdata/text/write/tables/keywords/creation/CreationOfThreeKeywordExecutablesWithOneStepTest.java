@@ -53,7 +53,7 @@ public class CreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationO
         final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
                 0);
 
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("3.0");
         modelFile.includeKeywordTableSection();
         final KeywordTable keywordTable = modelFile.getKeywordTable();
 

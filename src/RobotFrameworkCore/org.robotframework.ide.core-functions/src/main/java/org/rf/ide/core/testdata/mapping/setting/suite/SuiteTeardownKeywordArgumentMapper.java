@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.mapping.setting.suite;
 import java.util.List;
 import java.util.Stack;
 
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
@@ -27,11 +26,6 @@ public class SuiteTeardownKeywordArgumentMapper implements IParsingMapper {
     protected final ElementsUtility utility = new ElementsUtility();
 
     private final ParsingStateHelper stateHelper = new ParsingStateHelper();
-
-    @Override
-    public boolean isApplicableFor(final RobotVersion robotVersion) {
-        return robotVersion.isNewerOrEqualTo(new RobotVersion(3, 0));
-    }
 
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,

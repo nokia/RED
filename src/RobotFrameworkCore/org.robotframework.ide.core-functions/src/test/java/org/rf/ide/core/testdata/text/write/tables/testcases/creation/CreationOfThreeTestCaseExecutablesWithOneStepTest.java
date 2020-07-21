@@ -22,6 +22,8 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreationOfThreeExecUnitsTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames() {
         final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
@@ -53,7 +55,7 @@ public class CreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreation
         final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
                 0);
 
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
         modelFile.includeTestCaseTableSection();
         final TestCaseTable keywordTable = modelFile.getTestCaseTable();
 

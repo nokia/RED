@@ -34,18 +34,9 @@ public class VersionDependentValidatorsTest {
     public static class GeneralSettingsTableValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder29() {
-            assertThat(getGeneralSettingsTableValidators("2.8.0")).hasSize(11)
-                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class,
-                            TemplateSettingUntilRf31Validator.class);
-        }
-
-        @Test
-        public void properValidatorsAreReturnedForVersion29() {
-            assertThat(getGeneralSettingsTableValidators("2.9")).hasSize(12)
-                    .hasOnlyElementsOfTypes(SettingsDuplicationInOldRfValidator.class,
-                            MetadataKeyInColumnOfSettingValidatorUntilRF30.class,
-                            TemplateSettingUntilRf31Validator.class);
+        public void properValidatorsAreReturnedForVersionUnder30() {
+            assertThat(getGeneralSettingsTableValidators("2.9")).hasSize(2)
+                    .hasOnlyElementsOfTypes(TemplateSettingUntilRf31Validator.class);
         }
 
         @Test
@@ -157,9 +148,8 @@ public class VersionDependentValidatorsTest {
 
         @Test
         public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getTestCaseSettingsValidators("2.9")).hasSize(2)
-                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class,
-                            TemplateSettingUntilRf31Validator.class);
+            assertThat(getTestCaseSettingsValidators("2.9")).hasSize(1)
+                    .hasOnlyElementsOfTypes(TemplateSettingUntilRf31Validator.class);
         }
 
         @Test
@@ -284,9 +274,8 @@ public class VersionDependentValidatorsTest {
     public static class KeywordSettingsValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getKeywordSettingsValidators("2.9")).hasSize(1)
-                    .hasOnlyElementsOfTypes(LocalSettingsDuplicationInOldRfValidator.class);
+        public void noValidatorsAreReturnedForVersionUnder30() {
+            assertThat(getKeywordSettingsValidators("2.9")).isEmpty();
         }
 
         @Test

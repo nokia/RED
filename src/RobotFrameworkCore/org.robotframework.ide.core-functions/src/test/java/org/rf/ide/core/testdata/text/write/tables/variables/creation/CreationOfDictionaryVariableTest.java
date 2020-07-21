@@ -20,12 +20,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfDictionaryVariableTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateDictionaryVariable(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyDictionaryVariableDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -42,7 +44,7 @@ public class CreationOfDictionaryVariableTest {
             throws Exception {
         // prepare
         final String fileName = convert("DictionaryVariableDeclarationWithThreeValuePairKeysOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -63,7 +65,7 @@ public class CreationOfDictionaryVariableTest {
     public void test_emptyFile_and_thanCreationDictionary_withComment(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("DictionaryVariableDeclarationWithCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -91,7 +93,7 @@ public class CreationOfDictionaryVariableTest {
             throws Exception {
         // prepare
         final String fileName = convert("DictionaryVariableDeclarationWithCommentAndThreeKeyValuePairOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -122,7 +124,7 @@ public class CreationOfDictionaryVariableTest {
             final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("DictionaryVariableDeclarationWith2ValuesEmptyAndLastSet", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -144,7 +146,7 @@ public class CreationOfDictionaryVariableTest {
             final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("DictionaryVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();

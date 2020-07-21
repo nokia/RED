@@ -45,8 +45,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     @BeforeAll
     public static void setup() throws Exception {
         final Path path = getFile("presenter//DocPositionsFind.robot");
-        final RobotParser parser = new RobotParser(new RobotProjectHolder(new RobotRuntimeEnvironment(null, "2.9.0")),
-                new RobotVersion(2, 9));
+        final RobotParser parser = new RobotParser(new RobotProjectHolder(new RobotRuntimeEnvironment(null, "3.0.0")),
+                new RobotVersion(3, 0));
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(path, parser);
         out = modelFile.getParent();
         assertThat(out).isNotNull();

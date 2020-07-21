@@ -17,12 +17,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsSuiteDocumentationTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateSuiteDoc(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptySuiteDocumentationDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -38,7 +40,7 @@ public class CreationOfSettingsSuiteDocumentationTest {
     public void test_emptyFile_createSuiteDoc_andAddComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("SuiteDocumentationDeclarationWithCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -64,7 +66,7 @@ public class CreationOfSettingsSuiteDocumentationTest {
     public void test_emptyFile_createSuiteDoc_withText(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("SuiteDocumentationDeclarationWithTextOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -90,7 +92,7 @@ public class CreationOfSettingsSuiteDocumentationTest {
     public void test_emptyFile_createSuiteDoc_withMultipleLines(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptySuiteDocumentationThreeLines", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -108,7 +110,7 @@ public class CreationOfSettingsSuiteDocumentationTest {
     public void test_emptyFile_createSuiteDoc_withTextAndComment(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("SuiteDocumentationDeclarationWithTextAndCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

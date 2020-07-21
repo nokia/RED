@@ -108,7 +108,7 @@ public class RobotArtifactsBuilderTest {
     public void deprecatedRobotProblemIsReported_whenPythonInstallationIsNotDeprecated() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(project));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
-                "Robot Framework 2.8.2 (Python 2.7.1 on win32)");
+                "Robot Framework 2.9.2 (Python 2.7.1 on win32)");
         builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
@@ -119,21 +119,11 @@ public class RobotArtifactsBuilderTest {
     public void deprecatedRobotProblemIsReported_whenPythonInstallationIsDeprecated() throws Exception {
         final RobotProject robotProject = spy(model.createRobotProject(project));
         final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
-                "Robot Framework 2.8.2 (Python 2.6.1 on win32)");
+                "Robot Framework 2.9.2 (Python 2.6.1 on win32)");
         builder.checkRuntimeEnvironment(env, robotProject, reporter);
 
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(ProjectConfigurationProblem.ENVIRONMENT_DEPRECATED_ROBOT, new ProblemPosition(1)));
-    }
-
-    @Test
-    public void noProblemsAreReported_whenRobotInstallationIsNotDeprecated() throws Exception {
-        final RobotProject robotProject = spy(model.createRobotProject(project));
-        final IRuntimeEnvironment env = new RobotRuntimeEnvironment(null,
-                "Robot Framework 2.9 (Python 2.7.1 on win32)");
-        builder.checkRuntimeEnvironment(env, robotProject, reporter);
-
-        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test

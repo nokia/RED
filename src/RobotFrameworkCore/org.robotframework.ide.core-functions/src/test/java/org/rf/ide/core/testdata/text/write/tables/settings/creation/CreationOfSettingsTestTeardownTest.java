@@ -16,12 +16,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsTestTeardownTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateTestTeardown(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyTestTeardownDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -37,7 +39,7 @@ public class CreationOfSettingsTestTeardownTest {
     public void test_emptyFile_createTestTeardown_andAddComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTeardownDeclarationWithCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -63,7 +65,7 @@ public class CreationOfSettingsTestTeardownTest {
     public void test_emptyFile_createTestTeardown_andKeywordOnly(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTeardownDeclarationWithKeywordOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -84,7 +86,7 @@ public class CreationOfSettingsTestTeardownTest {
     public void test_emptyFile_createTestTeardown_andKeyword_andComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTeardownDeclarationWithKeywordCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -115,7 +117,7 @@ public class CreationOfSettingsTestTeardownTest {
     public void test_emptyFile_createTestTeardown_andKeyword_andThreeArgs(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTeardownDeclarationWithKeyword3ArgsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -147,7 +149,7 @@ public class CreationOfSettingsTestTeardownTest {
             throws Exception {
         // prepare
         final String fileName = convert("TestTeardownDeclarationWithKeyword3ArgsAndCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

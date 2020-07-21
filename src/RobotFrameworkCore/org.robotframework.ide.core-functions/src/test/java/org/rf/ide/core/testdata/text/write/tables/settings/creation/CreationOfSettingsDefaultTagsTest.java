@@ -16,12 +16,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsDefaultTagsTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateDefaultTags(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyDefaultTagsDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -36,7 +38,7 @@ public class CreationOfSettingsDefaultTagsTest {
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateDefaultTagsWithThreeTags(final FileFormat format) throws Exception {
         // prepare
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
         final String fileName = convert("DefaultTagsWithThreeTagsOnly", format);
 
         // test data prepare
@@ -62,7 +64,7 @@ public class CreationOfSettingsDefaultTagsTest {
     public void test_emptyFile_and_thanCreateDefaultTagsWithThreeComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("DefaultTagsWithThreeCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -88,7 +90,7 @@ public class CreationOfSettingsDefaultTagsTest {
             throws Exception {
         // prepare
         final String fileName = convert("DefaultTagsWithThreeTagsAndCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

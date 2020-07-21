@@ -29,7 +29,7 @@ public class TestCaseRemoveElementsTest {
 
     @BeforeEach
     public void setUp() {
-        final RobotFileOutput out = new RobotFileOutput(RobotVersion.from("2.9.0"));
+        final RobotFileOutput out = new RobotFileOutput(RobotVersion.from("3.0.0"));
         out.getFileModel().includeTestCaseTableSection();
         testCase = new TestCase(new RobotToken());
         out.getFileModel().getTestCaseTable().addTest(testCase);

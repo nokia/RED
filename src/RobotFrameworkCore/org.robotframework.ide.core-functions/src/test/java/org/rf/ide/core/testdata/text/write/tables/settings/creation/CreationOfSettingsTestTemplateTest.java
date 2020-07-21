@@ -16,12 +16,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsTestTemplateTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateTestTemplate(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyTestTemplateDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -37,7 +39,7 @@ public class CreationOfSettingsTestTemplateTest {
     public void test_emptyFile_createTestTemplate_andAddComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTemplateDeclarationWithCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -63,7 +65,7 @@ public class CreationOfSettingsTestTemplateTest {
     public void test_emptyFile_createTestTemplate_withKeywordName(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTemplateDeclarationWithKeywordOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -84,7 +86,7 @@ public class CreationOfSettingsTestTemplateTest {
     public void test_emptyFile_createTestTemplate_withKeywordName_andComment(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("TestTemplateDeclarationWithKeywordCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -116,7 +118,7 @@ public class CreationOfSettingsTestTemplateTest {
             throws Exception {
         // prepare
         final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -149,7 +151,7 @@ public class CreationOfSettingsTestTemplateTest {
             throws Exception {
         // prepare
         final String fileName = convert("TestTemplateDeclarationWithKeyword3UnwantedArgsCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

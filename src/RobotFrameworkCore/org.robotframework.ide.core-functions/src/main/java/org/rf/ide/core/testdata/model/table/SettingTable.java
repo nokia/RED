@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.TemplateSetting;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
@@ -38,15 +38,7 @@ import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
-import org.rf.ide.core.testdata.model.table.setting.views.DefaultTagsView;
-import org.rf.ide.core.testdata.model.table.setting.views.ForceTagsView;
 import org.rf.ide.core.testdata.model.table.setting.views.SuiteDocumentationView;
-import org.rf.ide.core.testdata.model.table.setting.views.SuiteSetupView;
-import org.rf.ide.core.testdata.model.table.setting.views.SuiteTeardownView;
-import org.rf.ide.core.testdata.model.table.setting.views.TestSetupView;
-import org.rf.ide.core.testdata.model.table.setting.views.TestTeardownView;
-import org.rf.ide.core.testdata.model.table.setting.views.TestTemplateView;
-import org.rf.ide.core.testdata.model.table.setting.views.TestTimeoutView;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -260,11 +252,6 @@ public class SettingTable extends ARobotSectionTable {
         metadatas.remove(metadata);
     }
 
-    public List<SuiteSetup> getSuiteSetupsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, suiteSetups, SuiteSetupView::new);
-    }
-
     public List<SuiteSetup> getSuiteSetups() {
         return Collections.unmodifiableList(suiteSetups);
     }
@@ -287,11 +274,6 @@ public class SettingTable extends ARobotSectionTable {
 
     public void removeSuiteSetup() {
         suiteSetups.clear();
-    }
-
-    public List<SuiteTeardown> getSuiteTeardownsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, suiteTeardowns, SuiteTeardownView::new);
     }
 
     public List<SuiteTeardown> getSuiteTeardowns() {
@@ -329,11 +311,6 @@ public class SettingTable extends ARobotSectionTable {
         return tags;
     }
 
-    public List<ForceTags> getForceTagsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, forceTags, ForceTagsView::new);
-    }
-
     public List<ForceTags> getForceTags() {
         return Collections.unmodifiableList(forceTags);
     }
@@ -345,11 +322,6 @@ public class SettingTable extends ARobotSectionTable {
 
     public void removeForceTags() {
         forceTags.clear();
-    }
-
-    public List<DefaultTags> getDefaultTagsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, defaultTags, DefaultTagsView::new);
     }
 
     public List<DefaultTags> getDefaultTags() {
@@ -374,11 +346,6 @@ public class SettingTable extends ARobotSectionTable {
 
     public void removeDefaultTags() {
         defaultTags.clear();
-    }
-
-    public List<TestSetup> getTestSetupsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, testSetups, TestSetupView::new);
     }
 
     public List<TestSetup> getTestSetups() {
@@ -428,11 +395,6 @@ public class SettingTable extends ARobotSectionTable {
         taskSetups.clear();
     }
 
-    public List<TestTeardown> getTestTeardownsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, testTeardowns, TestTeardownView::new);
-    }
-
     public List<TestTeardown> getTestTeardowns() {
         return Collections.unmodifiableList(testTeardowns);
     }
@@ -478,11 +440,6 @@ public class SettingTable extends ARobotSectionTable {
 
     public void removeTaskTeardown() {
         taskTeardowns.clear();
-    }
-
-    public List<TestTemplate> getTestTemplatesViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, testTemplates, TestTemplateView::new);
     }
 
     public List<TestTemplate> getTestTemplates() {
@@ -570,11 +527,6 @@ public class SettingTable extends ARobotSectionTable {
 
     public void removeTaskTemplate() {
         taskTemplates.clear();
-    }
-
-    public List<TestTimeout> getTestTimeoutsViews() {
-        final RobotVersion version = getVersion();
-        return MultipleSettingsViewsCreator.createView(version, this, testTimeouts, TestTimeoutView::new);
     }
 
     public List<TestTimeout> getTestTimeouts() {

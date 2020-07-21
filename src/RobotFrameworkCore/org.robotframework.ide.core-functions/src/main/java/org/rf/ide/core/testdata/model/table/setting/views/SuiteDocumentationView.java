@@ -17,7 +17,7 @@ public class SuiteDocumentationView extends SuiteDocumentation {
     public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs) {
         super(suiteDocs.get(0).getDeclaration());
         this.suiteDocs = suiteDocs;
-        
+
         initialize();
     }
 

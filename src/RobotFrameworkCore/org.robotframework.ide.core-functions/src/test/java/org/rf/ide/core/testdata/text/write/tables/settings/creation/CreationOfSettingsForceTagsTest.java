@@ -16,12 +16,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsForceTagsTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateForceTags(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyForceTagsDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -37,7 +39,7 @@ public class CreationOfSettingsForceTagsTest {
     public void test_emptyFile_and_thanCreateForceTagsWithThreeTags(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("ForceTagsWithThreeTagsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -62,7 +64,7 @@ public class CreationOfSettingsForceTagsTest {
     public void test_emptyFile_and_thanCreateForceTagsWithThreeComments(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("ForceTagsWithThreeCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();
@@ -88,7 +90,7 @@ public class CreationOfSettingsForceTagsTest {
             throws Exception {
         // prepare
         final String fileName = convert("ForceTagsWithThreeTagsAndCommentsOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeSettingTableSection();

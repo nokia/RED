@@ -16,12 +16,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfVariableTableHeaderTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateVariableHeaderOnly(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("VariablesHeaderOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -36,7 +38,7 @@ public class CreationOfVariableTableHeaderTest {
             throws Exception {
         // prepare
         final String fileName = convert("VariablesHeaderWithColumns", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -58,7 +60,7 @@ public class CreationOfVariableTableHeaderTest {
             throws Exception {
         // prepare
         final String fileName = convert("VariablesHeaderWithComments", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -80,7 +82,7 @@ public class CreationOfVariableTableHeaderTest {
             final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("VariablesHeaderWithColumnsAndComments", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();

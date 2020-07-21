@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
@@ -23,9 +22,6 @@ import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.agent.event.VariablesEvent;
-import org.rf.ide.core.execution.agent.event.VersionsEvent;
-import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
-import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
 import org.rf.ide.core.execution.debug.contexts.CaseContext;
 import org.rf.ide.core.execution.debug.contexts.ForLoopContext;
@@ -33,8 +29,6 @@ import org.rf.ide.core.execution.debug.contexts.ForLoopIterationContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-
-import com.google.common.annotations.VisibleForTesting;
 
 public class StacktraceBuilder extends RobotDefaultAgentEventListener {
 
@@ -44,8 +38,6 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
 
     private final RobotBreakpointSupplier breakpointSupplier;
 
-    private KeywordsTypesFixer keywordsTypesFixer;
-
     private final Set<URI> currentlyImportedResources = new LinkedHashSet<>();
 
     public StacktraceBuilder(final Stacktrace stacktrace, final ElementsLocator locator,
@@ -53,19 +45,6 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         this.stacktrace = stacktrace;
         this.locator = locator;
         this.breakpointSupplier = breakpointSupplier;
-    }
-
-    @VisibleForTesting
-    KeywordsTypesFixer getKeywordsTypesFixer() {
-        return keywordsTypesFixer;
-    }
-
-    @Override
-    public void handleVersions(final VersionsEvent event) {
-        final RobotVersion version = RobotVersion.from(event.getRobotVersion());
-        this.keywordsTypesFixer = version.isOlderThan(new RobotVersion(3, 0))
-                ? new KeywordsTypesForRf29Fixer()
-                : new KeywordsTypesFixer();
     }
 
     @Override
@@ -94,8 +73,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleKeywordAboutToStart(final KeywordStartedEvent event) {
-        final StackFrameContext context = stacktrace.peekCurrentFrame().map(StackFrame::getContext).orElse(null);
-        final RunningKeyword keyword = keywordsTypesFixer.keywordStarting(event.getRunningKeyword(), context);
+        final RunningKeyword keyword = event.getRunningKeyword();
 
         stacktrace.peekCurrentFrame().ifPresent(frame -> frame.moveToKeyword(keyword, breakpointSupplier));
     }
@@ -104,7 +82,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     public void handleKeywordStarted(final KeywordStartedEvent event) {
         final String keywordName = event.getName();
         final String libraryName = event.getLibraryName();
-        final RunningKeyword keyword = keywordsTypesFixer.keywordStarted(event.getRunningKeyword());
+        final RunningKeyword keyword = event.getRunningKeyword();
 
         final URI currentSuitePath = stacktrace.getPath(keyword.isSetup() || keyword.isTeardown()).orElse(null);
         
@@ -160,8 +138,6 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     @Override
     public void handleKeywordEnded(final KeywordEndedEvent event) {
         stacktrace.peekCurrentFrame().ifPresent(frame -> frame.moveOutOfKeyword());
-
-        keywordsTypesFixer.keywordEnded();
     }
 
     @Override

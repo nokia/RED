@@ -19,7 +19,7 @@ public class KeywordTagsRecognizer extends AExecutableElementSettingsRecognizer 
 
     @Override
     public boolean isApplicableFor(final RobotVersion robotVersion) {
-        return robotVersion != null && robotVersion.isNewerOrEqualTo(new RobotVersion(2, 9));
+        return robotVersion != null;
     }
 
     @Override

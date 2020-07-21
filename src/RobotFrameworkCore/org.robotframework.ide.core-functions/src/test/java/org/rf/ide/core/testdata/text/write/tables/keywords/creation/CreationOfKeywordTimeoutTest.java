@@ -17,6 +17,8 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfKeywordTimeoutTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateKeywordTimeout_withoutKeywordName_andTimeoutDecOnly(
@@ -35,7 +37,7 @@ public class CreationOfKeywordTimeoutTest {
             final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();
@@ -69,7 +71,7 @@ public class CreationOfKeywordTimeoutTest {
             final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();
@@ -107,7 +109,7 @@ public class CreationOfKeywordTimeoutTest {
             final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();
@@ -145,7 +147,7 @@ public class CreationOfKeywordTimeoutTest {
             final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();
@@ -184,7 +186,7 @@ public class CreationOfKeywordTimeoutTest {
             final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();
@@ -225,7 +227,7 @@ public class CreationOfKeywordTimeoutTest {
             final String userKeywordName, final FileFormat format) throws Exception {
         // prepare
         final String filePath = convert(fileNameWithoutExt, format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeKeywordTableSection();

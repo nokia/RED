@@ -13,7 +13,6 @@ import org.rf.ide.core.environment.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.DefaultTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ForceTagsRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.LibraryDeclarationRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.settings.MetaRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.MetadataRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.ResourceDeclarationRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.settings.SettingDocumentRecognizer;
@@ -45,7 +44,7 @@ public class SettingsRecognizersProvider {
             new ResourceDeclarationRecognizer(),
 
             new SettingDocumentationRecognizer(), new SettingDocumentRecognizer(),
-            new MetadataRecognizer(), new MetaRecognizer(),
+            new MetadataRecognizer(),
             new SuiteSetupRecognizer(), new SuiteTeardownRecognizer(),
             new SuitePreconditionRecognizer(), new SuitePostconditionRecognizer(),
             new ForceTagsRecognizer(), new DefaultTagsRecognizer(),

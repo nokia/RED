@@ -24,7 +24,7 @@ public class UpdateOfSettingsSuiteSetupTest {
 
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
-    public void test_createArgumentOnPosition_2and3_whichNotExists_shouldReturnSingleLineSuiteSetup(
+    public void test_createArgumentOnPosition_2and3_whichNotExists_shouldReturnTwoSuiteSetupsWithArgs(
             final FileFormat format) throws Exception {
         // prepare
         final String inFileName = convert("Input_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition", format);
@@ -32,19 +32,23 @@ public class UpdateOfSettingsSuiteSetupTest {
                 format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
-        final SuiteSetup suiteSetup = settingTable.getSuiteSetupsViews().get(0);
-        suiteSetup.setArgument(2, "arg3");
-        suiteSetup.setArgument(3, "");
+        final SuiteSetup suiteSetup1 = settingTable.getSuiteSetups().get(0);
+        final SuiteSetup suiteSetup2 = settingTable.getSuiteSetups().get(1);
+        suiteSetup2.setArgument(2, "arg3");
+        suiteSetup2.setArgument(3, "");
 
         // verify
-        assertThat(settingTable.getSuiteSetups()).hasSize(1);
-        final SuiteSetup suiteSetupCurrent = settingTable.getSuiteSetups().get(0);
-        assertThat(suiteSetupCurrent).isSameAs(suiteSetup);
-        assertThat(suiteSetupCurrent.getArguments()).hasSize(4);
+        assertThat(settingTable.getSuiteSetups()).hasSize(2);
+        final SuiteSetup suiteSetupCurrent1 = settingTable.getSuiteSetups().get(0);
+        final SuiteSetup suiteSetupCurrent2 = settingTable.getSuiteSetups().get(1);
+        assertThat(suiteSetupCurrent1).isSameAs(suiteSetup1);
+        assertThat(suiteSetupCurrent2).isSameAs(suiteSetup2);
+        assertThat(suiteSetupCurrent1.getArguments()).isEmpty();
+        assertThat(suiteSetupCurrent2.getArguments()).hasSize(4);
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
@@ -56,7 +60,7 @@ public class UpdateOfSettingsSuiteSetupTest {
         final String outputFileName = convert("Output_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -75,7 +79,7 @@ public class UpdateOfSettingsSuiteSetupTest {
         final String outputFileName = convert("Output_KeywordSetNoOtherElements", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -94,7 +98,7 @@ public class UpdateOfSettingsSuiteSetupTest {
         final String outputFileName = convert("Output_CommentSetNoOtherElements", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -123,7 +127,7 @@ public class UpdateOfSettingsSuiteSetupTest {
         final String outputFileName = convert("Output_KeywordExistsAndCommentSetNoOtherElements", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();
@@ -152,7 +156,7 @@ public class UpdateOfSettingsSuiteSetupTest {
         final String outputFileName = convert("Ouput_KeywordArgumentInDifferentLine", format);
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
-                RobotModelTestProvider.getParser("2.9"));
+                RobotModelTestProvider.getParser());
 
         // test data prepare
         final SettingTable settingTable = modelFile.getSettingTable();

@@ -39,7 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateLinked
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.JoinTemplateNameFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveSettingFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveSettingValuesExceptFirstFixer;
 
@@ -139,28 +138,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveSettingFixer());
-        }
-    },
-    DUPLICATED_SETTING_OLD {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DEPRECATED_API;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is duplicated. Line continuation (...) should be used instead";
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new ChangeToFixer("..."));
         }
     },
     INVALID_NUMBER_OF_SETTING_VALUES {
@@ -569,28 +546,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveSettingValuesExceptFirstFixer("Remove Test Timeout message"));
-        }
-    },
-    METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_29 {
-
-        @Override
-        public ProblemCategory getProblemCategory() {
-            return ProblemCategory.DEPRECATED_API;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting metadata using key in first column syntax is deprecated in RF 2.9 and removed in RF 3.0";
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new MetadataKeyInSameColumnFixer());
         }
     },
     DEPRECATED_SETTING_NAME {

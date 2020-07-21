@@ -73,13 +73,13 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         for (final ATags<?> tagSetting : getTagsSettings(settingsTable)) {
             elements.add(new RobotSetting(this, tagSetting));
         }
-        for (final TestTemplate templateSetting : settingsTable.getTestTemplatesViews()) {
+        for (final TestTemplate templateSetting : settingsTable.getTestTemplates()) {
             elements.add(new RobotSetting(this, templateSetting));
         }
         for (final TaskTemplate templateSetting : settingsTable.getTaskTemplates()) {
             elements.add(new RobotSetting(this, templateSetting));
         }
-        for (final TestTimeout timeoutSetting : settingsTable.getTestTimeoutsViews()) {
+        for (final TestTimeout timeoutSetting : settingsTable.getTestTimeouts()) {
             elements.add(new RobotSetting(this, timeoutSetting));
         }
         for (final TaskTimeout timeoutSetting : settingsTable.getTaskTimeouts()) {
@@ -242,11 +242,11 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
         final List<AKeywordBaseSetting<?>> elements = new ArrayList<>();
 
-        settingTable.getSuiteSetupsViews().stream().findFirst().ifPresent(elements::add);
-        settingTable.getSuiteTeardownsViews().stream().findFirst().ifPresent(elements::add);
-        settingTable.getTestSetupsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getSuiteSetups().stream().findFirst().ifPresent(elements::add);
+        settingTable.getSuiteTeardowns().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTestSetups().stream().findFirst().ifPresent(elements::add);
         settingTable.getTaskSetups().stream().findFirst().ifPresent(elements::add);
-        settingTable.getTestTeardownsViews().stream().findFirst().ifPresent(elements::add);
+        settingTable.getTestTeardowns().stream().findFirst().ifPresent(elements::add);
         settingTable.getTaskTeardowns().stream().findFirst().ifPresent(elements::add);
 
         return elements;
@@ -255,8 +255,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     private static List<? extends ATags<?>> getTagsSettings(final SettingTable settingTable) {
         final List<ATags<?>> elements = new ArrayList<>();
 
-        settingTable.getForceTagsViews().forEach(elements::add);
-        settingTable.getDefaultTagsViews().forEach(elements::add);
+        settingTable.getForceTags().forEach(elements::add);
+        settingTable.getDefaultTags().forEach(elements::add);
 
         return elements;
     }

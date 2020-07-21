@@ -19,12 +19,14 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfScalarVariableTest {
 
+    private static final String ROBOT_VERSION = "3.0";
+
     @ParameterizedTest
     @EnumSource(value = FileFormat.class, names = { "TXT_OR_ROBOT", "TSV" })
     public void test_emptyFile_and_thanCreateScalarVariable(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("EmptyScalarVariableDeclarationOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -40,7 +42,7 @@ public class CreationOfScalarVariableTest {
     public void test_emptyFile_and_thanCreateScalarVariable_andComment(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationWithCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -59,7 +61,7 @@ public class CreationOfScalarVariableTest {
     public void test_emptyFile_and_thanCreateScalarVariable_andOneValue(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationAndOneValueOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -79,7 +81,7 @@ public class CreationOfScalarVariableTest {
             throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationAndOneValueAndCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -101,7 +103,7 @@ public class CreationOfScalarVariableTest {
     public void test_emptyFile_and_thanCreateScalarVariable_andThreeValues(final FileFormat format) throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationAnd3ValueOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -123,7 +125,7 @@ public class CreationOfScalarVariableTest {
             throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationAnd3ValueAndCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
@@ -148,7 +150,7 @@ public class CreationOfScalarVariableTest {
             throws Exception {
         // prepare
         final String fileName = convert("ScalarVariableDeclarationAndEmptyValueAndCommentOnly", format);
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify(ROBOT_VERSION);
 
         // test data prepare
         modelFile.includeVariableTableSection();
