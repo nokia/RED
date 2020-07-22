@@ -140,13 +140,14 @@ public class RedImportProposalsTest {
                 "Library  StdLib1",
                 "Library  RefLib1",
                 "Resource  res1.robot",
+                "Resource  dir${/}res2.robot",
                 "Resource  other.robot",
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
         final RedImportProposals proposalsProvider = new RedImportProposals(suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("");
-        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("StdLib1", "other", "res1");
+        assertThat(proposals).extracting(AssistProposal::getLabel).containsExactly("StdLib1", "other", "res1", "res2");
     }
 
     @Test

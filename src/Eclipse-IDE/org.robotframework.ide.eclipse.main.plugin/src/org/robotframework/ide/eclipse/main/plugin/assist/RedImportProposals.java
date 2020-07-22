@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.rf.ide.core.libraries.LibrarySpecification;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
@@ -63,9 +64,11 @@ public class RedImportProposals {
             }
         }
 
+        final Map<String, String> mappings = suiteFile.getRobotProject().getRobotProjectHolder().getVariableMappings();
         final List<RedImportProposal> resProposals = new ArrayList<>();
         for (final String path : suiteFile.getResourcesPaths()) {
-            final String nameToUse = Files.getNameWithoutExtension(path);
+            String nameToUse = RobotExpressions.isParameterized(path) ? RobotExpressions.resolve(mappings, path) : path;
+            nameToUse = Files.getNameWithoutExtension(nameToUse);
 
             final BddMatchesHelper bddHelper = new BddMatchesHelper(matcher);
             final BddAwareProposalMatch match = bddHelper.findBddAwareMatch(userContent, nameToUse);
