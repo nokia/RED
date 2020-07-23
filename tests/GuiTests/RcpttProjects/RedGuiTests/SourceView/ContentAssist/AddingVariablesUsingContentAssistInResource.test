@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9rWNQHf-EeWYifgNPLzx_Q
-Runtime-Version: 2.3.0.201806262310
-Save-Time: 12/10/18 11:00 AM
+Runtime-Version: 2.5.0.202001211718
+Save-Time: 7/23/20 7:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -114,5 +114,67 @@ with [get-editor "resource_file.robot" | get-text-viewer] {
 	key-type Esc
 	
 }
+
+
+//RED-915 bug
+
+// add kw to resource file
+get-editor "resource_file.robot" | get-text-viewer | set-text  "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    log  7" 
+get-editor "resource_file.robot" | get-text-viewer | key-type "M1+s"
+
+//move resource to folder
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/resource_file.robot"
+    get-item -path "RobotProject/resource_file.robot" | drag-start 48 11
+    get-item -path "RobotProject/red.xml" | drag-enter 45 5 -detail move
+    get-item -path "RobotProject/red.xml" | drag-over 45 0
+    get-item -path "RobotProject/TestSuiteFolder" | drag-over 43 7 -detail move
+    get-item -path "RobotProject/red.xml" | drag-exit
+    get-item -path "RobotProject/TestSuiteFolder" | drag-accept 43 7 -detail move
+    drag-set-data
+    get-item -path "RobotProject/TestSuiteFolder" | drop 43 7 -detail move
+    drag-end -detail move
+}
+
+//open suite and add resource in settings
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"  
+    | double-click
+    
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Resource  TestSuiteFolder${/}resource_file.robot\n"
+    + "*** Test Cases ***\n"
+    + "tc" 
+    
+//type resource name and check CA
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 3
+    key-type Enter
+    type-text reso
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Import Resource - BuiltIn" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "resource_file" | verify-true
+}
+
+//select resource and check if KW name is visible in CA
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "resource_file" | click 
+    -default
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "kw 1 - resource_file.robot" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "kw 1 - resource_file.robot" 
+    | click -default
+    
+//check suite    
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Resource  TestSuiteFolder${/}resource_file.robot\n"
+    + "*** Test Cases ***\n"
+    + "tc\n"
+    + "    resource_file.kw 1" | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
