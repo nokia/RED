@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.5.0.202001211718
-Save-Time: 4/17/20 6:44 PM
+Save-Time: 7/23/20 6:56 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -90,12 +90,7 @@ exec-with-options -disableJobWaiting -command {
 		    get-property "getItems().TreeItem[1].getText()" | equals "Automatic Variables" | verify-true
 		}
 		
-		
-		if [$robot_version | matches "^Robot Framework 2\.8\.\d .*"] {	
-			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
-		}-else{
-			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals [plus $index 1] | verify-true
-		}
+		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals [plus $index 1] | verify-true
 		
 		check-items-in-thred-view -index [plus $index 1 ] -line 7
 			
