@@ -25,8 +25,7 @@ public class KeywordPostconditionRecognizer extends ATokenRecognizer {
     public boolean isApplicableFor(final RobotVersion robotVersion) {
         // [Postcondition] is working in 3.0, however warning is shown that
         // it is deprecated and finally this setting is removed from 3.1
-        return robotVersion.isNewerOrEqualTo(new RobotVersion(3, 0))
-                && robotVersion.isOlderThan(new RobotVersion(3, 1));
+        return robotVersion.isOlderThan(new RobotVersion(3, 1));
     }
 
     @Override

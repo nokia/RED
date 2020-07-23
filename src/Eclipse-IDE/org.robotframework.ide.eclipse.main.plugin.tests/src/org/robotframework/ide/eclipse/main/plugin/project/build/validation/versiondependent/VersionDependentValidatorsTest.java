@@ -34,12 +34,6 @@ public class VersionDependentValidatorsTest {
     public static class GeneralSettingsTableValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getGeneralSettingsTableValidators("2.9")).hasSize(2)
-                    .hasOnlyElementsOfTypes(TemplateSettingUntilRf31Validator.class);
-        }
-
-        @Test
         public void properValidatorsAreReturnedForVersion30() {
             assertThat(getGeneralSettingsTableValidators("3.0.4")).hasSize(19)
                     .hasOnlyElementsOfTypes(DeprecatedGeneralSettingsTableHeaderValidator.class,
@@ -75,11 +69,6 @@ public class VersionDependentValidatorsTest {
     public static class KeywordTableValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getKeywordTableValidators("2.9")).isEmpty();
-        }
-
-        @Test
         public void properValidatorsAreReturnedForVersion30() {
             assertThat(getKeywordTableValidators("3.0.4")).hasSize(1)
                     .hasOnlyElementsOfTypes(DeprecatedKeywordTableHeaderValidator.class);
@@ -104,11 +93,6 @@ public class VersionDependentValidatorsTest {
 
     @Nested
     public static class TestValidatorsTest {
-
-        @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getTestCaseValidators("2.9")).isEmpty();
-        }
 
         @Test
         public void properValidatorsAreReturnedForVersion30() {
@@ -145,12 +129,6 @@ public class VersionDependentValidatorsTest {
 
     @Nested
     public static class TestCaseSettingsValidatorsTest {
-
-        @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getTestCaseSettingsValidators("2.9")).hasSize(1)
-                    .hasOnlyElementsOfTypes(TemplateSettingUntilRf31Validator.class);
-        }
 
         @Test
         public void properValidatorsAreReturnedForVersion30() {
@@ -191,11 +169,6 @@ public class VersionDependentValidatorsTest {
     public static class TaskValidatorsTest {
 
         @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getTaskValidators("2.9")).isEmpty();
-        }
-
-        @Test
         public void properValidatorsAreReturnedForVersion30() {
             assertThat(getTaskValidators("3.0.4")).isEmpty();
         }
@@ -229,12 +202,6 @@ public class VersionDependentValidatorsTest {
 
     @Nested
     public static class TaskSettingsValidatorsTest {
-
-        @Test
-        public void properValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getTaskSettingsValidators("2.9")).hasSize(1)
-                    .hasOnlyElementsOfTypes(TemplateSettingUntilRf31Validator.class);
-        }
 
         @Test
         public void properValidatorsAreReturnedForVersion30() {
@@ -272,11 +239,6 @@ public class VersionDependentValidatorsTest {
 
     @Nested
     public static class KeywordSettingsValidatorsTest {
-
-        @Test
-        public void noValidatorsAreReturnedForVersionUnder30() {
-            assertThat(getKeywordSettingsValidators("2.9")).isEmpty();
-        }
 
         @Test
         public void properValidatorsAreReturnedForVersion30() {
