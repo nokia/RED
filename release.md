@@ -1,3 +1,30 @@
+# RED - Robot Editor v0.9.5
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Photon (v 4.8) or newer  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+For RED feature installed on Eclipse Neon or earlier, please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
+
+## Notable updates
+- Update platform to eclipse 2020-06
+- Drop support for eclipse Oxygen
+- Drop support for Robot Framework 2.9
+
+
+## GitHub issues updates
+ - #377 Test Runner Agent can't connect to RED server when running with default listener connection type setting
+ - #309 Unhandled event loop exception
+ - #372 Main feature contains an empty README.txt root file
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.9.4
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 

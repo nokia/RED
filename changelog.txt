@@ -1,3 +1,28 @@
+RED 0.9.5 - 2020/07/24
+
+Enhancement
+
+	[RED-1286] - Adding error for "..." KW/TC name
+	[RED-1404] - Variables in assignments is not validated for = character
+	[RED-1419] - Quick Fix - show message about empty fixer
+	[RED-1437] - [GitHub #377] Launch configuration to use custom connection settings from preferences
+
+Bug
+
+	[RED-915] - Content assist - incorrect resource proposal when separator variable used in import
+	[RED-1015] - Missing link when variable is in path in Variable Mapping for Libraries
+	[RED-1165] - Adding QF for wrong settings
+	[RED-1418] - Exception after switching to Variable mode in Debug shell
+	[RED-1438] - [GitHub #309] Handle ClassCastException in status bar
+
+Task
+
+	[RED-1019] - Remove RED custom support for Zoom In/Zoom Out
+	[RED-1431] - Drop support for Eclipse Oxygen
+	[RED-1432] - Prepare for Eclipse 2020-06
+	[RED-1433] - Drop support for Robot Framework 2.9.x
+
+
 RED 0.9.4 - 2020/04/28
 
 Feature
