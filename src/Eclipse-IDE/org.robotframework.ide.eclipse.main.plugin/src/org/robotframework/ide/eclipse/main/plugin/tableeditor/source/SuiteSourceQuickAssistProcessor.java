@@ -36,6 +36,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.EmptyCompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfigMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.QuickAssistProvider;
@@ -97,7 +98,12 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         final List<ICompletionProposal> proposals = new ArrayList<>();
         proposals.addAll(computeQuickFixes(invocationContext));
         proposals.addAll(computeQuickAssists(invocationContext));
-        return proposals.isEmpty() ? null : proposals.toArray(new ICompletionProposal[0]);
+        if (proposals.isEmpty()) {
+            // add empty proposal for informative purpose
+            proposals.add(
+                    new EmptyCompletionProposal("No quick fix available", "No quick fix was found for this issue"));
+        }
+        return proposals.toArray(new ICompletionProposal[0]);
     }
 
     private List<ICompletionProposal> computeQuickAssists(
