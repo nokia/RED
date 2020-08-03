@@ -46,3 +46,8 @@ Installation instructions can be found [here](https://github.com/nokia/RED/blob/
 
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/READMEMD/validation.gif "Validation")
 
+
+
+## License
+
+This project is licensed under the Apache-2.0 license - see the [LICENSE](https://github.com/nokia/RED/blob/master/LICENSE).
