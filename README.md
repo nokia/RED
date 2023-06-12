@@ -1,4 +1,9 @@
 # [RED - Robot Editor](http://nokia.github.io/RED/)
+
+## Important
+
+RED is currently not actively developed nor maintained.
+
 ## General information 
 
 RED is modern editor based on Eclipse IDE to provide efficient and comfortable work with [RobotFramework](https://github.com/robotframework/robotframework) testware.
