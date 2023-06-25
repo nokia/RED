@@ -33,7 +33,7 @@ public final class KeywordEndedEvent {
             throw new IllegalArgumentException(
                     "Keyword ended event should have name of keyword and library, keyword type and status");
         }
-        return new KeywordEndedEvent(libOrResourceName, keywordName, keywordType, Status.valueOf(status));
+        return new KeywordEndedEvent(libOrResourceName, keywordName, keywordType, Status.valueOf(status.replace(" ", "_")));
     }
 
     private final String libOrResourceName;
